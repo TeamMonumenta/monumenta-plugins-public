@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
@@ -25,6 +27,7 @@ import pe.project.classes.Utils.EntityUtil;
 import pe.project.classes.Utils.InventoryUtil;
 import pe.project.classes.Utils.ItemUtils;
 import pe.project.classes.Utils.ParticleUtil;
+import pe.project.classes.Utils.PotionUtil.PotionInfo;
 import pe.project.classes.Utils.ScoreboardUtil;
 
 /*
@@ -41,8 +44,6 @@ public class AlchemistClass extends BaseClass {
 	private static double GRUESOME_ALCHEMY_CHANCE = 0.05f;
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
-	private static int GRUESOME_ALCHEMY_DURATION = 11 * 20;
-	private static int GRUESOME_ALCHEMY_EFFECT_LVL = 0;
 	
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
 	private static String PUTRID_FUMES_2_TAG = "PutridFumes2";
@@ -85,22 +86,29 @@ public class AlchemistClass extends BaseClass {
 			int gruesomeAlchemy = ScoreboardUtil.getScoreboardValue(player, "GruesomeAlchemy");
 			if (gruesomeAlchemy > 0) {
 				if (mRandom.nextFloat() < GRUESOME_ALCHEMY_CHANCE) {
-					PotionEffectType type = PotionEffectType.WEAKNESS;
+					int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
+					ItemStack stack = new ItemStack(Material.SPLASH_POTION, count);
 					
 					int rand = mRandom.nextInt(4);
 					if (rand == 0) {
-						type = PotionEffectType.HARM;
+						ItemUtils.setPotionMeta(stack, "Splash Potion of Harming", PotionEffectType.INCREASE_DAMAGE.getColor());
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.HARM, 0, 1));
 					} else if (rand == 1) {
-						type = PotionEffectType.POISON;
+						ItemUtils.setPotionMeta(stack, "Potion of Decay", Color.fromRGB(6178631));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 32 * 20, 0));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WEAKNESS, 32 * 20, 0));
 					} else if (rand == 2) {
-						type = PotionEffectType.SLOW;
+						ItemUtils.setPotionMeta(stack, "Scorpion Venom", Color.fromRGB(4610355));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 18 * 20, 1));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.POISON, 18 * 20, 0));
+					} else {
+						ItemUtils.setPotionMeta(stack, "Lesser Frost Bomb", Color.fromRGB(3294553));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0));
 					}
 					
-					int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
-					ItemStack potions = ItemUtils.createStackedPotions(type, count, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_EFFECT_LVL, "Splash Potion of ???");
-					
 					World world = Bukkit.getWorld(player.getWorld().getName());
-					world.dropItemNaturally(killedEntity.getLocation(), potions);
+					world.dropItemNaturally(killedEntity.getLocation(), stack);
 				}
 			}
 		}
