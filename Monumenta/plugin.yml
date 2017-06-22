@@ -1,0 +1,38 @@
+name: Monumenta-Plugins
+main: pe.project.Main
+version: 1.0
+commands:
+  setServerVersion:
+    permission: monumenta.commands.setsetserverversion
+    description: ""
+    usage: /setServerVersion <version>
+  getServerVersion:
+    permission: monumenta.commands.getsetserverversion
+    description: ""
+    usage: /getServerVersion <version>
+  playTimeStats:
+    description: "Get the current playtime stats of everyone online"
+    usage: /playTimeStats
+  chatRange:
+    description: Set the default chat range that you can hear people from.
+    usage: /chatRange <range>
+  isShitty:
+    permission: monumenta.commands.isshitty
+    description: How sketchy is this person?
+    usage: /isShitty <playerName>
+  refreshPOITimer:
+    permission: monumenta.commands.refreshpoitimer
+    description: refresh an internal score from the scoreboard value.
+    usage: /refreshpoitimer
+  profiling:
+    permission: monumenta.commands.profiling
+    description: Get Profiling info on the running game.
+    usage: /profiling
+  setGuildPrefix:
+    permission: monumenta.commands.setGuildPrefix
+    description: Used to set the prefix tag on a guild
+    usage: /setGuildPrefix <team> <prefix>
+  setPlayerName:
+    permission: monumenta.commands.setPlayerName
+    description: ???
+    usage: N/A

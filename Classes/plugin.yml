@@ -1,0 +1,4 @@
+name: PE-Classes
+main: pe.project.classes.Main
+version: 1.0
+commands:

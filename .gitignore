@@ -1,0 +1,9 @@
+# Eclipse stuff
+.classpath
+.project
+.settings/
+.metadata
+.recommenders
+
+# various other potential build files
+/*/bin/
