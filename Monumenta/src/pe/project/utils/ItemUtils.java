@@ -60,7 +60,8 @@ public class ItemUtils {
             Material.WALL_SIGN,
             Material.WOOD_BUTTON,
             Material.WOOD_DOOR,
-            Material.WORKBENCH);
+            Material.WORKBENCH
+	);
 	
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
