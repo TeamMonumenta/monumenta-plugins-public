@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 
-import pe.project.locations.cities.CityConstants.Cities;
+import pe.project.locations.cities.CityConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
@@ -31,8 +31,8 @@ public class BoatTracking implements EntityTracking {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid()) {
 				Point loc = new Point(boat.getLocation());
-				Cities city = LocationManager.WithinSafeZone(loc);
-				if (city != Cities.None) {
+				SafeZones city = LocationManager.WithinSafeZone(loc);
+				if (city != SafeZones.None) {
 					boatIter.remove();
 					boat.remove();
 				}

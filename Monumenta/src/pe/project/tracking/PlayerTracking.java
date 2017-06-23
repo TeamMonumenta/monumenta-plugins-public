@@ -17,7 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
-import pe.project.locations.cities.CityConstants.Cities;
+import pe.project.locations.cities.CityConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
@@ -46,8 +46,9 @@ public class PlayerTracking implements EntityTracking {
 		while (playerIter.hasNext()) {
 			Player player = playerIter.next();
 			
-			boolean inACity = false;
+			boolean inSafeZone = false;
 			boolean inCapital = false;
+			boolean applyEffects = true;
 			GameMode mode = player.getGameMode();
 			
 			if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
@@ -66,9 +67,9 @@ public class PlayerTracking implements EntityTracking {
 					
 					player.teleport(new Location(player.getWorld(), Constants.SPAWN_POINT.mX, Constants.SPAWN_POINT.mY, Constants.SPAWN_POINT.mZ));
 				} else {
-					Cities city = LocationManager.WithinSafeZone(loc);	
-					if (city == Cities.Capital) {
-						inACity = true;
+					SafeZones city = LocationManager.WithinSafeZone(loc);	
+					if (city == SafeZones.Capital) {
+						inSafeZone = true;
 						inCapital = true;
 						
 						Material mat = world.getBlockAt((int)loc.mX, 10, (int)loc.mZ).getType();
@@ -82,30 +83,36 @@ public class PlayerTracking implements EntityTracking {
 								player.setGameMode(GameMode.SURVIVAL);
 							}
 						}
-					} else if (city != Cities.None) {
-						inACity = true;
+					} else if (city == SafeZones.SiegeOfHighwatch) {
+						inSafeZone = true;
+						applyEffects = false;
+						_transitionToAdventure(player);
+					} else if (city != SafeZones.None) {
+						inSafeZone = true;
 						_transitionToAdventure(player);
 					}
 				}
 				
 				//	Give potion effects to those in a City;
-				if (inACity) {
-					if (inCapital) {
-						player.addPotionEffect(Constants.CAPITAL_SPEED_EFFECT, true);
-					}
-					
-					player.addPotionEffect(Constants.CITY_RESISTENCE_EFFECT, true);
-					
-					PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
-					if (effect != null) {
-						if (effect.getAmplifier() <= 5) {
-							player.removePotionEffect(PotionEffectType.JUMP);
+				if (inSafeZone) {
+					if (applyEffects) {
+						if (inCapital) {
+							player.addPotionEffect(Constants.CAPITAL_SPEED_EFFECT, true);
 						}
-					}
-					
-					int food = ScoreboardUtils.getScoreboardValue(player, "Food");
-					if (food <= 17) {
-						player.addPotionEffect(Constants.CITY_SATURATION_EFFECT, true);
+						
+						player.addPotionEffect(Constants.CITY_RESISTENCE_EFFECT, true);
+						
+						PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
+						if (effect != null) {
+							if (effect.getAmplifier() <= 5) {
+								player.removePotionEffect(PotionEffectType.JUMP);
+							}
+						}
+						
+						int food = ScoreboardUtils.getScoreboardValue(player, "Food");
+						if (food <= 17) {
+							player.addPotionEffect(Constants.CITY_SATURATION_EFFECT, true);
+						}
 					}
 				} else {
 					if (mode == GameMode.ADVENTURE) {

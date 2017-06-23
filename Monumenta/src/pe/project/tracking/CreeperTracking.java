@@ -10,7 +10,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
 import pe.project.utils.ParticleUtils;
-import pe.project.locations.cities.CityConstants.Cities;
+import pe.project.locations.cities.CityConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
@@ -39,9 +39,9 @@ public class CreeperTracking implements EntityTracking {
 					snuggles = tags.contains("Snuggles");
 				}
 				
-				Cities city = LocationManager.WithinSafeZone(loc);
-				if (city != Cities.None) {
-					if (city == Cities.Farr) {
+				SafeZones city = LocationManager.WithinSafeZone(loc);
+				if (city != SafeZones.None) {
+					if (city == SafeZones.Farr) {
 						if (!snuggles) {
 							creeperIter.remove();
 							creeper.remove();

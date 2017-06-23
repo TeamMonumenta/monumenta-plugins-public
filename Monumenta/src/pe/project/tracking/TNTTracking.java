@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.TNTPrimed;
 
-import pe.project.locations.cities.CityConstants.Cities;
+import pe.project.locations.cities.CityConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
@@ -31,8 +31,8 @@ public class TNTTracking implements EntityTracking {
 			TNTPrimed tnt = tntIter.next();
 			if (tnt != null && tnt.isValid()) {
 				Point loc = new Point(tnt.getLocation());
-				Cities city = LocationManager.WithinSafeZone(loc);
-				if (city != Cities.None) {
+				SafeZones city = LocationManager.WithinSafeZone(loc);
+				if (city != SafeZones.None) {
 					tnt.remove();
 					tntIter.remove();
 				}
