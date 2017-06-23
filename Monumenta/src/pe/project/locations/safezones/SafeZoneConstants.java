@@ -1,9 +1,9 @@
-package pe.project.locations.cities;
+package pe.project.locations.safezones;
 
 import pe.project.point.AreaBounds;
 import pe.project.point.Point;
 
-public class CityConstants {
+public class SafeZoneConstants {
 	public enum SafeZones {
 		None(-1),
 		Capital(0),

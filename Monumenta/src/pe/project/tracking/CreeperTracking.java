@@ -10,7 +10,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
 import pe.project.utils.ParticleUtils;
-import pe.project.locations.cities.CityConstants.SafeZones;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 

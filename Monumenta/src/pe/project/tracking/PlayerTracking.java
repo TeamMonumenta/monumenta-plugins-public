@@ -17,7 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
-import pe.project.locations.cities.CityConstants.SafeZones;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;

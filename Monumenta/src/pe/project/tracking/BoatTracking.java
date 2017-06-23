@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 
-import pe.project.locations.cities.CityConstants.SafeZones;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
