@@ -31,8 +31,8 @@ public class TNTTracking implements EntityTracking {
 			TNTPrimed tnt = tntIter.next();
 			if (tnt != null && tnt.isValid()) {
 				Point loc = new Point(tnt.getLocation());
-				SafeZones city = LocationManager.WithinSafeZone(loc);
-				if (city != SafeZones.None) {
+				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+				if (safeZone != SafeZones.None) {
 					tnt.remove();
 					tntIter.remove();
 				}

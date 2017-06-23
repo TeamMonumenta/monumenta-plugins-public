@@ -31,8 +31,8 @@ public class BoatTracking implements EntityTracking {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid()) {
 				Point loc = new Point(boat.getLocation());
-				SafeZones city = LocationManager.WithinSafeZone(loc);
-				if (city != SafeZones.None) {
+				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+				if (safeZone != SafeZones.None) {
 					boatIter.remove();
 					boat.remove();
 				}

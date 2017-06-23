@@ -67,8 +67,8 @@ public class PlayerTracking implements EntityTracking {
 					
 					player.teleport(new Location(player.getWorld(), Constants.SPAWN_POINT.mX, Constants.SPAWN_POINT.mY, Constants.SPAWN_POINT.mZ));
 				} else {
-					SafeZones city = LocationManager.WithinSafeZone(loc);	
-					if (city == SafeZones.Capital) {
+					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);	
+					if (safeZone == SafeZones.Capital) {
 						inSafeZone = true;
 						inCapital = true;
 						
@@ -83,11 +83,11 @@ public class PlayerTracking implements EntityTracking {
 								player.setGameMode(GameMode.SURVIVAL);
 							}
 						}
-					} else if (city == SafeZones.SiegeOfHighwatch) {
+					} else if (safeZone == SafeZones.SiegeOfHighwatch) {
 						inSafeZone = true;
 						applyEffects = false;
 						_transitionToAdventure(player);
-					} else if (city != SafeZones.None) {
+					} else if (safeZone != SafeZones.None) {
 						inSafeZone = true;
 						_transitionToAdventure(player);
 					}

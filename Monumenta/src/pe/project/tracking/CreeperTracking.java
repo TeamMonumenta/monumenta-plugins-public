@@ -39,9 +39,9 @@ public class CreeperTracking implements EntityTracking {
 					snuggles = tags.contains("Snuggles");
 				}
 				
-				SafeZones city = LocationManager.WithinSafeZone(loc);
-				if (city != SafeZones.None) {
-					if (city == SafeZones.Farr) {
+				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+				if (safeZone != SafeZones.None) {
+					if (safeZone == SafeZones.Farr) {
 						if (!snuggles) {
 							creeperIter.remove();
 							creeper.remove();

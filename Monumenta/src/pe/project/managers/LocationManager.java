@@ -5,7 +5,7 @@ import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.point.Point;
 
 public class LocationManager {
-	public static SafeZones WithinSafeZone(Point point) {
+	public static SafeZones withinAnySafeZone(Point point) {
 		return SafeZoneConstants.withinAnySafeZone(point);
 	}
 }
