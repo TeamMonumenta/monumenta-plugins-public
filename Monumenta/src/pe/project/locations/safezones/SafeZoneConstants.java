@@ -21,8 +21,10 @@ public class SafeZoneConstants {
 		Commands(10),
 		
 		SiegeOfHighwatch(11),
+		Ctaz(12),
+		Hermy(13),
 
-		Total(11);
+		Total(14);
 		
 		public int mValue;
 		private SafeZones(int value)	{	this.mValue = value;	}
@@ -44,6 +46,8 @@ public class SafeZoneConstants {
 			new AreaBounds(new Point(-1584, 0, -1632), new Point(-1329, 255, -1377)),	//	Commands
 			
 			new AreaBounds(new Point(1505, 102, -178), new Point(1631, 256, -16)),		// Siege Of Highwatch
+			new AreaBounds(new Point(232, 68, 294), new Point(249, 96, 318)),			// Ctaz
+			new AreaBounds(new Point(-331, 86, 334), new Point(-310, 110, 355)),		// Hermy
 	};
 	
 	public static boolean withinSafeZone(SafeZones city, Point point) {
@@ -60,5 +64,15 @@ public class SafeZoneConstants {
 		}
 		
 		return SafeZones.None;
+	}
+	
+	public static boolean safeZoneAppliesEffects(SafeZones safeZone) {
+		if (safeZone == SafeZones.SiegeOfHighwatch
+			|| safeZone == SafeZones.Ctaz
+			|| safeZone == SafeZones.Hermy) {
+			return false;
+		}
+		
+		return true;
 	}
 }

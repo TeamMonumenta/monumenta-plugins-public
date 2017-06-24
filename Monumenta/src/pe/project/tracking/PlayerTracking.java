@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
+import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
@@ -68,28 +69,26 @@ public class PlayerTracking implements EntityTracking {
 					player.teleport(new Location(player.getWorld(), Constants.SPAWN_POINT.mX, Constants.SPAWN_POINT.mY, Constants.SPAWN_POINT.mZ));
 				} else {
 					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);	
-					if (safeZone == SafeZones.Capital) {
-						inSafeZone = true;
-						inCapital = true;
-						
-						Material mat = world.getBlockAt((int)loc.mX, 10, (int)loc.mZ).getType();
-						boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
-						
-						if (mode == GameMode.SURVIVAL && !neededMat) {
-							_transitionToAdventure(player);
-						} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
-							int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
-							if (apartment == 0) {
-								player.setGameMode(GameMode.SURVIVAL);
+					inSafeZone = (safeZone != SafeZones.None);
+					inCapital = (safeZone == SafeZones.Capital);
+					applyEffects = (inSafeZone && SafeZoneConstants.safeZoneAppliesEffects(safeZone));
+					
+					if (inSafeZone) {
+						if (safeZone == SafeZones.Capital) {
+							Material mat = world.getBlockAt((int)loc.mX, 10, (int)loc.mZ).getType();
+							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
+							
+							if (mode == GameMode.SURVIVAL && !neededMat) {
+								_transitionToAdventure(player);
+							} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
+								int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
+								if (apartment == 0) {
+									player.setGameMode(GameMode.SURVIVAL);
+								}
 							}
+						} else {
+							_transitionToAdventure(player);
 						}
-					} else if (safeZone == SafeZones.SiegeOfHighwatch) {
-						inSafeZone = true;
-						applyEffects = false;
-						_transitionToAdventure(player);
-					} else if (safeZone != SafeZones.None) {
-						inSafeZone = true;
-						_transitionToAdventure(player);
 					}
 				}
 				
