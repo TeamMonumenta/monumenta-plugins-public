@@ -218,7 +218,7 @@ public class AlchemistClass extends BaseClass {
 			}
 		}
 		
-		return false;
+		return true;
 	}
 	
 	@Override
