@@ -20,7 +20,7 @@ public class SetGuildPrefix implements CommandExecutor {
     		arg0.sendMessage(ChatColor.RED + "Too many parameters!");
     		arg0.sendMessage(ChatColor.RED + "Usage: " + arg1.getUsage());
     		return false;
-    	} else if (arg3[1].length() > 6) {
+    	} else if (arg3[1].length() > 7) {
     		arg0.sendMessage(ChatColor.RED + "Guild Tag is too long!");
     	}
 		
