@@ -32,8 +32,8 @@ public class SafeZoneConstants {
 	
 	static final AreaBounds[] mSafeZoneBounds = {
 			new AreaBounds(new Point(-1130, 10,-284), new Point(-498, 250, 344)),		//	Capital
-			new AreaBounds(new Point(-179, 80, -166), new Point(-79, 120, 14)),			//	Nyr
-			new AreaBounds(new Point(538, 70, 100), new Point(655, 150, 229)),			//	Farr
+			new AreaBounds(new Point(-179, 0, -166), new Point(-79, 256, 14)),			//	Nyr
+			new AreaBounds(new Point(538, 0, 100), new Point(655, 256, 229)),			//	Farr
 			new AreaBounds(new Point(1131, 120, -156), new Point(1221, 180, -76)),		//	Highwatch
 			
 			new AreaBounds(new Point(136, 53, -186), new Point(176, 83, -120)),			//	White Wool Lobby
