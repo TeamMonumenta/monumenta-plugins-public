@@ -77,7 +77,7 @@ public class PlayerTracking implements EntityTracking {
 					
 					if (inSafeZone) {
 						if (safeZone == SafeZones.Capital) {
-							Material mat = world.getBlockAt(location.getBlockX(), 9, location.getBlockZ()).getType();
+							Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
 							
 							if (mode == GameMode.SURVIVAL && !neededMat) {
