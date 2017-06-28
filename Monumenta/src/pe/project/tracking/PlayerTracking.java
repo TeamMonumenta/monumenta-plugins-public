@@ -54,7 +54,8 @@ public class PlayerTracking implements EntityTracking {
 			GameMode mode = player.getGameMode();
 			
 			if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
-				Point loc = new Point(player.getLocation());
+				Location location = player.getLocation();
+				Point loc = new Point(location);
 				
 				//	First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
@@ -76,11 +77,11 @@ public class PlayerTracking implements EntityTracking {
 					
 					if (inSafeZone) {
 						if (safeZone == SafeZones.Capital) {
-							Material mat = world.getBlockAt((int)loc.mX, 10, (int)loc.mZ).getType();
+							Material mat = world.getBlockAt(location.getBlockX(), 9, location.getBlockZ()).getType();
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
 							
 							if (mode == GameMode.SURVIVAL && !neededMat) {
-								_transitionToAdventure(player);
+								_transitionToAdventure(player, safeZone);
 							} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
 								int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
 								if (apartment == 0) {
@@ -88,7 +89,9 @@ public class PlayerTracking implements EntityTracking {
 								}
 							}
 						} else {
-							_transitionToAdventure(player);
+							if (mode == GameMode.SURVIVAL) {
+								_transitionToAdventure(player, safeZone);
+							}
 						}
 					}
 				}
@@ -126,7 +129,7 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 	
-	void _transitionToAdventure(Player player) {
+	void _transitionToAdventure(Player player, SafeZones zone) {
 		player.setGameMode(GameMode.ADVENTURE);
 		
 		Entity vehicle = player.getVehicle();

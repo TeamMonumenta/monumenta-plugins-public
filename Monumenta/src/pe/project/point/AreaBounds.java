@@ -1,7 +1,8 @@
 package pe.project.point;
 
 public class AreaBounds {
-	public AreaBounds(Point lowerCorner, Point upperCorner) {
+	public AreaBounds(String name, Point lowerCorner, Point upperCorner) {
+		mName = name;
 		mLowerCorner = lowerCorner;
 		mUpperCorner = upperCorner;
 	}
@@ -12,6 +13,11 @@ public class AreaBounds {
 				point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
 	}
 	
+	public String getName() {
+		return mName;
+	}
+	
 	Point mLowerCorner;
 	Point mUpperCorner;
+	String mName;
 }
