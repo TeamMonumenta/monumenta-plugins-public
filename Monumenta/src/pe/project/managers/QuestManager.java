@@ -10,7 +10,7 @@ import pe.project.Main;
 import pe.project.locations.LocationMarker;
 import pe.project.locations.quest.*;
 import pe.project.quest.Quest;
-import pe.project.utils.MessagingUtil;
+import pe.project.utils.MessagingUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class QuestManager {
@@ -67,7 +67,7 @@ public class QuestManager {
 		}
 		
 		if (markers.size() == 0) {
-			MessagingUtil.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
+			MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
 		} else {
 			LocationMarker currentMarker = markers.get(index);
 			String description = currentMarker.getMarkerDescription(player);
@@ -91,7 +91,7 @@ public class QuestManager {
 		}
 		
 		if (markers.size() == 0) {
-			MessagingUtil.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
+			MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
 		} else {
 			LocationMarker currentMarker = markers.get(index);
 			String description = currentMarker.getMarkerDescription(player);

@@ -3,6 +3,7 @@ package pe.project.utils;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -10,6 +11,8 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+import pe.project.utils.PotionUtils.PotionInfo;
 
 public class ItemUtils {
 	public static List<Material> interactables = Arrays.asList(
@@ -84,6 +87,19 @@ public class ItemUtils {
 		stack.setItemMeta(meta);
 		
 		return stack;
+	}
+	
+	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
+		PotionMeta meta = (PotionMeta)potion.getItemMeta();
+		meta.addCustomEffect(new PotionEffect(info.type, info.duration, info.amplifier, false, true), false);
+		potion.setItemMeta(meta);
+	}
+	
+	public static void setPotionMeta(ItemStack potion, String name, Color color) {
+		PotionMeta meta = (PotionMeta)potion.getItemMeta();
+		meta.setDisplayName("§r" + name);
+		meta.setColor(color);
+		potion.setItemMeta(meta);
 	}
 	
 	public static boolean isInteractable(Material mat) {

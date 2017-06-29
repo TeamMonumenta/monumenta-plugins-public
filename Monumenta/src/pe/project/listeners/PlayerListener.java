@@ -3,6 +3,7 @@ package pe.project.listeners;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,11 +14,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
@@ -53,6 +61,9 @@ public class PlayerListener implements Listener {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
+		
+		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
+		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
 		
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -137,5 +148,83 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+	}
+	
+	//	The Player swapped their current selected item.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
+		Player player = event.getPlayer();
+		final String name = player.getName();
+		
+		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+			@Override
+			public void run() {
+			    Player player = Bukkit.getPlayer(name);
+			    mPlugin.getClass(player).PlayerItemHeldEvent(player);
+			}
+		}, 0);
+	}
+	
+	//	The player dropped an item.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
+		final String name = player.getName();
+		
+		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+			@Override
+			public void run() {
+			    Player player = Bukkit.getPlayer(name);
+			    mPlugin.getClass(player).PlayerDropItemEvent(player);
+			}
+		}, 0);
+	}
+	
+//	An item on the player breaks.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
+		Player player = event.getPlayer();
+		final String name = player.getName();
+		
+		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+			@Override
+			public void run() {
+			    Player player = Bukkit.getPlayer(name);
+			    mPlugin.getClass(player).PlayerItemBreakEvent(player);
+			}
+		}, 0);
+	}
+	
+	//	The player clicked/released in their inventory.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void InventoryClickEvent(InventoryClickEvent event) {
+		Inventory inventory = event.getInventory();
+		if (inventory.getType() == InventoryType.PLAYER) {
+			Player player = (Player)inventory.getHolder();
+			final String name = player.getName();
+			
+			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+				@Override
+				public void run() {
+				    Player player = Bukkit.getPlayer(name);
+				    mPlugin.getClass(player).PlayerItemHeldEvent(player);
+				}
+			}, 0);
+		}
+	}
+	
+	//	The player has respawned.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerRespawnEvent(PlayerRespawnEvent event) {
+		Player player = event.getPlayer();
+		final String name = player.getName();
+		
+		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+			@Override
+			public void run() {
+				Player player = Bukkit.getPlayer(name);
+				mPlugin.getClass(player).PlayerRespawnEvent(player);
+			}
+		}, 0);
 	}
 }
