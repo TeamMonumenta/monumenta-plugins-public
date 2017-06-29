@@ -124,47 +124,44 @@ public class Main extends JavaPlugin {
 			
 			@Override
 			public void run() {
+				boolean oneHertz = ticks == 0;
+				boolean fourHertz = (ticks % 4) == 0;
+				boolean twentyHertz = true;
+				
 				//	Once a second.
-				if (ticks == 0) {
+				if (oneHertz) {
+					//	Update cooldowns.
+					mTimers.UpdateCooldowns(Constants.TICKS_PER_SECOND);
+					mPulseEffectTimers.Update(Constants.TICKS_PER_SECOND);
 					
-				}
-				
-				mTrackingManager.update(world);
-				mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
+					//	Update periodic timers.
+					mPeriodicTimer++;
 
-				ticks = (ticks + 1) % 4;
-			}
-		}, 0L, Constants.QUARTER_TICKS_PER_SECOND);
-		
-		//	Schedule ability cooldowns.
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			@Override
-			public void run() {
-				//	Update cooldowns.
-				mTimers.UpdateCooldowns(Constants.TICKS_PER_SECOND);
-				mPulseEffectTimers.Update(Constants.TICKS_PER_SECOND);
-				
-				//	Update periodic timers.
-				mPeriodicTimer++;
-
-				for(Player player : getServer().getOnlinePlayers()) {
-					BaseClass pClass = Main.this.getClass(player);
+					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
+						BaseClass pClass = Main.this.getClass(player);
+							
+						boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
+						boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
+						boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
+						pClass.PeriodicTrigger(player, two, fourty, sixty, mPeriodicTimer);
+					}
 						
-					boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
-					boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
-					boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
-					pClass.PeriodicTrigger(player, two, fourty, sixty, mPeriodicTimer);
+					mPeriodicTimer %= Times.ONE_TWENTY.getValue();
 				}
-					
-				mPeriodicTimer %= Times.ONE_TWENTY.getValue();
-			}
-		}, 0L, Constants.TICKS_PER_SECOND);
-		
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			@Override
-			public void run() {
-				//	Update cooldowns.
-				mProjectileEffectTimers.update();
+				
+				//	4 times a second.
+				if (fourHertz) {
+					mTrackingManager.update(world);
+					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
+				}
+				
+				//	Every tick.
+				if (twentyHertz) {
+					//	Update cooldowns.
+					mProjectileEffectTimers.update();
+				}
+				
+				ticks = (ticks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
 	}
