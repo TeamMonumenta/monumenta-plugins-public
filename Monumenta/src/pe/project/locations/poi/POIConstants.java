@@ -62,8 +62,9 @@ public class POIConstants {
 		JungleMine(55, "JungleMine"),
 		R1Bonus(56, "R1Bonus"),
 		MntnHideaway(57, "MountainHideaway"),
-		
-		Total(58, null);
+		MntnMine(58, "MountainMine"),
+			 
+		Total(59, null);
 		
 		public int mValue;
 		public String mScoreboard;
