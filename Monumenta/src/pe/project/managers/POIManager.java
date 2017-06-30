@@ -162,5 +162,6 @@ public class POIManager {
 		mPOIs.add(new PointOfInterest(POI.R1Bonus, "Cave of Secrets", new Point(430, 23, -129), 120, null));
 		
 		mPOIs.add(new PointOfInterest(POI.MntnHideaway, "Mountain Hideaway", new Point(613, 145, -351), 80, null));
+		mPOIs.add(new PointOfInterest(POI.MntnMine, "Mountain Mine", new Point(953, 144, -362), 85, null));
 	}
 }
