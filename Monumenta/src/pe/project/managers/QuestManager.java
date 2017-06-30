@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import pe.project.Main;
 import pe.project.locations.LocationMarker;
 import pe.project.locations.quest.*;
-import pe.project.quest.Quest;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ScoreboardUtils;
 

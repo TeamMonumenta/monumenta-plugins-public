@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
-import pe.project.quest.Quest;
+import pe.project.locations.quest.Quest;
 
 public class LocationMarker {
 	private Quest mQuestOwner;

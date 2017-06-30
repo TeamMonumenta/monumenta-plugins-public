@@ -1,4 +1,4 @@
-package pe.project.quest;
+package pe.project.locations.quest;
 
 import java.util.ArrayList;
 import java.util.List;

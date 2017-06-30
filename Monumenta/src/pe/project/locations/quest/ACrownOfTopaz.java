@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import pe.project.locations.LocationMarker;
-import pe.project.quest.Quest;
 
 public class ACrownOfTopaz extends Quest {
 	public ACrownOfTopaz(World world) {
