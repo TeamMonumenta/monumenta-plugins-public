@@ -39,6 +39,9 @@ import org.bukkit.util.Vector;
 
 import pe.project.Main;
 import pe.project.classes.BaseClass;
+import pe.project.locations.safezones.SafeZoneConstants;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.point.Point;
 
 public class EntityListener implements Listener {
 	Main mPlugin;
@@ -160,7 +163,11 @@ public class EntityListener implements Listener {
 	public void ExplosionPrimeEvent(ExplosionPrimeEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof TNTPrimed) {
-			mPlugin.mTrackingManager.addEntity(entity);
+			SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(new Point(entity.getLocation()));
+			if (safeZone != SafeZones.None) {
+				event.setCancelled(true);
+				entity.remove();
+			}
 		}
 	}
 	

@@ -8,7 +8,6 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
-import org.bukkit.entity.TNTPrimed;
 
 import pe.project.Main;
 
@@ -23,8 +22,6 @@ public class TrackingManager {
 	public void addEntity(Entity entity) {
 		if (entity instanceof Player) {
 			mPlayers.addEntity(entity);
-		} else if (entity instanceof TNTPrimed) {
-			mTNT.addEntity(entity);
 		} else if (entity instanceof Creeper) {
 			mCreepers.addEntity(entity);
 		} else if (entity instanceof Boat) {
@@ -37,8 +34,6 @@ public class TrackingManager {
 	public void removeEntity(Entity entity) {
 		if (entity instanceof Player) {
 			mPlayers.removeEntity(entity);
-		} else if (entity instanceof TNTPrimed) {
-			mTNT.removeEntity(entity);
 		} else if (entity instanceof Creeper) {
 			mCreepers.removeEntity(entity);
 		} else if (entity instanceof Boat) {
@@ -50,14 +45,12 @@ public class TrackingManager {
 	
 	public void update(World world) {
 		mPlayers.update(world);
-		mTNT.update(world);
 		mCreepers.update(world);
 		mBoats.update(world);
 		mSilverfish.update(world);
 	}
 	
 	public PlayerTracking mPlayers = new PlayerTracking();
-	public TNTTracking mTNT = new TNTTracking();
 	public CreeperTracking mCreepers = new CreeperTracking();
 	public BoatTracking mBoats = new BoatTracking();
 	public SilverfishTracking mSilverfish = new SilverfishTracking();
