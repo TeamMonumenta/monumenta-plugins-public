@@ -146,7 +146,7 @@ public class POIManager {
 		mPOIs.add(new PointOfInterest(POI.LTower, "Collapsing Tower", new Point(871, 169, -325), 80, null));
 
 		mPOIs.add(new PointOfInterest(POI.Snake, "Serpent Ruins", new Point(47, 124, 168), 80, null));
-		mPOIs.add(new PointOfInterest(POI.FireMine, "Fire Mine", new Point(88, 108, 185), 105, null));
+		mPOIs.add(new PointOfInterest(POI.FireMine, "Abandoned Tunnels", new Point(88, 108, 185), 105, null));
 		mPOIs.add(new PointOfInterest(POI.Docks, "Docks", new Point(-392, 94, 197), 110, null));
 
 		mPOIs.add(new PointOfInterest(POI.Chasm, "Molten Chasm", new Point(788, 30, 96), 110, null));
