@@ -14,6 +14,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
@@ -172,5 +173,16 @@ public class EntityUtils {
 		SplashPotion potion = (SplashPotion)world.spawnEntity(loc.add(0, 1.5, 0), EntityType.SPLASH_POTION);
 		
 		return potion;
+	}
+	
+	public static boolean withinRangeOfMonster(Player player, double range) {
+		List<Entity> entities = player.getNearbyEntities(range, range, range);
+		for (Entity entity : entities) {
+			if (entity instanceof Monster) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

@@ -2,6 +2,7 @@ package pe.project.listeners;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -17,6 +18,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -29,12 +31,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
+import pe.project.Constants;
 import pe.project.Main;
 import pe.project.locations.poi.PointOfInterest;
 import pe.project.point.Point;
 import pe.project.server.reset.RegionReset;
+import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.StringUtils;
 
 public class PlayerListener implements Listener {
 	Main mPlugin = null;
@@ -53,7 +58,15 @@ public class PlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerQuitEvent(PlayerQuitEvent event) {
-		mPlugin.mTrackingManager.removeEntity(event.getPlayer());
+		Player player = event.getPlayer();
+		
+		mPlugin.mTrackingManager.removeEntity(player);
+		
+		//	If the player is opped don't apply anti-combat logging technology!
+		if (!player.isOp() && EntityUtils.withinRangeOfMonster(player, 20)) {
+			UUID playerUUID = event.getPlayer().getUniqueId();
+			mPlugin.mGenericPlayerTimers.addTimer(playerUUID, Constants.FIVE_MINUTES);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -83,18 +96,8 @@ public class PlayerListener implements Listener {
 					if (pois != null && pois.size() > 0) {
 						for (PointOfInterest poi : pois) {
 							int ticks = poi.getTimer();
-	
-							int minutes = (int)((ticks / 20) / 60);
-							int seconds = ((ticks - ((minutes * 60) * 20))) / 20;
 							
-							String time = "";
-							if (minutes > 0) {
-								time = minutes + " minutes ";
-							}
-							
-							time += seconds + " seconds";
-							
-							player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + time);
+							player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks));
 						}
 					} else {
 						player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");
@@ -180,7 +183,7 @@ public class PlayerListener implements Listener {
 		}, 0);
 	}
 	
-//	An item on the player breaks.
+	//	An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
 		Player player = event.getPlayer();
@@ -226,5 +229,16 @@ public class PlayerListener implements Listener {
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 			}
 		}, 0);
+	}
+	
+	//	Player is trying to log in.
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void AsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
+		UUID player = event.getUniqueId();
+		
+		int time = mPlugin.mGenericPlayerTimers.getTimer(player);
+		if (time > 0) {
+			event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Anti-Combat Logging: Try relogging in " + StringUtils.ticksToTime(time));
+		}
 	}
 }
