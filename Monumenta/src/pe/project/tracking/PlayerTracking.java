@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -59,6 +60,12 @@ public class PlayerTracking implements EntityTracking {
 				
 				//	First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
+					//	Double check to make sure their on the ground as it can trigger a false positive.
+					Block below = world.getBlockAt(location.subtract(0, 1, 0));
+					if (below != null && below.getType() == Material.AIR) {
+						continue;
+					}
+					
 					int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes");
 					strikes++;
 					ScoreboardUtils.setScoreboardValue(player, "Strikes", strikes);
