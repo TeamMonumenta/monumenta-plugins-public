@@ -36,3 +36,7 @@ commands:
     permission: monumenta.commands.setPlayerName
     description: ???
     usage: N/A
+  transferScores:
+    permission: monumenta.commands.transferScores
+    description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.
+    usage: /transferScores <oldPlayerName> <newPlayerName>

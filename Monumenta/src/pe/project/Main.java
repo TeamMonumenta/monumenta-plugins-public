@@ -110,6 +110,7 @@ public class Main extends JavaPlugin {
 		getCommand("profiling").setExecutor(new ProfilingCommand(this));
 		getCommand("setGuildPrefix").setExecutor(new SetGuildPrefix());
 		getCommand("setPlayerName").setExecutor(new SetPlayerName());
+		getCommand("transferScores").setExecutor(new TransferScores());
 		
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
