@@ -2,13 +2,13 @@ package pe.project.listeners;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
@@ -18,7 +18,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -36,7 +35,6 @@ import pe.project.Main;
 import pe.project.locations.poi.PointOfInterest;
 import pe.project.point.Point;
 import pe.project.server.reset.RegionReset;
-import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.StringUtils;
@@ -62,10 +60,16 @@ public class PlayerListener implements Listener {
 		
 		mPlugin.mTrackingManager.removeEntity(player);
 		
-		//	If the player is opped don't apply anti-combat logging technology!
-		if (!player.isOp() && EntityUtils.withinRangeOfMonster(player, 20)) {
-			UUID playerUUID = event.getPlayer().getUniqueId();
-			mPlugin.mGenericPlayerTimers.addTimer(playerUUID, Constants.FIVE_MINUTES);
+		//		If the player is opped don't apply anti-combat logging technology!
+		List<Entity> nearbyEntities = player.getNearbyEntities(20, 20, 20);
+		if (nearbyEntities.size() > 0) {
+			for (Entity entity : nearbyEntities) {
+				if (entity instanceof Monster) {
+					Monster mob = (Monster)entity;
+					mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
+					mob.setRemoveWhenFarAway(false);
+				}
+			}
 		}
 	}
 	
@@ -157,15 +161,17 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
-		final String name = player.getName();
-		
-		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-			@Override
-			public void run() {
-			    Player player = Bukkit.getPlayer(name);
-			    mPlugin.getClass(player).PlayerItemHeldEvent(player);
-			}
-		}, 0);
+		if (player != null) {
+			final String name = player.getName();
+			
+			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+				@Override
+				public void run() {
+				    Player player = Bukkit.getPlayer(name);
+				    mPlugin.getClass(player).PlayerItemHeldEvent(player);
+				}
+			}, 0);
+		}
 	}
 	
 	//	The player dropped an item.
@@ -229,16 +235,5 @@ public class PlayerListener implements Listener {
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 			}
 		}, 0);
-	}
-	
-	//	Player is trying to log in.
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void AsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-		UUID player = event.getUniqueId();
-		
-		int time = mPlugin.mGenericPlayerTimers.getTimer(player);
-		if (time > 0) {
-			event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Anti-Combat Logging: Try relogging in " + StringUtils.ticksToTime(time));
-		}
 	}
 }

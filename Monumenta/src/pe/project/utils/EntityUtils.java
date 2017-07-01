@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -184,5 +185,16 @@ public class EntityUtils {
 		}
 		
 		return false;
+	}
+	
+	public static Entity getEntity(World world, UUID entityUUID) {
+		List<Entity> entities = world.getEntities();
+		for (Entity entity : entities) {
+			if (entity.getUniqueId() == entityUUID) {
+				return entity;
+			}
+		}
+		
+		return null;
 	}
 }

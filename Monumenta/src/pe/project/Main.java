@@ -21,10 +21,11 @@ import pe.project.listeners.EntityListener;
 import pe.project.listeners.ItemListener;
 import pe.project.listeners.MobListener;
 import pe.project.listeners.PlayerListener;
+import pe.project.listeners.WorldListener;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
 import pe.project.timers.CooldownTimers;
-import pe.project.timers.GenericPlayerTimers;
+import pe.project.timers.CombatLoggingTimers;
 import pe.project.timers.ProjectileEffectTimers;
 import pe.project.timers.PulseEffectTimers;
 import pe.project.tracking.TrackingManager;
@@ -63,7 +64,7 @@ public class Main extends JavaPlugin {
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public PulseEffectTimers mPulseEffectTimers = null;
-	public GenericPlayerTimers mGenericPlayerTimers = null;
+	public CombatLoggingTimers mCombatLoggingTimers = null;
 	private Random mRandom = null;
 	int mPeriodicTimer = -1;
 	
@@ -84,7 +85,7 @@ public class Main extends JavaPlugin {
 		mRandom = new Random();
 		mTimers = new CooldownTimers(this);
 		mPulseEffectTimers = new PulseEffectTimers(this);
-		mGenericPlayerTimers = new GenericPlayerTimers();
+		mCombatLoggingTimers = new CombatLoggingTimers();
 			
 		World world = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(world);
@@ -102,6 +103,7 @@ public class Main extends JavaPlugin {
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, world), this);
 		manager.registerEvents(new ItemListener(this), this);
+		manager.registerEvents(new WorldListener(this, world), this);
 		
 		//	Add some slash commands
 		getCommand("setServerVersion").setExecutor(new SetServerVersionCommand(this));
@@ -157,7 +159,7 @@ public class Main extends JavaPlugin {
 				if (fourHertz) {
 					mTrackingManager.update(world);
 					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
-					mGenericPlayerTimers.update(Constants.QUARTER_TICKS_PER_SECOND);
+					mCombatLoggingTimers.update(world, Constants.QUARTER_TICKS_PER_SECOND);
 				}
 				
 				//	Every tick.
