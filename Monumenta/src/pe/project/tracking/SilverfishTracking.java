@@ -6,16 +6,16 @@ import java.util.Set;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Silverfish;
 
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
-public class TNTTracking implements EntityTracking {
+public class SilverfishTracking implements EntityTracking {
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((TNTPrimed)entity);
+		mEntities.add((Silverfish)entity);
 	}
 	
 	@Override
@@ -25,21 +25,21 @@ public class TNTTracking implements EntityTracking {
 
 	@Override
 	public void update(World world) {
-		Iterator<TNTPrimed> tntIter = mEntities.iterator();
-		while (tntIter.hasNext()) {
-			TNTPrimed tnt = tntIter.next();
-			if (tnt != null && tnt.isValid()) {
-				Point loc = new Point(tnt.getLocation());
+		Iterator<Silverfish> silverfishIter = mEntities.iterator();
+		while (silverfishIter.hasNext()) {
+			Silverfish silverfish = silverfishIter.next();
+			if (silverfish != null && silverfish.isValid()) {
+				Point loc = new Point(silverfish.getLocation());
 				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
 				if (safeZone != SafeZones.None) {
-					tnt.remove();
-					tntIter.remove();
+					silverfish.remove();
+					silverfishIter.remove();
 				}
 			} else {
-				tntIter.remove();
+				silverfishIter.remove();
 			}
 		}
 	}
 
-	private Set<TNTPrimed> mEntities = new HashSet<TNTPrimed>();
+	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
 }
