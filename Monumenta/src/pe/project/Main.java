@@ -99,7 +99,7 @@ public class Main extends JavaPlugin {
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		
-		manager.registerEvents(new PlayerListener(this), this);
+		manager.registerEvents(new PlayerListener(this, world), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, world), this);
 		manager.registerEvents(new ItemListener(this), this);

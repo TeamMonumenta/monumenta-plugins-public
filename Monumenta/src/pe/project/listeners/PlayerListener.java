@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -41,9 +43,11 @@ import pe.project.utils.StringUtils;
 
 public class PlayerListener implements Listener {
 	Main mPlugin = null;
+	World mWorld = null;
 	
-	public PlayerListener(Main plugin) {
+	public PlayerListener(Main plugin, World world) {
 		mPlugin = plugin;
+		mWorld = world;
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -81,7 +85,7 @@ public class PlayerListener implements Listener {
 		
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
-		
+	
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			//	Quest Compass.
@@ -93,23 +97,31 @@ public class PlayerListener implements Listener {
 		//	Right Click.
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			//	Quest Compass.
-			if (item != null && item.getType() == Material.COMPASS) {
-				//	Show current POI respawn timer.
-				if (player.isSneaking()) {
-					List<PointOfInterest> pois = mPlugin.mPOIManager.allWithinAnyPointOfInterest(new Point(player.getLocation()));
-					if (pois != null && pois.size() > 0) {
-						for (PointOfInterest poi : pois) {
-							int ticks = poi.getTimer();
-							
-							player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks));
-						}
-					} else {
-						player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");
+			if (item != null) {
+				if (item.getType() == Material.MONSTER_EGG && action == Action.RIGHT_CLICK_BLOCK) {
+					Block block = event.getClickedBlock();
+					if (block.getType() == Material.MOB_SPAWNER) {
+						event.setCancelled(true);
+						return;
 					}
-				}
-				//	Cycle active Quest.
-				else {
-					mPlugin.mQuestManager.cycleQuestTracker(event.getPlayer());
+				} else if (item.getType() == Material.COMPASS) {
+					//	Show current POI respawn timer.
+					if (player.isSneaking()) {
+						List<PointOfInterest> pois = mPlugin.mPOIManager.allWithinAnyPointOfInterest(new Point(player.getLocation()));
+						if (pois != null && pois.size() > 0) {
+							for (PointOfInterest poi : pois) {
+								int ticks = poi.getTimer();
+								
+								player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks));
+							}
+						} else {
+							player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");
+						}
+					}
+					//	Cycle active Quest.
+					else {
+						mPlugin.mQuestManager.cycleQuestTracker(event.getPlayer());
+					}
 				}
 			}
 			
@@ -117,6 +129,14 @@ public class PlayerListener implements Listener {
 				ItemStack heldItem = player.getInventory().getItemInMainHand();
 				if (ItemUtils.isBoat(heldItem.getType())) {
 					event.setCancelled(true);
+				}
+			}
+		} else if (event.getAction() == Action.PHYSICAL) {
+			Block block = event.getClickedBlock();
+			if (block != null) {
+				if (block.getType() == Material.SOIL) {
+					event.setCancelled(true);
+					return;
 				}
 			}
 		}
