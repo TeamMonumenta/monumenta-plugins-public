@@ -1,6 +1,7 @@
 package pe.project.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
@@ -132,5 +133,32 @@ public class PotionUtils {
 		} else {
 			entity.addPotionEffect(effect);
 		}
+	}
+	
+	public static boolean hasPositiveEffects(Collection<PotionEffect> effects) {
+		for (PotionEffect effect: effects) {
+			PotionEffectType type = effect.getType();
+			String name = type.getName();
+			if (name.equals(PotionEffectType.ABSORPTION.getName())
+				|| name.equals(PotionEffectType.DAMAGE_RESISTANCE.getName())
+				|| name.equals(PotionEffectType.FAST_DIGGING.getName())
+				|| name.equals(PotionEffectType.FIRE_RESISTANCE.getName())
+				|| name.equals(PotionEffectType.HEAL.getName())
+				|| name.equals(PotionEffectType.HEALTH_BOOST.getName())
+				|| name.equals(PotionEffectType.INCREASE_DAMAGE.getName())
+				|| name.equals(PotionEffectType.INVISIBILITY.getName())
+				|| name.equals(PotionEffectType.JUMP.getName())
+				|| name.equals(PotionEffectType.LEVITATION.getName())
+				|| name.equals(PotionEffectType.LUCK.getName())
+				|| name.equals(PotionEffectType.NIGHT_VISION.getName())
+				|| name.equals(PotionEffectType.REGENERATION.getName())
+				|| name.equals(PotionEffectType.SATURATION.getName())
+				|| name.equals(PotionEffectType.SPEED.getName())
+				|| name.equals(PotionEffectType.WATER_BREATHING.getName())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

@@ -27,6 +27,7 @@ import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.ParticleUtils;
+import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
 
@@ -182,10 +183,12 @@ public class AlchemistClass extends BaseClass {
 	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
-			int putridFumes = ScoreboardUtils.getScoreboardValue(player, "PutridFumes");
-			if (putridFumes > 0) {
-				String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
-				potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
+			if (!PotionUtils.hasPositiveEffects(potion.getEffects())) {
+				int putridFumes = ScoreboardUtils.getScoreboardValue(player, "PutridFumes");
+				if (putridFumes > 0) {
+					String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
+					potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
+				}
 			}
 		}
 	}
