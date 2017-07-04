@@ -15,6 +15,8 @@ import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
 public class CreeperTracking implements EntityTracking {
+	private Set<Creeper> mEntities = new HashSet<Creeper>();
+	
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Creeper)entity);
@@ -66,6 +68,4 @@ public class CreeperTracking implements EntityTracking {
 	private void _updateSnugglesParticles(Creeper creeper, World world) {
 		ParticleUtils.playParticlesInWorld(world, Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
 	}
-
-	private Set<Creeper> mEntities = new HashSet<Creeper>();
 }

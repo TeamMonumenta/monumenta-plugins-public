@@ -28,12 +28,13 @@ import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class PlayerTracking implements EntityTracking {
-
+	private Set<Player> mEntities = new HashSet<Player>();
+	
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Player)entity);
 	}
-	
+
 	@Override
 	public void removeEntity(Entity entity) {
 		mEntities.remove(entity);
@@ -185,6 +186,4 @@ public class PlayerTracking implements EntityTracking {
 			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 		}
 	}
-	
-	private Set<Player> mEntities = new HashSet<Player>();
 }

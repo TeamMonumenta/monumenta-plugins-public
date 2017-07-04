@@ -20,6 +20,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -85,7 +87,7 @@ public class PlayerListener implements Listener {
 		
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
-	
+		
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			//	Quest Compass.
@@ -120,7 +122,18 @@ public class PlayerListener implements Listener {
 					}
 					//	Cycle active Quest.
 					else {
-						mPlugin.mQuestManager.cycleQuestTracker(event.getPlayer());
+						mPlugin.mQuestManager.cycleQuestTracker(player);
+					}
+				} else if (item.getType() == Material.FISHING_ROD) {
+					if (action == Action.RIGHT_CLICK_BLOCK) {
+						Material block = event.getClickedBlock().getType();
+						
+						//	If this is an interactible block it means they didn't really want to be fishing! :D
+						if (ItemUtils.isInteractable(block)) {
+							if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
+								mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
+							}
+						}
 					}
 				}
 			}
@@ -136,7 +149,6 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				if (block.getType() == Material.SOIL) {
 					event.setCancelled(true);
-					return;
 				}
 			}
 		}
@@ -255,5 +267,14 @@ public class PlayerListener implements Listener {
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 			}
 		}, 0);
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerFishEvent(PlayerFishEvent event) {
+		if (event.getState() == State.FISHING) {
+			mPlugin.mTrackingManager.mFishingHook.addEntity(event.getPlayer(), event.getHook());
+		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
+			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
+		}
 	}
 }

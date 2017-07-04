@@ -54,4 +54,5 @@ public class TrackingManager {
 	public CreeperTracking mCreepers = new CreeperTracking();
 	public BoatTracking mBoats = new BoatTracking();
 	public SilverfishTracking mSilverfish = new SilverfishTracking();
+	public FishingHookTracking mFishingHook = new FishingHookTracking();
 }

@@ -13,11 +13,13 @@ import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
 public class SilverfishTracking implements EntityTracking {
+	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
+	
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Silverfish)entity);
 	}
-	
+
 	@Override
 	public void removeEntity(Entity entity) {
 		mEntities.remove(entity);
@@ -40,6 +42,4 @@ public class SilverfishTracking implements EntityTracking {
 			}
 		}
 	}
-
-	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
 }

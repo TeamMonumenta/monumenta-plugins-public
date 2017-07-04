@@ -13,7 +13,8 @@ import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 
 public class BoatTracking implements EntityTracking {
-
+	private Set<Boat> mEntities = new HashSet<Boat>();
+	
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Boat)entity);
@@ -41,6 +42,4 @@ public class BoatTracking implements EntityTracking {
 			}
 		}
 	}
-
-	private Set<Boat> mEntities = new HashSet<Boat>();
 }
