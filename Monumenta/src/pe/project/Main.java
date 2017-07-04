@@ -116,6 +116,7 @@ public class Main extends JavaPlugin {
 		getCommand("setGuildPrefix").setExecutor(new SetGuildPrefix());
 		getCommand("setPlayerName").setExecutor(new SetPlayerName());
 		getCommand("transferScores").setExecutor(new TransferScores());
+		getCommand("getScore").setExecutor(new GetScore());
 		
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
