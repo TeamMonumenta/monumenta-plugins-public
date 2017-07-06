@@ -84,6 +84,7 @@ public class PlayerListener implements Listener {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
+		Block block = event.getClickedBlock();
 		
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
@@ -101,7 +102,6 @@ public class PlayerListener implements Listener {
 			//	Quest Compass.
 			if (item != null) {
 				if (item.getType() == Material.MONSTER_EGG && action == Action.RIGHT_CLICK_BLOCK) {
-					Block block = event.getClickedBlock();
 					if (block.getType() == Material.MOB_SPAWNER) {
 						event.setCancelled(true);
 						return;
@@ -126,15 +126,21 @@ public class PlayerListener implements Listener {
 					}
 				} else if (item.getType() == Material.FISHING_ROD) {
 					if (action == Action.RIGHT_CLICK_BLOCK) {
-						Material block = event.getClickedBlock().getType();
+						Material blockType = block.getType();
 						
 						//	If this is an interactible block it means they didn't really want to be fishing! :D
-						if (ItemUtils.isInteractable(block)) {
+						if (ItemUtils.isInteractable(blockType)) {
 							if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
 								mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
 							}
 						}
 					}
+				}
+			}
+			
+			if (block != null) {
+				if (player.getGameMode() != GameMode.CREATIVE && block.getType() == Material.ANVIL) {
+					event.setCancelled(true);
 				}
 			}
 			
@@ -145,7 +151,6 @@ public class PlayerListener implements Listener {
 				}
 			}
 		} else if (event.getAction() == Action.PHYSICAL) {
-			Block block = event.getClickedBlock();
 			if (block != null) {
 				if (block.getType() == Material.SOIL) {
 					event.setCancelled(true);
