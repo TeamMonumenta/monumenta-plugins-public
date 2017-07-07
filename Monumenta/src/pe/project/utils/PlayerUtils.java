@@ -1,10 +1,14 @@
 package pe.project.utils;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import net.md_5.bungee.api.ChatColor;
+import pe.project.Constants;
 
 public class PlayerUtils {
 	public static boolean isCritical(Player player) {
@@ -39,5 +43,19 @@ public class PlayerUtils {
 		boolean pitchLos = valY < yDotMax && valY > yDotMin;
 		
 		return yawLos && pitchLos;
+	}
+	
+	public static void awardStrike(Player player, String reason) {
+		int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes");
+		strikes++;
+		ScoreboardUtils.setScoreboardValue(player, "Strikes", strikes);
+		
+		Location loc = player.getLocation();
+		String OOBLoc = "[" + (int)loc.getX() + ", " + (int)loc.getY() + ", " + (int)loc.getZ() + "]";
+		
+		player.sendMessage(ChatColor.RED + "You've recieved a strike for "  + reason + " Location " + OOBLoc);
+		player.sendMessage(ChatColor.YELLOW + "If you feel that this strike is unjustified feel free to send a message and screenshot of this to a moderator on the Discord.");
+		
+		player.teleport(new Location(player.getWorld(), Constants.SPAWN_POINT.mX, Constants.SPAWN_POINT.mY, Constants.SPAWN_POINT.mZ));
 	}
 }

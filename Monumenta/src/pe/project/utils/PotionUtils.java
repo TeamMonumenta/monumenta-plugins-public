@@ -161,4 +161,25 @@ public class PotionUtils {
 		
 		return false;
 	}
+	
+	public static boolean hasNegativeEffects(Collection<PotionEffect> effects) {
+		for (PotionEffect effect: effects) {
+			PotionEffectType type = effect.getType();
+			String name = type.getName();
+			if (name.equals(PotionEffectType.BLINDNESS.getName())
+				|| name.equals(PotionEffectType.CONFUSION.getName())
+				|| name.equals(PotionEffectType.HARM.getName())
+				|| name.equals(PotionEffectType.HUNGER.getName())
+				|| name.equals(PotionEffectType.POISON.getName())
+				|| name.equals(PotionEffectType.SLOW.getName())
+				|| name.equals(PotionEffectType.SLOW_DIGGING.getName())
+				|| name.equals(PotionEffectType.UNLUCK.getName())
+				|| name.equals(PotionEffectType.WEAKNESS.getName())
+				|| name.equals(PotionEffectType.WITHER.getName())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }

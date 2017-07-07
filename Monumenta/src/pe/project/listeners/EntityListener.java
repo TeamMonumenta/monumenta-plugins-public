@@ -3,6 +3,8 @@ package pe.project.listeners;
 import java.util.Iterator;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
@@ -23,6 +25,8 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -42,6 +46,7 @@ import pe.project.classes.BaseClass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.point.Point;
+import pe.project.utils.PlayerUtils;
 
 public class EntityListener implements Listener {
 	Main mPlugin;
@@ -91,6 +96,46 @@ public class EntityListener implements Listener {
 		}
 	}
 	
+	//	Entity Hurt Event.
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void EntityDamageEvent(EntityDamageEvent event) {
+		Entity damagee = event.getEntity();
+		if (damagee instanceof Player) {
+			Player player = (Player)damagee;
+			World world = player.getWorld();
+			DamageCause source = event.getCause();
+			if (source == DamageCause.SUFFOCATION) {
+				//	If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
+				Location playerLoc = player.getLocation();
+				
+				for (double y = -0.5; y <= 0.5; y += 1) {
+					for (double x = -0.5; x <= 0.5; x += 1) {
+						for (double z = -0.5; z <= 0.5; z += 1) {
+							final int ny = (int)Math.floor(playerLoc.getY() + y * 0.1f + (float)player.getEyeHeight());
+							final int nx = (int)Math.floor(playerLoc.getX() + x * 0.48f);
+							final int nz = (int)Math.floor(playerLoc.getZ() + z * 0.48f);
+							
+							Material type = player.getWorld().getBlockAt(new Location(world, nx, ny, nz)).getType();
+							if (type == Material.BEDROCK) {
+								//	Remove their vehicle if they had one.
+								Entity vehicle = player.getVehicle();
+								if (vehicle != null) {
+									vehicle.eject();
+									vehicle.remove();
+								}
+								
+								//	Also Give the player a strike.
+								PlayerUtils.awardStrike(player, "being somewhere you probably shouldn't have been.");
+				             	
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	//	Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
@@ -131,14 +176,28 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				}
 			}
+			
+			/*//	Prevent players from getting negative effects from other players.
+			if (event.getPotion().getShooter() instanceof Player) {
+				boolean hasNegativeEffects = PotionUtils.hasNegativeEffects(event.getPotion().getEffects());
+				if (hasNegativeEffects) {
+					Collection<LivingEntity> entities = event.getAffectedEntities();
+					Iterator<LivingEntity> iter = entities.iterator();
+					while (iter.hasNext()) {
+						LivingEntity entity = iter.next();
+						if (entity instanceof Player) {
+							iter.remove();
+						}
+					}
+				}
+			}*/
 		}
 	}
 	
 	//	Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
-		ProjectileSource source = event.getEntity().getSource();
-		
+		ProjectileSource source = event.getEntity().getSource();	
 		if (source instanceof Player) {
 			Player player = (Player)source;
 			mPlugin.getClass(player).AreaEffectCloudApplyEvent(event.getAffectedEntities(), player);

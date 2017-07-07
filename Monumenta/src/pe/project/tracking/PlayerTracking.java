@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
@@ -25,6 +24,7 @@ import pe.project.managers.LocationManager;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
+import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class PlayerTracking implements EntityTracking {
@@ -67,16 +67,7 @@ public class PlayerTracking implements EntityTracking {
 						continue;
 					}
 					
-					int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes");
-					strikes++;
-					ScoreboardUtils.setScoreboardValue(player, "Strikes", strikes);
-					
-					String OOBLoc = "[" + (int)loc.mX + ", " + (int)loc.mY + ", " + (int)loc.mZ + "]";
-					
-					player.sendMessage(ChatColor.RED + "You've recieved a strike for breaking rule #5, leaving the bounds of the map at " + OOBLoc);
-					player.sendMessage(ChatColor.YELLOW + "If you feel that this strike is unjustified feel free to send a message and screenshot of this to a moderator on the Discord.");
-					
-					player.teleport(new Location(player.getWorld(), Constants.SPAWN_POINT.mX, Constants.SPAWN_POINT.mY, Constants.SPAWN_POINT.mZ));
+					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
 					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);	
 					inSafeZone = (safeZone != SafeZones.None);
