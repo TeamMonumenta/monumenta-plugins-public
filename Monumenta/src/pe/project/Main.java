@@ -132,7 +132,7 @@ public class Main extends JavaPlugin {
 			@Override
 			public void run() {
 				boolean oneHertz = ticks == 0;
-				boolean fourHertz = (ticks % 4) == 0;
+				boolean fourHertz = (ticks % 5) == 0;
 				boolean twentyHertz = true;
 				
 				//	Once a second.
