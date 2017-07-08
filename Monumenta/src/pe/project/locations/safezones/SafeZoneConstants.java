@@ -48,7 +48,7 @@ public class SafeZoneConstants {
 			new AreaBounds("", new Point(-1584, 0, -1632), new Point(-1329, 255, -1377)),			//	Commands
 			
 			new AreaBounds("", new Point(1505, 102, -178), new Point(1631, 256, -16)),				// Siege Of Highwatch
-			new AreaBounds("", new Point(232, 68, 294), new Point(249, 96, 318)),					// Ctaz
+			new AreaBounds("", new Point(232, 10, 294), new Point(249, 256, 318)),					// Ctaz
 			new AreaBounds("", new Point(-331, 86, 334), new Point(-310, 110, 355)),				// Hermy
 	};
 	
