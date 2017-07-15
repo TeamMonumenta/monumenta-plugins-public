@@ -28,7 +28,7 @@ public class CreeperTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world) {
+	public void update(World world, int ticks) {
 		Iterator<Creeper> creeperIter = mEntities.iterator();
 		while (creeperIter.hasNext()) {
 			Creeper creeper = creeperIter.next();
@@ -67,5 +67,14 @@ public class CreeperTracking implements EntityTracking {
 	
 	private void _updateSnugglesParticles(Creeper creeper, World world) {
 		ParticleUtils.playParticlesInWorld(world, Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
+	}
+	
+	@Override
+	public void unloadTrackedEntities() {
+		Iterator<Creeper> creepers = mEntities.iterator();
+		while (creepers.hasNext()) {
+			Creeper creeper = creepers.next();
+			removeEntity(creeper);
+		}
 	}
 }

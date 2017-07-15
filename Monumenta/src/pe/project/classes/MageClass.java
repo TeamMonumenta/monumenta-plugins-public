@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
@@ -91,6 +92,11 @@ public class MageClass extends BaseClass {
 	
 	public MageClass(Main plugin, Random random) {
 		super(plugin, random);
+	}
+	
+	@Override
+	public void setupClassPotionEffects(Player player) {
+		_testItemInHand(player);
 	}
 	
 	@Override
@@ -346,7 +352,7 @@ public class MageClass extends BaseClass {
 						int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 						int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 						
-						player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, false));
 						
 						int cooldown = prismatic == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), PRISMATIC_SHIELD_ID, cooldown);
@@ -365,9 +371,9 @@ public class MageClass extends BaseClass {
 				
 				if (InventoryUtils.isWandItem(mainHand)) {
 					int strengthAmp = wandMastery == 1 ? WAND_MASTERY_1 : WAND_MASTERY_2;
-					player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
 				} else {
-					player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
+					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 				}
 			}
 		}

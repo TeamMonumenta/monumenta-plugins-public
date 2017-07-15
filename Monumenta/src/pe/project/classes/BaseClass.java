@@ -21,8 +21,6 @@ public class BaseClass {
 	protected Random mRandom;
 	protected Main mPlugin;
 	
-	static public int FAKE_COOLDOWN_ID = 9999;
-
 	protected CooldownTimers mCooldowns = null;
 	
 	public BaseClass(Main plugin, Random random) {
@@ -42,14 +40,12 @@ public class BaseClass {
 		}
 	}
 	
-	public void AbilityOffCooldown(Player player, int abilityID) {
-	}
+	public void setupClassPotionEffects(Player player) {}
 	
-	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
-	}
+	public void AbilityOffCooldown(Player player, int abilityID) {}
 	
-	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
-	}
+	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
+	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
 	
 	public boolean has1SecondTrigger() {
 		return false;
@@ -67,53 +63,39 @@ public class BaseClass {
 		return false;
 	}
 	
-	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
-	}
+	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
 	
-	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {
-	}
+	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 	
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
-	}
+	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {}
 	
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
 		return true;
 	}
 	
-	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-	}
+	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {}
 	
-	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
-	}
+	public void PlayerShotArrowEvent(Player player, Arrow arrow) {}
 	
-	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
-	}
+	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {}
 	
-	public void ProjectileHitEvent(Player player, Arrow arrow) {
-	}
+	public void ProjectileHitEvent(Player player, Arrow arrow) {}
 	
-	public void PlayerItemHeldEvent(Player player) {
-	}
+	public void PlayerItemHeldEvent(Player player) {}
 	
-	public void PlayerDropItemEvent(Player player) {
-	}
+	public void PlayerDropItemEvent(Player player) {}
 	
-	public void PlayerItemBreakEvent(Player player) {
-	}
+	public void PlayerItemBreakEvent(Player player) {}
 	
-	public void PlayerRespawnEvent(Player player) {
-	}
+	public void PlayerRespawnEvent(Player player) {}
 	
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
-	}
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {}
 	
-	public void PlayerInteractEvent(Player player, Action action, Material material) {
-	}
+	public void PlayerInteractEvent(Player player, Action action, Material material) {}
 	
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
 		return true;
 	}
 	
-	public void AreaEffectCloudApplyEvent(List<LivingEntity> entities, Player player) {
-	}
+	public void AreaEffectCloudApplyEvent(List<LivingEntity> entities, Player player) {}
 }

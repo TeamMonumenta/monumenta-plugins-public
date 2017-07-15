@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
@@ -19,29 +22,49 @@ public class PotionUtils {
 	private static final int MINUTES_1 = 60 * SECONDS_1;
 	private static final int MINUTES_1_HALF = MINUTES_1 + SECONDS_30;
 	private static final int MINUTES_3 = MINUTES_1 * 3;
+	private static final int MINUTES_5 = MINUTES_1 * 5;
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 	
 	public static class PotionInfo {
-		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0);
-		public static final PotionInfo HEALING_STRONG = new PotionInfo(PotionEffectType.HEAL, 0, 1);
+		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0, false, true);
+		public static final PotionInfo HEALING_STRONG = new PotionInfo(PotionEffectType.HEAL, 0, 1, false, true);
 		
-		public static final PotionInfo REGENERATION = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_45, 0);
-		public static final PotionInfo REGENERATION_LONG = new PotionInfo(PotionEffectType.REGENERATION, MINUTES_1_HALF, 0);
-		public static final PotionInfo REGENERATION_STRONG = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_22_HALF, 1);
+		public static final PotionInfo REGENERATION = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_45, 0, false, true);
+		public static final PotionInfo REGENERATION_LONG = new PotionInfo(PotionEffectType.REGENERATION, MINUTES_1_HALF, 0, false, true);
+		public static final PotionInfo REGENERATION_STRONG = new PotionInfo(PotionEffectType.REGENERATION, SECONDS_22_HALF, 1, false, true);
 		
-		public static final PotionInfo SWIFTNESS = new PotionInfo(PotionEffectType.SPEED, MINUTES_3, 0);
-		public static final PotionInfo SWIFTNESS_LONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_8, 0);
-		public static final PotionInfo SWIFTNESS_STRONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_1_HALF, 1);
+		public static final PotionInfo SWIFTNESS = new PotionInfo(PotionEffectType.SPEED, MINUTES_3, 0, false, true);
+		public static final PotionInfo SWIFTNESS_LONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_8, 0, false, true);
+		public static final PotionInfo SWIFTNESS_STRONG = new PotionInfo(PotionEffectType.SPEED, MINUTES_1_HALF, 1, false, true);
 		
-		public static final PotionInfo STRENGTH = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_3, 0);
-		public static final PotionInfo STRENGTH_LONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_8, 0);
-		public static final PotionInfo STRENGTH_STRONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_1_HALF, 1);
+		public static final PotionInfo STRENGTH = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_3, 0, false, true);
+		public static final PotionInfo STRENGTH_LONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_8, 0, false, true);
+		public static final PotionInfo STRENGTH_STRONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_1_HALF, 1, false, true);
 		
-		public static final PotionInfo LEAPING = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_3, 0);
-		public static final PotionInfo LEAPING_LONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_8, 0);
-		public static final PotionInfo LEAPING_STRONG = new PotionInfo(PotionEffectType.INCREASE_DAMAGE, MINUTES_1_HALF, 1);
+		public static final PotionInfo LEAPING = new PotionInfo(PotionEffectType.JUMP, MINUTES_3, 0, false, true);
+		public static final PotionInfo LEAPING_LONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_8, 0, false, true);
+		public static final PotionInfo LEAPING_STRONG = new PotionInfo(PotionEffectType.JUMP, MINUTES_1_HALF, 1, false, true);
 		
-		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier) {
+		public static final PotionInfo NIGHT_VISION = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_3, 0, false, true);
+		public static final PotionInfo NIGHT_VISION_LONG = new PotionInfo(PotionEffectType.NIGHT_VISION, MINUTES_8, 0, false, true);
+		
+		public static final PotionInfo FIRE_RESISTANCE = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_3, 0, false, true);
+		public static final PotionInfo FIRE_RESISTANCE_LONG = new PotionInfo(PotionEffectType.FIRE_RESISTANCE, MINUTES_8, 0, false, true);
+		
+		public static final PotionInfo LUCK = new PotionInfo(PotionEffectType.LUCK, MINUTES_5, 0, false, true);
+		
+		public PotionInfo() {
+		}
+		
+		public PotionInfo(PotionEffect effect) {
+			type = effect.getType();
+			duration = effect.getDuration();
+			amplifier = effect.getAmplifier();
+			ambient = effect.isAmbient();
+			showParticles = effect.hasParticles();
+		}
+		
+		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean ambient, boolean hasParticles) {
 			type = _type;
 			duration = _duration;
 			amplifier = _amplifier;
@@ -50,6 +73,8 @@ public class PotionUtils {
 		public PotionEffectType type;
 		public int duration;
 		public int amplifier;
+		public boolean ambient;
+		public boolean showParticles;
 	}
 	
 	public static PotionInfo getPotionInfo(PotionData data) {
@@ -95,6 +120,20 @@ public class PotionUtils {
 			} else {
 				return PotionInfo.LEAPING;
 			}
+		} else if (type == PotionType.NIGHT_VISION) {
+			if (isExtended) {
+				return PotionInfo.NIGHT_VISION_LONG;
+			} else {
+				return PotionInfo.NIGHT_VISION;
+			}
+		} else if (type == PotionType.FIRE_RESISTANCE) {
+			if (isExtended) {
+				return PotionInfo.FIRE_RESISTANCE_LONG;
+			} else {
+				return PotionInfo.FIRE_RESISTANCE;
+			}
+		} else if (type == PotionType.LUCK) {
+			return PotionInfo.LUCK;
 		}
 		
 		return null;
@@ -107,7 +146,7 @@ public class PotionUtils {
 		if (data != null) {
 			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data);
 			if (info != null) {
-				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier);
+				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient, info.showParticles);
 				effectsList.add(effect);
 			}
 		}
@@ -122,16 +161,16 @@ public class PotionUtils {
 		return effectsList;
 	}
 	
-	public static void applyPotion(LivingEntity entity, PotionEffect effect) {
+	public static void applyPotion(Main plugin, Player player, PotionEffect effect) {
 		if (effect.getType().getName() == PotionEffectType.HEAL.getName()) {
-			double health = entity.getHealth();
+			double health = player.getHealth();
 			double healthToAdd = 4 * (effect.getAmplifier()+1);
 			
 			health = Math.min(health + healthToAdd, 20);
 			
-			entity.setHealth(health);
+			player.setHealth(health);
 		} else {
-			entity.addPotionEffect(effect);
+			plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 		}
 	}
 	

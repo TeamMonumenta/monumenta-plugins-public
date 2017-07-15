@@ -64,8 +64,10 @@ public class POIManager {
 	}
 	
 	public void saveAllPOIs() {
-		for (PointOfInterest poi : mPOIs) {
-			poi.save();
+		if (mPOIs != null) {
+			for (PointOfInterest poi : mPOIs) {
+				poi.save();
+			}
 		}
 	}
 	

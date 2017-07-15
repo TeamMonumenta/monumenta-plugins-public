@@ -18,9 +18,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Constants;
+import pe.project.Main;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
@@ -28,15 +30,24 @@ import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class PlayerTracking implements EntityTracking {
+	Main mPlugin = null;
 	private Set<Player> mEntities = new HashSet<Player>();
+	
+	PlayerTracking(Main plugin) {
+		mPlugin = plugin;
+	}
 	
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Player)entity);
+		
+		mPlugin.mPotionManager.loadPlayerPotionData((Player)entity);
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
+		mPlugin.mPotionManager.savePlayerPotionData((Player)entity);
+		
 		mEntities.remove(entity);
 	}
 	
@@ -45,7 +56,7 @@ public class PlayerTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world) {
+	public void update(World world, int ticks) {
 		Iterator<Player> playerIter = mEntities.iterator();
 		while (playerIter.hasNext()) {
 			Player player = playerIter.next();
@@ -99,21 +110,21 @@ public class PlayerTracking implements EntityTracking {
 				if (inSafeZone) {
 					if (applyEffects) {
 						if (inCapital) {
-							player.addPotionEffect(Constants.CAPITAL_SPEED_EFFECT, true);
+							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
 						}
 						
-						player.addPotionEffect(Constants.CITY_RESISTENCE_EFFECT, true);
+						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTENCE_EFFECT);
 						
 						PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
 						if (effect != null) {
 							if (effect.getAmplifier() <= 5) {
-								player.removePotionEffect(PotionEffectType.JUMP);
+								mPlugin.mPotionManager.removePotion(player, PotionID.SAFE_ZONE, PotionEffectType.JUMP);
 							}
 						}
 						
 						int food = ScoreboardUtils.getScoreboardValue(player, "Food");
 						if (food <= 17) {
-							player.addPotionEffect(Constants.CITY_SATURATION_EFFECT, true);
+							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
 						}
 					}
 				} else {
@@ -125,6 +136,8 @@ public class PlayerTracking implements EntityTracking {
 			
 			//	Extra Effects.
 			_updateExtraEffects(player, world);
+			
+			mPlugin.mPotionManager.updatePotionStatus(player, ticks);
 		}
 	}
 	
@@ -175,6 +188,15 @@ public class PlayerTracking implements EntityTracking {
 		ItemStack chest = player.getInventory().getChestplate();
 		if (InventoryUtils.testForItemWithLore(chest, "* Stylish *")) {
 			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
+		}
+	}
+	
+	@Override
+	public void unloadTrackedEntities() {
+		Iterator<Player> players = mEntities.iterator();
+		while (players.hasNext()) {
+			Player player = players.next();
+			removeEntity(player);
 		}
 	}
 }

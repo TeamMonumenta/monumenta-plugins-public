@@ -26,7 +26,7 @@ public class SilverfishTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world) {
+	public void update(World world, int ticks) {
 		Iterator<Silverfish> silverfishIter = mEntities.iterator();
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();
@@ -40,6 +40,15 @@ public class SilverfishTracking implements EntityTracking {
 			} else {
 				silverfishIter.remove();
 			}
+		}
+	}
+	
+	@Override
+	public void unloadTrackedEntities() {
+		Iterator<Silverfish> silverfishs = mEntities.iterator();
+		while (silverfishs.hasNext()) {
+			Silverfish silverfish = silverfishs.next();
+			removeEntity(silverfish);
 		}
 	}
 }

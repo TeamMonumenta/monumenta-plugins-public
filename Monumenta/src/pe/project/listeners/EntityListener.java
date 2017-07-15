@@ -1,11 +1,13 @@
 package pe.project.listeners;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
@@ -45,8 +47,11 @@ import pe.project.Main;
 import pe.project.classes.BaseClass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.utils.PlayerUtils;
+import pe.project.utils.PotionUtils;
+import pe.project.utils.PotionUtils.PotionInfo;
 
 public class EntityListener implements Listener {
 	Main mPlugin;
@@ -171,36 +176,44 @@ public class EntityListener implements Listener {
 			ProjectileSource source = potion.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
+				
 				boolean cancel = !mPlugin.getClass(player).PlayerSplashPotionEvent(player, event.getAffectedEntities(), potion);
 				if (cancel) {
 					event.setCancelled(true);
+				} else {
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, potion.getEffects());
 				}
 			}
-			
-			/*//	Prevent players from getting negative effects from other players.
-			if (event.getPotion().getShooter() instanceof Player) {
-				boolean hasNegativeEffects = PotionUtils.hasNegativeEffects(event.getPotion().getEffects());
-				if (hasNegativeEffects) {
-					Collection<LivingEntity> entities = event.getAffectedEntities();
-					Iterator<LivingEntity> iter = entities.iterator();
-					while (iter.hasNext()) {
-						LivingEntity entity = iter.next();
-						if (entity instanceof Player) {
-							iter.remove();
-						}
-					}
-				}
-			}*/
 		}
 	}
 	
 	//	Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
-		ProjectileSource source = event.getEntity().getSource();	
+		AreaEffectCloud cloud = event.getEntity();
+		ProjectileSource source = cloud.getSource();	
 		if (source instanceof Player) {
 			Player player = (Player)source;
-			mPlugin.getClass(player).AreaEffectCloudApplyEvent(event.getAffectedEntities(), player);
+			List<LivingEntity> entities = event.getAffectedEntities();
+			
+			mPlugin.getClass(player).AreaEffectCloudApplyEvent(entities, player);
+
+			PotionInfo data = PotionUtils.getPotionInfo(cloud.getBasePotionData());
+			List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
+			
+			for (LivingEntity entity : entities) {
+				if (entity instanceof Player) {
+					Player p = (Player)entity;
+					
+					if (data != null) {
+						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, data);
+					}
+					
+					if (effects != null) {
+						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, effects);
+					}
+				}
+			}
 		}
 	}
 	
@@ -280,6 +293,17 @@ public class EntityListener implements Listener {
 									arrow.removeCustomEffect(effect.getType());
 								}
 							}
+						}
+						
+						PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData());
+						List<PotionEffect> effects = arrow.getCustomEffects();
+
+						if (info != null) {
+							mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
+						}
+						
+						if (effects != null) {
+							mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 						}
 					}
 				}

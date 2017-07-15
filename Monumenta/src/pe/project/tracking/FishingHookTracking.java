@@ -39,5 +39,8 @@ public class FishingHookTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world) { }
+	public void update(World world, int ticks) { }
+	
+	@Override
+	public void unloadTrackedEntities() { }
 }

@@ -44,3 +44,7 @@ commands:
     permission: monumenta.commands.getScore
     description: Prints out a specific player's/dummy's passed in scoreboard value.
     usage: /getScore <player/dummy name> <scoreboardName>
+  refreshClassEffects:
+    permission: monumenta.commands.refreshClassEffects
+    description: Cause players near a given point (An ability unlock point) to refresh their potion effects based on their scoreboard.
+    usage: /refreshClassEffects <x y z>

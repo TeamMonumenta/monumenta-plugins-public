@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
@@ -81,6 +82,11 @@ public class AlchemistClass extends BaseClass {
 	}
 	
 	@Override
+	public void setupClassPotionEffects(Player player) {
+		_testInvigoratingOdor(player);
+	}
+	
+	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
 		//	GruesomeAlchemy
 		{
@@ -93,19 +99,19 @@ public class AlchemistClass extends BaseClass {
 					int rand = mRandom.nextInt(4);
 					if (rand == 0) {
 						ItemUtils.setPotionMeta(stack, "Splash Potion of Harming", PotionEffectType.INCREASE_DAMAGE.getColor());
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.HARM, 0, 1));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.HARM, 0, 1, false, true));
 					} else if (rand == 1) {
 						ItemUtils.setPotionMeta(stack, "Potion of Decay", Color.fromRGB(6178631));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 32 * 20, 0));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WEAKNESS, 32 * 20, 0));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 32 * 20, 0, false, true));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WEAKNESS, 32 * 20, 0, false, true));
 					} else if (rand == 2) {
 						ItemUtils.setPotionMeta(stack, "Scorpion Venom", Color.fromRGB(4610355));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 18 * 20, 1));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.POISON, 18 * 20, 0));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 18 * 20, 1, false, true));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.POISON, 18 * 20, 0, false, true));
 					} else {
 						ItemUtils.setPotionMeta(stack, "Lesser Frost Bomb", Color.fromRGB(3294553));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1, false, true));
+						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0, false, true));
 					}
 					
 					World world = Bukkit.getWorld(player.getWorld().getName());
@@ -140,10 +146,10 @@ public class AlchemistClass extends BaseClass {
 						if (targetEntity != null && targetEntity instanceof Player) {
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 							
-							targetEntity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
+							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
 							
 							if (powerInjection > 1) {
-								targetEntity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+								mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
 							}
 							
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), POWER_INJECTION_ID, POWER_INJECTION_COOLDOWN);
@@ -249,20 +255,20 @@ public class AlchemistClass extends BaseClass {
 		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
 		if (invigoratingOdor > 0) {
 			if (_testPotionInHand(player)) {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
 				
 				if (invigoratingOdor > 1) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 1000000, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1000000, INVIGORATING_ODOR_JUMP_EFFECT_LVL, true, false	));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 1000000, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, INVIGORATING_ODOR_JUMP_EFFECT_LVL, true, false));
 				}
 			} else {
-				player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-				player.removePotionEffect(PotionEffectType.SPEED);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
 				
 				if (invigoratingOdor > 1) {
-					player.removePotionEffect(PotionEffectType.REGENERATION);
-					player.removePotionEffect(PotionEffectType.JUMP);
+					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
+					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
 				}
 			}
 		}

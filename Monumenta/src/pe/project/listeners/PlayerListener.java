@@ -20,6 +20,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -32,14 +33,20 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Main;
 import pe.project.locations.poi.PointOfInterest;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.RegionReset;
 import pe.project.utils.ItemUtils;
+import pe.project.utils.PotionUtils;
+import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.StringUtils;
 
@@ -280,6 +287,29 @@ public class PlayerListener implements Listener {
 			mPlugin.mTrackingManager.mFishingHook.addEntity(event.getPlayer(), event.getHook());
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
+		Player player = event.getPlayer();
+		ItemStack item = event.getItem();
+		if (item.getType() == Material.POTION) {
+			PotionMeta meta = ItemUtils.getPotionMeta(item);
+			if (meta != null) {
+				//	Add base potion effect.
+				PotionData data = meta.getBasePotionData();
+				PotionInfo info = PotionUtils.getPotionInfo(data);
+				if (info != null) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
+				}
+				
+				//	Add custom potion effects.
+				List<PotionEffect> effects = meta.getCustomEffects();
+				if (effects != null) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
+				}
+			}
 		}
 	}
 }

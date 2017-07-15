@@ -26,7 +26,7 @@ public class BoatTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world) {
+	public void update(World world, int ticks) {
 		Iterator<Boat> boatIter = mEntities.iterator();
 		while (boatIter.hasNext()) {
 			Boat boat = boatIter.next();
@@ -40,6 +40,15 @@ public class BoatTracking implements EntityTracking {
 			} else {
 				boatIter.remove();
 			}
+		}
+	}
+
+	@Override
+	public void unloadTrackedEntities() {
+		Iterator<Boat> boats = mEntities.iterator();
+		while (boats.hasNext()) {
+			Boat boat = boats.next();
+			removeEntity(boat);
 		}
 	}
 }

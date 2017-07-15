@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -268,7 +269,7 @@ public class ClericClass extends BaseClass {
 							
 							List<PotionEffect> effectList = PotionUtils.getEffects(meta);
 							for (PotionEffect effect : effectList) {
-								PotionUtils.applyPotion(p, effect);
+								PotionUtils.applyPotion(mPlugin, p, effect);
 							}
 						}
 					}
@@ -293,7 +294,7 @@ public class ClericClass extends BaseClass {
 						targetEntity.setHealth(newHealth);
 						
 						if (healing > 1) {
-							targetEntity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, HEALING_REGEN_DURATION, HEALING_REGEN_LVL, true, false));
+							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, HEALING_REGEN_DURATION, HEALING_REGEN_LVL, true, false));
 						}
 						
 						int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;

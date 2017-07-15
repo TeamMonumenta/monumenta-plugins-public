@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
@@ -86,6 +87,11 @@ public class RogueClass extends BaseClass {
 	}
 	
 	@Override
+	public void setupClassPotionEffects(Player player) {
+		_testForDuelWielding(player);
+	}
+	
+	@Override
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == ASSASSINATION_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Assassination is now off cooldown");
@@ -123,10 +129,10 @@ public class RogueClass extends BaseClass {
 					if (_testForSwordsInHand(player)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), FOCUS_ID)) {
 							int effectLvl = focus == 1 ? FOCUS_1_STRENGTH_LVL : FOCUS_2_STRENGTH_LVL;
-							player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, FOCUS_DURATION, effectLvl, true, false));
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, FOCUS_DURATION, effectLvl, true, false));
 							
 							if (focus > 1) {
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, FOCUS_DURATION, FOCUS_RESISTENCE_LVL, true, false));
+								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, FOCUS_DURATION, FOCUS_RESISTENCE_LVL, true, false));
 							}
 							
 							World world = player.getWorld();
@@ -180,9 +186,9 @@ public class RogueClass extends BaseClass {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ESCAPE_DEATH_ID)) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_RESISTENCE_EFFECT_LVL, true, false));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_RESISTENCE_EFFECT_LVL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
 					
 					if (escapeDeath > 1) {
 						List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE);
@@ -266,9 +272,9 @@ public class RogueClass extends BaseClass {
 		if (dualWielding > 0) {
 			if (_testForSwordsInHand(player)) {	
 				int effectLvl = dualWielding == 1 ? DUAL_WIELDING_1_EFFECT_LVL : DUAL_WIELDING_2_EFFECT_LVL;
-				player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLvl, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLvl, true, false));
 			} else {
-				player.removePotionEffect(PotionEffectType.FAST_DIGGING);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			}
 		}
 	}
@@ -300,7 +306,7 @@ public class RogueClass extends BaseClass {
 					mPlugin.mTimers.removeCooldowns(player.getUniqueId());
 					MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
 					
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 				}
 				
 				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);

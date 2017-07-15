@@ -12,11 +12,35 @@ import org.bukkit.entity.Silverfish;
 import pe.project.Main;
 
 public class TrackingManager {
+	Main mPlugin = null;
+	
+	public PlayerTracking mPlayers;
+	public CreeperTracking mCreepers;
+	public BoatTracking mBoats;
+	public SilverfishTracking mSilverfish;
+	public FishingHookTracking mFishingHook;
+	
 	public TrackingManager(Main main, World world) {
+		mPlugin = main;
+		
+		mPlayers = new PlayerTracking(mPlugin);
+		mCreepers = new CreeperTracking();
+		mBoats = new BoatTracking();
+		mSilverfish = new SilverfishTracking();
+		mFishingHook = new FishingHookTracking();
+		
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
 			addEntity(entity);
 		}
+	}
+	
+	public void unloadTrackedEntities() {
+		mPlayers.unloadTrackedEntities();
+		mCreepers.unloadTrackedEntities();
+		mBoats.unloadTrackedEntities();
+		mSilverfish.unloadTrackedEntities();
+		mFishingHook.unloadTrackedEntities();
 	}
 	
 	public void addEntity(Entity entity) {
@@ -43,16 +67,10 @@ public class TrackingManager {
 		}
 	}
 	
-	public void update(World world) {
-		mPlayers.update(world);
-		mCreepers.update(world);
-		mBoats.update(world);
-		mSilverfish.update(world);
+	public void update(World world, int ticks) {
+		mPlayers.update(world, ticks);
+		mCreepers.update(world, ticks);
+		mBoats.update(world, ticks);
+		mSilverfish.update(world, ticks);
 	}
-	
-	public PlayerTracking mPlayers = new PlayerTracking();
-	public CreeperTracking mCreepers = new CreeperTracking();
-	public BoatTracking mBoats = new BoatTracking();
-	public SilverfishTracking mSilverfish = new SilverfishTracking();
-	public FishingHookTracking mFishingHook = new FishingHookTracking();
 }

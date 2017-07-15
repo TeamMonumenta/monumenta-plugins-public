@@ -8,5 +8,7 @@ public interface EntityTracking {
 	
 	public void removeEntity(Entity entity);
 	
-	public void update(World world);
+	public void unloadTrackedEntities();
+	
+	public void update(World world, int ticks);
 }

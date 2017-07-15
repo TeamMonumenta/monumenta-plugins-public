@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
@@ -64,6 +65,11 @@ public class WarriorClass extends BaseClass {
 	
 	public WarriorClass(Main plugin, Random random) {
 		super(plugin, random);
+	}
+	
+	public void setupClassPotionEffects(Player player) {
+		_testItemInHand(player);
+		_testToughness(player);
 	}
 	
 	@Override
@@ -203,12 +209,7 @@ public class WarriorClass extends BaseClass {
 	
 	@Override
 	public void PlayerRespawnEvent(Player player) {
-		int toughness = ScoreboardUtils.getScoreboardValue(player, "Toughness");
-		if (toughness > 0) {
-			int healthBoost = toughness == 1 ? 0 : 1;
-			player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 1000000, healthBoost, true, false));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 4, true, false));
-		}
+		_testToughness(player);
 	}
 	
 	@Override
@@ -217,16 +218,14 @@ public class WarriorClass extends BaseClass {
 		if (frenzy > 0) {
 			int hasteAmp = frenzy == 1 ? 2 : 3;
 			
-			player.removePotionEffect(PotionEffectType.FAST_DIGGING);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, false));
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, false));
 			
 			World world = Bukkit.getWorld(player.getWorld().getName());
 			Location loc = player.getLocation();
 			world.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
 			
 			if (frenzy > 1) {
-				player.removePotionEffect(PotionEffectType.SPEED);
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, false));
 			}
 		}
 	}
@@ -257,7 +256,8 @@ public class WarriorClass extends BaseClass {
 													Location loc = target.getLocation();
 													
 													target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
-													target.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, false));
+													boolean self = (target == player);
+													mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, false));
 												}
 											}
 											
@@ -286,24 +286,30 @@ public class WarriorClass extends BaseClass {
 			//	Player has an axe in their mainhands.
 			if (InventoryUtils.isAxeItem(mainHand)) {
 				int strengthAmp = weaponMastery == 1 ? 0 : 1;
-				player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
-				
-				player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			}
 			//	Player has an axe in their offhands.
 			else if (InventoryUtils.isSwordItem(mainHand)) {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
-				
-				player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-			}
-			else {
-				player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-				player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
+			} else {
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 			}
 			
 			if (InventoryUtils.isPickaxeItem(mainHand)) {
-				player.removePotionEffect(PotionEffectType.FAST_DIGGING);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			}
+		}
+	}
+	
+	private void _testToughness(Player player) {
+		int toughness = ScoreboardUtils.getScoreboardValue(player, "Toughness");
+		if (toughness > 0) {
+			int healthBoost = toughness == 1 ? 0 : 1;
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.HEALTH_BOOST, 1000000, healthBoost, true, false));
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 100, 4, true, false));
 		}
 	}
 }

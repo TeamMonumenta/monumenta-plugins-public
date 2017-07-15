@@ -25,6 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import pe.project.Main;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -81,6 +82,12 @@ public class ScoutClass extends BaseClass {
 	}
 	
 	@Override
+	public void setupClassPotionEffects(Player player) {
+		_testForAgility(player);
+		_testForSwiftness(player);
+	}
+	
+	@Override
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == VOLLEY_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Volley is now off cooldown");
@@ -91,26 +98,8 @@ public class ScoutClass extends BaseClass {
 	
 	@Override
 	public void PlayerRespawnEvent(Player player) {
-		//	Agility
-		{
-			int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
-			if (agility > 0) {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, AGILITY_EFFECT_SPEED_LVL, true, false));
-				
-				if (agility > 1) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1000000, AGILITY_EFFECT_JUMP_LVL, true, false));
-				}
-			}
-		}
-		
-		//	Swiftness
-		{
-			int swiftness = ScoreboardUtils.getScoreboardValue(player, "Swiftness");
-			if (swiftness > 0) {
-				int effectLevel = swiftness == 1 ? SWIFTNESS_1_EFFECT_LVL : SWIFTNESS_2_EFFECT_LVL;
-				player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
-			}
-		}
+		_testForAgility(player);
+		_testForSwiftness(player);
 		
 		//	Exploration
 		/*{
@@ -371,6 +360,25 @@ public class ScoutClass extends BaseClass {
 				damage *= STANDARD_BEARER_DAMAGE_MULTIPLIER;
 				event.setDamage(damage);
 			}
+		}
+	}
+	
+	public void _testForAgility(Player player) {
+		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
+		if (agility > 0) {
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, AGILITY_EFFECT_SPEED_LVL, true, false));
+			
+			if (agility > 1) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, AGILITY_EFFECT_JUMP_LVL, true, false));
+			}
+		}
+	}
+	
+	public void _testForSwiftness(Player player) {
+		int swiftness = ScoreboardUtils.getScoreboardValue(player, "Swiftness");
+		if (swiftness > 0) {
+			int effectLevel = swiftness == 1 ? SWIFTNESS_1_EFFECT_LVL : SWIFTNESS_2_EFFECT_LVL;
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
 		}
 	}
 }

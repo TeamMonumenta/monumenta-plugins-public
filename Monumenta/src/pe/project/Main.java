@@ -24,6 +24,7 @@ import pe.project.listeners.PlayerListener;
 import pe.project.listeners.WorldListener;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
+import pe.project.managers.potion.PotionManager;
 import pe.project.timers.CooldownTimers;
 import pe.project.timers.CombatLoggingTimers;
 import pe.project.timers.ProjectileEffectTimers;
@@ -75,6 +76,7 @@ public class Main extends JavaPlugin {
 	public QuestManager mQuestManager;
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
+	public PotionManager mPotionManager;
 	
 	//	Logic that is performed upon enabling the plugin.
 	@Override
@@ -117,7 +119,9 @@ public class Main extends JavaPlugin {
 		getCommand("setPlayerName").setExecutor(new SetPlayerName());
 		getCommand("transferScores").setExecutor(new TransferScores());
 		getCommand("getScore").setExecutor(new GetScore());
+		getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
 		
+		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
 		mPOIManager = new POIManager(this);
@@ -158,7 +162,7 @@ public class Main extends JavaPlugin {
 				
 				//	4 times a second.
 				if (fourHertz) {
-					mTrackingManager.update(world);
+					mTrackingManager.update(world, Constants.QUARTER_TICKS_PER_SECOND);
 					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
 					mCombatLoggingTimers.update(world, Constants.QUARTER_TICKS_PER_SECOND);
 				}
@@ -178,6 +182,8 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
+		
+		mTrackingManager.unloadTrackedEntities();
 		
 		//	Save info.
 		mPOIManager.saveAllPOIs();
