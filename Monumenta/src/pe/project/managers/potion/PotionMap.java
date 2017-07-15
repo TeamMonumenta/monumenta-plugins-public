@@ -4,9 +4,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -96,6 +102,69 @@ public class PotionMap {
 		if (bestEffect != null) {
 			player.removePotionEffect(bestEffect.type);
 			player.addPotionEffect(new PotionEffect(bestEffect.type, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles));
+		}
+	}
+	
+	JsonObject getAsJsonObject() {
+		JsonObject potionIDObject = null;
+		JsonObject potionMapObject = new JsonObject();
+		boolean hasMapping = false;
+		
+		Iterator<Entry<PotionID, Vector<PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
+		while (potionIter.hasNext()) {
+			
+			Entry<PotionID, Vector<PotionInfo>> potionMapping = potionIter.next();
+			if (potionMapping != null) {
+				JsonArray effectListArray = new JsonArray();
+				
+				Vector<PotionInfo> potionInfo = potionMapping.getValue();
+				
+				Iterator<PotionInfo> potionInfoIter = potionInfo.iterator();
+				while (potionInfoIter.hasNext()) {		
+					PotionInfo info = potionInfoIter.next();
+					effectListArray.add(info.getAsJsonObject(true));
+				}
+				
+				if (effectListArray.size() > 0) {
+					potionMapObject.add(potionMapping.getKey().getName(), effectListArray);
+					hasMapping = true;
+				}
+			}
+		}
+		
+		if (hasMapping) {
+			if (potionIDObject == null) {
+				potionIDObject = new JsonObject();
+			}
+			
+			potionIDObject.add("potion_map", potionMapObject);
+		}
+		
+		return potionIDObject;
+	}
+	
+	void loadFromJsonObject(JsonObject object, PotionEffectType type) {
+		JsonObject potionMap = object.get("potion_map").getAsJsonObject();
+		if (potionMap != null) {
+			Set<Entry<String, JsonElement>> entries = potionMap.entrySet();
+			for (Entry<String, JsonElement> entry : entries) {
+				Vector<PotionInfo> potionInfo = new Vector<PotionInfo>();
+				
+				PotionID id = PotionID.getFromString(entry.getKey());
+				JsonArray potionInfoArray = entry.getValue().getAsJsonArray();
+				
+				Iterator<JsonElement> elementIter = potionInfoArray.iterator();
+				while (elementIter.hasNext()) {
+					JsonElement element = elementIter.next();
+					
+					PotionInfo info = new PotionInfo();
+					info.loadFromJsonObject(element.getAsJsonObject(), type);
+					
+					potionInfo.add(info);
+				}
+				
+				mPotionMap.put(id, potionInfo);
+			}
 		}
 	}
 }

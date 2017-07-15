@@ -270,11 +270,11 @@ public class RogueClass extends BaseClass {
 	private void _testForDuelWielding(Player player) {
 		int dualWielding = ScoreboardUtils.getScoreboardValue(player, "DualWielding");
 		if (dualWielding > 0) {
-			if (_testForSwordsInHand(player)) {	
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			
+			if (_testForSwordsInHand(player)) {
 				int effectLvl = dualWielding == 1 ? DUAL_WIELDING_1_EFFECT_LVL : DUAL_WIELDING_2_EFFECT_LVL;
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLvl, true, false));
-			} else {
-				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			}
 		}
 	}

@@ -3,9 +3,13 @@ package pe.project.managers.potion;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -58,6 +62,37 @@ public class PlayerPotionInfo {
 		while (potionMapIter.hasNext()) {
 			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
 			potionEntry.getValue().applyBestPotionEffect(player);
+		}
+	}
+	
+	JsonObject getAsJsonObject() {
+		JsonObject playerPotionInfoObject = new JsonObject();
+		
+		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
+		while (potionMapIter.hasNext()) {
+			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
+			
+			JsonElement element = potionEntry.getValue().getAsJsonObject();
+			if (element != null) {
+				playerPotionInfoObject.add(potionEntry.getKey().getName(), element);
+			}
+		}
+		
+		return playerPotionInfoObject;
+	}
+	
+	void loadFromJsonObject(JsonObject object) {
+		Set<Entry<String, JsonElement>> potionInfo = object.entrySet();
+		for (Entry<String, JsonElement> info : potionInfo) {
+			PotionEffectType type = PotionEffectType.getByName(info.getKey());
+			PotionMap map = new PotionMap();
+			
+			JsonElement mapElement = info.getValue();
+			if (mapElement != null) {
+				map.loadFromJsonObject(mapElement.getAsJsonObject(), type);
+			
+				mPotionInfo.put(type, map);
+			}
 		}
 	}
 }

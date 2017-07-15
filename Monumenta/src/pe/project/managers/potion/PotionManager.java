@@ -5,15 +5,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import pe.project.Main;
-import pe.project.json.objects.PotionManagerObject;
 import pe.project.utils.FileUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 
@@ -53,31 +54,19 @@ public class PotionManager {
 	}
 	
 	public void loadPlayerPotionData(Player player) {
-		final String fileLocation = mPlugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
+		clearAllPotions(player, false);
 		
+		final String fileLocation = mPlugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 		try {
 			String content = FileUtils.getCreateFile(fileLocation);
-			if (content != null) {
+			if (content != null && content != "") {
 				Gson gson = new Gson();
 
-				PotionManagerObject object = gson.fromJson(content, PotionManagerObject.class);
-				
-				if (object != null) {
-					HashMap<UUID, PlayerPotionInfo> playerPotionInfo = object.convertToPotionManager();
-					
-					mPotionManager = playerPotionInfo;
-					
-					Collection<PotionEffect> effects = player.getActivePotionEffects();
-					for (PotionEffect effect : effects) {
-						player.removePotionEffect(effect.getType());
-					}
-				}
+				loadFromJsonObject(player, gson.fromJson(content, JsonObject.class));
 			}
-		} catch(Exception e) {
-			Bukkit.broadcastMessage("Load Player Failed - " + e.getMessage());
+		} catch (Exception e) {
 		}
 		
-		//	Refresh the players class effects.
 		refreshClassEffects(player);
 	}
 	
@@ -88,11 +77,10 @@ public class PotionManager {
 			try {
 				String content = FileUtils.getCreateFile(fileLocation);
 				if (content != null) {
-					Gson gson = new Gson();
-
-					PotionManagerObject object = new PotionManagerObject(mPotionManager);
-
-					String jsonStr = gson.toJson(object, PotionManagerObject.class);
+					Gson gson = new GsonBuilder().setPrettyPrinting().create();
+					
+					JsonObject object = getAsJsonObject(player);
+					String jsonStr = gson.toJson(object);
 					
 					FileUtils.writeFile(fileLocation, jsonStr);
 				}
@@ -113,7 +101,7 @@ public class PotionManager {
 	
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
 		UUID uuid = player.getUniqueId();
-		PlayerPotionInfo potionInfo = mPlugin.mPotionManager.mPotionManager.get(uuid);
+		PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
 		if (potionInfo != null) {
 			potionInfo.addPotionInfo(player, id, info);	
 		} else {
@@ -124,10 +112,21 @@ public class PotionManager {
 	}
 	
 	public void removePotion(Player player, PotionID id, PotionEffectType type) {
-		PlayerPotionInfo potionInfo = mPlugin.mPotionManager.mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.removePotionInfo(player, id, type);
 		}	
+	}
+	
+	public void clearAllPotions(Player player, boolean fromManager) {
+		Collection<PotionEffect> effects = player.getActivePotionEffects();
+		for (PotionEffect effect : effects) {
+			player.removePotionEffect(effect.getType());
+		}
+		
+		if (fromManager) {
+			mPotionManager.remove(player.getUniqueId());
+		}
 	}
 	
 	public void clearPotionIDType(Player player, PotionID id) {
@@ -162,5 +161,28 @@ public class PotionManager {
 			
 		//	Once all the potion stuff is setup apply the best effects.
 		applyBestPotionEffect(player);
+	}
+	
+	//	TODO: Abstract this out to a general Player Profile so we can have a general player data saving system.
+	//	This can be used with Bungee to pass over player data we want to share between servers.
+	JsonObject getAsJsonObject(Player player) {
+		JsonObject object = new JsonObject();
+		
+		PlayerPotionInfo info = mPotionManager.get(player.getUniqueId());
+		if (info != null) {
+			object.add("potion_info", info.getAsJsonObject());
+		}
+		
+		return object;
+	}
+	
+	void loadFromJsonObject(Player player, JsonObject object) {
+		JsonElement potionInfo = object.get("potion_info");
+		if (potionInfo != null) {
+			PlayerPotionInfo info = new PlayerPotionInfo();
+			info.loadFromJsonObject(potionInfo.getAsJsonObject());
+			
+			mPotionManager.put(player.getUniqueId(), info);
+		}
 	}
 }

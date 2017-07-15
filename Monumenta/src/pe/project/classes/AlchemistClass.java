@@ -254,6 +254,13 @@ public class AlchemistClass extends BaseClass {
 	private void _testInvigoratingOdor(Player player) {
 		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
 		if (invigoratingOdor > 0) {
+			//	First remove the effects and then if the test passes re-add them (This is to prevent the case where players scroll
+			//	between potions and they get multiple instances of the effects.
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
+			
 			if (_testPotionInHand(player)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
@@ -261,14 +268,6 @@ public class AlchemistClass extends BaseClass {
 				if (invigoratingOdor > 1) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 1000000, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, INVIGORATING_ODOR_JUMP_EFFECT_LVL, true, false));
-				}
-			} else {
-				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
-				
-				if (invigoratingOdor > 1) {
-					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
-					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
 				}
 			}
 		}

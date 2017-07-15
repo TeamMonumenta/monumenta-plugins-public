@@ -369,11 +369,11 @@ public class MageClass extends BaseClass {
 			if (wandMastery > 0) {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
+				
 				if (InventoryUtils.isWandItem(mainHand)) {
 					int strengthAmp = wandMastery == 1 ? WAND_MASTERY_1 : WAND_MASTERY_2;
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
-				} else {
-					mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 				}
 			}
 		}

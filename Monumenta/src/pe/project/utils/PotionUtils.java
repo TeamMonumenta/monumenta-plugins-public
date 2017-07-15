@@ -11,6 +11,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import com.google.gson.JsonObject;
+
 import pe.project.Main;
 import pe.project.managers.potion.PotionManager.PotionID;
 
@@ -75,6 +77,34 @@ public class PotionUtils {
 		public int amplifier;
 		public boolean ambient;
 		public boolean showParticles;
+		
+		public JsonObject getAsJsonObject(boolean ignoreType) {
+			JsonObject potionInfoObject = new JsonObject();
+		
+			if (!ignoreType) {
+				potionInfoObject.addProperty("type", type.getName());
+			}
+			
+			potionInfoObject.addProperty("duration", duration);
+			potionInfoObject.addProperty("amplifier", amplifier);
+			potionInfoObject.addProperty("ambient", ambient);
+			potionInfoObject.addProperty("show_particles", showParticles);
+			
+			return potionInfoObject;
+		}
+		
+		public void loadFromJsonObject(JsonObject object, PotionEffectType potionType) {
+			if (object.has("type")) {
+				type = PotionEffectType.getByName(object.get("type").getAsString());
+			} else {
+				type = potionType;
+			}
+			
+			duration = object.get("duration").getAsInt();
+			amplifier = object.get("amplifier").getAsInt();
+			ambient = object.get("ambient").getAsBoolean();
+			showParticles = object.get("show_particles").getAsBoolean();
+		}
 	}
 	
 	public static PotionInfo getPotionInfo(PotionData data) {
