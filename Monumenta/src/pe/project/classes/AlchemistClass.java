@@ -27,6 +27,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
+import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -47,11 +48,13 @@ public class AlchemistClass extends BaseClass {
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
 	
+	private static int PUTRID_FUMES_ID = 52;
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
 	private static String PUTRID_FUMES_2_TAG = "PutridFumes2";
 	private static float PUTRID_FUMES_1_RADIUS = 3;
 	private static float PUTRID_FUMES_2_RADIUS = 5;
 	private static int PUTRID_FUMES_DURATION = 15 * 20;
+	private static int PUTRID_FUMES_COOLDOWN = 10 * 20;
 	
 	private static int CAUSTIC_MIXTURE_1_DAMAGE = 6;
 	private static int CAUSTIC_MIXTURE_2_DAMAGE = 12;
@@ -84,6 +87,13 @@ public class AlchemistClass extends BaseClass {
 	@Override
 	public void setupClassPotionEffects(Player player) {
 		_testInvigoratingOdor(player);
+	}
+	
+	@Override
+	public void AbilityOffCooldown(Player player, int abilityID) {
+		if (abilityID == PUTRID_FUMES_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Putrid Fumes is now off cooldown");
+		}
 	}
 	
 	@Override
@@ -189,11 +199,15 @@ public class AlchemistClass extends BaseClass {
 	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
-			if (!PotionUtils.hasPositiveEffects(potion.getEffects())) {
-				int putridFumes = ScoreboardUtils.getScoreboardValue(player, "PutridFumes");
-				if (putridFumes > 0) {
-					String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
-					potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
+			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), PUTRID_FUMES_ID)) {
+				if (!PotionUtils.hasPositiveEffects(potion.getEffects())) {
+					int putridFumes = ScoreboardUtils.getScoreboardValue(player, "PutridFumes");
+					if (putridFumes > 0) {
+						String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
+						potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
+						
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), PUTRID_FUMES_ID, PUTRID_FUMES_COOLDOWN);
+					}
 				}
 			}
 		}
