@@ -43,11 +43,11 @@ import pe.project.utils.ScoreboardUtils;
 */
 
 public class ScoutClass extends BaseClass {
-	private static int AGILITY_EFFECT_SPEED_LVL = 0;
-	private static int AGILITY_EFFECT_JUMP_LVL = 2;
+	private static int SWIFTNESS_EFFECT_SPEED_LVL = 0;
+	private static int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 	
-	private static int SWIFTNESS_1_EFFECT_LVL = 0;
-	private static int SWIFTNESS_2_EFFECT_LVL = 1;
+	private static int AGILITY_1_EFFECT_LVL = 0;
+	private static int AGILITY_2_EFFECT_LVL = 1;
 	
 	//private static int EXPLORATION_1_EFFECT_LVL = 0;
 	//private static int EXPLORATION_2_EFFECT_LVL = 1;
@@ -366,19 +366,19 @@ public class ScoutClass extends BaseClass {
 	public void _testForAgility(Player player) {
 		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
 		if (agility > 0) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, AGILITY_EFFECT_SPEED_LVL, true, false));
-			
-			if (agility > 1) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, AGILITY_EFFECT_JUMP_LVL, true, false));
-			}
+			int effectLevel = agility == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
 		}
 	}
 	
 	public void _testForSwiftness(Player player) {
 		int swiftness = ScoreboardUtils.getScoreboardValue(player, "Swiftness");
 		if (swiftness > 0) {
-			int effectLevel = swiftness == 1 ? SWIFTNESS_1_EFFECT_LVL : SWIFTNESS_2_EFFECT_LVL;
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
+			
+			if (swiftness > 1) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
+			}
 		}
 	}
 }
