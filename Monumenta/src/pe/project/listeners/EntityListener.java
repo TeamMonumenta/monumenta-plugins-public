@@ -109,7 +109,7 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
 			DamageCause source = event.getCause();
-			if (source == DamageCause.SUFFOCATION) {
+			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {
 				//	If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
 				Location playerLoc = player.getLocation();
 				
