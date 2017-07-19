@@ -8,9 +8,11 @@ import java.io.IOException;
 public class FileUtils {
 	public static String getCreateFile(String fileName) throws IOException {
 		String content = null;
-		File file = new File(fileName);
+		File file;
 		
 		try {
+			file = new File(fileName);
+			
 			if (!file.exists()) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
@@ -19,19 +21,21 @@ public class FileUtils {
 			return null;
 		}
 		
-		FileReader reader = null;
-		
-		try {
-			reader = new FileReader(file);
-			char[] chars = new char[(int) file.length()];
-	        reader.read(chars);
-	        content = new String(chars);
-	        reader.close();
-		} catch(Exception e) {
-			return null;
-		} finally {
-			if (reader != null) {
-				reader.close();
+		if (file != null) {
+			FileReader reader = null;
+			
+			try {
+				reader = new FileReader(file);
+				char[] chars = new char[(int) file.length()];
+		        reader.read(chars);
+		        content = new String(chars);
+		        reader.close();
+			} catch(Exception e) {
+				return null;
+			} finally {
+				if (reader != null) {
+					reader.close();
+				}
 			}
 		}
 		
