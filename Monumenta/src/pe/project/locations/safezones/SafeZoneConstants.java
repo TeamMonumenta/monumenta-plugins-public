@@ -25,15 +25,17 @@ public class SafeZoneConstants {
 		SiegeOfHighwatch(11),
 		Ctaz(12),
 		Hermy(13),
+		
+		Monument(14),
 
-		Total(14);
+		Total(15);
 		
 		public int mValue;
 		private SafeZones(int value)	{	this.mValue = value;	}
 	}
 	
 	static final AreaBounds[] mSafeZoneBounds = {
-			new AreaBounds("Capital", new Point(-1130, 0,-284), new Point(-498, 256, 344)),		//	Capital
+			new AreaBounds("Capital", new Point(-1130, 0,-284), new Point(-498, 256, 344)),			//	Capital
 			new AreaBounds("Nyr", new Point(-179, 0, -166), new Point(-79, 256, 14)),				//	Nyr
 			new AreaBounds("Farr", new Point(538, 0, 100), new Point(655, 256, 229)),				//	Farr
 			new AreaBounds("Highwatch", new Point(1131, 0, -156), new Point(1221, 256, -76)),		//	Highwatch
@@ -50,6 +52,8 @@ public class SafeZoneConstants {
 			new AreaBounds("", new Point(1505, 102, -178), new Point(1631, 256, -16)),				// Siege Of Highwatch
 			new AreaBounds("", new Point(232, 10, 294), new Point(249, 256, 318)),					// Ctaz
 			new AreaBounds("", new Point(-331, 86, 334), new Point(-310, 110, 355)),				// Hermy
+			
+			new AreaBounds("Monument", new Point(1160, 0, -320), new Point(1400, 256, -115)),		//	Monument
 	};
 	
 	public static AreaBounds getSafeZone(SafeZones city) {
@@ -75,13 +79,15 @@ public class SafeZoneConstants {
 	public static boolean safeZoneAppliesEffects(SafeZones safeZone) {
 		if (safeZone == SafeZones.SiegeOfHighwatch
 			|| safeZone == SafeZones.Ctaz
-			|| safeZone == SafeZones.Hermy) {
+			|| safeZone == SafeZones.Hermy
+			|| safeZone == SafeZones.Monument) {
 			return false;
 		}
 		
 		return true;
 	}
 	
+	//	Maybe we'll use this one day...
 	public static void safeZoneEnteredMessage(SafeZones zone, Player player) {
 		String name = getSafeZone(zone).getName();
 		if (!name.isEmpty()) {
