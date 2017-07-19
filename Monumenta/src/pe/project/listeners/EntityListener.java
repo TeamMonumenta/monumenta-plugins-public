@@ -29,6 +29,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -136,6 +137,32 @@ public class EntityListener implements Listener {
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+	
+	//	Hanging Entity hurt by another entity.
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void HangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
+		Entity damager = event.getRemover();
+
+		//	If hurt by a player in adventure mode we want to prevent the break;
+		if (damager instanceof Player) {
+			Player player = (Player)damager;
+			if (player.getGameMode() == GameMode.ADVENTURE) {
+				event.setCancelled(true);
+			}
+		}
+		//	If hurt by an arrow from a player in adventure mode.
+		else if (damager instanceof Arrow || damager instanceof TippedArrow) {
+			Arrow arrow = (Arrow)damager;
+			
+			ProjectileSource source = arrow.getShooter();
+			if (source instanceof Player) {
+				Player player = (Player)source;
+				if (player.getGameMode() == GameMode.ADVENTURE) {
+					event.setCancelled(true);
 				}
 			}
 		}
