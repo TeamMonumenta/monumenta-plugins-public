@@ -45,10 +45,6 @@ public class SilverfishTracking implements EntityTracking {
 	
 	@Override
 	public void unloadTrackedEntities() {
-		Iterator<Silverfish> silverfishs = mEntities.iterator();
-		while (silverfishs.hasNext()) {
-			Silverfish silverfish = silverfishs.next();
-			removeEntity(silverfish);
-		}
+		mEntities.clear();
 	}
 }

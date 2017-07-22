@@ -71,10 +71,6 @@ public class CreeperTracking implements EntityTracking {
 	
 	@Override
 	public void unloadTrackedEntities() {
-		Iterator<Creeper> creepers = mEntities.iterator();
-		while (creepers.hasNext()) {
-			Creeper creeper = creepers.next();
-			removeEntity(creeper);
-		}
+		mEntities.clear();
 	}
 }

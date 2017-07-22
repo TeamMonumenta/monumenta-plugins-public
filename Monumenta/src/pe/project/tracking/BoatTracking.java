@@ -45,10 +45,6 @@ public class BoatTracking implements EntityTracking {
 
 	@Override
 	public void unloadTrackedEntities() {
-		Iterator<Boat> boats = mEntities.iterator();
-		while (boats.hasNext()) {
-			Boat boat = boats.next();
-			removeEntity(boat);
-		}
+		mEntities.clear();
 	}
 }
