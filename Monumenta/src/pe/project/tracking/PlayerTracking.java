@@ -26,6 +26,7 @@ import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.playerdata.PlayerData;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
@@ -42,14 +43,14 @@ public class PlayerTracking implements EntityTracking {
 	
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Player)entity);
+		PlayerData.DeserializePlayerData(mPlugin, (Player)entity);
 		
-		mPlugin.mPotionManager.loadPlayerPotionData((Player)entity);
+		mEntities.add((Player)entity);
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
-		mPlugin.mPotionManager.savePlayerPotionData((Player)entity);
+		PlayerData.SerializePlayerData(mPlugin, (Player)entity);
 		
 		mEntities.remove(entity);
 	}

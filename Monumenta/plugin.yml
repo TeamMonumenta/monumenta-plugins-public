@@ -48,3 +48,7 @@ commands:
     permission: monumenta.commands.refreshClassEffects
     description: Cause players near a given point (An ability unlock point) to refresh their potion effects based on their scoreboard.
     usage: /refreshClassEffects <x y z>
+  bungeeTest:
+    permission: monumenta.commands.bungeeTest
+    description: N/A
+    usage: /bungeeTest

@@ -156,7 +156,7 @@ public class PotionMap {
 				Iterator<JsonElement> elementIter = potionInfoArray.iterator();
 				while (elementIter.hasNext()) {
 					JsonElement element = elementIter.next();
-					
+
 					PotionInfo info = new PotionInfo();
 					info.loadFromJsonObject(element.getAsJsonObject(), type);
 					
