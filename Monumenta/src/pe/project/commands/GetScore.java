@@ -1,5 +1,6 @@
 package pe.project.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +14,7 @@ public class GetScore implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
 		if (arg0 instanceof Player) {
-			if (arg3.length < 1) {
+			if (arg3.length < 2) {
 	    		arg0.sendMessage(ChatColor.RED + "Too few parameters!");
 	    		arg0.sendMessage(ChatColor.RED + "Usage: " + arg1.getUsage());
 	    		return false;
