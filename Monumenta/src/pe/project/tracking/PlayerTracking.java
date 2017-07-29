@@ -223,7 +223,7 @@ public class PlayerTracking implements EntityTracking {
 		Iterator<Player> players = mEntities.iterator();
 		while (players.hasNext()) {
 			Player player = players.next();
-			mPlugin.mPotionManager.savePlayerPotionData(player);
+			PlayerData.SerializePlayerData(mPlugin, player);
 		}
 		
 		mEntities.clear();

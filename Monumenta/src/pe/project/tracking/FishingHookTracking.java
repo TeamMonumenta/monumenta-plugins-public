@@ -1,6 +1,8 @@
 package pe.project.tracking;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.World;
@@ -43,6 +45,12 @@ public class FishingHookTracking implements EntityTracking {
 	
 	@Override
 	public void unloadTrackedEntities() {
+		Iterator<Entry<UUID, FishHook>> iter = mEntities.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<UUID, FishHook> hook = iter.next();
+			hook.getValue().remove();
+		}
+		
 		mEntities.clear();
 	}
 }
