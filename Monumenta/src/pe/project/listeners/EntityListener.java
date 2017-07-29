@@ -303,9 +303,9 @@ public class EntityListener implements Listener {
 				if (entity instanceof Player) {
 					Player player = (Player)entity;
 					
+					TippedArrow arrow = (TippedArrow)event.getEntity();
+					
 					if (player.isBlocking()) {
-						TippedArrow arrow = (TippedArrow)event.getEntity();
-						
 						Vector to = player.getLocation().toVector();
 						Vector from = arrow.getLocation().toVector();
 						
@@ -321,17 +321,17 @@ public class EntityListener implements Listener {
 								}
 							}
 						}
-						
-						PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData());
-						List<PotionEffect> effects = arrow.getCustomEffects();
+					}
+					
+					PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData());
+					List<PotionEffect> effects = arrow.getCustomEffects();
 
-						if (info != null) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
-						}
-						
-						if (effects != null) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
-						}
+					if (info != null) {
+						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
+					}
+					
+					if (effects != null) {
+						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 					}
 				}
 			}
