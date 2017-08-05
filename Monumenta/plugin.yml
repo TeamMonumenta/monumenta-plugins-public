@@ -52,3 +52,7 @@ commands:
     permission: monumenta.commands.bungeeTest
     description: N/A
     usage: /bungeeTest
+  transferServer:
+    permission: monumenta.commands.transferServer
+    description: Transfer players between two points to target server.
+    usage: /transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
