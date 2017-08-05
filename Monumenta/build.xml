@@ -60,7 +60,7 @@
 			</and>
 		</condition>
 		<mkdir dir="bin"/>
-		<jar destfile="Monumenta-Plugins_${repository.version}_${TODAY}.jar" basedir="bin/">
+		<jar destfile="../Monumenta-Plugins_${repository.version}_${TODAY}.jar" basedir="bin/">
 			<manifest>
 				<attribute name="Main-Class" value="pe.project.Main"/>
 			</manifest>

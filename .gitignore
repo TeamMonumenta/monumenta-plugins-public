@@ -5,6 +5,8 @@
 .metadata
 .recommenders
 
+# Build artifacts
+*.jar
+
 # various other potential build files
-Monumenta/*.jar
 /*/bin/
