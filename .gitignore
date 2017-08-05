@@ -6,4 +6,5 @@
 .recommenders
 
 # various other potential build files
+Monumenta/*.jar
 /*/bin/
