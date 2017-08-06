@@ -1,4 +1,8 @@
 #!/bin/bash
 
-cd Monumenta
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/Monumenta"
+ant build jar
+
+cd "$SCRIPT_DIR/BungeeCord"
 ant build jar
