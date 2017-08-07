@@ -15,11 +15,11 @@ import net.md_5.bungee.api.event.PluginMessageEvent;
 
 public class EventListener implements Listener {
 	Main mMain;
-	
+
 	public EventListener(Main main) {
 		mMain = main;
 	}
-	
+
 	//	Plugin Message Event
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PluginMessageEvent(PluginMessageEvent event) {
@@ -36,7 +36,7 @@ public class EventListener implements Listener {
 						if (packetType.equals("TransferPlayerPacket")) {
 							//	Get the intended server target.
 							String newServer = input.readUTF();
-							
+
 							//	Now grab that servers info and transfer us there.
 							ServerInfo serverInfo = mMain.getProxy().getServers().get(newServer);
 							if (serverInfo != null) {
@@ -48,12 +48,12 @@ public class EventListener implements Listener {
 									player.connect(serverInfo, new Callback<Boolean>() {
 										@Override
 										public void done(Boolean arg0, Throwable arg1) {
-											mMain.getProxy().broadcast(new TextComponent("Player Transfered!"));
-											
+											mMain.getProxy().broadcast(new TextComponent("Player '" + playerName + "' transferred to '" + newServer + "'"));
+
 											//	Once that's done send over their data.
 											serverInfo.sendData("BungeeCord", event.getData());
 										}
-									});	
+									});
 								}
 							}
 						}
@@ -62,8 +62,8 @@ public class EventListener implements Listener {
 			}
 		}
 	}
-	
+
 	public void playerTransfered(boolean transfered) {
-		
+
 	}
 }
