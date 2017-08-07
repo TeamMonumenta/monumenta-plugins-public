@@ -54,5 +54,5 @@ commands:
     usage: /bungeeTest
   transferServer:
     permission: monumenta.commands.transferServer
-    description: Transfer players between two points to target server.
-    usage: /transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
+    description: Transfers all players between two points [having the specified score value] to target server. If 2nd argument is not "False", also transfers player's scores, equipment, etc. Note scores must be >= 0.
+    usage: /transferserver <server name> <True|False> <x1> <y1> <z1> <x2> <y2> <z2> [<scoreboard> <min_value> <max_value>]

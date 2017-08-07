@@ -12,24 +12,30 @@ public class TransferPlayerPacket implements Packet {
 	public String getPacketName() {
 		return "TransferPlayerPacket";
 	}
-	
+
 	@Override
 	public ByteArrayDataOutput writePacketData(ByteArrayDataOutput out) {
 		out.writeUTF(mNewServer);
-		
+
 		out.writeUTF(mPlayerName);
-		
-		out.writeUTF(mPlayerContent);
-		
+
+		if (mPlayerContent != null) {
+			out.writeUTF(mPlayerContent);
+		}
+
 		return out;
 	}
 
 	@Override
 	public void readPacketData(ByteArrayDataInput input) {
 		mNewServer = input.readUTF();
-		
+
 		mPlayerName = input.readUTF();
-		
-		mPlayerContent = input.readUTF();
+
+		try {
+			mPlayerContent = input.readUTF();
+		} catch (Exception e) {
+			mPlayerContent = null;
+		}
 	}
 }
