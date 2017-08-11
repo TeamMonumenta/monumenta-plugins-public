@@ -26,10 +26,10 @@ public class TransferServer implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
-		String score_name = null;
-		int score_min = 0;
-		int score_max = 0;
-		int send_player_stuff = 1;
+		String scoreName = null;
+		int scoreMin = 0;
+		int scoreMax = 0;
+		boolean sendPlayerStuff = true;
 
 		if (arg3.length != 8 && arg3.length != 11) {
 			sender.sendMessage(ChatColor.RED + "Invalid number of parameters!");
@@ -41,15 +41,15 @@ public class TransferServer implements CommandExecutor {
 
 		// Default to sending equipment
 		if (arg3[1].equals("False") || arg3[1].equals("false")) {
-			send_player_stuff = 0;
+			sendPlayerStuff = false;
 		}
 
-		// Need to only match players with the given score_name value
+		// Need to only match players with the given scoreName value
 		if (arg3.length == 11) {
 			try {
-				score_name = arg3[8];
-				score_min = CommandUtils.parseIntFromString(sender, command, arg3[9]);
-				score_max = CommandUtils.parseIntFromString(sender, command, arg3[10]);
+				scoreName = arg3[8];
+				scoreMin = CommandUtils.parseIntFromString(sender, command, arg3[9]);
+				scoreMax = CommandUtils.parseIntFromString(sender, command, arg3[10]);
 			} catch (Exception e) {
 				return false;
 			}
@@ -69,11 +69,11 @@ public class TransferServer implements CommandExecutor {
 
 		for (Player player : mMain.getServer().getOnlinePlayers()) {
 			if (bounds.within(player.getLocation())) {
-				if (score_name != null) {
-					int score = ScoreboardUtils.getScoreboardValue(player, score_name);
+				if (scoreName != null) {
+					int score = ScoreboardUtils.getScoreboardValue(player, scoreName);
 
 					// Ignore this player if score was specified and it didn't match
-					if (score == -1 || score < score_min || score > score_max) {
+					if (score == -1 || score < scoreMin || score > scoreMax) {
 						continue;
 					}
 				}
@@ -83,7 +83,7 @@ public class TransferServer implements CommandExecutor {
 				packet.mNewServer = server;
 				packet.mPlayerName = player.getName();
 
-				if (send_player_stuff != 0) {
+				if (sendPlayerStuff != false) {
 					packet.mPlayerContent = PlayerData.SerializePlayerData(mMain, player);
 				} else {
 					packet.mPlayerContent = null;
