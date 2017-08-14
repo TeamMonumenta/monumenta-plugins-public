@@ -84,7 +84,8 @@ public class SafeZoneConstants {
 		if (safeZone == SafeZones.SiegeOfHighwatch
 			|| safeZone == SafeZones.Ctaz
 			|| safeZone == SafeZones.Hermy
-			|| safeZone == SafeZones.Monument) {
+			|| safeZone == SafeZones.Monument
+			|| safeZone == SafeZones.Commands) {
 			return false;
 		}
 		
