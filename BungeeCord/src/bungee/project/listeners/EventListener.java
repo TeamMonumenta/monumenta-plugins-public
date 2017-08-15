@@ -48,7 +48,7 @@ public class EventListener implements Listener {
 									player.connect(serverInfo, new Callback<Boolean>() {
 										@Override
 										public void done(Boolean arg0, Throwable arg1) {
-											mMain.getProxy().broadcast(new TextComponent("Player '" + playerName + "' transferred to '" + newServer + "'"));
+											//mMain.getProxy().broadcast(new TextComponent("Player '" + playerName + "' transferred to '" + newServer + "'"));
 
 											//	Once that's done send over their data.
 											serverInfo.sendData("BungeeCord", event.getData());
