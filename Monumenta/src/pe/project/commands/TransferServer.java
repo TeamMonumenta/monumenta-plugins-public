@@ -89,6 +89,8 @@ public class TransferServer implements CommandExecutor {
 					packet.mPlayerContent = null;
 				}
 
+				sender.sendMessage("Transferring " + player.getName() + " to " + server);
+
 				NetworkUtils.SendPacket(mMain, packet);
 			}
 		}
