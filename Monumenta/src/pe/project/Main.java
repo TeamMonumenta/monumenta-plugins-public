@@ -124,7 +124,6 @@ public class Main extends JavaPlugin {
 		getCommand("transferScores").setExecutor(new TransferScores());
 		getCommand("getScore").setExecutor(new GetScore());
 		getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
-		getCommand("bungeeTest").setExecutor(new BungeeTest(this));
 		getCommand("transferServer").setExecutor(new TransferServer(this));
 		
 		mPotionManager = new PotionManager(this);
