@@ -210,8 +210,13 @@ public class EntityListener implements Listener {
 				boolean cancel = !mPlugin.getClass(player).PlayerSplashPotionEvent(player, event.getAffectedEntities(), potion);
 				if (cancel) {
 					event.setCancelled(true);
-				} else {
-					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, potion.getEffects());
+				}
+				
+				//	All affected players need to have the effect added to their potion manager.
+				for (Entity entity : event.getAffectedEntities()) {
+					if (entity instanceof Player) {
+						mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects());
+					}
 				}
 			}
 		}
