@@ -82,11 +82,14 @@ public class EntityListener implements Listener {
 			
 			//	Hit by player.
 			if (damager instanceof Player) {
-				Player player = (Player)damager;
-				
-				BaseClass _class = mPlugin.getClass(player);
-				_class.ModifyDamage(player, _class, event);
-				_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage());
+				//	Make sure to not trigger class abilities off Throrns.
+				if (event.getCause() != DamageCause.THORNS) {
+					Player player = (Player)damager;
+					
+					BaseClass _class = mPlugin.getClass(player);
+					_class.ModifyDamage(player, _class, event);
+					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage());
+				}
 			}
 			//	Hit by arrow.
 			else if (damager instanceof Arrow) {
