@@ -48,6 +48,9 @@ public class QuestManager {
 		_registerQuest(new OfMonksAndMagic(mWorld));
 		_registerQuest(new SonsOfTheForest(mWorld));
 		_registerQuest(new StarryNight(mWorld));
+		
+		//	Highwatch
+		_registerQuest(new SiegeOfHighwatch(mWorld));
 	}
 	
 	private void _registerQuest(Quest quest) {
