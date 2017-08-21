@@ -28,12 +28,13 @@ public class QuestManager {
 		//	Tutorial
 		_registerQuest(new Tutorial(mWorld));
 			
-		//	Capital
+		//	Capital/Sierhaven
 		_registerQuest(new ACrownOfTopaz(mWorld));
 		_registerQuest(new ACrownOfMajesty(mWorld));
 		_registerQuest(new BanditTroubles(mWorld));
 		_registerQuest(new MagesLegacy(mWorld));
 		_registerQuest(new APiratesLife(mWorld));
+		_registerQuest(new NelfinesCurse(mWorld));
 			
 		//	Nyr
 		_registerQuest(new BuriedBlade(mWorld));
