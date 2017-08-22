@@ -21,6 +21,8 @@ public class RegionReset {
 						if (version != plugin.mServerVersion) {
 							ScoreboardUtils.setScoreboardValue(player, "version", plugin.mServerVersion);
 							
+							_resetScoreboards(player);
+							
 							player.teleport(new Location(player.getWorld(), Constants.RESET_POINT.mX, Constants.RESET_POINT.mY, Constants.RESET_POINT.mZ));
 							player.sendMessage(ChatColor.GREEN + "The terrain has been reset since you've last played and you've been moved to safety.");
 							
@@ -32,5 +34,20 @@ public class RegionReset {
 				}
 			}.runTaskTimer(plugin, 0, 1);
 		}
+	}
+	
+	private static void _resetScoreboards(Player player) {
+		//	Reset Dungeon related scoreboards.
+		ScoreboardUtils.setScoreboardValue(player, "D1Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D2Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D3Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D4Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D5Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "DB1Access", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D1Finished", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D2Finished", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D3Finished", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D4Finished", 0);
+		ScoreboardUtils.setScoreboardValue(player, "D5Finished", 0);
 	}
 }
