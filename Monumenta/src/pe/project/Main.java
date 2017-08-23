@@ -73,6 +73,7 @@ public class Main extends JavaPlugin {
 	private FileConfiguration mConfig;
 	private File mConfigFile;
 	public int mServerVersion = 0;
+	public int mDailyQuestVersion = 0;
 	
 	public QuestManager mQuestManager;
 	public TrackingManager mTrackingManager;
@@ -125,6 +126,7 @@ public class Main extends JavaPlugin {
 		getCommand("getScore").setExecutor(new GetScore());
 		getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
 		getCommand("transferServer").setExecutor(new TransferServer(this));
+		getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 		
 		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
@@ -210,7 +212,11 @@ public class Main extends JavaPlugin {
 	
 	public void updateVersion(int version) {
 		mServerVersion = version;
-		mConfig.set("version", version);
+		_saveConfig();
+	}
+	
+	public void incrementDailyVersion() {
+		mDailyQuestVersion++;
 		_saveConfig();
 	}
 	
@@ -222,9 +228,13 @@ public class Main extends JavaPlugin {
 		mConfig = YamlConfiguration.loadConfiguration(mConfigFile);
 		
 		mServerVersion = mConfig.getInt("version");
+		mDailyQuestVersion = mConfig.getInt("daily_version");
 	}
 	
 	private void _saveConfig() {
+		mConfig.set("version", mServerVersion);
+		mConfig.set("daily_version", mDailyQuestVersion);
+		
 		try {
 			mConfig.save(mConfigFile);
 		} catch (IOException ex) {
