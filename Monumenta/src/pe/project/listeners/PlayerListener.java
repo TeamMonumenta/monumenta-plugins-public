@@ -43,6 +43,7 @@ import pe.project.Main;
 import pe.project.locations.poi.PointOfInterest;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
+import pe.project.server.reset.DailyReset;
 import pe.project.server.reset.RegionReset;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.PotionUtils;
@@ -65,6 +66,7 @@ public class PlayerListener implements Listener {
 		
 		mPlugin.mTrackingManager.addEntity(player);
 		RegionReset.handle(mPlugin, player);
+		DailyReset.handle(mPlugin, player);
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
