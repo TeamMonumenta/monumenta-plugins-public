@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -123,7 +124,7 @@ public class ClericClass extends BaseClass {
 							if (!p.isDead()) {
 								//	If this is us or we're allowing anyone to get it.
 								if (p == player || rejuvenation > 1) {
-									double newHealth = Math.min(player.getHealth() + REJUVENATION_HEAL_AMOUNT, 20);
+									double newHealth = Math.min(player.getHealth() + REJUVENATION_HEAL_AMOUNT, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 									player.setHealth(newHealth);
 								}
 							}
@@ -195,7 +196,7 @@ public class ClericClass extends BaseClass {
 					if (divineJustice > 1) {
 						int healAmount = divineJustice == 1 ? DIVINE_JUSTICE_1_HEAL : DIVINE_JUSTICE_2_HEAL;
 						
-						double newHealth = Math.min(player.getHealth() + healAmount, 20);
+						double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 						player.setHealth(newHealth);
 						
 						World world = player.getWorld();
@@ -290,7 +291,7 @@ public class ClericClass extends BaseClass {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
 					LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, HEALING_RANGE, true, true, true);
 					if (targetEntity != null && targetEntity instanceof Player) {
-						double newHealth = Math.min(targetEntity.getHealth() + HEALING_HEAL, 20);
+						double newHealth = Math.min(targetEntity.getHealth() + HEALING_HEAL, targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 						targetEntity.setHealth(newHealth);
 						
 						if (healing > 1) {
