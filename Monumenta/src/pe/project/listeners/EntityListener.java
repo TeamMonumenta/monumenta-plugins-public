@@ -13,6 +13,7 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -74,6 +75,9 @@ public class EntityListener implements Listener {
 			if (damager instanceof LivingEntity) {
 				Player player = (Player)damagee;
 				mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager, event.getDamage());
+			} else if (damager instanceof Firework) {
+				//	If we're hit by a rocket, cancel the damage.
+				event.setCancelled(true);
 			}
 		}
 		//	Else if the entity getting hurt is a LivingEntity.
