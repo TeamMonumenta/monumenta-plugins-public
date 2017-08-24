@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -156,8 +157,8 @@ public class RogueClass extends BaseClass {
 						if (mainHand != null && mainHand.getType() != Material.BOW) {
 							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE, SMOKESCREEN_RANGE);
 							for (Entity entity : entities) {
-								if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-									LivingEntity mob = (LivingEntity)entity;
+								if (entity instanceof Monster) {
+									Monster mob = (Monster)entity;
 									
 									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_1_WEAKNESS_EFFECT_LEVEL : SMOKESCREEN_2_WEAKNESS_EFFECT_LEVEL;
 								
@@ -193,8 +194,8 @@ public class RogueClass extends BaseClass {
 					if (escapeDeath > 1) {
 						List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE);
 						for (Entity entity : entities) {
-							if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-								LivingEntity mob = (LivingEntity)entity;
+							if (entity instanceof Monster) {
+								Monster mob = (Monster)entity;
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 							}
 						}
@@ -296,8 +297,8 @@ public class RogueClass extends BaseClass {
 				
 				List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE);
 				for (Entity entity : entities) {
-					if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-						LivingEntity mob = (LivingEntity)entity;
+					if (entity instanceof Monster) {
+						Monster mob = (Monster)entity;
 						mob.damage(VICIOUS_COMBOS_DAMAGE);
 					}
 				}

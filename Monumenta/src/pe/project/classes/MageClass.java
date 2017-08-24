@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -124,8 +125,8 @@ public class MageClass extends BaseClass {
 						List<Entity> entities = damagee.getNearbyEntities(ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS);
 						entities.add(damagee);
 						for(Entity e : entities) {
-							if(e instanceof LivingEntity && !(e instanceof Player)) {
-								LivingEntity mob = (LivingEntity)e;
+							if(e instanceof Monster) {
+								Monster mob = (Monster)e;
 								int dmg = extraDamage;
 								
 								if (arcaneStrike > 1 && mob.getFireTicks() > 0) {
@@ -198,8 +199,8 @@ public class MageClass extends BaseClass {
 										if (player.isBlocking()) {
 											List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
 											for(Entity e : entities) {
-												if(e instanceof LivingEntity && !(e instanceof Player)) {
-													LivingEntity mob = (LivingEntity)e;
+												if(e instanceof Monster) {
+													Monster mob = (Monster)e;
 													
 													Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 													if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
@@ -245,9 +246,8 @@ public class MageClass extends BaseClass {
 							entities.add(player);
 							for(int i = 0; i < entities.size(); i++) {
 								Entity e = entities.get(i);
-								if(e instanceof LivingEntity) {
-									if (!(e instanceof Player)) {
-										LivingEntity mob = (LivingEntity)(e);
+								if (e instanceof Monster) {
+									Monster mob = (Monster)(e);
 										
 										int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 										int effectLevel = frostNova == 1 ? FROST_NOVA_1_EFFECT_LVL : FROST_NOVA_2_EFFECT_LVL;
@@ -256,11 +256,8 @@ public class MageClass extends BaseClass {
 										mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, effectLevel, true, false));
 										
 										mob.setFireTicks(0);
-									} else {
-										Player p = (Player)e;
-										
-										p.setFireTicks(0);
-									}
+								} else if (e instanceof Player) {
+									e.setFireTicks(0);
 								}
 							}
 							
@@ -294,8 +291,8 @@ public class MageClass extends BaseClass {
 					if (elementalArrows == 2) {
 						List<Entity> entities = damagee.getNearbyEntities(ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS);
 						for (Entity entity : entities) {
-							if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-								LivingEntity mob = (LivingEntity)entity;
+							if (entity instanceof Monster) {
+								Monster mob = (Monster)entity;
 								mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 							}
 						}
@@ -307,8 +304,8 @@ public class MageClass extends BaseClass {
 					if (elementalArrows == 2) {
 						List<Entity> entities = damagee.getNearbyEntities(ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS);
 						for (Entity entity : entities) {
-							if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-								LivingEntity mob = (LivingEntity)entity;
+							if (entity instanceof Monster) {
+								Monster mob = (Monster)entity;
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
 							}
 						}
