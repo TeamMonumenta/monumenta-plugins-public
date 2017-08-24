@@ -186,7 +186,10 @@ public class MageClass extends BaseClass {
 			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
-				if (offHand.getType() == Material.SHIELD && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				if ((offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
+						&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+					
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
 					if (magmaShield > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), MAGMA_SHIELD_ID)) {
