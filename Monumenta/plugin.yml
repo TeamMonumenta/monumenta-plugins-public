@@ -31,7 +31,7 @@ commands:
   setGuildPrefix:
     permission: monumenta.commands.setGuildPrefix
     description: Used to set the prefix tag on a guild
-    usage: /setGuildPrefix <team> <prefix>
+    usage: /setGuildPrefix <team> <prefix> [prefix color] [name color]
   setPlayerName:
     permission: monumenta.commands.setPlayerName
     description: ???
