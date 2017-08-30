@@ -89,7 +89,10 @@ public class RogueClass extends BaseClass {
 	
 	@Override
 	public void setupClassPotionEffects(Player player) {
-		_testForDuelWielding(player);
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
+		_testForDuelWielding(player, mainHand, offHand);
 	}
 	
 	@Override
@@ -106,28 +109,31 @@ public class RogueClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerItemHeldEvent(Player player) {
-		_testForDuelWielding(player);
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testForDuelWielding(player, mainHand, offHand);
 	}
 	
 	@Override
-	public void PlayerDropItemEvent(Player player) {
-		_testForDuelWielding(player);
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testForDuelWielding(player, mainHand, offHand);
 	}
 	
 	@Override
-	public void PlayerItemBreakEvent(Player player) {
-		_testForDuelWielding(player);
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testForDuelWielding(player, mainHand, offHand);
 	}
 	
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, Material material) {
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
 		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(material))) {
 			//	FOCUS
 			{
 				int focus = ScoreboardUtils.getScoreboardValue(player, "Focus");		
 				if (focus > 0) {
-					if (_testForSwordsInHand(player)) {
+					if (_testForSwordsInHand(player, mainHand, offHand)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), FOCUS_ID)) {
 							int effectLvl = focus == 1 ? FOCUS_1_STRENGTH_LVL : FOCUS_2_STRENGTH_LVL;
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, FOCUS_DURATION, effectLvl, true, false));
@@ -153,7 +159,6 @@ public class RogueClass extends BaseClass {
 				int smokeScreen = ScoreboardUtils.getScoreboardValue(player, "SmokeScreen");
 				if (smokeScreen > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), SMOKESCREEN_ID)) {
-						ItemStack mainHand = player.getInventory().getItemInMainHand();
 						if (mainHand != null && mainHand.getType() != Material.BOW) {
 							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE, SMOKESCREEN_RANGE);
 							for (Entity entity : entities) {
@@ -268,22 +273,19 @@ public class RogueClass extends BaseClass {
 		_viciousCombos(player, killedEntity);
 	}
 	
-	private void _testForDuelWielding(Player player) {
+	private void _testForDuelWielding(Player player, ItemStack mainHand, ItemStack offHand) {
 		int dualWielding = ScoreboardUtils.getScoreboardValue(player, "DualWielding");
 		if (dualWielding > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			
-			if (_testForSwordsInHand(player)) {
+			if (_testForSwordsInHand(player, mainHand, offHand)) {
 				int effectLvl = dualWielding == 1 ? DUAL_WIELDING_1_EFFECT_LVL : DUAL_WIELDING_2_EFFECT_LVL;
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLvl, true, false));
 			}
 		}
 	}
 	
-	private boolean _testForSwordsInHand(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
-		
+	private boolean _testForSwordsInHand(Player player, ItemStack mainHand, ItemStack offHand) {
 		return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
 	}
 	

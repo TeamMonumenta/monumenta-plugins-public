@@ -68,8 +68,10 @@ public class WarriorClass extends BaseClass {
 		super(plugin, random);
 	}
 	
+	@Override
 	public void setupClassPotionEffects(Player player) {
-		_testItemInHand(player);
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		_testItemInHand(player, mainHand);
 		_testToughness(player);
 	}
 	
@@ -194,18 +196,18 @@ public class WarriorClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerItemHeldEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerDropItemEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerItemBreakEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
@@ -279,23 +281,21 @@ public class WarriorClass extends BaseClass {
 		}
 	}
 	
-	private void _testItemInHand(Player player) {
+	private void _testItemInHand(Player player, ItemStack mainHand) {
 		int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
 		if (weaponMastery > 0) {
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			
-			//	Player has an axe in their mainhands.
+			//	Player has an axe in their mainHands.
 			if (InventoryUtils.isAxeItem(mainHand)) {
 				int strengthAmp = weaponMastery == 1 ? 0 : 1;
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
 			}
-			//	Player has an axe in their offhands.
+			//	Player has an sword in their mainHand.
 			else if (InventoryUtils.isSwordItem(mainHand)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 			}

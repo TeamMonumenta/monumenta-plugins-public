@@ -13,6 +13,7 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 import pe.project.Main;
 import pe.project.timers.CooldownTimers;
@@ -80,12 +81,12 @@ public class BaseClass {
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {}
 	
 	public void ProjectileHitEvent(Player player, Arrow arrow) {}
+
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {};
 	
-	public void PlayerItemHeldEvent(Player player) {}
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {}
 	
-	public void PlayerDropItemEvent(Player player) {}
-	
-	public void PlayerItemBreakEvent(Player player) {}
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {}
 	
 	public void PlayerRespawnEvent(Player player) {}
 	

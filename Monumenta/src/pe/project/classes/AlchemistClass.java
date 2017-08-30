@@ -86,7 +86,8 @@ public class AlchemistClass extends BaseClass {
 	
 	@Override
 	public void setupClassPotionEffects(Player player) {
-		_testInvigoratingOdor(player);
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		_testInvigoratingOdor(player, mainHand);
 	}
 	
 	@Override
@@ -182,18 +183,18 @@ public class AlchemistClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerItemHeldEvent(Player player) {
-		_testInvigoratingOdor(player);
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testInvigoratingOdor(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerDropItemEvent(Player player) {
-		_testInvigoratingOdor(player);
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testInvigoratingOdor(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerItemBreakEvent(Player player) {
-		_testInvigoratingOdor(player);
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testInvigoratingOdor(player, mainHand);
 	}
 	
 	@Override
@@ -265,7 +266,7 @@ public class AlchemistClass extends BaseClass {
 		}
 	}
 	
-	private void _testInvigoratingOdor(Player player) {
+	private void _testInvigoratingOdor(Player player, ItemStack mainHand) {
 		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
 		if (invigoratingOdor > 0) {
 			//	First remove the effects and then if the test passes re-add them (This is to prevent the case where players scroll
@@ -275,7 +276,7 @@ public class AlchemistClass extends BaseClass {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
 			
-			if (_testPotionInHand(player)) {
+			if (InventoryUtils.isPotionItem(mainHand)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
 				
@@ -285,10 +286,5 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}
-	
-	private boolean _testPotionInHand(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		return InventoryUtils.isPotionItem(mainHand);
 	}
 }

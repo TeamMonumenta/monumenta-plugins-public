@@ -97,7 +97,8 @@ public class MageClass extends BaseClass {
 	
 	@Override
 	public void setupClassPotionEffects(Player player) {
-		_testItemInHand(player);
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
@@ -157,18 +158,18 @@ public class MageClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerItemHeldEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerDropItemEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
-	public void PlayerItemBreakEvent(Player player) {
-		_testItemInHand(player);
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 
 	@Override
@@ -362,19 +363,15 @@ public class MageClass extends BaseClass {
 		}	
 	}
 	
-	private void _testItemInHand(Player player) {
+	private void _testItemInHand(Player player, ItemStack mainHand) {
 		//	Wand Mastery
-		{
-			int wandMastery = ScoreboardUtils.getScoreboardValue(player, "WandMastery");
-			if (wandMastery > 0) {
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				
-				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-				
-				if (InventoryUtils.isWandItem(mainHand)) {
-					int strengthAmp = wandMastery == 1 ? WAND_MASTERY_1 : WAND_MASTERY_2;
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
-				}
+		int wandMastery = ScoreboardUtils.getScoreboardValue(player, "WandMastery");
+		if (wandMastery > 0) {
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
+			
+			if (InventoryUtils.isWandItem(mainHand)) {
+				int strengthAmp = wandMastery == 1 ? WAND_MASTERY_1 : WAND_MASTERY_2;
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
 			}
 		}
 	}

@@ -20,17 +20,19 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -207,30 +209,39 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
-		if (player != null) {
-			final String name = player.getName();
-			
-			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-				@Override
-				public void run() {
-				    Player player = Bukkit.getPlayer(name);
-				    mPlugin.getClass(player).PlayerItemHeldEvent(player);
-				}
-			}, 0);
-		}
+		
+		ItemStack mainHand = player.getInventory().getItem(event.getNewSlot());
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
+		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 	}
 	
 	//	The player dropped an item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		final String name = player.getName();
+		
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
+		mPlugin.getClass(player).PlayerDropItemEvent(player, mainHand, offHand);
+	}
+	
+	//	The player picked up an item.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void EntityPickupItemEvent(PlayerPickupItemEvent event) {
+		Player player = event.getPlayer();
+		String name = player.getName();
 		
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
 			public void run() {
-			    Player player = Bukkit.getPlayer(name);
-			    mPlugin.getClass(player).PlayerDropItemEvent(player);
+				Player p = Bukkit.getPlayer(name);
+				
+				ItemStack mainHand = p.getInventory().getItemInMainHand();
+				ItemStack offHand = p.getInventory().getItemInOffHand();
+				
+				mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
 			}
 		}, 0);
 	}
@@ -239,33 +250,52 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
 		Player player = event.getPlayer();
-		final String name = player.getName();
+		String name = player.getName();
 		
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
 			public void run() {
-			    Player player = Bukkit.getPlayer(name);
-			    mPlugin.getClass(player).PlayerItemBreakEvent(player);
+				Player p = Bukkit.getPlayer(name);
+				
+				ItemStack mainHand = p.getInventory().getItemInMainHand();
+				ItemStack offHand = p.getInventory().getItemInOffHand();
+				
+				mPlugin.getClass(p).PlayerItemBreakEvent(p, mainHand, offHand);
 			}
 		}, 0);
 	}
 	
-	//	The player clicked/released in their inventory.
+	//	The player moved item in their inventory.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
 		Inventory inventory = event.getInventory();
-		if (inventory.getType() == InventoryType.PLAYER) {
+		if (inventory.getType() == InventoryType.CRAFTING) {
 			Player player = (Player)inventory.getHolder();
-			final String name = player.getName();
+			String name = player.getName();
 			
 			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 				@Override
 				public void run() {
-				    Player player = Bukkit.getPlayer(name);
-				    mPlugin.getClass(player).PlayerItemHeldEvent(player);
+					Player p = Bukkit.getPlayer(name);
+					
+					ItemStack mainHand = p.getInventory().getItemInMainHand();
+					ItemStack offHand = p.getInventory().getItemInOffHand();
+					
+					mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
 				}
 			}, 0);
 		}
+	}
+	
+	//	Player swapped hand items
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		Player player = event.getPlayer();
+		
+		ItemStack mainHand = event.getMainHandItem();
+		ItemStack offHand = event.getOffHandItem();
+		
+		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 	}
 	
 	//	The player has respawned.
