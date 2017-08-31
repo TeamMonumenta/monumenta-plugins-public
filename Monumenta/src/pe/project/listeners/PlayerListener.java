@@ -362,7 +362,7 @@ public class PlayerListener implements Listener {
 			int unbreaking = item.getEnchantmentLevel(Enchantment.DURABILITY);
 			if (unbreaking > 0) {
 				for (int i = 0; i < damage; i++) {
-					if (mRandom.nextInt(unbreaking + 1) > 0) {
+					if (mRandom.nextInt(unbreaking + 2) > 1) {
 						damage--;
 					}
 				}
