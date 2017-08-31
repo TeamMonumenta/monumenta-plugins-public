@@ -2,6 +2,7 @@ package pe.project.listeners;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -9,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -24,6 +26,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
@@ -56,10 +59,12 @@ import pe.project.utils.StringUtils;
 public class PlayerListener implements Listener {
 	Main mPlugin = null;
 	World mWorld = null;
+	Random mRandom = null;
 	
-	public PlayerListener(Main plugin, World world) {
+	public PlayerListener(Main plugin, World world, Random random) {
 		mPlugin = plugin;
 		mWorld = world;
+		mRandom = random;
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -343,6 +348,31 @@ public class PlayerListener implements Listener {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
 			}
+		}
+	}
+	
+	//	An item has taken damage.
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) {
+		ItemStack item = event.getItem();
+		
+		if (ItemUtils.isArmorItem(item.getType())) {
+			int damage = event.getDamage();
+			
+			int unbreaking = item.getEnchantmentLevel(Enchantment.DURABILITY);
+			if (unbreaking > 0) {
+				for (int i = 0; i < damage; i++) {
+					if (mRandom.nextInt(unbreaking + 1) > 0) {
+						damage--;
+					}
+				}
+			}
+			
+			if (damage < 0) {
+				damage = 0;
+			}
+			
+			event.setDamage(damage);
 		}
 	}
 }

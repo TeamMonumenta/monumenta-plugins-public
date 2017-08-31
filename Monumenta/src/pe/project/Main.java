@@ -106,7 +106,7 @@ public class Main extends JavaPlugin {
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginListener(this));
 		
-		manager.registerEvents(new PlayerListener(this, world), this);
+		manager.registerEvents(new PlayerListener(this, world, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, world), this);
 		manager.registerEvents(new ItemListener(this), this);

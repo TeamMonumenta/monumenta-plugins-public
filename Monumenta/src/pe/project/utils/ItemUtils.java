@@ -66,6 +66,33 @@ public class ItemUtils {
             Material.WORKBENCH
 	);
 	
+	public static List<Material> armors = Arrays.asList(
+            Material.LEATHER_BOOTS,
+            Material.LEATHER_CHESTPLATE,
+            Material.LEATHER_HELMET,
+            Material.LEATHER_LEGGINGS,
+            
+            Material.CHAINMAIL_BOOTS,
+            Material.CHAINMAIL_CHESTPLATE,
+            Material.CHAINMAIL_HELMET,
+            Material.CHAINMAIL_LEGGINGS,
+            
+            Material.GOLD_BOOTS,
+            Material.GOLD_CHESTPLATE,
+            Material.GOLD_HELMET,
+            Material.GOLD_LEGGINGS,
+            
+            Material.IRON_BOOTS,
+            Material.IRON_CHESTPLATE,
+            Material.IRON_HELMET,
+            Material.IRON_LEGGINGS,
+            
+            Material.DIAMOND_BOOTS,
+            Material.DIAMOND_CHESTPLATE,
+            Material.DIAMOND_HELMET,
+            Material.DIAMOND_LEGGINGS
+	);
+	
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
 		
@@ -125,5 +152,15 @@ public class ItemUtils {
 	public static boolean isBoat(Material item) {
 		return item == Material.BOAT || item == Material.BOAT_ACACIA || item == Material.BOAT_BIRCH ||
 				item == Material.BOAT_DARK_OAK || item == Material.BOAT_JUNGLE || item == Material.BOAT_SPRUCE;
+	}
+	
+	public static boolean isArmorItem(Material item) {
+		for (Material material : armors) {
+			if (material.equals(item)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }
