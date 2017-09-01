@@ -3,7 +3,7 @@ main: pe.project.Main
 version: 1.0
 commands:
   setServerVersion:
-    permission: monumenta.commands.setsetserverversion
+    permission: monumenta.commands.setserverversion
     description: ""
     usage: /setServerVersion <version>
   getServerVersion:
