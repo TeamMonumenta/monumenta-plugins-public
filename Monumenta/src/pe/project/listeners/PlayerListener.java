@@ -125,12 +125,32 @@ public class PlayerListener implements Listener {
 				} else if (item.getType() == Material.COMPASS) {
 					//	Show current POI respawn timer.
 					if (player.isSneaking()) {
-						List<PointOfInterest> pois = mPlugin.mPOIManager.allWithinAnyPointOfInterest(new Point(player.getLocation()));
+						List<PointOfInterest> pois = mPlugin.mPOIManager.getAllNearbyPOI(new Point(player.getLocation()));
 						if (pois != null && pois.size() > 0) {
 							for (PointOfInterest poi : pois) {
 								int ticks = poi.getTimer();
 								
-								player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks));
+								String message;
+								
+								//	Seems there's plenty of time before we respawn.
+								if (ticks >= 20) {
+									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks);
+								}
+								//	Because we need to handle the case where the player clicks within sub one second and we still
+								//	Want to be able to tell them the POI is about to respawn while still having the [within] tag.
+								else if (ticks > 0) {
+									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is nearly ready to respawn!";
+								}
+								//	We're nearby, but not within the POI
+								else {
+									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is ready to respawn!";
+								}
+								
+								if (poi.withinPOI(new Point(player.getLocation()))) {
+									message += " [Within]";
+								}
+	
+								player.sendMessage(message);
 							}
 						} else {
 							player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");

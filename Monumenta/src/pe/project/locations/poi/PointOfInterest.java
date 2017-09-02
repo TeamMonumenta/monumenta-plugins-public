@@ -19,19 +19,25 @@ public class PointOfInterest implements KingsBounty {
 	protected String mAreaName = null;
 	protected String mKingsBountyDescription = null;
 	protected Point mCenter;
-	protected double mRadius;
+	protected double mWithinRadius;
+	protected double mNearbyRadius;
 	protected int mTimer;
 	
-	public PointOfInterest(POIConstants.POI poi, String areaName, Point center, double radius, String description) {
+	public PointOfInterest(POIConstants.POI poi, String areaName, Point center, double withinRadius, double nearbyRadius, String description) {
 		mAreaName = areaName;
 		mPOI = poi;
 		mCenter = center;
-		mRadius = radius;
+		mWithinRadius = withinRadius;
+		mNearbyRadius = nearbyRadius;
 		mKingsBountyDescription = description;
 	}
 	
+	public boolean nearPOI(Point playerLoc) {
+		return _distance(playerLoc) <= mNearbyRadius;
+	}
+	
 	public boolean withinPOI(Point playerLoc) {
-		return _distance(playerLoc) <= mRadius;
+		return _distance(playerLoc) <= mWithinRadius;
 	}
 	
 	public void update(Main plugin, int ticks) {
@@ -109,7 +115,7 @@ public class PointOfInterest implements KingsBounty {
 	private void _messageNearbyPlayers(Main plugin, String suffix) {
 		String message = ChatColor.RED + "" + ChatColor.BOLD + mAreaName + suffix;
 		for (Player player : plugin.mTrackingManager.mPlayers.getPlayers()) {
-			if (withinPOI(new Point(player.getLocation()))) {
+			if (nearPOI(new Point(player.getLocation()))) {
 				player.sendMessage(message);
 			}
 		}
