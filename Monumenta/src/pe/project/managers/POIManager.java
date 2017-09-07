@@ -143,7 +143,7 @@ public class POIManager {
 		mPOIs.add(new PointOfInterest(POI.TinyJungleRuin, "Tiny Jungle Ruin", new Point(506, 77, -178), 50, 80, null));
 		mPOIs.add(new PointOfInterest(POI.Tree, "Hawk Fortress", new Point(411, 180, 114), 100, 130, null));
 
-		mPOIs.add(new PointOfInterest(POI.Graveyard, "Graveyard", new Point(1099, 125, -166), 90, 120, null));
+		mPOIs.add(new PointOfInterest(POI.Graveyard, "Graveyard", new Point(1092, 115, -191), 60, 75, null));
 		mPOIs.add(new PointOfInterest(POI.LBlue, "Creeper Farm", new Point(789, 159, -324), 55, 85, null));
 		mPOIs.add(new PointOfInterest(POI.LTower, "Collapsing Tower", new Point(871, 169, -325), 50, 80, null));
 
