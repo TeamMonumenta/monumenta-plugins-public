@@ -5,8 +5,14 @@ import com.google.common.io.ByteStreams;
 
 import bungee.project.Main;
 import net.md_5.bungee.api.plugin.Listener;
+
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+
+import fr.rhaz.socket4mc.Bungee.BungeeSocketHandshakeEvent;
+import fr.rhaz.socket4mc.Bungee.BungeeSocketConnectEvent;
+import fr.rhaz.socket4mc.Bungee.BungeeSocketJSONEvent;
+
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -20,9 +26,18 @@ public class EventListener implements Listener {
 		mMain = main;
 	}
 
-	//	Plugin Message Event
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PluginMessageEvent(PluginMessageEvent event) {
+	public void onMessage(BungeeSocketJSONEvent e){
+		String channel = e.getChannel(); // The channel ("MyBukkitPlugin")
+		String name = e.getName(); // The Spigot server name
+		String data = e.getData(); // The data the plugin sent you
+		if(data.equals("Hello from Bukkit :)")){
+			e.write("Hello, " + name + ", how're you?");
+		}
+	}
+
+	//	Plugin Message Event
+	private void PluginMessageEvent(PluginMessageEvent event) {
 		if (event.getTag().equals("BungeeCord")) {
 			if (event.getData() != null && event.getData().length > 0) {
 				//	Because we don't want to manipulate the actual data we'll make a clone of it and work with that.
