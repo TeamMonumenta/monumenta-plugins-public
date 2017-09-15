@@ -16,6 +16,7 @@
     <path id="Monumenta-Bungee.classpath">
         <pathelement location="bin"/>
         <pathelement location="../api/BungeeCord.jar"/>
+		<pathelement location="../api/socket4mc-2.1.3.jar"/>
     </path>
 
     <target name="init">
