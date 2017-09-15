@@ -1,10 +1,9 @@
 package pe.project.network.packet;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
+import pe.project.Main;
 
 public interface Packet {
-	String getPacketName();
-	ByteArrayDataOutput writePacketData(ByteArrayDataOutput out);
-	void readPacketData(ByteArrayDataInput input);
+	String getPacketChannel();
+	String getPacketData();
+	void handlePacket(Main main, String data);
 }

@@ -43,14 +43,14 @@ public class PlayerTracking implements EntityTracking {
 	
 	@Override
 	public void addEntity(Entity entity) {
-		PlayerData.DeserializePlayerData(mPlugin, (Player)entity);
+		PlayerData.deserializePlayerData(mPlugin, (Player)entity);
 		
 		mEntities.add((Player)entity);
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
-		PlayerData.SerializePlayerData(mPlugin, (Player)entity);
+		PlayerData.serializePlayerData(mPlugin, (Player)entity);
 		
 		mEntities.remove(entity);
 	}
@@ -224,7 +224,7 @@ public class PlayerTracking implements EntityTracking {
 		Iterator<Player> players = mEntities.iterator();
 		while (players.hasNext()) {
 			Player player = players.next();
-			PlayerData.SerializePlayerData(mPlugin, player);
+			PlayerData.serializePlayerData(mPlugin, player);
 		}
 		
 		mEntities.clear();

@@ -7,7 +7,8 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Main;
-import pe.project.network.packet.TransferPlayerPacket;
+import pe.project.network.packet.TransferPlayerDataPacket;
+import pe.project.network.packet.SendPlayerPacket;
 import pe.project.playerdata.PlayerData;
 import pe.project.point.AreaBounds;
 import pe.project.point.Point;
@@ -66,7 +67,6 @@ public class TransferServer implements CommandExecutor {
 
 		AreaBounds bounds = new AreaBounds("", pos1, pos2);
 
-
 		for (Player player : mMain.getServer().getOnlinePlayers()) {
 			if (bounds.within(player.getLocation())) {
 				if (scoreName != null) {
@@ -78,20 +78,31 @@ public class TransferServer implements CommandExecutor {
 					}
 				}
 
-				TransferPlayerPacket packet = new TransferPlayerPacket();
+				if (sendPlayerStuff == false) {
+					SendPlayerPacket packet = new SendPlayerPacket();
 
-				packet.mNewServer = server;
-				packet.mPlayerName = player.getName();
+					packet.mNewServer = server;
+					packet.mPlayerName = player.getName();
+					packet.mPlayerUUID = player.getUniqueId();
 
-				if (sendPlayerStuff != false) {
-					packet.mPlayerContent = PlayerData.SerializePlayerData(mMain, player);
+					sender.sendMessage("Transferring " + player.getName() + " to " + server);
+					NetworkUtils.SendPacket(mMain, packet);
 				} else {
-					packet.mPlayerContent = null;
+					TransferPlayerDataPacket packet = new TransferPlayerDataPacket();
+
+					packet.mNewServer = server;
+					packet.mPlayerName = player.getName();
+					packet.mPlayerUUID = player.getUniqueId();
+					packet.mPlayerContent = PlayerData.serializePlayerData(mMain, player);
+					if (packet.mPlayerContent.isEmpty()) {
+						sender.sendMessage(ChatColor.RED + "Failed to get player data for " + player.getName());
+						continue;
+					}
+
+					sender.sendMessage("Transferring " + player.getName() + " with playerdata to " + server);
+					NetworkUtils.SendPacket(mMain, packet);
 				}
 
-				sender.sendMessage("Transferring " + player.getName() + " to " + server);
-
-				NetworkUtils.SendPacket(mMain, packet);
 			}
 		}
 

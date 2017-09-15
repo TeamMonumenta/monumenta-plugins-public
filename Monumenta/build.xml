@@ -17,6 +17,7 @@
         <pathelement location="bin"/>
         <pathelement location="../api/gson-2.8.1.jar"/>
         <pathelement location="../api/spigot-api-1.12-R0.1-SNAPSHOT-shaded.jar"/>
+		<pathelement location="../api/socket4mc-2.1.3.jar"/>
     </path>
 
     <target name="init">
