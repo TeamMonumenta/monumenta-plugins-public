@@ -21,7 +21,7 @@ import pe.project.listeners.EntityListener;
 import pe.project.listeners.ItemListener;
 import pe.project.listeners.MobListener;
 import pe.project.listeners.PlayerListener;
-import pe.project.listeners.PluginListener;
+import pe.project.listeners.SocketListener;
 import pe.project.listeners.WorldListener;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
@@ -103,9 +103,7 @@ public class Main extends JavaPlugin {
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		
-		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginListener(this));
-		
+		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, world, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, world), this);
