@@ -22,6 +22,7 @@ import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 import pe.project.classes.*;
 import pe.project.commands.*;
 import pe.project.listeners.*;
+import pe.project.managers.NpcManager;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
 import pe.project.managers.potion.PotionManager;
@@ -65,7 +66,7 @@ public class Main extends JavaPlugin {
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public PulseEffectTimers mPulseEffectTimers = null;
 	public CombatLoggingTimers mCombatLoggingTimers = null;
-	private Random mRandom = null;
+	public Random mRandom = null;
 	int mPeriodicTimer = -1;
 
 	public ServerProperties mServerProporties = new ServerProperties();
@@ -78,6 +79,8 @@ public class Main extends JavaPlugin {
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
+	public NpcManager mNpcManager;
+	
 	public SocketClient mSocketClient;
 
 	// Used for the /back and /forward commands - stacks of teleport locations
@@ -142,12 +145,16 @@ public class Main extends JavaPlugin {
 		if (Constants.POIS_ENABLED) {
 			getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));
 		}
+		if (Constants.NPCS_ENABLED) {
+			getCommand("questTrigger").setExecutor(new QuestTrigger(this));
+		}
 		
 		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
 		mPOIManager = new POIManager(this);
-
+		mNpcManager = new NpcManager(this);
+		
 		//	Load info.
 		_loadConfig();
 		mPOIManager.loadAllPOIs();

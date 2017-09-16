@@ -64,3 +64,7 @@ commands:
     permission: monumenta.commands.forward
     description: Transfers forward to location prior to /back. Works multiple times in one session. Saves coordinates to /back.
     usage: /forward
+  questtrigger:
+    permission: monumenta.commands.questTrigger
+    description: Used by scripted questing system
+    usage: What are you doing? You shouldn't be using this!

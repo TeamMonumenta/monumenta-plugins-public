@@ -21,6 +21,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -86,13 +87,17 @@ public class EntityListener implements Listener {
 			
 			//	Hit by player.
 			if (damager instanceof Player) {
-				//	Make sure to not trigger class abilities off Throrns.
-				if (event.getCause() != DamageCause.THORNS) {
-					Player player = (Player)damager;
-					
-					BaseClass _class = mPlugin.getClass(player);
-					_class.ModifyDamage(player, _class, event);
-					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+				if (damagee instanceof Villager) {
+					mPlugin.mNpcManager.interactEvent((Player)damager, damagee.getCustomName());
+				} else {
+					//	Make sure to not trigger class abilities off Throrns.
+					if (event.getCause() != DamageCause.THORNS) {
+						Player player = (Player)damager;
+						
+						BaseClass _class = mPlugin.getClass(player);
+						_class.ModifyDamage(player, _class, event);
+						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+					}
 				}
 			}
 			//	Hit by arrow.
@@ -106,6 +111,11 @@ public class EntityListener implements Listener {
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 				}
 			}
+		}
+
+		//	Don't hurt Villagers!
+		if (damagee instanceof Villager) {
+			event.setCancelled(true);
 		}
 	}
 	
@@ -216,10 +226,14 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				}
 				
-				//	All affected players need to have the effect added to their potion manager.
-				for (Entity entity : event.getAffectedEntities()) {
+				Iterator<LivingEntity> iter = event.getAffectedEntities().iterator();
+				while (iter.hasNext()) {
+					LivingEntity entity = iter.next();
+					//	All affected players need to have the effect added to their potion manager.
 					if (entity instanceof Player) {
 						mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects());
+					} else if (entity instanceof Villager) {
+						iter.remove();
 					}
 				}
 			}
