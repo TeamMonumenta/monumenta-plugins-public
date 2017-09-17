@@ -152,7 +152,7 @@ public class POIManager {
 		mPOIs.add(new PointOfInterest(POI.Docks, "Docks", new Point(-392, 94, 197), 80, 110, null));
 
 		mPOIs.add(new PointOfInterest(POI.Chasm, "Molten Chasm", new Point(788, 30, 96), 80, 110, null));
-		mPOIs.add(new PointOfInterest(POI.Island, "Corrupted Island", new Point(615, 76, 475), 70, 100, null));
+		mPOIs.add(new PointOfInterest(POI.Island, "Corrupted Island", new Point(599, 76, 475), 70, 100, null));
 		mPOIs.add(new PointOfInterest(POI.Pond, "Hallowed Pond", new Point(439, 72, 240), 85, 115, null));
 
 		mPOIs.add(new PointOfInterest(POI.Ruins, "Ancient Ruin", new Point(357, 77, -60), 70, 100, null));
