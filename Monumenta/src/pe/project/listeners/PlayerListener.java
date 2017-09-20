@@ -60,28 +60,28 @@ public class PlayerListener implements Listener {
 	Main mPlugin = null;
 	World mWorld = null;
 	Random mRandom = null;
-	
+
 	public PlayerListener(Main plugin, World world, Random random) {
 		mPlugin = plugin;
 		mWorld = world;
 		mRandom = random;
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		
+
 		mPlugin.mTrackingManager.addEntity(player);
 		RegionReset.handle(mPlugin, player);
 		DailyReset.handle(mPlugin, player);
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		
+
 		mPlugin.mTrackingManager.removeEntity(player);
-		
+
 		//		If the player is opped don't apply anti-combat logging technology!
 		List<Entity> nearbyEntities = player.getNearbyEntities(20, 20, 20);
 		if (nearbyEntities.size() > 0) {
@@ -94,17 +94,17 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
-		
+
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
-		
+
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			//	Quest Compass.
@@ -129,9 +129,9 @@ public class PlayerListener implements Listener {
 						if (pois != null && pois.size() > 0) {
 							for (PointOfInterest poi : pois) {
 								int ticks = poi.getTimer();
-								
+
 								String message;
-								
+
 								//	Seems there's plenty of time before we respawn.
 								if (ticks >= 20) {
 									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks);
@@ -145,11 +145,11 @@ public class PlayerListener implements Listener {
 								else {
 									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is ready to respawn!";
 								}
-								
+
 								if (poi.withinPOI(new Point(player.getLocation()))) {
 									message += " [Within]";
 								}
-	
+
 								player.sendMessage(message);
 							}
 						} else {
@@ -163,7 +163,7 @@ public class PlayerListener implements Listener {
 				} else if (item.getType() == Material.FISHING_ROD) {
 					if (action == Action.RIGHT_CLICK_BLOCK) {
 						Material blockType = block.getType();
-						
+
 						//	If this is an interactible block it means they didn't really want to be fishing! :D
 						if (ItemUtils.isInteractable(blockType)) {
 							if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
@@ -173,13 +173,13 @@ public class PlayerListener implements Listener {
 					}
 				}
 			}
-			
+
 			if (block != null) {
 				if (player.getGameMode() != GameMode.CREATIVE && block.getType() == Material.ANVIL) {
 					event.setCancelled(true);
 				}
 			}
-			
+
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				ItemStack heldItem = player.getInventory().getItemInMainHand();
 				if (ItemUtils.isBoat(heldItem.getType())) {
@@ -194,7 +194,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Entity entity = event.getRightClicked();
@@ -209,87 +209,88 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void AsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		Location playerLoc = player.getLocation();
 		int guild = ScoreboardUtils.getScoreboardValue(player, "Guild");
-		
+
 		Iterator<Player> iter = event.getRecipients().iterator();
 		while (iter.hasNext()) {
 			Player receiver = iter.next();
 			int receiverGuild = ScoreboardUtils.getScoreboardValue(receiver, "Guild");
-			
+
 			if (guild == 0 || guild != receiverGuild) {
-				int chatDistance = ScoreboardUtils.getScoreboardValue(receiver, "chatDistance");			
-				if (playerLoc.distance(receiver.getLocation()) > chatDistance) {
+				int chatDistance = ScoreboardUtils.getScoreboardValue(receiver, "chatDistance");
+
+				if (chatDistance != 0 && (playerLoc.distance(receiver.getLocation()) > chatDistance)) {
 					iter.remove();
 				}
 			}
 		}
 	}
-	
+
 	//	The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
-		
+
 		ItemStack mainHand = player.getInventory().getItem(event.getNewSlot());
 		ItemStack offHand = player.getInventory().getItemInOffHand();
-		
+
 		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 	}
-	
+
 	//	The player dropped an item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		
+
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
-		
+
 		mPlugin.getClass(player).PlayerDropItemEvent(player, mainHand, offHand);
 	}
-	
+
 	//	The player picked up an item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void EntityPickupItemEvent(PlayerPickupItemEvent event) {
 		Player player = event.getPlayer();
 		String name = player.getName();
-		
+
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
 			public void run() {
 				Player p = Bukkit.getPlayer(name);
-				
+
 				ItemStack mainHand = p.getInventory().getItemInMainHand();
 				ItemStack offHand = p.getInventory().getItemInOffHand();
-				
+
 				mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
 			}
 		}, 0);
 	}
-	
+
 	//	An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
 		Player player = event.getPlayer();
 		String name = player.getName();
-		
+
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
 			public void run() {
 				Player p = Bukkit.getPlayer(name);
-				
+
 				ItemStack mainHand = p.getInventory().getItemInMainHand();
 				ItemStack offHand = p.getInventory().getItemInOffHand();
-				
+
 				mPlugin.getClass(p).PlayerItemBreakEvent(p, mainHand, offHand);
 			}
 		}, 0);
 	}
-	
+
 	//	The player moved item in their inventory.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
@@ -297,38 +298,38 @@ public class PlayerListener implements Listener {
 		if (inventory.getType() == InventoryType.CRAFTING) {
 			Player player = (Player)inventory.getHolder();
 			String name = player.getName();
-			
+
 			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 				@Override
 				public void run() {
 					Player p = Bukkit.getPlayer(name);
-					
+
 					ItemStack mainHand = p.getInventory().getItemInMainHand();
 					ItemStack offHand = p.getInventory().getItemInOffHand();
-					
+
 					mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
 				}
 			}, 0);
 		}
 	}
-	
+
 	//	Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		Player player = event.getPlayer();
-		
+
 		ItemStack mainHand = event.getMainHandItem();
 		ItemStack offHand = event.getOffHandItem();
-		
+
 		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 	}
-	
+
 	//	The player has respawned.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerRespawnEvent(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
 		final String name = player.getName();
-		
+
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
 			public void run() {
@@ -337,7 +338,7 @@ public class PlayerListener implements Listener {
 			}
 		}, 0);
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerFishEvent(PlayerFishEvent event) {
 		if (event.getState() == State.FISHING) {
@@ -346,7 +347,7 @@ public class PlayerListener implements Listener {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
@@ -361,7 +362,7 @@ public class PlayerListener implements Listener {
 				if (info != null) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
-				
+
 				//	Add custom potion effects.
 				List<PotionEffect> effects = meta.getCustomEffects();
 				if (effects != null) {
@@ -370,15 +371,15 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	An item has taken damage.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) {
 		ItemStack item = event.getItem();
-		
+
 		if (ItemUtils.isArmorItem(item.getType())) {
 			int damage = event.getDamage();
-			
+
 			int unbreaking = item.getEnchantmentLevel(Enchantment.DURABILITY);
 			if (unbreaking > 0) {
 				for (int i = 0; i < damage; i++) {
@@ -387,11 +388,11 @@ public class PlayerListener implements Listener {
 					}
 				}
 			}
-			
+
 			if (damage < 0) {
 				damage = 0;
 			}
-			
+
 			event.setDamage(damage);
 		}
 	}
