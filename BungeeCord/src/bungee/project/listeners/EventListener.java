@@ -15,14 +15,11 @@ import net.md_5.bungee.event.EventPriority;
 
 import fr.rhaz.socketapi.SocketAPI.Server.SocketMessenger;
 import fr.rhaz.socket4mc.Bungee.BungeeSocketHandshakeEvent;
-import fr.rhaz.socket4mc.Bungee.BungeeSocketConnectEvent;
 import fr.rhaz.socket4mc.Bungee.BungeeSocketJSONEvent;
 
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PluginMessageEvent;
 
 public class EventListener implements Listener {
 
