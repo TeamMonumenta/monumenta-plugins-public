@@ -72,8 +72,9 @@ public class EntityUtils {
 			bz = b.getZ();
 			
 			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
-			if( checkLos && (b.getType() != Material.AIR && b.getType() != Material.GLASS) )
+			if (checkLos && _LosBlockingBlock(b.getType())) {
 				break;
+			}
 			
 			//	Loop through the entities and see if we hit one.
 			for(LivingEntity e : entities) {
@@ -196,5 +197,22 @@ public class EntityUtils {
 		}
 		
 		return null;
+	}
+	
+	private static boolean _LosBlockingBlock(Material mat) {
+		if (mat.equals(Material.AIR) ||
+			mat.equals(Material.GLASS) ||
+			mat.equals(Material.VINE) ||
+			mat.equals(Material.WEB) ||
+			mat.equals(Material.WATER) ||
+			mat.equals(Material.STATIONARY_WATER) ||
+			mat.equals(Material.LAVA) ||
+			mat.equals(Material.STATIONARY_LAVA) ||
+			mat.equals(Material.CARPET) ||
+			ItemUtils.isDoor(mat)) {
+			return false;
+		}
+
+		return true;
 	}
 }

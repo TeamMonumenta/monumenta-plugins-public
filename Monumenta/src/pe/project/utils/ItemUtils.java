@@ -93,6 +93,16 @@ public class ItemUtils {
             Material.DIAMOND_LEGGINGS
 	);
 	
+	public static List<Material> doors = Arrays.asList(
+			Material.ACACIA_DOOR,
+			Material.BIRCH_DOOR,
+			Material.DARK_OAK_DOOR,
+			Material.IRON_DOOR,
+			Material.JUNGLE_DOOR,
+			Material.SPRUCE_DOOR,
+			Material.WOOD_DOOR
+	);
+	
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
 		
@@ -156,6 +166,16 @@ public class ItemUtils {
 	
 	public static boolean isArmorItem(Material item) {
 		for (Material material : armors) {
+			if (material.equals(item)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public static boolean isDoor(Material item) {
+		for (Material material : doors) {
 			if (material.equals(item)) {
 				return true;
 			}
