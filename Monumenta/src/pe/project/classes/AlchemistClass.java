@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -99,7 +100,7 @@ public class AlchemistClass extends BaseClass {
 	}
 	
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
 		//	GruesomeAlchemy
 		{
 			int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");

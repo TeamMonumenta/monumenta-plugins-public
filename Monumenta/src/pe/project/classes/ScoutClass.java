@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -112,7 +113,7 @@ public class ScoutClass extends BaseClass {
 	}
 	
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause causee) {
 		int tinkering = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
 		if (tinkering > 0) {
 			double chanceOfSlowness = tinkering == 1 ? TINKERING_1_CHANCE_OF_SLOWNESS : TINKERING_2_CHANCE_OF_SLOWNESS;

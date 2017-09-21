@@ -18,6 +18,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -165,10 +166,10 @@ public class ClericClass extends BaseClass {
 	}
 	
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		//	DivineJustice
 		{
-			if (PlayerUtils.isCritical(player)) {
+			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 				if (EntityUtils.isUndead(damagee)) {
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 0) {
@@ -187,10 +188,10 @@ public class ClericClass extends BaseClass {
 	}
 	
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
 		//	DivineJustice
 		{
-			if (PlayerUtils.isCritical(player)) {
+			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 				if (EntityUtils.isUndead(killedEntity)) {
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 1) {

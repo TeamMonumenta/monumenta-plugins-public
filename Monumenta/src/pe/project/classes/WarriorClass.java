@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -113,7 +114,7 @@ public class WarriorClass extends BaseClass {
 	}
 	
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		//	Obliteration
 		{
 			//	First we need to check if we're actually sneaking and holding an axe, if not we can bail out.
@@ -169,7 +170,7 @@ public class WarriorClass extends BaseClass {
 		{
 			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
 			if (bruteForce > 0) {
-				if (PlayerUtils.isCritical(player)) {
+				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 					World world = Bukkit.getWorld(player.getWorld().getName());
 					
 					List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
@@ -216,7 +217,7 @@ public class WarriorClass extends BaseClass {
 	}
 	
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
 		int frenzy = ScoreboardUtils.getScoreboardValue(player, "Frenzy");
 		if (frenzy > 0) {
 			int hasteAmp = frenzy == 1 ? 2 : 3;

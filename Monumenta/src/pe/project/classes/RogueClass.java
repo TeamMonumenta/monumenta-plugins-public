@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -231,8 +232,8 @@ public class RogueClass extends BaseClass {
 	}
 	
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
-		if (PlayerUtils.isCritical(player)) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+		if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
@@ -269,7 +270,7 @@ public class RogueClass extends BaseClass {
 	}
 	
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
 		_viciousCombos(player, killedEntity);
 	}
 	

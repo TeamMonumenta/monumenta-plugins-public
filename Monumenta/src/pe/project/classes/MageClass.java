@@ -15,6 +15,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -113,7 +114,7 @@ public class MageClass extends BaseClass {
 	}
 	
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		//	Arcane Strike
 		{
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -173,7 +174,7 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
 		int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
 		if (intellect > 0) {
 			player.giveExp(INTELLECT_XP);

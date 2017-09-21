@@ -92,7 +92,7 @@ public class EntityListener implements Listener {
 					
 					BaseClass _class = mPlugin.getClass(player);
 					_class.ModifyDamage(player, _class, event);
-					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage());
+					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
 				}
 			}
 			//	Hit by arrow.
@@ -264,7 +264,7 @@ public class EntityListener implements Listener {
 			LivingEntity livingEntity = (LivingEntity)entity;
 			Player player = livingEntity.getKiller();
 			if (player != null) {
-				mPlugin.getClass(player).EntityDeathEvent(player, livingEntity);
+				mPlugin.getClass(player).EntityDeathEvent(player, livingEntity, entity.getLastDamageCause().getCause());
 			}
 		}
 	}

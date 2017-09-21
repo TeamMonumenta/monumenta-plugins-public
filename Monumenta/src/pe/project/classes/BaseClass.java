@@ -13,6 +13,7 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
 import pe.project.Main;
@@ -70,7 +71,7 @@ public class BaseClass {
 	
 	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {}
 	
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		return true;
 	}
 	
@@ -90,7 +91,7 @@ public class BaseClass {
 	
 	public void PlayerRespawnEvent(Player player) {}
 	
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity) {}
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {}
 	
 	public void PlayerInteractEvent(Player player, Action action, Material material) {}
 	
