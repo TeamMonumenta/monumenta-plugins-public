@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-			  as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="Monumenta">
 	<tstamp>
 		<format property="TODAY" pattern="yyyyMMdd-HHmmss"  locale="en,US" />
 	</tstamp>
 
+	<available file="../utils" property="pmd.exists" value="anything"/>
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
@@ -38,10 +34,31 @@
 
     <target name="build-subprojects"/>
 
+	<target name="pmd" if="pmd.exists">
+		<path id="pmd.classpath">
+			<pathelement location="${basedir}"/>
+			<fileset dir="../utils/pmd-bin-5.8.1/lib/">
+				<include name="*.jar"/>
+			</fileset>
+		</path>
+
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
+		<pmd rulesetfiles="java-imports,java-unusedcode">
+			<sourceLanguage name="java" version="1.8"/>
+			<formatter type="text" toConsole="true"/>
+			<fileset dir="src">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+
 	<target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
 			<compilerarg line="-encoding ISO-8859-1"/>
+			<compilerarg line="-Xlint:all"/>
+			<compilerarg line="-Xmaxwarns"/>
+			<compilerarg line="9999"/>
             <src path="src"/>
             <classpath refid="Monumenta.classpath"/>
         </javac>
