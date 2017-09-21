@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
@@ -230,7 +231,7 @@ public class AlchemistClass extends BaseClass {
 			
 			int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
 			for (LivingEntity entity : affectedEntities) {
-				if (!(entity instanceof Player)) {
+				if (entity instanceof Monster) {
 					if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
 						entity.damage(damage);
 						entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
@@ -253,7 +254,7 @@ public class AlchemistClass extends BaseClass {
 			
 			int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
 			for (LivingEntity entity : entities) {
-				if (!(entity instanceof Player)) {
+				if (entity instanceof Monster) {
 					if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
 						entity.damage(damage);
 						entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
