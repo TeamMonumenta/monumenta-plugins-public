@@ -70,7 +70,7 @@ public class PlayTimeStats implements CommandExecutor {
     }
 	
 	int _ticksToDays(int ticks) {
-		return (int)((((ticks / 20) / 60) / 60) / 24);
+		return ((((ticks / 20) / 60) / 60) / 24);
 	}
 	
 	int _daysToTicks(int days) {
@@ -78,7 +78,7 @@ public class PlayTimeStats implements CommandExecutor {
 	}
     
     int _ticksToHours(int ticks) {
-    	return (int)(((ticks / 20) / 60) / 60);
+    	return (((ticks / 20) / 60) / 60);
     }
     
     int _hoursToTicks(int hours) {
@@ -86,7 +86,7 @@ public class PlayTimeStats implements CommandExecutor {
     }
     
     int _ticksToMinutes(int ticks) {
-    	return (int)((ticks / 20) / 60);
+    	return ((ticks / 20) / 60);
     }
     
     int _minutesToTicks(int minutes) {
@@ -94,6 +94,6 @@ public class PlayTimeStats implements CommandExecutor {
     }
     
     int _ticksToSeconds(int ticks) {
-    	return (int)(ticks / 20);
+    	return (ticks / 20);
     }
 }
