@@ -59,7 +59,7 @@ public class EventListener implements Listener {
 		}
 
 		// Decode the input "string" into the byte array that was sent
-		byte[] packetInfo = data.getBytes(StandardCharsets.UTF_8);
+		byte[] packetInfo = data.getBytes(StandardCharsets.ISO_8859_1);
 
 		// Decode the input into an array of individual byte arrays
 		ByteArrayDataInput input = ByteStreams.newDataInput(packetInfo);
