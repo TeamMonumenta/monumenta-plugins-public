@@ -27,7 +27,7 @@ public class PlayerData {
 				return writeContent;
 			}
 		} catch (Exception e) {
-			main.getLogger().warning("Failed to write player data to " + fileLocation);
+			main.getLogger().severe("Failed to write player data to " + fileLocation);
 		}
 
 		return "";
@@ -72,6 +72,8 @@ public class PlayerData {
 			String content = gson.toJson(root);
 			return content;
 		} catch (Exception e) {
+			main.getLogger().severe("Caught exception: " + e);
+			e.printStackTrace();
 		}
 
 		return "";
@@ -86,6 +88,8 @@ public class PlayerData {
 				loadFromString(main, player, content);
 			}
 		} catch (Exception e) {
+			main.getLogger().severe("Caught exception: " + e);
+			e.printStackTrace();
 		}
 	}
 
@@ -158,6 +162,8 @@ public class PlayerData {
 				ScoreboardUtils.loadFromJsonObject(player, object.getAsJsonArray("scoreboards"));
 
 			} catch (Exception e) {
+				main.getLogger().severe("Caught exception: " + e);
+				e.printStackTrace();
 			}
 		}
 	}

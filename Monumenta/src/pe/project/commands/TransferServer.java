@@ -93,7 +93,7 @@ public class TransferServer implements CommandExecutor {
 					packet.mNewServer = server;
 					packet.mPlayerName = player.getName();
 					packet.mPlayerUUID = player.getUniqueId();
-					packet.mPlayerContent = PlayerData.serializePlayerData(mMain, player);
+					packet.mPlayerContent = PlayerData.convertToString(mMain, player);
 					if (packet.mPlayerContent.isEmpty()) {
 						sender.sendMessage(ChatColor.RED + "Failed to get player data for " + player.getName());
 						continue;

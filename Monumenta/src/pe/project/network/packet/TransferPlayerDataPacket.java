@@ -44,37 +44,38 @@ public class TransferPlayerDataPacket implements Packet {
 		byte[] bytes = out.toByteArray();
 
 		// Convert that byte array to a generic string
-		return new String(bytes, StandardCharsets.UTF_8);
+		return new String(bytes, StandardCharsets.ISO_8859_1);
 	}
 
 	@Override
 	public void handlePacket(Main main, String data) {
 		// Convert the data to a byte array
-		ByteArrayDataInput input = ByteStreams.newDataInput(data.getBytes(StandardCharsets.UTF_8));
+		ByteArrayDataInput input = ByteStreams.newDataInput(data.getBytes(StandardCharsets.ISO_8859_1));
 
 		// Read the payload data
-		mNewServer = input.readUTF();
-		if (mNewServer.isEmpty()) {
-			main.getLogger().warning("Failed to retrieve new server name from packet");
-			return;
-		}
-
-		mPlayerName = input.readUTF();
-		if (mNewServer.isEmpty()) {
-			main.getLogger().warning("Failed to retrieve player name from packet");
-			return;
-		}
-
 		try {
-			mPlayerUUID = UUID.fromString(input.readUTF());
-		} catch (Exception e) {
-			main.getLogger().warning("Failed to retrieve UUID from packet for '" + mPlayerName + "'");
-			return;
-		}
+			mNewServer = input.readUTF();
+			if (mNewServer.isEmpty()) {
+				main.getLogger().warning("Failed to retrieve new server name from packet");
+				return;
+			}
 
-		mPlayerContent = input.readUTF();
-		if (mPlayerContent.isEmpty()) {
-			main.getLogger().warning("Failed to retrieve player data from packet for '" + mPlayerName + "'");
+			mPlayerName = input.readUTF();
+			if (mNewServer.isEmpty()) {
+				main.getLogger().warning("Failed to retrieve player name from packet");
+				return;
+			}
+
+			mPlayerUUID = UUID.fromString(input.readUTF());
+
+			mPlayerContent = input.readUTF();
+			if (mPlayerContent.isEmpty()) {
+				main.getLogger().warning("Failed to retrieve player data from packet for '" + mPlayerName + "'");
+				return;
+			}
+		} catch (Exception e) {
+			main.getLogger().severe("Caught exception: " + e);
+			e.printStackTrace();
 			return;
 		}
 

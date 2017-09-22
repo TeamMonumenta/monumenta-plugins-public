@@ -39,7 +39,7 @@ public class SendPlayerPacket implements Packet {
 		byte[] bytes = out.toByteArray();
 
 		// Convert that byte array to a generic string
-		return new String(bytes, StandardCharsets.UTF_8);
+		return new String(bytes, StandardCharsets.ISO_8859_1);
 	}
 
 	@Override
