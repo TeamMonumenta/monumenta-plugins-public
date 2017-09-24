@@ -345,6 +345,10 @@ public class PlayerListener implements Listener {
 			mPlugin.mTrackingManager.mFishingHook.addEntity(event.getPlayer(), event.getHook());
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
+
+			if (event.getState() == State.CAUGHT_ENTITY && !(event.getCaught() instanceof Monster)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
