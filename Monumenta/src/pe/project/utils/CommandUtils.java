@@ -125,45 +125,26 @@ public class CommandUtils {
 			}
 		}
 
-		try {
-			if (xStr.equals("~")) {
-				// Nothing to do - coordinate already correct
-			} else if (yStr.startsWith("~")) {
-				x += parseDoubleFromString(sender, command, xStr.substring(1));
-			} else {
-				x = parseDoubleFromString(sender, command, xStr);
-			}
-		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse x coordinate '" + xStr + "'");
-			throw new Exception();
-		}
-
-		try {
-			if (yStr.equals("~")) {
-				// Nothing to do - coordinate already correct
-			} else if (yStr.startsWith("~")) {
-				y += parseDoubleFromString(sender, command, yStr.substring(1));
-			} else {
-				y = parseDoubleFromString(sender, command, yStr);
-			}
-		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse y coordinate '" + yStr + "'");
-			throw new Exception();
-		}
-
-		try {
-			if (zStr.equals("~")) {
-				// Nothing to do - coordinate already correct
-			} else if (yStr.startsWith("~")) {
-				z += parseDoubleFromString(sender, command, zStr.substring(1));
-			} else {
-				z = parseDoubleFromString(sender, command, zStr);
-			}
-		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse z coordinate '" + zStr + "'");
-			throw new Exception();
-		}
+		x = parseCoordFromString(sender, command, x, xStr);
+		y = parseCoordFromString(sender, command, y, xStr);
+		z = parseCoordFromString(sender, command, z, xStr);
 
 		return new Point(x, y, z);
+	}
+
+	public static double parseCoordFromString(CommandSender sender, Command command,
+	                                          double senderPos, String str) throws Exception {
+		try {
+			if (str.equals("~")) {
+				return senderPos;
+			} else if (str.startsWith("~")) {
+				return senderPos + parseDoubleFromString(sender, command, str.substring(1));
+			} else {
+				return parseDoubleFromString(sender, command, str.substring(1));
+			}
+		} catch (Exception e) {
+			sender.sendMessage(ChatColor.RED + "Failed to parse coordinate '" + str + "'");
+			throw new Exception();
+		}
 	}
 }
