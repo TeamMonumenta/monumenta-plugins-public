@@ -56,16 +56,13 @@ public class TransferServer implements CommandExecutor {
 			}
 		}
 
-		Point pos1;
-		Point pos2;
+		AreaBounds bounds;
 		try {
-			pos1 = CommandUtils.parsePointFromString(sender, command, arg3[2], arg3[3], arg3[4]);
-			pos2 = CommandUtils.parsePointFromString(sender, command, arg3[5], arg3[6], arg3[7]);
+			bounds = CommandUtils.parseAreaFromString(sender, command, arg3[2], arg3[3],
+			                                          arg3[4], arg3[5], arg3[6], arg3[7]);
 		} catch (Exception e) {
 			return false;
 		}
-
-		AreaBounds bounds = new AreaBounds("", pos1, pos2);
 
 		for (Player player : mMain.getServer().getOnlinePlayers()) {
 			if (bounds.within(player.getLocation())) {
