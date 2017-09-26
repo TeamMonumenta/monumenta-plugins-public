@@ -88,6 +88,7 @@ public class CommandUtils {
 			try {
 				for (Method m : methods) {
 					if (m.getName().equals("getLocation") && (m.getParameterTypes().length == 0)) {
+						// This is for an entity which has a location
 						senderPos = (Location)m.invoke(sender, (Object[])null);
 						x = senderPos.getX();
 						y = senderPos.getY();
@@ -99,12 +100,17 @@ public class CommandUtils {
 						}
 						break;
 					} else if (m.getName().equals("getBlock") && (m.getParameterTypes().length == 0)) {
+						// This is for a block like a command block
 						senderPos = ((Block)m.invoke(sender, (Object[])null)).getLocation();
 						// Note that the coordinate returned for blocks is the lowest corner
 						x = senderPos.getX();
 						y = senderPos.getY();
 						z = senderPos.getZ();
 						break;
+					} else if (m.getName().equals("getCallee") && (m.getParameterTypes().length == 0)) {
+						// This is for execute commands - CommandSender is a ProxiedCommandSender
+						// Get the callee command sender and recurse (only expect to recurse once)
+						return parsePointFromString((CommandSender)(m.invoke(sender, (Object[])null)), command, xStr, yStr, zStr, doSubtractEntityOffset);
 					}
 				}
 			} catch (Exception e) {
