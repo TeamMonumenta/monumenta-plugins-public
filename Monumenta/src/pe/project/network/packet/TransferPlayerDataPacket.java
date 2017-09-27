@@ -9,7 +9,7 @@ import com.google.common.io.ByteStreams;
 
 import pe.project.Main;
 import pe.project.playerdata.PlayerData;
-import pe.project.utils.NetworkUtils;
+import pe.project.utils.PacketUtils;
 
 public class TransferPlayerDataPacket implements Packet {
 	public String mNewServer;
@@ -93,6 +93,6 @@ public class TransferPlayerDataPacket implements Packet {
 		packet.mPlayerUUID = mPlayerUUID;
 
 		main.getLogger().info("Transferring " + mPlayerName + " to " + mNewServer);
-		NetworkUtils.SendPacket(main, packet);
+		PacketUtils.SendPacket(main, packet);
 	}
 }

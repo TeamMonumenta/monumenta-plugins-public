@@ -8,7 +8,7 @@ import fr.rhaz.socket4mc.Bukkit.BukkitSocketHandshakeEvent;
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketJSONEvent;
 
 import pe.project.Main;
-import pe.project.utils.NetworkUtils;
+import pe.project.utils.PacketUtils;
 import pe.project.network.packet.HeartbeatPacket;
 
 public class SocketListener implements Listener{
@@ -24,7 +24,7 @@ public class SocketListener implements Listener{
 
 		// Send a simple hello message to bungee
 		HeartbeatPacket packet = new HeartbeatPacket();
-		NetworkUtils.SendPacket(mMain, packet);
+		PacketUtils.SendPacket(mMain, packet);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -32,6 +32,6 @@ public class SocketListener implements Listener{
 		String channel = e.getChannel();
 		String data = e.getData();
 
-		NetworkUtils.ProcessPacket(mMain, channel, data);
+		PacketUtils.ProcessPacket(mMain, channel, data);
 	}
 }

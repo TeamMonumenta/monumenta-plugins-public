@@ -7,13 +7,10 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Main;
-import pe.project.network.packet.TransferPlayerDataPacket;
-import pe.project.network.packet.SendPlayerPacket;
-import pe.project.playerdata.PlayerData;
 import pe.project.point.AreaBounds;
 import pe.project.utils.CommandUtils;
-import pe.project.utils.NetworkUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.NetworkUtils;
 
 //	/transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
 
@@ -31,13 +28,32 @@ public class TransferServer implements CommandExecutor {
 		int scoreMax = 0;
 		boolean sendPlayerStuff = true;
 
-		if (arg3.length != 8 && arg3.length != 11) {
+		if (arg3.length != 1 && arg3.length != 8 && arg3.length != 11) {
 			sender.sendMessage(ChatColor.RED + "Invalid number of parameters!");
-			sender.sendMessage(ChatColor.RED + "Usage: " + command.getUsage());
 			return false;
 		}
 
 		String server = arg3[0];
+
+		if (arg3.length == 1) {
+			// Sender is requesting transfer to destination server with equipment
+			if (sender instanceof Player) {
+				try {
+					// Sender is a player - send them to the requested server with their gear
+					sender.sendMessage("Transferring with playerdata to " + server);
+					NetworkUtils.transferPlayerData(mMain, (Player)sender, server);
+					return true;
+				} catch (Exception e) {
+					sender.sendMessage("Caught exception when transferring players");
+					return false;
+				}
+			} else {
+				// Only players can be sent!
+				sender.sendMessage(ChatColor.RED + "Invalid number of parameters for non-player sender!");
+				return false;
+			}
+
+		}
 
 		// Default to sending equipment
 		if (arg3[1].equals("False") || arg3[1].equals("false")) {
@@ -74,31 +90,18 @@ public class TransferServer implements CommandExecutor {
 					}
 				}
 
-				if (sendPlayerStuff == false) {
-					SendPlayerPacket packet = new SendPlayerPacket();
-
-					packet.mNewServer = server;
-					packet.mPlayerName = player.getName();
-					packet.mPlayerUUID = player.getUniqueId();
-
-					sender.sendMessage("Transferring " + player.getName() + " to " + server);
-					NetworkUtils.SendPacket(mMain, packet);
-				} else {
-					TransferPlayerDataPacket packet = new TransferPlayerDataPacket();
-
-					packet.mNewServer = server;
-					packet.mPlayerName = player.getName();
-					packet.mPlayerUUID = player.getUniqueId();
-					packet.mPlayerContent = PlayerData.convertToString(mMain, player);
-					if (packet.mPlayerContent.isEmpty()) {
-						sender.sendMessage(ChatColor.RED + "Failed to get player data for " + player.getName());
-						continue;
+				try {
+					if (sendPlayerStuff == false) {
+						sender.sendMessage("Transferring " + player.getName() + " to " + server);
+						NetworkUtils.sendPlayer(mMain, player, server);
+					} else {
+						sender.sendMessage("Transferring " + player.getName() + " with playerdata to " + server);
+						NetworkUtils.transferPlayerData(mMain, player, server);
 					}
-
-					sender.sendMessage("Transferring " + player.getName() + " with playerdata to " + server);
-					NetworkUtils.SendPacket(mMain, packet);
+				} catch (Exception e) {
+					sender.sendMessage("Caught exception when transferring players");
+					return false;
 				}
-
 			}
 		}
 
