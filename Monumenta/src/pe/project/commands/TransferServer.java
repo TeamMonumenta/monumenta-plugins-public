@@ -11,7 +11,6 @@ import pe.project.network.packet.TransferPlayerDataPacket;
 import pe.project.network.packet.SendPlayerPacket;
 import pe.project.playerdata.PlayerData;
 import pe.project.point.AreaBounds;
-import pe.project.point.Point;
 import pe.project.utils.CommandUtils;
 import pe.project.utils.NetworkUtils;
 import pe.project.utils.ScoreboardUtils;

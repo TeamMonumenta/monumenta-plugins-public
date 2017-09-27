@@ -19,7 +19,6 @@ public class CommandUtils {
 			value = Integer.parseInt(str);
     	} catch (NumberFormatException e) {
     		sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
-    		sender.sendMessage(ChatColor.RED + "Usage: " + command.getUsage());
     		throw new Exception();
     	}
 
@@ -33,7 +32,6 @@ public class CommandUtils {
 			value = Float.parseFloat(str);
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
-    		sender.sendMessage(ChatColor.RED + "Usage: " + command.getUsage());
     		throw new Exception();
 		}
 
@@ -126,8 +124,8 @@ public class CommandUtils {
 		}
 
 		x = parseCoordFromString(sender, command, x, xStr);
-		y = parseCoordFromString(sender, command, y, xStr);
-		z = parseCoordFromString(sender, command, z, xStr);
+		y = parseCoordFromString(sender, command, y, yStr);
+		z = parseCoordFromString(sender, command, z, zStr);
 
 		return new Point(x, y, z);
 	}
