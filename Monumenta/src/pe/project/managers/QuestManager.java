@@ -51,6 +51,9 @@ public class QuestManager {
 		
 		//	Highwatch
 		_registerQuest(new SiegeOfHighwatch(mWorld));
+		
+		//	Lowtide
+		_registerQuest(new TheSalmon(mWorld));
 	}
 	
 	private void _registerQuest(Quest quest) {
