@@ -100,6 +100,7 @@ public class TransferServer implements CommandExecutor {
 					}
 				} catch (Exception e) {
 					sender.sendMessage("Caught exception when transferring players");
+					e.printStackTrace();
 					return false;
 				}
 			}

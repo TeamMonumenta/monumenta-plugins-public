@@ -138,7 +138,7 @@ public class CommandUtils {
 			} else if (str.startsWith("~")) {
 				return senderPos + parseDoubleFromString(sender, command, str.substring(1));
 			} else {
-				return parseDoubleFromString(sender, command, str.substring(1));
+				return parseDoubleFromString(sender, command, str);
 			}
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Failed to parse coordinate '" + str + "'");
