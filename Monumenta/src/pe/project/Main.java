@@ -23,6 +23,7 @@ import pe.project.listeners.*;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
 import pe.project.managers.potion.PotionManager;
+import pe.project.server.properties.ServerProperties;
 import pe.project.timers.*;
 import pe.project.tracking.TrackingManager;
 import pe.project.utils.ScoreboardUtils;
@@ -65,6 +66,7 @@ public class Main extends JavaPlugin {
 	private Random mRandom = null;
 	int mPeriodicTimer = -1;
 	
+	public ServerProperties mServerProporties = new ServerProperties();
 	private FileConfiguration mConfig;
 	private File mConfigFile;
 	public int mServerVersion = 0;
@@ -133,6 +135,7 @@ public class Main extends JavaPlugin {
 		//	Load info.
 		_loadConfig();
 		mPOIManager.loadAllPOIs();
+		mServerProporties.load(this);
 		
 		//	Move the logic out of Main and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
