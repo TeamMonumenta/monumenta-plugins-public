@@ -3,6 +3,7 @@ package pe.project.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
@@ -36,16 +37,29 @@ public class TransferServer implements CommandExecutor {
 		String server = arg3[0];
 
 		if (arg3.length == 1) {
-			// Sender is requesting transfer to destination server with equipment
 			if (sender instanceof Player) {
+				// Sender is requesting transfer to destination server with equipment
 				try {
-					// Sender is a player - send them to the requested server with their gear
 					sender.sendMessage("Transferring with playerdata to " + server);
 					NetworkUtils.transferPlayerData(mMain, (Player)sender, server);
 					return true;
 				} catch (Exception e) {
 					sender.sendMessage("Caught exception when transferring players");
 					return false;
+				}
+			} else if (sender instanceof ProxiedCommandSender) {
+				CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
+				CommandSender caller = ((ProxiedCommandSender)sender).getCaller();
+				if (callee instanceof Player) {
+					// Sender is an /execute command targeting a player
+					try {
+						caller.sendMessage("Transferring " + callee.getName() + " with playerdata to " + server);
+						NetworkUtils.transferPlayerData(mMain, (Player)callee, server);
+						return true;
+					} catch (Exception e) {
+						caller.sendMessage("Caught exception when transferring players");
+						return false;
+					}
 				}
 			} else {
 				// Only players can be sent!
