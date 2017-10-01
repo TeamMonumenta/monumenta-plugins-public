@@ -28,6 +28,7 @@ import pe.project.tracking.TrackingManager;
 import pe.project.utils.ScoreboardUtils;
 
 public class Main extends JavaPlugin {
+	//	TODO: Remove all Class related information out of Main and into it's own class "ClassManager" maybe?
 	public enum Classes {
 		NONE(0),
 		MAGE(1),
@@ -88,7 +89,8 @@ public class Main extends JavaPlugin {
 			
 		World world = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(world);
-			
+		
+		//	TODO: Move this out of here and into it's own ClassManager class.
 		//	Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom));
@@ -98,6 +100,7 @@ public class Main extends JavaPlugin {
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		
+		//	TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, world, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
@@ -105,6 +108,7 @@ public class Main extends JavaPlugin {
 		manager.registerEvents(new ItemListener(this), this);
 		manager.registerEvents(new WorldListener(this, world), this);
 		
+		//	TODO: Move this out of here and into it's own CommandManager class.
 		//	Add some slash commands
 		getCommand("setServerVersion").setExecutor(new SetServerVersionCommand(this));
 		getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
@@ -130,14 +134,15 @@ public class Main extends JavaPlugin {
 		_loadConfig();
 		mPOIManager.loadAllPOIs();
 		
+		//	Move the logic out of Main and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int ticks = 0;
 			
 			@Override
 			public void run() {
-				boolean oneHertz = ticks == 0;
-				boolean fourHertz = (ticks % 5) == 0;
-				boolean twentyHertz = true;
+				final boolean oneHertz = ticks == 0;
+				final boolean fourHertz = (ticks % 5) == 0;
+				final boolean twentyHertz = true;
 				
 				//	Once a second.
 				if (oneHertz) {
@@ -147,13 +152,13 @@ public class Main extends JavaPlugin {
 					
 					//	Update periodic timers.
 					mPeriodicTimer++;
-
+					
+					final boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
+					final boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
+					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
+					
 					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
 						BaseClass pClass = Main.this.getClass(player);
-							
-						boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
-						boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
-						boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 						pClass.PeriodicTrigger(player, two, fourty, sixty, mPeriodicTimer);
 					}
 						
@@ -193,6 +198,7 @@ public class Main extends JavaPlugin {
 		return getServer().getPlayer(playerID);
 	}
 	
+	//	TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
 	public BaseClass getClass(Player player) {
 		int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
 		if (playerClass >= 0 && playerClass <= Classes.COUNT.getValue()) {
@@ -203,6 +209,7 @@ public class Main extends JavaPlugin {
 		return mClassMap.get(Classes.NONE.getValue());
 	}
 	
+	//	TODO: Move Config saving/loading out of Main and into it's own files that can be called into for updating server info.
 	public void updateVersion(int version) {
 		mServerVersion = version;
 		_saveConfig();
