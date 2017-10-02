@@ -41,6 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
@@ -69,6 +70,20 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerJoinEvent(PlayerJoinEvent event) {
+		new BukkitRunnable() {
+			Integer tick = 0;
+			public void run() {
+				if (++tick == 20) {
+					Player player = event.getPlayer();
+
+					mPlugin.mTrackingManager.addEntity(player);
+					RegionReset.handle(mPlugin, player);
+					DailyReset.handle(mPlugin, player);
+
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 		Player player = event.getPlayer();
 
 		mPlugin.mTrackingManager.addEntity(player);
