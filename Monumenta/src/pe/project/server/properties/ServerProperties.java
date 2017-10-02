@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 
 import pe.project.Main;
 import pe.project.utils.FileUtils;
@@ -11,11 +12,17 @@ import pe.project.utils.FileUtils;
 public class ServerProperties {
 	private final static String FILE_NAME = "Properties.json";
 	//private boolean mRandomVariable;	//	SAMPLE VARIABLE
-	
+
 	/*public boolean getRandomVariable() {	//	SAMPLE GETTER
 		return mRandomVariable;
 	}*/
-	
+
+	private boolean mDailyResetEnabled = false;
+
+	public boolean getDailyResetEnabled() {
+		return mDailyResetEnabled;
+	}
+
 	public void load(Main plugin) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
@@ -29,7 +36,7 @@ public class ServerProperties {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void _loadFromString(Main main, String content) throws Exception {
 		if (content != null && content != "") {
 			try {
@@ -43,6 +50,10 @@ public class ServerProperties {
 					if (randomVariable != null) {
 						mRandomVariable = randomVariable.getAsBoolean();
 					}*/
+					JsonElement dailyResetEnabled = object.get("dailyResetEnabled");
+					if (dailyResetEnabled != null) {
+						mDailyResetEnabled = dailyResetEnabled.getAsBoolean();
+					}
 				}
 			} catch (Exception e) {
 				main.getLogger().severe("Caught exception: " + e);
