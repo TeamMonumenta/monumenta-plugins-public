@@ -11,16 +11,16 @@ import pe.project.utils.FileUtils;
 
 public class ServerProperties {
 	private final static String FILE_NAME = "Properties.json";
-	//private boolean mRandomVariable;	//	SAMPLE VARIABLE
-
-	/*public boolean getRandomVariable() {	//	SAMPLE GETTER
-		return mRandomVariable;
-	}*/
 
 	private boolean mDailyResetEnabled = false;
+	private boolean mJoinMessagesEnabled = false;
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
+	}
+
+	public boolean getJoinMessagesEnabled() {
+		return mJoinMessagesEnabled;
 	}
 
 	public void load(Main plugin) {
@@ -45,14 +45,14 @@ public class ServerProperties {
 				//	Load the file, if it exist than let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					/*//	Load random variable.	//	SAMPLE VARIABLE PARSING
-					JsonElement randomVariable = object.get("random_variable");
-					if (randomVariable != null) {
-						mRandomVariable = randomVariable.getAsBoolean();
-					}*/
 					JsonElement dailyResetEnabled = object.get("dailyResetEnabled");
 					if (dailyResetEnabled != null) {
 						mDailyResetEnabled = dailyResetEnabled.getAsBoolean();
+					}
+
+					JsonElement joinMessagesEnabled = object.get("joinMessagesEnabled");
+					if (joinMessagesEnabled != null) {
+						mJoinMessagesEnabled = joinMessagesEnabled.getAsBoolean();
 					}
 				}
 			} catch (Exception e) {

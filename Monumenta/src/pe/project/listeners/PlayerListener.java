@@ -70,6 +70,10 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerJoinEvent(PlayerJoinEvent event) {
+		if (mPlugin.mServerProporties.getJoinMessagesEnabled() == false) {
+			event.setJoinMessage("");
+		}
+
 		new BukkitRunnable() {
 			Integer tick = 0;
 			public void run() {
@@ -93,6 +97,10 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerQuitEvent(PlayerQuitEvent event) {
+		if (mPlugin.mServerProporties.getJoinMessagesEnabled() == false) {
+			event.setQuitMessage("");
+		}
+
 		Player player = event.getPlayer();
 
 		mPlugin.mTrackingManager.removeEntity(player);
