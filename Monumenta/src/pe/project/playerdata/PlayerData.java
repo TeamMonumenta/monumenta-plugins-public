@@ -6,6 +6,7 @@ import java.io.File;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.attribute.Attribute;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -103,7 +104,7 @@ public class PlayerData {
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 
 				//	Set health to max
-				player.setHealth(player.getMaxHealth());
+				player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
 				//	Load Saturation.
 				JsonElement saturation = object.get("saturation");
