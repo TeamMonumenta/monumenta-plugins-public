@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 import pe.project.Main;
 import pe.project.point.AreaBounds;
 import pe.project.utils.CommandUtils;

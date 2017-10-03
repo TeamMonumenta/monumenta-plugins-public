@@ -3,6 +3,7 @@ package pe.project.playerdata;
 import java.util.UUID;
 import java.io.File;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,6 +16,7 @@ import pe.project.Main;
 import pe.project.utils.FileUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.NetworkUtils;
 
 public class PlayerData {
 	static public String savePlayerData(Main main, UUID playerUUID, String writeContent) {
@@ -44,7 +46,6 @@ public class PlayerData {
 			JsonObject root = new JsonObject();
 
 			//	Add basic player information.
-			root.addProperty("health", player.getHealth());
 			root.addProperty("saturation", player.getSaturation());
 			root.addProperty("food_level", player.getFoodLevel());
 			root.addProperty("level", player.getLevel());
@@ -101,11 +102,8 @@ public class PlayerData {
 				//	Load the file, if it exist than let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 
-				//	Load Health.
-				JsonElement health = object.get("health");
-				if (health != null) {
-					player.setHealth(health.getAsDouble());
-				}
+				//	Set health to max
+				player.setHealth(player.getMaxHealth());
 
 				//	Load Saturation.
 				JsonElement saturation = object.get("saturation");
@@ -164,6 +162,25 @@ public class PlayerData {
 			} catch (Exception e) {
 				main.getLogger().severe("Caught exception: " + e);
 				e.printStackTrace();
+
+				final String fileLocation = main.getDataFolder() + File.separator + "broken_players" + File.separator + player.getUniqueId() + ".json";
+
+				try {
+					if (FileUtils.getCreateFile(fileLocation) != null) {
+						FileUtils.writeFile(fileLocation, content);
+					}
+				} catch (Exception ex) {
+					main.getLogger().severe("Failed to write player data to " + fileLocation);
+				}
+
+				player.sendMessage(ChatColor.RED + "Something very bad happened while transferring your player data.");
+				player.sendMessage(ChatColor.RED + "As a precaution, the server has attempted to move you to Purgatory.");
+				player.sendMessage(ChatColor.RED + "If for some reason you aren't on purgatory, take a screenshot and log off.");
+				player.sendMessage(ChatColor.RED + "Please post in #moderator-help and tag @admin");
+				player.sendMessage(ChatColor.RED + "Include details about what you were doing");
+				player.sendMessage(ChatColor.RED + "such as joining or leaving a dungeon (and which one!)");
+
+				NetworkUtils.sendPlayer(main, player, "purgatory");
 			}
 		}
 	}
