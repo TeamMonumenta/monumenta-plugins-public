@@ -4,20 +4,21 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 public class FileUtils {
-	public static String readFile(String fileName) throws IOException {
+	public static String readFile(String fileName) throws Exception, FileNotFoundException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
 		String content = null;
 		File file;
 
 		if (fileName == null || fileName.isEmpty()) {
-			throw new IOException("Filename is null or empty");
+			throw new Exception("Filename is null or empty");
 		}
 
 		file = new File(fileName);
 		if (!file.exists()) {
-			throw new IOException("File '" + fileName + "' does not exist");
+			throw new FileNotFoundException("File '" + fileName + "' does not exist");
 		}
 
 		FileReader reader = null;

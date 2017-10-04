@@ -2,6 +2,7 @@ package pe.project.playerdata;
 
 import java.util.UUID;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -103,11 +104,17 @@ public class PlayerData {
 	static public void loadPlayerData(Main main, Player player) throws Exception {
 		final String fileLocation = main.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 
-		String content = FileUtils.readFile(fileLocation);
-		if (content == null || content.isEmpty()) {
+		String content = "";
+		try {
+			content = FileUtils.readFile(fileLocation);
+		} catch (FileNotFoundException e) {
 			// This is expected when a player has never logged on before
 			main.getLogger().info("No player data file for '" + player.getName() + "'");
 			return;
+		}
+		if (content == null || content.isEmpty()) {
+			// This is bad - if the file didn't exist, a FileNotFound exception should have been raised, not bad/empty data returned
+			throw new Exception("No player data returned for player '" + player.getName() + "'");
 		}
 
 		try {
