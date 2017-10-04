@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Set;
 
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,29 +33,45 @@ import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.NetworkUtils;
 
 public class PlayerTracking implements EntityTracking {
 	Main mPlugin = null;
 	private Set<Player> mEntities = new HashSet<Player>();
-	
+
 	PlayerTracking(Main plugin) {
 		mPlugin = plugin;
 	}
-	
+
 	@Override
 	public void addEntity(Entity entity) {
-		PlayerData.deserializePlayerData(mPlugin, (Player)entity);
-		
-		mEntities.add((Player)entity);
+		Player player = (Player)entity;
+		try {
+			PlayerData.loadPlayerData(mPlugin, player);
+		} catch (Exception e) {
+			mPlugin.getLogger().severe("Failed to load playerdata for player '" + player.getName() + "'");
+			e.printStackTrace();
+
+			player.sendMessage(ChatColor.RED + "Something very bad happened while transferring your player data.");
+			player.sendMessage(ChatColor.RED + "  As a precaution, the server has attempted to move you to Purgatory.");
+			player.sendMessage(ChatColor.RED + "  If for some reason you aren't on purgatory, take a screenshot and log off.");
+			player.sendMessage(ChatColor.RED + "  Please post in #moderator-help and tag @admin");
+			player.sendMessage(ChatColor.RED + "  Include details about what you were doing");
+			player.sendMessage(ChatColor.RED + "  such as joining or leaving a dungeon (and which one!)");
+
+			NetworkUtils.sendPlayer(mPlugin, player, "purgatory");
+		}
+
+		mEntities.add(player);
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
-		PlayerData.serializePlayerData(mPlugin, (Player)entity);
-		
+		PlayerData.savePlayerData(mPlugin, (Player)entity);
+
 		mEntities.remove(entity);
 	}
-	
+
 	public Set<Player> getPlayers() {
 		return mEntities;
 	}
@@ -64,16 +81,16 @@ public class PlayerTracking implements EntityTracking {
 		Iterator<Player> playerIter = mEntities.iterator();
 		while (playerIter.hasNext()) {
 			Player player = playerIter.next();
-			
+
 			boolean inSafeZone = false;
 			boolean inCapital = false;
 			boolean applyEffects = true;
 			GameMode mode = player.getGameMode();
-			
+
 			if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
 				Location location = player.getLocation();
 				Point loc = new Point(location);
-				
+
 				//	First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
 					//	Double check to make sure their on the ground as it can trigger a false positive.
@@ -81,19 +98,19 @@ public class PlayerTracking implements EntityTracking {
 					if (below != null && below.getType() == Material.AIR) {
 						continue;
 					}
-					
+
 					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);	
+					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
 					inSafeZone = (safeZone != SafeZones.None);
 					inCapital = (safeZone == SafeZones.Capital);
 					applyEffects = (inSafeZone && SafeZoneConstants.safeZoneAppliesEffects(safeZone));
-					
+
 					if (inSafeZone) {
 						if (safeZone == SafeZones.Capital) {
 							Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
-							
+
 							if (mode == GameMode.SURVIVAL && !neededMat) {
 								_transitionToAdventure(player, safeZone);
 							} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
@@ -109,23 +126,23 @@ public class PlayerTracking implements EntityTracking {
 						}
 					}
 				}
-				
+
 				//	Give potion effects to those in a City;
 				if (inSafeZone) {
 					if (applyEffects) {
 						if (inCapital) {
 							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
 						}
-						
+
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTENCE_EFFECT);
-						
+
 						PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
 						if (effect != null) {
 							if (effect.getAmplifier() <= 5) {
 								mPlugin.mPotionManager.removePotion(player, PotionID.SAFE_ZONE, PotionEffectType.JUMP);
 							}
 						}
-						
+
 						int food = ScoreboardUtils.getScoreboardValue(player, "Food");
 						if (food <= 17) {
 							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
@@ -137,19 +154,19 @@ public class PlayerTracking implements EntityTracking {
 					}
 				}
 			}
-			
+
 			//	Extra Effects.
 			_updateExtraEffects(player, world);
-			
+
 			mPlugin.mPotionManager.updatePotionStatus(player, ticks);
 		}
 	}
-	
+
 	void _transitionToAdventure(Player player, SafeZones zone) {
 		player.setGameMode(GameMode.ADVENTURE);
-		
+
 		_removeSpecialItems(player);
-		
+
 		Entity vehicle = player.getVehicle();
 		if (vehicle != null) {
 			if (vehicle instanceof Boat) {
@@ -157,12 +174,12 @@ public class PlayerTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	void _updateExtraEffects(Player player, World world) {
 		_updatePatreonEffects(player, world);
 		_updateItemEffects(player, world);
 	}
-	
+
 	//	TODO: We should move this out of being ticked and into an event based system as well as store all
 	//	Patrons in a list so we're not testing against every player 4 times a second.
 	void _updatePatreonEffects(Player player, World world) {
@@ -173,13 +190,13 @@ public class PlayerTracking implements EntityTracking {
 				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_INSTANT, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
-			
+
 			int shinyPurple = ScoreboardUtils.getScoreboardValue(player, "ShinyPurple");
 			if (shinyPurple == 1 && patreon >= 10) {
 				ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
-			
+
 			int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
 			if (shinyGreen == 1 && patreon >= 10) {
 				ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
@@ -187,7 +204,7 @@ public class PlayerTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	//	TODO: This is the incorrect way to handle this, this should only be test against when an event triggers that might
 	//	cause a change in the inventory that might change the item. (Item Break, Item Moved, Item Dropped, etc)
 	void _updateItemEffects(Player player, World world) {
@@ -196,7 +213,7 @@ public class PlayerTracking implements EntityTracking {
 			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 		}
 	}
-	
+
 	void _removeSpecialItems(Player player) {
 		//	Clear inventory
 		PlayerInventory inventory = player.getInventory();
@@ -207,7 +224,7 @@ public class PlayerTracking implements EntityTracking {
 				inventory.remove(item);
 			}
 		}
-		
+
 		//	Clear Ender Chest
 		Inventory enderChest = player.getEnderChest();
 		ListIterator<ItemStack> enderIter = enderChest.iterator();
@@ -218,15 +235,15 @@ public class PlayerTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	@Override
 	public void unloadTrackedEntities() {
 		Iterator<Player> players = mEntities.iterator();
 		while (players.hasNext()) {
 			Player player = players.next();
-			PlayerData.serializePlayerData(mPlugin, player);
+			PlayerData.savePlayerData(mPlugin, player);
 		}
-		
+
 		mEntities.clear();
 	}
 }

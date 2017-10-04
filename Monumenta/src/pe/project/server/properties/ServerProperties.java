@@ -27,7 +27,7 @@ public class ServerProperties {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
 		try {
-			String content = FileUtils.getCreateFile(fileLocation);
+			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {
 				_loadFromString(plugin, content);
 			}

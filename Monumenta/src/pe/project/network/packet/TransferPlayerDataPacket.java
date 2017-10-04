@@ -73,19 +73,16 @@ public class TransferPlayerDataPacket implements Packet {
 				main.getLogger().warning("Failed to retrieve player data from packet for '" + mPlayerName + "'");
 				return;
 			}
+
+			// Save the player data so that when the player logs in they'll get it applied to them
+			PlayerData.savePlayerData(main, mPlayerUUID, mPlayerContent);
 		} catch (Exception e) {
 			main.getLogger().severe("Caught exception: " + e);
 			e.printStackTrace();
 			return;
 		}
 
-		// Save the player data so that when the player logs in they'll get it applied to them
-		if (PlayerData.savePlayerData(main, mPlayerUUID, mPlayerContent).isEmpty()) {
-			main.getLogger().warning("Failed to save player data for '" + mPlayerName + "'");
-			return;
-		}
-
-		// Everything looks good - request bungeecord transfer the player to the new server
+		// Everything looks good - request bungeecord transfer the player to this server
 		SendPlayerPacket packet = new SendPlayerPacket();
 
 		packet.mNewServer = mNewServer;
