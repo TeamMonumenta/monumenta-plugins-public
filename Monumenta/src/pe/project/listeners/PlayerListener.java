@@ -36,6 +36,8 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -423,4 +425,17 @@ public class PlayerListener implements Listener {
 			event.setDamage(damage);
 		}
 	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
+		TeleportCause cause = event.getCause();
+		if (cause.equals(TeleportCause.CHORUS_FRUIT)
+			|| cause.equals(TeleportCause.ENDER_PEARL)
+			|| cause.equals(TeleportCause.END_GATEWAY)
+			|| cause.equals(TeleportCause.END_PORTAL)
+			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
+			event.setCancelled(true);
+		}
+	}
+
 }
