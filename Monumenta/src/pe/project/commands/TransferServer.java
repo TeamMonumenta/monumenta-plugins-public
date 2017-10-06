@@ -78,8 +78,8 @@ public class TransferServer implements CommandExecutor {
 		if (arg3.length == 11) {
 			try {
 				scoreName = arg3[8];
-				scoreMin = CommandUtils.parseIntFromString(sender, command, arg3[9]);
-				scoreMax = CommandUtils.parseIntFromString(sender, command, arg3[10]);
+				scoreMin = CommandUtils.parseIntFromString(sender, arg3[9]);
+				scoreMax = CommandUtils.parseIntFromString(sender, arg3[10]);
 			} catch (Exception e) {
 				return false;
 			}
@@ -87,7 +87,7 @@ public class TransferServer implements CommandExecutor {
 
 		AreaBounds bounds;
 		try {
-			bounds = CommandUtils.parseAreaFromString(sender, command, arg3[2], arg3[3],
+			bounds = CommandUtils.parseAreaFromString(sender, arg3[2], arg3[3],
 			                                          arg3[4], arg3[5], arg3[6], arg3[7]);
 		} catch (Exception e) {
 			return false;
