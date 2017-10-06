@@ -444,11 +444,8 @@ public class PlayerListener implements Listener {
 				backStack = new Stack<Location>();
 			}
 
-			event.getPlayer().sendMessage("Saving previous location");
 			backStack.push(event.getFrom());
 			mPlugin.mBackLocations.put(playerUUID, backStack);
-		} else {
-			event.getPlayer().sendMessage("Requested skip save of previous location");
 		}
 
 		// Indicate the next teleport will not be skipped unless overwritten by /back or /forward
