@@ -1,6 +1,7 @@
 package pe.project.server.properties;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -31,9 +32,10 @@ public class ServerProperties {
 			if (content != null && content != "") {
 				_loadFromString(plugin, content);
 			}
+		} catch (FileNotFoundException e) {
+			//	Do nothing.
 		} catch (Exception e) {
 			plugin.getLogger().severe("Caught exception: " + e);
-			e.printStackTrace();
 		}
 	}
 

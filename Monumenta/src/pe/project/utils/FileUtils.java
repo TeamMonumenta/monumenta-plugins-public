@@ -27,7 +27,6 @@ public class FileUtils {
 			char[] chars = new char[(int) file.length()];
 			reader.read(chars);
 			content = new String(chars);
-			reader.close();
 		} finally {
 			if (reader != null) {
 				reader.close();
