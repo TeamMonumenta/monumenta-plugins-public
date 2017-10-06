@@ -3,6 +3,8 @@ package pe.project.listeners;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -428,6 +430,32 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
+		UUID playerUUID = event.getPlayer().getUniqueId();
+
+		// Only add the location to the back stack if the player didn't just use /back or /forward
+		Boolean skipBackLocation = mPlugin.mSkipBackLocation.get(playerUUID);
+		if (skipBackLocation == null) {
+			skipBackLocation = new Boolean(false);
+		}
+		if (skipBackLocation == false) {
+			// Get the stack of previous teleport locations
+			Stack<Location> backStack = mPlugin.mBackLocations.get(playerUUID);
+			if (backStack == null) {
+				backStack = new Stack<Location>();
+			}
+
+			event.getPlayer().sendMessage("Saving previous location");
+			backStack.push(event.getFrom());
+			mPlugin.mBackLocations.put(playerUUID, backStack);
+		} else {
+			event.getPlayer().sendMessage("Requested skip save of previous location");
+		}
+
+		// Indicate the next teleport will not be skipped unless overwritten by /back or /forward
+		skipBackLocation = false;
+		mPlugin.mSkipBackLocation.put(playerUUID, skipBackLocation);
+
+		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
 			|| cause.equals(TeleportCause.ENDER_PEARL)

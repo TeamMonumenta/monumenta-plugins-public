@@ -56,3 +56,11 @@ commands:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
     usage: /incrementDaily
+  back:
+    permission: monumenta.commands.back
+    description: Transfers back to location prior to teleporting. Works multiple times in one session. Saves coordinates to /forward.
+    usage: /back
+  forward:
+    permission: monumenta.commands.forward
+    description: Transfers forward to location prior to /back. Works multiple times in one session. Saves coordinates to /back.
+    usage: /forward

@@ -3,12 +3,14 @@ package pe.project;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -78,6 +80,12 @@ public class Main extends JavaPlugin {
 	public PotionManager mPotionManager;
 	public SocketClient mSocketClient;
 
+	// Used for the /back and /forward commands - stacks of teleport locations
+	public HashMap<UUID, Stack<Location>> mBackLocations = new HashMap<UUID, Stack<Location>>();
+	public HashMap<UUID, Stack<Location>> mForwardLocations = new HashMap<UUID, Stack<Location>>();
+	// Used to indicate if a player just used /back or /forward to skip adding that teleport to /back
+	public HashMap<UUID, Boolean> mSkipBackLocation = new HashMap<UUID, Boolean>();
+
 	//	Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
@@ -126,6 +134,8 @@ public class Main extends JavaPlugin {
 		getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
 		getCommand("transferServer").setExecutor(new TransferServer(this));
 		getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
+		getCommand("back").setExecutor(new Back(this));
+		getCommand("forward").setExecutor(new Forward(this));
 
 		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
