@@ -430,6 +430,16 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
+		// Cancel teleports caused by forbidden sources
+		TeleportCause cause = event.getCause();
+		if (cause.equals(TeleportCause.CHORUS_FRUIT)
+			|| cause.equals(TeleportCause.ENDER_PEARL)
+			|| cause.equals(TeleportCause.END_GATEWAY)
+			|| cause.equals(TeleportCause.END_PORTAL)
+			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
+			event.setCancelled(true);
+		}
+		
 		UUID playerUUID = event.getPlayer().getUniqueId();
 
 		// Only add the location to the back stack if the player didn't just use /back or /forward
@@ -451,16 +461,6 @@ public class PlayerListener implements Listener {
 		// Indicate the next teleport will not be skipped unless overwritten by /back or /forward
 		skipBackLocation = false;
 		mPlugin.mSkipBackLocation.put(playerUUID, skipBackLocation);
-
-		// Cancel teleports caused by forbidden sources
-		TeleportCause cause = event.getCause();
-		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-			|| cause.equals(TeleportCause.ENDER_PEARL)
-			|| cause.equals(TeleportCause.END_GATEWAY)
-			|| cause.equals(TeleportCause.END_PORTAL)
-			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
-			event.setCancelled(true);
-		}
 	}
 
 }
