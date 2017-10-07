@@ -120,23 +120,29 @@ public class Main extends JavaPlugin {
 
 		//	TODO: Move this out of here and into it's own CommandManager class.
 		//	Add some slash commands
-		getCommand("setServerVersion").setExecutor(new SetServerVersionCommand(this));
-		getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
-		getCommand("playTimeStats").setExecutor(new PlayTimeStats(this, world));
-		getCommand("chatRange").setExecutor(new ChatRangeCommand());
-		getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));
-		getCommand("isShitty").setExecutor(new IsShittyCommand());
-		getCommand("profiling").setExecutor(new ProfilingCommand(this));
-		getCommand("setGuildPrefix").setExecutor(new SetGuildPrefix());
-		getCommand("setPlayerName").setExecutor(new SetPlayerName());
-		getCommand("transferScores").setExecutor(new TransferScores());
-		getCommand("getScore").setExecutor(new GetScore());
-		getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
-		getCommand("transferServer").setExecutor(new TransferServer(this));
-		getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
-		getCommand("back").setExecutor(new Back(this));
-		getCommand("forward").setExecutor(new Forward(this));
-
+		if (Constants.COMMANDS_SERVER_ENABLED) {
+			getCommand("setServerVersion").setExecutor(new SetServerVersionCommand(this));
+			getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
+			getCommand("playTimeStats").setExecutor(new PlayTimeStats(this, world));
+			getCommand("chatRange").setExecutor(new ChatRangeCommand());
+			getCommand("isShitty").setExecutor(new IsShittyCommand());
+			getCommand("profiling").setExecutor(new ProfilingCommand(this));
+			getCommand("setGuildPrefix").setExecutor(new SetGuildPrefix());
+			getCommand("setPlayerName").setExecutor(new SetPlayerName());
+			getCommand("transferScores").setExecutor(new TransferScores());
+			getCommand("getScore").setExecutor(new GetScore());
+			getCommand("transferServer").setExecutor(new TransferServer(this));
+			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
+			getCommand("back").setExecutor(new Back(this));
+			getCommand("forward").setExecutor(new Forward(this));
+		}
+		if (Constants.CLASSES_ENABLED) {
+			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
+		}
+		if (Constants.POIS_ENABLED) {
+			getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));
+		}
+		
 		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
@@ -213,9 +219,11 @@ public class Main extends JavaPlugin {
 
 	//	TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
 	public BaseClass getClass(Player player) {
-		int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
-		if (playerClass >= 0 && playerClass <= Classes.COUNT.getValue()) {
-			return mClassMap.get(playerClass);
+		if (Constants.CLASSES_ENABLED) {
+			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
+			if (playerClass >= 0 && playerClass <= Classes.COUNT.getValue()) {
+				return mClassMap.get(playerClass);
+			}
 		}
 
 		//	We Seem to be missing a class.

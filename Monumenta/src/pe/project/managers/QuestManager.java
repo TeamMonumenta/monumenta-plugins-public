@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import pe.project.Constants;
 import pe.project.Main;
 import pe.project.locations.LocationMarker;
 import pe.project.locations.quest.*;
@@ -61,51 +62,55 @@ public class QuestManager {
 	}
 	
 	public void showCurrentQuest(Player player) {
-		int index = ScoreboardUtils.getScoreboardValue(player, "locationIndex");
-		
-		List<LocationMarker> markers = new ArrayList<LocationMarker>();
-		for (Quest quest : mQuest) {
-			markers.addAll(quest.getMarkers(player));
-		}
-		
-		if (index >= markers.size()) {
-			index = 0;
-		}
-		
-		if (markers.size() == 0) {
-			MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
-		} else {
-			LocationMarker currentMarker = markers.get(index);
-			String description = currentMarker.getMarkerDescription(player);
+		if (Constants.QUEST_MANAGER_ENABLED) {
+			int index = ScoreboardUtils.getScoreboardValue(player, "locationIndex");
 			
-			player.sendMessage(description);
-			player.setCompassTarget(currentMarker.getLocation());
+			List<LocationMarker> markers = new ArrayList<LocationMarker>();
+			for (Quest quest : mQuest) {
+				markers.addAll(quest.getMarkers(player));
+			}
+			
+			if (index >= markers.size()) {
+				index = 0;
+			}
+			
+			if (markers.size() == 0) {
+				MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
+			} else {
+				LocationMarker currentMarker = markers.get(index);
+				String description = currentMarker.getMarkerDescription(player);
+				
+				player.sendMessage(description);
+				player.setCompassTarget(currentMarker.getLocation());
+			}
 		}
 	}
 	
 	public void cycleQuestTracker(Player player) {
-		int index = ScoreboardUtils.getScoreboardValue(player, "locationIndex");
-		index++;
-		
-		List<LocationMarker> markers = new ArrayList<LocationMarker>();
-		for (Quest quest : mQuest) {
-			markers.addAll(quest.getMarkers(player));
-		}
-		
-		if (index >= markers.size()) {
-			index = 0;
-		}
-		
-		if (markers.size() == 0) {
-			MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
-		} else {
-			LocationMarker currentMarker = markers.get(index);
-			String description = currentMarker.getMarkerDescription(player);
+		if (Constants.QUEST_MANAGER_ENABLED) {
+			int index = ScoreboardUtils.getScoreboardValue(player, "locationIndex");
+			index++;
 			
-			player.sendMessage(description);
-			player.setCompassTarget(currentMarker.getLocation());
+			List<LocationMarker> markers = new ArrayList<LocationMarker>();
+			for (Quest quest : mQuest) {
+				markers.addAll(quest.getMarkers(player));
+			}
+			
+			if (index >= markers.size()) {
+				index = 0;
+			}
+			
+			if (markers.size() == 0) {
+				MessagingUtils.sendAbilityTriggeredMessage(mPlugin, player, "You have no active quest.");
+			} else {
+				LocationMarker currentMarker = markers.get(index);
+				String description = currentMarker.getMarkerDescription(player);
+				
+				player.sendMessage(description);
+				player.setCompassTarget(currentMarker.getLocation());
+			}
+			
+			ScoreboardUtils.setScoreboardValue(player, "locationIndex", index);
 		}
-		
-		ScoreboardUtils.setScoreboardValue(player, "locationIndex", index);
 	}
 }

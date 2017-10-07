@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pe.project.Constants;
 import pe.project.Main;
 import pe.project.utils.PotionUtils.PotionInfo;
 
@@ -60,14 +61,16 @@ public class PotionManager {
 	}
 	
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
-		UUID uuid = player.getUniqueId();
-		PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
-		if (potionInfo != null) {
-			potionInfo.addPotionInfo(player, id, info);	
-		} else {
-			PlayerPotionInfo newPotionInfo = new PlayerPotionInfo();
-			newPotionInfo.addPotionInfo(player, id, info);
-			mPlugin.mPotionManager.mPotionManager.put(uuid, newPotionInfo);
+		if (Constants.POTION_MANAGER_ENABLED) {
+			UUID uuid = player.getUniqueId();
+			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
+			if (potionInfo != null) {
+				potionInfo.addPotionInfo(player, id, info);	
+			} else {
+				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo();
+				newPotionInfo.addPotionInfo(player, id, info);
+				mPlugin.mPotionManager.mPotionManager.put(uuid, newPotionInfo);
+			}
 		}
 	}
 	

@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 
+import pe.project.Constants;
 import pe.project.Main;
 
 public class TrackingManager {
@@ -44,14 +45,16 @@ public class TrackingManager {
 	}
 	
 	public void addEntity(Entity entity) {
-		if (entity instanceof Player) {
-			mPlayers.addEntity(entity);
-		} else if (entity instanceof Creeper) {
-			mCreepers.addEntity(entity);
-		} else if (entity instanceof Boat) {
-			mBoats.addEntity(entity);
-		} else if (entity instanceof Silverfish) {
-			mSilverfish.addEntity(entity);
+		if (Constants.TRACKING_MANAGER_ENABLED) {
+			if (entity instanceof Player) {
+				mPlayers.addEntity(entity);
+			} else if (entity instanceof Creeper) {
+				mCreepers.addEntity(entity);
+			} else if (entity instanceof Boat) {
+				mBoats.addEntity(entity);
+			} else if (entity instanceof Silverfish) {
+				mSilverfish.addEntity(entity);
+			}
 		}
 	}
 	
