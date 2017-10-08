@@ -222,6 +222,7 @@ public class MageClass extends BaseClass {
 											
 											World world = Bukkit.getWorld(player.getWorld().getName());
 											world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
+											world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
 											
 											boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
 											

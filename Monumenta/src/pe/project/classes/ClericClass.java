@@ -337,13 +337,19 @@ public class ClericClass extends BaseClass {
 														
 														Location loc = p.getLocation();
 														
-														ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
-														ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
-														player.getWorld().playSound(loc, "entity.generic.splash", 1.5f, 1.5f); 
+														ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+														ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+														player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
+														player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
 													}
 												}	
 											}
 										}
+										
+										player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
+										player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
+										
+										ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 									}
 									this.cancel();
 								}
