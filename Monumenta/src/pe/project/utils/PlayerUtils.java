@@ -2,6 +2,7 @@ package pe.project.utils;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -57,5 +58,10 @@ public class PlayerUtils {
 		player.sendMessage(ChatColor.YELLOW + "If you feel that this strike is unjustified feel free to send a message and screenshot of this to a moderator on the Discord.");
 
 		player.teleport(new Location(player.getWorld(), Constants.RESET_POINT.mX, Constants.RESET_POINT.mY, Constants.RESET_POINT.mZ));
+	}
+	
+	public static void healPlayer(Player player, double healAmount) {
+		double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		player.setHealth(newHealth);
 	}
 }

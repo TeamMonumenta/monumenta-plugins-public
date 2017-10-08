@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -64,9 +63,9 @@ public class ClericClass extends BaseClass {
 	
 	//	CLEANSING
 	
-	private static int DIVINE_JUSTICE_DAMAGE = 8;
-	private static int DIVINE_JUSTICE_1_HEAL = 2;
-	private static int DIVINE_JUSTICE_2_HEAL = 3;
+	private static int DIVINE_JUSTICE_DAMAGE = 5;
+	private static int DIVINE_JUSTICE_HEAL = 4;
+	private static int DIVINE_JUSTICE_CRIT_HEAL = 1;
 	
 	private static int CELESTIAL_ID = 36;
 	public static int CELESTIAL_1_FAKE_ID = 100361;
@@ -125,8 +124,7 @@ public class ClericClass extends BaseClass {
 							if (!p.isDead()) {
 								//	If this is us or we're allowing anyone to get it.
 								if (p == player || rejuvenation > 1) {
-									double newHealth = Math.min(player.getHealth() + REJUVENATION_HEAL_AMOUNT, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-									player.setHealth(newHealth);
+									PlayerUtils.healPlayer(player, REJUVENATION_HEAL_AMOUNT);
 								}
 							}
 						}
@@ -175,6 +173,8 @@ public class ClericClass extends BaseClass {
 					if (divineJustice > 0) {
 						damagee.damage(DIVINE_JUSTICE_DAMAGE);
 						
+						PlayerUtils.healPlayer(player, DIVINE_JUSTICE_CRIT_HEAL);
+						
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.25, 0.5, 0.5, 0.001);
@@ -195,11 +195,8 @@ public class ClericClass extends BaseClass {
 				if (EntityUtils.isUndead(killedEntity)) {
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 1) {
-						int healAmount = divineJustice == 1 ? DIVINE_JUSTICE_1_HEAL : DIVINE_JUSTICE_2_HEAL;
-						
-						double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-						player.setHealth(newHealth);
-						
+						PlayerUtils.healPlayer(player, DIVINE_JUSTICE_HEAL);
+
 						World world = player.getWorld();
 						Location loc = killedEntity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.25, 0.25, 0.25, 0.001);
@@ -292,8 +289,7 @@ public class ClericClass extends BaseClass {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
 					LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, HEALING_RANGE, true, true, true);
 					if (targetEntity != null && targetEntity instanceof Player) {
-						double newHealth = Math.min(targetEntity.getHealth() + HEALING_HEAL, targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-						targetEntity.setHealth(newHealth);
+						PlayerUtils.healPlayer((Player)targetEntity, HEALING_HEAL);
 						
 						if (healing > 1) {
 							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, HEALING_REGEN_DURATION, HEALING_REGEN_LVL, true, false));
