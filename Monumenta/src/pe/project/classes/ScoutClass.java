@@ -28,6 +28,7 @@ import org.bukkit.potion.PotionType;
 import pe.project.Main;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
+import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
@@ -49,6 +50,8 @@ public class ScoutClass extends BaseClass {
 	
 	private static int AGILITY_1_EFFECT_LVL = 0;
 	private static int AGILITY_2_EFFECT_LVL = 1;
+	private static int AGILITY_1_RESISTANCE_LEVEL = 0;
+	private static int AGILITY_2_RESISTANCE_LEVEL = 1;
 	
 	//private static int EXPLORATION_1_EFFECT_LVL = 0;
 	//private static int EXPLORATION_2_EFFECT_LVL = 1;
@@ -86,6 +89,9 @@ public class ScoutClass extends BaseClass {
 	public void setupClassPotionEffects(Player player) {
 		_testForAgility(player);
 		_testForSwiftness(player);
+		
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
@@ -110,6 +116,21 @@ public class ScoutClass extends BaseClass {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 1000000, effectLevel, true, false));
 			}
 		}*/
+	}
+	
+	@Override
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
+	}
+	
+	@Override
+	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
+	}
+	
+	@Override
+	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		_testItemInHand(player, mainHand);
 	}
 	
 	@Override
@@ -379,6 +400,18 @@ public class ScoutClass extends BaseClass {
 			
 			if (swiftness > 1) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
+			}
+		}
+	}
+	
+	private void _testItemInHand(Player player, ItemStack mainHand) {
+		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
+		if (agility > 0) {
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+			
+			if (InventoryUtils.isPickaxeItem(mainHand)) {
+				int effectLevel = agility == 1 ? AGILITY_1_RESISTANCE_LEVEL : AGILITY_2_RESISTANCE_LEVEL;
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, effectLevel, true, false));
 			}
 		}
 	}
