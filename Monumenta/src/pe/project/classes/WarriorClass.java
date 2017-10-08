@@ -61,7 +61,7 @@ public class WarriorClass extends BaseClass {
 	
 	private static float BRUTE_FORCE_RADIUS = 2.0f;
 	private static Integer BRUTE_FORCE_1_DAMAGE = 3;
-	private static Integer BRUTE_FORCE_2_DAMAGE = 6;
+	private static Integer BRUTE_FORCE_2_DAMAGE = 7;
 	private static float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
 	private static Integer BRUTE_FORCE_PIECES_TO_REMOVE = 2;
 	
