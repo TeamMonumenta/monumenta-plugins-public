@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CommandBlock;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
@@ -40,6 +42,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -60,6 +63,7 @@ import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.StringUtils;
+import pe.project.utils.CommandUtils;
 
 public class PlayerListener implements Listener {
 	Main mPlugin = null;
@@ -464,4 +468,89 @@ public class PlayerListener implements Listener {
 		mPlugin.mSkipBackLocation.put(playerUUID, skipBackLocation);
 	}
 
+	/** Implements bed teleporters.
+	 *
+	 * When a player sleeps in a bed, the 10 blocks under that bed are checked for
+	 * a regular command block.
+	 *
+	 * If a command block is found, it's command string is used for coordinates to teleport
+	 * the player to after a short delay
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerBedEnterEvent(PlayerBedEnterEvent event) {
+		Player player = event.getPlayer();
+		Block bed = event.getBed();
+		Location loc = bed.getLocation();
+		World world = loc.getWorld();
+
+		for (double y = 10; y > 0; y--) {
+			loc = loc.subtract(0, 1, 0);
+			Block testblock = loc.getBlock();
+			BlockState state = testblock.getState();
+
+			if (testblock.getType().equals(Material.COMMAND)
+				&& state instanceof CommandBlock) {
+
+				String str = ((CommandBlock)state).getCommand();
+
+				String[] split = str.split(" ");
+				if (split.length != 5) {
+					player.sendMessage(ChatColor.RED + "Command block should be of the format 'x y z pitch yaw'");
+					player.sendMessage(ChatColor.RED + "Relative and absolute coordinates accepted");
+					continue;
+				}
+
+				try {
+					// Coordinates are relative to the head of the bed
+					Point pt = CommandUtils.parsePointFromString(player, split[0], split[1], split[2],
+					                                             false, bed.getLocation());
+
+					float yaw = (float)CommandUtils.parseDoubleFromString(player, split[3]);
+					float pitch = (float)CommandUtils.parseDoubleFromString(player, split[4]);
+
+					// Adjust for player teleports being off-center
+					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
+
+					// Create a deferred task to eject player and teleport them after a short sleep
+					new BukkitRunnable() {
+						Integer tick = 0;
+						public void run() {
+							GameMode mode;
+
+							if (++tick == 80) {
+								// Abort, player got out of bed early
+								if (player.isSleeping() == false) {
+									this.cancel();
+									return;
+								}
+
+								// Get player's current gamemode
+								mode = player.getGameMode();
+
+								// Set player's gamemode to survival so they can be damaged
+								player.setGameMode(GameMode.SURVIVAL);
+
+								// Poke the player to eject them from the bed
+								player.damage(0.001);
+
+								// Set player's gamemode back to whatever it was
+								player.setGameMode(mode);
+							} else if (tick >= 81) {
+								// After ejecting player, teleport them
+								player.teleport(teleLoc);
+
+								world.playSound(teleLoc, "entity.elder_guardian.death", 1.0f, 1.3f);
+
+								this.cancel();
+							}
+						}
+					}.runTaskTimer(mPlugin, 0, 1);
+
+					return;
+				} catch (Exception e) {
+					player.sendMessage("Failed to parse teleport coordinates");
+				}
+			}
+		}
+	}
 }
