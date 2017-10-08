@@ -59,10 +59,10 @@ public class MageClass extends BaseClass {
 	private static int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
 	private static int PRISMATIC_SHIELD_EFFECT_LVL_1 = 1;
 	private static int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
-	private static int PRISMATIC_SHIELD_1_DURATION = 6 * 20;
+	private static int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
 	private static int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static int PRISMATIC_SHIELD_1_COOLDOWN = 4 * 60 * 20;
-	private static int PRISMATIC_SHIELD_2_COOLDOWN = 3 * 60 * 20;
+	private static int PRISMATIC_SHIELD_1_COOLDOWN = 3 * 60 * 20;
+	private static int PRISMATIC_SHIELD_2_COOLDOWN = 2 * 60 * 20;
 	
 	private static int MAGMA_SHIELD_ID = 14;
 	private static int MAGMA_SHIELD_1_COOLDOWN = 21 * 20;
