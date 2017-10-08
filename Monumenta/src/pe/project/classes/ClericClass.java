@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,9 +22,10 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import pe.project.Main;
-import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -80,12 +80,12 @@ public class ClericClass extends BaseClass {
 	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.30;
 	
 	private static int HEALING_ID = 37;
-	private static int HEALING_RANGE = 20;
-	private static int HEALING_HEAL = 12;
-	private static int HEALING_REGEN_DURATION = 12 * 20;
-	private static int HEALING_REGEN_LVL = 1;
-	private static int HEALING_1_COOLDOWN = 15 * 20;
-	private static int HEALING_2_COOLDOWN = 10 * 20;
+	private static int HEALING_RADIUS = 12;
+	private static int HEALING_1_HEAL = 10;
+	private static int HEALING_2_HEAL = 16;
+	private static double HEALING_DOT_ANGLE = 0.33;
+	private static int HEALING_1_COOLDOWN = 20 * 20;
+	private static int HEALING_2_COOLDOWN = 15 * 20;
 	
 	public ClericClass(Main plugin, Random random) {
 		super(plugin, random);
@@ -96,7 +96,7 @@ public class ClericClass extends BaseClass {
 		if (abilityID == CELESTIAL_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Celestial Blessing is now off cooldown");
 		} else if (abilityID == HEALING_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Healing Spell is now off cooldown");
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Hand of Light is now off cooldown");
 		}
 	}
 	
@@ -282,36 +282,6 @@ public class ClericClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
-		if (arrow.isCritical() && player.isSneaking()) {
-			int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-			if (healing > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
-					LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, HEALING_RANGE, true, true, true);
-					if (targetEntity != null && targetEntity instanceof Player) {
-						PlayerUtils.healPlayer((Player)targetEntity, HEALING_HEAL);
-						
-						if (healing > 1) {
-							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, HEALING_REGEN_DURATION, HEALING_REGEN_LVL, true, false));
-						}
-						
-						int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
-						
-						World world = player.getWorld();
-						Location loc = targetEntity.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
-						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
-						player.getWorld().playSound(loc, "entity.generic.splash", 1.5f, 1.5f);
-						
-						arrow.remove();
-					}
-				}
-			}
-		}
-	}
-	
-	@Override
 	public void PlayerInteractEvent(Player player, Action action, Material material) {
 		if (player.isSneaking()) {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -343,6 +313,46 @@ public class ClericClass extends BaseClass {
 						
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), CELESTIAL_ID, CELESTIAL_COOLDOWN);
 					}
+				}
+			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+				int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
+				if (healing > 0) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
+						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+						World world = player.getWorld();
+						new BukkitRunnable() {
+							Integer tick = 0;
+							public void run() {
+								if (++tick == 5) {
+									if (player.isBlocking()) {
+										List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
+										for(Entity e : entities) {
+											if(e instanceof Player) {
+												Player p = (Player)e;
+												if (p != player) {
+													Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+													if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
+														int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
+														PlayerUtils.healPlayer(p, healAmount);
+														
+														Location loc = p.getLocation();
+														
+														ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
+														ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
+														player.getWorld().playSound(loc, "entity.generic.splash", 1.5f, 1.5f); 
+													}
+												}	
+											}
+										}
+									}
+									this.cancel();
+								}
+							}
+						}.runTaskTimer(mPlugin, 0, 1);
+					}
+					
+					int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
 				}
 			}
 		}
