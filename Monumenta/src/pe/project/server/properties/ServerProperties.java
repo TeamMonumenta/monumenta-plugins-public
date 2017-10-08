@@ -24,18 +24,19 @@ public class ServerProperties {
 		return mJoinMessagesEnabled;
 	}
 
-	public void load(Main plugin) {
-		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
+	public void load(Main main) {
+		final String fileLocation = main.getDataFolder() + File.separator + FILE_NAME;
 
 		try {
 			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {
-				_loadFromString(plugin, content);
+				_loadFromString(main, content);
 			}
 		} catch (FileNotFoundException e) {
-			//	Do nothing.
+			main.getLogger().info("Properties.json file does not exist - using default values" + e);
 		} catch (Exception e) {
-			plugin.getLogger().severe("Caught exception: " + e);
+			main.getLogger().severe("Caught exception: " + e);
+			e.printStackTrace();
 		}
 	}
 
@@ -44,17 +45,19 @@ public class ServerProperties {
 			try {
 				Gson gson = new Gson();
 
-				//	Load the file, if it exist than let's start parsing it.
+				//	Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
 					JsonElement dailyResetEnabled = object.get("dailyResetEnabled");
 					if (dailyResetEnabled != null) {
 						mDailyResetEnabled = dailyResetEnabled.getAsBoolean();
+						main.getLogger().info("Properties: dailyResetEnabled = " + mDailyResetEnabled);
 					}
 
 					JsonElement joinMessagesEnabled = object.get("joinMessagesEnabled");
 					if (joinMessagesEnabled != null) {
 						mJoinMessagesEnabled = joinMessagesEnabled.getAsBoolean();
+						main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
 					}
 				}
 			} catch (Exception e) {
