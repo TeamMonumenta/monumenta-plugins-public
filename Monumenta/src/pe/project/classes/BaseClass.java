@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
@@ -70,6 +71,8 @@ public class BaseClass {
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 	
 	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {}
+
+	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) { return true; }
 	
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		return true;

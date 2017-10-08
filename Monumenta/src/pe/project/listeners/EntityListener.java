@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownPotion;
@@ -79,6 +80,14 @@ public class EntityListener implements Listener {
 			} else if (damager instanceof Firework) {
 				//	If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
+			} else {
+				if (damager instanceof Projectile) {
+					Player player = (Player)damagee;
+					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, (Projectile)damager)) {
+						damager.remove();
+						event.setCancelled(true);
+					}
+				}
 			}
 		}
 		//	Else if the entity getting hurt is a LivingEntity.
@@ -323,7 +332,9 @@ public class EntityListener implements Listener {
 	//	An Arrow hit something.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileHitEvent(ProjectileHitEvent event) {
-		if (event.getEntityType() == EntityType.TIPPED_ARROW) {
+		EntityType type = event.getEntityType();
+		
+		if (type == EntityType.TIPPED_ARROW) {
 			Entity entity = event.getHitEntity();
 			if (entity != null) {
 				if (entity instanceof Player) {
@@ -363,7 +374,7 @@ public class EntityListener implements Listener {
 			}
 		}
 		
-		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW) {
+		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {

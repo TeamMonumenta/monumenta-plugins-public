@@ -8,9 +8,11 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +35,7 @@ import pe.project.utils.ScoreboardUtils;
 	Focus
 	ViciousCombos
 	SmokeScreen
-PoisonTrap
+	PoisonTrap	(Now called Dodging in game - We use the same scoreboard value to avoid any extra work)
 	EscapeDeath
 	Assassination
 */
@@ -63,7 +65,12 @@ public class RogueClass extends BaseClass {
 	private static int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL = 1;
 	private static int SMOKESCREEN_DURATION = 8 * 20;
 	
-	//	POISONTRAP
+	//	DODGING
+	private static int DODGING_ID = 45;
+	private static int DODGING_1_COOLDOWN = 10 * 20;
+	private static int DODGING_2_COOLDOWN = 8 * 20;
+	private static int DODGING_SPEED_EFFECT_LEVEL = 0;
+	private static int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
 	
 	private static int ESCAPE_DEATH_ID = 46;
 	private static int ESCAPE_DEATH_HEALTH_TRIGGER = 10;
@@ -106,6 +113,8 @@ public class RogueClass extends BaseClass {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death is now off cooldown");
 		} else if (abilityID == SMOKESCREEN_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Smokescreen is now off cooldown");
+		} else if (abilityID == DODGING_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Dodging is now off cooldown");
 		}
 	}
 	
@@ -229,6 +238,33 @@ public class RogueClass extends BaseClass {
 				}	
 			}
 		}
+	}
+	
+	@Override
+	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) {
+		//	Dodging
+		EntityType type = damager.getType();
+		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SMALL_FIREBALL) {
+			int dodging = ScoreboardUtils.getScoreboardValue(player, "PoisonTrap");
+			if (dodging > 0) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DODGING_ID)) {
+					World world = player.getWorld();
+					if (dodging > 1) {
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, DODGING_SPEED_EFFECT_DURATION, DODGING_SPEED_EFFECT_LEVEL, true, false));
+						world.playSound(player.getLocation(), "entity.firework.launch", 2.0f, 0.5f);
+					}
+					
+					world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+					
+					int cooldown = dodging == 1 ? DODGING_1_COOLDOWN : DODGING_2_COOLDOWN;
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), DODGING_ID, cooldown);
+					
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
