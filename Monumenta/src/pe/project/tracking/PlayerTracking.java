@@ -2,7 +2,6 @@ package pe.project.tracking;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -12,12 +11,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -216,22 +216,29 @@ public class PlayerTracking implements EntityTracking {
 
 	void _removeSpecialItems(Player player) {
 		//	Clear inventory
-		PlayerInventory inventory = player.getInventory();
-		ListIterator<ItemStack> iter = inventory.iterator();
-		while (iter.hasNext()) {
-			ItemStack item = iter.next();
-			if (InventoryUtils.testForItemWithLore(item, "D4 Key")) {
-				inventory.remove(item);
-			}
-		}
+		_removeSpecialItemsFromInventory(player.getInventory());
 
 		//	Clear Ender Chest
-		Inventory enderChest = player.getEnderChest();
-		ListIterator<ItemStack> enderIter = enderChest.iterator();
-		while (enderIter.hasNext()) {
-			ItemStack item = enderIter.next();
-			if (InventoryUtils.testForItemWithLore(item, "D4 Key")) {
-				enderChest.remove(item);
+		_removeSpecialItemsFromInventory(player.getEnderChest());
+	}
+	
+	void _removeSpecialItemsFromInventory(Inventory inventory) {
+		for (ItemStack item : inventory.getContents()) {
+			if (item != null) {
+				if (InventoryUtils.testForItemWithLore(item, "D4 Key")) {
+					inventory.removeItem(item);
+				} else {
+					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
+						BlockStateMeta meta = (BlockStateMeta)item.getItemMeta();
+						if (meta.getBlockState() instanceof ShulkerBox) {
+							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
+							_removeSpecialItemsFromInventory(shulker.getInventory());
+							
+							meta.setBlockState(shulker);
+							item.setItemMeta(meta);
+						}
+					}
+				}
 			}
 		}
 	}
