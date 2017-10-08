@@ -53,7 +53,7 @@ public class ClericClass extends BaseClass {
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
 	
 	private static int REJUVENATION_RADIUS = 12;
-	private static int REJUVENATION_HEAL_AMOUNT = 2;
+	private static int REJUVENATION_HEAL_AMOUNT = 1;
 	
 	//	HEAVENLY_BOON
 	private static double HEAVENLY_BOON_1_CHANCE = 0.05;
@@ -109,10 +109,10 @@ public class ClericClass extends BaseClass {
 	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
 		if (!player.isDead()) {
-			boolean sixSeconds = ((originalTime % 6) == 0);
+			boolean threeSeconds = ((originalTime % 3) == 0);
 			
 			//	Rejuvenation
-			if (sixSeconds) {
+			if (threeSeconds) {
 				int rejuvenation = ScoreboardUtils.getScoreboardValue(player, "Rejuvenation");
 				if (rejuvenation > 0) {
 					List<Entity> entities = player.getNearbyEntities(REJUVENATION_RADIUS, REJUVENATION_RADIUS, REJUVENATION_RADIUS);
