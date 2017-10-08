@@ -220,6 +220,9 @@ public class MageClass extends BaseClass {
 											
 											ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA, 0.25f, MAGMA_SHIELD_DOT_ANGLE);
 											
+											World world = Bukkit.getWorld(player.getWorld().getName());
+											world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
+											
 											boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
 											
 											int cooldown = intellectBonus ? (magmaShield == 1 ? INTELLECT_MS_1_COOLDOWN : INTELLECT_MS_2_COOLDOWN) :
