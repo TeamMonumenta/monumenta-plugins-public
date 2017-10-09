@@ -438,8 +438,9 @@ public class PlayerListener implements Listener {
 			|| cause.equals(TeleportCause.END_PORTAL)
 			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
+			return;
 		}
-		
+
 		UUID playerUUID = event.getPlayer().getUniqueId();
 
 		// Only add the location to the back stack if the player didn't just use /back or /forward
