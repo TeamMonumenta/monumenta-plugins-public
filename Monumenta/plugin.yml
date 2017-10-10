@@ -50,8 +50,8 @@ commands:
     usage: /refreshClassEffects <x y z>
   transferServer:
     permission: monumenta.commands.transferServer
-    description: Transfers all players between two points [having the specified score value] to target server. If 2nd argument is not "False", also transfers player's scores, equipment, etc. Note scores must be >= 0.
-    usage: /transferserver <server name> [<True|False> <x1> <y1> <z1> <x2> <y2> <z2> [<scoreboard> <min_value> <max_value>]]
+    description: Transfers players with or without inventory between bungee shards.
+    usage: /transferserver <server name> [<True|False>]
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
