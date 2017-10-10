@@ -15,6 +15,7 @@ public class ServerProperties {
 
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
+	private boolean mTransferDataEnabled = true;
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -22,6 +23,10 @@ public class ServerProperties {
 
 	public boolean getJoinMessagesEnabled() {
 		return mJoinMessagesEnabled;
+	}
+
+	public boolean getTransferDataEnabled() {
+		return mTransferDataEnabled;
 	}
 
 	public void load(Main main) {
@@ -58,6 +63,12 @@ public class ServerProperties {
 					if (joinMessagesEnabled != null) {
 						mJoinMessagesEnabled = joinMessagesEnabled.getAsBoolean();
 						main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
+					}
+
+					JsonElement TransferDataEnabled = object.get("transferDataEnabled");
+					if (TransferDataEnabled != null) {
+						mTransferDataEnabled = TransferDataEnabled.getAsBoolean();
+						main.getLogger().info("Properties: transferDataEnabled = " + mTransferDataEnabled);
 					}
 				}
 			} catch (Exception e) {

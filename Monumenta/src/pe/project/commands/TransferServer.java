@@ -29,8 +29,8 @@ public class TransferServer implements CommandExecutor {
 
 		String server = arg3[0];
 
-		// Default to sending equipment
-		boolean sendPlayerStuff = true;
+		// Default to server properties - if properties says false, no way to set to true
+		boolean sendPlayerStuff = mMain.mServerProporties.getTransferDataEnabled();
 
 		if (arg3.length == 2) {
 			if (arg3[1].equals("False") || arg3[1].equals("false") || arg3[1].equals("f") || arg3[1].equals("F")) {
