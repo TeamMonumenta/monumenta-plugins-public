@@ -1,17 +1,20 @@
 package pe.project.network.packet;
 
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
-
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 
 import pe.project.Main;
+import pe.project.utils.PacketUtils;
 
 public class SendPlayerPacket implements Packet {
-	public String mNewServer;
-	public String mPlayerName;
-	public UUID mPlayerUUID;
+	private String mNewServer;
+	private String mPlayerName;
+	private UUID mPlayerUUID;
+
+	public SendPlayerPacket(String server, String playerName, UUID playerUUID) {
+		mNewServer = server;
+		mPlayerName = playerName;
+		mPlayerUUID = playerUUID;
+	}
 
 	// TODO - Ugh, this is so annoying
 	// Want to just be able to call SendPlayerPacket.getPacketChannel() without an object
@@ -26,24 +29,12 @@ public class SendPlayerPacket implements Packet {
 	}
 
 	@Override
-	public String getPacketData() {
-		// Get an object to serialize the data
-		ByteArrayDataOutput out = ByteStreams.newDataOutput();
-
-		// Write the payload data
-		out.writeUTF(mNewServer);
-		out.writeUTF(mPlayerName);
-		out.writeUTF(mPlayerUUID.toString());
-
-		// Serialize the packet payload (resulting bytes depend on type of packet)
-		byte[] bytes = out.toByteArray();
-
-		// Convert that byte array to a generic string
-		return new String(bytes, StandardCharsets.ISO_8859_1);
+	public String getPacketData() throws Exception {
+		String[] data = {mNewServer, mPlayerName, mPlayerUUID.toString()};
+		return PacketUtils.encodeStrings(data);
 	}
 
-	@Override
-	public void handlePacket(Main main, String data) {
-		main.getLogger().severe("Got " + getPacketChannel() + " message from which should only be received by bungeecord");
+	public static void handlePacket(Main main, String data) throws Exception {
+		throw new Exception("Got message from which should only be received by bungeecord");
 	}
 }

@@ -1,5 +1,7 @@
 package pe.project.utils;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 
 import pe.project.Main;
@@ -9,28 +11,23 @@ import pe.project.playerdata.PlayerData;
 
 public class NetworkUtils {
 
-	public static void sendPlayer(Main main, Player player, String server) {
-		SendPlayerPacket packet = new SendPlayerPacket();
-
-		packet.mNewServer = server;
-		packet.mPlayerName = player.getName();
-		packet.mPlayerUUID = player.getUniqueId();
-
-		PacketUtils.SendPacket(main, packet);
+	public static void sendPlayer(Main plugin, Player player, String server) throws Exception {
+		sendPlayer(plugin, player.getName(), player.getUniqueId(), server);
 	}
 
-	public static void transferPlayerData(Main main, Player player, String server) throws Exception {
-		TransferPlayerDataPacket packet = new TransferPlayerDataPacket();
+	public static void sendPlayer(Main plugin, String playerName, UUID playerUUID, String server) throws Exception {
+		PacketUtils.SendPacket(plugin, new SendPlayerPacket(server,
+															playerName,
+															playerUUID));
 
-		packet.mNewServer = server;
-		packet.mPlayerName = player.getName();
-		packet.mPlayerUUID = player.getUniqueId();
-		packet.mPlayerContent = PlayerData.convertToString(main, player);
-		if (packet.mPlayerContent.isEmpty()) {
-			main.getLogger().warning("Failed to get player data for " + player.getName());
-			throw new Exception();
-		}
+		// Success, print transfer message request to log
+		plugin.getLogger().info("Requested bungeecord transfer " + playerName + " to " + server);
+	}
 
-		PacketUtils.SendPacket(main, packet);
+	public static void transferPlayerData(Main plugin, Player player, String server) throws Exception {
+		PacketUtils.SendPacket(plugin, new TransferPlayerDataPacket(server,
+																    player.getName(),
+																    player.getUniqueId(),
+																    PlayerData.convertToString(plugin, player)));
 	}
 }

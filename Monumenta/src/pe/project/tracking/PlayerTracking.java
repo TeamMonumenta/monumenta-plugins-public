@@ -59,7 +59,13 @@ public class PlayerTracking implements EntityTracking {
 			player.sendMessage(ChatColor.RED + "  Include details about what you were doing");
 			player.sendMessage(ChatColor.RED + "  such as joining or leaving a dungeon (and which one!)");
 
-			NetworkUtils.sendPlayer(mPlugin, player, "purgatory");
+			try {
+				NetworkUtils.sendPlayer(mPlugin, player, "purgatory");
+			} catch (Exception ex) {
+				mPlugin.getLogger().severe("CRITICAL: Failed to send failed player '" + player.getName() + "' to purgatory");
+				ex.printStackTrace();
+			}
+
 		}
 
 		mEntities.add(player);
@@ -229,7 +235,7 @@ public class PlayerTracking implements EntityTracking {
 		//	Clear Ender Chest
 		_removeSpecialItemsFromInventory(player.getEnderChest());
 	}
-	
+
 	void _removeSpecialItemsFromInventory(Inventory inventory) {
 		for (ItemStack item : inventory.getContents()) {
 			if (item != null) {
@@ -241,7 +247,7 @@ public class PlayerTracking implements EntityTracking {
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
 							_removeSpecialItemsFromInventory(shulker.getInventory());
-							
+
 							meta.setBlockState(shulker);
 							item.setItemMeta(meta);
 						}

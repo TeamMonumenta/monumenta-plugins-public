@@ -1,9 +1,10 @@
 package pe.project.network.packet;
 
-import pe.project.Main;
-
 public interface Packet {
 	String getPacketChannel();
-	String getPacketData();
-	void handlePacket(Main main, String data);
+	String getPacketData() throws Exception;
+
+	// Implementers should also have the following static methods:
+	// String getPacketChannel();
+	// void handlePacket(Main main, String data) throws Exception;
 }

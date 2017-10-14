@@ -11,7 +11,7 @@ import pe.project.Main;
 import pe.project.utils.PacketUtils;
 import pe.project.network.packet.HeartbeatPacket;
 
-public class SocketListener implements Listener{
+public class SocketListener implements Listener {
 	Main mMain = null;
 
 	public SocketListener(Main main) {
@@ -22,9 +22,14 @@ public class SocketListener implements Listener{
 	public void onConnect(BukkitSocketHandshakeEvent e){
 		mMain.mSocketClient = e.getClient();
 
-		// Send a simple hello message to bungee
-		HeartbeatPacket packet = new HeartbeatPacket();
-		PacketUtils.SendPacket(mMain, packet);
+		try {
+			// Send a simple hello message to bungee
+			PacketUtils.SendPacket(mMain, new HeartbeatPacket());
+		} catch (Exception ex) {
+			mMain.getLogger().severe("Caught exception sending HeartbeatPacket: " + ex);
+			ex.printStackTrace();
+			return;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -32,6 +37,12 @@ public class SocketListener implements Listener{
 		String channel = e.getChannel();
 		String data = e.getData();
 
-		PacketUtils.ProcessPacket(mMain, channel, data);
+		try {
+			PacketUtils.ProcessPacket(mMain, channel, data);
+		} catch (Exception ex) {
+			mMain.getLogger().severe("Caught exception handling packet on channel '" + channel + "'");
+			ex.printStackTrace();
+			return;
+		}
 	}
 }

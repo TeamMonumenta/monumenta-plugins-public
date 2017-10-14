@@ -1,13 +1,10 @@
 package bungee.project.listeners;
 
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
-
 import bungee.project.Main;
+import bungee.project.utils.PacketUtils;
 import net.md_5.bungee.api.plugin.Listener;
 
 import net.md_5.bungee.event.EventHandler;
@@ -42,55 +39,58 @@ public class EventListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onMessage(BungeeSocketJSONEvent e) {
 		String channel = e.getChannel(); // The channel ("MyBukkitPlugin")
-		String name = e.getName(); // The Spigot server name
-		String data = e.getData(); // The data the plugin sent you
-
+		String sendingServer = e.getName(); // The Spigot server name
+		String rawData = e.getData(); // The data the plugin sent you
 		// Nothing to do with no payload
-		if (data == null || data.length() <= 0) {
-			mMain.getLogger().warning("Got message from '" + name + "' with empty data");
+		if (rawData == null || rawData.length() <= 0) {
+			mMain.getLogger().warning("Got message from '" + sendingServer + "' with empty data");
 			return;
 		}
 
 		if ((!channel.equals("Monumenta.Bungee.Forward.TransferPlayerData"))
 			&& (!channel.equals("Monumenta.Bungee.SendPlayer"))
 			&& (!channel.equals("Monumenta.Bungee.Heartbeat"))) {
-			mMain.getLogger().warning("Got message from '" + name + "' with invalid channel '" + channel + "'");
+			mMain.getLogger().warning("Got message from '" + sendingServer + "' with invalid channel '" + channel + "'");
 			return;
 		}
 
-		// Decode the input "string" into the byte array that was sent
-		byte[] packetInfo = data.getBytes(StandardCharsets.ISO_8859_1);
+		/* Special case - no payload */
+		if (channel.equals("Monumenta.Bungee.Heartbeat")) {
+			mMain.getLogger().info("Got heartbeat message from '" + sendingServer + "'");
+			return;
+		}
 
-		// Decode the input into an array of individual byte arrays
-		ByteArrayDataInput input = ByteStreams.newDataInput(packetInfo);
-
-		if (input == null) {
-			mMain.getLogger().warning("Got message from '" + name + "' with invalid payload data");
+		/* For all other message types, attempt to decode payload */
+		String[] rcvStrings = null;
+		try {
+			rcvStrings = PacketUtils.decodeStrings(rawData);
+		} catch (Exception ex) {
+			rcvStrings = null;
+		}
+		if (rcvStrings == null || rcvStrings.length <= 0) {
+			mMain.getLogger().warning("Got message from '" + sendingServer + "' with invalid payload");
 			return;
 		}
 
 		switch(channel) {
 			case "Monumenta.Bungee.Forward.TransferPlayerData":
-				bungeeForward(channel, name, input, data);
+				bungeeForward(channel, sendingServer, rcvStrings, rawData);
 				break;
 			case "Monumenta.Bungee.SendPlayer":
-				sendPlayer(channel, name, input, data);
-				break;
-			case "Monumenta.Bungee.Heartbeat":
-				mMain.getLogger().info("Got heartbeat message from '" + name + "'");
+				sendPlayer(sendingServer, rcvStrings);
 				break;
 			default:
-				mMain.getLogger().warning("Got message from '" + name + "' with unhandled channel '" + channel + "'");
+				mMain.getLogger().warning("Got message from '" + sendingServer + "' with unhandled channel '" + channel + "'");
 				break;
 		}
 	}
 
-	private void bungeeForward(String channel, String name, ByteArrayDataInput input, String data) {
+	private void bungeeForward(String channel, String sendingServer, String[] rcvStrings, String rawData) {
 		// First component of this type of packet is the destination server
-		String destination = input.readUTF();
+		String destination = rcvStrings[0];
 
 		if (destination == null || (!mSockets.containsKey(destination))) {
-			mMain.getLogger().warning("Cannot forward message from '" + name + "' to unknown destination '" + destination + "'");
+			mMain.getLogger().warning("Cannot forward message from '" + sendingServer + "' to unknown destination '" + destination + "'");
 			return;
 		}
 
@@ -98,37 +98,42 @@ public class EventListener implements Listener {
 		SocketMessenger socketDest = mSockets.get(destination);
 
 		if ((!socketDest.isHandshaked()) || (!socketDest.isConnectedAndOpened())) {
-			mMain.getLogger().warning("Cannot forward message from '" + name + "' because '" + destination + "' has not finished connecting");
+			mMain.getLogger().warning("Cannot forward message from '" + sendingServer + "' because '" + destination + "' has not finished connecting");
 			return;
 		}
 
 		// Finally forward the message
-		socketDest.writeJSON(channel, data);
-		mMain.getLogger().info("Forwarded message from '" + name + "' to '" + destination + "'");
+		socketDest.writeJSON(channel, rawData);
+		mMain.getLogger().info("Forwarded message from '" + sendingServer + "' to '" + destination + "'");
 	}
 
-	private void sendPlayer(String channel, String name, ByteArrayDataInput input, String data) {
-		// Message contains just player name and destination server
-		String destination = input.readUTF();
-		String player = input.readUTF();
-		UUID uuid = UUID.fromString(input.readUTF());
+	private void sendPlayer(String sendingServer, String[] rcvStrings) {
+		if (rcvStrings.length != 3) {
+			mMain.getLogger().warning("Got sendPlayer command with invalid parameter count " + Integer.toString(rcvStrings.length) + "; expected 3");
+			return;
+		}
+
+		// Message contains just player name, destination server, and player's UUID
+		String destination = rcvStrings[0];
+		String player = rcvStrings[1];
+		UUID uuid = UUID.fromString(rcvStrings[2]);
 
 		if (destination == null || player == null || uuid == null || destination.length() <= 0 || player.length() <= 0) {
-			mMain.getLogger().warning("Got transfer message from '" + name + "' with invalid arguments");
+			mMain.getLogger().warning("Got transfer message from '" + sendingServer + "' with invalid arguments");
 			return;
 		}
 
 		// Get and validate the destination server
 		ServerInfo serverInfo = mMain.getProxy().getServers().get(destination);
 		if (serverInfo == null) {
-			mMain.getLogger().warning("Cannot transfer player from '" + name + "' to unknown destination '" + destination + "'");
+			mMain.getLogger().warning("Cannot transfer player from '" + sendingServer + "' to unknown destination '" + destination + "'");
 			return;
 		}
 
 		// Get and validate the player
 		ProxiedPlayer playerInfo = mMain.getProxy().getPlayer(uuid);
 		if (serverInfo == null) {
-			mMain.getLogger().warning("Cannot transfer unknown player '" + player + "' from '" + name + "' to '" + destination + "'");
+			mMain.getLogger().warning("Cannot transfer unknown player '" + player + "' from '" + sendingServer + "' to '" + destination + "'");
 			return;
 		}
 

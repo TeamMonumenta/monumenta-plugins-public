@@ -93,6 +93,11 @@ public class PlayerData {
 
 		//	Save the file.
 		String content = gson.toJson(root);
+
+		if (content == null || content.isEmpty()) {
+			throw new Exception("Playerdata content is empty!");
+		}
+
 		return content;
 	}
 

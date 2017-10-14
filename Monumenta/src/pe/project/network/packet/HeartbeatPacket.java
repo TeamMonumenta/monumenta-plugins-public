@@ -17,12 +17,11 @@ public class HeartbeatPacket implements Packet {
 	}
 
 	@Override
-	public String getPacketData() {
+	public String getPacketData() throws Exception {
 		return "Hello";
 	}
 
-	@Override
-	public void handlePacket(Main main, String data) {
-		main.getLogger().severe("Got " + getPacketChannel() + " message from which should only be received by bungeecord");
+	public static void handlePacket(Main main, String data) throws Exception {
+		throw new Exception("Got message from which should only be received by bungeecord");
 	}
 }

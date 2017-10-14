@@ -1,36 +1,12 @@
-package pe.project.utils;
+package bungee.project.utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
-import pe.project.Main;
-import pe.project.network.packet.Packet;
-import pe.project.network.packet.TransferPlayerDataPacket;
-import pe.project.network.packet.SendPlayerPacket;
-import pe.project.network.packet.HeartbeatPacket;
-
 public class PacketUtils {
 	/* If a packet shows up with more than 16 MB of data, something is probably wrong */
 	public static int MAX_PACKET_LEN = 1024 * 1024 * 16;
-
-	public static void SendPacket(Main main, Packet packet) throws Exception {
-		// Serialize the packet data into a string that can be sent
-		String data = packet.getPacketData();
-
-		// Send that string to the bungeecord proxy via the opened socket
-		main.mSocketClient.writeJSON(packet.getPacketChannel(), data);
-	}
-
-	public static void ProcessPacket(Main main, String channel, String data) throws Exception {
-		if (channel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
-			TransferPlayerDataPacket.handlePacket(main, data);
-		} else if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {
-			SendPlayerPacket.handlePacket(main, data);
-		} else if (channel.equals(HeartbeatPacket.getStaticPacketChannel())) {
-			HeartbeatPacket.handlePacket(main, data);
-		}
-	}
 
 	/**
 	 * Encodes string array to a byte buffer, which is encoded to a single string
