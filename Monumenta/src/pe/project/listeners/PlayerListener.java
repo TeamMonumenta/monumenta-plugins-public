@@ -517,7 +517,7 @@ public class PlayerListener implements Listener {
 						public void run() {
 							GameMode mode;
 
-							if (++tick == 80) {
+							if (++tick == 60) {
 								// Abort, player got out of bed early
 								if (player.isSleeping() == false) {
 									this.cancel();
@@ -535,8 +535,7 @@ public class PlayerListener implements Listener {
 
 								// Set player's gamemode back to whatever it was
 								player.setGameMode(mode);
-							} else if (tick >= 81) {
-								// After ejecting player, teleport them
+							} else if (tick >= 61) {
 								player.teleport(teleLoc);
 
 								world.playSound(teleLoc, "entity.elder_guardian.death", 1.0f, 1.3f);
