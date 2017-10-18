@@ -88,7 +88,7 @@ public class PlayerData {
 		//	Add Ender Chest.
 		root.addProperty("ender_chest", InventoryUtils.itemStackArrayToBase64(player.getEnderChest().getContents()));
 
-		//	Add Scoreboards for this player.
+		//	Add Scoreboards and Tags for this player.
 		root.add("scoreboards", ScoreboardUtils.getAsJsonObject(player));
 
 		//	Save the file.
@@ -209,7 +209,7 @@ public class PlayerData {
 			}
 		}
 
-		//	Load Scoreboards.
-		ScoreboardUtils.loadFromJsonObject(player, object.getAsJsonArray("scoreboards"));
+		//	Load Scoreboards and Tags
+		ScoreboardUtils.loadFromJsonObject(player, object.getAsJsonObject("scoreboards"));
 	}
 }
