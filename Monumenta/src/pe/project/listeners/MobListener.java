@@ -8,9 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import pe.project.Main;
+import pe.project.utils.InventoryUtils;
 
 public class MobListener implements Listener {
 	Main mPlugin = null;
@@ -20,22 +20,14 @@ public class MobListener implements Listener {
 	}
 
 	/**
-	 * Returns true if the ItemStack has lore not containing '$$$' and should be dropped
+	 * Items drop if they have lore that does not contain $$$
 	 */
-	private boolean _shouldItemDrop(ItemStack item) {
-		if (item != null && item.hasItemMeta() == true) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta.hasLore() == true) {
-				for (String s: meta.getLore()) {
-					if (s.contains("$$$")) {
-						continue;
-					} else {
-						return true;
-					}
-				}
-			}
+	private float _getItemDropChance(ItemStack item) {
+		if (item.getItemMeta().hasLore() == true && !InventoryUtils.testForItemWithLore(item, "$$$")) {
+			return 1.0f;
+		} else {
+			return 0.0f;
 		}
-		return false;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -47,44 +39,14 @@ public class MobListener implements Listener {
 			//	Mark mobs not able to pick-up items.
 			mob.setCanPickupItems(false);
 
-			//	Set all drop chances on gear and in main/off hand to be 0.
+			// Overwrite drop chances for mob armor and held items
 			EntityEquipment equipment = mob.getEquipment();
-
-			if (_shouldItemDrop(equipment.getHelmet())) {
-				equipment.setHelmetDropChance(1.0f);
-			} else {
-				equipment.setHelmetDropChance(0.0f);
-			}
-
-			if (_shouldItemDrop(equipment.getChestplate())) {
-				equipment.setChestplateDropChance(1.0f);
-			} else {
-				equipment.setChestplateDropChance(0.0f);
-			}
-
-			if (_shouldItemDrop(equipment.getLeggings())) {
-				equipment.setLeggingsDropChance(1.0f);
-			} else {
-				equipment.setLeggingsDropChance(0.0f);
-			}
-
-			if (_shouldItemDrop(equipment.getBoots())) {
-				equipment.setBootsDropChance(1.0f);
-			} else {
-				equipment.setBootsDropChance(0.0f);
-			}
-
-			if (_shouldItemDrop(equipment.getItemInMainHand())) {
-				equipment.setItemInMainHandDropChance(1.0f);
-			} else {
-				equipment.setItemInMainHandDropChance(0.0f);
-			}
-
-			if (_shouldItemDrop(equipment.getItemInOffHand())) {
-				equipment.setItemInOffHandDropChance(1.0f);
-			} else {
-				equipment.setItemInOffHandDropChance(0.0f);
-			}
+			equipment.setHelmetDropChance(_getItemDropChance(equipment.getHelmet()));
+			equipment.setChestplateDropChance(_getItemDropChance(equipment.getChestplate()));
+			equipment.setLeggingsDropChance(_getItemDropChance(equipment.getLeggings()));
+			equipment.setBootsDropChance(_getItemDropChance(equipment.getBoots()));
+			equipment.setItemInMainHandDropChance(_getItemDropChance(equipment.getItemInMainHand()));
+			equipment.setItemInOffHandDropChance(_getItemDropChance(equipment.getItemInOffHand()));
 		}
 	}
 }
