@@ -10,7 +10,6 @@ import org.bukkit.entity.Silverfish;
 
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
-import pe.project.point.Point;
 
 public class SilverfishTracking implements EntityTracking {
 	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
@@ -31,8 +30,7 @@ public class SilverfishTracking implements EntityTracking {
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();
 			if (silverfish != null && silverfish.isValid()) {
-				Point loc = new Point(silverfish.getLocation());
-				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+				SafeZones safeZone = LocationManager.withinAnySafeZone(silverfish);
 				if (safeZone != SafeZones.None) {
 					silverfish.remove();
 					silverfishIter.remove();

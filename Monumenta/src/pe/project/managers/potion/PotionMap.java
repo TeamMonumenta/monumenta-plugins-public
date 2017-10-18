@@ -38,9 +38,13 @@ public class PotionMap {
 	}
 	
 	public void removePotionMap(Player player, PotionID id) {
-		Vector<PotionInfo> trackedPotionInfo = mPotionMap.get(id);
-		if (trackedPotionInfo != null) {
-			trackedPotionInfo.clear();
+		if (id != PotionID.ALL) {
+			Vector<PotionInfo> trackedPotionInfo = mPotionMap.get(id);
+			if (trackedPotionInfo != null) {
+				trackedPotionInfo.clear();
+			}
+		} else {
+			mPotionMap.clear();
 		}
 
 		applyBestPotionEffect(player);

@@ -101,7 +101,7 @@ public class PlayerTracking implements EntityTracking {
 
 					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+					SafeZones safeZone = LocationManager.withinAnySafeZone(player);
 					inSafeZone = (safeZone != SafeZones.None);
 					inCapital = (safeZone == SafeZones.Capital);
 					applyEffects = (inSafeZone && SafeZoneConstants.safeZoneAppliesEffects(safeZone));
@@ -112,16 +112,16 @@ public class PlayerTracking implements EntityTracking {
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
 
 							if (mode == GameMode.SURVIVAL && !neededMat) {
-								_transitionToAdventure(player, safeZone);
+								_transitionToAdventure(player);
 							} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
 								int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
 								if (apartment == 0) {
-									player.setGameMode(GameMode.SURVIVAL);
+									_transitionToSurvival(player);
 								}
 							}
 						} else {
 							if (mode == GameMode.SURVIVAL) {
-								_transitionToAdventure(player, safeZone);
+								_transitionToAdventure(player);
 							}
 						}
 					}
@@ -150,7 +150,7 @@ public class PlayerTracking implements EntityTracking {
 					}
 				} else {
 					if (mode == GameMode.ADVENTURE) {
-						player.setGameMode(GameMode.SURVIVAL);
+						_transitionToSurvival(player);
 					}
 				}
 			}
@@ -162,9 +162,11 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
-	void _transitionToAdventure(Player player, SafeZones zone) {
+	void _transitionToAdventure(Player player) {
 		player.setGameMode(GameMode.ADVENTURE);
-
+		
+		mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
+		
 		_removeSpecialItems(player);
 
 		Entity vehicle = player.getVehicle();
@@ -173,6 +175,12 @@ public class PlayerTracking implements EntityTracking {
 				vehicle.remove();
 			}
 		}
+	}
+	
+	void _transitionToSurvival(Player player) {
+		player.setGameMode(GameMode.SURVIVAL);
+		
+		mPlugin.getClass(player).setupClassPotionEffects(player);
 	}
 
 	void _updateExtraEffects(Player player, World world) {

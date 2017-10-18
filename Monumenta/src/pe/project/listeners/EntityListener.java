@@ -51,6 +51,7 @@ import pe.project.Main;
 import pe.project.classes.BaseClass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.managers.LocationManager;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.utils.PlayerUtils;
@@ -230,6 +231,11 @@ public class EntityListener implements Listener {
 			if (source instanceof Player) {
 				Player player = (Player)source;
 				
+				if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
+					event.setCancelled(true);
+					return;
+				}
+				
 				boolean cancel = !mPlugin.getClass(player).PlayerSplashPotionEvent(player, event.getAffectedEntities(), potion);
 				if (cancel) {
 					event.setCancelled(true);
@@ -256,6 +262,11 @@ public class EntityListener implements Listener {
 		ProjectileSource source = cloud.getSource();	
 		if (source instanceof Player) {
 			Player player = (Player)source;
+			
+			if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
+				return;
+			}
+			
 			List<LivingEntity> entities = event.getAffectedEntities();
 			
 			mPlugin.getClass(player).AreaEffectCloudApplyEvent(entities, player);

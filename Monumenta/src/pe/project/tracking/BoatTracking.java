@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
-import pe.project.point.Point;
 
 public class BoatTracking implements EntityTracking {
 	private Set<Boat> mEntities = new HashSet<Boat>();
@@ -31,8 +30,7 @@ public class BoatTracking implements EntityTracking {
 		while (boatIter.hasNext()) {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid()) {
-				Point loc = new Point(boat.getLocation());
-				SafeZones safeZone = LocationManager.withinAnySafeZone(loc);
+				SafeZones safeZone = LocationManager.withinAnySafeZone(boat);
 				if (safeZone != SafeZones.None) {
 					boatIter.remove();
 					boat.remove();

@@ -13,6 +13,8 @@ import com.google.gson.JsonObject;
 
 import pe.project.Constants;
 import pe.project.Main;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.managers.LocationManager;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
@@ -24,7 +26,8 @@ public class PotionManager {
 		APPLIED_POTION(0, "APPLIED_POTION"),
 		ABILITY_SELF(1, "ABILITY_SELF"),
 		ABILITY_OTHER(2, "ABILITY_OTHER"),
-		SAFE_ZONE(3, "SAFE_ZONE");
+		SAFE_ZONE(3, "SAFE_ZONE"),
+		ALL(4, "ALL");
 		
 		private int value;
 		private String name;
@@ -62,6 +65,12 @@ public class PotionManager {
 	
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
 		if (Constants.POTION_MANAGER_ENABLED) {
+			if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
+				if (info.type.getName().equals(PotionEffectType.JUMP.getName())) {
+					return;
+				}
+			}
+			
 			UUID uuid = player.getUniqueId();
 			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
 			if (potionInfo != null) {
