@@ -4,32 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
 
 import pe.project.Main;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
-import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
@@ -53,16 +55,18 @@ public class ScoutClass extends BaseClass {
 	private static int AGILITY_1_RESISTANCE_LEVEL = 0;
 	private static int AGILITY_2_RESISTANCE_LEVEL = 1;
 	
-	//private static int EXPLORATION_1_EFFECT_LVL = 0;
-	//private static int EXPLORATION_2_EFFECT_LVL = 1;
-	
 	private static int BOW_MASTER_1_DAMAGE = 3;
 	private static int BOW_MASTER_2_DAMAGE = 6;
 	
-	private static double TINKERING_1_CHANCE_OF_SLOWNESS = 0.25f;
-	private static double TINKERING_2_CHANCE_OF_SLOWNESS = 0.5f;
-	private static double TINKERING_1_CHANCE_OF_WEAKNESS = 0.25f;
-	private static double TINKERING_2_CHANCE_OF_WEAKNESS = 0.5f;
+	private static int EAGLE_EYE_ID = 64;
+	private static String EAGLE_EYE_TAG_NAME = "TagEagleEye";
+	private static int EAGLE_EYE_EFFECT_LVL = 0;
+	private static int EAGLE_EYE_DURATION = 10 * 20;
+	private static int EAGLE_EYE_COOLDOWN = 30 * 20;
+	private static int EAGLE_EYE_1_EXTRA_DAMAGE = 3;
+	private static int EAGLE_EYE_2_EXTRA_DAMAGE = 6;
+	private static int EAGLE_EYE_RADIUS = 20;
+	private static double EAGLE_EYE_DOT_ANGLE = 0.33;
 	
 	private static int VOLLEY_ID = 65;
 	private static int VOLLEY_COOLDOWN = 15 * 20;
@@ -100,6 +104,8 @@ public class ScoutClass extends BaseClass {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Volley is now off cooldown");
 		} else if (abilityID == STANDARD_BEARER_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Standard Bearer is now off cooldown");
+		} else if (abilityID == EAGLE_EYE_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Eagle Eye is now off cooldown");
 		}
 	}
 	
@@ -107,15 +113,6 @@ public class ScoutClass extends BaseClass {
 	public void PlayerRespawnEvent(Player player) {
 		_testForAgility(player);
 		_testForSwiftness(player);
-		
-		//	Exploration
-		/*{
-			int exploration = ScoreboardUtil.getScoreboardValue(player, "Exploration");
-			if (exploration > 0) {
-				int effectLevel = exploration == 1 ? EXPLORATION_1_EFFECT_LVL : EXPLORATION_2_EFFECT_LVL;
-				player.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 1000000, effectLevel, true, false));
-			}
-		}*/
 	}
 	
 	@Override
@@ -131,31 +128,6 @@ public class ScoutClass extends BaseClass {
 	@Override
 	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
 		_testItemInHand(player, mainHand);
-	}
-	
-	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause causee) {
-		int tinkering = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
-		if (tinkering > 0) {
-			double chanceOfSlowness = tinkering == 1 ? TINKERING_1_CHANCE_OF_SLOWNESS : TINKERING_2_CHANCE_OF_SLOWNESS;
-			double chanceOfWeakness = tinkering == 1 ? TINKERING_1_CHANCE_OF_WEAKNESS : TINKERING_2_CHANCE_OF_WEAKNESS;
-			
-			//	Try to find Slowness Arrow.
-			if (mRandom.nextDouble() < chanceOfSlowness) {
-				PotionData data = new PotionData(PotionType.SLOWNESS, false, false);
-				ItemStack arrow = ItemUtils.createTippedArrows(PotionType.SLOWNESS, 1, data);
-
-				player.getWorld().dropItemNaturally(killedEntity.getLocation(), arrow);
-			}
-			//	Try to find Weakness Arrow.
-			else if (mRandom.nextDouble() < chanceOfWeakness) {
-				PotionData data = new PotionData(PotionType.WEAKNESS, false, false);
-				ItemStack arrow = ItemUtils.createTippedArrows(PotionType.WEAKNESS, 1, data);
-				
-				World world = Bukkit.getWorld(player.getWorld().getName());
-				world.dropItemNaturally(killedEntity.getLocation(), arrow);
-			}
-		}
 	}
 	
 	@Override
@@ -180,22 +152,6 @@ public class ScoutClass extends BaseClass {
 				if (arrow.isCritical()) {
 					int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
 					damagee.damage(bonusDamage);
-				}
-			}
-		}
-		{
-			//	Tinkering
-			int tinkering = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
-			if (tinkering > 1) {
-				if (arrow instanceof TippedArrow) {
-					TippedArrow tArrow = (TippedArrow)arrow;
-					PotionData data = tArrow.getBasePotionData();
-					
-					if (data.getType() == PotionType.SLOWNESS) {
-						damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 11 * 20, 1, false, true));
-					} else if (data.getType() == PotionType.WEAKNESS) {
-						damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 11 * 20, 1, false, true));
-					}
 				}
 			}
 		}
@@ -374,6 +330,39 @@ public class ScoutClass extends BaseClass {
 	}
 	
 	@Override
+	public void PlayerInteractEvent(Player player, Action action, Material material) {
+		if (player.isSneaking()) {
+			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+				int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
+				if (eagleEye > 0) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), EAGLE_EYE_ID)) {
+						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+						World world = player.getWorld();
+						
+						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS);
+						for(Entity e : entities) {
+							if(e instanceof Monster) {
+								Monster mob = (Monster)e;
+								
+								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+								if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+									mob.setMetadata(EAGLE_EYE_TAG_NAME, new FixedMetadataValue(mPlugin, 1));
+									
+									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+									world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
+								}
+							}
+						}
+						
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), EAGLE_EYE_ID, EAGLE_EYE_COOLDOWN);
+					}
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {
 		if (player.hasMetadata(STANDARD_BEARER_TAG_NAME)) {
 			int standardBearer = ScoreboardUtils.getScoreboardValue(player, "StandardBearer");
@@ -383,6 +372,20 @@ public class ScoutClass extends BaseClass {
 				event.setDamage(damage);
 			}
 		}
+		
+		Entity entity = event.getEntity();
+		if (entity instanceof Monster) {
+			Monster mob = (Monster)entity;
+			
+			int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
+			if (eagleEye > 0) {
+				//	TODO: In the future we need to have the entities meta data remove after the durations....for now...we be lazy.
+				if (mob.hasMetadata(EAGLE_EYE_TAG_NAME) && mob.hasPotionEffect(PotionEffectType.GLOWING)) {
+					int extraDamage = (eagleEye == 1) ? EAGLE_EYE_1_EXTRA_DAMAGE : EAGLE_EYE_2_EXTRA_DAMAGE;
+					event.setDamage(event.getDamage() + extraDamage);
+				}
+			}
+		}	
 	}
 	
 	public void _testForAgility(Player player) {
