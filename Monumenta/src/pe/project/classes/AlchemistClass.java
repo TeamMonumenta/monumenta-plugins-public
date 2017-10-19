@@ -46,9 +46,11 @@ PoisonTrail
 */
 
 public class AlchemistClass extends BaseClass {
-	private static double GRUESOME_ALCHEMY_CHANCE = 0.05f;
+	private static int GRUESOME_ALCHEMY_ID = 51;
+	private static double GRUESOME_ALCHEMY_CHANCE = 0.20f;
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
+	private static int GRUESOME_ALCHEMY_COOLDOWN = 5 * 60 * 20;
 	
 	private static int PUTRID_FUMES_ID = 52;
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
@@ -105,30 +107,34 @@ public class AlchemistClass extends BaseClass {
 		{
 			int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
 			if (gruesomeAlchemy > 0) {
-				if (mRandom.nextFloat() < GRUESOME_ALCHEMY_CHANCE) {
-					int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
-					ItemStack stack = new ItemStack(Material.SPLASH_POTION, count);
-					
-					int rand = mRandom.nextInt(4);
-					if (rand == 0) {
-						ItemUtils.setPotionMeta(stack, "Splash Potion of Harming", PotionEffectType.INCREASE_DAMAGE.getColor());
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.HARM, 0, 1, false, true));
-					} else if (rand == 1) {
-						ItemUtils.setPotionMeta(stack, "Potion of Decay", Color.fromRGB(6178631));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 32 * 20, 0, false, true));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WEAKNESS, 32 * 20, 0, false, true));
-					} else if (rand == 2) {
-						ItemUtils.setPotionMeta(stack, "Scorpion Venom", Color.fromRGB(4610355));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 18 * 20, 1, false, true));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.POISON, 18 * 20, 0, false, true));
-					} else {
-						ItemUtils.setPotionMeta(stack, "Lesser Frost Bomb", Color.fromRGB(3294553));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1, false, true));
-						ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0, false, true));
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID)) {
+					if (mRandom.nextFloat() < GRUESOME_ALCHEMY_CHANCE) {
+						int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
+						ItemStack stack = new ItemStack(Material.SPLASH_POTION, count);
+						
+						int rand = mRandom.nextInt(4);
+						if (rand == 0) {
+							ItemUtils.setPotionMeta(stack, "Splash Potion of Harming", PotionEffectType.INCREASE_DAMAGE.getColor());
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.HARM, 0, 1, false, true));
+						} else if (rand == 1) {
+							ItemUtils.setPotionMeta(stack, "Potion of Decay", Color.fromRGB(6178631));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 32 * 20, 0, false, true));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WEAKNESS, 32 * 20, 0, false, true));
+						} else if (rand == 2) {
+							ItemUtils.setPotionMeta(stack, "Scorpion Venom", Color.fromRGB(4610355));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 18 * 20, 1, false, true));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.POISON, 18 * 20, 0, false, true));
+						} else {
+							ItemUtils.setPotionMeta(stack, "Lesser Frost Bomb", Color.fromRGB(3294553));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1, false, true));
+							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0, false, true));
+						}
+						
+						World world = Bukkit.getWorld(player.getWorld().getName());
+						world.dropItemNaturally(killedEntity.getLocation(), stack);
+						
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID, GRUESOME_ALCHEMY_COOLDOWN);
 					}
-					
-					World world = Bukkit.getWorld(player.getWorld().getName());
-					world.dropItemNaturally(killedEntity.getLocation(), stack);
 				}
 			}
 		}
