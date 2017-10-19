@@ -9,10 +9,12 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Stray;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -295,6 +297,10 @@ public class MageClass extends BaseClass {
 			int elementalArrows = ScoreboardUtils.getScoreboardValue(player, "Elemental");
 			if (elementalArrows > 0) {
 				if (arrow.hasMetadata("FireArrow")) {
+					if (damagee instanceof Stray) {
+						event.setDamage(event.getDamage() + 8);
+					}
+					
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 					
 					if (elementalArrows == 2) {
@@ -308,8 +314,12 @@ public class MageClass extends BaseClass {
 					}
 				}
 				else if (arrow.hasMetadata("IceArrow")) {
+					if (damagee instanceof Blaze) {
+						event.setDamage(event.getDamage() + 8);
+					}
+					
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-				
+					
 					if (elementalArrows == 2) {
 						List<Entity> entities = damagee.getNearbyEntities(ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS);
 						for (Entity entity : entities) {
