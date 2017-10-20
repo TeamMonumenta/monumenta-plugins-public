@@ -27,7 +27,6 @@ import org.bukkit.potion.PotionEffectType;
 import pe.project.Main;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
-import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
@@ -77,21 +76,17 @@ public class AlchemistClass extends BaseClass {
 	private static int POWER_INJECTION_DURATION = 20 * 20;
 	private static int POWER_INJECTION_COOLDOWN = 30 * 20;
 	
-	private static int INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL = 1;
+	private static int INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_SPEED_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_REGENERATION_EFFECT_LVL = 0;
-	private static int INVIGORATING_ODOR_JUMP_EFFECT_LVL = 2;
+	private static int INVIGORATING_ODOR_1_DURATION = 12 * 20;
+	private static int INVIGORATING_ODOR_2_DURATION = 15 * 20;
+
 	
 	//	POISON_TRAIL
 	
 	public AlchemistClass(Main plugin, Random random) {
 		super(plugin, random);
-	}
-	
-	@Override
-	public void setupClassPotionEffects(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		_testInvigoratingOdor(player, mainHand);
 	}
 	
 	@Override
@@ -191,21 +186,6 @@ public class AlchemistClass extends BaseClass {
 	}
 	
 	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testInvigoratingOdor(player, mainHand);
-	}
-	
-	@Override
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testInvigoratingOdor(player, mainHand);
-	}
-	
-	@Override
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testInvigoratingOdor(player, mainHand);
-	}
-	
-	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), PUTRID_FUMES_ID)) {
@@ -232,20 +212,41 @@ public class AlchemistClass extends BaseClass {
 			cloud.setSource(player);
 		}
 		
+		World world = player.getWorld();
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
-		if (causticMixture > 0) {
-			World world = player.getWorld();
-			
-			int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
+		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
+		
+		boolean hitMonster = false;
+		
+		if (affectedEntities != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (entity instanceof Monster) {
-					if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
-						entity.damage(damage);
-						entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
-						
-						Location loc = entity.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
+					//	Caustic Mixture
+					
+					if (causticMixture > 0) {
+						int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
+						if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
+							entity.damage(damage);
+							entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
+							
+							Location loc = entity.getLocation();
+							ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
+						}
 					}
+					
+					//	Invigorating Odor
+					if (invigoratingOdor > 0 && !hitMonster) {
+						int duration = (invigoratingOdor == 1) ? INVIGORATING_ODOR_1_DURATION : INVIGORATING_ODOR_2_DURATION;
+						
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, duration, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
+					
+						if (invigoratingOdor > 1) {
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, duration, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false)); 
+						}
+					}
+					
+					hitMonster = true;
 				}
 			}
 		}
@@ -269,28 +270,6 @@ public class AlchemistClass extends BaseClass {
 						Location loc = entity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
 					}
-				}
-			}
-		}
-	}
-	
-	private void _testInvigoratingOdor(Player player, ItemStack mainHand) {
-		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
-		if (invigoratingOdor > 0) {
-			//	First remove the effects and then if the test passes re-add them (This is to prevent the case where players scroll
-			//	between potions and they get multiple instances of the effects.
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
-			
-			if (InventoryUtils.isPotionItem(mainHand)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
-				
-				if (invigoratingOdor > 1) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 1000000, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, INVIGORATING_ODOR_JUMP_EFFECT_LVL, true, false));
 				}
 			}
 		}
