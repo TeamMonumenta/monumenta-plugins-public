@@ -84,7 +84,7 @@ public class ScoreboardUtils {
 		return returnData;
 	}
 
-	public static void loadFromJsonObject(Player player, JsonObject object) {
+	public static void loadFromJsonObject(Player player, JsonObject object) throws Exception {
 		// Load scoreboards first
 		Iterator<JsonElement> scoreIter = object.get("scores").getAsJsonArray().iterator();
 		while (scoreIter.hasNext()) {
@@ -104,10 +104,7 @@ public class ScoreboardUtils {
 		}
 
 		// Remove player's tags
-		Set<String> playerTags = player.getScoreboardTags();
-		for (String tag : playerTags) {
-			player.removeScoreboardTag(tag);
-		}
+		player.getScoreboardTags().clear();
 
 		// Add player tags from JSON
 		Iterator<JsonElement> tagIter = object.get("tags").getAsJsonArray().iterator();
