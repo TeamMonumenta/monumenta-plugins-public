@@ -107,7 +107,13 @@ public class PlayerTracking implements EntityTracking {
 
 					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					SafeZones safeZone = LocationManager.withinAnySafeZone(player);
+					// If the world is a town world, treat the player like they are in the capital
+					// Otherwise figure out which (if any) safezone the player is in
+					SafeZones safeZone = SafeZones.Capital;
+					if (!mPlugin.mServerProporties.getIsTownWorld()) {
+						safeZone = LocationManager.withinAnySafeZone(player);
+					}
+
 					inSafeZone = (safeZone != SafeZones.None);
 					inCapital = (safeZone == SafeZones.Capital);
 					applyEffects = (inSafeZone && SafeZoneConstants.safeZoneAppliesEffects(safeZone));
@@ -119,7 +125,10 @@ public class PlayerTracking implements EntityTracking {
 
 							if (mode == GameMode.SURVIVAL && !neededMat) {
 								_transitionToAdventure(player);
-							} else if (mode == GameMode.ADVENTURE && neededMat && loc.mY > 95) {
+
+							// TODO UGLY HACK - Only the capital cares about loc.mY > 95, r1plots doesn't need this restriction.
+							// Thus the derpy || conditional - and only r1plots gets the IsTownWorld set to true for now
+							} else if (mode == GameMode.ADVENTURE && neededMat && (mPlugin.mServerProporties.getIsTownWorld() || loc.mY > 95)) {
 								int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
 								if (apartment == 0) {
 									_transitionToSurvival(player);
@@ -170,9 +179,9 @@ public class PlayerTracking implements EntityTracking {
 
 	void _transitionToAdventure(Player player) {
 		player.setGameMode(GameMode.ADVENTURE);
-		
+
 		mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
-		
+
 		_removeSpecialItems(player);
 
 		Entity vehicle = player.getVehicle();
@@ -182,10 +191,10 @@ public class PlayerTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	void _transitionToSurvival(Player player) {
 		player.setGameMode(GameMode.SURVIVAL);
-		
+
 		mPlugin.getClass(player).setupClassPotionEffects(player);
 	}
 

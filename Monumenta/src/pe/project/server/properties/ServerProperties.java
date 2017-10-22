@@ -16,6 +16,7 @@ public class ServerProperties {
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
 	private boolean mTransferDataEnabled = true;
+	private boolean mIsTownWorld = false;
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -27,6 +28,10 @@ public class ServerProperties {
 
 	public boolean getTransferDataEnabled() {
 		return mTransferDataEnabled;
+	}
+
+	public boolean getIsTownWorld() {
+		return mIsTownWorld;
 	}
 
 	public void load(Main main) {
@@ -65,10 +70,16 @@ public class ServerProperties {
 						main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
 					}
 
-					JsonElement TransferDataEnabled = object.get("transferDataEnabled");
-					if (TransferDataEnabled != null) {
-						mTransferDataEnabled = TransferDataEnabled.getAsBoolean();
+					JsonElement transferDataEnabled = object.get("transferDataEnabled");
+					if (transferDataEnabled != null) {
+						mTransferDataEnabled = transferDataEnabled.getAsBoolean();
 						main.getLogger().info("Properties: transferDataEnabled = " + mTransferDataEnabled);
+					}
+
+					JsonElement isTownWorld = object.get("isTownWorld");
+					if (isTownWorld != null) {
+						mIsTownWorld = isTownWorld.getAsBoolean();
+						main.getLogger().info("Properties: isTownWorld = " + mIsTownWorld);
 					}
 				}
 			} catch (Exception e) {
