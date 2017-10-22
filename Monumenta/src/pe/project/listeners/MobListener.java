@@ -23,7 +23,7 @@ public class MobListener implements Listener {
 	 * Items drop if they have lore that does not contain $$$
 	 */
 	private float _getItemDropChance(ItemStack item) {
-		if (item.getItemMeta().hasLore() == true && !InventoryUtils.testForItemWithLore(item, "$$$")) {
+		if (!InventoryUtils.testForItemWithLore(item, "$$$")) {
 			return 1.0f;
 		} else {
 			return 0.0f;
