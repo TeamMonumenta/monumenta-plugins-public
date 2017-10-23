@@ -124,7 +124,7 @@ public class ClericClass extends BaseClass {
 							if (!p.isDead()) {
 								//	If this is us or we're allowing anyone to get it.
 								if (p == player || rejuvenation > 1) {
-									PlayerUtils.healPlayer(player, REJUVENATION_HEAL_AMOUNT);
+									PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 								}
 							}
 						}
