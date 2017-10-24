@@ -61,7 +61,9 @@ public class PlayerUtils {
 	}
 	
 	public static void healPlayer(Player player, double healAmount) {
-		double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-		player.setHealth(newHealth);
+		if (!player.isDead()) {
+			double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+			player.setHealth(newHealth);
+		}
 	}
 }

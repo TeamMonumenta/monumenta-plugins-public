@@ -121,11 +121,9 @@ public class ClericClass extends BaseClass {
 						if (entity instanceof Player) {
 							Player p = (Player)entity;
 							
-							if (!p.isDead()) {
-								//	If this is us or we're allowing anyone to get it.
-								if (p == player || rejuvenation > 1) {
-									PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
-								}
+							//	If this is us or we're allowing anyone to get it.
+							if (p == player || rejuvenation > 1) {
+								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 							}
 						}
 					}
