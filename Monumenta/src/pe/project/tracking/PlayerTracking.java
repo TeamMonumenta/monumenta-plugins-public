@@ -248,7 +248,7 @@ public class PlayerTracking implements EntityTracking {
 	void _removeSpecialItemsFromInventory(Inventory inventory) {
 		for (ItemStack item : inventory.getContents()) {
 			if (item != null) {
-				if (InventoryUtils.testForItemWithLore(item, "D4 Key")) {
+				if (_containsSpecialLore(item)) {
 					inventory.removeItem(item);
 				} else {
 					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
@@ -264,6 +264,11 @@ public class PlayerTracking implements EntityTracking {
 				}
 			}
 		}
+	}
+	
+	boolean _containsSpecialLore(ItemStack item) {
+		return	InventoryUtils.testForItemWithLore(item, "D4 Key") ||
+				InventoryUtils.testForItemWithLore(item, "D5 Key");
 	}
 
 	@Override
