@@ -350,15 +350,15 @@ public class ClericClass extends BaseClass {
 										player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
 										
 										ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+									
+										int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+										mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
 									}
 									this.cancel();
 								}
 							}
 						}.runTaskTimer(mPlugin, 0, 1);
 					}
-					
-					int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
 				}
 			}
 		}
