@@ -126,13 +126,10 @@ public class PlayerTracking implements EntityTracking {
 							if (mode == GameMode.SURVIVAL && !neededMat) {
 								_transitionToAdventure(player);
 
-							// TODO UGLY HACK - Only the capital cares about loc.mY > 95, r1plots doesn't need this restriction.
-							// Thus the derpy || conditional - and only r1plots gets the IsTownWorld set to true for now
-							} else if (mode == GameMode.ADVENTURE && neededMat && (mPlugin.mServerProporties.getIsTownWorld() || loc.mY > 95)) {
-								int apartment = ScoreboardUtils.getScoreboardValue(player, "Apartment");
-								if (apartment == 0) {
-									_transitionToSurvival(player);
-								}
+							} else if (mode == GameMode.ADVENTURE && neededMat
+							           && loc.mY > mPlugin.mServerProporties.getPlotSurvivalMinHeight()
+									   && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
+								_transitionToSurvival(player);
 							}
 						} else {
 							if (mode == GameMode.SURVIVAL) {
