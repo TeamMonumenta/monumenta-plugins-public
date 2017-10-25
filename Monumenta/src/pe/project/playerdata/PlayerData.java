@@ -58,6 +58,24 @@ public class PlayerData {
 	}
 
 	/**
+	 * Makes a backup of the playerdata file and then removes it from the primary location
+	 */
+	static public void removePlayerDataFile(Main main, Player player) {
+		final String fileLocation = main.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
+		final String backupFileLocation = main.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
+
+		try {
+			FileUtils.moveFile(fileLocation, backupFileLocation);
+		} catch (FileNotFoundException e) {
+			// Player file didn't exist, no problem
+			return;
+		} catch (Exception e) {
+			main.getLogger().severe("Generic failure backing up player data file");
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * @return Returns a string containing serialized player data
 	 *
 	 * @throws Exception on error
@@ -113,8 +131,7 @@ public class PlayerData {
 		try {
 			content = FileUtils.readFile(fileLocation);
 		} catch (FileNotFoundException e) {
-			// This is expected when a player has never logged on before
-			main.getLogger().info("No player data file for '" + player.getName() + "'");
+			// This is the usual case when a player logs out and back in on the same server
 			return;
 		}
 		if (content == null || content.isEmpty()) {

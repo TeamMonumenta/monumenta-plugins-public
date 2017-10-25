@@ -55,4 +55,26 @@ public class FileUtils {
 			}
 		}
 	}
+
+	public static void moveFile(String fromFile, String toFile) throws Exception, FileNotFoundException {
+		if (fromFile == null || fromFile.isEmpty()) {
+			throw new Exception("fromFile is null or empty");
+		}
+		if (toFile == null || toFile.isEmpty()) {
+			throw new Exception("toFile is null or empty");
+		}
+
+		// Open the new file if it exists
+		File sourceFile = new File(fromFile);
+		if (!sourceFile.exists()) {
+			throw new FileNotFoundException("sourceFile '" + fromFile + "' does not exist");
+		}
+
+		// Make sure the target directory exists
+		File destFile = new File(toFile);
+		destFile.getParentFile().mkdirs();
+
+		// Rename the file and overwrite anything there
+		sourceFile.renameTo(destFile);
+	}
 }

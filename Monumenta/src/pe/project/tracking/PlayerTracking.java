@@ -73,7 +73,7 @@ public class PlayerTracking implements EntityTracking {
 
 	@Override
 	public void removeEntity(Entity entity) {
-		PlayerData.savePlayerData(mPlugin, (Player)entity);
+		PlayerData.removePlayerDataFile(mPlugin, (Player)entity);
 
 		mEntities.remove(entity);
 	}
@@ -265,7 +265,7 @@ public class PlayerTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	boolean _containsSpecialLore(ItemStack item) {
 		return	InventoryUtils.testForItemWithLore(item, "D4 Key") ||
 				InventoryUtils.testForItemWithLore(item, "D5 Key");
@@ -276,7 +276,7 @@ public class PlayerTracking implements EntityTracking {
 		Iterator<Player> players = mEntities.iterator();
 		while (players.hasNext()) {
 			Player player = players.next();
-			PlayerData.savePlayerData(mPlugin, player);
+			PlayerData.removePlayerDataFile(mPlugin, player);
 		}
 
 		mEntities.clear();
