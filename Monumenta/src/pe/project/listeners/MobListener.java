@@ -26,7 +26,7 @@ public class MobListener implements Listener {
 		if ((item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$$")) {
 			return 1.0f;
 		} else {
-			return 0.0f;
+			return -200.0f;
 		}
 	}
 
