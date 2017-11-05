@@ -80,7 +80,7 @@ public class Main extends JavaPlugin {
 	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
 	public NpcManager mNpcManager;
-	
+
 	public SocketClient mSocketClient;
 
 	// Used for the /back and /forward commands - stacks of teleport locations
@@ -135,6 +135,7 @@ public class Main extends JavaPlugin {
 			getCommand("transferScores").setExecutor(new TransferScores());
 			getCommand("getScore").setExecutor(new GetScore());
 			getCommand("transferServer").setExecutor(new TransferServer(this));
+			getCommand("broadcastCommand").setExecutor(new BroadcastCommand(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
@@ -148,13 +149,13 @@ public class Main extends JavaPlugin {
 		if (Constants.NPCS_ENABLED) {
 			getCommand("questTrigger").setExecutor(new QuestTrigger(this));
 		}
-		
+
 		mPotionManager = new PotionManager(this);
 		mQuestManager = new QuestManager(this, world);
 		mTrackingManager = new TrackingManager(this, world);
 		mPOIManager = new POIManager(this);
 		mNpcManager = new NpcManager(this);
-		
+
 		//	Load info.
 		_loadConfig();
 		mPOIManager.loadAllPOIs();

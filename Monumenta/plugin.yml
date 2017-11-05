@@ -51,7 +51,11 @@ commands:
   transferServer:
     permission: monumenta.commands.transferServer
     description: Transfers players with or without inventory between bungee shards.
-    usage: /transferserver <server name> [<True|False>]
+    usage: /transferserver <server name> [True|False]
+  broadcastCommand:
+    permission: monumenta.commands.broadcastCommand
+    description: Broadcasts a command to run on all Monumenta servers
+    usage: /broadcastcommand [command arg1 arg2 ...]
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.

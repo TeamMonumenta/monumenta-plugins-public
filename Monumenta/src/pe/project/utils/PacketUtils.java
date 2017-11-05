@@ -5,10 +5,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 import pe.project.Main;
-import pe.project.network.packet.Packet;
-import pe.project.network.packet.TransferPlayerDataPacket;
-import pe.project.network.packet.SendPlayerPacket;
-import pe.project.network.packet.HeartbeatPacket;
+import pe.project.network.packet.*;
 
 public class PacketUtils {
 	/* If a packet shows up with more than 16 MB of data, something is probably wrong */
@@ -29,6 +26,10 @@ public class PacketUtils {
 			SendPlayerPacket.handlePacket(main, data);
 		} else if (channel.equals(HeartbeatPacket.getStaticPacketChannel())) {
 			HeartbeatPacket.handlePacket(main, data);
+		} else if (channel.equals(GetServerListPacket.getStaticPacketChannel())) {
+			GetServerListPacket.handlePacket(main, data);
+		} else if (channel.equals(BroadcastCommandPacket.getStaticPacketChannel())) {
+			BroadcastCommandPacket.handlePacket(main, data);
 		}
 	}
 

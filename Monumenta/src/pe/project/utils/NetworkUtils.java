@@ -8,6 +8,7 @@ import pe.project.Main;
 import pe.project.network.packet.TransferPlayerDataPacket;
 import pe.project.network.packet.SendPlayerPacket;
 import pe.project.network.packet.GetServerListPacket;
+import pe.project.network.packet.BroadcastCommandPacket;
 import pe.project.playerdata.PlayerData;
 
 public class NetworkUtils {
@@ -37,5 +38,12 @@ public class NetworkUtils {
 
 		// Success, print transfer message request to log
 		plugin.getLogger().info("Requested server list for " + player.getName());
+	}
+
+	public static void broadcastCommand(Main plugin, String command) throws Exception {
+		PacketUtils.SendPacket(plugin, new BroadcastCommandPacket(command));
+
+		// Success, print transfer message request to log
+		plugin.getLogger().info("Requested broadcast of command '" + command + "'");
 	}
 }
