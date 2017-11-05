@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import pe.project.Main;
 import pe.project.network.packet.TransferPlayerDataPacket;
 import pe.project.network.packet.SendPlayerPacket;
+import pe.project.network.packet.GetServerListPacket;
 import pe.project.playerdata.PlayerData;
 
 public class NetworkUtils {
@@ -29,5 +30,12 @@ public class NetworkUtils {
 																    player.getName(),
 																    player.getUniqueId(),
 																    PlayerData.convertToString(plugin, player)));
+	}
+
+	public static void getServerList(Main plugin, Player player) throws Exception {
+		PacketUtils.SendPacket(plugin, new GetServerListPacket(player.getName(), player.getUniqueId()));
+
+		// Success, print transfer message request to log
+		plugin.getLogger().info("Requested server list for " + player.getName());
 	}
 }

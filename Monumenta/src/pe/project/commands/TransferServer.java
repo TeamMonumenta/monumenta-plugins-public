@@ -21,10 +21,20 @@ public class TransferServer implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
-
-		if (arg3.length != 1 && arg3.length != 2) {
+		if (arg3.length > 2 || (arg3.length == 0 && !(sender instanceof Player))) {
 			sender.sendMessage(ChatColor.RED + "Invalid number of parameters!");
 			return false;
+		}
+
+		if (arg3.length == 0 && sender instanceof Player) {
+			// No arguments - print usage and request list of available servers
+			sender.sendMessage(ChatColor.RED + "Usage: " + command.getUsage());
+			try {
+				NetworkUtils.getServerList(mMain, (Player)sender);
+			} catch (Exception e) {
+				sender.sendMessage("Requesting server list from bungee failed");
+			}
+			return true;
 		}
 
 		String server = arg3[0];
