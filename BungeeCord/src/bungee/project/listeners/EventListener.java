@@ -48,7 +48,8 @@ public class EventListener implements Listener {
 			return;
 		}
 
-		if ((!channel.equals("Monumenta.Bungee.Forward.TransferPlayerData"))
+		if ((!channel.startsWith("Monumenta.Bungee.Forward."))
+			&& (!channel.startsWith("Monumenta.Bungee.Broadcast."))
 			&& (!channel.equals("Monumenta.Bungee.SendPlayer"))
 			&& (!channel.equals("Monumenta.Bungee.Heartbeat"))) {
 			mMain.getLogger().warning("Got message from '" + sendingServer + "' with invalid channel '" + channel + "'");
@@ -73,16 +74,14 @@ public class EventListener implements Listener {
 			return;
 		}
 
-		switch(channel) {
-			case "Monumenta.Bungee.Forward.TransferPlayerData":
-				bungeeForward(channel, sendingServer, rcvStrings, rawData);
-				break;
-			case "Monumenta.Bungee.SendPlayer":
-				sendPlayer(sendingServer, rcvStrings);
-				break;
-			default:
-				mMain.getLogger().warning("Got message from '" + sendingServer + "' with unhandled channel '" + channel + "'");
-				break;
+		if (channel.startsWith("Monumenta.Bungee.Forward.")) {
+			bungeeForward(channel, sendingServer, rcvStrings, rawData);
+		} else if (channel.startsWith("Monumenta.Bungee.Broadcast.")) {
+			bungeeBroadcast(channel, sendingServer, rawData);
+		} else if (channel.equals("Monumenta.Bungee.SendPlayer")) {
+			sendPlayer(sendingServer, rcvStrings);
+		} else {
+			mMain.getLogger().warning("Got message from '" + sendingServer + "' with unhandled channel '" + channel + "'");
 		}
 	}
 
@@ -110,6 +109,20 @@ public class EventListener implements Listener {
 		// Finally forward the message
 		socketDest.writeJSON(channel, rawData);
 		mMain.getLogger().info("Forwarded message from '" + sendingServer + "' to '" + destination + "'");
+	}
+
+	// Sends a message to all connected servers (including the one that sent it)
+	private void bungeeBroadcast(String channel, String sendingServer, String rawData) {
+		mMain.getLogger().info("Broadcasting message from '" + sendingServer + "' on channel '" + channel + "'");
+		for (Map.Entry<String, SocketMessenger> entry : mSockets.entrySet()) {
+			SocketMessenger socketDest = entry.getValue();
+
+			if ((!socketDest.isHandshaked()) || (!socketDest.isConnectedAndOpened())) {
+				mMain.getLogger().warning("Cannot send broadcast message to '" + entry.getKey() + "' because it has not finished connecting");
+			} else {
+				socketDest.writeJSON(channel, rawData);
+			}
+		}
 	}
 
 	private void sendPlayer(String sendingServer, String[] rcvStrings) {
