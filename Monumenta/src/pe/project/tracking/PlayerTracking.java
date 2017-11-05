@@ -232,11 +232,6 @@ public class PlayerTracking implements EntityTracking {
 		if (InventoryUtils.testForItemWithLore(chest, "* Stylish *")) {
 			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 		}
-
-		if (ScoreboardUtils.getScoreboardValue(player, "halloweenPlague") > 0) {
-			ParticleUtils.playParticlesInWorld(world, Particle.SLIME, player.getLocation().add(0, 0.9, 0), 1, 0.2, 0.2, 0.2, 0);
-			ParticleUtils.playParticlesInWorld(world, Particle.BLOCK_CRACK, player.getLocation().add(0, 0.9, 0), 1, 0.2, 0.2, 0.2, 0);
-		}
 	}
 
 	void _removeSpecialItems(Player player) {
