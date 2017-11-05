@@ -7,6 +7,8 @@ import java.util.Map;
 import bungee.project.Main;
 import bungee.project.utils.PacketUtils;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.ChatColor;
 
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -51,6 +53,7 @@ public class EventListener implements Listener {
 		if ((!channel.startsWith("Monumenta.Bungee.Forward."))
 			&& (!channel.startsWith("Monumenta.Bungee.Broadcast."))
 			&& (!channel.equals("Monumenta.Bungee.SendPlayer"))
+			&& (!channel.equals("Monumenta.Bungee.GetServerList"))
 			&& (!channel.equals("Monumenta.Bungee.Heartbeat"))) {
 			mMain.getLogger().warning("Got message from '" + sendingServer + "' with invalid channel '" + channel + "'");
 			return;
@@ -80,6 +83,8 @@ public class EventListener implements Listener {
 			bungeeBroadcast(channel, sendingServer, rawData);
 		} else if (channel.equals("Monumenta.Bungee.SendPlayer")) {
 			sendPlayer(sendingServer, rcvStrings);
+		} else if (channel.equals("Monumenta.Bungee.GetServerList")) {
+			GetServerList(sendingServer, rcvStrings);
 		} else {
 			mMain.getLogger().warning("Got message from '" + sendingServer + "' with unhandled channel '" + channel + "'");
 		}
@@ -162,5 +167,37 @@ public class EventListener implements Listener {
 				mMain.getLogger().info("Transferred '" + player + "' to '" + destination + "'");
 			}
 		});
+	}
+
+	private void GetServerList(String sendingServer, String[] rcvStrings) {
+		if (rcvStrings.length != 2) {
+			mMain.getLogger().warning("Got GetServerList command with invalid parameter count " + Integer.toString(rcvStrings.length) + "; expected 2");
+			return;
+		}
+
+		// Message contains just player name and player's UUID
+		String player = rcvStrings[0];
+		UUID uuid = UUID.fromString(rcvStrings[1]);
+		ProxiedPlayer playerInfo = mMain.getProxy().getPlayer(uuid);
+
+		// Check arguments
+		if (player == null || uuid == null || player.length() <= 0 || playerInfo == null) {
+			mMain.getLogger().warning("Got GetServerList command from '" + sendingServer + "' with invalid arguments");
+			return;
+		}
+
+		// Print list of servers to player
+		TextComponent header = new TextComponent("Available Monumenta servers:");
+		header.setColor(ChatColor.GOLD);
+		playerInfo.sendMessage(header);
+		for (Map.Entry<String, SocketMessenger> entry : mSockets.entrySet()) {
+			SocketMessenger socketDest = entry.getValue();
+
+			if (socketDest.isHandshaked() && socketDest.isConnectedAndOpened()) {
+				TextComponent serverMessage = new TextComponent("  " + entry.getKey());
+				serverMessage.setColor(ChatColor.GOLD);
+				playerInfo.sendMessage(serverMessage);
+			}
+		}
 	}
 }
