@@ -7,8 +7,10 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
+
 import pe.project.Main;
 import pe.project.utils.NetworkUtils;
+import pe.project.utils.InventoryUtils;
 
 //	/transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
 
@@ -73,6 +75,9 @@ public class TransferServer implements CommandExecutor {
 		try {
 			if (sendPlayerStuff == true) {
 				player.sendMessage(ChatColor.GOLD + "Transferring you to " + server);
+
+				InventoryUtils.removeSpecialItems(player);
+
 				NetworkUtils.transferPlayerData(mMain, player, server);
 			} else {
 				player.sendMessage(ChatColor.GOLD + "Transferring you " + ChatColor.RED  + "without playerdata" + ChatColor.GOLD + " to " + server);
@@ -85,5 +90,4 @@ public class TransferServer implements CommandExecutor {
 
 		return true;
 	}
-
 }

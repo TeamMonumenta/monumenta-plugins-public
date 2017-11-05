@@ -11,13 +11,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -179,8 +176,6 @@ public class PlayerTracking implements EntityTracking {
 
 		mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
 
-		_removeSpecialItems(player);
-
 		Entity vehicle = player.getVehicle();
 		if (vehicle != null) {
 			if (vehicle instanceof Boat) {
@@ -232,40 +227,6 @@ public class PlayerTracking implements EntityTracking {
 		if (InventoryUtils.testForItemWithLore(chest, "* Stylish *")) {
 			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 		}
-	}
-
-	void _removeSpecialItems(Player player) {
-		//	Clear inventory
-		_removeSpecialItemsFromInventory(player.getInventory());
-
-		//	Clear Ender Chest
-		_removeSpecialItemsFromInventory(player.getEnderChest());
-	}
-
-	void _removeSpecialItemsFromInventory(Inventory inventory) {
-		for (ItemStack item : inventory.getContents()) {
-			if (item != null) {
-				if (_containsSpecialLore(item)) {
-					inventory.removeItem(item);
-				} else {
-					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
-						BlockStateMeta meta = (BlockStateMeta)item.getItemMeta();
-						if (meta.getBlockState() instanceof ShulkerBox) {
-							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							_removeSpecialItemsFromInventory(shulker.getInventory());
-
-							meta.setBlockState(shulker);
-							item.setItemMeta(meta);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	boolean _containsSpecialLore(ItemStack item) {
-		return	InventoryUtils.testForItemWithLore(item, "D4 Key") ||
-				InventoryUtils.testForItemWithLore(item, "D5 Key");
 	}
 
 	@Override
