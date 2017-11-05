@@ -2,6 +2,7 @@ package bungee.project.listeners;
 
 import java.util.UUID;
 import java.util.HashMap;
+import java.util.Map;
 
 import bungee.project.Main;
 import bungee.project.utils.PacketUtils;
@@ -91,6 +92,10 @@ public class EventListener implements Listener {
 
 		if (destination == null || (!mSockets.containsKey(destination))) {
 			mMain.getLogger().warning("Cannot forward message from '" + sendingServer + "' to unknown destination '" + destination + "'");
+			mMain.getLogger().warning("mSockets list contents:");
+			for (Map.Entry<String, SocketMessenger> entry : mSockets.entrySet()) {
+				mMain.getLogger().warning("  " + entry.getKey());
+			}
 			return;
 		}
 
