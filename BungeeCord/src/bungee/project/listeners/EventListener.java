@@ -1,7 +1,7 @@
 package bungee.project.listeners;
 
 import java.util.UUID;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 import bungee.project.Main;
@@ -26,16 +26,17 @@ public class EventListener implements Listener {
 	Main mMain;
 
 	// Collection of all connected sockets
-	private static HashMap<String, SocketMessenger> mSockets;
+	private static ConcurrentHashMap<String, SocketMessenger> mSockets;
 
 	public EventListener(Main main) {
 		mMain = main;
-		mSockets = new HashMap<>();
+		mSockets = new ConcurrentHashMap<>();
 	}
 
 	// Every time a bungee server shard connects, add its socket to the list
 	@EventHandler(priority = EventPriority.LOWEST)
     public void onHandshake(BungeeSocketHandshakeEvent e) {
+		mMain.getLogger().info("'" + e.getName() + "' connected");
         mSockets.put(e.getName(), e.getMessenger());
     }
 
@@ -43,7 +44,17 @@ public class EventListener implements Listener {
 	public void onMessage(BungeeSocketJSONEvent e) {
 		String channel = e.getChannel(); // The channel ("MyBukkitPlugin")
 		String sendingServer = e.getName(); // The Spigot server name
+		SocketMessenger sendingSocket = e.getMessenger();
 		String rawData = e.getData(); // The data the plugin sent you
+
+		// Re-register the sending server if it is not in the hashmap
+		// This shouldn't be necessary, but Socket4MC seems to not call onHandshake
+		// when servers connect before bungee is started
+		if (sendingServer != null && sendingSocket != null && (!mSockets.containsKey(sendingServer))) {
+			mMain.getLogger().info("Adding '" + sendingServer + "' to list of connected servers");
+			mSockets.put(sendingServer, sendingSocket);
+		}
+
 		// Nothing to do with no payload
 		if (rawData == null || rawData.length() <= 0) {
 			mMain.getLogger().warning("Got message from '" + sendingServer + "' with empty data");
