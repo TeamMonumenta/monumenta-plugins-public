@@ -3,6 +3,7 @@ package pe.project.listeners;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketHandshakeEvent;
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketJSONEvent;
@@ -22,14 +23,31 @@ public class SocketListener implements Listener {
 	public void onConnect(BukkitSocketHandshakeEvent e){
 		mMain.mSocketClient = e.getClient();
 
-		try {
-			// Send a simple hello message to bungee
-			PacketUtils.SendPacket(mMain, new HeartbeatPacket());
-		} catch (Exception ex) {
-			mMain.getLogger().severe("Caught exception sending HeartbeatPacket: " + ex);
-			ex.printStackTrace();
-			return;
-		}
+		/* This deferred task helps work around a bug in Socket4MC/SocketAPI
+		 * If bungee restarts when the servers are already up, the sockets connect
+		 * before Monumenta is loaded, so the onHandshake() call doesn't fire, which means
+		 * the Monumenta Bungee plugin doesn't know these servers are connected.
+		 * They connect just fine though.
+		 *
+		 * So this deferred task pokes bungee a bit later to remind it this server is connected
+		 */
+		new BukkitRunnable() {
+			Integer tick = 0;
+			public void run() {
+				if (++tick == 100) {
+					try {
+						mMain.getLogger().info("Sending heartbeat message to bungee");
+						// Send a simple hello message to bungee
+						PacketUtils.SendPacket(mMain, new HeartbeatPacket());
+					} catch (Exception ex) {
+						mMain.getLogger().severe("Caught exception sending HeartbeatPacket: " + ex);
+						ex.printStackTrace();
+					}
+
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mMain, 0, 1);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
