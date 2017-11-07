@@ -45,6 +45,7 @@ public class PlayerTracking implements EntityTracking {
 		Player player = (Player)entity;
 		try {
 			PlayerData.loadPlayerData(mPlugin, player);
+			PlayerData.removePlayerDataFile(mPlugin, player);
 		} catch (Exception e) {
 			mPlugin.getLogger().severe("Failed to load playerdata for player '" + player.getName() + "'");
 			e.printStackTrace();
