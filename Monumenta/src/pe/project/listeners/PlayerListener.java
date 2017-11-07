@@ -202,18 +202,17 @@ public class PlayerListener implements Listener {
 							}
 						}
 					}
+				} else if (ItemUtils.isBoat(item.getType()) && player.getGameMode() == GameMode.ADVENTURE) {
+					/* Prevent placing boats in adventure mode */
+					event.setCancelled(true);
+				} else if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+					/* Prevent accidentally placing lore items (plants, etc.) */
+					event.setCancelled(true);
 				}
 			}
 
 			if (block != null) {
 				if (player.getGameMode() != GameMode.CREATIVE && block.getType() == Material.ANVIL) {
-					event.setCancelled(true);
-				}
-			}
-
-			if (player.getGameMode() == GameMode.ADVENTURE) {
-				ItemStack heldItem = player.getInventory().getItemInMainHand();
-				if (ItemUtils.isBoat(heldItem.getType())) {
 					event.setCancelled(true);
 				}
 			}
