@@ -10,7 +10,6 @@ import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -18,7 +17,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Vehicle;
@@ -27,7 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -61,17 +59,17 @@ import pe.project.utils.PotionUtils.PotionInfo;
 public class EntityListener implements Listener {
 	Main mPlugin;
 	World mWorld;
-	
+
 	public EntityListener(Main plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
 	}
-	
+
 	//	An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
-		
+
 		//	If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
 			Entity damager = event.getDamager();
@@ -94,7 +92,7 @@ public class EntityListener implements Listener {
 		//	Else if the entity getting hurt is a LivingEntity.
 		else if (damagee instanceof LivingEntity) {
 			Entity damager = event.getDamager();
-			
+
 			//	Hit by player.
 			if (damager instanceof Player) {
 				if (damagee instanceof Villager) {
@@ -103,7 +101,7 @@ public class EntityListener implements Listener {
 					//	Make sure to not trigger class abilities off Throrns.
 					if (event.getCause() != DamageCause.THORNS) {
 						Player player = (Player)damager;
-						
+
 						BaseClass _class = mPlugin.getClass(player);
 						_class.ModifyDamage(player, _class, event);
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
@@ -115,7 +113,7 @@ public class EntityListener implements Listener {
 				Arrow arrow = (Arrow)damager;
 				if (arrow.getShooter() instanceof Player) {
 					Player player = (Player)arrow.getShooter();
-					
+
 					BaseClass _class = mPlugin.getClass(player);
 					_class.ModifyDamage(player, _class, event);
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
@@ -128,7 +126,7 @@ public class EntityListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	//	Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageEvent(EntityDamageEvent event) {
@@ -140,14 +138,14 @@ public class EntityListener implements Listener {
 			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {
 				//	If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
 				Location playerLoc = player.getLocation();
-				
+
 				for (double y = -0.5; y <= 0.5; y += 1) {
 					for (double x = -0.5; x <= 0.5; x += 1) {
 						for (double z = -0.5; z <= 0.5; z += 1) {
 							final int ny = (int)Math.floor(playerLoc.getY() + y * 0.1f + (float)player.getEyeHeight());
 							final int nx = (int)Math.floor(playerLoc.getX() + x * 0.48f);
 							final int nz = (int)Math.floor(playerLoc.getZ() + z * 0.48f);
-							
+
 							Material type = player.getWorld().getBlockAt(new Location(world, nx, ny, nz)).getType();
 							if (type == Material.BEDROCK) {
 								//	Remove their vehicle if they had one.
@@ -156,10 +154,10 @@ public class EntityListener implements Listener {
 									vehicle.eject();
 									vehicle.remove();
 								}
-								
+
 								//	Also Give the player a strike.
 								PlayerUtils.awardStrike(player, "being somewhere you probably shouldn't have been.");
-				             	
+
 								return;
 							}
 						}
@@ -168,7 +166,7 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	Hanging Entity hurt by another entity.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void HangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
@@ -184,7 +182,7 @@ public class EntityListener implements Listener {
 		//	If hurt by an arrow from a player in adventure mode.
 		else if (damager instanceof Arrow || damager instanceof TippedArrow) {
 			Arrow arrow = (Arrow)damager;
-			
+
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
@@ -194,23 +192,21 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof Creeper) {
-			mPlugin.mTrackingManager.mCreepers.addEntity(entity);
-		}
+		mPlugin.mTrackingManager.addEntity(entity);
 	}
-	
+
 	//	Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
 		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			if (arrow.getShooter() instanceof Player) {
-				Player player = (Player)arrow.getShooter();		
+				Player player = (Player)arrow.getShooter();
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
 			}
 		} else if(event.getEntityType() == EntityType.SPLASH_POTION) {
@@ -221,7 +217,7 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	A players thrown potion splashed.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PotionSplashEvent(PotionSplashEvent event) {
@@ -230,17 +226,17 @@ public class EntityListener implements Listener {
 			ProjectileSource source = potion.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
-				
+
 				if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
 					event.setCancelled(true);
 					return;
 				}
-				
+
 				boolean cancel = !mPlugin.getClass(player).PlayerSplashPotionEvent(player, event.getAffectedEntities(), potion);
 				if (cancel) {
 					event.setCancelled(true);
 				}
-				
+
 				Iterator<LivingEntity> iter = event.getAffectedEntities().iterator();
 				while (iter.hasNext()) {
 					LivingEntity entity = iter.next();
@@ -254,34 +250,34 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		AreaEffectCloud cloud = event.getEntity();
-		ProjectileSource source = cloud.getSource();	
+		ProjectileSource source = cloud.getSource();
 		if (source instanceof Player) {
 			Player player = (Player)source;
-			
+
 			if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
 				return;
 			}
-			
+
 			List<LivingEntity> entities = event.getAffectedEntities();
-			
+
 			mPlugin.getClass(player).AreaEffectCloudApplyEvent(entities, player);
 
 			PotionInfo data = PotionUtils.getPotionInfo(cloud.getBasePotionData());
 			List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
-			
+
 			for (LivingEntity entity : entities) {
 				if (entity instanceof Player) {
 					Player p = (Player)entity;
-					
+
 					if (data != null) {
 						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, data);
 					}
-					
+
 					if (effects != null) {
 						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, effects);
 					}
@@ -289,7 +285,7 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	The player has died.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void EntityDeathEvent(EntityDeathEvent event) {
@@ -302,20 +298,17 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
-	//	Explosion Prime Event.
+
+	//	Entity Explode Event
+	//	Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void ExplosionPrimeEvent(ExplosionPrimeEvent event) {
-		Entity entity = event.getEntity();
-		if (entity instanceof TNTPrimed) {
-			SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(new Point(entity.getLocation()));
-			if (safeZone != SafeZones.None) {
-				event.setCancelled(true);
-				entity.remove();
-			}
+	public void EntityExplodeEvent(EntityExplodeEvent event) {
+		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(new Point(event.getLocation()));
+		if (safeZone != SafeZones.None) {
+			event.setCancelled(true);
 		}
 	}
-	
+
 	//	Vehicle created.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void VehicleCreateEvent(VehicleCreateEvent event) {
@@ -324,12 +317,12 @@ public class EntityListener implements Listener {
 			mPlugin.mTrackingManager.addEntity(vehicle);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void VehicleEntityCollisionEvent(VehicleEntityCollisionEvent event) {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
-		
+
 		if (entity.getVehicle() != vehicle) {
 			if (entity instanceof Player) {
 				Player player = (Player)entity;
@@ -339,28 +332,28 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	//	An Arrow hit something.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileHitEvent(ProjectileHitEvent event) {
 		EntityType type = event.getEntityType();
-		
+
 		if (type == EntityType.TIPPED_ARROW) {
 			Entity entity = event.getHitEntity();
 			if (entity != null) {
 				if (entity instanceof Player) {
 					Player player = (Player)entity;
-					
+
 					TippedArrow arrow = (TippedArrow)event.getEntity();
-					
+
 					if (player.isBlocking()) {
 						Vector to = player.getLocation().toVector();
 						Vector from = arrow.getLocation().toVector();
-						
+
 						if (to.subtract(from).dot(player.getLocation().getDirection()) < 0) {
 							PotionData data = new PotionData(PotionType.AWKWARD);
 							arrow.setBasePotionData(data);
-							
+
 							if (arrow.hasCustomEffects()) {
 								Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
 								while (effectIter.hasNext()) {
@@ -370,27 +363,27 @@ public class EntityListener implements Listener {
 							}
 						}
 					}
-					
+
 					PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData());
 					List<PotionEffect> effects = arrow.getCustomEffects();
 
 					if (info != null) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 					}
-					
+
 					if (effects != null) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 					}
 				}
 			}
 		}
-		
+
 		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
-				
+
 				mPlugin.getClass(player).ProjectileHitEvent(player, arrow);
 				mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			}

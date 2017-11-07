@@ -14,28 +14,28 @@ import pe.project.Main;
 
 public class TrackingManager {
 	Main mPlugin = null;
-	
+
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
 	public BoatTracking mBoats;
 	public SilverfishTracking mSilverfish;
 	public FishingHookTracking mFishingHook;
-	
+
 	public TrackingManager(Main main, World world) {
 		mPlugin = main;
-		
+
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();
 		mBoats = new BoatTracking();
 		mSilverfish = new SilverfishTracking();
 		mFishingHook = new FishingHookTracking();
-		
+
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
 			addEntity(entity);
 		}
 	}
-	
+
 	public void unloadTrackedEntities() {
 		mPlayers.unloadTrackedEntities();
 		mCreepers.unloadTrackedEntities();
@@ -43,7 +43,7 @@ public class TrackingManager {
 		mSilverfish.unloadTrackedEntities();
 		mFishingHook.unloadTrackedEntities();
 	}
-	
+
 	public void addEntity(Entity entity) {
 		if (Constants.TRACKING_MANAGER_ENABLED) {
 			if (entity instanceof Player) {
@@ -57,7 +57,7 @@ public class TrackingManager {
 			}
 		}
 	}
-	
+
 	public void removeEntity(Entity entity) {
 		if (entity instanceof Player) {
 			mPlayers.removeEntity(entity);
@@ -69,7 +69,7 @@ public class TrackingManager {
 			mSilverfish.removeEntity(entity);
 		}
 	}
-	
+
 	public void update(World world, int ticks) {
 		mPlayers.update(world, ticks);
 		mCreepers.update(world, ticks);
