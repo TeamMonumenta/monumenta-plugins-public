@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -23,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -69,6 +73,17 @@ public class PlayerListener implements Listener {
 	Main mPlugin = null;
 	World mWorld = null;
 	Random mRandom = null;
+
+	/*
+	 * List of materials that are allowed to be placed by
+	 * players in survival even if they have lore text
+	 */
+	private static final Material[] ALLOW_LORE_MATS_VALS = new Material[] {Material.CHEST,
+	                                                                       Material.FROSTED_ICE,
+																		   Material.SKULL,
+																		   Material.SKULL_ITEM};
+	private static final Set<Material> ALLOW_LORE_MATS = new HashSet<>(Arrays.asList(ALLOW_LORE_MATS_VALS));
+
 
 	public PlayerListener(Main plugin, World world, Random random) {
 		mPlugin = plugin;
@@ -205,9 +220,6 @@ public class PlayerListener implements Listener {
 				} else if (ItemUtils.isBoat(item.getType()) && player.getGameMode() == GameMode.ADVENTURE) {
 					/* Prevent placing boats in adventure mode */
 					event.setCancelled(true);
-				} else if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
-					/* Prevent accidentally placing lore items (plants, etc.) */
-					event.setCancelled(true);
 				}
 			}
 
@@ -223,6 +235,19 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void BlockPlaceEvent(BlockPlaceEvent event) {
+		ItemStack item = event.getItemInHand();
+
+		if (item.hasItemMeta() && item.getItemMeta().hasLore()
+			&& event.getPlayer().getGameMode() != GameMode.CREATIVE
+			&& !(ALLOW_LORE_MATS.contains(item.getType()))) {
+			/* Prevent accidentally placing most lore items (plants, etc.) */
+			event.setCancelled(true);
+		}
+
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
