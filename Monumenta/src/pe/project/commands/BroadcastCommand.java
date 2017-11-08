@@ -50,27 +50,34 @@ public class BroadcastCommand implements CommandExecutor {
 				return false;
 		}
 
+		String playerName = null;
+		if (sender instanceof Player) {
+			playerName = sender.getName();
+		} else if (sender instanceof ProxiedCommandSender) {
+			CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
+			if (callee instanceof Player) {
+				playerName = callee.getName();
+			}
+		}
+
 		String commandStr = "";
 		for (String str: arg3) {
 			if (commandStr != "") {
 				commandStr += " ";
 			}
-			// If possible, replace @s with player's name
-			if (str.equals("@s")) {
-				if (sender instanceof Player) {
-					str = sender.getName();
-				} else if (sender instanceof ProxiedCommandSender) {
-					CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
-					if (callee instanceof Player) {
-						str = callee.getName();
-					}
-				}
 
-				if (str.equals("@s")) {
+			// If possible, replace @s with player's name
+			if (str.contains("@s")) {
+				if (playerName == null) {
 					sender.sendMessage(ChatColor.RED + "Failed to resolve @s argument!");
-					return false;
+				} else {
+					str = str.replace("@s", playerName);
 				}
 			}
+
+			// Replace the special @A token with @a
+			// (so Minecraft isn't allowed to resolve it preemptively)
+			str = str.replace("@A", "@a");
 
 			commandStr += str;
 		}
