@@ -4,10 +4,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -69,22 +71,69 @@ public class ScoreboardUtils {
 				scoreboardArray.add(scoreboardInfo);
 			}
 		}
-
 		returnData.add("scores", scoreboardArray);
 
 		// Tags
 		JsonArray tagArray = new JsonArray();
-		Set<String> playerTags = player.getScoreboardTags();
-		for (String tag : playerTags) {
+		for (String tag : player.getScoreboardTags()) {
 			tagArray.add(tag);
 		}
-
 		returnData.add("tags", tagArray);
+
+
+		/*
+		 * "team" : [
+		 *  "name" : "theName",
+		 *  "displayName" : "theDisplayName",
+		 *  "prefix" : "thePrefix",
+		 *  "suffix" : "theSuffix",
+		 *  "color" : "theColor",
+		 *  "members" : [
+		 *   "member1",
+		 *   "member2",
+		 *  ]
+		 * ]
+		 */
+		Team team = scoreboard.getEntryTeam(player.getName());
+		if (team != null) {
+			JsonObject teamObject = new JsonObject();
+
+			String name = team.getName();
+			if (name == null) name = "";
+			teamObject.addProperty("name", name);
+
+			String displayName = team.getDisplayName();
+			if (displayName == null) displayName = "";
+			teamObject.addProperty("displayName", displayName);
+
+			String prefix = team.getPrefix();
+			if (prefix == null) prefix = "";
+			teamObject.addProperty("prefix", prefix);
+
+			String suffix = team.getSuffix();
+			if (suffix == null) suffix = "";
+			teamObject.addProperty("suffix", suffix);
+
+			ChatColor color = team.getColor();
+			if (color == null) color = ChatColor.WHITE;
+			teamObject.addProperty("color", color.name());
+
+			JsonArray teamMembers = new JsonArray();
+			for (String entry : team.getEntries()) {
+				teamMembers.add(entry);
+			}
+			teamObject.add("members", teamMembers);
+
+			// Add this whole collection to the player data
+			returnData.add("team", teamObject);
+		}
 
 		return returnData;
 	}
 
 	public static void loadFromJsonObject(Player player, JsonObject object) throws Exception {
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+
 		// Load scoreboards first
 		Iterator<JsonElement> scoreIter = object.get("scores").getAsJsonArray().iterator();
 		while (scoreIter.hasNext()) {
@@ -93,7 +142,6 @@ public class ScoreboardUtils {
 			String name = scoreboardObject.get("name").getAsString();
 			int scoreVal = scoreboardObject.get("score").getAsInt();
 
-			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 			Objective objective = scoreboard.getObjective(name);
 			if (objective == null) {
 				objective = scoreboard.registerNewObjective(name, "dummy");
@@ -110,6 +158,63 @@ public class ScoreboardUtils {
 		Iterator<JsonElement> tagIter = object.get("tags").getAsJsonArray().iterator();
 		while (tagIter.hasNext()) {
 			player.addScoreboardTag(tagIter.next().getAsString());
+		}
+
+		Team currentTeam = scoreboard.getEntryTeam(player.getName());
+
+		if (object.has("team")) {
+			JsonObject teamObject = object.get("team").getAsJsonObject();
+
+			String name = teamObject.get("name").getAsString();
+			String displayName = teamObject.get("displayName").getAsString();
+			String prefix = teamObject.get("prefix").getAsString();
+			String suffix = teamObject.get("suffix").getAsString();
+			String color = teamObject.get("color").getAsString();
+
+			Team newTeam = null;
+			if (currentTeam != null) {
+				if (currentTeam.getName().equals(name)) {
+					// Already on this team
+					newTeam = currentTeam;
+				} else {
+					// Joined to a different team - need to leave it
+					currentTeam.removeEntry(player.getName());
+
+					// If the team is empty, remove it
+					if (currentTeam.getSize() <= 0) {
+						currentTeam.unregister();
+					}
+				}
+			}
+
+			// If newTeam still null, need to join to it
+			if (newTeam == null) {
+				// Look up the right team
+				newTeam = scoreboard.getTeam(name);
+
+				// If newTeam *still* null, this team doesn't exist
+				if (newTeam == null) {
+					newTeam = scoreboard.registerNewTeam(name);
+				}
+
+				// Join player to the team
+				newTeam.addEntry(player.getName());
+			}
+
+			newTeam.setDisplayName(displayName);
+			newTeam.setPrefix(prefix);
+			newTeam.setSuffix(suffix);
+			newTeam.setColor(ChatColor.valueOf(color));
+
+			// Note - team member list not used here
+		} else if (currentTeam != null){
+			// If no team info was sent but player on a team remove player from team
+			currentTeam.removeEntry(player.getName());
+
+			// If the team is empty, remove it
+			if (currentTeam.getSize() <= 0) {
+				currentTeam.unregister();
+			}
 		}
 	}
 }
