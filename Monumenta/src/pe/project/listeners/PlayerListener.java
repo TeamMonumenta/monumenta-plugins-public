@@ -80,6 +80,7 @@ public class PlayerListener implements Listener {
 	 */
 	private static final Material[] ALLOW_LORE_MATS_VALS = new Material[] {Material.CHEST,
 	                                                                       Material.FROSTED_ICE,
+	                                                                       Material.WOOL,
 																		   Material.SKULL,
 																		   Material.SKULL_ITEM};
 	private static final Set<Material> ALLOW_LORE_MATS = new HashSet<>(Arrays.asList(ALLOW_LORE_MATS_VALS));
