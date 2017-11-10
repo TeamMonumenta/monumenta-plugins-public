@@ -19,6 +19,11 @@ public class BroadcastCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
+		if (mMain.mServerProporties.getBroadcastCommandEnabled() == false) {
+			sender.sendMessage(ChatColor.RED + "Use of this command is restricted on this server");
+			return false;
+		}
+
 		if (arg3.length == 0) {
 			sender.sendMessage(ChatColor.RED + "Invalid number of parameters!");
 			return false;

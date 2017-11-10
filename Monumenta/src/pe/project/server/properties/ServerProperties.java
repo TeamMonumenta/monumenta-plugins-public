@@ -17,6 +17,7 @@ public class ServerProperties {
 	private boolean mJoinMessagesEnabled = false;
 	private boolean mTransferDataEnabled = true;
 	private boolean mIsTownWorld = false;
+	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
 
@@ -34,6 +35,10 @@ public class ServerProperties {
 
 	public boolean getIsTownWorld() {
 		return mIsTownWorld;
+	}
+
+	public boolean getBroadcastCommandEnabled() {
+		return mBroadcastCommandEnabled;
 	}
 
 	public int getPlotSurvivalMinHeight() {
@@ -86,6 +91,12 @@ public class ServerProperties {
 					if (isTownWorld != null) {
 						mIsTownWorld = isTownWorld.getAsBoolean();
 						main.getLogger().info("Properties: isTownWorld = " + mIsTownWorld);
+					}
+
+					JsonElement BroadcastCommandEnabled = object.get("broadcastCommandEnabled");
+					if (BroadcastCommandEnabled != null) {
+						mBroadcastCommandEnabled = BroadcastCommandEnabled.getAsBoolean();
+						main.getLogger().info("Properties: BroadcastCommandEnabled = " + mBroadcastCommandEnabled);
 					}
 
 					JsonElement plotSurvivalMinHeight = object.get("plotSurvivalMinHeight");

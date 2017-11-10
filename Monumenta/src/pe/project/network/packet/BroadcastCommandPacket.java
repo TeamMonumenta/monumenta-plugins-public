@@ -31,12 +31,14 @@ public class BroadcastCommandPacket implements Packet {
 	}
 
 	public static void handlePacket(Main main, String data) throws Exception {
-		String[] rcvStrings = PacketUtils.decodeStrings(data);
-		if (rcvStrings == null || rcvStrings.length != 1) {
-			throw new Exception("Received string data is null or invalid length");
-		}
+		if (main.mServerProporties.getBroadcastCommandEnabled() == true) {
+			String[] rcvStrings = PacketUtils.decodeStrings(data);
+			if (rcvStrings == null || rcvStrings.length != 1) {
+				throw new Exception("Received string data is null or invalid length");
+			}
 
-		main.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]);
+			main.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]);
+		}
 	}
 }
