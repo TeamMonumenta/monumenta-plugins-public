@@ -14,7 +14,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
@@ -341,8 +340,8 @@ public class ScoutClass extends BaseClass {
 						
 						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS);
 						for(Entity e : entities) {
-							if(e instanceof Monster) {
-								Monster mob = (Monster)e;
+							if(EntityUtils.isHostileMob(e)) {
+								LivingEntity mob = (LivingEntity)e;
 								
 								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 								if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
@@ -374,8 +373,8 @@ public class ScoutClass extends BaseClass {
 		}
 		
 		Entity entity = event.getEntity();
-		if (entity instanceof Monster) {
-			Monster mob = (Monster)entity;
+		if (EntityUtils.isHostileMob(entity)) {
+			LivingEntity mob = (LivingEntity)entity;
 			
 			int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
 			if (eagleEye > 0) {

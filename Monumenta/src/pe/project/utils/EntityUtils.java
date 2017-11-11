@@ -18,8 +18,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.TippedArrow;
+import org.bukkit.entity.Wolf;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
@@ -37,6 +40,18 @@ public class EntityUtils {
 	public static boolean isEliteBoss(LivingEntity mob) {
 		Set<String> tags = mob.getScoreboardTags();
 		return tags.contains("Elite") || tags.contains("Boss");
+	}
+	
+	public static boolean isHostileMob(Entity entity) {
+		if (entity instanceof Monster) {
+			return true;
+		} else if (entity instanceof Wolf) {
+			return ((Wolf)entity).isAngry();
+		} else if (entity instanceof Rabbit) {
+			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
+		}
+		
+		return false;
 	}
 	
 	public static LivingEntity GetEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {

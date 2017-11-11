@@ -12,7 +12,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -24,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import pe.project.Main;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
@@ -103,7 +103,7 @@ public class WarriorClass extends BaseClass {
 						List<Entity> entities = player.getNearbyEntities(COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS);
 						for(int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
-							if(e instanceof Monster) {
+							if(EntityUtils.isHostileMob(e)) {
 								((LivingEntity)e).damage(csDamage, player);
 							}
 						}
@@ -128,7 +128,7 @@ public class WarriorClass extends BaseClass {
 						List<Entity> entities = player.getNearbyEntities(OBLITERATION_RADIUS, OBLITERATION_RADIUS, OBLITERATION_RADIUS);
 						for(int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
-							if (e instanceof Monster) {
+							if (EntityUtils.isHostileMob(e)) {
 								LivingEntity mob = (LivingEntity)e;
 								
 								//	Test against Elite/Boss tags.
@@ -177,7 +177,7 @@ public class WarriorClass extends BaseClass {
 					entities.add(damagee);
 					for(int i = 0; i < entities.size(); i++) {
 						Entity e = entities.get(i);
-						if(e instanceof Monster) {
+						if(EntityUtils.isHostileMob(e)) {
 							LivingEntity mob = (LivingEntity)e;
 							
 							Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
