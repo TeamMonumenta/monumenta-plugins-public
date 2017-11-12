@@ -1,13 +1,13 @@
 package pe.project.listeners;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -30,14 +30,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -46,7 +47,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -57,17 +57,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Main;
-import pe.project.locations.poi.PointOfInterest;
+import pe.project.items.QuestingCompass;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
 import pe.project.server.reset.RegionReset;
+import pe.project.utils.CommandUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
-import pe.project.utils.StringUtils;
-import pe.project.utils.CommandUtils;
 
 public class PlayerListener implements Listener {
 	Main mPlugin = null;
@@ -100,6 +99,7 @@ public class PlayerListener implements Listener {
 
 		new BukkitRunnable() {
 			Integer tick = 0;
+			@Override
 			public void run() {
 				if (++tick == 20) {
 					Player player = event.getPlayer();
@@ -154,80 +154,14 @@ public class PlayerListener implements Listener {
 
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			//	Quest Compass.
-			if (item != null && item.getType() == Material.COMPASS) {
-				//	Show currently active quest.
-				mPlugin.mQuestManager.showCurrentQuest(player);
+			if (!_handleLeftClickInteract(player, action, item, block)) {
+				event.setCancelled(true);
 			}
 		}
 		//	Right Click.
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			//	Quest Compass.
-			if (item != null) {
-				if (item.getType() == Material.MONSTER_EGG && action == Action.RIGHT_CLICK_BLOCK) {
-					if (block.getType() == Material.MOB_SPAWNER) {
-						event.setCancelled(true);
-						return;
-					}
-				} else if (item.getType() == Material.COMPASS) {
-					//	Show current POI respawn timer.
-					if (player.isSneaking()) {
-						List<PointOfInterest> pois = mPlugin.mPOIManager.getAllNearbyPOI(new Point(player.getLocation()));
-						if (pois != null && pois.size() > 0) {
-							for (PointOfInterest poi : pois) {
-								int ticks = poi.getTimer();
-
-								String message;
-
-								//	Seems there's plenty of time before we respawn.
-								if (ticks >= 20) {
-									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks);
-								}
-								//	Because we need to handle the case where the player clicks within sub one second and we still
-								//	Want to be able to tell them the POI is about to respawn while still having the [within] tag.
-								else if (ticks > 0) {
-									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is nearly ready to respawn!";
-								}
-								//	We're nearby, but not within the POI
-								else {
-									message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is ready to respawn!";
-								}
-
-								if (poi.withinPOI(new Point(player.getLocation()))) {
-									message += " [Within]";
-								}
-
-								player.sendMessage(message);
-							}
-						} else {
-							player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");
-						}
-					}
-					//	Cycle active Quest.
-					else {
-						mPlugin.mQuestManager.cycleQuestTracker(player);
-					}
-				} else if (item.getType() == Material.FISHING_ROD) {
-					if (action == Action.RIGHT_CLICK_BLOCK) {
-						Material blockType = block.getType();
-
-						//	If this is an interactible block it means they didn't really want to be fishing! :D
-						if (ItemUtils.isInteractable(blockType)) {
-							if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
-								mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
-							}
-						}
-					}
-				} else if (ItemUtils.isBoat(item.getType()) && player.getGameMode() == GameMode.ADVENTURE) {
-					/* Prevent placing boats in adventure mode */
-					event.setCancelled(true);
-				}
-			}
-
-			if (block != null) {
-				if (player.getGameMode() != GameMode.CREATIVE && block.getType() == Material.ANVIL) {
-					event.setCancelled(true);
-				}
+			if (!_handleRightClickInteract(player, action, item, block)) {
+				event.setCancelled(true);
 			}
 		} else if (event.getAction() == Action.PHYSICAL) {
 			if (block != null) {
@@ -539,6 +473,7 @@ public class PlayerListener implements Listener {
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
 						Integer tick = 0;
+						@Override
 						public void run() {
 							GameMode mode;
 							final int BED_TELE_TIME = 20 * 3;
@@ -577,5 +512,98 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+	}
+
+	//	This function returns false if we don't want to handle this action.
+	private boolean _handleRightClickInteract(Player player, Action action, ItemStack item, Block block) {
+		GameMode gamemode = player.getGameMode();
+		Material itemType = (item != null) ? item.getType() : Material.AIR;
+		Material blockType = (block != null) ? block.getType() : Material.AIR;
+
+		//	Handle Item Interactions.
+		if (itemType != Material.AIR) {
+			switch (itemType) {
+			case MONSTER_EGG: {
+				return (action == Action.RIGHT_CLICK_AIR) ||
+						(action == Action.RIGHT_CLICK_BLOCK && blockType != Material.MOB_SPAWNER);
+			}
+			case COMPASS: {
+				QuestingCompass.handleInteraction(mPlugin, player, action);
+				break;
+			}
+			case FISHING_ROD: {
+				if (action == Action.RIGHT_CLICK_BLOCK) {
+					//	If this is an interactable block it means they didn't really want to be fishing! :D
+					if (ItemUtils.isInteractable(blockType)) {
+						if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
+							mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
+						}
+					}
+				}
+				break;
+			}
+			case BOAT:
+			case BOAT_ACACIA:
+			case BOAT_BIRCH:
+			case BOAT_DARK_OAK:
+			case BOAT_JUNGLE:
+			case BOAT_SPRUCE: {
+				return (action == Action.RIGHT_CLICK_AIR) ||
+						(action == Action.RIGHT_CLICK_BLOCK && gamemode != GameMode.ADVENTURE);	//	Prevent placing boars in adventure mode.
+			}
+			case BUCKET:
+			case WATER_BUCKET:
+			case LAVA_BUCKET: {
+				return (action == Action.RIGHT_CLICK_AIR) ||
+						(action == Action.RIGHT_CLICK_BLOCK && gamemode == GameMode.CREATIVE);
+			}
+
+			default:
+				break;
+			}
+		}
+
+		//	Handle Block Interactions
+		if (blockType != Material.AIR) {
+			switch (blockType) {
+			case ANVIL: {
+				return (gamemode == GameMode.CREATIVE);
+			}
+
+			default:
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean _handleLeftClickInteract(Player player, Action action, ItemStack item, Block block) {
+		//GameMode gamemode = player.getGameMode();
+		Material itemType = (item != null) ? item.getType() : Material.AIR;
+		Material blockType = (block != null) ? block.getType() : Material.AIR;
+
+		//	Handle Item Interactions
+		if (itemType != Material.AIR) {
+			switch (itemType) {
+			case COMPASS: {
+				QuestingCompass.handleInteraction(mPlugin, player, action);
+			}
+
+			default:
+				break;
+			}
+		}
+
+		//	Handle Block Interactions
+		if (blockType != Material.AIR) {
+			switch (blockType) {
+
+			default:
+				break;
+			}
+		}
+
+		return true;
 	}
 }

@@ -65,34 +65,34 @@ public class ItemUtils {
             Material.WOOD_DOOR,
             Material.WORKBENCH
 	);
-	
+
 	public static List<Material> armors = Arrays.asList(
             Material.LEATHER_BOOTS,
             Material.LEATHER_CHESTPLATE,
             Material.LEATHER_HELMET,
             Material.LEATHER_LEGGINGS,
-            
+
             Material.CHAINMAIL_BOOTS,
             Material.CHAINMAIL_CHESTPLATE,
             Material.CHAINMAIL_HELMET,
             Material.CHAINMAIL_LEGGINGS,
-            
+
             Material.GOLD_BOOTS,
             Material.GOLD_CHESTPLATE,
             Material.GOLD_HELMET,
             Material.GOLD_LEGGINGS,
-            
+
             Material.IRON_BOOTS,
             Material.IRON_CHESTPLATE,
             Material.IRON_HELMET,
             Material.IRON_LEGGINGS,
-            
+
             Material.DIAMOND_BOOTS,
             Material.DIAMOND_CHESTPLATE,
             Material.DIAMOND_HELMET,
             Material.DIAMOND_LEGGINGS
 	);
-	
+
 	public static List<Material> doors = Arrays.asList(
 			Material.ACACIA_DOOR,
 			Material.BIRCH_DOOR,
@@ -102,85 +102,80 @@ public class ItemUtils {
 			Material.SPRUCE_DOOR,
 			Material.WOOD_DOOR
 	);
-	
+
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
-		
+
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();
 		meta.setBasePotionData(data);
 		stack.setItemMeta(meta);
-		
+
 		return stack;
 	}
-	
+
 	public static ItemStack createStackedPotions(PotionEffectType type, int amount, int duration, int amplifier, String name) {
 		ItemStack stack = new ItemStack(Material.SPLASH_POTION, amount);
-		
+
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();
 
 		meta.setDisplayName("§r" + name);
 		meta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
 		meta.setColor(type.getColor());
 		stack.setItemMeta(meta);
-		
+
 		return stack;
 	}
-	
+
 	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
 		meta.addCustomEffect(new PotionEffect(info.type, info.duration, info.amplifier, false, true), false);
 		potion.setItemMeta(meta);
 	}
-	
+
 	public static void setPotionMeta(ItemStack potion, String name, Color color) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
 		meta.setDisplayName("§r" + name);
 		meta.setColor(color);
 		potion.setItemMeta(meta);
 	}
-	
+
 	public static PotionMeta getPotionMeta(ItemStack potion) {
 		Material type = potion.getType();
 		if (type == Material.POTION || type == Material.SPLASH_POTION || type == Material.LINGERING_POTION) {
 			PotionMeta meta = (PotionMeta)potion.getItemMeta();
 			return meta;
 		}
-		
+
 		return null;
 	}
-	
+
 	public static boolean isInteractable(Material mat) {
 		for (Material material : interactables) {
 			if (material.equals(mat)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	public static boolean isBoat(Material item) {
-		return item == Material.BOAT || item == Material.BOAT_ACACIA || item == Material.BOAT_BIRCH ||
-				item == Material.BOAT_DARK_OAK || item == Material.BOAT_JUNGLE || item == Material.BOAT_SPRUCE;
-	}
-	
+
 	public static boolean isArmorItem(Material item) {
 		for (Material material : armors) {
 			if (material.equals(item)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public static boolean isDoor(Material item) {
 		for (Material material : doors) {
 			if (material.equals(item)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }
