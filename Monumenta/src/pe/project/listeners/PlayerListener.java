@@ -77,12 +77,13 @@ public class PlayerListener implements Listener {
 	 * List of materials that are allowed to be placed by
 	 * players in survival even if they have lore text
 	 */
-	private static final Material[] ALLOW_LORE_MATS_VALS = new Material[] {Material.CHEST,
-	                                                                       Material.FROSTED_ICE,
-	                                                                       Material.WOOL,
-																		   Material.SKULL,
-																		   Material.SKULL_ITEM};
-	private static final Set<Material> ALLOW_LORE_MATS = new HashSet<>(Arrays.asList(ALLOW_LORE_MATS_VALS));
+	public static Set<Material> ALLOW_LORE_MATS = new HashSet<>(Arrays.asList(
+		Material.CHEST,
+		Material.PACKED_ICE,
+		Material.WOOL,
+		Material.SKULL,
+		Material.SKULL_ITEM
+	));
 
 
 	public PlayerListener(Main plugin, World world, Random random) {
