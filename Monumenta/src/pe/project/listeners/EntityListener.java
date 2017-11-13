@@ -51,7 +51,6 @@ import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.managers.potion.PotionManager.PotionID;
-import pe.project.point.Point;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -303,7 +302,7 @@ public class EntityListener implements Listener {
 	//	Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
-		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(new Point(event.getLocation()));
+		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(event.getLocation());
 		if (safeZone != SafeZones.None) {
 			event.setCancelled(true);
 		}

@@ -58,6 +58,8 @@ import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Main;
 import pe.project.items.QuestingCompass;
+import pe.project.locations.safezones.SafeZoneConstants;
+import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
@@ -384,7 +386,9 @@ public class PlayerListener implements Listener {
 				}
 			}
 
-			if (damage < 0) {
+			// Players that get resistance from safezones don't take armor damage
+			SafeZones zone = SafeZoneConstants.withinAnySafeZone(event.getPlayer().getLocation());
+			if (damage < 0 || SafeZoneConstants.safeZoneAppliesEffects(zone)) {
 				damage = 0;
 			}
 
@@ -589,6 +593,7 @@ public class PlayerListener implements Listener {
 			switch (itemType) {
 			case COMPASS: {
 				QuestingCompass.handleInteraction(mPlugin, player, action);
+				break;
 			}
 
 			default:
