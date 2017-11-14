@@ -9,7 +9,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
-import pe.project.Constants;
 
 public class PlayerUtils {
 	public static boolean isCritical(Player player) {
@@ -57,9 +56,9 @@ public class PlayerUtils {
 		player.sendMessage(ChatColor.RED + "You've recieved a strike for "  + reason + " Location " + OOBLoc);
 		player.sendMessage(ChatColor.YELLOW + "If you feel that this strike is unjustified feel free to send a message and screenshot of this to a moderator on the Discord.");
 
-		player.teleport(new Location(player.getWorld(), Constants.RESET_POINT.mX, Constants.RESET_POINT.mY, Constants.RESET_POINT.mZ));
+		player.teleport(player.getWorld().getSpawnLocation());
 	}
-	
+
 	public static void healPlayer(Player player, double healAmount) {
 		if (!player.isDead()) {
 			double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
