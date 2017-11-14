@@ -10,36 +10,33 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import pe.project.Constants;
 import pe.project.Main;
-import pe.project.kingsbounty.KingsBounty;
 import pe.project.locations.poi.POIConstants.POI;
 import pe.project.point.Point;
 
-public class PointOfInterest implements KingsBounty {
+public class PointOfInterest {
 	protected POIConstants.POI mPOI;
 	protected String mAreaName = null;
-	protected String mKingsBountyDescription = null;
 	protected Point mCenter;
 	protected double mWithinRadius;
 	protected double mNearbyRadius;
 	protected int mTimer;
-	
+
 	public PointOfInterest(POIConstants.POI poi, String areaName, Point center, double withinRadius, double nearbyRadius, String description) {
 		mAreaName = areaName;
 		mPOI = poi;
 		mCenter = center;
 		mWithinRadius = withinRadius;
 		mNearbyRadius = nearbyRadius;
-		mKingsBountyDescription = description;
 	}
-	
+
 	public boolean nearPOI(Point playerLoc) {
 		return _distance(playerLoc) <= mNearbyRadius;
 	}
-	
+
 	public boolean withinPOI(Point playerLoc) {
 		return _distance(playerLoc) <= mWithinRadius;
 	}
-	
+
 	public void update(Main plugin, int ticks) {
 		int oldValue = mTimer;
 		if (oldValue > 0) {
@@ -54,48 +51,39 @@ public class PointOfInterest implements KingsBounty {
 			}
 		}
 	}
-	
+
 	public String getName() {
 		return mAreaName;
 	}
-	
+
 	public POI getPOI() {
 		return mPOI;
 	}
-	
+
 	public int getTimer() {
 		return mTimer;
 	}
-	
+
 	public void setTimer(int value) {
 		mTimer = value;
 	}
 
-	public boolean hasKingsBounty() {
-		return getKingBountyDescription() != null;
-	}
-
-	@Override
-	public String getKingBountyDescription() {
-		return null;
-	}
-	
 	public void save() {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
-		
+
 		for (Score score : scores) {
 			if (score.getObjective().getDisplayName().contains("POITimers")) {
-				score.setScore(mTimer);	
+				score.setScore(mTimer);
 				break;
 			}
 		}
 	}
-	
+
 	public void load() {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
-		
+
 		for(Score score : scores) {
 			if (score.getObjective().getDisplayName().contains("POITimers")) {
 				mTimer = score.getScore();
@@ -103,7 +91,7 @@ public class PointOfInterest implements KingsBounty {
 			}
 		}
 	}
-	
+
 	public double _distance(Point point) {
 		return Math.sqrt(
 			((point.mX - mCenter.mX) * (point.mX - mCenter.mX)) +
@@ -111,7 +99,7 @@ public class PointOfInterest implements KingsBounty {
 			((point.mZ - mCenter.mZ) * (point.mZ - mCenter.mZ))
 		);
 	}
-	
+
 	private void _messageNearbyPlayers(Main plugin, String suffix) {
 		String message = ChatColor.RED + "" + ChatColor.BOLD + mAreaName + suffix;
 		for (Player player : plugin.mTrackingManager.mPlayers.getPlayers()) {

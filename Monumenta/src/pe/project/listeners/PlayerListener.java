@@ -115,11 +115,6 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-		Player player = event.getPlayer();
-
-		mPlugin.mTrackingManager.addEntity(player);
-		RegionReset.handle(mPlugin, player);
-		DailyReset.handle(mPlugin, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
