@@ -98,7 +98,6 @@ public class SafeZoneConstants {
 			|| safeZone == SafeZones.SiegeOfHighwatch
 			|| safeZone == SafeZones.Ctaz
 			|| safeZone == SafeZones.Hermy
-			|| safeZone == SafeZones.Monument
 			|| safeZone == SafeZones.Commands) {
 			return false;
 		}
