@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -19,7 +18,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,9 +33,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-
-import org.bukkit.event.vehicle.VehicleCreateEvent;
-import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -305,30 +300,6 @@ public class EntityListener implements Listener {
 		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(event.getLocation());
 		if (safeZone != SafeZones.None) {
 			event.setCancelled(true);
-		}
-	}
-
-	//	Vehicle created.
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleCreateEvent(VehicleCreateEvent event) {
-		Vehicle vehicle = event.getVehicle();
-		if (vehicle instanceof Boat) {
-			mPlugin.mTrackingManager.addEntity(vehicle);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleEntityCollisionEvent(VehicleEntityCollisionEvent event) {
-		Entity entity = event.getEntity();
-		Vehicle vehicle = event.getVehicle();
-
-		if (entity.getVehicle() != vehicle) {
-			if (entity instanceof Player) {
-				Player player = (Player)entity;
-				if (player.getGameMode() == GameMode.ADVENTURE) {
-					vehicle.remove();
-				}
-			}
 		}
 	}
 

@@ -118,6 +118,7 @@ public class Main extends JavaPlugin {
 		manager.registerEvents(new PlayerListener(this, world, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, world), this);
+		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new ItemListener(this), this);
 		manager.registerEvents(new WorldListener(this, world), this);
 
