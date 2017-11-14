@@ -35,7 +35,9 @@ public class SafeZoneConstants {
 		LowtideDock(17),
 		LowtideBoat(18),
 
-		Total(19);
+		NewPlayer(19),
+
+		Total(20);
 
 		public int mValue;
 		private SafeZones(int value)	{	this.mValue = value;	}
@@ -67,6 +69,8 @@ public class SafeZoneConstants {
 			new AreaBounds("", new Point(675, 0, 421), new Point(767, 255, 558)),			//	Main lowtide area
 			new AreaBounds("", new Point(664, 0, 474), new Point(675, 255, 483)),			//	Lowtide docks
 			new AreaBounds("", new Point(650, 0, 483), new Point(675, 255, 558)),			//	Lowtide boat
+
+			new AreaBounds("NewPlayer", new Point(-1456, 0, -1216), new Point(-1425, 255, -1185)),  // New Player Lobby (on Tutorial)
 	};
 
 	public static AreaBounds getSafeZone(SafeZones city) {
