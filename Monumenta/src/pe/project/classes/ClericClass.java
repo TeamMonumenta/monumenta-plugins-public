@@ -51,22 +51,22 @@ public class ClericClass extends BaseClass {
 	private static final int SANCTIFIED_EFFECT_LEVEL = 0;
 	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
-	
+
 	private static int REJUVENATION_RADIUS = 12;
 	private static int REJUVENATION_HEAL_AMOUNT = 1;
-	
+
 	//	HEAVENLY_BOON
 	private static double HEAVENLY_BOON_1_CHANCE = 0.05;
 	private static double HEAVENLY_BOON_2_CHANCE = 0.08;
 	private static double HEAVENLY_BOON_TRIGGER_RANGE = 1.0;
 	private static double HEAVENLY_BOON_RADIUS = 12;
-	
+
 	//	CLEANSING
-	
+
 	private static int DIVINE_JUSTICE_DAMAGE = 5;
 	private static int DIVINE_JUSTICE_HEAL = 4;
 	private static int DIVINE_JUSTICE_CRIT_HEAL = 1;
-	
+
 	private static int CELESTIAL_ID = 36;
 	public static int CELESTIAL_1_FAKE_ID = 100361;
 	public static int CELESTIAL_2_FAKE_ID = 100362;
@@ -78,7 +78,7 @@ public class ClericClass extends BaseClass {
 	public static String CELESTIAL_2_TAGNAME = "Celestial_2";
 	private static double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.30;
-	
+
 	private static int HEALING_ID = 37;
 	private static int HEALING_RADIUS = 12;
 	private static int HEALING_1_HEAL = 10;
@@ -86,11 +86,11 @@ public class ClericClass extends BaseClass {
 	private static double HEALING_DOT_ANGLE = 0.33;
 	private static int HEALING_1_COOLDOWN = 20 * 20;
 	private static int HEALING_2_COOLDOWN = 15 * 20;
-	
+
 	public ClericClass(Main plugin, Random random) {
 		super(plugin, random);
 	}
-	
+
 	@Override
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == CELESTIAL_ID) {
@@ -99,18 +99,18 @@ public class ClericClass extends BaseClass {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Hand of Light is now off cooldown");
 		}
 	}
-	
+
 	@Override
 	public boolean has2SecondTrigger() {
 		return true;
 	}
-	
+
 	@Override
 	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
 		if (!player.isDead()) {
 			boolean threeSeconds = ((originalTime % 3) == 0);
-			
+
 			//	Rejuvenation
 			if (threeSeconds) {
 				int rejuvenation = ScoreboardUtils.getScoreboardValue(player, "Rejuvenation");
@@ -120,18 +120,18 @@ public class ClericClass extends BaseClass {
 					for (Entity entity : entities) {
 						if (entity instanceof Player) {
 							Player p = (Player)entity;
-							
+
 							//	If this is us or we're allowing anyone to get it.
 							if (p == player || rejuvenation > 1) {
 								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 							}
 						}
 					}
-				}	
+				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		//	Sanctified
@@ -143,24 +143,24 @@ public class ClericClass extends BaseClass {
 					return;
 				}
 			}
-			
+
 			int sanctified = ScoreboardUtils.getScoreboardValue(player, "Sanctified");
 			if (sanctified > 0) {
 				double extraDamage = sanctified == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
 				damager.damage(extraDamage);
-				
+
 				MovementUtils.KnockAway(player, damager, SANCTIFIED_KNOCKBACK_SPEED);
-				
+
 				Location loc = damager.getLocation();
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.END_ROD, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
-				
+
 				if (sanctified > 1) {
 					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, true, false));
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		//	DivineJustice
@@ -170,9 +170,9 @@ public class ClericClass extends BaseClass {
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 0) {
 						damagee.damage(DIVINE_JUSTICE_DAMAGE);
-						
+
 						PlayerUtils.healPlayer(player, DIVINE_JUSTICE_CRIT_HEAL);
-						
+
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.25, 0.5, 0.5, 0.001);
@@ -181,12 +181,12 @@ public class ClericClass extends BaseClass {
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		//	DivineJustice
 		{
 			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
@@ -199,22 +199,22 @@ public class ClericClass extends BaseClass {
 						Location loc = killedEntity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.25, 0.25, 0.25, 0.001);
 						player.getWorld().playSound(loc, "block.enchantment_table.use", 1.5f, 1.5f);
-						
+
 					}
 				}
 			}
 		}
-		
+
 		//	HeavenlyBoon
-		{
+		if (shouldGenDrops) {
 			if (EntityUtils.isUndead(killedEntity)) {
 				int heavenlyBoon = ScoreboardUtils.getScoreboardValue(player, "HeavenlyBoon");
 				if (heavenlyBoon > 0) {
 					double chance = heavenlyBoon == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
-					
+
 					if (mRandom.nextDouble() < chance) {
 						ItemStack potions;
-						
+
 						if (heavenlyBoon == 1) {
 							int rand = mRandom.nextInt(3);
 							if (rand == 0) {
@@ -238,7 +238,7 @@ public class ClericClass extends BaseClass {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 120 * 20, 0, "Splash Potion of Resistance");
 							}
 						}
-						
+
 						World world = Bukkit.getWorld(player.getWorld().getName());
 						world.dropItemNaturally(killedEntity.getLocation(), potions);
 					}
@@ -246,7 +246,7 @@ public class ClericClass extends BaseClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
 		//	HeavenlyBoon
@@ -256,29 +256,29 @@ public class ClericClass extends BaseClass {
 				double range = potion.getLocation().distance(player.getLocation());
 				if (range <= HEAVENLY_BOON_TRIGGER_RANGE) {
 					PotionMeta meta = (PotionMeta)potion.getItem().getItemMeta();
-					
+
 					List<Entity> entities = player.getNearbyEntities(HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS);
 					entities.add(player);
 					for(int i = 0; i < entities.size(); i++) {
 						Entity e = entities.get(i);
 						if(e instanceof Player) {
 							Player p = (Player)(e);
-							
+
 							List<PotionEffect> effectList = PotionUtils.getEffects(meta);
 							for (PotionEffect effect : effectList) {
 								PotionUtils.applyPotion(mPlugin, p, effect);
 							}
 						}
 					}
-					
+
 					return false;
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, Material material) {
 		if (player.isSneaking()) {
@@ -287,28 +287,28 @@ public class ClericClass extends BaseClass {
 				if (celestial > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CELESTIAL_ID)) {
 						World world = player.getWorld();
-						
+
 						List<Entity> entities = player.getNearbyEntities(CELESTIAL_RADIUS, CELESTIAL_RADIUS, CELESTIAL_RADIUS);
 						entities.add(player);
 						for(int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
 							if(e instanceof Player) {
 								Player p = (Player)(e);
-								
+
 								int fakeID = celestial == 1 ? CELESTIAL_1_FAKE_ID : CELESTIAL_2_FAKE_ID;
-								
+
 								int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-								
+
 								mPlugin.mTimers.AddCooldown(p.getUniqueId(), fakeID, duration);
-								
+
 								p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
-								
+
 								Location loc = p.getLocation();
 								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 15, 0.75, 0.75, 0.75, 0.001);
 								world.playSound(loc, "entity.player.levelup", 0.15f, 1.5f);
 							}
 						}
-						
+
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), CELESTIAL_ID, CELESTIAL_COOLDOWN);
 					}
 				}
@@ -332,23 +332,23 @@ public class ClericClass extends BaseClass {
 													if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
 														int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
 														PlayerUtils.healPlayer(p, healAmount);
-														
+
 														Location loc = p.getLocation();
-														
+
 														ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 														ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 														player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
 														player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
 													}
-												}	
+												}
 											}
 										}
-										
+
 										player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
 										player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
-										
+
 										ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
-									
+
 										int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 										mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
 									}
@@ -361,7 +361,7 @@ public class ClericClass extends BaseClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {
 		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {

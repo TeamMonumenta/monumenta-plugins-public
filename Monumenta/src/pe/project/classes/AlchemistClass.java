@@ -49,7 +49,7 @@ public class AlchemistClass extends BaseClass {
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
 	private static int GRUESOME_ALCHEMY_COOLDOWN = 5 * 60 * 20;
-	
+
 	private static int PUTRID_FUMES_ID = 52;
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
 	private static String PUTRID_FUMES_2_TAG = "PutridFumes2";
@@ -57,16 +57,16 @@ public class AlchemistClass extends BaseClass {
 	private static float PUTRID_FUMES_2_RADIUS = 5;
 	private static int PUTRID_FUMES_DURATION = 15 * 20;
 	private static int PUTRID_FUMES_COOLDOWN = 10 * 20;
-	
+
 	private static int CAUSTIC_MIXTURE_1_DAMAGE = 6;
 	private static int CAUSTIC_MIXTURE_2_DAMAGE = 12;
 	private static String CAUSTIC_MIXTURE_TAG = "CausticMixture";
-	
+
 	private static int BASILISK_POISON_1_EFFECT_LVL = 0;
 	private static int BASILISK_POISON_2_EFFECT_LVL = 1;
 	private static int BASILISK_POISON_1_DURATION = 15 * 20;
 	private static int BASILISK_POISON_2_DURATION = 12 * 20;
-	
+
 	private static int POWER_INJECTION_ID = 55;
 	private static int POWER_INJECTION_RANGE = 8;
 	private static int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
@@ -74,38 +74,38 @@ public class AlchemistClass extends BaseClass {
 	private static int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
 	private static int POWER_INJECTION_DURATION = 20 * 20;
 	private static int POWER_INJECTION_COOLDOWN = 30 * 20;
-	
+
 	private static int INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_SPEED_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_REGENERATION_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_1_DURATION = 12 * 20;
 	private static int INVIGORATING_ODOR_2_DURATION = 15 * 20;
 
-	
+
 	//	POISON_TRAIL
-	
+
 	public AlchemistClass(Main plugin, Random random) {
 		super(plugin, random);
 	}
-	
+
 	@Override
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == PUTRID_FUMES_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Putrid Fumes is now off cooldown");
 		}
 	}
-	
+
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		//	GruesomeAlchemy
-		{
+		if (shouldGenDrops) {
 			int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
 			if (gruesomeAlchemy > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID)) {
 					if (mRandom.nextFloat() < GRUESOME_ALCHEMY_CHANCE) {
 						int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
 						ItemStack stack = new ItemStack(Material.SPLASH_POTION, count);
-						
+
 						int rand = mRandom.nextInt(4);
 						if (rand == 0) {
 							ItemUtils.setPotionMeta(stack, "Splash Potion of Harming", PotionEffectType.INCREASE_DAMAGE.getColor());
@@ -123,17 +123,17 @@ public class AlchemistClass extends BaseClass {
 							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.SLOW, 20 * 20, 1, false, true));
 							ItemUtils.addPotionEffect(stack, new PotionInfo(PotionEffectType.WITHER, 20 * 20, 0, false, true));
 						}
-						
+
 						World world = Bukkit.getWorld(player.getWorld().getName());
 						world.dropItemNaturally(killedEntity.getLocation(), stack);
-						
+
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID, GRUESOME_ALCHEMY_COOLDOWN);
 					}
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		//	BasiliskPoison
@@ -146,7 +146,7 @@ public class AlchemistClass extends BaseClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
 		//	PowerInjection
@@ -158,15 +158,15 @@ public class AlchemistClass extends BaseClass {
 						LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, POWER_INJECTION_RANGE, true, true, true);
 						if (targetEntity != null && targetEntity instanceof Player) {
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
-							
+
 							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
-							
+
 							if (powerInjection > 1) {
 								mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
 							}
-							
+
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), POWER_INJECTION_ID, POWER_INJECTION_COOLDOWN);
-							
+
 							arrow.remove();
 							return;
 						}
@@ -174,7 +174,7 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-		
+
 		//	BasiliskPoison
 		{
 			int basiliskPoison = ScoreboardUtils.getScoreboardValue(player, "BasiliskPoison");
@@ -183,7 +183,7 @@ public class AlchemistClass extends BaseClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
@@ -193,14 +193,14 @@ public class AlchemistClass extends BaseClass {
 					if (putridFumes > 0) {
 						String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
 						potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
-						
+
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), PUTRID_FUMES_ID, PUTRID_FUMES_COOLDOWN);
 					}
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
 		if (potion.hasMetadata(PUTRID_FUMES_1_TAG)) {
@@ -210,62 +210,62 @@ public class AlchemistClass extends BaseClass {
 			AreaEffectCloud cloud = EntityUtils.spawnAreaEffectCloud(player.getWorld(), potion.getLocation(), potion.getEffects(), PUTRID_FUMES_2_RADIUS, PUTRID_FUMES_DURATION);
 			cloud.setSource(player);
 		}
-		
+
 		World world = player.getWorld();
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
 		int invigoratingOdor = ScoreboardUtils.getScoreboardValue(player, "InvigoratingOdor");
-		
+
 		boolean hitMonster = false;
-		
+
 		if (affectedEntities != null) {
 			for (LivingEntity entity : affectedEntities) {
 				if (EntityUtils.isHostileMob(entity)) {
 					//	Caustic Mixture
-					
+
 					if (causticMixture > 0) {
 						int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
 						if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
 							entity.damage(damage);
 							entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
-							
+
 							Location loc = entity.getLocation();
 							ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
 						}
 					}
-					
+
 					//	Invigorating Odor
 					if (invigoratingOdor > 0 && !hitMonster) {
 						int duration = (invigoratingOdor == 1) ? INVIGORATING_ODOR_1_DURATION : INVIGORATING_ODOR_2_DURATION;
-						
+
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, duration, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
-					
+
 						if (invigoratingOdor > 1) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, duration, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false)); 
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, duration, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));
 						}
 					}
-					
+
 					hitMonster = true;
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void AreaEffectCloudApplyEvent(List<LivingEntity> entities, Player player) {
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
 		if (causticMixture > 0) {
 			World world = player.getWorld();
-			
+
 			int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
 			for (LivingEntity entity : entities) {
 				if (EntityUtils.isHostileMob(entity)) {
 					if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
 						entity.damage(damage);
 						entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
-						
+
 						Location loc = entity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
 					}

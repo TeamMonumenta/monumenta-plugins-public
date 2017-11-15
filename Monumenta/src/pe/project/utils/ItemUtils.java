@@ -103,6 +103,17 @@ public class ItemUtils {
 			Material.WOOD_DOOR
 	);
 
+	/**
+	 * Items drop if they have lore that does not contain $$$
+	 */
+	public static float getItemDropChance(ItemStack item) {
+		if ((item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$$")) {
+			return 1.0f;
+		} else {
+			return -200.0f;
+		}
+	}
+
 	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
 

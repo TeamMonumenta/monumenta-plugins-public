@@ -25,7 +25,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -276,19 +275,6 @@ public class EntityListener implements Listener {
 						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, effects);
 					}
 				}
-			}
-		}
-	}
-
-	//	The player has died.
-	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityDeathEvent(EntityDeathEvent event) {
-		Entity entity = event.getEntity();
-		if (entity instanceof LivingEntity) {
-			LivingEntity livingEntity = (LivingEntity)entity;
-			Player player = livingEntity.getKiller();
-			if (player != null) {
-				mPlugin.getClass(player).EntityDeathEvent(player, livingEntity, entity.getLastDamageCause().getCause());
 			}
 		}
 	}
