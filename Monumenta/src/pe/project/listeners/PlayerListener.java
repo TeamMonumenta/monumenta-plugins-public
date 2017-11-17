@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -310,6 +311,15 @@ public class PlayerListener implements Listener {
 		ItemStack offHand = event.getOffHandItem();
 
 		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+	}
+
+	//	The player has died
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerDeathEvent(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+
+		// Give the player a NewDeath score of 1 so the city guides will give items again
+		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 	}
 
 	//	The player has respawned.
