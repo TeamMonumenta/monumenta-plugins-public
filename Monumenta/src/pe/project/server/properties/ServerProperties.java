@@ -1,5 +1,8 @@
 package pe.project.server.properties;
 
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -20,6 +23,7 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
+	public Set<String> mAllowedTransferTargets = new HashSet<>();
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -72,37 +76,50 @@ public class ServerProperties {
 					JsonElement dailyResetEnabled = object.get("dailyResetEnabled");
 					if (dailyResetEnabled != null) {
 						mDailyResetEnabled = dailyResetEnabled.getAsBoolean();
-						main.getLogger().info("Properties: dailyResetEnabled = " + mDailyResetEnabled);
 					}
+					main.getLogger().info("Properties: dailyResetEnabled = " + mDailyResetEnabled);
 
 					JsonElement joinMessagesEnabled = object.get("joinMessagesEnabled");
 					if (joinMessagesEnabled != null) {
 						mJoinMessagesEnabled = joinMessagesEnabled.getAsBoolean();
-						main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
 					}
+					main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
 
 					JsonElement transferDataEnabled = object.get("transferDataEnabled");
 					if (transferDataEnabled != null) {
 						mTransferDataEnabled = transferDataEnabled.getAsBoolean();
-						main.getLogger().info("Properties: transferDataEnabled = " + mTransferDataEnabled);
 					}
+					main.getLogger().info("Properties: transferDataEnabled = " + mTransferDataEnabled);
 
 					JsonElement isTownWorld = object.get("isTownWorld");
 					if (isTownWorld != null) {
 						mIsTownWorld = isTownWorld.getAsBoolean();
-						main.getLogger().info("Properties: isTownWorld = " + mIsTownWorld);
 					}
+					main.getLogger().info("Properties: isTownWorld = " + mIsTownWorld);
 
 					JsonElement BroadcastCommandEnabled = object.get("broadcastCommandEnabled");
 					if (BroadcastCommandEnabled != null) {
 						mBroadcastCommandEnabled = BroadcastCommandEnabled.getAsBoolean();
-						main.getLogger().info("Properties: BroadcastCommandEnabled = " + mBroadcastCommandEnabled);
 					}
+					main.getLogger().info("Properties: BroadcastCommandEnabled = " + mBroadcastCommandEnabled);
 
 					JsonElement plotSurvivalMinHeight = object.get("plotSurvivalMinHeight");
 					if (plotSurvivalMinHeight != null) {
 						mPlotSurvivalMinHeight = plotSurvivalMinHeight.getAsInt();
-						main.getLogger().info("Properties: plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);
+					}
+					main.getLogger().info("Properties: plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);
+
+					JsonElement allowedTransferTargets = object.get("allowedTransferTargets");
+					if (allowedTransferTargets != null) {
+						Iterator<JsonElement> targetIter = allowedTransferTargets.getAsJsonArray().iterator();
+						while (targetIter.hasNext()) {
+							mAllowedTransferTargets.add(targetIter.next().getAsString());
+						}
+					}
+					if (mAllowedTransferTargets.isEmpty()) {
+						main.getLogger().info("Properties: allowedTransferTargets = <all>");
+					} else {
+						main.getLogger().info("Properties: allowedTransferTargets = " + mAllowedTransferTargets.toString());
 					}
 				}
 			} catch (Exception e) {

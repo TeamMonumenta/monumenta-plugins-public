@@ -41,6 +41,15 @@ public class TransferServer implements CommandExecutor {
 
 		String server = arg3[0];
 
+		// Error if target server is now allowed
+		if (!(mMain.mServerProporties.mAllowedTransferTargets.isEmpty()
+			  || mMain.mServerProporties.mAllowedTransferTargets.contains(server))) {
+			sender.sendMessage(ChatColor.RED + "You may not transfer to that server from here!");
+			sender.sendMessage(ChatColor.RED + "Allowed servers are: " +
+			                   mMain.mServerProporties.mAllowedTransferTargets.toString());
+			return false;
+		}
+
 		// Default to server properties - if properties says false, no way to set to true
 		boolean sendPlayerStuff = mMain.mServerProporties.getTransferDataEnabled();
 
