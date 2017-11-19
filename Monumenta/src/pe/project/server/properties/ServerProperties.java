@@ -1,14 +1,14 @@
 package pe.project.server.properties;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import pe.project.Main;
 import pe.project.utils.FileUtils;
@@ -24,6 +24,7 @@ public class ServerProperties {
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
+	private boolean mQuestCompassEnabled = true;
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -47,6 +48,10 @@ public class ServerProperties {
 
 	public int getPlotSurvivalMinHeight() {
 		return mPlotSurvivalMinHeight;
+	}
+
+	public boolean getQuestCompassEnabled() {
+		return mQuestCompassEnabled;
 	}
 
 	public void load(Main main) {
@@ -73,59 +78,65 @@ public class ServerProperties {
 				//	Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					JsonElement dailyResetEnabled = object.get("dailyResetEnabled");
-					if (dailyResetEnabled != null) {
-						mDailyResetEnabled = dailyResetEnabled.getAsBoolean();
-					}
-					main.getLogger().info("Properties: dailyResetEnabled = " + mDailyResetEnabled);
-
-					JsonElement joinMessagesEnabled = object.get("joinMessagesEnabled");
-					if (joinMessagesEnabled != null) {
-						mJoinMessagesEnabled = joinMessagesEnabled.getAsBoolean();
-					}
-					main.getLogger().info("Properties: joinMessagesEnabled = " + mJoinMessagesEnabled);
-
-					JsonElement transferDataEnabled = object.get("transferDataEnabled");
-					if (transferDataEnabled != null) {
-						mTransferDataEnabled = transferDataEnabled.getAsBoolean();
-					}
-					main.getLogger().info("Properties: transferDataEnabled = " + mTransferDataEnabled);
-
-					JsonElement isTownWorld = object.get("isTownWorld");
-					if (isTownWorld != null) {
-						mIsTownWorld = isTownWorld.getAsBoolean();
-					}
-					main.getLogger().info("Properties: isTownWorld = " + mIsTownWorld);
-
-					JsonElement BroadcastCommandEnabled = object.get("broadcastCommandEnabled");
-					if (BroadcastCommandEnabled != null) {
-						mBroadcastCommandEnabled = BroadcastCommandEnabled.getAsBoolean();
-					}
-					main.getLogger().info("Properties: BroadcastCommandEnabled = " + mBroadcastCommandEnabled);
-
-					JsonElement plotSurvivalMinHeight = object.get("plotSurvivalMinHeight");
-					if (plotSurvivalMinHeight != null) {
-						mPlotSurvivalMinHeight = plotSurvivalMinHeight.getAsInt();
-					}
-					main.getLogger().info("Properties: plotSurvivalMinHeight = " + mPlotSurvivalMinHeight);
-
-					JsonElement allowedTransferTargets = object.get("allowedTransferTargets");
-					if (allowedTransferTargets != null) {
-						Iterator<JsonElement> targetIter = allowedTransferTargets.getAsJsonArray().iterator();
-						while (targetIter.hasNext()) {
-							mAllowedTransferTargets.add(targetIter.next().getAsString());
-						}
-					}
-					if (mAllowedTransferTargets.isEmpty()) {
-						main.getLogger().info("Properties: allowedTransferTargets = <all>");
-					} else {
-						main.getLogger().info("Properties: allowedTransferTargets = " + mAllowedTransferTargets.toString());
-					}
+					mDailyResetEnabled			= _getPropertyValueBool(main, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled		= _getPropertyValueBool(main, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled		= _getPropertyValueBool(main, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld				= _getPropertyValueBool(main, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled	= _getPropertyValueBool(main, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight		= _getPropertyValueInt(main, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mAllowedTransferTargets		= _getPropertyValueStringSet(main, object, "allowedTransferTargets");
+					mQuestCompassEnabled		= _getPropertyValueBool(main, object, "questCompassEnabled", mQuestCompassEnabled);
 				}
 			} catch (Exception e) {
 				main.getLogger().severe("Caught exception: " + e);
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private boolean _getPropertyValueBool(Main plugin, JsonObject object, String properyName, boolean defaultVal) {
+		boolean value = defaultVal;
+
+		JsonElement element = object.get(properyName);
+		if (element != null) {
+			value = element.getAsBoolean();
+		}
+
+		plugin.getLogger().info("Properties: " + properyName + " = " + value);
+
+		return value;
+	}
+
+	private int _getPropertyValueInt(Main plugin, JsonObject object, String properyName, int defaultVal) {
+		int value = defaultVal;
+
+		JsonElement element = object.get(properyName);
+		if (element != null) {
+			value = element.getAsInt();
+		}
+
+		plugin.getLogger().info("Properties: " + properyName + " = " + value);
+
+		return value;
+	}
+
+	private Set<String> _getPropertyValueStringSet(Main plugin, JsonObject object, String properyName) {
+		Set<String> value = new HashSet<>();
+
+		JsonElement element = object.get(properyName);
+		if (element != null) {
+			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
+			while (targetIter.hasNext()) {
+				value.add(targetIter.next().getAsString());
+			}
+		}
+
+		if (value.isEmpty()) {
+			plugin.getLogger().info("Properties: " + properyName + " = <all>");
+		} else {
+			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
+		}
+
+		return value;
 	}
 }
