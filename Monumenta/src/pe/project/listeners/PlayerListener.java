@@ -183,7 +183,7 @@ public class PlayerListener implements Listener {
 		} else if (item.getType() == Material.PACKED_ICE
 		           && item.hasItemMeta() && item.getItemMeta().hasLore()
 				   && event.getPlayer().getGameMode() == GameMode.SURVIVAL
-				   && (SafeZoneConstants.withinAnySafeZone(event.getPlayer().getLocation()) != SafeZones.None) || mPlugin.mServerProporties.getIsTownWorld()) {
+				   && ((SafeZoneConstants.withinAnySafeZone(event.getPlayer().getLocation()) != SafeZones.None) || mPlugin.mServerProporties.getIsTownWorld())) {
 			// Special packed ice that becomes water in a plot
 			event.getBlockPlaced().setType(Material.STATIONARY_WATER);
 		}
