@@ -8,14 +8,14 @@ import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.CommandUtils;
 
 
 public class MinusExp implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public MinusExp(Main plugin) {
+	public MinusExp(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

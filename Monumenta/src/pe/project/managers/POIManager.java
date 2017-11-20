@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.locations.poi.POIConstants.POI;
 import pe.project.locations.poi.PointOfInterest;
 import pe.project.point.Point;
 
 public class POIManager {
-	Main mPlugin;
+	Plugin mPlugin;
 	List<PointOfInterest> mPOIs = new ArrayList<PointOfInterest>();
 
-	public POIManager(Main plugin) {
+	public POIManager(Plugin plugin) {
 		mPlugin = plugin;
 		_initPOIs();
 	}

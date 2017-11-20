@@ -11,13 +11,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class RefreshClassEffects implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 	World mWorld;
 	
-	public RefreshClassEffects(Main plugin, World world) {
+	public RefreshClassEffects(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
 	}

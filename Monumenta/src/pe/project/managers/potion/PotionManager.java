@@ -12,13 +12,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 	//	Player ID / Player Potion Info
 	public HashMap<UUID, PlayerPotionInfo> mPotionManager;
 	
@@ -48,7 +48,7 @@ public class PotionManager {
 		}
 	}
 	
-	public PotionManager(Main plugin) {
+	public PotionManager(Plugin plugin) {
 		mPlugin = plugin;
 		mPotionManager = new HashMap<UUID, PlayerPotionInfo>();
 	}

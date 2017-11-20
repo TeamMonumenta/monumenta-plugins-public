@@ -6,14 +6,14 @@ import java.util.HashMap;
 import org.bukkit.entity.Player;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.npcs.Npc;
 
 public class NpcManager {
-	Main mPlugin;
+	Plugin mPlugin;
 	HashMap<String, Npc> mNpcs = new HashMap<String, Npc>();
 
-	public NpcManager(Main plugin) {
+	public NpcManager(Plugin plugin) {
 		mPlugin = plugin;
 
 		if (Constants.NPCS_ENABLED) {

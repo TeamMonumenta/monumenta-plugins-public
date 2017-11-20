@@ -11,13 +11,13 @@ import org.bukkit.event.Listener;
 
 import org.bukkit.event.world.ChunkLoadEvent;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class WorldListener implements Listener {
-	Main mPlugin;
+	Plugin mPlugin;
 	World mWorld;
 	
-	public WorldListener(Main plugin, World world) {
+	public WorldListener(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
 	}

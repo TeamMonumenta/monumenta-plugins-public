@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.ScoreboardUtils;
 
 public class SetScoresAction implements BaseAction {
@@ -35,7 +35,7 @@ public class SetScoresAction implements BaseAction {
 	}
 
 	@Override
-	public void trigger(Main plugin, Player player) {
+	public void trigger(Plugin plugin, Player player) {
 		//	Loop through all our scores to set, and set them on the passed in player.
 		Iterator<Entry<String, Integer>> iter = mScoresToSet.entrySet().iterator();
 		while (iter.hasNext()) {

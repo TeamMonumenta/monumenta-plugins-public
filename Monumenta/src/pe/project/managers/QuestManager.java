@@ -7,18 +7,18 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.locations.LocationMarker;
 import pe.project.locations.quest.*;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class QuestManager {
-	Main mPlugin;
+	Plugin mPlugin;
 	World mWorld;
 	List<Quest> mQuest = new ArrayList<Quest>();
 	
-	public QuestManager(Main plugin, World world) {
+	public QuestManager(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
 		

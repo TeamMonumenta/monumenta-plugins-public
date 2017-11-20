@@ -66,7 +66,7 @@ public class SafeZoneConstants {
 
 			new AreaBounds("", new Point(317, 61, 309), new Point(383, 106, 392)),			//	Mystic Grotto
 
-			new AreaBounds("", new Point(675, 0, 421), new Point(767, 255, 558)),			//	Main lowtide area
+			new AreaBounds("", new Point(675, 0, 421), new Point(767, 255, 558)),			//	Plugin lowtide area
 			new AreaBounds("", new Point(664, 0, 474), new Point(675, 255, 483)),			//	Lowtide docks
 			new AreaBounds("", new Point(650, 0, 483), new Point(675, 255, 558)),			//	Lowtide boat
 

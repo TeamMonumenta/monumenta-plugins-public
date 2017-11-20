@@ -57,7 +57,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.items.QuestingCompass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
@@ -72,7 +72,7 @@ import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
 
 public class PlayerListener implements Listener {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 	World mWorld = null;
 	Random mRandom = null;
 
@@ -89,7 +89,7 @@ public class PlayerListener implements Listener {
 	));
 
 
-	public PlayerListener(Main plugin, World world, Random random) {
+	public PlayerListener(Plugin plugin, World world, Random random) {
 		mPlugin = plugin;
 		mWorld = world;
 		mRandom = random;

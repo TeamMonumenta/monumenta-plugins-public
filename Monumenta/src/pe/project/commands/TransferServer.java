@@ -8,16 +8,16 @@ import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.NetworkUtils;
 import pe.project.utils.InventoryUtils;
 
 //	/transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
 
 public class TransferServer implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public TransferServer(Main plugin) {
+	public TransferServer(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

@@ -25,7 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -87,7 +87,7 @@ public class ClericClass extends BaseClass {
 	private static int HEALING_1_COOLDOWN = 20 * 20;
 	private static int HEALING_2_COOLDOWN = 15 * 20;
 
-	public ClericClass(Main plugin, Random random) {
+	public ClericClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 

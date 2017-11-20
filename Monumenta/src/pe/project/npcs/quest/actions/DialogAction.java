@@ -2,7 +2,7 @@ package pe.project.npcs.quest.actions;
 
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class DialogAction implements BaseAction {
 	private String mDialogName;
@@ -17,7 +17,7 @@ public class DialogAction implements BaseAction {
 	}
 
 	@Override
-	public void trigger(Main plugin, Player player) {
+	public void trigger(Plugin plugin, Player player) {
 		//	Do nothing.
 	}
 	

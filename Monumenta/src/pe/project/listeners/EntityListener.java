@@ -39,7 +39,7 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.classes.BaseClass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
@@ -50,10 +50,10 @@ import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class EntityListener implements Listener {
-	Main mPlugin;
+	Plugin mPlugin;
 	World mWorld;
 
-	public EntityListener(Main plugin, World world) {
+	public EntityListener(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
 	}

@@ -5,13 +5,13 @@ import org.bukkit.entity.Player;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 class QuestInfo {
 	String mQuestName;
 	QuestPrerequisites mPrerequisites;
 	
-	QuestInfo(Main plugin, JsonObject object) {
+	QuestInfo(Plugin plugin, JsonObject object) {
 		JsonElement name = object.get("name");
 		if (name != null) {
 			mQuestName = name.getAsString();

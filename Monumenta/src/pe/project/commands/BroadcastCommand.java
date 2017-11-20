@@ -7,13 +7,13 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.NetworkUtils;
 
 public class BroadcastCommand implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public BroadcastCommand(Main plugin) {
+	public BroadcastCommand(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

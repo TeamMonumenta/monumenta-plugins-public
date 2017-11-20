@@ -2,7 +2,7 @@ package pe.project.npcs.quest.actions;
 
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class FunctionAction implements BaseAction {
 	private String mFunctionFileName;
@@ -17,7 +17,7 @@ public class FunctionAction implements BaseAction {
 	}
 
 	@Override
-	public void trigger(Main plugin, Player player) {
+	public void trigger(Plugin plugin, Player player) {
 		//	Because there's no currently good way to run functions we need to run them via the console....janky....I know.
 		String commandStr = String.format("execute %s ~ ~ ~ function %s", player.getName(), mFunctionFileName);
 		plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), commandStr);

@@ -10,12 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class Forward implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public Forward(Main plugin) {
+	public Forward(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

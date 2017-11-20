@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -94,7 +94,7 @@ public class MageClass extends BaseClass {
 	private static int INTELLECT_MS_1_COOLDOWN = 14 * 20;
 	private static int INTELLECT_MS_2_COOLDOWN = 14 * 20;
 
-	public MageClass(Main plugin, Random random) {
+	public MageClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 

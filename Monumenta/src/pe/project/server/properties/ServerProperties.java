@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.FileUtils;
 
 public class ServerProperties {
@@ -54,7 +54,7 @@ public class ServerProperties {
 		return mQuestCompassEnabled;
 	}
 
-	public void load(Main plugin) {
+	public void load(Plugin plugin) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
 		try {
@@ -70,7 +70,7 @@ public class ServerProperties {
 		}
 	}
 
-	private void _loadFromString(Main plugin, String content) throws Exception {
+	private void _loadFromString(Plugin plugin, String content) throws Exception {
 		if (content != null && content != "") {
 			try {
 				Gson gson = new Gson();
@@ -94,7 +94,7 @@ public class ServerProperties {
 		}
 	}
 
-	private boolean _getPropertyValueBool(Main plugin, JsonObject object, String properyName, boolean defaultVal) {
+	private boolean _getPropertyValueBool(Plugin plugin, JsonObject object, String properyName, boolean defaultVal) {
 		boolean value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -107,7 +107,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private int _getPropertyValueInt(Main plugin, JsonObject object, String properyName, int defaultVal) {
+	private int _getPropertyValueInt(Plugin plugin, JsonObject object, String properyName, int defaultVal) {
 		int value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -120,7 +120,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private Set<String> _getPropertyValueStringSet(Main plugin, JsonObject object, String properyName) {
+	private Set<String> _getPropertyValueStringSet(Plugin plugin, JsonObject object, String properyName) {
 		Set<String> value = new HashSet<>();
 
 		JsonElement element = object.get(properyName);

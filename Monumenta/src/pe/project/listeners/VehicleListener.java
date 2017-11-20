@@ -12,12 +12,12 @@ import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class VehicleListener implements Listener {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public VehicleListener(Main plugin) {
+	public VehicleListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

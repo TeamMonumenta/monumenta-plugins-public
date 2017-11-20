@@ -31,8 +31,8 @@ import pe.project.timers.*;
 import pe.project.tracking.TrackingManager;
 import pe.project.utils.ScoreboardUtils;
 
-public class Main extends JavaPlugin {
-	//	TODO: Remove all Class related information out of Main and into it's own class "ClassManager" maybe?
+public class Plugin extends JavaPlugin {
+	//	TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?
 	public enum Classes {
 		NONE(0),
 		MAGE(1),
@@ -163,7 +163,7 @@ public class Main extends JavaPlugin {
 		mPOIManager.loadAllPOIs();
 		mServerProporties.load(this);
 
-		//	Move the logic out of Main and into it's own class that derives off Runnable, a Timer class of some type.
+		//	Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int ticks = 0;
 
@@ -187,7 +187,7 @@ public class Main extends JavaPlugin {
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
-						BaseClass pClass = Main.this.getClass(player);
+						BaseClass pClass = Plugin.this.getClass(player);
 						pClass.PeriodicTrigger(player, two, fourty, sixty, mPeriodicTimer);
 					}
 
@@ -240,7 +240,7 @@ public class Main extends JavaPlugin {
 		return mClassMap.get(Classes.NONE.getValue());
 	}
 
-	//	TODO: Move Config saving/loading out of Main and into it's own files that can be called into for updating server info.
+	//	TODO: Move Config saving/loading out of Plugin and into it's own files that can be called into for updating server info.
 	public void updateVersion(int version) {
 		mServerVersion = version;
 		_saveConfig();

@@ -1,5 +1,5 @@
 name: Monumenta-Plugins
-main: pe.project.Main
+main: pe.project.Plugin
 version: 1.0
 commands:
   setServerVersion:

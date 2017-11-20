@@ -10,12 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.bukkit.ChatColor;
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class Back implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public Back(Main plugin) {
+	public Back(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

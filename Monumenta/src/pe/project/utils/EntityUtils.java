@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {
@@ -112,7 +112,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Main plugin, Player player, Vector rotation, Vector offset, Vector speed) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch()+(float)rotation.getX());
@@ -128,7 +128,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static Projectile spawnTippedArrow(Main plugin, Player player, Vector rotation, Vector offset, Vector speed) {
+	public static Projectile spawnTippedArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch()+(float)rotation.getX());
@@ -144,7 +144,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Main plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
@@ -159,7 +159,7 @@ public class EntityUtils {
 		return projectiles;
 	}
 
-	public static List<Projectile> spawnTippedArrowVolley(Main plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
+	public static List<Projectile> spawnTippedArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);

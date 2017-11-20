@@ -7,13 +7,13 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class CooldownTimers {
 	public HashMap<UUID, HashMap<Integer, Integer>> mTimers = null;
-	private Main mPlugin = null;
+	private Plugin mPlugin = null;
 	
-	public CooldownTimers(Main plugin) {
+	public CooldownTimers(Plugin plugin) {
 		mPlugin = plugin;
 		mTimers = new HashMap<UUID, HashMap<Integer, Integer>>();
 	}

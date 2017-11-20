@@ -7,13 +7,13 @@ import java.util.Map.Entry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 class QuestDialogs {
 	NpcQuest mParent;
 	HashMap<String, QuestDialog> mDialogs = new HashMap<String, QuestDialog>();
 	
-	QuestDialogs(Main plugin, NpcQuest quest, JsonObject object) {
+	QuestDialogs(Plugin plugin, NpcQuest quest, JsonObject object) {
 		mParent = quest;
 		
 		Iterator<Entry<String, JsonElement>> iter = object.entrySet().iterator();

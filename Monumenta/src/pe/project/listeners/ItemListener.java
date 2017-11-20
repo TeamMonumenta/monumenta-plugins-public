@@ -6,13 +6,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.InventoryUtils;
 
 public class ItemListener implements Listener {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 	
-	public ItemListener(Main plugin) {
+	public ItemListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
 	

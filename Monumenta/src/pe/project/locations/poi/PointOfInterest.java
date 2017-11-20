@@ -9,7 +9,7 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.locations.poi.POIConstants.POI;
 import pe.project.point.Point;
 
@@ -37,7 +37,7 @@ public class PointOfInterest {
 		return _distance(playerLoc) <= mWithinRadius;
 	}
 
-	public void update(Main plugin, int ticks) {
+	public void update(Plugin plugin, int ticks) {
 		int oldValue = mTimer;
 		if (oldValue > 0) {
 			int newValue = mTimer -= ticks;
@@ -100,7 +100,7 @@ public class PointOfInterest {
 		);
 	}
 
-	private void _messageNearbyPlayers(Main plugin, String suffix) {
+	private void _messageNearbyPlayers(Plugin plugin, String suffix) {
 		String message = ChatColor.RED + "" + ChatColor.BOLD + mAreaName + suffix;
 		for (Player player : plugin.mTrackingManager.mPlayers.getPlayers()) {
 			if (nearPOI(new Point(player.getLocation()))) {

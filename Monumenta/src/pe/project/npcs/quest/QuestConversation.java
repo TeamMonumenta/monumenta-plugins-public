@@ -5,13 +5,13 @@ import org.bukkit.entity.Player;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 class QuestConversation {
 	private QuestPrerequisites mPrerequisites;
 	private String mDialogName;
 	
-	QuestConversation(Main plugin, JsonObject object) {
+	QuestConversation(Plugin plugin, JsonObject object) {
 		mPrerequisites = new QuestPrerequisites(object.getAsJsonObject("prerequisites"));
 		
 		JsonElement dialog = object.get("dialog");

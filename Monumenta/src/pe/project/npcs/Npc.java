@@ -14,7 +14,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.npcs.quest.NpcQuest;
 import pe.project.utils.FileUtils;
 
@@ -25,7 +25,7 @@ public class Npc {
 	ArrayList<String> mIdleDialogs = new ArrayList<String>();
 	HashMap<String, NpcQuest> mQuest = new HashMap<String, NpcQuest>();
 	
-	public Npc(Main plugin, String fileLocation) {
+	public Npc(Plugin plugin, String fileLocation) {
 		try {
 			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {

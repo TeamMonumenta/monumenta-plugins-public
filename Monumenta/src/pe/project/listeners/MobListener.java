@@ -21,16 +21,16 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.ItemUtils;
 
 public class MobListener implements Listener {
 	static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 
-	public MobListener(Main plugin) {
+	public MobListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

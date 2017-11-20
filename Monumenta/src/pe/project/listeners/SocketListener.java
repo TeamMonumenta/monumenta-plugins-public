@@ -8,14 +8,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketHandshakeEvent;
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketJSONEvent;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.PacketUtils;
 import pe.project.network.packet.HeartbeatPacket;
 
 public class SocketListener implements Listener {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 
-	public SocketListener(Main plugin) {
+	public SocketListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

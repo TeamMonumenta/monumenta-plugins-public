@@ -9,7 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.MessagingUtils;
 
 class QuestDialog {
@@ -17,7 +17,7 @@ class QuestDialog {
 	String mTrigger;
 	ArrayList<QuestOption> mOptions = new ArrayList<QuestOption>();
 	
-	QuestDialog(Main plugin, JsonObject object) {
+	QuestDialog(Plugin plugin, JsonObject object) {
 		JsonElement text = object.get("text");
 		if (text != null) {
 			mText = text.getAsString();
@@ -41,7 +41,7 @@ class QuestDialog {
 		}
 	}
 	
-	void display(Main plugin, Player player, String npcName, String questName) {
+	void display(Plugin plugin, Player player, String npcName, String questName) {
 		//	Display the Dialog Text.
 		MessagingUtils.sendNPCMessage(plugin, player, npcName, mText);
 		

@@ -80,7 +80,7 @@
 		<mkdir dir="bin"/>
 		<jar destfile="../Monumenta-Plugins_${repository.version}_${TODAY}.jar" basedir="bin/">
 			<manifest>
-				<attribute name="Main-Class" value="pe.project.Main"/>
+				<attribute name="Main-Class" value="pe.project.Plugin"/>
 			</manifest>
 			<zipfileset dir="./" includes="plugin.yml" fullpath="plugin.yml"/>
 		</jar>

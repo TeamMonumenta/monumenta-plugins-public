@@ -21,7 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -65,7 +65,7 @@ public class WarriorClass extends BaseClass {
 	private static float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
 	private static Integer BRUTE_FORCE_PIECES_TO_REMOVE = 2;
 
-	public WarriorClass(Main plugin, Random random) {
+	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 

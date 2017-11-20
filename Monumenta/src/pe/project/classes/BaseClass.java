@@ -17,16 +17,16 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.timers.CooldownTimers;
 
 public class BaseClass {
 	protected Random mRandom;
-	protected Main mPlugin;
+	protected Plugin mPlugin;
 
 	protected CooldownTimers mCooldowns = null;
 
-	public BaseClass(Main plugin, Random random) {
+	public BaseClass(Plugin plugin, Random random) {
 		mRandom = random;
 		mPlugin = plugin;
 

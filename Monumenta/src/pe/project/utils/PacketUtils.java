@@ -2,11 +2,11 @@ package pe.project.utils;
 
 import com.google.gson.Gson;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.network.packet.*;
 
 public class PacketUtils {
-	public static void SendPacket(Main plugin, Packet packet) throws Exception {
+	public static void SendPacket(Plugin plugin, Packet packet) throws Exception {
 		// Serialize the packet data into a string that can be sent
 		String data = packet.getPacketData();
 
@@ -14,7 +14,7 @@ public class PacketUtils {
 		plugin.mSocketClient.writeJSON(packet.getPacketChannel(), data);
 	}
 
-	public static void ProcessPacket(Main plugin, String channel, String data) throws Exception {
+	public static void ProcessPacket(Plugin plugin, String channel, String data) throws Exception {
 		if (channel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
 			TransferPlayerDataPacket.handlePacket(plugin, data);
 		} else if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {

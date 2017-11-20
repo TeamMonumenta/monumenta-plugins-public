@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.MessagingUtils;
 
 class QuestOption {
@@ -14,7 +14,7 @@ class QuestOption {
 	String mText;
 	String mTrigger;
 	
-	QuestOption(Main plugin, JsonObject object) {
+	QuestOption(Plugin plugin, JsonObject object) {
 		JsonElement text = object.get("text");
 		if (text != null) {
 			mText = text.getAsString();
@@ -30,7 +30,7 @@ class QuestOption {
 		}
 	}
 	
-	void display(Main plugin, Player player, String npcName, String questName) {
+	void display(Plugin plugin, Player player, String npcName, String questName) {
 		String squashedName = npcName.replaceAll("\\s+", "");
 		String triggerStr = String.format(COMMAND_STRING, player.getName(), squashedName, questName, mTrigger);	
 		MessagingUtils.sendClickableNPCMessage(plugin, player, mText, triggerStr);

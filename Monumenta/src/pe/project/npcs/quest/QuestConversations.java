@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 class QuestConversations {
 	NpcQuest mParent;
 	HashMap<String, QuestConversation> mConversations = new HashMap<String, QuestConversation>();
 	
-	QuestConversations(Main plugin, NpcQuest quest, JsonObject object) {
+	QuestConversations(Plugin plugin, NpcQuest quest, JsonObject object) {
 		mParent = quest;
 		
 		Iterator<Entry<String, JsonElement>> iter = object.entrySet().iterator();

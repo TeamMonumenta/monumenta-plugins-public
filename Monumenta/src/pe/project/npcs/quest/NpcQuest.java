@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.npcs.Npc;
 import pe.project.npcs.quest.actions.BaseAction;
 import pe.project.npcs.quest.actions.BaseAction.actionType;
@@ -15,7 +15,7 @@ import pe.project.utils.FileUtils;
 import pe.project.npcs.quest.actions.DialogAction;
 
 public class NpcQuest {
-	Main mPlugin;
+	Plugin mPlugin;
 	Npc mParentNpc;
 	String mRawQuestName;
 	QuestInfo mQuestInfo;
@@ -23,7 +23,7 @@ public class NpcQuest {
 	QuestDialogs mDialogs;
 	QuestTriggers mTriggers;
 	
-	public NpcQuest(Main plugin, String fileLocation, String rawQuestName, Npc npc) {
+	public NpcQuest(Plugin plugin, String fileLocation, String rawQuestName, Npc npc) {
 		mPlugin = plugin;
 		mRawQuestName = rawQuestName;
 		mParentNpc = npc;

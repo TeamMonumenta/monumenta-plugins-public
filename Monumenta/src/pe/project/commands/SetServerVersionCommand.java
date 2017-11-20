@@ -6,12 +6,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class SetServerVersionCommand implements CommandExecutor {
-	private Main mPlugin;
+	private Plugin mPlugin;
 	
-	public SetServerVersionCommand(Main plugin) {
+	public SetServerVersionCommand(Plugin plugin) {
 		mPlugin = plugin;
 	}
 	

@@ -18,12 +18,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.classes.BaseClass;
 
 public class PulseEffectTimers {
 	class EffectInfo {
-		public EffectInfo(Main plugin, Player player, BaseClass playerClass, int abilityID, String tagName, int cooldown, Location loc, int radius) {
+		public EffectInfo(Plugin plugin, Player player, BaseClass playerClass, int abilityID, String tagName, int cooldown, Location loc, int radius) {
 			mPlugin = plugin;
 			mOwner = player;
 			mClass = playerClass;
@@ -97,7 +97,7 @@ public class PulseEffectTimers {
 			return mMarkerEntity;
 		}
 		
-		Main mPlugin;
+		Plugin mPlugin;
 		Player mOwner;
 		Entity mMarkerEntity;
 		BaseClass mClass;
@@ -111,9 +111,9 @@ public class PulseEffectTimers {
 	}	
 	
 	private Vector<EffectInfo> mPulseEffects = null;
-	private Main mPlugin = null;
+	private Plugin mPlugin = null;
 	
-	public PulseEffectTimers(Main plugin) {
+	public PulseEffectTimers(Plugin plugin) {
 		mPulseEffects = new Vector<>();
 		mPlugin = plugin;
 	}

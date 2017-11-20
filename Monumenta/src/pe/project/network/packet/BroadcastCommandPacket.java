@@ -2,7 +2,7 @@ package pe.project.network.packet;
 
 import org.bukkit.Bukkit;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.PacketUtils;
 
 public class BroadcastCommandPacket implements Packet {
@@ -30,7 +30,7 @@ public class BroadcastCommandPacket implements Packet {
 		return PacketUtils.encodeStrings(data);
 	}
 
-	public static void handlePacket(Main plugin, String data) throws Exception {
+	public static void handlePacket(Plugin plugin, String data) throws Exception {
 		String[] rcvStrings = PacketUtils.decodeStrings(data);
 		if (rcvStrings == null || rcvStrings.length != 1) {
 			throw new Exception("Received string data is null or invalid length");

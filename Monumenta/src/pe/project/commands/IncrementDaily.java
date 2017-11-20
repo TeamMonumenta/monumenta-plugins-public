@@ -5,13 +5,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.server.reset.DailyReset;
 
 public class IncrementDaily implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 
-	public IncrementDaily(Main plugin) {
+	public IncrementDaily(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

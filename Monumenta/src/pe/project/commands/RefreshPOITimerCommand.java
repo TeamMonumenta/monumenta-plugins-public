@@ -5,12 +5,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class RefreshPOITimerCommand implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 	
-	public RefreshPOITimerCommand(Main plugin) {
+	public RefreshPOITimerCommand(Plugin plugin) {
 		mPlugin = plugin;
 	}
 	

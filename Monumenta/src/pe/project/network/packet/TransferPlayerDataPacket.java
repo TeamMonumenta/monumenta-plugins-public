@@ -2,7 +2,7 @@ package pe.project.network.packet;
 
 import java.util.UUID;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.playerdata.PlayerData;
 import pe.project.utils.PacketUtils;
 import pe.project.utils.NetworkUtils;
@@ -38,7 +38,7 @@ public class TransferPlayerDataPacket implements Packet {
 		return PacketUtils.encodeStrings(data);
 	}
 
-	public static void handlePacket(Main plugin, String data) throws Exception {
+	public static void handlePacket(Plugin plugin, String data) throws Exception {
 		String[] rcvStrings = PacketUtils.decodeStrings(data);
 		if (rcvStrings == null || rcvStrings.length != 4) {
 			throw new Exception("Received string data is null or invalid length");

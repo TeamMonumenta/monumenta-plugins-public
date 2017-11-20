@@ -5,12 +5,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class GetServerVersionCommand implements CommandExecutor {
-	private Main mPlugin;
+	private Plugin mPlugin;
 	
-	public GetServerVersionCommand(Main plugin) {
+	public GetServerVersionCommand(Plugin plugin) {
 		mPlugin = plugin;
 	}
 	

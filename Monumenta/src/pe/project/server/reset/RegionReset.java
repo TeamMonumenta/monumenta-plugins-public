@@ -4,11 +4,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import net.md_5.bungee.api.ChatColor;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.ScoreboardUtils;
 
 public class RegionReset {
-	public static void handle(Main plugin, Player player) {
+	public static void handle(Plugin plugin, Player player) {
 		if (player != null) {
 			int version = ScoreboardUtils.getScoreboardValue(player, "version");
 			if (version != plugin.mServerVersion) {

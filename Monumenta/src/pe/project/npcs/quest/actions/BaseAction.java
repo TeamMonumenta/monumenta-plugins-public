@@ -2,7 +2,7 @@ package pe.project.npcs.quest.actions;
 
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public interface BaseAction {
 	public enum actionType {
@@ -12,5 +12,5 @@ public interface BaseAction {
 	}
 	
 	public actionType getType();
-	public void trigger(Main plugin, Player player);
+	public void trigger(Plugin plugin, Player player);
 }

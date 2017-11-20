@@ -13,7 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.utils.FileUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ScoreboardUtils;
@@ -24,7 +24,7 @@ public class PlayerData {
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Main plugin, Player player) {
+	static public void savePlayerData(Plugin plugin, Player player) {
 		String playerdata = null;
 		try {
 			playerdata = convertToString(plugin, player);
@@ -41,7 +41,7 @@ public class PlayerData {
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Main plugin, UUID playerUUID, String writeContent) {
+	static public void savePlayerData(Plugin plugin, UUID playerUUID, String writeContent) {
 		if (writeContent == null || writeContent.isEmpty()) {
 			plugin.getLogger().severe("writeContent for player '" + playerUUID + "' is null or empty!");
 			return;
@@ -60,7 +60,7 @@ public class PlayerData {
 	/**
 	 * Makes a backup of the playerdata file and then removes it from the primary location
 	 */
-	static public void removePlayerDataFile(Main plugin, Player player) {
+	static public void removePlayerDataFile(Plugin plugin, Player player) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 		final String backupFileLocation = plugin.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
 
@@ -80,7 +80,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static public String convertToString(Main plugin, Player player) throws Exception {
+	static public String convertToString(Plugin plugin, Player player) throws Exception {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		JsonObject root = new JsonObject();
@@ -124,7 +124,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static public void loadPlayerData(Main plugin, Player player) throws Exception {
+	static public void loadPlayerData(Plugin plugin, Player player) throws Exception {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 
 		String content = "";
@@ -162,7 +162,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static private void _loadPlayerData(Main plugin, Player player, String content) throws Exception {
+	static private void _loadPlayerData(Plugin plugin, Player player, String content) throws Exception {
 		if (content == null || content.isEmpty()) {
 			throw new Exception("Specified player content is null or empty!");
 		}

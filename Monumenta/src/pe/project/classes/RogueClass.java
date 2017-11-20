@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -90,7 +90,7 @@ public class RogueClass extends BaseClass {
 	private static int ASSASSINATION_2_DAMAGE = 24;
 	private static int ASSASSINATION_ELITE_MODIFIER = 2;
 
-	public RogueClass(Main plugin, Random random) {
+	public RogueClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 

@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.LocationManager;
@@ -33,10 +33,10 @@ import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.NetworkUtils;
 
 public class PlayerTracking implements EntityTracking {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 	private Set<Player> mEntities = new HashSet<Player>();
 
-	PlayerTracking(Main plugin) {
+	PlayerTracking(Plugin plugin) {
 		mPlugin = plugin;
 	}
 

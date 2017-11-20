@@ -23,7 +23,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
@@ -84,7 +84,7 @@ public class AlchemistClass extends BaseClass {
 
 	//	POISON_TRAIL
 
-	public AlchemistClass(Main plugin, Random random) {
+	public AlchemistClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 

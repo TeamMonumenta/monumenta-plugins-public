@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionType;
 
 import com.google.gson.JsonObject;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 
 public class PotionUtils {
@@ -191,7 +191,7 @@ public class PotionUtils {
 		return effectsList;
 	}
 	
-	public static void applyPotion(Main plugin, Player player, PotionEffect effect) {
+	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
 		if (effect.getType().getName() == PotionEffectType.HEAL.getName()) {
 			double health = player.getHealth();
 			double healthToAdd = 4 * (effect.getAmplifier()+1);

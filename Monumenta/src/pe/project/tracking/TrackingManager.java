@@ -10,10 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 
 import pe.project.Constants;
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class TrackingManager {
-	Main mPlugin = null;
+	Plugin mPlugin = null;
 
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
@@ -21,7 +21,7 @@ public class TrackingManager {
 	public SilverfishTracking mSilverfish;
 	public FishingHookTracking mFishingHook;
 
-	public TrackingManager(Main plugin, World world) {
+	public TrackingManager(Plugin plugin, World world) {
 		mPlugin = plugin;
 
 		mPlayers = new PlayerTracking(mPlugin);

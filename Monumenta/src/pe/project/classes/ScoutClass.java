@@ -27,7 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -84,7 +84,7 @@ public class ScoutClass extends BaseClass {
 	private static int STANDARD_BEARER_TRIGGER_RADIUS = 12;
 	private static double STANDARD_BEARER_DAMAGE_MULTIPLIER = 1.25;
 	
-	public ScoutClass(Main plugin, Random random) {
+	public ScoutClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 	

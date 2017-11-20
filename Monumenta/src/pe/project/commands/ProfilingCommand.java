@@ -16,12 +16,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class ProfilingCommand implements CommandExecutor {
-	Main mPlugin;
+	Plugin mPlugin;
 	
-	public ProfilingCommand(Main plugin) {
+	public ProfilingCommand(Plugin plugin) {
 		mPlugin = plugin;
 	}
 	

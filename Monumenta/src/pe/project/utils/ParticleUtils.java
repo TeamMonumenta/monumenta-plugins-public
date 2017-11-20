@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import pe.project.Main;
+import pe.project.Plugin;
 
 public class ParticleUtils {
 	public static void playParticleInWorld(World world, Particle type, Location loc, int count) {
@@ -21,7 +21,7 @@ public class ParticleUtils {
 		world.spawnParticle(type, loc, count, xOffset, yOffset, zOffset, data);
 	}
 	
-	public static void explodingSphereEffect(Main plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2) {
+	public static void explodingSphereEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2) {
 		new BukkitRunnable(){
             double t = Math.PI/4;
             Location loc = player.getLocation();
@@ -62,7 +62,7 @@ public class ParticleUtils {
 		}.runTaskTimer(plugin, 0, 1);
 	}
 	
-	public static void explodingConeEffect(Main plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
+	public static void explodingConeEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
 		new BukkitRunnable(){
             double t = Math.PI/4;
             Location loc = player.getLocation();
