@@ -24,16 +24,16 @@ public class PlayerData {
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Main main, Player player) {
+	static public void savePlayerData(Main plugin, Player player) {
 		String playerdata = null;
 		try {
-			playerdata = convertToString(main, player);
+			playerdata = convertToString(plugin, player);
 		} catch (Exception e) {
-			main.getLogger().severe("Failed to get player data");
+			plugin.getLogger().severe("Failed to get player data");
 			e.printStackTrace();
 		}
 
-		savePlayerData(main, player.getUniqueId(), playerdata);
+		savePlayerData(plugin, player.getUniqueId(), playerdata);
 	}
 
 	/**
@@ -41,18 +41,18 @@ public class PlayerData {
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Main main, UUID playerUUID, String writeContent) {
+	static public void savePlayerData(Main plugin, UUID playerUUID, String writeContent) {
 		if (writeContent == null || writeContent.isEmpty()) {
-			main.getLogger().severe("writeContent for player '" + playerUUID + "' is null or empty!");
+			plugin.getLogger().severe("writeContent for player '" + playerUUID + "' is null or empty!");
 			return;
 		}
 
-		final String fileLocation = main.getDataFolder() + File.separator + "players" + File.separator + playerUUID + ".json";
+		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + playerUUID + ".json";
 
 		try {
 			FileUtils.writeFile(fileLocation, writeContent);
 		} catch (Exception e) {
-			main.getLogger().severe("Failed to write player data to " + fileLocation);
+			plugin.getLogger().severe("Failed to write player data to " + fileLocation);
 			e.printStackTrace();
 		}
 	}
@@ -60,9 +60,9 @@ public class PlayerData {
 	/**
 	 * Makes a backup of the playerdata file and then removes it from the primary location
 	 */
-	static public void removePlayerDataFile(Main main, Player player) {
-		final String fileLocation = main.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
-		final String backupFileLocation = main.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
+	static public void removePlayerDataFile(Main plugin, Player player) {
+		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
+		final String backupFileLocation = plugin.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
 
 		try {
 			FileUtils.moveFile(fileLocation, backupFileLocation);
@@ -70,7 +70,7 @@ public class PlayerData {
 			// Player file didn't exist, no problem
 			return;
 		} catch (Exception e) {
-			main.getLogger().severe("Generic failure backing up player data file");
+			plugin.getLogger().severe("Generic failure backing up player data file");
 			e.printStackTrace();
 		}
 	}
@@ -80,7 +80,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static public String convertToString(Main main, Player player) throws Exception {
+	static public String convertToString(Main plugin, Player player) throws Exception {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		JsonObject root = new JsonObject();
@@ -92,7 +92,7 @@ public class PlayerData {
 		root.addProperty("xp", player.getExp());
 
 		//	Save Player Potion Data
-		JsonObject potions = main.mPotionManager.getAsJsonObject(player);
+		JsonObject potions = plugin.mPotionManager.getAsJsonObject(player);
 		if (potions != null) {
 			root.add("potion_info", potions);
 		}
@@ -124,8 +124,8 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static public void loadPlayerData(Main main, Player player) throws Exception {
-		final String fileLocation = main.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
+	static public void loadPlayerData(Main plugin, Player player) throws Exception {
+		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 
 		String content = "";
 		try {
@@ -140,16 +140,16 @@ public class PlayerData {
 		}
 
 		try {
-			_loadPlayerData(main, player, content);
+			_loadPlayerData(plugin, player, content);
 		} catch (Exception e) {
-			final String backupFileLocation = main.getDataFolder() + File.separator + "broken_players" + File.separator + player.getUniqueId() + ".json";
-			main.getLogger().severe("Failed to apply player data from saved file to player '" + player.getName() + "'");
-			main.getLogger().severe("Writing failing player data to '" + backupFileLocation + "'");
+			final String backupFileLocation = plugin.getDataFolder() + File.separator + "broken_players" + File.separator + player.getUniqueId() + ".json";
+			plugin.getLogger().severe("Failed to apply player data from saved file to player '" + player.getName() + "'");
+			plugin.getLogger().severe("Writing failing player data to '" + backupFileLocation + "'");
 
 			try {
 				FileUtils.writeFile(backupFileLocation, content);
 			} catch (Exception ex) {
-				main.getLogger().severe("Failed to write player data to " + backupFileLocation);
+				plugin.getLogger().severe("Failed to write player data to " + backupFileLocation);
 			}
 
 			// Propogate the more-important exception regardless of whether the player data writing failed
@@ -162,7 +162,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static private void _loadPlayerData(Main main, Player player, String content) throws Exception {
+	static private void _loadPlayerData(Main plugin, Player player, String content) throws Exception {
 		if (content == null || content.isEmpty()) {
 			throw new Exception("Specified player content is null or empty!");
 		}
@@ -200,7 +200,7 @@ public class PlayerData {
 		}
 
 		//	Load Player Potion Data.
-		main.mPotionManager.loadFromJsonObject(player, object);
+		plugin.mPotionManager.loadFromJsonObject(player, object);
 
 		//	Load Armor.
 		JsonElement armor = object.get("armor");

@@ -15,10 +15,10 @@ import pe.project.utils.InventoryUtils;
 //	/transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
 
 public class TransferServer implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public TransferServer(Main main) {
-		mMain = main;
+	public TransferServer(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class TransferServer implements CommandExecutor {
 			// No arguments - print usage and request list of available servers
 			sender.sendMessage(ChatColor.RED + "Usage: " + command.getUsage());
 			try {
-				NetworkUtils.getServerList(mMain, (Player)sender);
+				NetworkUtils.getServerList(mPlugin, (Player)sender);
 			} catch (Exception e) {
 				sender.sendMessage("Requesting server list from bungee failed");
 			}
@@ -42,16 +42,16 @@ public class TransferServer implements CommandExecutor {
 		String server = arg3[0];
 
 		// Error if target server is now allowed
-		if (!(mMain.mServerProporties.mAllowedTransferTargets.isEmpty()
-			  || mMain.mServerProporties.mAllowedTransferTargets.contains(server))) {
+		if (!(mPlugin.mServerProporties.mAllowedTransferTargets.isEmpty()
+			  || mPlugin.mServerProporties.mAllowedTransferTargets.contains(server))) {
 			sender.sendMessage(ChatColor.RED + "You may not transfer to that server from here!");
 			sender.sendMessage(ChatColor.RED + "Allowed servers are: " +
-			                   mMain.mServerProporties.mAllowedTransferTargets.toString());
+			                   mPlugin.mServerProporties.mAllowedTransferTargets.toString());
 			return false;
 		}
 
 		// Default to server properties - if properties says false, no way to set to true
-		boolean sendPlayerStuff = mMain.mServerProporties.getTransferDataEnabled();
+		boolean sendPlayerStuff = mPlugin.mServerProporties.getTransferDataEnabled();
 
 		if (arg3.length == 2) {
 			if (arg3[1].equals("False") || arg3[1].equals("false") || arg3[1].equals("f") || arg3[1].equals("F")) {
@@ -87,10 +87,10 @@ public class TransferServer implements CommandExecutor {
 
 				InventoryUtils.removeSpecialItems(player);
 
-				NetworkUtils.transferPlayerData(mMain, player, server);
+				NetworkUtils.transferPlayerData(mPlugin, player, server);
 			} else {
 				player.sendMessage(ChatColor.GOLD + "Transferring you " + ChatColor.RED  + "without playerdata" + ChatColor.GOLD + " to " + server);
-				NetworkUtils.sendPlayer(mMain, player, server);
+				NetworkUtils.sendPlayer(mPlugin, player, server);
 			}
 		} catch (Exception e) {
 			sender.sendMessage("Caught exception when transferring players");

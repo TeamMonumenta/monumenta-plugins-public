@@ -21,8 +21,8 @@ public class TrackingManager {
 	public SilverfishTracking mSilverfish;
 	public FishingHookTracking mFishingHook;
 
-	public TrackingManager(Main main, World world) {
-		mPlugin = main;
+	public TrackingManager(Main plugin, World world) {
+		mPlugin = plugin;
 
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();

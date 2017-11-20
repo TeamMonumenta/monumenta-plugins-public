@@ -30,19 +30,19 @@ public class BroadcastCommandPacket implements Packet {
 		return PacketUtils.encodeStrings(data);
 	}
 
-	public static void handlePacket(Main main, String data) throws Exception {
+	public static void handlePacket(Main plugin, String data) throws Exception {
 		String[] rcvStrings = PacketUtils.decodeStrings(data);
 		if (rcvStrings == null || rcvStrings.length != 1) {
 			throw new Exception("Received string data is null or invalid length");
 		}
 
-		if (main.mServerProporties.getBroadcastCommandEnabled() == true
+		if (plugin.mServerProporties.getBroadcastCommandEnabled() == true
 			|| rcvStrings[0].startsWith("say")
 			|| rcvStrings[0].startsWith("msg")
 			|| rcvStrings[0].startsWith("tell")
 			|| rcvStrings[0].startsWith("tellraw")) {
 
-			main.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
+			plugin.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]);
 		}
 	}

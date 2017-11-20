@@ -13,10 +13,10 @@ import org.bukkit.ChatColor;
 import pe.project.Main;
 
 public class Forward implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public Forward(Main main) {
-		mMain = main;
+	public Forward(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class Forward implements CommandExecutor {
 		UUID playerUUID = player.getUniqueId();
 
 		// Get the stack of previous teleport locations
-		Stack<Location> forwardStack = mMain.mForwardLocations.get(playerUUID);
+		Stack<Location> forwardStack = mPlugin.mForwardLocations.get(playerUUID);
 		if (forwardStack == null || forwardStack.empty()) {
 			sender.sendMessage(ChatColor.RED + "No forward location to teleport to");
 			return true;
@@ -45,7 +45,7 @@ public class Forward implements CommandExecutor {
 		Location target = forwardStack.pop();
 
 		// Save updated stack
-		mMain.mForwardLocations.put(playerUUID, forwardStack);
+		mPlugin.mForwardLocations.put(playerUUID, forwardStack);
 
 		// Teleport the player
 		player.teleport(target);

@@ -38,7 +38,7 @@ public class TransferPlayerDataPacket implements Packet {
 		return PacketUtils.encodeStrings(data);
 	}
 
-	public static void handlePacket(Main main, String data) throws Exception {
+	public static void handlePacket(Main plugin, String data) throws Exception {
 		String[] rcvStrings = PacketUtils.decodeStrings(data);
 		if (rcvStrings == null || rcvStrings.length != 4) {
 			throw new Exception("Received string data is null or invalid length");
@@ -50,9 +50,9 @@ public class TransferPlayerDataPacket implements Packet {
 		String playerContent = rcvStrings[3];
 
 		// Save the player data so that when the player logs in they'll get it applied to them
-		PlayerData.savePlayerData(main, playerUUID, playerContent);
+		PlayerData.savePlayerData(plugin, playerUUID, playerContent);
 
 		// Everything looks good - request bungeecord transfer the player to this server
-		NetworkUtils.sendPlayer(main, playerName, playerUUID, server);
+		NetworkUtils.sendPlayer(plugin, playerName, playerUUID, server);
 	}
 }

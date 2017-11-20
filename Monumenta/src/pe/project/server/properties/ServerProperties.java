@@ -54,23 +54,23 @@ public class ServerProperties {
 		return mQuestCompassEnabled;
 	}
 
-	public void load(Main main) {
-		final String fileLocation = main.getDataFolder() + File.separator + FILE_NAME;
+	public void load(Main plugin) {
+		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
 		try {
 			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {
-				_loadFromString(main, content);
+				_loadFromString(plugin, content);
 			}
 		} catch (FileNotFoundException e) {
-			main.getLogger().info("Properties.json file does not exist - using default values" + e);
+			plugin.getLogger().info("Properties.json file does not exist - using default values" + e);
 		} catch (Exception e) {
-			main.getLogger().severe("Caught exception: " + e);
+			plugin.getLogger().severe("Caught exception: " + e);
 			e.printStackTrace();
 		}
 	}
 
-	private void _loadFromString(Main main, String content) throws Exception {
+	private void _loadFromString(Main plugin, String content) throws Exception {
 		if (content != null && content != "") {
 			try {
 				Gson gson = new Gson();
@@ -78,17 +78,17 @@ public class ServerProperties {
 				//	Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled			= _getPropertyValueBool(main, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled		= _getPropertyValueBool(main, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled		= _getPropertyValueBool(main, object, "transferDataEnabled", mTransferDataEnabled);
-					mIsTownWorld				= _getPropertyValueBool(main, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled	= _getPropertyValueBool(main, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
-					mPlotSurvivalMinHeight		= _getPropertyValueInt(main, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mAllowedTransferTargets		= _getPropertyValueStringSet(main, object, "allowedTransferTargets");
-					mQuestCompassEnabled		= _getPropertyValueBool(main, object, "questCompassEnabled", mQuestCompassEnabled);
+					mDailyResetEnabled			= _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled		= _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled		= _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld				= _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled	= _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight		= _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mAllowedTransferTargets		= _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mQuestCompassEnabled		= _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
 				}
 			} catch (Exception e) {
-				main.getLogger().severe("Caught exception: " + e);
+				plugin.getLogger().severe("Caught exception: " + e);
 				e.printStackTrace();
 			}
 		}

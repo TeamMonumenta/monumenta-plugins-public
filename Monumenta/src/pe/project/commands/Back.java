@@ -13,10 +13,10 @@ import org.bukkit.ChatColor;
 import pe.project.Main;
 
 public class Back implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public Back(Main main) {
-		mMain = main;
+	public Back(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class Back implements CommandExecutor {
 		UUID playerUUID = player.getUniqueId();
 
 		// Get the stack of previous teleport locations
-		Stack<Location> backStack = mMain.mBackLocations.get(playerUUID);
+		Stack<Location> backStack = mPlugin.mBackLocations.get(playerUUID);
 		if (backStack == null || backStack.empty()) {
 			sender.sendMessage(ChatColor.RED + "No back location to teleport to");
 			return true;
@@ -45,18 +45,18 @@ public class Back implements CommandExecutor {
 		Location target = backStack.pop();
 
 		// Get the stack of previous /back locations and push the target location to it
-		Stack<Location> forwardStack = mMain.mForwardLocations.get(playerUUID);
+		Stack<Location> forwardStack = mPlugin.mForwardLocations.get(playerUUID);
 		if (forwardStack == null) {
 			forwardStack = new Stack<Location>();
 		}
 		forwardStack.push(player.getLocation());
 
 		// Set the status to indicate that the next teleport shouldn't be added to the list
-		mMain.mSkipBackLocation.put(playerUUID, new Boolean(true));
+		mPlugin.mSkipBackLocation.put(playerUUID, new Boolean(true));
 
 		// Save updated stacks
-		mMain.mBackLocations.put(playerUUID, backStack);
-		mMain.mForwardLocations.put(playerUUID, forwardStack);
+		mPlugin.mBackLocations.put(playerUUID, backStack);
+		mPlugin.mForwardLocations.put(playerUUID, forwardStack);
 
 		// Teleport the player
 		player.teleport(target);

@@ -21,7 +21,7 @@ public class HeartbeatPacket implements Packet {
 		return "Hello";
 	}
 
-	public static void handlePacket(Main main, String data) throws Exception {
+	public static void handlePacket(Main plugin, String data) throws Exception {
 		throw new Exception("Got message from which should only be received by bungeecord");
 	}
 }

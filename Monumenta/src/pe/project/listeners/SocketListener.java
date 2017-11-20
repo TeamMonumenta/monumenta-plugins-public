@@ -13,15 +13,15 @@ import pe.project.utils.PacketUtils;
 import pe.project.network.packet.HeartbeatPacket;
 
 public class SocketListener implements Listener {
-	Main mMain = null;
+	Main mPlugin = null;
 
-	public SocketListener(Main main) {
-		mMain = main;
+	public SocketListener(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onConnect(BukkitSocketHandshakeEvent e){
-		mMain.mSocketClient = e.getClient();
+		mPlugin.mSocketClient = e.getClient();
 
 		/* This deferred task helps work around a bug in Socket4MC/SocketAPI
 		 * If bungee restarts when the servers are already up, the sockets connect
@@ -36,18 +36,18 @@ public class SocketListener implements Listener {
 			public void run() {
 				if (++tick == 100) {
 					try {
-						mMain.getLogger().info("Sending heartbeat message to bungee");
+						mPlugin.getLogger().info("Sending heartbeat message to bungee");
 						// Send a simple hello message to bungee
-						PacketUtils.SendPacket(mMain, new HeartbeatPacket());
+						PacketUtils.SendPacket(mPlugin, new HeartbeatPacket());
 					} catch (Exception ex) {
-						mMain.getLogger().severe("Caught exception sending HeartbeatPacket: " + ex);
+						mPlugin.getLogger().severe("Caught exception sending HeartbeatPacket: " + ex);
 						ex.printStackTrace();
 					}
 
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mMain, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -56,9 +56,9 @@ public class SocketListener implements Listener {
 		String data = e.getData();
 
 		try {
-			PacketUtils.ProcessPacket(mMain, channel, data);
+			PacketUtils.ProcessPacket(mPlugin, channel, data);
 		} catch (Exception ex) {
-			mMain.getLogger().severe("Caught exception handling packet on channel '" + channel + "'");
+			mPlugin.getLogger().severe("Caught exception handling packet on channel '" + channel + "'");
 			ex.printStackTrace();
 			return;
 		}

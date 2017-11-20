@@ -9,20 +9,20 @@ import pe.project.Main;
 import pe.project.server.reset.DailyReset;
 
 public class IncrementDaily implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public IncrementDaily(Main main) {
-		mMain = main;
+	public IncrementDaily(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
 		//	Increment the servers Daily version.
-		mMain.incrementDailyVersion();
+		mPlugin.incrementDailyVersion();
 
 		//	Loop through all online players, reset their scoreboards and message them about the Daily reset.
-		for (Player player : mMain.getServer().getOnlinePlayers()) {
-			DailyReset.handle(mMain, player);
+		for (Player player : mPlugin.getServer().getOnlinePlayers()) {
+			DailyReset.handle(mPlugin, player);
 		}
 
 		return true;

@@ -13,10 +13,10 @@ import pe.project.utils.CommandUtils;
 
 
 public class MinusExp implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public MinusExp(Main main) {
-		mMain = main;
+	public MinusExp(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
@@ -79,12 +79,14 @@ public class MinusExp implements CommandExecutor {
 	}
 
 	private void _setTotalExp(Player player, float exp) {
-		if (exp < 0)
+		if (exp < 0) {
 			exp = 0.0F;
+		}
 
 		int level = 0;
-		while (_levelToExp(level + 1) < exp)
+		while (_levelToExp(level + 1) < exp) {
 			level++;
+		}
 
 		player.setLevel(level);
 		player.setExp((exp - _levelToExp(level)) / (_levelToExp(level + 1) - _levelToExp(level)));

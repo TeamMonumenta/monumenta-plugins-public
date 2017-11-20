@@ -6,5 +6,5 @@ public interface Packet {
 
 	// Implementers should also have the following static methods:
 	// String getPacketChannel();
-	// void handlePacket(Main main, String data) throws Exception;
+	// void handlePacket(Main plugin, String data) throws Exception;
 }

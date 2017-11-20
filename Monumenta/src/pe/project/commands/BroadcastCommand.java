@@ -11,15 +11,15 @@ import pe.project.Main;
 import pe.project.utils.NetworkUtils;
 
 public class BroadcastCommand implements CommandExecutor {
-	Main mMain;
+	Main mPlugin;
 
-	public BroadcastCommand(Main main) {
-		mMain = main;
+	public BroadcastCommand(Main plugin) {
+		mPlugin = plugin;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
-		if (mMain.mServerProporties.getBroadcastCommandEnabled() == false) {
+		if (mPlugin.mServerProporties.getBroadcastCommandEnabled() == false) {
 			sender.sendMessage(ChatColor.RED + "Use of this command is restricted on this server");
 			return false;
 		}
@@ -89,7 +89,7 @@ public class BroadcastCommand implements CommandExecutor {
 
 		sender.sendMessage(ChatColor.GOLD + "Broadcasting command '" + commandStr + "' to all servers!");
 		try {
-			NetworkUtils.broadcastCommand(mMain, commandStr);
+			NetworkUtils.broadcastCommand(mPlugin, commandStr);
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
 		}

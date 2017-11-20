@@ -6,25 +6,25 @@ import pe.project.Main;
 import pe.project.network.packet.*;
 
 public class PacketUtils {
-	public static void SendPacket(Main main, Packet packet) throws Exception {
+	public static void SendPacket(Main plugin, Packet packet) throws Exception {
 		// Serialize the packet data into a string that can be sent
 		String data = packet.getPacketData();
 
 		// Send that string to the bungeecord proxy via the opened socket
-		main.mSocketClient.writeJSON(packet.getPacketChannel(), data);
+		plugin.mSocketClient.writeJSON(packet.getPacketChannel(), data);
 	}
 
-	public static void ProcessPacket(Main main, String channel, String data) throws Exception {
+	public static void ProcessPacket(Main plugin, String channel, String data) throws Exception {
 		if (channel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
-			TransferPlayerDataPacket.handlePacket(main, data);
+			TransferPlayerDataPacket.handlePacket(plugin, data);
 		} else if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {
-			SendPlayerPacket.handlePacket(main, data);
+			SendPlayerPacket.handlePacket(plugin, data);
 		} else if (channel.equals(HeartbeatPacket.getStaticPacketChannel())) {
-			HeartbeatPacket.handlePacket(main, data);
+			HeartbeatPacket.handlePacket(plugin, data);
 		} else if (channel.equals(GetServerListPacket.getStaticPacketChannel())) {
-			GetServerListPacket.handlePacket(main, data);
+			GetServerListPacket.handlePacket(plugin, data);
 		} else if (channel.equals(BroadcastCommandPacket.getStaticPacketChannel())) {
-			BroadcastCommandPacket.handlePacket(main, data);
+			BroadcastCommandPacket.handlePacket(plugin, data);
 		}
 	}
 
