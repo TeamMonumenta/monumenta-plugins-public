@@ -140,6 +140,7 @@ public class Main extends JavaPlugin {
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
+			getCommand("minusexp").setExecutor(new MinusExp(this));
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
