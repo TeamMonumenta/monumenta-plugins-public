@@ -1,11 +1,8 @@
 package pe.project.listeners;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -21,7 +18,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,7 +54,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.items.QuestingCompass;
 import pe.project.locations.safezones.SafeZoneConstants;
 import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 import pe.project.managers.potion.PotionManager.PotionID;
@@ -75,19 +70,6 @@ public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
 	World mWorld = null;
 	Random mRandom = null;
-
-	/*
-	 * List of materials that are allowed to be placed by
-	 * players in survival even if they have lore text
-	 */
-	public static Set<Material> ALLOW_LORE_MATS = new HashSet<>(Arrays.asList(
-		Material.CHEST,
-		Material.PACKED_ICE,
-		Material.WOOL,
-		Material.SKULL,
-		Material.SKULL_ITEM
-	));
-
 
 	public PlayerListener(Plugin plugin, World world, Random random) {
 		mPlugin = plugin;
@@ -153,20 +135,18 @@ public class PlayerListener implements Listener {
 
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			if (!_handleLeftClickInteract(player, action, item, block)) {
+			if (!mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 			}
 		}
 		//	Right Click.
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			if (!_handleRightClickInteract(player, action, item, block)) {
+			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 			}
-		} else if (event.getAction() == Action.PHYSICAL) {
-			if (block != null) {
-				if (block.getType() == Material.SOIL) {
-					event.setCancelled(true);
-				}
+		} else if (action == Action.PHYSICAL) {
+			if (!mPlugin.mItemOverrides.physicsInteraction(mPlugin, player, action, item, block)) {
+				event.setCancelled(true);
 			}
 		}
 	}
@@ -174,33 +154,21 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void BlockPlaceEvent(BlockPlaceEvent event) {
 		ItemStack item = event.getItemInHand();
+		Player player = event.getPlayer();
 
-		if (item.hasItemMeta() && item.getItemMeta().hasLore()
-			&& event.getPlayer().getGameMode() != GameMode.CREATIVE
-			&& !(ALLOW_LORE_MATS.contains(item.getType()))) {
-			/* Prevent accidentally placing most lore items (plants, etc.) */
+		if (!mPlugin.mItemOverrides.blockPlaceInteraction(mPlugin, player, item, event)) {
 			event.setCancelled(true);
-		} else if (item.getType() == Material.PACKED_ICE
-		           && item.hasItemMeta() && item.getItemMeta().hasLore()
-				   && event.getPlayer().getGameMode() == GameMode.SURVIVAL
-				   && ((SafeZoneConstants.withinAnySafeZone(event.getPlayer().getLocation()) != SafeZones.None) || mPlugin.mServerProporties.getIsTownWorld())) {
-			// Special packed ice that becomes water in a plot
-			event.getBlockPlaced().setType(Material.STATIONARY_WATER);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-		Entity entity = event.getRightClicked();
-		if (entity instanceof ZombieVillager) {
-			Player player = event.getPlayer();
-			ItemStack item = player.getEquipment().getItemInMainHand();
-			if (item != null) {
-				Material type = item.getType();
-				if (type == Material.GOLDEN_APPLE) {
-					event.setCancelled(true);
-				}
-			}
+		Player player = event.getPlayer();
+		Entity clickedEntity = event.getRightClicked();
+		ItemStack itemInHand = player.getEquipment().getItemInMainHand();
+
+		if (!mPlugin.mItemOverrides.rightClickEntityInteraction(mPlugin, player, clickedEntity, itemInHand)) {
+			event.setCancelled(true);
 		}
 	}
 
@@ -527,99 +495,5 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
-	}
-
-	//	This function returns false if we don't want to handle this action.
-	private boolean _handleRightClickInteract(Player player, Action action, ItemStack item, Block block) {
-		GameMode gamemode = player.getGameMode();
-		Material itemType = (item != null) ? item.getType() : Material.AIR;
-		Material blockType = (block != null) ? block.getType() : Material.AIR;
-
-		//	Handle Item Interactions.
-		if (itemType != Material.AIR) {
-			switch (itemType) {
-			case MONSTER_EGG: {
-				return (action == Action.RIGHT_CLICK_AIR) ||
-						(action == Action.RIGHT_CLICK_BLOCK && blockType != Material.MOB_SPAWNER);
-			}
-			case COMPASS: {
-				QuestingCompass.handleInteraction(mPlugin, player, action);
-				break;
-			}
-			case FISHING_ROD: {
-				if (action == Action.RIGHT_CLICK_BLOCK) {
-					//	If this is an interactable block it means they didn't really want to be fishing! :D
-					if (ItemUtils.isInteractable(blockType)) {
-						if (mPlugin.mTrackingManager.mFishingHook.containsEntity(player)) {
-							mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
-						}
-					}
-				}
-				break;
-			}
-			case BOAT:
-			case BOAT_ACACIA:
-			case BOAT_BIRCH:
-			case BOAT_DARK_OAK:
-			case BOAT_JUNGLE:
-			case BOAT_SPRUCE: {
-				return (action == Action.RIGHT_CLICK_AIR) ||
-						(action == Action.RIGHT_CLICK_BLOCK && gamemode != GameMode.ADVENTURE);	//	Prevent placing boars in adventure mode.
-			}
-			case BUCKET:
-			case WATER_BUCKET:
-			case LAVA_BUCKET: {
-				return (action == Action.RIGHT_CLICK_AIR) ||
-						(action == Action.RIGHT_CLICK_BLOCK && gamemode == GameMode.CREATIVE);
-			}
-
-			default:
-				break;
-			}
-		}
-
-		//	Handle Block Interactions
-		if (blockType != Material.AIR) {
-			switch (blockType) {
-			case ANVIL: {
-				return (gamemode == GameMode.CREATIVE);
-			}
-
-			default:
-				break;
-			}
-		}
-
-		return true;
-	}
-
-	private boolean _handleLeftClickInteract(Player player, Action action, ItemStack item, Block block) {
-		//GameMode gamemode = player.getGameMode();
-		Material itemType = (item != null) ? item.getType() : Material.AIR;
-		Material blockType = (block != null) ? block.getType() : Material.AIR;
-
-		//	Handle Item Interactions
-		if (itemType != Material.AIR) {
-			switch (itemType) {
-			case COMPASS: {
-				QuestingCompass.handleInteraction(mPlugin, player, action);
-				break;
-			}
-
-			default:
-				break;
-			}
-		}
-
-		//	Handle Block Interactions
-		if (blockType != Material.AIR) {
-			switch (blockType) {
-
-			default:
-				break;
-			}
-		}
-
-		return true;
 	}
 }

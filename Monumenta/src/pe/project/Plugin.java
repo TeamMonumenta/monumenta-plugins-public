@@ -3,14 +3,14 @@ package pe.project;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Stack;
 import java.util.Random;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,16 +18,49 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
-
-import pe.project.classes.*;
-import pe.project.commands.*;
-import pe.project.listeners.*;
+import pe.project.classes.AlchemistClass;
+import pe.project.classes.BaseClass;
+import pe.project.classes.ClericClass;
+import pe.project.classes.MageClass;
+import pe.project.classes.RogueClass;
+import pe.project.classes.ScoutClass;
+import pe.project.classes.WarriorClass;
+import pe.project.commands.Back;
+import pe.project.commands.BroadcastCommand;
+import pe.project.commands.ChatRangeCommand;
+import pe.project.commands.Forward;
+import pe.project.commands.GetScore;
+import pe.project.commands.GetServerVersionCommand;
+import pe.project.commands.IncrementDaily;
+import pe.project.commands.IsShittyCommand;
+import pe.project.commands.MinusExp;
+import pe.project.commands.PlayTimeStats;
+import pe.project.commands.ProfilingCommand;
+import pe.project.commands.QuestTrigger;
+import pe.project.commands.RefreshClassEffects;
+import pe.project.commands.RefreshPOITimerCommand;
+import pe.project.commands.SetGuildPrefix;
+import pe.project.commands.SetPlayerName;
+import pe.project.commands.SetServerVersionCommand;
+import pe.project.commands.TransferScores;
+import pe.project.commands.TransferServer;
+import pe.project.items.ItemOverrides;
+import pe.project.listeners.EntityListener;
+import pe.project.listeners.ItemListener;
+import pe.project.listeners.MobListener;
+import pe.project.listeners.PlayerListener;
+import pe.project.listeners.SocketListener;
+import pe.project.listeners.VehicleListener;
+import pe.project.listeners.WorldListener;
 import pe.project.managers.NpcManager;
 import pe.project.managers.POIManager;
 import pe.project.managers.QuestManager;
 import pe.project.managers.potion.PotionManager;
 import pe.project.server.properties.ServerProperties;
-import pe.project.timers.*;
+import pe.project.timers.CombatLoggingTimers;
+import pe.project.timers.CooldownTimers;
+import pe.project.timers.ProjectileEffectTimers;
+import pe.project.timers.PulseEffectTimers;
 import pe.project.tracking.TrackingManager;
 import pe.project.utils.ScoreboardUtils;
 
@@ -83,6 +116,8 @@ public class Plugin extends JavaPlugin {
 
 	public SocketClient mSocketClient;
 
+	public ItemOverrides mItemOverrides;
+
 	// Used for the /back and /forward commands - stacks of teleport locations
 	public HashMap<UUID, Stack<Location>> mBackLocations = new HashMap<UUID, Stack<Location>>();
 	public HashMap<UUID, Stack<Location>> mForwardLocations = new HashMap<UUID, Stack<Location>>();
@@ -93,6 +128,8 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		PluginManager manager = getServer().getPluginManager();
+
+		mItemOverrides = new ItemOverrides();
 
 		//	Initialize Variables.
 		mRandom = new Random();

@@ -3,24 +3,19 @@ package pe.project.items;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 
 import pe.project.Plugin;
 import pe.project.locations.poi.PointOfInterest;
 import pe.project.point.Point;
 import pe.project.utils.StringUtils;
 
-public class QuestingCompass {
-	public static void handleInteraction(Plugin plugin, Player player, Action action) {
-		if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			_handleRightClick(plugin, player);
-		} else if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			_handleLeftClick(plugin, player);
-		}
-	}
-
-	private static void _handleRightClick(Plugin plugin, Player player) {
+public class CompassOverride extends OverrideItem {
+	@Override
+	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (plugin.mServerProporties.getQuestCompassEnabled()) {
 			//	Show current POI respawn timer.
 			if (player.isSneaking()) {
@@ -61,14 +56,19 @@ public class QuestingCompass {
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting places on this server shard.");
 		}
+
+		return true;
 	}
 
-	private static void _handleLeftClick(Plugin plugin, Player player) {
+	@Override
+	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (plugin.mServerProporties.getQuestCompassEnabled()) {
 			//	Show currently active quest.
 			plugin.mQuestManager.showCurrentQuest(player);
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting quest on this server shard.");
 		}
+
+		return true;
 	}
 }
