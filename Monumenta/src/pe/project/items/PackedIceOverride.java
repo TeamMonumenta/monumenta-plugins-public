@@ -13,6 +13,10 @@ import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
 public class PackedIceOverride extends OverrideItem {
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
+		if (player == null || item == null || event == null) {
+			return true;
+		}
+
 		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() == GameMode.SURVIVAL
 				&& ((SafeZoneConstants.withinAnySafeZone(player.getLocation()) != SafeZones.None) || plugin.mServerProporties.getIsTownWorld())) {
 			event.getBlockPlaced().setType(Material.STATIONARY_WATER);

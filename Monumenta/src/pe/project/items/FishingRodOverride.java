@@ -12,6 +12,10 @@ import pe.project.utils.ItemUtils;
 public class FishingRodOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+		if (block == null || player == null) {
+			return true;
+		}
+
 		Material blockType = block.getType();
 
 		if (action == Action.RIGHT_CLICK_BLOCK) {

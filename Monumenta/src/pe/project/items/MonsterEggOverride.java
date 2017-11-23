@@ -12,6 +12,6 @@ public class MonsterEggOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		//	Are we clicking on a monster spawner?
-		return (block.getType() != Material.MOB_SPAWNER);
+		return (block == null || block.getType() != Material.MOB_SPAWNER);
 	}
 }

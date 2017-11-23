@@ -11,6 +11,6 @@ import pe.project.Plugin;
 public class BucketOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return player.getGameMode() == GameMode.CREATIVE;
+		return (player == null || player.getGameMode() == GameMode.CREATIVE);
 	}
 }

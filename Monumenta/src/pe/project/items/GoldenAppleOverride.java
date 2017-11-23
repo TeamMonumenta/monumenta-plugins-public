@@ -10,6 +10,6 @@ import pe.project.Plugin;
 public class GoldenAppleOverride extends OverrideItem {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
-		return !(clickedEntity instanceof ZombieVillager);
+		return (clickedEntity == null || !(clickedEntity instanceof ZombieVillager));
 	}
 }
