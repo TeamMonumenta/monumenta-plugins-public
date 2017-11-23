@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -283,9 +284,19 @@ public class EntityListener implements Listener {
 	//	Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
+		// Cancel the event immediately if within a safezone
 		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(event.getLocation());
 		if (safeZone != SafeZones.None) {
 			event.setCancelled(true);
+			return;
+		}
+
+		// If any block damaged by an explosion is with a safezone, cancel the explosion
+		for (Block block : event.blockList()) {
+			if (SafeZoneConstants.withinAnySafeZone(block.getLocation()) != SafeZones.None) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 	}
 
