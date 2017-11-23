@@ -28,4 +28,8 @@ public class Constants {
 	public static final boolean POTION_MANAGER_ENABLED = true;
 	public static final boolean QUEST_MANAGER_ENABLED = true;
 	public static final boolean COMMANDS_SERVER_ENABLED = true;
+
+	// Metadata keys
+	public static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
+	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
 }

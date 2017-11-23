@@ -25,6 +25,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -32,6 +34,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -83,6 +86,9 @@ public class PlayerListener implements Listener {
 			event.setJoinMessage("");
 		}
 
+		// Remove the metadata that prevents player from interacting with things (if present)
+		event.getPlayer().removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
+
 		new BukkitRunnable() {
 			Integer tick = 0;
 			@Override
@@ -108,6 +114,9 @@ public class PlayerListener implements Listener {
 
 		Player player = event.getPlayer();
 
+		// Remove the metadata that prevents player from interacting with things (if present)
+		event.getPlayer().removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
+
 		mPlugin.mTrackingManager.removeEntity(player);
 
 		//		If the player is opped don't apply anti-combat logging technology!
@@ -129,6 +138,12 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
+
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
 
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
@@ -161,14 +176,34 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	// Player interacts with an entity (not triggered on armor stands for some reason
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
+
+		/* Don't let the player interact with items when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		Entity clickedEntity = event.getRightClicked();
 		ItemStack itemInHand = player.getEquipment().getItemInMainHand();
 
 		if (!mPlugin.mItemOverrides.rightClickEntityInteraction(mPlugin, player, clickedEntity, itemInHand)) {
 			event.setCancelled(true);
+		}
+	}
+
+	// Player interacts with an armor stand
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+		Player player = event.getPlayer();
+
+		/* Don't let the player interact with items when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 
@@ -209,6 +244,12 @@ public class PlayerListener implements Listener {
 	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 
+		/* Don't let the player drop items when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 
@@ -217,9 +258,15 @@ public class PlayerListener implements Listener {
 
 	//	The player picked up an item.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityPickupItemEvent(PlayerPickupItemEvent event) {
+	public void PlayerPickupItemEvent(PlayerPickupItemEvent event) {
 		Player player = event.getPlayer();
 		String name = player.getName();
+
+		/* Don't let the player pick up items when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
 
 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 			@Override
@@ -272,6 +319,34 @@ public class PlayerListener implements Listener {
 					mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
 				}
 			}, 0);
+		}
+	}
+
+	//	The player opened an inventory
+	@EventHandler(priority = EventPriority.HIGH)
+	public void InventoryOpenEvent(InventoryOpenEvent event) {
+		if (event.getPlayer() instanceof Player) {
+			Player player = (Player)event.getPlayer();
+
+			/* Don't let the player open inventories when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
+	//	Something interacts with an inventory
+	@EventHandler(priority = EventPriority.HIGH)
+	public void InventoryInteractEvent(InventoryInteractEvent event) {
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player)event.getWhoClicked();
+
+			/* Don't let the player interact with inventories when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 	}
 

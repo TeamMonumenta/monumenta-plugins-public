@@ -23,9 +23,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import pe.project.Plugin;
 import pe.project.utils.ItemUtils;
+import pe.project.Constants;
 
 public class MobListener implements Listener {
-	static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 
 	Plugin mPlugin = null;
@@ -60,25 +60,25 @@ public class MobListener implements Listener {
 		Entity mob = event.getEntity();
 		int spawnCount = 1;
 
-		if (spawner.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+		if (spawner.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 			// There should only be one value - just use the latest one
-			for (MetadataValue value : spawner.getMetadata(SPAWNER_COUNT_METAKEY)) {
+			for (MetadataValue value : spawner.getMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 				// Previous value found - add one to it for the currently-spawning mob
 				spawnCount = value.asInt() + 1;
 			}
 		}
 
 		// Create new metadata entries
-		spawner.setMetadata(SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
-		mob.setMetadata(SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+		spawner.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 	}
 
 	/* Clear the metadata if it exists when a player breaks a block */
 	@EventHandler(priority = EventPriority.LOWEST)
 	void BlockBreakEvent(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (block.hasMetadata(SPAWNER_COUNT_METAKEY)) {
-			event.getBlock().removeMetadata(SPAWNER_COUNT_METAKEY, mPlugin);
+		if (block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+			event.getBlock().removeMetadata(Constants.SPAWNER_COUNT_METAKEY, mPlugin);
 		}
 	}
 
@@ -88,11 +88,11 @@ public class MobListener implements Listener {
 		boolean shouldGenDrops = true;
 
 		// Check if this mob was likely spawned by a grinder spawner
-		if (entity.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+		if (entity.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 			int spawnCount = 0;
 
 			// There should only be one value - just use the latest one
-			for (MetadataValue value : entity.getMetadata(SPAWNER_COUNT_METAKEY)) {
+			for (MetadataValue value : entity.getMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 				spawnCount = value.asInt();
 			}
 

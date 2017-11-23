@@ -5,9 +5,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import org.bukkit.ChatColor;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.NetworkUtils;
 import pe.project.utils.InventoryUtils;
@@ -84,6 +86,9 @@ public class TransferServer implements CommandExecutor {
 		try {
 			if (sendPlayerStuff == true) {
 				player.sendMessage(ChatColor.GOLD + "Transferring you to " + server);
+
+				/* Mark this player as inventory locked */
+				player.setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(mPlugin, true));
 
 				InventoryUtils.removeSpecialItems(player);
 
