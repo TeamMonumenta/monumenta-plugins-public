@@ -1,7 +1,6 @@
 package pe.project.utils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.EnumSet;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -15,7 +14,7 @@ import org.bukkit.potion.PotionType;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class ItemUtils {
-	public static List<Material> interactables = Arrays.asList(
+	public static EnumSet<Material> interactables = EnumSet.of(
             Material.ACACIA_DOOR,
             Material.ACACIA_FENCE_GATE,
             Material.ANVIL,
@@ -66,7 +65,7 @@ public class ItemUtils {
             Material.WORKBENCH
 	);
 
-	public static List<Material> armors = Arrays.asList(
+	public static EnumSet<Material> armors = EnumSet.of(
             Material.LEATHER_BOOTS,
             Material.LEATHER_CHESTPLATE,
             Material.LEATHER_HELMET,
@@ -93,7 +92,7 @@ public class ItemUtils {
             Material.DIAMOND_LEGGINGS
 	);
 
-	public static List<Material> doors = Arrays.asList(
+	public static EnumSet<Material> doors = EnumSet.of(
 			Material.ACACIA_DOOR,
 			Material.BIRCH_DOOR,
 			Material.DARK_OAK_DOOR,
@@ -101,6 +100,15 @@ public class ItemUtils {
 			Material.JUNGLE_DOOR,
 			Material.SPRUCE_DOOR,
 			Material.WOOD_DOOR
+	);
+
+	// List of materials that trees can replace when they grow
+	public static EnumSet<Material> allowedTreeReplaceMaterials = EnumSet.of(
+			Material.AIR,
+			Material.LEAVES,
+			Material.LEAVES_2,
+			Material.SAPLING,
+			Material.VINE
 	);
 
 	/**
@@ -161,32 +169,18 @@ public class ItemUtils {
 	}
 
 	public static boolean isInteractable(Material mat) {
-		for (Material material : interactables) {
-			if (material.equals(mat)) {
-				return true;
-			}
-		}
-
-		return false;
+		return interactables.contains(mat);
 	}
 
 	public static boolean isArmorItem(Material item) {
-		for (Material material : armors) {
-			if (material.equals(item)) {
-				return true;
-			}
-		}
-
-		return false;
+		return armors.contains(item);
 	}
 
 	public static boolean isDoor(Material item) {
-		for (Material material : doors) {
-			if (material.equals(item)) {
-				return true;
-			}
-		}
+		return doors.contains(item);
+	}
 
-		return false;
+	public static boolean isAllowedTreeReplace(Material item) {
+		return allowedTreeReplaceMaterials.contains(item);
 	}
 }

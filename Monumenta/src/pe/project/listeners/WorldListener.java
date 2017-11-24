@@ -1,7 +1,6 @@
 package pe.project.listeners;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -9,7 +8,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -25,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.utils.ItemUtils;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
@@ -34,17 +33,6 @@ public class WorldListener implements Listener {
 		mPlugin = plugin;
 		mWorld = world;
 	}
-
-	/*
-	 * List of materials that trees can not grow through
-	 */
-	public static Set<Material> ALLOW_TREE_MATS = EnumSet.of(
-		Material.AIR,
-		Material.LEAVES,
-		Material.LEAVES_2,
-		Material.SAPLING,
-		Material.VINE
-	);
 
 	//	A Chunk Loaded.
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -76,7 +64,7 @@ public class WorldListener implements Listener {
 		while (iter.hasNext()) {
 			BlockState bs = iter.next();
 
-			if (ALLOW_TREE_MATS.contains(bs.getBlock().getType())) {
+			if (ItemUtils.isAllowedTreeReplace(bs.getBlock().getType())) {
 				// Mark every potentially allowed block with metadata
 				bs.getBlock().setMetadata(Constants.TREE_METAKEY, new FixedMetadataValue(mPlugin, true));
 			} else {
