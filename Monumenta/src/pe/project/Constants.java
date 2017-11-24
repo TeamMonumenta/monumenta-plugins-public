@@ -32,4 +32,5 @@ public class Constants {
 	// Metadata keys
 	public static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
 	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
+	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 }
