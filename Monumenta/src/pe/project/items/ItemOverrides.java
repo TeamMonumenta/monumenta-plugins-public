@@ -2,7 +2,6 @@ package pe.project.items;
 
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -20,8 +19,9 @@ public class ItemOverrides {
 	 * List of materials that are allowed to be placed by
 	 * players in survival even if they have lore text
 	 */
-	public static Set<Material> ALLOW_LORE_MATS = EnumSet.of(
+	public static EnumSet<Material> ALLOW_LORE_MATS = EnumSet.of(
 		Material.CHEST,
+		Material.ENDER_CHEST,
 		Material.PACKED_ICE,
 		Material.WOOL,
 		Material.SKULL,
