@@ -22,7 +22,6 @@ import org.bukkit.entity.Slime;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.SplashPotion;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Wolf;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockIterator;
@@ -112,7 +111,8 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch()+(float)rotation.getX());
@@ -120,7 +120,7 @@ public class EntityUtils {
 		Vector vel = new Vector(loc.getDirection().getX()*speed.getX(), loc.getDirection().getY()*speed.getY(), loc.getDirection().getZ()*speed.getZ());
 
 		World world = player.getWorld();
-		Arrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, Arrow.class);
+		Arrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, arrowClass);
 
 		arrow.setShooter(player);
 		arrow.setVelocity(vel);
@@ -128,44 +128,14 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static Projectile spawnTippedArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed) {
-		Location loc = player.getEyeLocation();
-		loc.add(offset);
-		loc.setPitch(loc.getPitch()+(float)rotation.getX());
-		loc.setYaw(loc.getYaw()+(float)rotation.getY());
-		Vector vel = new Vector(loc.getDirection().getX()*speed.getX(), loc.getDirection().getY()*speed.getY(), loc.getDirection().getZ()*speed.getZ());
-
-		World world = player.getWorld();
-		TippedArrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, TippedArrow.class);
-
-		arrow.setShooter(player);
-		arrow.setVelocity(vel);
-
-		return arrow;
-	}
-
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
 
 		for (double yaw = -spacing * (numProjectiles/2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
-			Projectile proj = spawnArrow(plugin, player, new Vector(0, yaw, 0), new Vector(0, 0, 0), speed);
-			if (proj != null) {
-				projectiles.add(proj);
-			}
-		}
-
-		return projectiles;
-	}
-
-	public static List<Projectile> spawnTippedArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing) {
-		List<Projectile> projectiles = new ArrayList<Projectile>();
-
-		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
-
-		for (double yaw = -spacing * (numProjectiles/2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
-			Projectile proj = spawnTippedArrow(plugin, player, new Vector(0, yaw, 0), new Vector(0, 0, 0), speed);
+			Projectile proj = spawnArrow(plugin, player, new Vector(0, yaw, 0), new Vector(0, 0, 0), speed, arrowClass);
 			if (proj != null) {
 				projectiles.add(proj);
 			}

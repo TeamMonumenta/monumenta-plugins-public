@@ -197,7 +197,7 @@ public class EntityListener implements Listener {
 	//	Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
-		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW) {
+		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			if (arrow.getShooter() instanceof Player) {
 				Player player = (Player)arrow.getShooter();
