@@ -39,7 +39,6 @@ import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
 import pe.project.commands.SetGuildPrefix;
 import pe.project.commands.SetPlayerName;
-import pe.project.commands.SetServerVersionCommand;
 import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
 import pe.project.items.ItemOverrides;
@@ -154,7 +153,6 @@ public class Plugin extends JavaPlugin {
 		//	TODO: Move this out of here and into it's own CommandManager class.
 		//	Add some slash commands
 		if (Constants.COMMANDS_SERVER_ENABLED) {
-			getCommand("setServerVersion").setExecutor(new SetServerVersionCommand(this));
 			getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
 			getCommand("playTimeStats").setExecutor(new PlayTimeStats(this, world));
 			getCommand("chatRange").setExecutor(new ChatRangeCommand());

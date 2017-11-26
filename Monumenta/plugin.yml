@@ -2,13 +2,9 @@ name: Monumenta-Plugins
 main: pe.project.Plugin
 version: 1.0
 commands:
-  setServerVersion:
-    permission: monumenta.commands.setserverversion
-    description: ""
-    usage: /setServerVersion <version>
   getServerVersion:
-    permission: monumenta.commands.getsetserverversion
-    description: ""
+    permission: monumenta.commands.getserverversion
+    description: "Gets the current terrain reset version of the server"
     usage: /getServerVersion <version>
   playTimeStats:
     description: "Get the current playtime stats of everyone online"
