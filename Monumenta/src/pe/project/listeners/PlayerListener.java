@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -50,6 +49,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -450,6 +450,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
+    @SuppressWarnings("unchecked")
 	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
@@ -462,27 +463,24 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		UUID playerUUID = event.getPlayer().getUniqueId();
+		Player player = event.getPlayer();
 
 		// Only add the location to the back stack if the player didn't just use /back or /forward
-		Boolean skipBackLocation = mPlugin.mSkipBackLocation.get(playerUUID);
-		if (skipBackLocation == null) {
-			skipBackLocation = new Boolean(false);
-		}
-		if (skipBackLocation == false) {
+		if (player.hasMetadata(Constants.PLAYER_SKIP_BACK_ADD_METAKEY)) {
+			player.removeMetadata(Constants.PLAYER_SKIP_BACK_ADD_METAKEY, mPlugin);
+		} else {
 			// Get the stack of previous teleport locations
-			Stack<Location> backStack = mPlugin.mBackLocations.get(playerUUID);
+			Stack<Location> backStack = null;
+			if (player.hasMetadata(Constants.PLAYER_BACK_STACK_METAKEY)) {
+				backStack = (Stack<Location>)player.getMetadata(Constants.PLAYER_BACK_STACK_METAKEY).get(0).value();
+			}
 			if (backStack == null) {
 				backStack = new Stack<Location>();
 			}
 
 			backStack.push(event.getFrom());
-			mPlugin.mBackLocations.put(playerUUID, backStack);
+			player.setMetadata(Constants.PLAYER_BACK_STACK_METAKEY, new FixedMetadataValue(mPlugin, backStack));
 		}
-
-		// Indicate the next teleport will not be skipped unless overwritten by /back or /forward
-		skipBackLocation = false;
-		mPlugin.mSkipBackLocation.put(playerUUID, skipBackLocation);
 	}
 
 	/** Implements bed teleporters.

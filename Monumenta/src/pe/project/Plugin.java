@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Stack;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -117,12 +115,6 @@ public class Plugin extends JavaPlugin {
 	public SocketClient mSocketClient;
 
 	public ItemOverrides mItemOverrides;
-
-	// Used for the /back and /forward commands - stacks of teleport locations
-	public HashMap<UUID, Stack<Location>> mBackLocations = new HashMap<UUID, Stack<Location>>();
-	public HashMap<UUID, Stack<Location>> mForwardLocations = new HashMap<UUID, Stack<Location>>();
-	// Used to indicate if a player just used /back or /forward to skip adding that teleport to /back
-	public HashMap<UUID, Boolean> mSkipBackLocation = new HashMap<UUID, Boolean>();
 
 	//	Logic that is performed upon enabling the plugin.
 	@Override

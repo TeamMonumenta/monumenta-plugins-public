@@ -33,4 +33,9 @@ public class Constants {
 	public static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
 	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
+
+	// For /back and /forward
+	public static final String PLAYER_BACK_STACK_METAKEY = "MonumentaBackStack";
+	public static final String PLAYER_FORWARD_STACK_METAKEY = "MonumentaForwardStack";
+	public static final String PLAYER_SKIP_BACK_ADD_METAKEY = "MonumentaSkipAddToBackList";
 }

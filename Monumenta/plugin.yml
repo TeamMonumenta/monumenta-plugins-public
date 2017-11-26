@@ -63,11 +63,11 @@ commands:
   back:
     permission: monumenta.commands.back
     description: Transfers back to location prior to teleporting. Works multiple times in one session. Saves coordinates to /forward.
-    usage: /back
+    usage: /back [count]
   forward:
     permission: monumenta.commands.forward
     description: Transfers forward to location prior to /back. Works multiple times in one session. Saves coordinates to /back.
-    usage: /forward
+    usage: /forward [count]
   questtrigger:
     permission: monumenta.commands.questTrigger
     description: Used by scripted questing system
