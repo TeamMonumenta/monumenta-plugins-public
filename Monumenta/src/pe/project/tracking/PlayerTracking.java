@@ -20,9 +20,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.locations.safezones.SafeZoneConstants;
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
-import pe.project.managers.LocationManager;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.playerdata.PlayerData;
 import pe.project.point.Point;
@@ -105,19 +104,13 @@ public class PlayerTracking implements EntityTracking {
 
 					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					// If the world is a town world, treat the player like they are in the capital
-					// Otherwise figure out which (if any) safezone the player is in
-					SafeZones safeZone = SafeZones.Capital;
-					if (!mPlugin.mServerProporties.getIsTownWorld()) {
-						safeZone = LocationManager.withinAnySafeZone(player);
-					}
-
-					inSafeZone = (safeZone != SafeZones.None);
-					inCapital = (safeZone == SafeZones.Capital);
-					applyEffects = (inSafeZone && SafeZoneConstants.safeZoneAppliesEffects(safeZone));
+					LocationType zone = LocationUtils.getLocationType(mPlugin, player);
+					inSafeZone = (zone != LocationType.None);
+					inCapital = (zone == LocationType.Capital);
+					applyEffects = (zone == LocationType.Capital || zone == LocationType.SafeZone);
 
 					if (inSafeZone) {
-						if (safeZone == SafeZones.Capital) {
+						if (zone == LocationType.Capital) {
 							Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
 

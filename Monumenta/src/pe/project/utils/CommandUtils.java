@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import pe.project.point.Point;
 import pe.project.point.AreaBounds;
+import pe.project.managers.LocationUtils.LocationType;
 
 public class CommandUtils {
 
@@ -111,7 +112,7 @@ public class CommandUtils {
 		pos2.mY += 1;
 		pos2.mZ += 1;
 
-		return new AreaBounds("", pos1, pos2);
+		return new AreaBounds("", LocationType.None, pos1, pos2);
 	}
 
 	public static Point parsePointFromString(CommandSender sender,

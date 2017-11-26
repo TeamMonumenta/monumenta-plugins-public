@@ -26,8 +26,8 @@ public class TrackingManager {
 
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();
-		mBoats = new BoatTracking();
-		mSilverfish = new SilverfishTracking();
+		mBoats = new BoatTracking(mPlugin);
+		mSilverfish = new SilverfishTracking(mPlugin);
 		mFishingHook = new FishingHookTracking();
 
 		List<Entity> entities = world.getEntities();

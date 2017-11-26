@@ -42,9 +42,8 @@ import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
-import pe.project.locations.safezones.SafeZoneConstants;
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
-import pe.project.managers.LocationManager;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
@@ -221,7 +220,7 @@ public class EntityListener implements Listener {
 			if (source instanceof Player) {
 				Player player = (Player)source;
 
-				if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
+				if (LocationUtils.getLocationType(mPlugin, player) != LocationType.None) {
 					event.setCancelled(true);
 					return;
 				}
@@ -253,7 +252,7 @@ public class EntityListener implements Listener {
 		if (source instanceof Player) {
 			Player player = (Player)source;
 
-			if (LocationManager.withinAnySafeZone(player) != SafeZones.None) {
+			if (LocationUtils.getLocationType(mPlugin, player) != LocationType.None) {
 				return;
 			}
 
@@ -285,15 +284,15 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
-		SafeZones safeZone = SafeZoneConstants.withinAnySafeZone(event.getLocation());
-		if (safeZone != SafeZones.None) {
+		LocationType zone = LocationUtils.getLocationType(mPlugin, event.getLocation());
+		if (zone != LocationType.None) {
 			event.setCancelled(true);
 			return;
 		}
 
 		// If any block damaged by an explosion is with a safezone, cancel the explosion
 		for (Block block : event.blockList()) {
-			if (SafeZoneConstants.withinAnySafeZone(block.getLocation()) != SafeZones.None) {
+			if (LocationUtils.getLocationType(mPlugin, block.getLocation()) != LocationType.None) {
 				event.setCancelled(true);
 				return;
 			}

@@ -8,12 +8,18 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
-import pe.project.managers.LocationManager;
+import pe.project.Plugin;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 
 public class SilverfishTracking implements EntityTracking {
+	Plugin mPlugin = null;
 	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
-	
+
+	SilverfishTracking(Plugin plugin) {
+		mPlugin = plugin;
+	}
+
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Silverfish)entity);
@@ -30,8 +36,7 @@ public class SilverfishTracking implements EntityTracking {
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();
 			if (silverfish != null && silverfish.isValid()) {
-				SafeZones safeZone = LocationManager.withinAnySafeZone(silverfish);
-				if (safeZone != SafeZones.None) {
+				if (LocationUtils.getLocationType(mPlugin, silverfish) != LocationType.None) {
 					silverfish.remove();
 					silverfishIter.remove();
 				}
@@ -40,7 +45,7 @@ public class SilverfishTracking implements EntityTracking {
 			}
 		}
 	}
-	
+
 	@Override
 	public void unloadTrackedEntities() {
 		mEntities.clear();

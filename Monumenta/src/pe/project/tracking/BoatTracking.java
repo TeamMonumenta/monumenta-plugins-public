@@ -8,17 +8,23 @@ import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
-import pe.project.managers.LocationManager;
+import pe.project.Plugin;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 
 public class BoatTracking implements EntityTracking {
+	Plugin mPlugin = null;
 	private Set<Boat> mEntities = new HashSet<Boat>();
-	
+
+	BoatTracking(Plugin plugin) {
+		mPlugin = plugin;
+	}
+
 	@Override
 	public void addEntity(Entity entity) {
 		mEntities.add((Boat)entity);
 	}
-	
+
 	@Override
 	public void removeEntity(Entity entity) {
 		mEntities.remove(entity);
@@ -30,8 +36,7 @@ public class BoatTracking implements EntityTracking {
 		while (boatIter.hasNext()) {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid()) {
-				SafeZones safeZone = LocationManager.withinAnySafeZone(boat);
-				if (safeZone != SafeZones.None) {
+				if (LocationUtils.getLocationType(mPlugin, boat) != LocationType.None) {
 					boatIter.remove();
 					boat.remove();
 				}

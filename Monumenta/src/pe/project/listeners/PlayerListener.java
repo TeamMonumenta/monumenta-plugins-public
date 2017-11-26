@@ -57,8 +57,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.locations.safezones.SafeZoneConstants;
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
@@ -440,8 +440,8 @@ public class PlayerListener implements Listener {
 			}
 
 			// Players that get resistance from safezones don't take armor damage
-			SafeZones zone = SafeZoneConstants.withinAnySafeZone(event.getPlayer().getLocation());
-			if (damage < 0 || SafeZoneConstants.safeZoneAppliesEffects(zone)) {
+			LocationType zone = LocationUtils.getLocationType(mPlugin, event.getPlayer());
+			if (damage < 0 || zone == LocationType.Capital || zone == LocationType.SafeZone) {
 				damage = 0;
 			}
 

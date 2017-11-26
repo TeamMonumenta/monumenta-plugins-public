@@ -7,8 +7,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import pe.project.Plugin;
-import pe.project.locations.safezones.SafeZoneConstants;
-import pe.project.locations.safezones.SafeZoneConstants.SafeZones;
+import pe.project.managers.LocationUtils;
+import pe.project.managers.LocationUtils.LocationType;
 
 public class PackedIceOverride extends OverrideItem {
 	@Override
@@ -17,8 +17,10 @@ public class PackedIceOverride extends OverrideItem {
 			return true;
 		}
 
-		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() == GameMode.SURVIVAL
-				&& ((SafeZoneConstants.withinAnySafeZone(player.getLocation()) != SafeZones.None) || plugin.mServerProporties.getIsTownWorld())) {
+		if (item.hasItemMeta()
+				&& item.getItemMeta().hasLore()
+				&& player.getGameMode() == GameMode.SURVIVAL
+				&& LocationUtils.getLocationType(plugin, player) == LocationType.Capital) {
 			event.getBlockPlaced().setType(Material.STATIONARY_WATER);
 		}
 
