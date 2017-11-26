@@ -47,7 +47,7 @@ public class SafeZoneConstants {
 			new AreaBounds("Capital", new Point(-1130, 0,-284), new Point(-498, 256, 344)),		//	Capital
 			new AreaBounds("Nyr", new Point(-181, 0, -166), new Point(-79, 256, 14)),		//	Nyr
 			new AreaBounds("Farr", new Point(538, 0, 100), new Point(658, 256, 229)),		//	Farr
-			new AreaBounds("Highwatch", new Point(1130, 0, -156), new Point(1221, 256, -76)),	//	Highwatch
+			new AreaBounds("Highwatch", new Point(1130, 0, -156), new Point(1242, 256, -76)),	//	Highwatch
 
 			new AreaBounds("", new Point(136, 53, -186), new Point(176, 83, -120)),			//	White Wool Lobby
 			new AreaBounds("", new Point(27, 64, 164), new Point(67, 94, 229)),			//	Orange Wool Lobby
