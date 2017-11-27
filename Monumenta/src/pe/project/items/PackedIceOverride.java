@@ -7,8 +7,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import pe.project.Plugin;
-import pe.project.managers.LocationUtils;
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class PackedIceOverride extends OverrideItem {
 	@Override

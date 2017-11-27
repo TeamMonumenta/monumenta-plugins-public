@@ -9,8 +9,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
 import pe.project.Plugin;
-import pe.project.managers.LocationUtils;
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class SilverfishTracking implements EntityTracking {
 	Plugin mPlugin = null;

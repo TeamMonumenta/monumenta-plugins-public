@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import pe.project.point.Point;
 import pe.project.point.AreaBounds;
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class CommandUtils {
 

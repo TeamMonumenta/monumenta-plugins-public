@@ -2,7 +2,7 @@ package pe.project.point;
 
 import org.bukkit.Location;
 
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class AreaBounds {
 	public AreaBounds(String name, LocationType type, Point lowerCorner, Point upperCorner) {

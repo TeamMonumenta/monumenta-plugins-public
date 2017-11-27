@@ -42,8 +42,8 @@ import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
-import pe.project.managers.LocationUtils;
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;

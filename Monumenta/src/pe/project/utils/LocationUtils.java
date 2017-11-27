@@ -1,4 +1,4 @@
-package pe.project.managers;
+package pe.project.utils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;

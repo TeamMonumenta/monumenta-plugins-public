@@ -13,8 +13,8 @@ import com.google.gson.JsonObject;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.managers.LocationUtils;
-import pe.project.managers.LocationUtils.LocationType;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
