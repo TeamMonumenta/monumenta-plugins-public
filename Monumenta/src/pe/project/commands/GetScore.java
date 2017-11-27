@@ -1,11 +1,11 @@
 package pe.project.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.md_5.bungee.api.ChatColor;
 import pe.project.utils.ScoreboardUtils;
 
 public class GetScore implements CommandExecutor {
@@ -22,14 +22,14 @@ public class GetScore implements CommandExecutor {
 	    		arg0.sendMessage(ChatColor.RED + "Usage: " + arg1.getUsage());
 	    		return false;
 	    	}
-	
+
 			int score = ScoreboardUtils.getScoreboardValue(arg3[0], arg3[1]);
 			if (score != -1) {
 				((Player)arg0).sendMessage(ChatColor.GREEN + arg3[0] + "'s score for " + arg3[1] + ": " + score);
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 

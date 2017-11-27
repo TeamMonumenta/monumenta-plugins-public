@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,7 +55,6 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.md_5.bungee.api.ChatColor;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.LocationUtils;

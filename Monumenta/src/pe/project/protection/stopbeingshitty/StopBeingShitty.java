@@ -1,5 +1,6 @@
 package pe.project.protection.stopbeingshitty;
 
+import org.bukkit.ChatColor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,8 +16,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class StopBeingShitty {
 	private static List<Material> contraband = Arrays.asList(
@@ -49,7 +48,7 @@ public class StopBeingShitty {
             Material.ELYTRA,
             Material.ENCHANTMENT_TABLE
 	);
-	
+
 	static Map<String, Integer> mSketchyEnchants = new HashMap<String, Integer>();
 	static Map<String, Integer> mShittyEnchants = new HashMap<String, Integer>();
 	static {
@@ -57,12 +56,12 @@ public class StopBeingShitty {
 		mSketchyEnchants.put("DAMAGE_UNDEAD", 3);
 		mSketchyEnchants.put("ARROW_DAMAGE", 3);
 		mSketchyEnchants.put("DURABILITY", 3);
-		
+
 		mShittyEnchants.put("DAMAGE_ALL", 5);
 		mShittyEnchants.put("DAMAGE_UNDEAD", 5);
 		mShittyEnchants.put("ARROW_DAMAGE", 4);
 	}
-	
+
 	public static void chanceOfBeingShitty(Player player, Player commandPlayer) {
     	String shittyMessage = "Chance of %s being shitty - %.2f percent chance %s";
     	List<String> shittyAllInfo = new ArrayList<String>();
@@ -71,7 +70,7 @@ public class StopBeingShitty {
     	boolean absolutelyShitty = false;
     	String sketchyInfo = "Sketchy Item info - ";
     	String shittyInfo = "Shitty Item info - ";
-    	
+
     	//	Loop through a players inventory...
     	PlayerInventory inventory = commandPlayer.getInventory();
     	Iterator<ItemStack> inventoryIter = inventory.iterator();
@@ -82,7 +81,7 @@ public class StopBeingShitty {
     			String isAbsolutelyShity = isShitty(item, shittyInfo);
     			if (isAbsolutelyShity != null) {
     				shittyAllInfo.add(isAbsolutelyShity);
-    				absolutelyShitty = true;	
+    				absolutelyShitty = true;
     				slot = 1;
     			} else {
     				String isSketchy = isSketchy(item, sketchyInfo);
@@ -91,7 +90,7 @@ public class StopBeingShitty {
     					slot = 1;
     				}
     			}
-    			
+
     			String contraband = isContraband(item);
 				if (contraband != null) {
 					shittyAllInfo.add(contraband + " [Inventory]");
@@ -99,12 +98,12 @@ public class StopBeingShitty {
 					slot = 1;
 				}
     		}
-    		
+
     		shittySlots += slot;
     	}
-    	
+
     	slots += inventory.getSize();
-    	
+
     	//	Ender Chest
     	Inventory enderChest = commandPlayer.getEnderChest();
     	Iterator<ItemStack> enderIter = enderChest.iterator();
@@ -124,7 +123,7 @@ public class StopBeingShitty {
     					slot = 1;
     				}
     			}
-    			
+
     			String contraband = isContraband(item);
 				if (contraband != null) {
 					shittyAllInfo.add(contraband + " [Ender Chest]");
@@ -132,23 +131,23 @@ public class StopBeingShitty {
 					slot = 1;
 				}
     		}
-    		
+
     		shittySlots += slot;
     	}
-    	
+
     	slots += enderChest.getSize();
-    	
+
     	float chance = (!absolutelyShitty) ? ((float)shittySlots / (float)slots) * 100 : 100;
     	player.sendMessage(ChatColor.LIGHT_PURPLE + String.format(shittyMessage, commandPlayer.getName(), chance, "(" + shittySlots + "/" + slots + ")"));
     	for (String info : shittyAllInfo) {
     		player.sendMessage(info);
     	}
     }
-	
+
 	static String isSketchy(ItemStack stack, String info) {
 		String sketchyInfo = ChatColor.YELLOW + info;
 		boolean sketchy = false;
-		
+
 		ItemMeta meta = stack.getItemMeta();
 		if (meta != null) {
 			if (meta.hasDisplayName()) {
@@ -157,7 +156,7 @@ public class StopBeingShitty {
 				sketchyInfo += stack.getType().toString().replace("_", " ").toLowerCase() + ChatColor.RESET;
 			}
 		}
-		
+
 		//	Sketchy Enchants.
 		Iterator<Entry<String, Integer>> sketchyIter = mSketchyEnchants.entrySet().iterator();
 		while (sketchyIter.hasNext()) {
@@ -171,14 +170,14 @@ public class StopBeingShitty {
 				}
 			}
 		}
-		
+
 		return sketchy ? sketchyInfo : null;
 	}
-	
+
 	static String isShitty(ItemStack stack, String info) {
 		String shittyInfo = ChatColor.RED + info;
 		boolean shitty = false;
-		
+
 		ItemMeta meta = stack.getItemMeta();
 		if (meta != null) {
 			String displayName = meta.getDisplayName();
@@ -188,7 +187,7 @@ public class StopBeingShitty {
 				shittyInfo += stack.getType().toString().replace("_", " ").toLowerCase() + ChatColor.RESET;
 			}
 		}
-		
+
 		//	Sketchy Enchants.
 		Iterator<Entry<String, Integer>> sketchyIter = mShittyEnchants.entrySet().iterator();
 		while (sketchyIter.hasNext()) {
@@ -202,19 +201,19 @@ public class StopBeingShitty {
 				}
 			}
 		}
-		
+
 		return shitty ? shittyInfo : null;
 	}
-	
+
 	static String isContraband(ItemStack item) {
 		Material mat = item.getType();
-		
+
 		for (Material material : contraband) {
 			if (material.equals(mat)) {
 				return ChatColor.RED + "Contraband Item - " + item.getType().toString().replace("_", " ").toLowerCase() + ChatColor.RESET;
 			}
 		}
-		
+
 		return null;
 	}
 }

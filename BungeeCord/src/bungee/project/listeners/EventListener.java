@@ -89,7 +89,18 @@ public class EventListener implements Listener {
 		}
 
 		if (channel.startsWith("Monumenta.Bungee.Forward.")) {
-			bungeeForward(channel, sendingServer, rcvStrings, rawData);
+			if (bungeeForward(channel, sendingServer, rcvStrings, rawData) == false) {
+				// If sending failed, send the message back with the first item as the previous channel
+				String[] replyStrings = new String[rcvStrings.length + 1];
+				replyStrings[0] = channel;
+				System.arraycopy(rcvStrings, 0, replyStrings, 1, rcvStrings.length);
+
+				try {
+					sendingSocket.writeJSON("Monumenta.Bungee.Error.Forward", PacketUtils.encodeStrings(replyStrings));
+				} catch (Exception ex) {
+					mMain.getLogger().warning("Failed to send error packet response to '" + sendingServer + "'");
+				}
+			}
 		} else if (channel.startsWith("Monumenta.Bungee.Broadcast.")) {
 			bungeeBroadcast(channel, sendingServer, rawData);
 		} else if (channel.equals("Monumenta.Bungee.SendPlayer")) {
@@ -101,7 +112,8 @@ public class EventListener implements Listener {
 		}
 	}
 
-	private void bungeeForward(String channel, String sendingServer, String[] rcvStrings, String rawData) {
+	// Returns true if forwarding was successful, else returns false
+	private boolean bungeeForward(String channel, String sendingServer, String[] rcvStrings, String rawData) {
 		// First component of this type of packet is the destination server
 		String destination = rcvStrings[0];
 
@@ -111,7 +123,7 @@ public class EventListener implements Listener {
 			for (Map.Entry<String, SocketMessenger> entry : mSockets.entrySet()) {
 				mMain.getLogger().warning("  " + entry.getKey());
 			}
-			return;
+			return false;
 		}
 
 		// Look up the destination socket
@@ -119,12 +131,14 @@ public class EventListener implements Listener {
 
 		if ((!socketDest.isHandshaked()) || (!socketDest.isConnectedAndOpened())) {
 			mMain.getLogger().warning("Cannot forward message from '" + sendingServer + "' because '" + destination + "' has not finished connecting");
-			return;
+			return false;
 		}
 
 		// Finally forward the message
 		socketDest.writeJSON(channel, rawData);
 		mMain.getLogger().info("Forwarded message from '" + sendingServer + "' to '" + destination + "'");
+
+		return true;
 	}
 
 	// Sends a message to all connected servers (including the one that sent it)

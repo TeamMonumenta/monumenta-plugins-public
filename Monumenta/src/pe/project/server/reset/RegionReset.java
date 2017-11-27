@@ -1,9 +1,9 @@
 package pe.project.server.reset;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-import net.md_5.bungee.api.ChatColor;
 import pe.project.Plugin;
 import pe.project.utils.ScoreboardUtils;
 

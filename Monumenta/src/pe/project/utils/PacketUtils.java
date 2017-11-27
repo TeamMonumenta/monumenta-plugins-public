@@ -25,6 +25,8 @@ public class PacketUtils {
 			GetServerListPacket.handlePacket(plugin, data);
 		} else if (channel.equals(BroadcastCommandPacket.getStaticPacketChannel())) {
 			BroadcastCommandPacket.handlePacket(plugin, data);
+		} else if (channel.equals(ForwardErrorPacket.getStaticPacketChannel())) {
+			ForwardErrorPacket.handlePacket(plugin, data);
 		}
 	}
 
