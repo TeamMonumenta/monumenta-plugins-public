@@ -147,7 +147,7 @@ public class WarriorClass extends BaseClass {
 										}.runTaskTimer(mPlugin, 0, 1);
 									}
 
-									mob.damage(extraDamage);
+									mob.damage(extraDamage, player);
 
 									World world = player.getWorld();
 									Location loc = player.getLocation();
@@ -181,7 +181,7 @@ public class WarriorClass extends BaseClass {
 							LivingEntity mob = (LivingEntity)e;
 
 							Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
-							mob.damage(extraDamage);
+							mob.damage(extraDamage, player);
 
 							MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
 

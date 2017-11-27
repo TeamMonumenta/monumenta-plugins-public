@@ -33,13 +33,14 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
 import pe.project.utils.LocationUtils;
@@ -81,12 +82,9 @@ public class EntityListener implements Listener {
 					}
 				}
 			}
-		}
-		//	Else if the entity getting hurt is a LivingEntity.
-		else if (damagee instanceof LivingEntity) {
+		} else if (damagee instanceof LivingEntity) {
 			Entity damager = event.getDamager();
 
-			//	Hit by player.
 			if (damager instanceof Player) {
 				if (damagee instanceof Villager) {
 					mPlugin.mNpcManager.interactEvent((Player)damager, damagee.getCustomName());
@@ -95,14 +93,23 @@ public class EntityListener implements Listener {
 					if (event.getCause() != DamageCause.THORNS) {
 						Player player = (Player)damager;
 
+						if (damagee.hasMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY)
+								&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+							// This damage was just added by the player's class - don't process class effects again
+							return;
+						} else {
+							// New damage this tick - mark entity so that this event handler will be skipped if
+							// more damage is applied by the player's class
+							damagee.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
+							                    new FixedMetadataValue(mPlugin, player.getTicksLived()));
+						}
+
 						BaseClass _class = mPlugin.getClass(player);
 						_class.ModifyDamage(player, _class, event);
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
 					}
 				}
-			}
-			//	Hit by arrow.
-			else if (damager instanceof Arrow) {
+			} else if (damager instanceof Arrow) {
 				Arrow arrow = (Arrow)damager;
 				if (arrow.getShooter() instanceof Player) {
 					Player player = (Player)arrow.getShooter();
