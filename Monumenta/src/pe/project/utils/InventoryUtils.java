@@ -8,19 +8,26 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 public class InventoryUtils {
+	private static int OFFHAND_SLOT = 40;
+	private static int HELMET_SLOT = 39;
+	private static int CHESTPLATE_SLOT = 38;
+	private static int LEGGINGS_SLOT = 37;
+	private static int BOOTS_SLOT = 36;
+
 	public static boolean testForItemWithLore(ItemStack item, String loreText) {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
@@ -250,6 +257,23 @@ public class InventoryUtils {
         } catch (ClassNotFoundException e) {
             throw new IOException("Unable to decode class type.", e);
         }
+	}
+
+	public static ItemStack getItemFromEquipment(EntityEquipment equipment, EquipmentSlot slot) {
+		switch (slot) {
+		case HEAD:		return equipment.getHelmet();
+		case CHEST:		return equipment.getChestplate();
+		case LEGS:		return equipment.getLeggings();
+		case FEET:		return equipment.getBoots();
+		case HAND:		return equipment.getItemInMainHand();
+		case OFF_HAND:	return equipment.getItemInOffHand();
+		}
+
+		return null;
+	}
+
+	public static boolean isArmorSlotFromId(int slotId) {
+		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
 	static void _shuffleArray(Random rand, int[] ar)

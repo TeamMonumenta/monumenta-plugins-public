@@ -1,4 +1,4 @@
-package pe.project.playerdata;
+package pe.project.player;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -3,7 +3,7 @@ package pe.project.network.packet;
 import java.util.UUID;
 
 import pe.project.Plugin;
-import pe.project.playerdata.PlayerData;
+import pe.project.player.PlayerData;
 import pe.project.utils.PacketUtils;
 import pe.project.utils.NetworkUtils;
 

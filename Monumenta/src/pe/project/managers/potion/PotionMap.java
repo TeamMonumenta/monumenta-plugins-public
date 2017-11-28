@@ -41,7 +41,11 @@ public class PotionMap {
 		if (id != PotionID.ALL) {
 			Vector<PotionInfo> trackedPotionInfo = mPotionMap.get(id);
 			if (trackedPotionInfo != null) {
-				trackedPotionInfo.clear();
+				for (PotionInfo info : trackedPotionInfo) {
+					player.removePotionEffect(info.type);
+				}
+
+				mPotionMap.remove(id);
 			}
 		} else {
 			mPotionMap.clear();
@@ -51,7 +55,7 @@ public class PotionMap {
 	}
 
 	public void clearPotionIDType(Player player, PotionID id) {
-		mPotionMap.remove(id);
+		removePotionMap(player, id);
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
@@ -91,6 +95,7 @@ public class PotionMap {
 		while (potionInfoIter.hasNext()) {
 			Entry<PotionID, Vector<PotionInfo>> potionInfo = potionInfoIter.next();
 			Vector<PotionInfo> potionVector = potionInfo.getValue();
+
 			for (PotionInfo info : potionVector) {
 				if (bestEffect == null) {
 					bestEffect = info;

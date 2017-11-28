@@ -1,7 +1,8 @@
 package pe.project.tracking;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -14,14 +15,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
-import pe.project.playerdata.PlayerData;
+import pe.project.player.PlayerData;
+import pe.project.player.PlayerInventory;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
@@ -33,7 +34,7 @@ import pe.project.utils.ScoreboardUtils;
 
 public class PlayerTracking implements EntityTracking {
 	Plugin mPlugin = null;
-	private Set<Player> mEntities = new HashSet<Player>();
+	private HashMap<Player, PlayerInventory> mPlayers = new HashMap<Player, PlayerInventory>();
 
 	PlayerTracking(Plugin plugin) {
 		mPlugin = plugin;
@@ -43,6 +44,9 @@ public class PlayerTracking implements EntityTracking {
 	public void addEntity(Entity entity) {
 		Player player = (Player)entity;
 		try {
+			mPlugin.mPotionManager.clearAllEffects(player);
+			mPlugin.getClass(player).setupClassPotionEffects(player);
+
 			PlayerData.loadPlayerData(mPlugin, player);
 			PlayerData.removePlayerDataFile(mPlugin, player);
 			mPlugin.mPotionManager.refreshClassEffects(player);
@@ -69,25 +73,36 @@ public class PlayerTracking implements EntityTracking {
 		// Remove the metadata that prevents player from interacting with things (if present)
 		player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
 
-		mEntities.add(player);
+		mPlayers.put(player, new PlayerInventory(mPlugin, player));
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
-		PlayerData.removePlayerDataFile(mPlugin, (Player)entity);
+		Player player = (Player)entity;
 
-		mEntities.remove(entity);
+		PlayerData.removePlayerDataFile(mPlugin, player);
+
+		mPlayers.remove(player);
 	}
 
 	public Set<Player> getPlayers() {
-		return mEntities;
+		return mPlayers.keySet();
+	}
+
+	public void updateEquipmentProperties(Player player) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.updateEquipmentProperties(mPlugin, player);
+		}
 	}
 
 	@Override
 	public void update(World world, int ticks) {
-		Iterator<Player> playerIter = mEntities.iterator();
+		Iterator<Entry<Player, PlayerInventory>> playerIter = mPlayers.entrySet().iterator();
 		while (playerIter.hasNext()) {
-			Player player = playerIter.next();
+			Entry<Player, PlayerInventory> entry = playerIter.next();
+			Player player = entry.getKey();
+			PlayerInventory inventory = entry.getValue();
 
 			boolean inSafeZone = false;
 			boolean inCapital = false;
@@ -163,7 +178,8 @@ public class PlayerTracking implements EntityTracking {
 			}
 
 			//	Extra Effects.
-			_updateExtraEffects(player, world);
+			inventory.tick(mPlugin, world, player);
+			_updatePatreonEffects(player, world);
 
 			mPlugin.mPotionManager.updatePotionStatus(player, ticks);
 		}
@@ -186,11 +202,6 @@ public class PlayerTracking implements EntityTracking {
 		player.setGameMode(GameMode.SURVIVAL);
 
 		mPlugin.getClass(player).setupClassPotionEffects(player);
-	}
-
-	void _updateExtraEffects(Player player, World world) {
-		_updatePatreonEffects(player, world);
-		_updateItemEffects(player, world);
 	}
 
 	//	TODO: We should move this out of being ticked and into an event based system as well as store all
@@ -218,23 +229,16 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
-	//	TODO: This is the incorrect way to handle this, this should only be test against when an event triggers that might
-	//	cause a change in the inventory that might change the item. (Item Break, Item Moved, Item Dropped, etc)
-	void _updateItemEffects(Player player, World world) {
-		ItemStack chest = player.getInventory().getChestplate();
-		if (InventoryUtils.testForItemWithLore(chest, "* Stylish *")) {
-			ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
-		}
-	}
-
 	@Override
 	public void unloadTrackedEntities() {
-		Iterator<Player> players = mEntities.iterator();
-		while (players.hasNext()) {
-			Player player = players.next();
+		Iterator<Entry<Player, PlayerInventory>> iter = mPlayers.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<Player, PlayerInventory> entry = iter.next();
+			Player player = entry.getKey();
+			entry.getValue().cleanupProperties(mPlugin, player);
 			PlayerData.removePlayerDataFile(mPlugin, player);
 		}
 
-		mEntities.clear();
+		mPlayers.clear();
 	}
 }

@@ -36,7 +36,6 @@ public class PlayerPotionInfo {
 	public void removePotionInfo(Player player, PotionID id, PotionEffectType type) {
 		PotionMap potionMap = mPotionInfo.get(type);
 		if (potionMap != null) {
-			player.removePotionEffect(type);
 			potionMap.removePotionMap(player, id);
 		}
 	}

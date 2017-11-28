@@ -29,6 +29,7 @@ public class PotionManager {
 		ABILITY_SELF(1, "ABILITY_SELF"),
 		ABILITY_OTHER(2, "ABILITY_OTHER"),
 		SAFE_ZONE(3, "SAFE_ZONE"),
+		ITEM(4, "ITEM"),
 		ALL(4, "ALL");
 
 		private int value;
@@ -44,6 +45,8 @@ public class PotionManager {
 				return PotionID.ABILITY_OTHER;
 			} else if (name.equals(PotionID.SAFE_ZONE.getValue())) {
 				return PotionID.SAFE_ZONE;
+			} else if (name.equals(PotionID.ITEM.getValue())) {
+				return PotionID.ITEM;
 			} else {
 				return PotionID.APPLIED_POTION;
 			}
@@ -168,6 +171,12 @@ public class PotionManager {
 			return gson.toJson(object);
 		} else {
 			return "{}";
+		}
+	}
+
+	public void clearAllEffects(Player player) {
+		for (PotionEffect type : player.getActivePotionEffects()) {
+			player.removePotionEffect(type.getType());
 		}
 	}
 }

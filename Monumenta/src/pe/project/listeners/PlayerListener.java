@@ -25,9 +25,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -62,6 +62,7 @@ import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
 import pe.project.server.reset.RegionReset;
 import pe.project.utils.CommandUtils;
+import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
@@ -155,6 +156,15 @@ public class PlayerListener implements Listener {
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
+			}
+
+			if (item != null && ItemUtils.isArmorItem(item.getType())) {
+				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+					@Override
+					public void run() {
+						mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+					}
+				}, 0);
 			}
 		} else if (action == Action.PHYSICAL) {
 			if (!mPlugin.mItemOverrides.physicsInteraction(mPlugin, player, action, item, block)) {
@@ -301,31 +311,38 @@ public class PlayerListener implements Listener {
 				ItemStack offHand = p.getInventory().getItemInOffHand();
 
 				mPlugin.getClass(p).PlayerItemBreakEvent(p, mainHand, offHand);
+				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 			}
 		}, 0);
 	}
 
-	//	The player moved item in their inventory.
-	@EventHandler(priority = EventPriority.HIGH)
+	//	If an inventory interaction happened.
+ 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
-		Inventory inventory = event.getInventory();
-		if (inventory.getType() == InventoryType.CRAFTING) {
-			Player player = (Player)inventory.getHolder();
-			String name = player.getName();
+ 		Inventory inventory = event.getInventory();
+ 		Player player = (Player)inventory.getHolder();
 
-			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-				@Override
-				public void run() {
-					Player p = Bukkit.getPlayer(name);
+ 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+			@Override
+			public void run() {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				ItemStack offHand = player.getInventory().getItemInOffHand();
 
-					ItemStack mainHand = p.getInventory().getItemInMainHand();
-					ItemStack offHand = p.getInventory().getItemInOffHand();
+				mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+			}
+		}, 0);
 
-					mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
-				}
-			}, 0);
-		}
-	}
+ 		int slot = event.getSlot();
+ 		if (InventoryUtils.isArmorSlotFromId(slot) || slot == player.getInventory().getHeldItemSlot() ||
+ 				(event.isShiftClick() && ItemUtils.isArmorItem(event.getCurrentItem().getType()))) {
+ 			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+ 				@Override
+ 				public void run() {
+ 					mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+ 				}
+ 			}, 0);
+ 		}
+ 	}
 
 	//	The player opened an inventory
 	@EventHandler(priority = EventPriority.HIGH)
@@ -342,6 +359,20 @@ public class PlayerListener implements Listener {
 				return;
 			}
 		}
+	}
+
+	//	...Because there's a known bug with the stupid Item Property stuff and the InventoryClickEvent stuff...
+	//	The player inventory is closed
+	@EventHandler(priority = EventPriority.HIGH)
+	public void InventoryCloseEvent(InventoryCloseEvent event) {
+		Inventory inventory = event.getInventory();
+ 		Player player = (Player)inventory.getHolder();
+
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+
+		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+		mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 	}
 
 	//	Something interacts with an inventory
@@ -391,6 +422,10 @@ public class PlayerListener implements Listener {
 			@Override
 			public void run() {
 				Player player = Bukkit.getPlayer(name);
+
+				mPlugin.mPotionManager.clearAllEffects(player);
+				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 			}
 		}, 0);

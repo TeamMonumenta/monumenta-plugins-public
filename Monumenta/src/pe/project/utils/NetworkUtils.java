@@ -6,10 +6,10 @@ import org.bukkit.entity.Player;
 
 import pe.project.Plugin;
 import pe.project.network.packet.TransferPlayerDataPacket;
+import pe.project.player.PlayerData;
 import pe.project.network.packet.SendPlayerPacket;
 import pe.project.network.packet.GetServerListPacket;
 import pe.project.network.packet.BroadcastCommandPacket;
-import pe.project.playerdata.PlayerData;
 
 public class NetworkUtils {
 
