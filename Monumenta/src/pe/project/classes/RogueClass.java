@@ -133,11 +133,11 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, Material material) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 
-		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(material))) {
+		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked))) {
 			//	FOCUS
 			{
 				int focus = ScoreboardUtils.getScoreboardValue(player, "Focus");

@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
@@ -280,7 +279,7 @@ public class ClericClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, Material material) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (player.isSneaking()) {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				int celestial = ScoreboardUtils.getScoreboardValue(player, "Celestial");
@@ -313,49 +312,43 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-				int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-				if (healing > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
-						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-						World world = player.getWorld();
-						new BukkitRunnable() {
-							Integer tick = 0;
-							public void run() {
-								if (++tick == 5) {
-									if (player.isBlocking()) {
-										List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
-										for(Entity e : entities) {
-											if(e instanceof Player) {
-												Player p = (Player)e;
-												if (p != player) {
-													Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-													if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
-														int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
-														PlayerUtils.healPlayer(p, healAmount);
+				ItemStack offHand = player.getInventory().getItemInOffHand();
+				if (offHand != null && offHand.getType() == Material.SHIELD) {
+					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
+					if (healing > 0) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
+							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+							World world = player.getWorld();
 
-														Location loc = p.getLocation();
+							List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
+							for(Entity e : entities) {
+								if(e instanceof Player) {
+									Player p = (Player)e;
+									if (p != player) {
+										Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+										if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
+											int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
+											PlayerUtils.healPlayer(p, healAmount);
 
-														ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-														ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-														player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
-														player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
-													}
-												}
-											}
+											Location loc = p.getLocation();
+
+											ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+											ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+											player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
+											player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
 										}
-
-										player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
-										player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
-
-										ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
-
-										int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-										mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
 									}
-									this.cancel();
 								}
 							}
-						}.runTaskTimer(mPlugin, 0, 1);
+
+							player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
+							player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
+
+							ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+
+							int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
+						}
 					}
 				}
 			}

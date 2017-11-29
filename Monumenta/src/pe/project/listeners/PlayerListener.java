@@ -25,16 +25,16 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -57,14 +57,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.utils.LocationUtils;
-import pe.project.utils.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
 import pe.project.server.reset.RegionReset;
 import pe.project.utils.CommandUtils;
 import pe.project.utils.ItemUtils;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
@@ -146,7 +146,7 @@ public class PlayerListener implements Listener {
 		}
 
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
-		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), mat);
+		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
 
 		//	Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {

@@ -96,7 +96,7 @@ public class BaseClass {
 
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {}
 
-	public void PlayerInteractEvent(Player player, Action action, Material material) {}
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {}
 
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
 		return true;

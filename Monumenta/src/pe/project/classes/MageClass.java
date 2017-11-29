@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
@@ -184,7 +183,7 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, Material material) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		//	Magma Shield
 		{
 			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
@@ -198,47 +197,35 @@ public class MageClass extends BaseClass {
 					if (magmaShield > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), MAGMA_SHIELD_ID)) {
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+							List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
+							for(Entity e : entities) {
+								if(EntityUtils.isHostileMob(e)) {
+									LivingEntity mob = (LivingEntity)e;
 
-							new BukkitRunnable() {
-								Integer tick = 0;
-								public void run() {
-									if (++tick == 5) {
-										if (player.isBlocking()) {
-											List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
-											for(Entity e : entities) {
-												if(EntityUtils.isHostileMob(e)) {
-													LivingEntity mob = (LivingEntity)e;
+									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+									if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
+										MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
+										mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
-													Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-													if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
-														MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
-														mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
-
-														int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-														mob.damage(extraDamage, player);
-													}
-												}
-											}
-
-											ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA, 0.25f, MAGMA_SHIELD_DOT_ANGLE);
-
-											World world = Bukkit.getWorld(player.getWorld().getName());
-											world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
-											world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
-
-											boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-
-											int cooldown = intellectBonus ? (magmaShield == 1 ? INTELLECT_MS_1_COOLDOWN : INTELLECT_MS_2_COOLDOWN) :
-														(magmaShield == 1 ? MAGMA_SHIELD_1_COOLDOWN : MAGMA_SHIELD_2_COOLDOWN);
-
-
-											mPlugin.mTimers.AddCooldown(player.getUniqueId(), MAGMA_SHIELD_ID, cooldown);
-
-										}
-										this.cancel();
+										int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
+										mob.damage(extraDamage, player);
 									}
 								}
-							}.runTaskTimer(mPlugin, 0, 1);
+							}
+
+							ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA, 0.25f, MAGMA_SHIELD_DOT_ANGLE);
+
+							World world = Bukkit.getWorld(player.getWorld().getName());
+							world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
+							world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
+
+							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
+
+							int cooldown = intellectBonus ? (magmaShield == 1 ? INTELLECT_MS_1_COOLDOWN : INTELLECT_MS_2_COOLDOWN) :
+										(magmaShield == 1 ? MAGMA_SHIELD_1_COOLDOWN : MAGMA_SHIELD_2_COOLDOWN);
+
+
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), MAGMA_SHIELD_ID, cooldown);
 						}
 					}
 				}

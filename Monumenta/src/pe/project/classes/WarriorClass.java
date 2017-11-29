@@ -139,6 +139,7 @@ public class WarriorClass extends BaseClass {
 									//	Also knock all mobs up if this ability is tier 2.
 									if (obliteration >= 2) {
 										new BukkitRunnable() {
+											@Override
 											public void run() {
 												mob.setVelocity(new Vector(0.0f, OBLITERATION_KNOCKUP, 0.0f));
 
@@ -235,7 +236,7 @@ public class WarriorClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, Material material) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		//	Defensive Line
 		{
 			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
@@ -245,36 +246,24 @@ public class WarriorClass extends BaseClass {
 					int defensiveLine = ScoreboardUtils.getScoreboardValue(player, "DefensiveLine");
 					if (defensiveLine > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID)) {
+							List<Entity> entities = player.getNearbyEntities(DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS);
+							entities.add(player);
+							for(int i = 0; i < entities.size(); i++) {
+								Entity e = entities.get(i);
+								if(e instanceof Player) {
+									Player target = (Player)e;
+									Location loc = target.getLocation();
 
-							new BukkitRunnable() {
-								Integer tick = 0;
-								public void run() {
-									if (++tick == 5) {
-										if (player.isBlocking()) {
-											List<Entity> entities = player.getNearbyEntities(DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS);
-											entities.add(player);
-											for(int i = 0; i < entities.size(); i++) {
-												Entity e = entities.get(i);
-												if(e instanceof Player) {
-													Player target = (Player)e;
-													Location loc = target.getLocation();
-
-													target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
-													boolean self = (target == player);
-													mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, false));
-												}
-											}
-
-											ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
-
-											Integer cooldown = defensiveLine == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
-											mPlugin.mTimers.AddCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID, cooldown);
-
-										}
-										this.cancel();
-									}
+									target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
+									boolean self = (target == player);
+									mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, false));
 								}
-							}.runTaskTimer(mPlugin, 0, 1);
+							}
+
+							ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
+
+							Integer cooldown = defensiveLine == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID, cooldown);
 						}
 					}
 				}
