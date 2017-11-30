@@ -12,6 +12,7 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,11 +29,12 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -164,6 +166,23 @@ public class EntityListener implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	// Entity interacts with something
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void EntityInteractEvent(EntityInteractEvent event) {
+		Material material = event.getBlock().getType();
+
+		if (material == Material.TRIPWIRE || material == Material.TRIPWIRE_HOOK) {
+			Entity entity = event.getEntity();
+
+			// Only items and players can activate tripwires
+			if (entity instanceof Item || entity instanceof Player) {
+				return;
+			}
+
+			event.setCancelled(true);
 		}
 	}
 
