@@ -3,7 +3,7 @@ package pe.project.locations.poi;
 public class POIConstants {
 	public enum POI {
 		None(-1, null),
-		
+
 		Bandit1(0, "Bandit1"),
 		Bandit2(1, "Bandit2"),
 		Bandit3(2, "Bandit3"),
@@ -64,9 +64,9 @@ public class POIConstants {
 		MntnHideaway(57, "MountainHideaway"),
 		MntnMine(58, "MountainMine"),
 		CursedForest(59, "CursedForest"),
-		
-		Total(60, null);
-		
+		KaulArena(60, null),
+		Total(61, null);
+
 		public int mValue;
 		public String mScoreboard;
 		private POI(int value, String scoreboard)	{

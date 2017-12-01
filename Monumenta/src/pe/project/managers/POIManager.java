@@ -80,7 +80,7 @@ public class POIManager {
 
 	public void refreshPOI(String dummyPlayer, int value) {
 		for (PointOfInterest poi : mPOIs) {
-			if (poi.getPOI().mScoreboard.contains(dummyPlayer)) {
+			if (poi.getPOI().mScoreboard != null && poi.getPOI().mScoreboard.contains(dummyPlayer)) {
 				poi.setTimer(value);
 				poi.save();
 			}
@@ -168,6 +168,8 @@ public class POIManager {
 			mPOIs.add(new PointOfInterest(POI.MntnHideaway, "Mountain Hideaway", new Point(613, 145, -351), 40, 80, null));
 			mPOIs.add(new PointOfInterest(POI.MntnMine, "Mountain Mine", new Point(953, 144, -362), 50, 85, null));
 			mPOIs.add(new PointOfInterest(POI.CursedForest, "Cursed Forest", new Point(1103, 100, 54), 100, 110, null));
+
+			mPOIs.add(new PointOfInterest(POI.KaulArena, "Kaul Arena", new Point(733, 61, 11), 55, 85, "????? Cenote...what is this place here all about?"));
 		}
 	}
 }

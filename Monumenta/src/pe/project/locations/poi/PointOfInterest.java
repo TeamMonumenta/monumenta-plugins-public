@@ -16,17 +16,19 @@ import pe.project.point.Point;
 public class PointOfInterest {
 	protected POIConstants.POI mPOI;
 	protected String mAreaName = null;
+	protected String mCustomMessage = null;
 	protected Point mCenter;
 	protected double mWithinRadius;
 	protected double mNearbyRadius;
 	protected int mTimer;
 
-	public PointOfInterest(POIConstants.POI poi, String areaName, Point center, double withinRadius, double nearbyRadius, String description) {
+	public PointOfInterest(POIConstants.POI poi, String areaName, Point center, double withinRadius, double nearbyRadius, String customMessage) {
 		mAreaName = areaName;
 		mPOI = poi;
 		mCenter = center;
 		mWithinRadius = withinRadius;
 		mNearbyRadius = nearbyRadius;
+		mCustomMessage = customMessage;
 	}
 
 	public boolean nearPOI(Point playerLoc) {
@@ -56,6 +58,10 @@ public class PointOfInterest {
 		return mAreaName;
 	}
 
+	public String getCustomMessage() {
+		return mCustomMessage;
+	}
+
 	public POI getPOI() {
 		return mPOI;
 	}
@@ -69,25 +75,29 @@ public class PointOfInterest {
 	}
 
 	public void save() {
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
+		if (mPOI.mScoreboard != null) {
+			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+			Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
 
-		for (Score score : scores) {
-			if (score.getObjective().getDisplayName().contains("POITimers")) {
-				score.setScore(mTimer);
-				break;
+			for (Score score : scores) {
+				if (score.getObjective().getDisplayName().contains("POITimers")) {
+					score.setScore(mTimer);
+					break;
+				}
 			}
 		}
 	}
 
 	public void load() {
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
+		if (mPOI.mScoreboard != null) {
+			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+			Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
 
-		for(Score score : scores) {
-			if (score.getObjective().getDisplayName().contains("POITimers")) {
-				mTimer = score.getScore();
-				break;
+			for(Score score : scores) {
+				if (score.getObjective().getDisplayName().contains("POITimers")) {
+					mTimer = score.getScore();
+					break;
+				}
 			}
 		}
 	}
