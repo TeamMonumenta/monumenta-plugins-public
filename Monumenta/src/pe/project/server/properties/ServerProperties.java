@@ -25,6 +25,7 @@ public class ServerProperties {
 	private int mPlotSurvivalMinHeight = 256;
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	private boolean mQuestCompassEnabled = true;
+	private boolean mIsSleepingEnabled = true;
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -52,6 +53,10 @@ public class ServerProperties {
 
 	public boolean getQuestCompassEnabled() {
 		return mQuestCompassEnabled;
+	}
+
+	public boolean getIsSleepingEnabled() {
+		return mIsSleepingEnabled;
 	}
 
 	public void load(Plugin plugin) {
@@ -86,6 +91,7 @@ public class ServerProperties {
 					mPlotSurvivalMinHeight		= _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
 					mAllowedTransferTargets		= _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mQuestCompassEnabled		= _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
+					mIsSleepingEnabled			= _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 				}
 			} catch (Exception e) {
 				plugin.getLogger().severe("Caught exception: " + e);

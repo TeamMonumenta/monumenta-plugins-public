@@ -69,6 +69,8 @@ public class ItemOverrides {
 		mItems.put(Material.LAVA_BUCKET, new BucketOverride());
 
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());
+
+		mItems.put(Material.BED_BLOCK, new BedOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
