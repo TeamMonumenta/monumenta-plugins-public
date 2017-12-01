@@ -18,11 +18,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Slime;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
@@ -157,8 +158,10 @@ public class EntityUtils {
 		return cloud;
 	}
 
-	public static SplashPotion createCustomSplashPotion(World world, Location loc) {
-		SplashPotion potion = (SplashPotion)world.spawnEntity(loc.add(0, 1.5, 0), EntityType.SPLASH_POTION);
+	public static SplashPotion spawnCustomSplashPotion(World world, Player player, ItemStack potionStack, Location loc) {
+		SplashPotion potion = (SplashPotion)world.spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
+		potion.setShooter(player);
+		potion.setItem(potionStack);
 
 		return potion;
 	}

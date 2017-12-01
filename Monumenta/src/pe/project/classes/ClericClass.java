@@ -239,7 +239,7 @@ public class ClericClass extends BaseClass {
 						}
 
 						World world = Bukkit.getWorld(player.getWorld().getName());
-						world.dropItemNaturally(killedEntity.getLocation(), potions);
+						EntityUtils.spawnCustomSplashPotion(world, player, potions, player.getLocation());
 					}
 				}
 			}
