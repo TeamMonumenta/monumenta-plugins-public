@@ -2,6 +2,7 @@ package pe.project.server.properties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -11,7 +12,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import pe.project.Plugin;
+import pe.project.point.AreaBounds;
+import pe.project.point.Point;
 import pe.project.utils.FileUtils;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class ServerProperties {
 	private final static String FILE_NAME = "Properties.json";
@@ -23,9 +27,11 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
-	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	private boolean mQuestCompassEnabled = true;
 	private boolean mIsSleepingEnabled = true;
+
+	public Set<String> mAllowedTransferTargets = new HashSet<>();
+	public ArrayList<AreaBounds> mLocationBounds = new ArrayList<>();
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -80,18 +86,20 @@ public class ServerProperties {
 			try {
 				Gson gson = new Gson();
 
-				//	Load the file - if it exists, then let's start parsing it.
+				//  Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled			= _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled		= _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled		= _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
-					mIsTownWorld				= _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled	= _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
-					mPlotSurvivalMinHeight		= _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mAllowedTransferTargets		= _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
-					mQuestCompassEnabled		= _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
-					mIsSleepingEnabled			= _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mDailyResetEnabled          = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled        = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled        = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld                = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled    = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight      = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mQuestCompassEnabled        = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
+					mIsSleepingEnabled          = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+
+					mAllowedTransferTargets     = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mLocationBounds             = _getPropertyValueLocationList(plugin, object, "locationBounds");
 				}
 			} catch (Exception e) {
 				plugin.getLogger().severe("Caught exception: " + e);
@@ -139,6 +147,40 @@ public class ServerProperties {
 
 		if (value.isEmpty()) {
 			plugin.getLogger().info("Properties: " + properyName + " = <all>");
+		} else {
+			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
+		}
+
+		return value;
+	}
+
+	private ArrayList<AreaBounds> _getPropertyValueLocationList(Plugin plugin, JsonObject object, String properyName) {
+		ArrayList<AreaBounds> value = new ArrayList<AreaBounds>();
+
+		JsonElement element = object.get(properyName);
+		if (element != null) {
+			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
+			while (targetIter.hasNext()) {
+				JsonObject iter = targetIter.next().getAsJsonObject();
+
+				if (iter.has("name") && iter.has("type") && iter.has("pos1") && iter.has("pos2")) {
+					try {
+						value.add(new AreaBounds(iter.get("name").getAsString(),
+						                         LocationType.valueOf(iter.get("type").getAsString()),
+						                         Point.fromString(iter.get("pos1").getAsString()),
+						                         Point.fromString(iter.get("pos2").getAsString())));
+					} catch (Exception e) {
+						plugin.getLogger().severe("Invalid locationBounds element at: '" + iter.toString() + "'");
+						e.printStackTrace();
+					}
+				} else {
+					plugin.getLogger().severe("Invalid locationBounds element at: '" + iter.toString() + "'");
+				}
+			}
+		}
+
+		if (value.isEmpty()) {
+			plugin.getLogger().info("Properties: " + properyName + " = []");
 		} else {
 			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
 		}

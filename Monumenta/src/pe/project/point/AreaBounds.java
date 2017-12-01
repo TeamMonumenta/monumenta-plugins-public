@@ -5,6 +5,11 @@ import org.bukkit.Location;
 import pe.project.utils.LocationUtils.LocationType;
 
 public class AreaBounds {
+	public String mName;
+	public LocationType mType;
+	public Point mLowerCorner;
+	public Point mUpperCorner;
+
 	public AreaBounds(String name, LocationType type, Point lowerCorner, Point upperCorner) {
 		double temp;
 
@@ -50,8 +55,8 @@ public class AreaBounds {
 		return mType;
 	}
 
-	String mName;
-	LocationType mType;
-	Point mLowerCorner;
-	Point mUpperCorner;
+	public String toString() {
+		return "{" + mName + ", " + mType.toString() + ", " +
+			mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";
+	}
 }

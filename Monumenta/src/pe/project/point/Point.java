@@ -28,13 +28,15 @@ public class Point {
 	}
 
 	public static Point fromString(CommandSender sender, String str) throws Exception {
-		String strArray[] = str.split(", ");
+		// Remove parenthesis, then split on either , or space or both together
+		String strArray[] = str.replaceAll("[()]", "").split("[, ]+");
 		if (strArray.length != 3) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Failed to parse string '" + str + "' as point");
+				sender.sendMessage(ChatColor.RED + "Failed to parse string '" + str +
+				                   "' as point - found " + strArray.length + " elements");
 			}
-			throw new Exception("Failed to parse string '" + str + "' as point");
-
+			throw new Exception("Failed to parse string '" + str +
+			                    "' as point - found " + strArray.length + " elements");
 		}
 		return fromString(sender, strArray[0], strArray[1], strArray[2], false, null);
 	}
@@ -82,5 +84,10 @@ public class Point {
 		z = CommandUtils.parseCoordFromString(sender, z, zStr);
 
 		return new Point(x, y, z);
+	}
+
+	public String toString() {
+		return "(" + Double.toString(mX) + ", " +
+			Double.toString(mY) + ", " + Double.toString(mZ) + ")";
 	}
 }
