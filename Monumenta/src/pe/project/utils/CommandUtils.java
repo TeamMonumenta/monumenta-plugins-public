@@ -22,7 +22,11 @@ public class CommandUtils {
 		return getLocation(sender, false);
 	}
 
+	// TODO: Reflection is cute and all, but instanceof would be way simpler/better
 	public static Location getLocation(CommandSender sender, boolean doSubtractEntityOffset) throws Exception {
+		if (sender == null) {
+			throw new Exception("sender is null!");
+		}
 		Location senderLoc = null;
 
 		// Use reflection to find out if the sender's position can be obtained via getLocation()
@@ -56,7 +60,7 @@ public class CommandUtils {
 
 		if (senderLoc == null) {
 			sender.sendMessage(ChatColor.RED + "Failed to get required command sender coordinates");
-			throw new Exception();
+			throw new Exception("Failed to get required command sender coordinates");
 		}
 
 		return senderLoc;
@@ -68,8 +72,10 @@ public class CommandUtils {
 		try{
 			value = Integer.parseInt(str);
     	} catch (NumberFormatException e) {
-    		sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
-    		throw new Exception();
+    		if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
+			}
+    		throw new Exception(e);
     	}
 
 		return value;
@@ -81,8 +87,10 @@ public class CommandUtils {
 		try {
 			value = Float.parseFloat(str);
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
-    		throw new Exception();
+			if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
+			}
+    		throw new Exception(e);
 		}
 
 		return value;
@@ -97,15 +105,19 @@ public class CommandUtils {
 		try {
 			pos1 = parsePointFromString(sender, xStr1, yStr1, zStr1, true);
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse first coordinate");
-			throw new Exception();
+			if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Failed to parse first coordinate");
+			}
+			throw new Exception(e);
 		}
 
 		try {
 			pos2 = parsePointFromString(sender, xStr2, yStr2, zStr2, true);
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse second coordinate");
-			throw new Exception();
+			if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Failed to parse second coordinate");
+			}
+			throw new Exception(e);
 		}
 
 		pos2.mX += 1;
@@ -167,8 +179,10 @@ public class CommandUtils {
 				return parseDoubleFromString(sender, str);
 			}
 		} catch (Exception e) {
-			sender.sendMessage(ChatColor.RED + "Failed to parse coordinate '" + str + "'");
-			throw new Exception();
+			if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Failed to parse coordinate '" + str + "'");
+			}
+			throw new Exception(e);
 		}
 	}
 }
