@@ -517,8 +517,7 @@ public class PlayerListener implements Listener {
 
 				try {
 					// Coordinates are relative to the head of the bed
-					Point pt = CommandUtils.parsePointFromString(player, split[0], split[1], split[2],
-					                                             false, bed.getLocation());
+					Point pt = Point.fromString(player, split[0], split[1], split[2], false, bed.getLocation());
 
 					float yaw = (float)CommandUtils.parseDoubleFromString(player, split[3]);
 					float pitch = (float)CommandUtils.parseDoubleFromString(player, split[4]);

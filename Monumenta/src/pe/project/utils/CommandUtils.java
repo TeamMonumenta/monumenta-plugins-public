@@ -103,7 +103,7 @@ public class CommandUtils {
 		Point pos2;
 
 		try {
-			pos1 = parsePointFromString(sender, xStr1, yStr1, zStr1, true);
+			pos1 = Point.fromString(sender, xStr1, yStr1, zStr1, true);
 		} catch (Exception e) {
 			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Failed to parse first coordinate");
@@ -112,7 +112,7 @@ public class CommandUtils {
 		}
 
 		try {
-			pos2 = parsePointFromString(sender, xStr2, yStr2, zStr2, true);
+			pos2 = Point.fromString(sender, xStr2, yStr2, zStr2, true);
 		} catch (Exception e) {
 			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Failed to parse second coordinate");
@@ -125,47 +125,6 @@ public class CommandUtils {
 		pos2.mZ += 1;
 
 		return new AreaBounds("", LocationType.None, pos1, pos2);
-	}
-
-	public static Point parsePointFromString(CommandSender sender,
-	                                         String xStr, String yStr, String zStr) throws Exception {
-		return parsePointFromString(sender, xStr, yStr, zStr, false, null);
-	}
-
-	public static Point parsePointFromString(CommandSender sender,
-	                                         String xStr, String yStr, String zStr,
-											 Location senderLoc) throws Exception {
-		return parsePointFromString(sender, xStr, yStr, zStr, false, senderLoc);
-	}
-
-	public static Point parsePointFromString(CommandSender sender,
-	                                         String xStr, String yStr, String zStr,
-	                                         boolean doSubtractEntityOffset) throws Exception {
-		return parsePointFromString(sender, xStr, yStr, zStr, doSubtractEntityOffset, null);
-	}
-
-	public static Point parsePointFromString(CommandSender sender,
-	                                         String xStr, String yStr, String zStr,
-	                                         boolean doSubtractEntityOffset,
-											 Location senderLoc) throws Exception {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-
-		if (xStr.startsWith("~") || yStr.startsWith("~") || zStr.startsWith("~")) {
-			if (senderLoc == null) {
-				senderLoc = getLocation(sender);
-			}
-			x = senderLoc.getX();
-			y = senderLoc.getY();
-			z = senderLoc.getZ();
-		}
-
-		x = parseCoordFromString(sender, x, xStr);
-		y = parseCoordFromString(sender, y, yStr);
-		z = parseCoordFromString(sender, z, zStr);
-
-		return new Point(x, y, z);
 	}
 
 	public static double parseCoordFromString(CommandSender sender,
