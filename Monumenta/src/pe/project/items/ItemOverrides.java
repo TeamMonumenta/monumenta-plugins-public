@@ -71,6 +71,8 @@ public class ItemOverrides {
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());
 
 		mItems.put(Material.BED_BLOCK, new BedOverride());
+
+		mItems.put(Material.FIREWORK, new FireworkOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
