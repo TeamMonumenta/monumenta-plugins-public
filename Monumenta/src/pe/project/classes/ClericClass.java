@@ -221,7 +221,7 @@ public class ClericClass extends BaseClass {
 							} else if (rand == 1) {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 45 * 20, 0, "Splash Potion of Regeneration");
 							} else {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.JUMP, 1, 180 * 20, 1, "Splash Potion of Leaping");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1, 180 * 20, 0, "Splash Potion of Fire Resistance");
 							}
 						} else {
 							int rand = mRandom.nextInt(5);
