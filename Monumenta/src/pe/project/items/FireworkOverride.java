@@ -17,7 +17,7 @@ public class FireworkOverride extends OverrideItem {
     	if (item != null && block != null) {
     		ItemMeta meta = item.getItemMeta();
     		if (meta != null) {
-    			if (meta.hasDisplayName() && meta.getDisplayName().equals("Signal Flare")) {
+    			if (meta.hasDisplayName() && meta.getDisplayName().contains("Signal Flare")) {
     				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
     			}
     		}
