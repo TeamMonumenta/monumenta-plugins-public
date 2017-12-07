@@ -3,27 +3,26 @@ package pe.project.listeners;
 import java.util.ListIterator;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.ItemUtils;
-import pe.project.Constants;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -79,6 +78,10 @@ public class MobListener implements Listener {
 		Block block = event.getBlock();
 		if (block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 			event.getBlock().removeMetadata(Constants.SPAWNER_COUNT_METAKEY, mPlugin);
+		}
+
+		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
+			event.setCancelled(true);
 		}
 	}
 

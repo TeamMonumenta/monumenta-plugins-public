@@ -3,9 +3,12 @@ package pe.project.server.properties;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.bukkit.Material;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -32,6 +35,8 @@ public class ServerProperties {
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	public ArrayList<AreaBounds> mLocationBounds = new ArrayList<>();
+
+	public EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -89,17 +94,19 @@ public class ServerProperties {
 				//  Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled          = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled        = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled        = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
-					mIsTownWorld                = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled    = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
-					mPlotSurvivalMinHeight      = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mQuestCompassEnabled        = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
-					mIsSleepingEnabled          = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mDailyResetEnabled         = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled       = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled       = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld               = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled   = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight     = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mQuestCompassEnabled       = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
+					mIsSleepingEnabled         = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 
-					mAllowedTransferTargets     = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
-					mLocationBounds             = _getPropertyValueLocationList(plugin, object, "locationBounds");
+					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mLocationBounds            = _getPropertyValueLocationList(plugin, object, "locationBounds");
+
+					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks");
 				}
 			} catch (Exception e) {
 				plugin.getLogger().severe("Caught exception: " + e);
@@ -154,10 +161,10 @@ public class ServerProperties {
 		return value;
 	}
 
-	private ArrayList<AreaBounds> _getPropertyValueLocationList(Plugin plugin, JsonObject object, String properyName) {
+	private ArrayList<AreaBounds> _getPropertyValueLocationList(Plugin plugin, JsonObject object, String propertyName) {
 		ArrayList<AreaBounds> value = new ArrayList<AreaBounds>();
 
-		JsonElement element = object.get(properyName);
+		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
 			while (targetIter.hasNext()) {
@@ -180,9 +187,39 @@ public class ServerProperties {
 		}
 
 		if (value.isEmpty()) {
-			plugin.getLogger().info("Properties: " + properyName + " = []");
+			plugin.getLogger().info("Properties: " + propertyName + " = []");
 		} else {
-			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
+			plugin.getLogger().info("Properties: " + propertyName + " = " + value.toString());
+		}
+
+		return value;
+	}
+
+	private EnumSet<Material> _getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName) {
+		EnumSet<Material> value = EnumSet.noneOf(Material.class);
+
+		JsonElement element = object.get(propertyName);
+		if (element != null) {
+			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
+			while (targetIter.hasNext()) {
+				JsonElement iter = targetIter.next();
+				try {
+					String blockName = iter.getAsString();
+					Material mat = Material.getMaterial(blockName);
+					if (mat != null) {
+						value.add(mat);
+					}
+				} catch (Exception e) {
+					plugin.getLogger().severe("Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
+					e.printStackTrace();
+				}
+			}
+		}
+
+		if (value.isEmpty()) {
+			plugin.getLogger().info("Properties: " + propertyName + " = []");
+		} else {
+			plugin.getLogger().info("Properties: " + propertyName + " = " + value.toString());
 		}
 
 		return value;

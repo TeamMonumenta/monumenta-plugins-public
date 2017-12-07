@@ -135,6 +135,21 @@ public class ItemOverrides {
 		OverrideItem override = mItems.get(blockType);
 
 		return (override != null) ? override.blockPlaceInteraction(plugin, player, item, event) : true;
+	}
 
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+		boolean eventCancelled = false;
+		OverrideItem override = mItems.get(block.getType());
+		if (override != null) {
+			eventCancelled = override.blockBreakInteraction(plugin, player, block);
+		}
+
+		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
+			if (plugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

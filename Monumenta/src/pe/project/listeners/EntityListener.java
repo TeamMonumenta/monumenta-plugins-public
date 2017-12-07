@@ -3,6 +3,7 @@ package pe.project.listeners;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,8 +13,8 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -24,16 +25,16 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -45,9 +46,9 @@ import org.bukkit.util.Vector;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
-import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -316,11 +317,19 @@ public class EntityListener implements Listener {
 			return;
 		}
 
-		// If any block damaged by an explosion is with a safezone, cancel the explosion
-		for (Block block : event.blockList()) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+
+			// If any block damaged by an explosion is with a safezone, cancel the explosion
 			if (LocationUtils.getLocationType(mPlugin, block.getLocation()) != LocationType.None) {
 				event.setCancelled(true);
 				return;
+			}
+
+			//	If this block is "unbreakable" than we want to remove it from the list.
+			if (mPlugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
+				iter.remove();
 			}
 		}
 	}
