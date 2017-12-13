@@ -20,16 +20,16 @@ import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.utils.LocationUtils;
-import pe.project.utils.LocationUtils.LocationType;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.playerdata.PlayerData;
 import pe.project.point.Point;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
+import pe.project.utils.NetworkUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
-import pe.project.utils.NetworkUtils;
 
 public class PlayerTracking implements EntityTracking {
 	Plugin mPlugin = null;
@@ -45,6 +45,7 @@ public class PlayerTracking implements EntityTracking {
 		try {
 			PlayerData.loadPlayerData(mPlugin, player);
 			PlayerData.removePlayerDataFile(mPlugin, player);
+			mPlugin.mPotionManager.refreshClassEffects(player);
 		} catch (Exception e) {
 			mPlugin.getLogger().severe("Failed to load playerdata for player '" + player.getName() + "'");
 			e.printStackTrace();

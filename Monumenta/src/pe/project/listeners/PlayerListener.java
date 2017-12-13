@@ -408,8 +408,9 @@ public class PlayerListener implements Listener {
 				//	Add base potion effect.
 				PotionData data = meta.getBasePotionData();
 				PotionInfo info = PotionUtils.getPotionInfo(data);
-				info.showParticles = true;
+
 				if (info != null) {
+					info.showParticles = true;
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 				}
 

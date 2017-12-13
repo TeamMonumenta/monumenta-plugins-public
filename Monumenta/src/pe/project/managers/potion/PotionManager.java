@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -155,8 +157,17 @@ public class PotionManager {
 			info.loadFromJsonObject(potionInfo.getAsJsonObject());
 
 			mPotionManager.put(player.getUniqueId(), info);
+		}
+	}
 
-			refreshClassEffects(player);
+	public String printInfo(Player player) {
+		JsonObject object = getAsJsonObject(player);
+		if (object != null) {
+
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return gson.toJson(object);
+		} else {
+			return "{}";
 		}
 	}
 }
