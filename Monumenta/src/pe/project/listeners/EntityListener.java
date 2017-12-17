@@ -379,7 +379,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW) {
+		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SPECTRAL_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
