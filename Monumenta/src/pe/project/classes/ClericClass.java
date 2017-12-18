@@ -313,7 +313,10 @@ public class ClericClass extends BaseClass {
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
-				if (offHand != null && offHand.getType() == Material.SHIELD) {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+
+				if ((offHand != null && offHand.getType() == Material.SHIELD) ||
+						mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
 					if (healing > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
