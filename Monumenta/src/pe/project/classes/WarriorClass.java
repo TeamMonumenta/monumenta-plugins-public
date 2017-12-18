@@ -104,7 +104,7 @@ public class WarriorClass extends BaseClass {
 						for(int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
 							if(EntityUtils.isHostileMob(e)) {
-								((LivingEntity)e).damage(csDamage, player);
+								EntityUtils.damageEntity(mPlugin, (LivingEntity)e, csDamage, player);
 							}
 						}
 					}
@@ -148,7 +148,7 @@ public class WarriorClass extends BaseClass {
 										}.runTaskTimer(mPlugin, 0, 1);
 									}
 
-									mob.damage(extraDamage, player);
+									EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 
 									World world = player.getWorld();
 									Location loc = player.getLocation();
@@ -182,7 +182,7 @@ public class WarriorClass extends BaseClass {
 							LivingEntity mob = (LivingEntity)e;
 
 							Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
-							mob.damage(extraDamage, player);
+							EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 
 							MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
 

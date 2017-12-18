@@ -282,7 +282,7 @@ public class RogueClass extends BaseClass {
 							extraDamage *= ASSASSINATION_ELITE_MODIFIER;
 						}
 
-						damagee.damage(extraDamage, player);
+						EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
 
 						if (damagee.getHealth() <= 0) {
 							_viciousCombos(player, damagee);
@@ -337,7 +337,7 @@ public class RogueClass extends BaseClass {
 				for (Entity entity : entities) {
 					if (EntityUtils.isHostileMob(entity)) {
 						LivingEntity mob = (LivingEntity)entity;
-						mob.damage(VICIOUS_COMBOS_DAMAGE, player);
+						EntityUtils.damageEntity(mPlugin, mob, VICIOUS_COMBOS_DAMAGE, player);
 					}
 				}
 

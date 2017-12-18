@@ -225,7 +225,7 @@ public class AlchemistClass extends BaseClass {
 					if (causticMixture > 0) {
 						int damage = causticMixture == 1 ? CAUSTIC_MIXTURE_1_DAMAGE : CAUSTIC_MIXTURE_2_DAMAGE;
 						if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
-							entity.damage(damage, player);
+							EntityUtils.damageEntity(mPlugin, entity, damage, player);
 							entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
 
 							Location loc = entity.getLocation();
@@ -263,7 +263,7 @@ public class AlchemistClass extends BaseClass {
 			for (LivingEntity entity : entities) {
 				if (EntityUtils.isHostileMob(entity)) {
 					if (!entity.hasMetadata(CAUSTIC_MIXTURE_TAG)) {
-						entity.damage(damage, player);
+						EntityUtils.damageEntity(mPlugin, entity, damage, player);
 						entity.setMetadata(CAUSTIC_MIXTURE_TAG, new FixedMetadataValue(mPlugin, 0));
 
 						Location loc = entity.getLocation();

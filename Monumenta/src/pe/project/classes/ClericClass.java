@@ -146,7 +146,7 @@ public class ClericClass extends BaseClass {
 			int sanctified = ScoreboardUtils.getScoreboardValue(player, "Sanctified");
 			if (sanctified > 0) {
 				double extraDamage = sanctified == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
-				damager.damage(extraDamage, player);
+				EntityUtils.damageEntity(mPlugin, damager, extraDamage, player);
 
 				MovementUtils.KnockAway(player, damager, SANCTIFIED_KNOCKBACK_SPEED);
 
@@ -168,7 +168,7 @@ public class ClericClass extends BaseClass {
 				if (EntityUtils.isUndead(damagee)) {
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 0) {
-						damagee.damage(DIVINE_JUSTICE_DAMAGE, player);
+						EntityUtils.damageEntity(mPlugin, damagee, DIVINE_JUSTICE_DAMAGE, player);
 
 						PlayerUtils.healPlayer(player, DIVINE_JUSTICE_CRIT_HEAL);
 

@@ -150,7 +150,7 @@ public class ScoutClass extends BaseClass {
 			if (bowMastery > 0) {
 				if (arrow.isCritical()) {
 					int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-					damagee.damage(bonusDamage, player);
+					EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, player);
 				}
 			}
 		}

@@ -136,7 +136,7 @@ public class MageClass extends BaseClass {
 									dmg += ARCANE_STRIKE_BURN_DAMAGE;
 								}
 
-								mob.damage(dmg, player);
+								EntityUtils.damageEntity(mPlugin, mob, dmg, player);
 							}
 						}
 
@@ -208,7 +208,7 @@ public class MageClass extends BaseClass {
 										mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
 										int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-										mob.damage(extraDamage, player);
+										EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 									}
 								}
 							}
@@ -250,7 +250,7 @@ public class MageClass extends BaseClass {
 										int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 										int effectLevel = frostNova == 1 ? FROST_NOVA_1_EFFECT_LVL : FROST_NOVA_2_EFFECT_LVL;
 
-										mob.damage(extraDamage, player);
+										EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 
 										mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, effectLevel, true, false));
 
