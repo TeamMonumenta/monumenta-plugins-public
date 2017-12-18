@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
@@ -77,9 +78,9 @@ public class MageClass extends BaseClass {
 
 	private static int ARCANE_STRIKE_ID = 15;
 	private static float ARCANE_STRIKE_RADIUS = 4.0f;
-	private static int ARCANE_STRIKE_1_DAMAGE = 5;
-	private static int ARCANE_STRIKE_2_DAMAGE = 8;
-	private static int ARCANE_STRIKE_BURN_DAMAGE = 4;
+	private static int ARCANE_STRIKE_1_DAMAGE = 6;
+	private static int ARCANE_STRIKE_2_DAMAGE = 9;
+	private static int ARCANE_STRIKE_BURN_DAMAGE = 6;
 	private static int ARCANE_STRIKE_COOLDOWN = 6 * 20;
 
 	private static int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
@@ -132,7 +133,12 @@ public class MageClass extends BaseClass {
 								LivingEntity mob = (LivingEntity)e;
 								int dmg = extraDamage;
 
-								if (arcaneStrike > 1 && mob.getFireTicks() > 0) {
+								// Arcane strike fire damage for level 2.
+								// First check if the mob is burning
+								// If burning, must either not have the metadata value or it must not match this player doing damage
+								if (arcaneStrike > 1 && mob.getFireTicks() > 0
+										&& (!mob.hasMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY)
+											|| (mob.getMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY).get(0).asInt() != player.getTicksLived()))) {
 									dmg += ARCANE_STRIKE_BURN_DAMAGE;
 								}
 

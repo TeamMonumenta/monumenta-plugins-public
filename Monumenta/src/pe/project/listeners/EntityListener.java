@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -60,6 +61,21 @@ public class EntityListener implements Listener {
 	public EntityListener(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void EntityCombustByEntityEvent(EntityCombustByEntityEvent event) {
+		// Record the time of the player who sets a mob on fire
+		// Used to prevent arcane strike from counting mobs on fire that were
+		// set on fire by the same hit that triggered arcane strike
+		// Only mark mobs that were not already burning
+		Entity combustee = event.getEntity();
+		Entity combuster = event.getCombuster();
+
+		if (combustee.getFireTicks() <= 0) {
+			combustee.setMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY,
+								  new FixedMetadataValue(mPlugin, combuster.getTicksLived()));
+		}
 	}
 
 	//	An Entity hit another Entity.

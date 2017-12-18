@@ -34,6 +34,7 @@ public class Constants {
 	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 	public static final String ENTITY_DAMAGE_NONCE_METAKEY = "MonumentaEntityDamageNonce";
+	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";
 
 	// For /back and /forward
 	public static final String PLAYER_BACK_STACK_METAKEY = "MonumentaBackStack";
