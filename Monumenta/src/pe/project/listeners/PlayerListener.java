@@ -181,8 +181,10 @@ public class PlayerListener implements Listener {
 	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 
-		/* Don't let the player interact with items when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+		/* Don't let the player do this when transferring or if in a restricted zone */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+				&& player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -200,8 +202,10 @@ public class PlayerListener implements Listener {
 	public void PlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
 
-		/* Don't let the player interact with items when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+		/* Don't let the player do this when transferring or if in a restricted zone */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+				&& player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -244,8 +248,10 @@ public class PlayerListener implements Listener {
 	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 
-		/* Don't let the player drop items when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+		/* Don't let the player do this when transferring or if in a restricted zone */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+				&& player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -262,8 +268,10 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		String name = player.getName();
 
-		/* Don't let the player pick up items when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+		/* Don't let the player do this when transferring or if in a restricted zone */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+				&& player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -328,8 +336,11 @@ public class PlayerListener implements Listener {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
 
-			/* Don't let the player open inventories when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			/* Don't let the player do this when transferring or if in a restricted zone */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+					&& player.getGameMode() != GameMode.CREATIVE
+					&& player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -342,8 +353,11 @@ public class PlayerListener implements Listener {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
 
-			/* Don't let the player interact with inventories when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			/* Don't let the player do this when transferring or if in a restricted zone */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+					&& player.getGameMode() != GameMode.CREATIVE
+					&& player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
 				return;
 			}

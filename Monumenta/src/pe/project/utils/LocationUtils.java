@@ -18,7 +18,10 @@ public class LocationUtils {
 		SafeZone(1),
 
 		// Adventure
-		AdventureZone(2);
+		AdventureZone(2),
+
+		// Restricted - Adventure and some interactions are restricted
+		RestrictedZone(3);
 
 		public int mValue;
 		private LocationType(int value) {
