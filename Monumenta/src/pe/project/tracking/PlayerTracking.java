@@ -66,6 +66,9 @@ public class PlayerTracking implements EntityTracking {
 
 		}
 
+		// Remove the metadata that prevents player from interacting with things (if present)
+		player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
+
 		mEntities.add(player);
 	}
 

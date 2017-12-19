@@ -86,8 +86,8 @@ public class PlayerListener implements Listener {
 			event.setJoinMessage("");
 		}
 
-		// Remove the metadata that prevents player from interacting with things (if present)
-		event.getPlayer().removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
+		/* Mark this player as inventory locked until their inventory data is applied */
+		event.getPlayer().setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(mPlugin, true));
 
 		new BukkitRunnable() {
 			Integer tick = 0;
@@ -113,9 +113,6 @@ public class PlayerListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-
-		// Remove the metadata that prevents player from interacting with things (if present)
-		event.getPlayer().removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
 
 		mPlugin.mTrackingManager.removeEntity(player);
 
