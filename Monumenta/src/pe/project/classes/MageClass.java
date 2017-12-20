@@ -171,16 +171,6 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
 		if (shouldGenDrops && intellect > 0) {

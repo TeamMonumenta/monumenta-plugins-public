@@ -120,16 +120,6 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		{
 			//	Volley

@@ -1,6 +1,7 @@
 package pe.project.item.properties;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -13,6 +14,12 @@ public class Gills extends ItemProperty {
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
+	}
+
+	@Override
+	public boolean validSlot(EquipmentSlot slot) {
+		// Only valid in offhand slot
+		return EquipmentSlot.OFF_HAND.equals(slot);
 	}
 
 	@Override

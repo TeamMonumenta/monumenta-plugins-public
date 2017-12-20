@@ -123,16 +123,6 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testForDuelWielding(player, mainHand, offHand);
-	}
-
-	@Override
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testForDuelWielding(player, mainHand, offHand);
-	}
-
-	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();

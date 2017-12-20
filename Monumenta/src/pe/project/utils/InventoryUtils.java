@@ -21,12 +21,27 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import pe.project.Plugin;
+
 public class InventoryUtils {
 	private static int OFFHAND_SLOT = 40;
 	private static int HELMET_SLOT = 39;
 	private static int CHESTPLATE_SLOT = 38;
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
+
+	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player) {
+		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+			@Override
+			public void run() {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				ItemStack offHand = player.getInventory().getItemInOffHand();
+
+				plugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+			}
+		}, 0);
+	}
 
 	public static boolean testForItemWithLore(ItemStack item, String loreText) {
 		if (item != null) {

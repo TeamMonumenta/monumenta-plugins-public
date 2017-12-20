@@ -8,8 +8,8 @@ import org.bukkit.potion.PotionEffectType;
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 
-public class Regeneration extends ItemProperty {
-	private static String PROPERTY_NAME = "* Regeneration *";
+public class MainhandRegeneration extends ItemProperty {
+	private static String PROPERTY_NAME = "* Mainhand Regeneration *";
 
 	@Override
 	public String getProperty() {
@@ -19,7 +19,7 @@ public class Regeneration extends ItemProperty {
 	@Override
 	public boolean validSlot(EquipmentSlot slot) {
 		// Valid in all slots except main hand
-		return !EquipmentSlot.HAND.equals(slot);
+		return EquipmentSlot.HAND.equals(slot);
 	}
 
 	@Override

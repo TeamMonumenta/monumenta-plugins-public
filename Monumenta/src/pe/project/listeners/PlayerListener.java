@@ -31,6 +31,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
@@ -159,12 +160,7 @@ public class PlayerListener implements Listener {
 			}
 
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
-				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-					@Override
-					public void run() {
-						mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
-					}
-				}, 0);
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 			}
 		} else if (action == Action.PHYSICAL) {
 			if (!mPlugin.mItemOverrides.physicsInteraction(mPlugin, player, action, item, block)) {
@@ -242,12 +238,7 @@ public class PlayerListener implements Listener {
 	//	The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
-		Player player = event.getPlayer();
-
-		ItemStack mainHand = player.getInventory().getItem(event.getNewSlot());
-		ItemStack offHand = player.getInventory().getItemInOffHand();
-
-		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
 	}
 
 	//	The player dropped an item.
@@ -263,17 +254,13 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
-
-		mPlugin.getClass(player).PlayerDropItemEvent(player, mainHand, offHand);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 	}
 
 	//	The player picked up an item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerPickupItemEvent(PlayerPickupItemEvent event) {
 		Player player = event.getPlayer();
-		String name = player.getName();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
@@ -283,37 +270,13 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-			@Override
-			public void run() {
-				Player p = Bukkit.getPlayer(name);
-
-				ItemStack mainHand = p.getInventory().getItemInMainHand();
-				ItemStack offHand = p.getInventory().getItemInOffHand();
-
-				mPlugin.getClass(p).PlayerItemHeldEvent(p, mainHand, offHand);
-			}
-		}, 0);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 	}
 
 	//	An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
-		Player player = event.getPlayer();
-		String name = player.getName();
-
-		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-			@Override
-			public void run() {
-				Player p = Bukkit.getPlayer(name);
-
-				ItemStack mainHand = p.getInventory().getItemInMainHand();
-				ItemStack offHand = p.getInventory().getItemInOffHand();
-
-				mPlugin.getClass(p).PlayerItemBreakEvent(p, mainHand, offHand);
-				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
-			}
-		}, 0);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
 	}
 
 	//	If an inventory interaction happened.
@@ -322,26 +285,7 @@ public class PlayerListener implements Listener {
  		Inventory inventory = event.getInventory();
  		Player player = (Player)inventory.getHolder();
 
- 		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-			@Override
-			public void run() {
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				ItemStack offHand = player.getInventory().getItemInOffHand();
-
-				mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
-			}
-		}, 0);
-
- 		int slot = event.getSlot();
- 		if (InventoryUtils.isArmorSlotFromId(slot) || slot == player.getInventory().getHeldItemSlot() ||
- 				(event.isShiftClick() && ItemUtils.isArmorItem(event.getCurrentItem().getType()))) {
- 			player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
- 				@Override
- 				public void run() {
- 					mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
- 				}
- 			}, 0);
- 		}
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
  	}
 
 	//	The player opened an inventory
@@ -392,15 +336,16 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	//	Player changed hand items
+	@EventHandler(priority = EventPriority.HIGH)
+	public void PlayerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
+	}
+
 	//	Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		Player player = event.getPlayer();
-
-		ItemStack mainHand = event.getMainHandItem();
-		ItemStack offHand = event.getOffHandItem();
-
-		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
 	}
 
 	//	The player has died
@@ -424,6 +369,11 @@ public class PlayerListener implements Listener {
 				Player player = Bukkit.getPlayer(name);
 
 				mPlugin.mPotionManager.clearAllEffects(player);
+
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				ItemStack offHand = player.getInventory().getItemInOffHand();
+
+				mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 
 				mPlugin.getClass(player).PlayerRespawnEvent(player);

@@ -88,10 +88,6 @@ public class BaseClass {
 
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {};
 
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {}
-
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {}
-
 	public void PlayerRespawnEvent(Player player) {}
 
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {}

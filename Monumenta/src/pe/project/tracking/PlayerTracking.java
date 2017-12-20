@@ -24,7 +24,6 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.player.PlayerData;
 import pe.project.player.PlayerInventory;
 import pe.project.point.Point;
-import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.NetworkUtils;

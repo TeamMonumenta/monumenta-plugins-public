@@ -203,16 +203,6 @@ public class WarriorClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDropItemEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
-	public void PlayerItemBreakEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
 	public void PlayerRespawnEvent(Player player) {
 		_testToughness(player);
 	}

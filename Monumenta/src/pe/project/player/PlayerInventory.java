@@ -74,12 +74,7 @@ public class PlayerInventory {
 			Entry<EquipmentSlot, List<ItemProperty>> entry = iter.next();
 			EquipmentSlot slot = entry.getKey();
 
-			//	For now we want to ignore the main hand slot for Item Properties.
-			if (slot == EquipmentSlot.HAND) {
-				continue;
-			}
-
-			final List<ItemProperty> properties = ItemPropertyManager.getItemProperties(InventoryUtils.getItemFromEquipment(equipment, slot));
+			final List<ItemProperty> properties = ItemPropertyManager.getItemProperties(InventoryUtils.getItemFromEquipment(equipment, slot), slot);
 			for (ItemProperty p : properties) {
 				p.applyProperty(plugin, player);
 
