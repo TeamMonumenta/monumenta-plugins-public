@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
@@ -37,6 +39,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -239,6 +242,24 @@ public class EntityListener implements Listener {
 	//	Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+		if (event.getEntityType() == EntityType.SNOWBALL) {
+			Snowball origBall = (Snowball)event.getEntity();
+			if (origBall.getShooter() instanceof Player) {
+				Player player = (Player)origBall.getShooter();
+				ItemStack itemInHand = player.getEquipment().getItemInMainHand();
+				if (itemInHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					// This is an infinite snowball - summon a new one and cancel the event
+					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+
+					newBall.setShooter(player);
+					newBall.setVelocity(origBall.getVelocity());
+					//newBall.setGlowing(true);
+
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
 		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			if (arrow.getShooter() instanceof Player) {
