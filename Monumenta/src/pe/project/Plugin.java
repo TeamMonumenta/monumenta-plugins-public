@@ -29,6 +29,7 @@ import pe.project.commands.ChatRangeCommand;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
 import pe.project.commands.GetServerVersionCommand;
+import pe.project.commands.GiveSoulbound;
 import pe.project.commands.IncrementDaily;
 import pe.project.commands.IsShittyCommand;
 import pe.project.commands.MinusExp;
@@ -164,6 +165,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("getScore").setExecutor(new GetScore());
 			getCommand("transferServer").setExecutor(new TransferServer(this));
 			getCommand("broadcastCommand").setExecutor(new BroadcastCommand(this));
+			getCommand("giveSoulbound").setExecutor(new GiveSoulbound(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));

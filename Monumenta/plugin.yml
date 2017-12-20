@@ -52,6 +52,10 @@ commands:
     permission: monumenta.commands.broadcastCommand
     description: Broadcasts a command to run on all Monumenta servers
     usage: /broadcastcommand [command arg1 arg2 ...]
+  giveSoulbound:
+    permission: monumenta.commands.giveSoulbound
+    description: Appends the player's name into lore text on the given item
+    usage: /execute @p[stuff] ~ ~ ~ givesoulbound item amount data datatag
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
