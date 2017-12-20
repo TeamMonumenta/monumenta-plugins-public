@@ -43,6 +43,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
@@ -425,6 +426,14 @@ public class EntityListener implements Listener {
 				mPlugin.getClass(player).ProjectileHitEvent(player, arrow);
 				mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			}
+		}
+
+		if ((type == EntityType.SNOWBALL)
+			&& (event.getHitEntity() instanceof LivingEntity)
+			&& (!(event.getHitEntity() instanceof Player))) {
+
+			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 300, 0, false);
+			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);
 		}
 	}
 }
