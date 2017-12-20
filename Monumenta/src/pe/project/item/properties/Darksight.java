@@ -1,6 +1,7 @@
 package pe.project.item.properties;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -13,6 +14,12 @@ public class Darksight extends ItemProperty {
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
+	}
+
+	@Override
+	public boolean validSlot(EquipmentSlot slot) {
+		// Valid in all slots except main hand
+		return !EquipmentSlot.HAND.equals(slot);
 	}
 
 	@Override

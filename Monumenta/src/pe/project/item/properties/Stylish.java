@@ -17,14 +17,14 @@ public class Stylish extends ItemProperty {
 	}
 
 	@Override
-	public boolean validSlot(EquipmentSlot slot) {
-		// Stylish *shirt*
-		return EquipmentSlot.CHEST.equals(slot);
+	public String getProperty() {
+		return PROPERTY_NAME;
 	}
 
 	@Override
-	public String getProperty() {
-		return PROPERTY_NAME;
+	public boolean validSlot(EquipmentSlot slot) {
+		// Stylish *shirt*
+		return EquipmentSlot.CHEST.equals(slot);
 	}
 
 	@Override

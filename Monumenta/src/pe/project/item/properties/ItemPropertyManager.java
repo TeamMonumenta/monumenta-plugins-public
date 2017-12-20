@@ -3,6 +3,7 @@ package pe.project.item.properties;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,13 +22,15 @@ public class ItemPropertyManager {
 		mProperties.add(new Stylish());
 	}
 
-	public static List<ItemProperty> getItemProperties(ItemStack item, EquipmentSlot slot) {
+	public static List<ItemProperty> getItemProperties(ItemStack item, EquipmentSlot slot, Player player) {
 		List<ItemProperty> properties = new ArrayList<ItemProperty>();
 
 		for (ItemProperty property : mProperties) {
 			if (property.validSlot(slot)
 			    && InventoryUtils.testForItemWithLore(item, property.getProperty())) {
-				properties.add(property);
+				if (!property.requireSoulbound() || InventoryUtils.isSoulboundToPlayer(item, player)) {
+					properties.add(property);
+				}
 			}
 		}
 

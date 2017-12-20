@@ -74,7 +74,7 @@ public class PlayerInventory {
 			Entry<EquipmentSlot, List<ItemProperty>> entry = iter.next();
 			EquipmentSlot slot = entry.getKey();
 
-			final List<ItemProperty> properties = ItemPropertyManager.getItemProperties(InventoryUtils.getItemFromEquipment(equipment, slot), slot);
+			final List<ItemProperty> properties = ItemPropertyManager.getItemProperties(InventoryUtils.getItemFromEquipment(equipment, slot), slot, player);
 			for (ItemProperty p : properties) {
 				p.applyProperty(plugin, player);
 

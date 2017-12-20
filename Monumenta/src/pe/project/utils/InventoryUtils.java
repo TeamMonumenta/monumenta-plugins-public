@@ -110,6 +110,11 @@ public class InventoryUtils {
 		return false;
 	}
 
+	public static boolean isSoulboundToPlayer(ItemStack item, Player player) {
+		// TODO: Needs to handle renames
+		return testForItemWithLore(item, "* Soulbound to " + player.getName() + " *");
+	}
+
 	public static boolean isPotionItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
