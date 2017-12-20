@@ -1,6 +1,7 @@
 package pe.project.utils;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
 import pe.project.Plugin;
@@ -49,5 +50,22 @@ public class LocationUtils {
 		}
 
 		return LocationType.None;
+	}
+
+	public static boolean isLosBlockingBlock(Material mat) {
+		if (mat.equals(Material.AIR) ||
+				mat.equals(Material.GLASS) ||
+				mat.equals(Material.VINE) ||
+				mat.equals(Material.WEB) ||
+				mat.equals(Material.WATER) ||
+				mat.equals(Material.STATIONARY_WATER) ||
+				mat.equals(Material.LAVA) ||
+				mat.equals(Material.STATIONARY_LAVA) ||
+				mat.equals(Material.CARPET) ||
+				ItemUtils.isDoor(mat)) {
+				return false;
+			}
+
+			return true;
 	}
 }

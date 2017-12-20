@@ -39,6 +39,10 @@ public class BaseClass {
 			player.removeMetadata(ClericClass.CELESTIAL_2_TAGNAME, mPlugin);
 		} else if (abilityID == ScoutClass.STANDARD_BEARER_FAKE_ID) {
 			player.removeMetadata(ScoutClass.STANDARD_BEARER_TAG_NAME, mPlugin);
+		} else if (abilityID == RogueClass.ADVANCING_SHADOWS_1_FAKE_ID) {
+			player.removeMetadata(RogueClass.ADVANCING_SHADOWS_1_TAGNAME, mPlugin);
+		} else if (abilityID == RogueClass.ADVANCING_SHADOWS_2_FAKE_ID) {
+			player.removeMetadata(RogueClass.ADVANCING_SHADOWS_2_TAGNAME, mPlugin);
 		}
 	}
 

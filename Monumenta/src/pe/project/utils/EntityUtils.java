@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
@@ -90,7 +89,7 @@ public class EntityUtils {
 			bz = b.getZ();
 
 			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
-			if (checkLos && _LosBlockingBlock(b.getType())) {
+			if (checkLos && LocationUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
 
@@ -188,23 +187,6 @@ public class EntityUtils {
 		}
 
 		return null;
-	}
-
-	private static boolean _LosBlockingBlock(Material mat) {
-		if (mat.equals(Material.AIR) ||
-			mat.equals(Material.GLASS) ||
-			mat.equals(Material.VINE) ||
-			mat.equals(Material.WEB) ||
-			mat.equals(Material.WATER) ||
-			mat.equals(Material.STATIONARY_WATER) ||
-			mat.equals(Material.LAVA) ||
-			mat.equals(Material.STATIONARY_LAVA) ||
-			mat.equals(Material.CARPET) ||
-			ItemUtils.isDoor(mat)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {

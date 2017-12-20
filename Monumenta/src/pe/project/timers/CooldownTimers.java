@@ -12,16 +12,16 @@ import pe.project.Plugin;
 public class CooldownTimers {
 	public HashMap<UUID, HashMap<Integer, Integer>> mTimers = null;
 	private Plugin mPlugin = null;
-	
+
 	public CooldownTimers(Plugin plugin) {
 		mPlugin = plugin;
 		mTimers = new HashMap<UUID, HashMap<Integer, Integer>>();
 	}
-	
+
 	public void RegisterCooldown(Player player, Integer cooldownID, Integer cooldownTime) {
 		mTimers.put(player.getUniqueId(), new HashMap<Integer, Integer>(cooldownID, cooldownTime));
 	}
-	
+
 	public boolean isAbilityOnCooldown(UUID playerID, Integer abilityID) {
 		//	First check if the player has any cooldowns in the HashMap.
 		HashMap<Integer, Integer> player = mTimers.get(playerID);
@@ -36,10 +36,10 @@ public class CooldownTimers {
 		else {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean AddCooldown(UUID playerID, Integer abilityID, Integer cooldownTime) {
 		//	First let's investigate whether this player already has existing cooldowns.
 		HashMap<Integer, Integer> player = mTimers.get(playerID);
@@ -56,16 +56,23 @@ public class CooldownTimers {
 		//	Else add a new player entry with it's info.
 		else {
 			HashMap<Integer, Integer> cooldownHash = new HashMap<Integer, Integer>();
-			
+
 			cooldownHash.put(abilityID, cooldownTime);
 			mTimers.put(playerID, cooldownHash);
 
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
+	public void removeCooldown(UUID playerID, Integer abilityID) {
+		HashMap<Integer, Integer> cooldownHash = mTimers.get(playerID);
+		if (cooldownHash != null) {
+			cooldownHash.remove(abilityID);
+		}
+	}
+
 	public void UpdateCooldowns(Integer ticks) {
 		//	Our set of player cooldowns is broken down into a Hashmap of Hashmaps.
 		//	Because of this, we first loop through each player (UUID), than we loop
@@ -73,39 +80,39 @@ public class CooldownTimers {
 		Iterator<Entry<UUID, HashMap<Integer, Integer>>> playerIter = mTimers.entrySet().iterator();
 		while (playerIter.hasNext()) {
 			Entry<UUID, HashMap<Integer, Integer>> player = playerIter.next();
-			
+
 		    Iterator<Entry<Integer, Integer>> abilityIter = player.getValue().entrySet().iterator();
 		    while(abilityIter.hasNext()) {
 		    	Entry<Integer, Integer> cooldown = abilityIter.next();
-		    	
+
 		    	Player _player = mPlugin.getPlayer(player.getKey());
 		    	if (_player != null && _player.isOnline()) {
 			    	//	Update the cooldown time, if it's not over, set the value, else remove it.
 			    	int time = cooldown.getValue() - ticks;
 			    	if (time <= 0) {
 			    		int cooldownID = cooldown.getKey();
-			    		
+
 			    		if (cooldownID < 100) {
 			    			mPlugin.getClass(_player).AbilityOffCooldown(_player, cooldownID);
 			    		} else {
 			    			mPlugin.getClass(_player).FakeAbilityOffCooldown(_player, cooldownID);
 			    		}
-			    		
+
 			    		abilityIter.remove();
 			    	} else {
 			    		cooldown.setValue(time);
 			    	}
 		    	}
 		    }
-		    
+
 		    //	If this player no longer has any more cooldowns for them, remove the player.
 		    if (player.getValue().isEmpty()) {
 		    	playerIter.remove();
 		    }
 		}
 	}
-	
-	public void removeCooldowns(UUID playerID) {
+
+	public void removeAllCooldowns(UUID playerID) {
 		mTimers.remove(playerID);
 	}
 }
