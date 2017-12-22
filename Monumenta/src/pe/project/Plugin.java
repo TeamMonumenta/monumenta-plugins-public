@@ -26,6 +26,7 @@ import pe.project.classes.WarriorClass;
 import pe.project.commands.Back;
 import pe.project.commands.BroadcastCommand;
 import pe.project.commands.ChatRangeCommand;
+import pe.project.commands.CheckEmptyInventory;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
 import pe.project.commands.GetServerVersionCommand;
@@ -166,6 +167,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("transferServer").setExecutor(new TransferServer(this));
 			getCommand("broadcastCommand").setExecutor(new BroadcastCommand(this));
 			getCommand("giveSoulbound").setExecutor(new GiveSoulbound(this));
+			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
