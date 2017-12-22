@@ -49,6 +49,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -310,13 +311,16 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
- 		Player player = (Player)inventory.getHolder();
+		InventoryHolder holder = inventory.getHolder();
+		if (holder instanceof Player) {
+			Player player = (Player)holder;
 
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-		mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
-		mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+		}
 	}
 
 	//	Something interacts with an inventory
