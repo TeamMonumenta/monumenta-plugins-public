@@ -6,7 +6,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,8 +35,8 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	void CreatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof Monster) {
-			Monster mob = (Monster)entity;
+		if (!(entity instanceof Player)) {
+			LivingEntity mob = (LivingEntity)entity;
 
 			//	Mark mobs not able to pick-up items.
 			mob.setCanPickupItems(false);
