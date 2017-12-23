@@ -35,7 +35,7 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	void CreatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof Player)) {
+		if ((entity instanceof LivingEntity) && !(entity instanceof Player)) {
 			LivingEntity mob = (LivingEntity)entity;
 
 			//	Mark mobs not able to pick-up items.
@@ -43,12 +43,14 @@ public class MobListener implements Listener {
 
 			// Overwrite drop chances for mob armor and held items
 			EntityEquipment equipment = mob.getEquipment();
-			equipment.setHelmetDropChance(ItemUtils.getItemDropChance(equipment.getHelmet()));
-			equipment.setChestplateDropChance(ItemUtils.getItemDropChance(equipment.getChestplate()));
-			equipment.setLeggingsDropChance(ItemUtils.getItemDropChance(equipment.getLeggings()));
-			equipment.setBootsDropChance(ItemUtils.getItemDropChance(equipment.getBoots()));
-			equipment.setItemInMainHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInMainHand()));
-			equipment.setItemInOffHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInOffHand()));
+			if (equipment != null) {
+				equipment.setHelmetDropChance(ItemUtils.getItemDropChance(equipment.getHelmet()));
+				equipment.setChestplateDropChance(ItemUtils.getItemDropChance(equipment.getChestplate()));
+				equipment.setLeggingsDropChance(ItemUtils.getItemDropChance(equipment.getLeggings()));
+				equipment.setBootsDropChance(ItemUtils.getItemDropChance(equipment.getBoots()));
+				equipment.setItemInMainHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInMainHand()));
+				equipment.setItemInOffHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInOffHand()));
+			}
 		}
 	}
 
