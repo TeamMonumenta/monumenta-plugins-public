@@ -284,9 +284,10 @@ public class PlayerListener implements Listener {
  	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
  		Inventory inventory = event.getInventory();
- 		Player player = (Player)inventory.getHolder();
-
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+		InventoryHolder holder = inventory.getHolder();
+		if (holder != null && holder instanceof Player) {
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player)holder);
+		}
  	}
 
 	//	The player opened an inventory
@@ -312,7 +313,7 @@ public class PlayerListener implements Listener {
 	public void InventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
-		if (holder instanceof Player) {
+		if (holder != null && holder instanceof Player) {
 			Player player = (Player)holder;
 
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
