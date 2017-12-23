@@ -30,7 +30,7 @@ public class PotionManager {
 		ABILITY_OTHER(2, "ABILITY_OTHER"),
 		SAFE_ZONE(3, "SAFE_ZONE"),
 		ITEM(4, "ITEM"),
-		ALL(4, "ALL");
+		ALL(5, "ALL");
 
 		private int value;
 		private String name;
