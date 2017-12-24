@@ -60,6 +60,10 @@ commands:
     permission: monumenta.commands.checkEmptyInventory
     description: Return success if the player's inventory is empty, fails otherwise
     usage: /execute @p[stuff] ~ ~ ~ checkEmptyInventory
+  debugInfo:
+    permission: monumenta.commands.debugInfo
+    description: Tells the sender information about the target
+    usage: /execute @p[stuff] ~ ~ ~ debugInfo
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.

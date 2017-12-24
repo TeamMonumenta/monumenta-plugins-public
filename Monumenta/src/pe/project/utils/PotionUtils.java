@@ -78,13 +78,10 @@ public class PotionUtils {
 		public boolean ambient;
 		public boolean showParticles;
 
-		public JsonObject getAsJsonObject(boolean ignoreType) {
+		public JsonObject getAsJsonObject() {
 			JsonObject potionInfoObject = new JsonObject();
 
-			if (!ignoreType) {
-				potionInfoObject.addProperty("type", type.getName());
-			}
-
+			potionInfoObject.addProperty("type", type.getName());
 			potionInfoObject.addProperty("duration", duration);
 			potionInfoObject.addProperty("amplifier", amplifier);
 			potionInfoObject.addProperty("ambient", ambient);
@@ -93,13 +90,8 @@ public class PotionUtils {
 			return potionInfoObject;
 		}
 
-		public void loadFromJsonObject(JsonObject object, PotionEffectType potionType) {
-			if (object.has("type")) {
-				type = PotionEffectType.getByName(object.get("type").getAsString());
-			} else {
-				type = potionType;
-			}
-
+		public void loadFromJsonObject(JsonObject object) throws Exception {
+			type = PotionEffectType.getByName(object.get("type").getAsString());
 			duration = object.get("duration").getAsInt();
 			amplifier = object.get("amplifier").getAsInt();
 			ambient = object.get("ambient").getAsBoolean();

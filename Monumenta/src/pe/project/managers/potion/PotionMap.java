@@ -1,10 +1,10 @@
 package pe.project.managers.potion;
 
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -18,57 +18,71 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionMap {
-//	ID / Potion info
-	public HashMap<PotionID, Vector<PotionInfo>> mPotionMap;
+	// PotionID is the type (safezone, item, etc.)
+	// Each PotionID has an iterable TreeMap with one entry per effect level
+	//
+	// This implementation allows only one status effect of each (type, level)
+	// So you can have a level 0 regen from a safezone and a level 0 regen from an item,
+	//   but not two level 0 regens from items
+	private EnumMap<PotionID, TreeMap<Integer, PotionInfo>> mPotionMap;
 
-	public PotionMap() {
-		mPotionMap = new HashMap<PotionID, Vector<PotionInfo>>();
+	// Type of this particular map
+	private PotionEffectType mType;
+
+	public PotionMap(PotionEffectType type) {
+		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
+		mType = type;
+	}
+
+	private void _addPotionMap(PotionID id, PotionInfo newPotionInfo) {
+		Integer amplifier = newPotionInfo.amplifier;
+
+		TreeMap<Integer, PotionInfo> trackedPotionInfo = mPotionMap.get(id);
+		if (trackedPotionInfo == null) {
+			trackedPotionInfo = new TreeMap<Integer, PotionInfo>();
+		}
+
+		// Only add the new effect if it is longer for the same effect amplifier
+		PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
+		if (currentInfo == null || currentInfo.duration < newPotionInfo.duration) {
+			trackedPotionInfo.put(amplifier, newPotionInfo);
+		}
+
+		mPotionMap.put(id, trackedPotionInfo);
+
 	}
 
 	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
-		Vector<PotionInfo> trackedPotionInfo = mPotionMap.get(id);
-		if (trackedPotionInfo == null) {
-			trackedPotionInfo = new Vector<PotionInfo>();
-		}
-
-		trackedPotionInfo.add(newPotionInfo);
-		mPotionMap.put(id, trackedPotionInfo);
+		_addPotionMap(id, newPotionInfo);
 
 		applyBestPotionEffect(player);
 	}
 
+	// If amplifier is negative, remove all levels of that effect
 	public void removePotionMap(Player player, PotionID id) {
-		if (id != PotionID.ALL) {
-			Vector<PotionInfo> trackedPotionInfo = mPotionMap.get(id);
-			if (trackedPotionInfo != null) {
-				for (PotionInfo info : trackedPotionInfo) {
-					player.removePotionEffect(info.type);
-				}
-
-				mPotionMap.remove(id);
-			}
-		} else {
+		if (id == PotionID.ALL) {
+			// Clear all effects from all sources
 			mPotionMap.clear();
+		} else {
+			// Clear out all effects from this source
+			mPotionMap.remove(id);
 		}
 
 		applyBestPotionEffect(player);
-	}
-
-	public void clearPotionIDType(Player player, PotionID id) {
-		removePotionMap(player, id);
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
 		//	First update the timers of all our tracked potion timers.
 		boolean effectWoreOff = false;
-		Iterator<Entry<PotionID, Vector<PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
+
+		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
 		while (potionIter.hasNext()) {
-			Entry<PotionID, Vector<PotionInfo>> potionMapping = potionIter.next();
+			Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping = potionIter.next();
 			if (potionMapping != null) {
-				Vector<PotionInfo> potionInfo = potionMapping.getValue();
-				Iterator<PotionInfo> potionInfoIter = potionInfo.iterator();
+				TreeMap<Integer, PotionInfo> potionInfo = potionMapping.getValue();
+				Iterator<Entry<Integer, PotionInfo>> potionInfoIter = potionInfo.entrySet().iterator();
 				while (potionInfoIter.hasNext()) {
-					PotionInfo info = potionInfoIter.next();
+					PotionInfo info = potionInfoIter.next().getValue();
 
 					info.duration -= ticks;
 					if (info.duration <= 0) {
@@ -91,12 +105,14 @@ public class PotionMap {
 
 	void applyBestPotionEffect(Player player) {
 		PotionInfo bestEffect = null;
-		Iterator<Entry<PotionID, Vector<PotionInfo>>> potionInfoIter = mPotionMap.entrySet().iterator();
-		while (potionInfoIter.hasNext()) {
-			Entry<PotionID, Vector<PotionInfo>> potionInfo = potionInfoIter.next();
-			Vector<PotionInfo> potionVector = potionInfo.getValue();
 
-			for (PotionInfo info : potionVector) {
+		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionSourceIter = mPotionMap.entrySet().iterator();
+		while (potionSourceIter.hasNext()) {
+			Entry<PotionID, TreeMap<Integer, PotionInfo>> potionInfo = potionSourceIter.next();
+
+			for (Entry<Integer, PotionInfo> infoIter : potionInfo.getValue().entrySet()) {
+				PotionInfo info = infoIter.getValue();
+
 				if (bestEffect == null) {
 					bestEffect = info;
 				} else if (info.amplifier > bestEffect.amplifier) {
@@ -108,9 +124,11 @@ public class PotionMap {
 			}
 		}
 
+		// TODO: Until we catch all potion effect sources, this will likely clear those effects not tracked
+		player.removePotionEffect(mType);
+
 		if (bestEffect != null) {
-			player.removePotionEffect(bestEffect.type);
-			player.addPotionEffect(new PotionEffect(bestEffect.type, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles));
+			player.addPotionEffect(new PotionEffect(mType, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles));
 		}
 	}
 
@@ -119,19 +137,17 @@ public class PotionMap {
 		JsonObject potionMapObject = new JsonObject();
 		boolean hasMapping = false;
 
-		Iterator<Entry<PotionID, Vector<PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
+		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
 		while (potionIter.hasNext()) {
-
-			Entry<PotionID, Vector<PotionInfo>> potionMapping = potionIter.next();
+			Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping = potionIter.next();
 			if (potionMapping != null) {
 				JsonArray effectListArray = new JsonArray();
 
-				Vector<PotionInfo> potionInfo = potionMapping.getValue();
-
-				Iterator<PotionInfo> potionInfoIter = potionInfo.iterator();
+				TreeMap<Integer, PotionInfo> potionInfo = potionMapping.getValue();
+				Iterator<Entry<Integer, PotionInfo>> potionInfoIter = potionInfo.entrySet().iterator();
 				while (potionInfoIter.hasNext()) {
-					PotionInfo info = potionInfoIter.next();
-					effectListArray.add(info.getAsJsonObject(true));
+					PotionInfo info = potionInfoIter.next().getValue();
+					effectListArray.add(info.getAsJsonObject());
 				}
 
 				if (effectListArray.size() > 0) {
@@ -152,27 +168,28 @@ public class PotionMap {
 		return potionIDObject;
 	}
 
-	void loadFromJsonObject(JsonObject object, PotionEffectType type) {
+	void loadFromJsonObject(JsonObject object) throws Exception {
+		// Remove all current entries
+		mPotionMap.clear();
+
 		JsonObject potionMap = object.get("potion_map").getAsJsonObject();
 		if (potionMap != null) {
 			Set<Entry<String, JsonElement>> entries = potionMap.entrySet();
 			for (Entry<String, JsonElement> entry : entries) {
-				Vector<PotionInfo> potionInfo = new Vector<PotionInfo>();
-
 				PotionID id = PotionID.getFromString(entry.getKey());
-				JsonArray potionInfoArray = entry.getValue().getAsJsonArray();
+				if (id != null) {
+					JsonArray potionInfoArray = entry.getValue().getAsJsonArray();
 
-				Iterator<JsonElement> elementIter = potionInfoArray.iterator();
-				while (elementIter.hasNext()) {
-					JsonElement element = elementIter.next();
+					Iterator<JsonElement> elementIter = potionInfoArray.iterator();
+					while (elementIter.hasNext()) {
+						JsonElement element = elementIter.next();
 
-					PotionInfo info = new PotionInfo();
-					info.loadFromJsonObject(element.getAsJsonObject(), type);
+						PotionInfo info = new PotionInfo();
+						info.loadFromJsonObject(element.getAsJsonObject());
 
-					potionInfo.add(info);
+						_addPotionMap(id, info);
+					}
 				}
-
-				mPotionMap.put(id, potionInfo);
 			}
 		}
 	}

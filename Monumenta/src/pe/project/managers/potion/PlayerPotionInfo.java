@@ -27,7 +27,7 @@ public class PlayerPotionInfo {
 		if (type != null) {
 			type.addPotionMap(player, id, info);
 		} else {
-			PotionMap newMap = new PotionMap();
+			PotionMap newMap = new PotionMap(info.type);
 			newMap.addPotionMap(player, id, info);
 			mPotionInfo.put(info.type, newMap);
 		}
@@ -44,7 +44,7 @@ public class PlayerPotionInfo {
 		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
 		while (potionMapIter.hasNext()) {
 			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
-			potionEntry.getValue().clearPotionIDType(player, id);
+			potionEntry.getValue().removePotionMap(player, id);
 		}
 	}
 
@@ -80,15 +80,15 @@ public class PlayerPotionInfo {
 		return playerPotionInfoObject;
 	}
 
-	void loadFromJsonObject(JsonObject object) {
+	void loadFromJsonObject(JsonObject object) throws Exception {
 		Set<Entry<String, JsonElement>> potionInfo = object.entrySet();
 		for (Entry<String, JsonElement> info : potionInfo) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
-			PotionMap map = new PotionMap();
+			PotionMap map = new PotionMap(type);
 
 			JsonElement mapElement = info.getValue();
 			if (mapElement != null) {
-				map.loadFromJsonObject(mapElement.getAsJsonObject(), type);
+				map.loadFromJsonObject(mapElement.getAsJsonObject());
 
 				mPotionInfo.put(type, map);
 			}

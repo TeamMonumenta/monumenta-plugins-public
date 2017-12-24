@@ -1,5 +1,6 @@
 package pe.project.listeners;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -278,32 +279,32 @@ public class EntityListener implements Listener {
 	//	A players thrown potion splashed.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PotionSplashEvent(PotionSplashEvent event) {
-		if (event.getEntityType() == EntityType.SPLASH_POTION) {
-			ThrownPotion potion = event.getPotion();
-			ProjectileSource source = potion.getShooter();
-			if (source instanceof Player) {
-				Player player = (Player)source;
+		ThrownPotion potion = event.getPotion();
+		ProjectileSource source = potion.getShooter();
+		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
-				if (LocationUtils.getLocationType(mPlugin, player) != LocationType.None) {
-					event.setCancelled(true);
-					return;
-				}
+		// If we are in any type of safezone don't apply splash effects to non-players
+		if (LocationUtils.getLocationType(mPlugin, potion.getLocation()) != LocationType.None) {
+			affectedEntities.removeIf(entity -> (!(entity instanceof Player)));
+		}
 
-				boolean cancel = !mPlugin.getClass(player).PlayerSplashPotionEvent(player, event.getAffectedEntities(), potion);
-				if (cancel) {
-					event.setCancelled(true);
-				}
+		// Never apply effects to villagers
+		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
-				Iterator<LivingEntity> iter = event.getAffectedEntities().iterator();
-				while (iter.hasNext()) {
-					LivingEntity entity = iter.next();
-					//	All affected players need to have the effect added to their potion manager.
-					if (entity instanceof Player) {
-						mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects());
-					} else if (entity instanceof Villager) {
-						iter.remove();
-					}
-				}
+		// Class effects from splashing potion
+		if (source instanceof Player) {
+			Player player = (Player)source;
+
+			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		//	All affected players need to have the effect added to their potion manager.
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player) {
+				mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(), event.getIntensity(entity));
 			}
 		}
 	}
@@ -313,31 +314,32 @@ public class EntityListener implements Listener {
 	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		AreaEffectCloud cloud = event.getEntity();
 		ProjectileSource source = cloud.getSource();
+		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
+		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
+
+		// If we are in any type of safezone don't apply splash effects to non-players
+		if (LocationUtils.getLocationType(mPlugin, cloud.getLocation()) != LocationType.None) {
+			affectedEntities.removeIf(entity -> (!(entity instanceof Player)));
+		}
+
+		// Never apply effects to villagers
+		affectedEntities.removeIf(entity -> (entity instanceof Villager));
+
+		// Class effects from splashing potion
 		if (source instanceof Player) {
 			Player player = (Player)source;
 
-			if (LocationUtils.getLocationType(mPlugin, player) != LocationType.None) {
-				return;
-			}
+			mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
+		}
 
-			List<LivingEntity> entities = event.getAffectedEntities();
+		//	All affected players need to have the effect added to their potion manager.
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player) {
+				// TODO: Base potion data from lingering potions isn't applied here. The straightforward implementation
+				// (check git history) results in full-duration effects being applied to the player, for example 8 minutes instead of 2
 
-			mPlugin.getClass(player).AreaEffectCloudApplyEvent(entities, player);
-
-			PotionInfo data = PotionUtils.getPotionInfo(cloud.getBasePotionData());
-			List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
-
-			for (LivingEntity entity : entities) {
-				if (entity instanceof Player) {
-					Player p = (Player)entity;
-
-					if (data != null) {
-						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, data);
-					}
-
-					if (effects != null) {
-						mPlugin.mPotionManager.addPotion(p, PotionID.APPLIED_POTION, effects);
-					}
+				if (effects != null) {
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, effects);
 				}
 			}
 		}

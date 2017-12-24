@@ -15,8 +15,6 @@ import com.google.gson.JsonObject;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.utils.LocationUtils;
-import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
@@ -39,16 +37,18 @@ public class PotionManager {
 		public String getName()		{	return name;	}
 
 		public static PotionID getFromString(String name) {
-			if (name.equals(PotionID.ABILITY_SELF.getName())) {
+			if (name.equals(PotionID.APPLIED_POTION.getName())) {
+				return PotionID.APPLIED_POTION;
+			} else if (name.equals(PotionID.ABILITY_SELF.getName())) {
 				return PotionID.ABILITY_SELF;
 			} else if (name.equals(PotionID.ABILITY_OTHER.getName())) {
 				return PotionID.ABILITY_OTHER;
-			} else if (name.equals(PotionID.SAFE_ZONE.getValue())) {
+			} else if (name.equals(PotionID.SAFE_ZONE.getName())) {
 				return PotionID.SAFE_ZONE;
-			} else if (name.equals(PotionID.ITEM.getValue())) {
+			} else if (name.equals(PotionID.ITEM.getName())) {
 				return PotionID.ITEM;
 			} else {
-				return PotionID.APPLIED_POTION;
+				return null;
 			}
 		}
 	}
@@ -58,24 +58,28 @@ public class PotionManager {
 		mPotionManager = new HashMap<UUID, PlayerPotionInfo>();
 	}
 
-	public void addPotion(Player player, PotionID id, Collection<PotionEffect> effects) {
+
+	public void addPotion(Player player, PotionID id, Collection<PotionEffect> effects, double intensity) {
 		for (PotionEffect effect : effects) {
-			addPotion(player, id, new PotionInfo(effect.getType(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()));
+			addPotion(player, id, effect, intensity);
 		}
 	}
 
+	public void addPotion(Player player, PotionID id, Collection<PotionEffect> effects) {
+		addPotion(player, id, effects, 1.0);
+	}
+
+	public void addPotion(Player player, PotionID id, PotionEffect effect, double intensity) {
+		addPotion(player, id, new PotionInfo(effect.getType(), (int)(((double)effect.getDuration()) * intensity),
+											 effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()));
+	}
+
 	public void addPotion(Player player, PotionID id, PotionEffect effect) {
-		addPotion(player, id, new PotionInfo(effect.getType(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()));
+		addPotion(player, id, effect, 1.0);
 	}
 
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
 		if (Constants.POTION_MANAGER_ENABLED) {
-			if (LocationUtils.getLocationType(mPlugin, player) != LocationType.None) {
-				if (info.type.getName().equals(PotionEffectType.JUMP.getName())) {
-					return;
-				}
-			}
-
 			UUID uuid = player.getUniqueId();
 			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
 			if (potionInfo != null) {
@@ -140,8 +144,6 @@ public class PotionManager {
 		applyBestPotionEffect(player);
 	}
 
-	//	TODO: Abstract this out to a general Player Profile so we can have a general player data saving system.
-	//	This can be used with Bungee to pass over player data we want to share between servers.
 	public JsonObject getAsJsonObject(Player player) {
 		PlayerPotionInfo info = mPotionManager.get(player.getUniqueId());
 		if (info != null) {
@@ -151,7 +153,7 @@ public class PotionManager {
 		return null;
 	}
 
-	public void loadFromJsonObject(Player player, JsonObject object) {
+	public void loadFromJsonObject(Player player, JsonObject object) throws Exception {
 		JsonElement potionInfo = object.get("potion_info");
 		if (potionInfo != null) {
 			clearAllPotions(player, false);

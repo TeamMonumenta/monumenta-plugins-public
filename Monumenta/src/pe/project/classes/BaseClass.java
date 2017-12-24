@@ -1,7 +1,6 @@
 package pe.project.classes;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -98,5 +97,5 @@ public class BaseClass {
 		return true;
 	}
 
-	public void AreaEffectCloudApplyEvent(List<LivingEntity> entities, Player player) {}
+	public void AreaEffectCloudApplyEvent(Collection<LivingEntity> entities, Player player) {}
 }

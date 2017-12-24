@@ -160,7 +160,7 @@ public class PlayerTracking implements EntityTracking {
 						PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
 						if (effect != null) {
 							if (effect.getAmplifier() <= 5) {
-								mPlugin.mPotionManager.removePotion(player, PotionID.SAFE_ZONE, PotionEffectType.JUMP);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
 							}
 						}
 

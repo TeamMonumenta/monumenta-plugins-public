@@ -1,7 +1,6 @@
 package pe.project.classes;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -254,7 +253,7 @@ public class AlchemistClass extends BaseClass {
 	}
 
 	@Override
-	public void AreaEffectCloudApplyEvent(List<LivingEntity> entities, Player player) {
+	public void AreaEffectCloudApplyEvent(Collection<LivingEntity> entities, Player player) {
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
 		if (causticMixture > 0) {
 			World world = player.getWorld();
