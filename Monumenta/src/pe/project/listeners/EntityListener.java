@@ -368,6 +368,14 @@ public class EntityListener implements Listener {
 			if (mPlugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
 				iter.remove();
 			}
+
+			//	Spawners directly above bedrock are unbreakable by explosions
+			if (block.getType() == Material.MOB_SPAWNER) {
+				Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
+				if (blockUnder != null && blockUnder.getType() == Material.BEDROCK) {
+					iter.remove();
+				}
+			}
 		}
 	}
 
