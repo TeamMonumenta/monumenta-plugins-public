@@ -24,7 +24,7 @@ public class MainhandRegeneration extends ItemProperty {
 
 	@Override
 	public void applyProperty(Plugin plugin, Player player) {
-		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 1000000, 0, true, false));
+		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 1000049, 0, true, false));
 	}
 
 	@Override
