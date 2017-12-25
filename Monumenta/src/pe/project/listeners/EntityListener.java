@@ -370,16 +370,9 @@ public class EntityListener implements Listener {
 			}
 
 			//	If this block is "unbreakable" than we want to remove it from the list.
-			if (mPlugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
+			if (mPlugin.mServerProporties.mUnbreakableBlocks.contains(block.getType()) ||
+					!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
-			}
-
-			//	Spawners directly above bedrock are unbreakable by explosions
-			if (block.getType() == Material.MOB_SPAWNER) {
-				Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
-				if (blockUnder != null && blockUnder.getType() == Material.BEDROCK) {
-					iter.remove();
-				}
 			}
 		}
 	}

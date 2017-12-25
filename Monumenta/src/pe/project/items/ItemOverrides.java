@@ -69,10 +69,10 @@ public class ItemOverrides {
 		mItems.put(Material.LAVA_BUCKET, new BucketOverride());
 
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());
-
 		mItems.put(Material.BED_BLOCK, new BedOverride());
-
 		mItems.put(Material.FIREWORK, new FireworkOverride());
+
+		mItems.put(Material.MOB_SPAWNER, new MobSpawnerOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
@@ -143,21 +143,22 @@ public class ItemOverrides {
 		boolean eventCancelled = false;
 		OverrideItem override = mItems.get(block.getType());
 		if (override != null) {
-			eventCancelled = override.blockBreakInteraction(plugin, player, block);
+			eventCancelled = !override.blockBreakInteraction(plugin, player, block);
 		}
 
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (plugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
-				return false;
+				eventCancelled = true;
 			}
+		}
 
-			//	Spawners directly above bedrock are unbreakable except in creative
-			if (block.getType() == Material.MOB_SPAWNER) {
-				Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
-				if (blockUnder != null && blockUnder.getType() == Material.BEDROCK) {
-					return false;
-				}
-			}
+		return !eventCancelled;
+	}
+
+	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
+		OverrideItem override = mItems.get(block.getType());
+		if (override != null) {
+			return override.blockExplodeInteraction(plugin, block);
 		}
 
 		return true;

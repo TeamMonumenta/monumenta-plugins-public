@@ -22,4 +22,5 @@ public class OverrideItem {
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) { return true; }
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) { return true; }
+	public boolean blockExplodeInteraction(Plugin plugin, Block block) { return true; }
 }
