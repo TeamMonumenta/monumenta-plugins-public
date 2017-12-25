@@ -52,6 +52,7 @@ import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PlayerUtils;
@@ -248,7 +249,9 @@ public class EntityListener implements Listener {
 			if (origBall.getShooter() instanceof Player) {
 				Player player = (Player)origBall.getShooter();
 				ItemStack itemInHand = player.getEquipment().getItemInMainHand();
-				if (itemInHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+				if ((itemInHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)
+					&& InventoryUtils.isSoulboundToPlayer(itemInHand, player)) {
+
 					// This is an infinite snowball - summon a new one and cancel the event
 					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
