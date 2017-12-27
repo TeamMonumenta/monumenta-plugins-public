@@ -5,12 +5,20 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 
 public class MobSpawnerOverride extends OverrideItem {
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
-		return (player.getGameMode() == GameMode.CREATIVE) || _breakable(block);
+		if ((player.getGameMode() == GameMode.CREATIVE) || _breakable(block)) {
+			// Breaking was allowed - remove the metadata associated with the spawner
+			if (notCancelled && block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+				block.removeMetadata(Constants.SPAWNER_COUNT_METAKEY, plugin);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override

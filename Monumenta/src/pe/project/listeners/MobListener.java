@@ -76,11 +76,6 @@ public class MobListener implements Listener {
 	/* Clear the metadata if it exists when a player breaks a block */
 	@EventHandler(priority = EventPriority.LOWEST)
 	void BlockBreakEvent(BlockBreakEvent event) {
-		Block block = event.getBlock();
-		if (block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
-			event.getBlock().removeMetadata(Constants.SPAWNER_COUNT_METAKEY, mPlugin);
-		}
-
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
 		}
