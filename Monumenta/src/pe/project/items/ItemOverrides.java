@@ -71,6 +71,7 @@ public class ItemOverrides {
 		mItems.put(Material.FIREWORK, new FireworkOverride());
 
 		mItems.put(Material.MOB_SPAWNER, new MobSpawnerOverride());
+		mItems.put(Material.FLOWER_POT, new FlowerPotOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
