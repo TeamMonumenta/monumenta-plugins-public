@@ -2,7 +2,6 @@ package pe.project.listeners;
 
 import java.util.ListIterator;
 
-import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

@@ -13,7 +13,7 @@ public class MobSpawnerOverride extends OverrideItem {
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		if ((player.getGameMode() == GameMode.CREATIVE) || _breakable(block)) {
 			// Breaking was allowed - remove the metadata associated with the spawner
-			if (notCancelled && block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+			if (block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
 				block.removeMetadata(Constants.SPAWNER_COUNT_METAKEY, plugin);
 			}
 			return true;
