@@ -24,8 +24,6 @@ public class ItemOverrides {
 		Material.ENDER_CHEST,
 		Material.PACKED_ICE,
 		Material.WOOL,
-		Material.SKULL,
-		Material.SKULL_ITEM,
 
 		Material.WOOD_HOE,
 		Material.STONE_HOE,
