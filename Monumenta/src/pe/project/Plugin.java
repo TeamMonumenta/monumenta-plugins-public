@@ -176,7 +176,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("minusexp").setExecutor(new MinusExp(this));
 		}
 		if (Constants.CLASSES_ENABLED) {
-			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this, world));
+			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));
 		}
 		if (Constants.POIS_ENABLED) {
 			getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));

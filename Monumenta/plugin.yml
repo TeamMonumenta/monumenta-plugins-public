@@ -42,8 +42,8 @@ commands:
     usage: /getScore <player/dummy name> <scoreboardName>
   refreshClassEffects:
     permission: monumenta.commands.refreshClassEffects
-    description: Cause players near a given point (An ability unlock point) to refresh their potion effects based on their scoreboard.
-    usage: /refreshClassEffects <x y z>
+    description: Refreshes class effects for affected player (either sender or target of /execute)
+    usage: /execute @p[stuff] ~ ~ ~ refreshClassEffects
   transferServer:
     permission: monumenta.commands.transferServer
     description: Transfers players with or without inventory between bungee shards.
