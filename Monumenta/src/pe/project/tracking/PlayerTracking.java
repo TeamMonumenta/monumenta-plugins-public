@@ -156,13 +156,7 @@ public class PlayerTracking implements EntityTracking {
 						}
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTENCE_EFFECT);
-
-						PotionEffect effect = player.getPotionEffect(PotionEffectType.JUMP);
-						if (effect != null) {
-							if (effect.getAmplifier() <= 5) {
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
-							}
-						}
+						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_EFFECT);
 
 						int food = ScoreboardUtils.getScoreboardValue(player, "Food");
 						if (food <= 17) {
@@ -186,8 +180,6 @@ public class PlayerTracking implements EntityTracking {
 
 	void _transitionToAdventure(Player player) {
 		player.setGameMode(GameMode.ADVENTURE);
-
-		mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.JUMP);
 
 		Entity vehicle = player.getVehicle();
 		if (vehicle != null) {
