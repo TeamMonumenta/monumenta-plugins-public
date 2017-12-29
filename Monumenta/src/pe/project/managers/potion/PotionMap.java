@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 
 public class PotionMap {
@@ -29,9 +30,12 @@ public class PotionMap {
 	// Type of this particular map
 	private PotionEffectType mType;
 
+	private boolean isNegative;
+
 	public PotionMap(PotionEffectType type) {
 		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
 		mType = type;
+		isNegative = PotionUtils.hasNegativeEffects(type);
 	}
 
 	private void _addPotionMap(PotionID id, PotionInfo newPotionInfo) {
@@ -42,14 +46,23 @@ public class PotionMap {
 			trackedPotionInfo = new TreeMap<Integer, PotionInfo>();
 		}
 
-		// Only add the new effect if it is longer for the same effect amplifier
-		PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
-		if (currentInfo == null || currentInfo.duration < newPotionInfo.duration) {
-			trackedPotionInfo.put(amplifier, newPotionInfo);
+		if (isNegative) {
+			// Negative potions don't track multiple levels - only the highest / longest one
+			PotionInfo bestEffect = getBestEffect();
+			if (bestEffect.amplifier < newPotionInfo.amplifier
+				|| (bestEffect.amplifier == newPotionInfo.amplifier)
+					&& (bestEffect.duration < newPotionInfo.duration)) {
+				trackedPotionInfo.put(amplifier, newPotionInfo);
+			}
+		} else {
+			// Only add the new effect if it is longer for the same effect amplifier
+			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
+			if (currentInfo == null || currentInfo.duration < newPotionInfo.duration) {
+				trackedPotionInfo.put(amplifier, newPotionInfo);
+			}
 		}
 
 		mPotionMap.put(id, trackedPotionInfo);
-
 	}
 
 	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
@@ -103,7 +116,7 @@ public class PotionMap {
 		}
 	}
 
-	void applyBestPotionEffect(Player player) {
+	PotionInfo getBestEffect() {
 		PotionInfo bestEffect = null;
 
 		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionSourceIter = mPotionMap.entrySet().iterator();
@@ -123,6 +136,12 @@ public class PotionMap {
 				}
 			}
 		}
+
+		return bestEffect;
+	}
+
+	void applyBestPotionEffect(Player player) {
+		PotionInfo bestEffect = getBestEffect();
 
 		// TODO: Until we catch all potion effect sources, this will likely clear those effects not tracked
 		player.removePotionEffect(mType);

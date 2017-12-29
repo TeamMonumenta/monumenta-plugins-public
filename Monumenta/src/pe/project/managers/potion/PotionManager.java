@@ -79,7 +79,8 @@ public class PotionManager {
 	}
 
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
-		if (Constants.POTION_MANAGER_ENABLED) {
+		// Instant potions do not need to be tracked
+		if (Constants.POTION_MANAGER_ENABLED && !info.type.isInstant()) {
 			UUID uuid = player.getUniqueId();
 			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
 			if (potionInfo != null) {

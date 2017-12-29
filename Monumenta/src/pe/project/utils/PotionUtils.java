@@ -203,24 +203,7 @@ public class PotionUtils {
 
 	public static boolean hasPositiveEffects(Collection<PotionEffect> effects) {
 		for (PotionEffect effect: effects) {
-			PotionEffectType type = effect.getType();
-			String name = type.getName();
-			if (name.equals(PotionEffectType.ABSORPTION.getName())
-				|| name.equals(PotionEffectType.DAMAGE_RESISTANCE.getName())
-				|| name.equals(PotionEffectType.FAST_DIGGING.getName())
-				|| name.equals(PotionEffectType.FIRE_RESISTANCE.getName())
-				|| name.equals(PotionEffectType.HEAL.getName())
-				|| name.equals(PotionEffectType.HEALTH_BOOST.getName())
-				|| name.equals(PotionEffectType.INCREASE_DAMAGE.getName())
-				|| name.equals(PotionEffectType.INVISIBILITY.getName())
-				|| name.equals(PotionEffectType.JUMP.getName())
-				|| name.equals(PotionEffectType.LEVITATION.getName())
-				|| name.equals(PotionEffectType.LUCK.getName())
-				|| name.equals(PotionEffectType.NIGHT_VISION.getName())
-				|| name.equals(PotionEffectType.REGENERATION.getName())
-				|| name.equals(PotionEffectType.SATURATION.getName())
-				|| name.equals(PotionEffectType.SPEED.getName())
-				|| name.equals(PotionEffectType.WATER_BREATHING.getName())) {
+			if (hasPositiveEffects(effect.getType())) {
 				return true;
 			}
 		}
@@ -228,22 +211,53 @@ public class PotionUtils {
 		return false;
 	}
 
+	public static boolean hasPositiveEffects(PotionEffectType type) {
+		String name = type.getName();
+		if (name.equals(PotionEffectType.ABSORPTION.getName())
+			|| name.equals(PotionEffectType.DAMAGE_RESISTANCE.getName())
+			|| name.equals(PotionEffectType.FAST_DIGGING.getName())
+			|| name.equals(PotionEffectType.FIRE_RESISTANCE.getName())
+			|| name.equals(PotionEffectType.HEAL.getName())
+			|| name.equals(PotionEffectType.HEALTH_BOOST.getName())
+			|| name.equals(PotionEffectType.INCREASE_DAMAGE.getName())
+			|| name.equals(PotionEffectType.INVISIBILITY.getName())
+			|| name.equals(PotionEffectType.JUMP.getName())
+			|| name.equals(PotionEffectType.LEVITATION.getName())
+			|| name.equals(PotionEffectType.LUCK.getName())
+			|| name.equals(PotionEffectType.NIGHT_VISION.getName())
+			|| name.equals(PotionEffectType.REGENERATION.getName())
+			|| name.equals(PotionEffectType.SATURATION.getName())
+			|| name.equals(PotionEffectType.SPEED.getName())
+			|| name.equals(PotionEffectType.WATER_BREATHING.getName())) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean hasNegativeEffects(Collection<PotionEffect> effects) {
 		for (PotionEffect effect: effects) {
-			PotionEffectType type = effect.getType();
-			String name = type.getName();
-			if (name.equals(PotionEffectType.BLINDNESS.getName())
-				|| name.equals(PotionEffectType.CONFUSION.getName())
-				|| name.equals(PotionEffectType.HARM.getName())
-				|| name.equals(PotionEffectType.HUNGER.getName())
-				|| name.equals(PotionEffectType.POISON.getName())
-				|| name.equals(PotionEffectType.SLOW.getName())
-				|| name.equals(PotionEffectType.SLOW_DIGGING.getName())
-				|| name.equals(PotionEffectType.UNLUCK.getName())
-				|| name.equals(PotionEffectType.WEAKNESS.getName())
-				|| name.equals(PotionEffectType.WITHER.getName())) {
+			if (hasNegativeEffects(effect.getType())) {
 				return true;
 			}
+		}
+
+		return false;
+	}
+
+	public static boolean hasNegativeEffects(PotionEffectType type) {
+		String name = type.getName();
+		if (name.equals(PotionEffectType.BLINDNESS.getName())
+			|| name.equals(PotionEffectType.CONFUSION.getName())
+			|| name.equals(PotionEffectType.HARM.getName())
+			|| name.equals(PotionEffectType.HUNGER.getName())
+			|| name.equals(PotionEffectType.POISON.getName())
+			|| name.equals(PotionEffectType.SLOW.getName())
+			|| name.equals(PotionEffectType.SLOW_DIGGING.getName())
+			|| name.equals(PotionEffectType.UNLUCK.getName())
+			|| name.equals(PotionEffectType.WEAKNESS.getName())
+			|| name.equals(PotionEffectType.WITHER.getName())) {
+			return true;
 		}
 
 		return false;
