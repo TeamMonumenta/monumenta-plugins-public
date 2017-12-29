@@ -370,7 +370,7 @@ public class EntityListener implements Listener {
 			}
 
 			//	If this block is "unbreakable" than we want to remove it from the list.
-			if (mPlugin.mServerProporties.mUnbreakableBlocks.contains(block.getType()) ||
+			if (mPlugin.mServerProperties.mUnbreakableBlocks.contains(block.getType()) ||
 					!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}

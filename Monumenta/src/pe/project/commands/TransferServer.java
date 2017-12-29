@@ -44,16 +44,16 @@ public class TransferServer implements CommandExecutor {
 		String server = arg3[0];
 
 		// Error if target server is now allowed
-		if (!(mPlugin.mServerProporties.mAllowedTransferTargets.isEmpty()
-			  || mPlugin.mServerProporties.mAllowedTransferTargets.contains(server))) {
+		if (!(mPlugin.mServerProperties.mAllowedTransferTargets.isEmpty()
+			  || mPlugin.mServerProperties.mAllowedTransferTargets.contains(server))) {
 			sender.sendMessage(ChatColor.RED + "You may not transfer to that server from here!");
 			sender.sendMessage(ChatColor.RED + "Allowed servers are: " +
-			                   mPlugin.mServerProporties.mAllowedTransferTargets.toString());
+			                   mPlugin.mServerProperties.mAllowedTransferTargets.toString());
 			return false;
 		}
 
 		// Default to server properties - if properties says false, no way to set to true
-		boolean sendPlayerStuff = mPlugin.mServerProporties.getTransferDataEnabled();
+		boolean sendPlayerStuff = mPlugin.mServerProperties.getTransferDataEnabled();
 
 		if (arg3.length == 2) {
 			if (arg3[1].equals("False") || arg3[1].equals("false") || arg3[1].equals("f") || arg3[1].equals("F")) {

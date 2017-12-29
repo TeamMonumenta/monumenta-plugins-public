@@ -146,7 +146,7 @@ public class ItemOverrides {
 		}
 
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (plugin.mServerProporties.mUnbreakableBlocks.contains(block.getType())) {
+			if (plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
 				eventCancelled = true;
 			}
 		}

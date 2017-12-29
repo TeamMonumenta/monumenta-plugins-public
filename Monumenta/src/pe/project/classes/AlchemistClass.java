@@ -74,7 +74,7 @@ public class AlchemistClass extends BaseClass {
 	private static int POWER_INJECTION_DURATION = 20 * 20;
 	private static int POWER_INJECTION_COOLDOWN = 30 * 20;
 
-	private static int INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL = 0;
+	private static int INVIGORATING_ODOR_RESISTANCE_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_SPEED_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_REGENERATION_EFFECT_LVL = 0;
 	private static int INVIGORATING_ODOR_1_DURATION = 12 * 20;
@@ -237,7 +237,7 @@ public class AlchemistClass extends BaseClass {
 						int duration = (invigoratingOdor == 1) ? INVIGORATING_ODOR_1_DURATION : INVIGORATING_ODOR_2_DURATION;
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, duration, INVIGORATING_ODOR_SPEED_EFFECT_LVL, true, false));
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, INVIGORATING_ODOR_RESISTENCE_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, INVIGORATING_ODOR_RESISTANCE_EFFECT_LVL, true, false));
 
 						if (invigoratingOdor > 1) {
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, duration, INVIGORATING_ODOR_REGENERATION_EFFECT_LVL, true, false));

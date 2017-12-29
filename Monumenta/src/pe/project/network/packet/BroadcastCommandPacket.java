@@ -36,7 +36,7 @@ public class BroadcastCommandPacket implements Packet {
 			throw new Exception("Received string data is null or invalid length");
 		}
 
-		if (plugin.mServerProporties.getBroadcastCommandEnabled() == true
+		if (plugin.mServerProperties.getBroadcastCommandEnabled() == true
 			|| rcvStrings[0].startsWith("say")
 			|| rcvStrings[0].startsWith("msg")
 			|| rcvStrings[0].startsWith("tell")

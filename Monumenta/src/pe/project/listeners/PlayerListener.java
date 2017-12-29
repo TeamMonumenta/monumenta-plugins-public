@@ -85,7 +85,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerJoinEvent(PlayerJoinEvent event) {
-		if (mPlugin.mServerProporties.getJoinMessagesEnabled() == false) {
+		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
 			event.setJoinMessage("");
 		}
 
@@ -111,7 +111,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerQuitEvent(PlayerQuitEvent event) {
-		if (mPlugin.mServerProporties.getJoinMessagesEnabled() == false) {
+		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
 			event.setQuitMessage("");
 		}
 

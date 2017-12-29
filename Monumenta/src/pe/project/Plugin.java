@@ -102,7 +102,7 @@ public class Plugin extends JavaPlugin {
 	public Random mRandom = null;
 	int mPeriodicTimer = -1;
 
-	public ServerProperties mServerProporties = new ServerProperties();
+	public ServerProperties mServerProperties = new ServerProperties();
 	private FileConfiguration mConfig;
 	private File mConfigFile;
 	public int mServerVersion = 0;
@@ -194,7 +194,7 @@ public class Plugin extends JavaPlugin {
 		//	Load info.
 		_loadConfig();
 		mPOIManager.loadAllPOIs();
-		mServerProporties.load(this);
+		mServerProperties.load(this);
 
 		//	Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -280,7 +280,7 @@ public class Plugin extends JavaPlugin {
 	}
 
 	public void incrementDailyVersion() {
-		if (mServerProporties.getDailyResetEnabled()) {
+		if (mServerProperties.getDailyResetEnabled()) {
 			mDailyQuestVersion++;
 			_saveConfig();
 		}

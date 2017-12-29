@@ -38,11 +38,11 @@ public class LocationUtils {
 	}
 
 	public static LocationType getLocationType(Plugin plugin, Point point) {
-		if (plugin.mServerProporties.getIsTownWorld()) {
+		if (plugin.mServerProperties.getIsTownWorld()) {
 			return LocationType.Capital;
 		}
 
-		for (AreaBounds area : plugin.mServerProporties.mLocationBounds) {
+		for (AreaBounds area : plugin.mServerProperties.mLocationBounds) {
 			if (area.within(point)) {
 				return area.getType();
 			}

@@ -19,7 +19,7 @@ public class BroadcastCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
-		if (mPlugin.mServerProporties.getBroadcastCommandEnabled() == false) {
+		if (mPlugin.mServerProperties.getBroadcastCommandEnabled() == false) {
 			sender.sendMessage(ChatColor.RED + "Use of this command is restricted on this server");
 			return false;
 		}

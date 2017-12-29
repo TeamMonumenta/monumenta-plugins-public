@@ -16,7 +16,7 @@ import pe.project.utils.StringUtils;
 public class CompassOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		if (plugin.mServerProporties.getQuestCompassEnabled()) {
+		if (plugin.mServerProperties.getQuestCompassEnabled()) {
 			//	Show current POI respawn timer.
 			if (player.isSneaking()) {
 				List<PointOfInterest> pois = plugin.mPOIManager.getAllNearbyPOI(new Point(player.getLocation()));
@@ -66,7 +66,7 @@ public class CompassOverride extends OverrideItem {
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		if (plugin.mServerProporties.getQuestCompassEnabled()) {
+		if (plugin.mServerProperties.getQuestCompassEnabled()) {
 			//	Show currently active quest.
 			plugin.mQuestManager.showCurrentQuest(player);
 		} else {

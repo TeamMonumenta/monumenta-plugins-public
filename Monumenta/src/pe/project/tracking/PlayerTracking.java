@@ -134,7 +134,7 @@ public class PlayerTracking implements EntityTracking {
 								_transitionToAdventure(player);
 
 							} else if (mode == GameMode.ADVENTURE && neededMat
-							           && loc.mY > mPlugin.mServerProporties.getPlotSurvivalMinHeight()
+							           && loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
 									   && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
 								_transitionToSurvival(player);
 							}
@@ -153,7 +153,7 @@ public class PlayerTracking implements EntityTracking {
 							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
 						}
 
-						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTENCE_EFFECT);
+						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTANCE_EFFECT);
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_EFFECT);
 
 						int food = ScoreboardUtils.getScoreboardValue(player, "Food");

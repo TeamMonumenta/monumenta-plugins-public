@@ -48,7 +48,7 @@ public class RogueClass extends BaseClass {
 	private static int FOCUS_1_STRENGTH_LVL = 1;
 	private static int FOCUS_2_STRENGTH_LVL = 2;
 	private static int FOCUS_COOLDOWN = 20 * 20;
-	private static int FOCUS_RESISTENCE_LVL = 0;
+	private static int FOCUS_RESISTANCE_LVL = 0;
 
 	private static int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 	private static int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
@@ -76,7 +76,7 @@ public class RogueClass extends BaseClass {
 	private static int ESCAPE_DEATH_DURATION = 4 * 20;
 	private static int ESCAPE_DEATH_DURATION_OTHER = 8 * 20;
 	private static int ESCAPE_DEATH_DURATION_SLOWNESS = 5 * 20;
-	private static int ESCAPE_DEATH_RESISTENCE_EFFECT_LVL = 1;
+	private static int ESCAPE_DEATH_RESISTANCE_EFFECT_LVL = 1;
 	private static int ESCAPE_DEATH_SPEED_EFFECT_LVL = 1;
 	private static int ESCAPE_DEATH_JUMP_EFFECT_LVL = 2;
 	private static int ESCAPE_DEATH_SLOWNESS_EFFECT_LVL = 4;
@@ -138,7 +138,7 @@ public class RogueClass extends BaseClass {
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, FOCUS_DURATION, effectLvl, true, false));
 
 							if (focus > 1) {
-								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, FOCUS_DURATION, FOCUS_RESISTENCE_LVL, true, false));
+								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, FOCUS_DURATION, FOCUS_RESISTANCE_LVL, true, false));
 							}
 
 							World world = player.getWorld();
@@ -191,7 +191,7 @@ public class RogueClass extends BaseClass {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ESCAPE_DEATH_ID)) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_RESISTENCE_EFFECT_LVL, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_RESISTANCE_EFFECT_LVL, true, false));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
 

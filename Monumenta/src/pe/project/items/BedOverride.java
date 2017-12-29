@@ -10,6 +10,6 @@ import pe.project.Plugin;
 public class BedOverride extends OverrideItem {
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return plugin.mServerProporties.getIsSleepingEnabled();
+		return plugin.mServerProperties.getIsSleepingEnabled();
 	}
 }
