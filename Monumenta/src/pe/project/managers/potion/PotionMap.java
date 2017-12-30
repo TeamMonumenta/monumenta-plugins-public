@@ -49,7 +49,8 @@ public class PotionMap {
 		if (isNegative) {
 			// Negative potions don't track multiple levels - only the highest / longest one
 			PotionInfo bestEffect = getBestEffect();
-			if (bestEffect.amplifier < newPotionInfo.amplifier
+			if (bestEffect == null
+				|| bestEffect.amplifier < newPotionInfo.amplifier
 				|| (bestEffect.amplifier == newPotionInfo.amplifier)
 					&& (bestEffect.duration < newPotionInfo.duration)) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
