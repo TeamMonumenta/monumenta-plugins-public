@@ -15,7 +15,7 @@ monumenta="$(ls -r Monumenta-Plugins*${monumenta_version}.jar | head -n 1)"
 echo "Bungee version: $bungee"
 echo "Monumenta version: $monumenta"
 
-scp -P 9922 $bungee $monumenta rock@50.39.100.13:/home/rock/project_epic/server_config/plugins/
-ssh -p 9922 rock@50.39.100.13 "cd /home/rock/project_epic/server_config/plugins && rm -f Monumenta-Bungee-Plugins.jar Monumenta-Plugins.jar ; ln -s $bungee Monumenta-Bungee-Plugins.jar ; ln -s $monumenta Monumenta-Plugins.jar"
+scp -P 8822 $bungee $monumenta rock@beta.playmonumenta.com:/home/rock/project_epic/server_config/plugins/
+ssh -p 8822 rock@beta.playmonumenta.com "cd /home/rock/project_epic/server_config/plugins && rm -f Monumenta-Bungee-Plugins.jar Monumenta-Plugins.jar ; ln -s $bungee Monumenta-Bungee-Plugins.jar ; ln -s $monumenta Monumenta-Plugins.jar"
 
 
