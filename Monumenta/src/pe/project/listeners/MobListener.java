@@ -2,6 +2,8 @@ package pe.project.listeners;
 
 import java.util.ListIterator;
 
+import org.bukkit.GameMode;
+import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -21,6 +24,8 @@ import org.bukkit.metadata.MetadataValue;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.ItemUtils;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -77,6 +82,31 @@ public class MobListener implements Listener {
 	void BlockBreakEvent(BlockBreakEvent event) {
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
+		}
+	}
+
+	/* Prevent fire from catching in towns */
+	@EventHandler(priority = EventPriority.LOWEST)
+	void BlockIgniteEvent(BlockIgniteEvent event) {
+		if (event.isCancelled()) {
+			// Don't waste time if cancelled somewhere else
+			return;
+		}
+
+		Block block = event.getBlock();
+
+		// If the block is within a safezone, cancel the ignition unless it was from a player in creative mode
+		if (LocationUtils.getLocationType(mPlugin, block.getLocation()) != LocationType.None) {
+			if (event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL)) {
+				Player player = event.getPlayer();
+				if (player != null && player.getGameMode() != GameMode.ADVENTURE) {
+					// Don't cancel the event for non-adventure players
+					return;
+				}
+			}
+
+			event.setCancelled(true);
+			return;
 		}
 	}
 
