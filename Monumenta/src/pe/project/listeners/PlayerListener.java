@@ -53,6 +53,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -474,8 +475,12 @@ public class PlayerListener implements Listener {
 			// Get the stack of previous teleport locations
 			Stack<Location> backStack = null;
 			if (player.hasMetadata(Constants.PLAYER_BACK_STACK_METAKEY)) {
-				backStack = (Stack<Location>)player.getMetadata(Constants.PLAYER_BACK_STACK_METAKEY).get(0).value();
+				List<MetadataValue> val = player.getMetadata(Constants.PLAYER_BACK_STACK_METAKEY);
+				if (val != null && !val.isEmpty()) {
+					backStack = (Stack<Location>)val.get(0).value();
+				}
 			}
+
 			if (backStack == null) {
 				backStack = new Stack<Location>();
 			}
