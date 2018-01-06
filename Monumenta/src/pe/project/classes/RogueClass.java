@@ -16,7 +16,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -25,7 +24,6 @@ import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
-import pe.project.utils.LocationUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
@@ -53,19 +51,14 @@ public class RogueClass extends BaseClass {
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 
 	private static final int ADVANCING_SHADOWS_ID = 42;
-	public static final int ADVANCING_SHADOWS_1_FAKE_ID = 100421;
-	public static final int ADVANCING_SHADOWS_2_FAKE_ID = 100422;
-	private static final int ADVANCING_SHADOWS_RANGE_1 = 7;
-	private static final int ADVANCING_SHADOWS_RANGE_2 = 11;
-	private static final int ADVANCING_SHADOWS_ON_HIT_RANGE = 3;
-	private static float ADVANCING_SHADOWS_ON_HIT_SPEED = 0.5f;
-	private static double ADVANCING_SHADOWS_ON_HIT_1_MODIFIER = 0.25;
-	private static double ADVANCING_SHADOWS_ON_HIT_2_MODIFIER = 0.5;
-	private static final double ADVANCING_SHADOWS_OFFSET = 5.0;
+	private static final int ADVANCING_SHADOWS_RANGE_1 = 10;
+	private static final int ADVANCING_SHADOWS_RANGE_2 = 15;
+	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
+	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
+	private static final double ADVANCING_SHADOWS_OFFSET = 3.0;
+	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
+	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
-	private static final int ADVANCING_SHADOWS_ON_HIT_COOLDOWN = 2 * 20;
-	public static final String ADVANCING_SHADOWS_1_TAGNAME = "AdvancShadows1";
-	public static final String ADVANCING_SHADOWS_2_TAGNAME = "AdvancShadows2";
 
 	private static final int DODGING_ID = 43;
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
@@ -75,14 +68,15 @@ public class RogueClass extends BaseClass {
 
 	private static final int ESCAPE_DEATH_ID = 44;
 	private static final double ESCAPE_DEATH_HEALTH_TRIGGER = 10;
-	private static final int ESCAPE_DEATH_DURATION = 4 * 20;
+	private static final int ESCAPE_DEATH_DURATION = 5 * 20;
 	private static final int ESCAPE_DEATH_DURATION_OTHER = 8 * 20;
-	private static final int ESCAPE_DEATH_RESISTENCE_EFFECT_LVL = 1;
+	private static final int ESCAPE_DEATH_ABSORBTION_EFFECT_LVL = 1;
 	private static final int ESCAPE_DEATH_SPEED_EFFECT_LVL = 1;
 	private static final int ESCAPE_DEATH_JUMP_EFFECT_LVL = 2;
 	private static final int ESCAPE_DEATH_RANGE = 5;
 	private static final int ESCAPE_DEATH_DURATION_SLOWNESS = 5 * 20;
 	private static final int ESCAPE_DEATH_SLOWNESS_EFFECT_LVL = 4;
+	private static final int ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL = 2;
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
 
 	private static final int VICIOUS_COMBOS_RANGE = 5;
@@ -131,32 +125,32 @@ public class RogueClass extends BaseClass {
 
 						LivingEntity entity = EntityUtils.GetEntityAtCursor(player, range, false, true, true);
 						if (entity != null && EntityUtils.isHostileMob(entity)) {
-							Location loc = entity.getLocation();
-							Vector dir = loc.getDirection().normalize();
+							Vector toPos = entity.getLocation().toVector();
+							Vector fromPos = player.getLocation().toVector();
 
-							Location newLoc = loc.add(dir.multiply(-ADVANCING_SHADOWS_OFFSET));
+							Vector dir = fromPos.subtract(toPos).normalize();
+
+							Location newLoc = entity.getLocation().add(dir.multiply(ADVANCING_SHADOWS_OFFSET));
 							newLoc.setY(entity.getLocation().getY());
-							newLoc.setYaw(entity.getLocation().getYaw());
-
-							//	Don't let the player teleport if the place they would teleport to is not safe.
-							if (!LocationUtils.isLosBlockingBlock(newLoc.clone().add(0, -1, 0).getBlock().getType()) ||
-									LocationUtils.isLosBlockingBlock(newLoc.clone().getBlock().getType()) ||
-									LocationUtils.isLosBlockingBlock(newLoc.clone().add(0, 1, 0).getBlock().getType())) {
-								return;
-							}
+							newLoc.setPitch(player.getLocation().getPitch());
+							newLoc.setYaw(player.getLocation().getYaw());
 
 							player.teleport(newLoc);
+
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+
+							if (advancingShadows > 1) {
+								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+								for (Entity mob : entities) {
+									if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
+										MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+									}
+								}
+							}
 
 							player.getWorld().playSound(player.getLocation(), "entity.endermen.teleport", 1.0f, 1.5f);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), ADVANCING_SHADOWS_ID, ADVANCING_SHADOWS_COOLDOWN);
-
-							//	Add the meta data and cooldown for the on hit.
-							int onHitID = (advancingShadows == 1) ? ADVANCING_SHADOWS_1_FAKE_ID : ADVANCING_SHADOWS_2_FAKE_ID;
-							String onHitMetaString = (advancingShadows == 1) ? ADVANCING_SHADOWS_1_TAGNAME : ADVANCING_SHADOWS_2_TAGNAME;
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), onHitID, ADVANCING_SHADOWS_ON_HIT_COOLDOWN);
-							player.setMetadata(onHitMetaString, new FixedMetadataValue(mPlugin, 0));
 						}
 					}
 				}
@@ -195,27 +189,6 @@ public class RogueClass extends BaseClass {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
-		boolean onHit1 = player.hasMetadata(ADVANCING_SHADOWS_1_TAGNAME);
-		boolean onHit2 = player.hasMetadata(ADVANCING_SHADOWS_2_TAGNAME);
-
-		if (onHit1 || onHit2) {
-			List<Entity> entities = player.getNearbyEntities(ADVANCING_SHADOWS_ON_HIT_RANGE, ADVANCING_SHADOWS_ON_HIT_RANGE, ADVANCING_SHADOWS_ON_HIT_RANGE);
-			for (Entity e : entities) {
-				if (EntityUtils.isHostileMob(e)) {
-					LivingEntity mob = (LivingEntity)e;
-					if (mob != damagee) {
-						double damageModifier = onHit1 ? ADVANCING_SHADOWS_ON_HIT_1_MODIFIER : ADVANCING_SHADOWS_ON_HIT_2_MODIFIER;
-						_damageMob(player, mob, damage * damageModifier);
-
-						MovementUtils.KnockAway(player, mob, ADVANCING_SHADOWS_ON_HIT_SPEED);
-					}
-				}
-			}
-
-			mPlugin.mTimers.removeCooldown(player.getUniqueId(), onHit1 ? ADVANCING_SHADOWS_1_FAKE_ID : ADVANCING_SHADOWS_2_FAKE_ID);
-			player.removeMetadata(onHit1 ? ADVANCING_SHADOWS_1_TAGNAME : ADVANCING_SHADOWS_2_TAGNAME, mPlugin);
-		}
-
 		if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -224,10 +197,17 @@ public class RogueClass extends BaseClass {
 				if (byMyBlade > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), BY_MY_BLADE_ID)) {
 						int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, effectLevel, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, effectLevel, false, true));
 
 						double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 						_damageMob(player, damagee, extraDamage);
+
+						World world = player.getWorld();
+						Location loc = damagee.getLocation();
+						loc.add(0, 1, 0);
+						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 15, 0.25, 0.5, 0.5, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
+						world.playSound(loc, "item.shield.break", 2.0f, 0.5f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), BY_MY_BLADE_ID, BY_MY_BLADE_COOLDOWN);
 					}
@@ -272,18 +252,19 @@ public class RogueClass extends BaseClass {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ESCAPE_DEATH_ID)) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_RESISTENCE_EFFECT_LVL, true, false));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
+					List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE);
+					for (Entity entity : entities) {
+						if (EntityUtils.isHostileMob(entity)) {
+							LivingEntity mob = (LivingEntity)entity;
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
+						}
+					}
 
 					if (escapeDeath > 1) {
-						List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE);
-						for (Entity entity : entities) {
-							if (EntityUtils.isHostileMob(entity)) {
-								LivingEntity mob = (LivingEntity)entity;
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
-							}
-						}
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
 					}
 
 					World world = player.getWorld();
@@ -300,7 +281,7 @@ public class RogueClass extends BaseClass {
 						ParticleUtils.playParticlesInWorld(world, Particle.CLOUD, loc, particles, offset.getX(), offset.getY(), offset.getZ(), 0.001);
 					}
 
-					world.playSound(loc, "item.totem.use", 1.0f, 0.5f);
+					world.playSound(loc, "item.totem.use", 0.5f, 0.5f);
 
 					MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
 

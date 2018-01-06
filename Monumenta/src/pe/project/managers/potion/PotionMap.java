@@ -1,10 +1,10 @@
 package pe.project.managers.potion;
 
 import java.util.EnumMap;
-import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

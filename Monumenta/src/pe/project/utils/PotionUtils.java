@@ -70,6 +70,7 @@ public class PotionUtils {
 			type = _type;
 			duration = _duration;
 			amplifier = _amplifier;
+			showParticles = hasParticles;
 		}
 
 		public PotionEffectType type;
