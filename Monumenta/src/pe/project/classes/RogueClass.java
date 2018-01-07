@@ -51,11 +51,11 @@ public class RogueClass extends BaseClass {
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 
 	private static final int ADVANCING_SHADOWS_ID = 42;
-	private static final int ADVANCING_SHADOWS_RANGE_1 = 10;
-	private static final int ADVANCING_SHADOWS_RANGE_2 = 15;
+	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
+	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
-	private static final double ADVANCING_SHADOWS_OFFSET = 3.0;
+	private static final double ADVANCING_SHADOWS_OFFSET = 4.0;
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
