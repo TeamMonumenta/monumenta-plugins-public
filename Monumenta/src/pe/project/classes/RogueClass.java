@@ -199,6 +199,8 @@ public class RogueClass extends BaseClass {
 						int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, effectLevel, false, true));
 
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), BY_MY_BLADE_ID, BY_MY_BLADE_COOLDOWN);
+
 						double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 						_damageMob(player, damagee, extraDamage);
 
@@ -208,8 +210,6 @@ public class RogueClass extends BaseClass {
 						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 15, 0.25, 0.5, 0.5, 0.001);
 						ParticleUtils.playParticlesInWorld(world, Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
 						world.playSound(loc, "item.shield.break", 2.0f, 0.5f);
-
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), BY_MY_BLADE_ID, BY_MY_BLADE_COOLDOWN);
 					}
 				}
 			}
