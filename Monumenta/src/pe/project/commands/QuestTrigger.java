@@ -1,26 +1,72 @@
 package pe.project.commands;
 
+import java.util.ArrayList;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.utils.CommandUtils;
+import pe.project.npcs.quest.actions.dialog.DialogClickableTextEntry;
 
 public class QuestTrigger implements CommandExecutor {
 	private Plugin mPlugin;
-	
+
 	public QuestTrigger(Plugin plugin) {
 		mPlugin = plugin;
 	}
-	
+
 	@Override
-	public boolean onCommand(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
-		//	Because this is something that should ONLY be triggered via the scripted system, I'm going to be lazy
-		//	and ignore error checking....I know...such a badass.
-		Player player = mPlugin.getServer().getPlayer(arg3[0]);
-		
-		mPlugin.mNpcManager.triggerEvent(player, arg3[1], arg3[2], arg3[3]);
+	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
+		// This command can be run by players at any time by typing /questtrigger or clicking
+		// a chat message, potentially one that is old higher up in the chat.
+		//
+		// Therefore we must keep the state / arguments separate from the command itself, and
+		// only use the command to know that one of the available dialog actions has been
+		// chosen.
+
+		// The player must be the CommandSender when they either type in /questtrigger or
+		// click a dialog option in chat
+		if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "This command can only be run by players");
+			return false;
+		}
+
+		// Only one argument is allowed, an integer indicating which of the available options was chosen
+		if (arg3.length != 1) {
+			sender.sendMessage(ChatColor.RED + "This command requires exactly one argument");
+			return false;
+		}
+
+		Player player = (Player)sender;
+		int triggerIndex;
+
+		try {
+			triggerIndex = CommandUtils.parseIntFromString(sender, arg3[0]);
+		} catch (Exception e) {
+			sender.sendMessage(ChatColor.RED + "Argument parsing failed");
+			return false;
+		}
+
+        // Get the stack of previous teleport locations
+        if (player.hasMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY)) {
+			@SuppressWarnings("unchecked")
+            ArrayList<DialogClickableTextEntry> availTriggers = (ArrayList<DialogClickableTextEntry>)
+				player.getMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY).get(0).value();
+
+			if (availTriggers != null) {
+				for (DialogClickableTextEntry entry : availTriggers) {
+					entry.doActionsIfIdxMatches(mPlugin, player, triggerIndex);
+				}
+			}
+
+			// Player can only click one dialog option per conversation
+			player.removeMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY, mPlugin);
+        }
 
 		return true;
 	}

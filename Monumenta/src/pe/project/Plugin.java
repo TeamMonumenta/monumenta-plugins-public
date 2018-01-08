@@ -41,6 +41,7 @@ import pe.project.commands.ProfilingCommand;
 import pe.project.commands.QuestTrigger;
 import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
+import pe.project.commands.ReloadConfig;
 import pe.project.commands.SetGuildPrefix;
 import pe.project.commands.SetPlayerName;
 import pe.project.commands.TransferScores;
@@ -176,6 +177,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
 			getCommand("minusexp").setExecutor(new MinusExp(this));
+			getCommand("reloadConfig").setExecutor(new ReloadConfig(this));
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));

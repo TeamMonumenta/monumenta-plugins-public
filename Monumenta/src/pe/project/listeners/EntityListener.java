@@ -111,7 +111,7 @@ public class EntityListener implements Listener {
 
 			if (damager instanceof Player) {
 				if (damagee instanceof Villager) {
-					mPlugin.mNpcManager.interactEvent((Player)damager, damagee.getCustomName());
+					mPlugin.mNpcManager.interactEvent(mPlugin, (Player)damager, damagee.getCustomName());
 				} else {
 					//	Make sure to not trigger class abilities off Throrns.
 					if (event.getCause() != DamageCause.THORNS) {

@@ -84,6 +84,10 @@ commands:
     permission: monumenta.commands.questTrigger
     description: Used by scripted questing system
     usage: What are you doing? You shouldn't be using this!
+  reloadconfig:
+    permission: monumenta.commands.reloadconfig
+    description: Reloads quest config files
+    usage: /reloadconfig
   minusexp:
     permission: monumenta.commands.minusexp
     description: Subtracts an equivalent amount of levels worth of experience

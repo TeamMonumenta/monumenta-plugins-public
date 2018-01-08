@@ -1,0 +1,189 @@
+#
+# Only JSON syntax is accepted here, plus comments
+# This is a comment
+// So is this
+/*
+This is a
+multi-line comment
+*/
+# Comments can be specified either by starting a line with # or //
+# Multi-line comments can be set up
+# All comments (lines starting with #) will be stripped before processing
+{
+  # Value: NPC's name (String)
+  # Used to match the NPC and for dialog
+  # Colors are not required / supported
+  # REQUIRED
+  "npc": "Dennis",
+
+  # The actual details about how the quest works
+  # Value: Array of quest objects, each describing a step in the quest
+  #   Each value can only have a "prerequisites" and an "actions" entry
+  # Quest items will be processed in-order. Thus if one matches, it will
+  #  be run, and if it results in a changed score that lets the next item
+  #  run it will be executed afterwards
+  # REQUIRED
+  "quest_components": [{
+      # prerequisites apply to this specific quest interaction
+      # Value: ["check_scores": {}, "items_in_inventory": {}]
+      # Checks that all conditions are true
+      # Default: no prerequisites
+      "prerequisites": {
+        # Value: ["scoreboardName1": {}, "scoreboardName2": {}, etc.]
+        # Array of all scoreboard names/values to check against
+        # Entry keys should be the names of scoreboards to check
+        # Entry values should be either the exact score or a min/max
+        "check_scores": [
+          { "Quest45": { "min": 0, "max": 0 } },
+          { "Quest44": 13 }
+        ],
+
+        # Value: [{"lore": "#Q45I01", "name": "sparklefist", "count": 12}]
+        # Only succeeds if all items specified are present
+        # Note you can use this to match an empty inventory using { "count": 0 }
+        #  or a non-empty inventory - { "count" : 1 }
+        "items_in_inventory": [
+          # Lore matches any lore text containing the specified string.
+          # Default: ""
+          { "lore": "#Q45I01" },
+
+          # If a count is specified, will first match the lore AND name on
+          # an item stack and then make sure at least that many are in that stack
+          # Will match a stack of more than the specified number, but not less
+          # If count <= 0, "negative" match - succeeds if the item does not exist
+          # Default: 1
+          { "lore": "#Q45I02", "count": 12 },
+
+          # Match item name instead of lore.
+          # Default: ""
+          { "name": "sparklefist" }
+        ]
+      },
+
+      # List of all actions that should be taken if the prerequisites are met
+      # Allowed action types: "dialog", "set_scores", "function"
+      # Actions are processed in-order
+      # REQUIRED - at least one action
+      "actions": [{
+          # An action involving talk between the NPC and the player
+          # Available sub-keys:
+          # - "text": NPC text including NPC's name, not clickable
+          # - "raw_text": Generic text, not clickable
+          # - "clickable_text": Player chat with associated on-click actions
+          # Dialog elements are processed in-order
+          "dialog": {
+            # A list of dialog to be said by the NPC
+            # Each entry is one line
+            # Color codes are supported (use & instead of the section symbol)
+            # The NPC's name will preceed each message, for example:
+            #   [Dennis] Go fetch me some of dem pretty gems!
+            # NPC's name will be colored gold
+            # Text will be non-italic white
+            "text": ["Go fetch me some of dem pretty gems!"],
+
+            # A list of clickable text options the player can reply with
+            # The player will only be able to click one message!
+            # Thus the player can not click one option then go back and click
+            #  a different option later without repeating this action
+            "clickable_text": [
+              {
+                # Dialog said by the player
+                # Only one line is supported here
+                # Color is dark purple - color codes are not supported
+                "player_text": "Gems you say? Where can I find them?",
+
+                # What to do when the text above is clicked.
+                # Identical capabilities as "actions" above
+                # This means you could technically have very deep logic here,
+                #  each with on-click actions. This is allowed, but make sure
+                #  it is readable! As a general rule, clickable text actions
+                #  should not contain more clickable text.
+                "actions": [{
+                    "dialog": {
+                      "text": ["Ah! Great! You can find dem gems over in the haunted mines! Get me 3 of dem and I'll get you something shiny."],
+
+                      # Identical to text except the NPC's name is not prefixed and
+                      # the text color is the default (changeable via color codes)
+                      "raw_text": [
+                        "&b&lQUEST : A DERP OF GEMS",
+                        "&b Length : Short",
+                        "&b Difficulty : 2hard4u",
+                        "&b&oHead to the haunted mines to look for gems."
+                      ]
+                    }
+                  },{
+                    # Straightforward action - sets one or more scores
+                    # Value is a list [] of {"scoreboardName": value}
+                    "set_scores": [
+                      { "Quest45": 1 }
+                    ]
+                  }
+                ]
+              },{
+                "player_text": "I would prefer not to.",
+                "actions": [{
+                    "dialog": {
+                      "text": ["Shame...Not really my loss!"]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },{
+      "prerequisites": {
+        "check_scores": [
+          { "Quest45": 1 }
+        ],
+        "items_in_inventory": [
+          { "lore": "#Q45I01" },
+          { "lore": "#Q45I02" },
+          { "lore": "#Q45I03" }
+        ]
+      },
+      "actions":[{
+          "dialog": {
+            "text": ["Holy Moly! You found dem all! You definitely deserve this!"]
+          }
+        },{
+          "set_scores": [
+            { "Quest45": 2 }
+          ]
+        },{
+            # Runs a function like: /execute <player> ~ ~ ~ function <func>
+            # The function should be written to operate on the player as @s
+            "function": "monumenta:quests/r1/45/reward"
+        }
+      ]
+    },{
+      # Idle dialog for before quest can be started
+      "prerequisites": {
+        "check_scores": [
+          { "Quest45": 0 },
+          { "Quest44": {"min": 0, "max": 12} }
+        ]
+      },
+      "actions":[{
+          "dialog": {
+            "text": ["Go away, you are not cool enough to derp with gems"]
+          }
+        }
+      ]
+    },{
+      # Idle dialog for after quest is complete
+      "prerequisites": {
+        "check_scores": [
+          { "Quest45": 2 }
+        ]
+      },
+      "actions":[{
+          "dialog": {
+            "text": ["You got dem gems, kthx"]
+          }
+        }
+      ]
+    }
+  ]
+}

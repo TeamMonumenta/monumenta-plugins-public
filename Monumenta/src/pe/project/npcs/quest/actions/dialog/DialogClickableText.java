@@ -1,0 +1,59 @@
+package pe.project.npcs.quest.actions.dialog;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
+import pe.project.Constants;
+import pe.project.Plugin;
+
+public class DialogClickableText implements DialogBase {
+	private ArrayList<DialogClickableTextEntry> mEntries = new ArrayList<DialogClickableTextEntry>();
+
+	public DialogClickableText(String npcName, JsonElement element) throws Exception {
+		/*
+		 * Integer used to determine which of the available clickable entries was
+		 * clicked when a player clicks a chat message
+		 * Choosing a random 32-bit starting number is good enough to prevent collisions
+		 * Doesn't actually matter from a security perspective if collisions do happen,
+		 *  it'd just mean you could click dialog from a different NPC way up in chat
+		 *  and it'd potentially trigger a current conversation
+		 */
+		int entryIdx = (new Random()).nextInt();
+
+		JsonArray array = element.getAsJsonArray();
+		if (array == null) {
+			throw new Exception("clickable_text value is not an array!");
+		}
+
+		Iterator<JsonElement> iter = array.iterator();
+		while (iter.hasNext()) {
+			JsonElement entry = iter.next();
+
+			mEntries.add(new DialogClickableTextEntry(npcName, entry, entryIdx));
+
+			entryIdx++;
+		}
+	}
+
+	@Override
+	public void sendDialog(Plugin plugin, Player player) {
+		for (DialogClickableTextEntry entry : mEntries) {
+			entry.sendDialog(plugin, player);
+		}
+
+		/*
+		 * Attach the available clickable text options to the player so they can
+		 * be decoded when the player clicks a message
+		 */
+		player.setMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY,
+		                   new FixedMetadataValue(plugin, mEntries));
+	}
+}
+
