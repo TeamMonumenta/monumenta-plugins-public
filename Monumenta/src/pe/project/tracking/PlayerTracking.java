@@ -157,11 +157,7 @@ public class PlayerTracking implements EntityTracking {
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTANCE_EFFECT);
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
-
-						int food = ScoreboardUtils.getScoreboardValue(player, "Food");
-						if (food <= 17) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
-						}
+						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
 					}
 				} else {
 					if (mode == GameMode.ADVENTURE) {
