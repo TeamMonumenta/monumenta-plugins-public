@@ -181,6 +181,8 @@ public class PotionManager {
 	}
 
 	public void clearAllEffects(Player player) {
+		mPotionManager.remove(player.getUniqueId());
+
 		for (PotionEffect type : player.getActivePotionEffects()) {
 			player.removePotionEffect(type.getType());
 		}

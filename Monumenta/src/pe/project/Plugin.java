@@ -27,6 +27,7 @@ import pe.project.commands.Back;
 import pe.project.commands.BroadcastCommand;
 import pe.project.commands.ChatRangeCommand;
 import pe.project.commands.CheckEmptyInventory;
+import pe.project.commands.ClearEffects;
 import pe.project.commands.DebugInfo;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
@@ -170,6 +171,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("giveSoulbound").setExecutor(new GiveSoulbound(this));
 			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
 			getCommand("debugInfo").setExecutor(new DebugInfo(this));
+			getCommand("clearEffects").setExecutor(new ClearEffects(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));

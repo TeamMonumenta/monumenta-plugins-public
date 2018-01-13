@@ -64,6 +64,10 @@ commands:
     permission: monumenta.commands.debugInfo
     description: Tells the sender information about the target
     usage: /execute @p[stuff] ~ ~ ~ debugInfo
+  cleareffects:
+    permission: monumenta.commands.cleareffects
+    description: Clears all status effects from the player
+    usage: /execute @p[stuff] ~ ~ ~ cleareffects
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
