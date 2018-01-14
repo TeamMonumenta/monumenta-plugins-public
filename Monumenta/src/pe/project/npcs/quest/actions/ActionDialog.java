@@ -15,6 +15,7 @@ import pe.project.Plugin;
 import pe.project.npcs.quest.actions.dialog.DialogBase;
 import pe.project.npcs.quest.actions.dialog.DialogClickableText;
 import pe.project.npcs.quest.actions.dialog.DialogRawText;
+import pe.project.npcs.quest.actions.dialog.DialogRandomText;
 import pe.project.npcs.quest.actions.dialog.DialogText;
 
 public class ActionDialog implements ActionBase {
@@ -30,14 +31,18 @@ public class ActionDialog implements ActionBase {
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
 
-			if (!key.equals("text") && !key.equals("raw_text") && !key.equals("clickable_text")) {
+			if (!key.equals("text") && !key.equals("raw_text")
+				&& !key.equals("clickable_text") && !key.equals("random_text")) {
 				throw new Exception("Unknown dialog key: '" + key + "'");
 			}
 
-			// clickable_text is a special case
-			//  the whole array of options needs to be one DialogClickableText object
+			// clickable_text and random_text are special cases
+			//  the whole array of options needs to be one object
 			if (key.equals("clickable_text")) {
 				mDialogs.add(new DialogClickableText(npcName, ent.getValue()));
+				continue;
+			} else if (key.equals("random_text")) {
+				mDialogs.add(new DialogRandomText(npcName, ent.getValue()));
 				continue;
 			}
 
