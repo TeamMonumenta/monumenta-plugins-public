@@ -74,12 +74,12 @@ public class NpcManager {
 		if (npcName != null && !npcName.isEmpty()) {
 			NpcQuest npc = mNpcs.get(_squashNpcName(npcName));
 			if (npc != null) {
-				npc.interactEvent(plugin, player, npcName);
+				npc.interactEvent(plugin, player, _squashNpcName(npcName));
 			}
 		}
 	}
 
 	private String _squashNpcName(String name) {
-		return name.replaceAll("\\s+", "");
+		return ChatColor.stripColor(name.replaceAll("\\s+", ""));
 	}
 }

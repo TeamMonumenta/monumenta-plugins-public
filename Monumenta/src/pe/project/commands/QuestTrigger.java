@@ -52,20 +52,20 @@ public class QuestTrigger implements CommandExecutor {
 			return false;
 		}
 
-        // Get the stack of previous teleport locations
+        // Get the list of available dialogs the player can currently click
         if (player.hasMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY)) {
 			@SuppressWarnings("unchecked")
             ArrayList<DialogClickableTextEntry> availTriggers = (ArrayList<DialogClickableTextEntry>)
 				player.getMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY).get(0).value();
+
+			// Player can only click one dialog option per conversation
+			player.removeMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY, mPlugin);
 
 			if (availTriggers != null) {
 				for (DialogClickableTextEntry entry : availTriggers) {
 					entry.doActionsIfIdxMatches(mPlugin, player, triggerIndex);
 				}
 			}
-
-			// Player can only click one dialog option per conversation
-			player.removeMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY, mPlugin);
         }
 
 		return true;
