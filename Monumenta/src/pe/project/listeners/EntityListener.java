@@ -248,18 +248,30 @@ public class EntityListener implements Listener {
 			Snowball origBall = (Snowball)event.getEntity();
 			if (origBall.getShooter() instanceof Player) {
 				Player player = (Player)origBall.getShooter();
-				ItemStack itemInHand = player.getEquipment().getItemInMainHand();
-				if ((itemInHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)
-					&& InventoryUtils.isSoulboundToPlayer(itemInHand, player)) {
+				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
-					// This is an infinite snowball - summon a new one and cancel the event
-					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
-
-					newBall.setShooter(player);
-					newBall.setVelocity(origBall.getVelocity());
-					//newBall.setGlowing(true);
-
+				// Check if the player has an infinity snowball in main or off hand
+				if (((itemInMainHand.getType().equals(Material.SNOW_BALL)) &&
+				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
+				    ((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
+				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
+					// If they do, cancel the event. This means players can't throw eachother's
+					// soulbound snowballs
 					event.setCancelled(true);
+
+					if (((itemInMainHand.getType().equals(Material.SNOW_BALL)) &&
+						 (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
+						 (InventoryUtils.isSoulboundToPlayer(itemInMainHand, player))) ||
+						((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
+						 (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
+						 (InventoryUtils.isSoulboundToPlayer(itemInOffHand, player)))) {
+
+						Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+
+						newBall.setShooter(player);
+						newBall.setVelocity(origBall.getVelocity());
+					}
 					return;
 				}
 			}
