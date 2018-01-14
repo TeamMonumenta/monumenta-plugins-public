@@ -361,6 +361,9 @@ public class PlayerListener implements Listener {
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
+
+		// Clear effects
+		mPlugin.mPotionManager.clearAllEffects(player);
 	}
 
 	//	The player has respawned.
