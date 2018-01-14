@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 
 import pe.project.Plugin;
 import pe.project.npcs.quest.actions.ActionBase;
+import pe.project.npcs.quest.actions.ActionCommand;
 import pe.project.npcs.quest.actions.ActionDialog;
 import pe.project.npcs.quest.actions.ActionFunction;
 import pe.project.npcs.quest.actions.ActionSetScores;
@@ -39,7 +40,8 @@ public class QuestActions {
 			for (Entry<String, JsonElement> ent : entries) {
 				String key = ent.getKey();
 
-				if (!key.equals("dialog") && !key.equals("set_scores") && !key.equals("function")) {
+				if (!key.equals("dialog") && !key.equals("set_scores") &&
+				    !key.equals("command") && !key.equals("function")) {
 					throw new Exception("Unknown actions key: " + key);
 				}
 
@@ -54,6 +56,8 @@ public class QuestActions {
 					mActions.add(new ActionDialog(npcName, value));
 				} else if (key.equals("set_scores")) {
 					mActions.add(new ActionSetScores(value));
+				} else if (key.equals("command")) {
+					mActions.add(new ActionCommand(value));
 				} else if (key.equals("function")) {
 					mActions.add(new ActionFunction(value));
 				}
