@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -13,6 +14,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import pe.project.Plugin;
+import pe.project.utils.LocationUtils;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class ItemOverrides {
 	/*
@@ -148,6 +151,19 @@ public class ItemOverrides {
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
 				eventCancelled = true;
+			}
+		}
+
+		// Prevent players from breaking blocks in safezones from outside of them
+		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
+			if (LocationUtils.getLocationType(plugin, block.getLocation()) != LocationType.None) {
+				// Allow breaking if the player would be in survival mode at that spot
+				Location testLocation = block.getLocation();
+				testLocation.setY(10.0);
+				Material testMaterial = testLocation.getBlock().getType();
+				if (testMaterial != Material.SPONGE && testMaterial != Material.OBSIDIAN) {
+					eventCancelled = true;
+				}
 			}
 		}
 

@@ -77,7 +77,6 @@ public class MobListener implements Listener {
 		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
 	}
 
-	/* Clear the metadata if it exists when a player breaks a block */
 	@EventHandler(priority = EventPriority.LOWEST)
 	void BlockBreakEvent(BlockBreakEvent event) {
 		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
