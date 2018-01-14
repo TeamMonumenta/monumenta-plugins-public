@@ -20,11 +20,18 @@ public class QuestComponent {
 			throw new Exception("quest_components value is not an object!");
 		}
 
+		// Read the delay_actions_by_ticks field first, if specified
+		JsonElement delayElement = object.get("delay_actions_by_ticks");
+		int delayTicks = 0;
+		if (delayElement != null) {
+			delayTicks = delayElement.getAsInt();
+		}
+
 		Set<Entry<String, JsonElement>> entries = object.entrySet();
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
 
-			if (!key.equals("prerequisites") && !key.equals("actions")) {
+			if (!key.equals("prerequisites") && !key.equals("actions") && !key.equals("delay_actions_by_ticks")) {
 				throw new Exception("Unknown quest_components key: " + key);
 			}
 
@@ -38,7 +45,7 @@ public class QuestComponent {
 			if (key.equals("prerequisites")) {
 				mPrerequisites = new QuestPrerequisites(value);
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, value);
+				mActions = new QuestActions(npcName, delayTicks, value);
 			}
 		}
 

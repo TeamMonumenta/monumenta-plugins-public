@@ -36,6 +36,7 @@ public class Constants {
 	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
 	public static final String PLAYER_CLICKABLE_DIALOG_METAKEY = "MonumentaPlayerClickableDialog";
 	public static final String PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY = "MonumentaPlayerClickableDialogLocation";
+	public static final String PLAYER_QUEST_ACTIONS_LOCKED_METAKEY = "MonumentaPlayerQuestActionsLocked";
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 	public static final String ENTITY_DAMAGE_NONCE_METAKEY = "MonumentaEntityDamageNonce";
 	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";

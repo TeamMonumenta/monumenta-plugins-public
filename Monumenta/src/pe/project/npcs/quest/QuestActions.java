@@ -6,11 +6,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.npcs.quest.actions.ActionBase;
 import pe.project.npcs.quest.actions.ActionCommand;
@@ -20,8 +22,11 @@ import pe.project.npcs.quest.actions.ActionSetScores;
 
 public class QuestActions {
 	ArrayList<ActionBase> mActions = new ArrayList<ActionBase>();
+	int mDelayTicks = 0;
 
-	public QuestActions(String npcName, JsonElement element) throws Exception {
+	public QuestActions(String npcName, int delayTicks, JsonElement element) throws Exception {
+		mDelayTicks = delayTicks;
+
 		JsonArray array = element.getAsJsonArray();
 		if (array == null) {
 			throw new Exception("actions value is not an array!");
@@ -66,8 +71,28 @@ public class QuestActions {
 	}
 
 	public void doActions(Plugin plugin, Player player) {
-		for (ActionBase action : mActions) {
-			action.doAction(plugin, player);
+		if (mDelayTicks <= 0) {
+			// If not delayed, actions can run without restrictions
+			for (ActionBase action : mActions) {
+				action.doAction(plugin, player);
+			}
+		} else {
+			// If delayed, only one delayed group of actions is allowed per player
+			if (!player.hasMetadata(Constants.PLAYER_QUEST_ACTIONS_LOCKED_METAKEY)) {
+				player.setMetadata(Constants.PLAYER_QUEST_ACTIONS_LOCKED_METAKEY,
+								   new FixedMetadataValue(plugin, true));
+
+				player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+					@Override
+					public void run() {
+						for (ActionBase action : mActions) {
+							action.doAction(plugin, player);
+						}
+
+						player.removeMetadata(Constants.PLAYER_QUEST_ACTIONS_LOCKED_METAKEY, plugin);
+					}
+				}, mDelayTicks);
+			}
 		}
 	}
 }

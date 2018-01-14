@@ -25,11 +25,18 @@ public class DialogClickableTextEntry implements DialogBase {
 			throw new Exception("dialog value is not an object!");
 		}
 
+		// Read the delay_actions_by_ticks field first, if specified
+		JsonElement delayElement = object.get("delay_actions_by_ticks");
+		int delayTicks = 0;
+		if (delayElement != null) {
+			delayTicks = delayElement.getAsInt();
+		}
+
 		Set<Entry<String, JsonElement>> entries = object.entrySet();
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
 
-			if (!key.equals("player_text") && !key.equals("actions")) {
+			if (!key.equals("player_text") && !key.equals("actions") && !key.equals("delay_actions_by_ticks")) {
 				throw new Exception("Unknown clickable_text key: " + key);
 			}
 
@@ -46,7 +53,7 @@ public class DialogClickableTextEntry implements DialogBase {
 					throw new Exception("clickable_text player_text entry is not a string!");
 				}
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, value);
+				mActions = new QuestActions(npcName, delayTicks, value);
 			}
 		}
 
