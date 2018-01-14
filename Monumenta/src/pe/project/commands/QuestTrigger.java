@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.point.AreaBounds;
 import pe.project.utils.CommandUtils;
 import pe.project.npcs.quest.actions.dialog.DialogClickableTextEntry;
 
@@ -32,7 +33,7 @@ public class QuestTrigger implements CommandExecutor {
 		// The player must be the CommandSender when they either type in /questtrigger or
 		// click a dialog option in chat
 		if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be run by players");
+			sender.sendMessage(ChatColor.RED + "This command can only be run by players");
 			return false;
 		}
 
@@ -52,21 +53,26 @@ public class QuestTrigger implements CommandExecutor {
 			return false;
 		}
 
-        // Get the list of available dialogs the player can currently click
-        if (player.hasMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY)) {
+		// Get the list of available dialogs the player can currently click
+		if (player.hasMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY) &&
+			player.hasMetadata(Constants.PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY)) {
+
+			AreaBounds validLocation = (AreaBounds)player.getMetadata(Constants.PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY).get(0).value();
+
 			@SuppressWarnings("unchecked")
-            ArrayList<DialogClickableTextEntry> availTriggers = (ArrayList<DialogClickableTextEntry>)
-				player.getMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY).get(0).value();
+			ArrayList<DialogClickableTextEntry> availTriggers = (ArrayList<DialogClickableTextEntry>)
+			                                                    player.getMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY).get(0).value();
 
 			// Player can only click one dialog option per conversation
 			player.removeMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY, mPlugin);
+			player.removeMetadata(Constants.PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY, mPlugin);
 
-			if (availTriggers != null) {
+			if (availTriggers != null && validLocation.within(player.getLocation())) {
 				for (DialogClickableTextEntry entry : availTriggers) {
 					entry.doActionsIfIdxMatches(mPlugin, player, triggerIndex);
 				}
 			}
-        }
+		}
 
 		return true;
 	}

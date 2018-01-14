@@ -12,6 +12,9 @@ import com.google.gson.JsonElement;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.point.AreaBounds;
+import pe.project.point.Point;
+import pe.project.utils.LocationUtils.LocationType;
 
 public class DialogClickableText implements DialogBase {
 	private ArrayList<DialogClickableTextEntry> mEntries = new ArrayList<DialogClickableTextEntry>();
@@ -54,6 +57,17 @@ public class DialogClickableText implements DialogBase {
 		 */
 		player.setMetadata(Constants.PLAYER_CLICKABLE_DIALOG_METAKEY,
 		                   new FixedMetadataValue(plugin, mEntries));
+
+		/*
+		 * Attach an area bound around where the player is now. They can only
+		 * reply to messages if they are still within this bound when they click
+		 * the chat option
+		 */
+		player.setMetadata(Constants.PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY,
+		                   new FixedMetadataValue(plugin,
+		                                          new AreaBounds("", LocationType.None,
+		                                                         new Point(player.getLocation().subtract(4.0, 4.0, 4.0)),
+		                                                         new Point(player.getLocation().add(4.0, 4.0, 4.0)))));
 	}
 }
 
