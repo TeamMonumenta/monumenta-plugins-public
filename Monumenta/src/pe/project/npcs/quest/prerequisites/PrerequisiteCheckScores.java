@@ -52,22 +52,24 @@ public class PrerequisiteCheckScores implements PrerequisiteBase {
 
 				mRange = new ScoreRange(score);
 			} else {
-				//	Has a min/max
-				JsonObject scoreObject = value.getAsJsonObject();
-				if (scoreObject == null) {
-					throw new Exception("check_score value for scoreboard '" + mScoreName + "' is an unparseable object");
+				Integer imin = Integer.MIN_VALUE;
+				Integer imax = Integer.MAX_VALUE;
+
+				Set<Entry<String, JsonElement>> subentries = value.getAsJsonObject().entrySet();
+				for (Entry<String, JsonElement> subent : subentries) {
+					String key = subent.getKey();
+
+					if (key.equals("min")) {
+						imin = subent.getValue().getAsInt();
+					} else if (key.equals("max")) {
+						imax = subent.getValue().getAsInt();
+					} else {
+						throw new Exception("Unknown check_score value: '" + key + "'");
+					}
 				}
 
-				JsonElement min = scoreObject.get("min");
-				JsonElement max = scoreObject.get("max");
-				if (min == null || max == null) {
-					throw new Exception("check_score value for scoreboard '" + mScoreName + "' is an object but without min and max");
-				}
-
-				Integer imin = min.getAsInt();
-				Integer imax = max.getAsInt();
-				if (imin == null || imax == null) {
-					throw new Exception("check_score value for scoreboard '" + mScoreName + "' is an object but min/max are not integers");
+				if (imin == Integer.MIN_VALUE && imax == Integer.MAX_VALUE) {
+					throw new Exception("Bogus check_score object with no min or max");
 				}
 
 				mRange = new ScoreRange(imin, imax);
