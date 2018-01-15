@@ -7,7 +7,6 @@ import java.util.Random;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import pe.project.Constants;
@@ -30,18 +29,17 @@ public class DialogClickableText implements DialogBase {
 		 */
 		int entryIdx = (new Random()).nextInt();
 
-		JsonArray array = element.getAsJsonArray();
-		if (array == null) {
-			throw new Exception("clickable_text value is not an array!");
-		}
+		if (element.isJsonObject()) {
+			mEntries.add(new DialogClickableTextEntry(npcName, element, entryIdx));
+		} else if (element.isJsonArray()) {
+			Iterator<JsonElement> iter = element.getAsJsonArray().iterator();
+			while (iter.hasNext()) {
+				mEntries.add(new DialogClickableTextEntry(npcName, iter.next(), entryIdx));
 
-		Iterator<JsonElement> iter = array.iterator();
-		while (iter.hasNext()) {
-			JsonElement entry = iter.next();
-
-			mEntries.add(new DialogClickableTextEntry(npcName, entry, entryIdx));
-
-			entryIdx++;
+				entryIdx++;
+			}
+		} else {
+			throw new Exception("clickable_text value is neither an object nor an array!");
 		}
 	}
 

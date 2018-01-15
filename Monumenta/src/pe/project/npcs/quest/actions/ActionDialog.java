@@ -1,13 +1,11 @@
 package pe.project.npcs.quest.actions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -31,36 +29,16 @@ public class ActionDialog implements ActionBase {
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
 
-			if (!key.equals("text") && !key.equals("raw_text")
-				&& !key.equals("clickable_text") && !key.equals("random_text")) {
-				throw new Exception("Unknown dialog key: '" + key + "'");
-			}
-
-			// clickable_text and random_text are special cases
-			//  the whole array of options needs to be one object
-			if (key.equals("clickable_text")) {
+			if (key.equals("text")) {
+				mDialogs.add(new DialogText(npcName, ent.getValue()));
+			} else if (key.equals("raw_text")) {
+				mDialogs.add(new DialogRawText(ent.getValue()));
+			} else if (key.equals("clickable_text")) {
 				mDialogs.add(new DialogClickableText(npcName, ent.getValue()));
-				continue;
 			} else if (key.equals("random_text")) {
 				mDialogs.add(new DialogRandomText(npcName, ent.getValue()));
-				continue;
-			}
-
-			// The remaining options - text and raw_text - are JSON arrays
-			JsonArray array = object.getAsJsonArray(key);
-			if (array == null) {
-				throw new Exception("Dialog value for key '" + key + "' is not an array!");
-			}
-
-			Iterator<JsonElement> iter = array.iterator();
-			while (iter.hasNext()) {
-				JsonElement entry = iter.next();
-
-				if (key.equals("text")) {
-					mDialogs.add(new DialogText(npcName, entry));
-				} else if (key.equals("raw_text")) {
-					mDialogs.add(new DialogRawText(entry));
-				}
+			} else {
+				throw new Exception("Unknown dialog key: '" + key + "'");
 			}
 		}
 	}
