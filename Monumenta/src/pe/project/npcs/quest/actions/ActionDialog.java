@@ -19,7 +19,7 @@ import pe.project.npcs.quest.actions.dialog.DialogText;
 public class ActionDialog implements ActionBase {
 	ArrayList<DialogBase> mDialogs = new ArrayList<DialogBase>();
 
-	public ActionDialog(String npcName, JsonElement element) throws Exception {
+	public ActionDialog(String displayName, JsonElement element) throws Exception {
 		JsonObject object = element.getAsJsonObject();
 		if (object == null) {
 			throw new Exception("dialog value is not an object!");
@@ -30,13 +30,13 @@ public class ActionDialog implements ActionBase {
 			String key = ent.getKey();
 
 			if (key.equals("text")) {
-				mDialogs.add(new DialogText(npcName, ent.getValue()));
+				mDialogs.add(new DialogText(displayName, ent.getValue()));
 			} else if (key.equals("raw_text")) {
 				mDialogs.add(new DialogRawText(ent.getValue()));
 			} else if (key.equals("clickable_text")) {
-				mDialogs.add(new DialogClickableText(npcName, ent.getValue()));
+				mDialogs.add(new DialogClickableText(displayName, ent.getValue()));
 			} else if (key.equals("random_text")) {
-				mDialogs.add(new DialogRandomText(npcName, ent.getValue()));
+				mDialogs.add(new DialogRandomText(displayName, ent.getValue()));
 			} else {
 				throw new Exception("Unknown dialog key: '" + key + "'");
 			}

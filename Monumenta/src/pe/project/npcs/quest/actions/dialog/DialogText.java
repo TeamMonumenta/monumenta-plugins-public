@@ -11,11 +11,11 @@ import pe.project.Plugin;
 import pe.project.utils.MessagingUtils;
 
 public class DialogText implements DialogBase {
-	private String mNpcName;
+	private String mDisplayName;
 	private ArrayList<String> mText = new ArrayList<String>();
 
-	public DialogText(String npcName, JsonElement element) throws Exception {
-		mNpcName = npcName;
+	public DialogText(String displayName, JsonElement element) throws Exception {
+		mDisplayName = displayName;
 
 		if (element.isJsonPrimitive()) {
 			mText.add(element.getAsString());
@@ -32,7 +32,7 @@ public class DialogText implements DialogBase {
 	@Override
 	public void sendDialog(Plugin plugin, Player player) {
 		for (String text : mText) {
-			MessagingUtils.sendNPCMessage(player, mNpcName, text);
+			MessagingUtils.sendNPCMessage(player, mDisplayName, text);
 		}
 	}
 }

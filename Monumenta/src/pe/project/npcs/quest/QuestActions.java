@@ -24,7 +24,7 @@ public class QuestActions {
 	ArrayList<ActionBase> mActions = new ArrayList<ActionBase>();
 	int mDelayTicks = 0;
 
-	public QuestActions(String npcName, int delayTicks, JsonElement element) throws Exception {
+	public QuestActions(String displayName, int delayTicks, JsonElement element) throws Exception {
 		mDelayTicks = delayTicks;
 
 		JsonArray array = element.getAsJsonArray();
@@ -58,7 +58,7 @@ public class QuestActions {
 				}
 
 				if (key.equals("dialog")) {
-					mActions.add(new ActionDialog(npcName, value));
+					mActions.add(new ActionDialog(displayName, value));
 				} else if (key.equals("set_scores")) {
 					mActions.add(new ActionSetScores(value));
 				} else if (key.equals("command")) {

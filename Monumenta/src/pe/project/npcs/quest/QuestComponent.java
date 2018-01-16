@@ -14,7 +14,7 @@ public class QuestComponent {
 	private QuestPrerequisites mPrerequisites = null;
 	private QuestActions mActions = null;
 
-	public QuestComponent(String npcName, JsonElement element) throws Exception {
+	public QuestComponent(String displayName, JsonElement element) throws Exception {
 		JsonObject object = element.getAsJsonObject();
 		if (object == null) {
 			throw new Exception("quest_components value is not an object!");
@@ -45,7 +45,7 @@ public class QuestComponent {
 			if (key.equals("prerequisites")) {
 				mPrerequisites = new QuestPrerequisites(value);
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, delayTicks, value);
+				mActions = new QuestActions(displayName, delayTicks, value);
 			}
 		}
 

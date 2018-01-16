@@ -25,6 +25,7 @@ import pe.project.utils.FileUtils;
 public class NpcQuest {
 	private ArrayList<QuestComponent> mComponents = new ArrayList<QuestComponent>();
 	private String mNpcName;
+	private String mDisplayName;
 
 	public NpcQuest(String fileLocation) throws Exception {
 		String content = FileUtils.readFile(fileLocation);
@@ -46,11 +47,22 @@ public class NpcQuest {
 				                    fileLocation + "' as string");
 			}
 
+			// Read the npc's display name
+			JsonElement displayName = object.get("displayName");
+			if (displayName == null) {
+				mDisplayName = mNpcName;
+			} else {
+		    mDisplayName = displayName.getAsString();
+		    if (mDisplayName == null) {
+			    mDisplayName = mNpcName;
+		    }
+			}
+
 			Set<Entry<String, JsonElement>> entries = object.entrySet();
 			for (Entry<String, JsonElement> ent : entries) {
 				String key = ent.getKey();
 
-				if (!key.equals("npc") && !key.equals("quest_components")) {
+				if (!key.equals("npc") && !key.equals("displayName") && !key.equals("quest_components")) {
 					throw new Exception("Unknown quest key: " + key);
 				}
 
@@ -66,7 +78,7 @@ public class NpcQuest {
 					while (iter.hasNext()) {
 						JsonElement entry = iter.next();
 
-						mComponents.add(new QuestComponent(mNpcName, entry));
+						mComponents.add(new QuestComponent(mDisplayName, entry));
 					}
 				}
 			}
@@ -75,6 +87,10 @@ public class NpcQuest {
 
 	public String getNpcName() {
 		return mNpcName;
+	}
+
+	public String getDisplayName() {
+		return mDisplayName;
 	}
 
 	public ArrayList<QuestComponent> getComponents() {

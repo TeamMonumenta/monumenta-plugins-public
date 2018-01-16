@@ -22,8 +22,8 @@ public class MessagingUtils {
 		plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), commandStr);
 	}
 
-	public static void sendNPCMessage(Player player, String npcName, String message) {
-		sendRawMessage(player, String.format(ChatColor.GOLD + "[%s] " + ChatColor.WHITE + "%s", npcName, message));
+	public static void sendNPCMessage(Player player, String displayName, String message) {
+		sendRawMessage(player, String.format(ChatColor.GOLD + "[%s] " + ChatColor.WHITE + "%s", displayName, message));
 	}
 
 	public static void sendRawMessage(Player player, String message) {
