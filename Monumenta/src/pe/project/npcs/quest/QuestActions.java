@@ -18,6 +18,7 @@ import pe.project.npcs.quest.actions.ActionBase;
 import pe.project.npcs.quest.actions.ActionCommand;
 import pe.project.npcs.quest.actions.ActionDialog;
 import pe.project.npcs.quest.actions.ActionFunction;
+import pe.project.npcs.quest.actions.ActionRerunComponents;
 import pe.project.npcs.quest.actions.ActionSetScores;
 
 public class QuestActions {
@@ -46,7 +47,8 @@ public class QuestActions {
 				String key = ent.getKey();
 
 				if (!key.equals("dialog") && !key.equals("set_scores") &&
-				    !key.equals("command") && !key.equals("function")) {
+				    !key.equals("command") && !key.equals("function") &&
+				    !key.equals("rerun_components")) {
 					throw new Exception("Unknown actions key: " + key);
 				}
 
@@ -65,6 +67,8 @@ public class QuestActions {
 					mActions.add(new ActionCommand(value));
 				} else if (key.equals("function")) {
 					mActions.add(new ActionFunction(value));
+				} else if (key.equals("rerun_components")) {
+					mActions.add(new ActionRerunComponents(npcName));
 				}
 			}
 		}
