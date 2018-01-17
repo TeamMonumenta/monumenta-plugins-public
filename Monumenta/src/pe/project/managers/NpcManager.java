@@ -2,9 +2,11 @@ package pe.project.managers;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import pe.project.Constants;
@@ -14,6 +16,8 @@ import pe.project.utils.MessagingUtils;
 
 public class NpcManager {
 	HashMap<String, NpcQuest> mNpcs = new HashMap<String, NpcQuest>();
+
+	EnumSet<EntityType> mEntityTypes = EnumSet.noneOf(EntityType.class);
 
 	/*
 	 * If sender is non-null, it will be sent debugging information
@@ -38,9 +42,12 @@ public class NpcManager {
 
 							if (sender != null) {
 								sender.sendMessage(ChatColor.GOLD + "Loaded " +
-														Integer.toString(npc.getComponents().size()) +
-														" quest components for NPC '" + npc.getNpcName() + "'");
+								                   Integer.toString(npc.getComponents().size()) +
+								                   " quest components for NPC '" + npc.getNpcName() + "'");
 							}
+
+							// Track this type of entity from now on when entities are interacted with
+							mEntityTypes.add(npc.getEntityType());
 
 							// Check if an existing NPC already exists with quest components
 							NpcQuest existingNpc = mNpcs.get(_squashNpcName(npc.getNpcName()));
@@ -69,13 +76,24 @@ public class NpcManager {
 		reload(plugin, null);
 	}
 
-	public void interactEvent(Plugin plugin, Player player, String npcName) {
-		if (npcName != null && !npcName.isEmpty()) {
-			NpcQuest npc = mNpcs.get(_squashNpcName(npcName));
-			if (npc != null) {
-				npc.interactEvent(plugin, player, _squashNpcName(npcName));
-			}
+	public boolean interactEvent(Plugin plugin, Player player, String npcName, EntityType entityType) {
+		// Only search for the entity's name if we have a quest with that entity type
+		if (!mEntityTypes.contains(entityType)) {
+			return false;
 		}
+
+		// Only entities with custom names
+		if (npcName == null || npcName.isEmpty()) {
+			return false;
+		}
+
+		// Run the interaction if we have an NPC with that name
+		NpcQuest npc = mNpcs.get(_squashNpcName(npcName));
+		if (npc != null) {
+			return npc.interactEvent(plugin, player, _squashNpcName(npcName), entityType);
+		}
+
+		return false;
 	}
 
 	private String _squashNpcName(String name) {

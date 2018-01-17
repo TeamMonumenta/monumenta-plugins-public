@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.entity.EntityType;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -26,6 +27,7 @@ public class NpcQuest {
 	private ArrayList<QuestComponent> mComponents = new ArrayList<QuestComponent>();
 	private String mNpcName;
 	private String mDisplayName;
+	private EntityType mEntityType;
 
 	public NpcQuest(String fileLocation) throws Exception {
 		String content = FileUtils.readFile(fileLocation);
@@ -58,11 +60,24 @@ public class NpcQuest {
 				}
 			}
 
+			// Read the npc's entity_type
+			// Default to villager
+			JsonElement entityType = object.get("entity_type");
+			if (entityType == null) {
+				mEntityType = EntityType.VILLAGER;
+			} else {
+				mEntityType = EntityType.valueOf(entityType.getAsString());
+				if (mEntityType == null) {
+					mEntityType = EntityType.VILLAGER;
+				}
+			}
+
 			Set<Entry<String, JsonElement>> entries = object.entrySet();
 			for (Entry<String, JsonElement> ent : entries) {
 				String key = ent.getKey();
 
-				if (!key.equals("npc") && !key.equals("display_name") && !key.equals("quest_components")) {
+				if (!key.equals("npc") && !key.equals("display_name")
+				    && !key.equals("quest_components") && !key.equals("entity_type")) {
 					throw new Exception("Unknown quest key: " + key);
 				}
 
@@ -78,7 +93,7 @@ public class NpcQuest {
 					while (iter.hasNext()) {
 						JsonElement entry = iter.next();
 
-						mComponents.add(new QuestComponent(mNpcName, mDisplayName, entry));
+						mComponents.add(new QuestComponent(mNpcName, mDisplayName, mEntityType, entry));
 					}
 				}
 			}
@@ -97,6 +112,10 @@ public class NpcQuest {
 		return mComponents;
 	}
 
+	public EntityType getEntityType() {
+		return mEntityType;
+	}
+
 	// Combines another quest using the same NPC into this one
 	public void addFromQuest(Plugin plugin, NpcQuest quest) {
 		if (quest.getNpcName().equals(mNpcName)) {
@@ -108,11 +127,15 @@ public class NpcQuest {
 		}
 	}
 
-	public void interactEvent(Plugin plugin, Player player, String npcName) {
-		if (mNpcName.equals(npcName)) {
+	// Returns true if any quest components were attempted with this NPC
+	// False otherwise
+	public boolean interactEvent(Plugin plugin, Player player, String npcName, EntityType entityType) {
+		if (mEntityType.equals(entityType) && mNpcName.equals(npcName)) {
 			for (QuestComponent component : mComponents) {
 				component.doActionsIfPrereqsMet(plugin, player);
 			}
+			return true;
 		}
+		return false;
 	}
 }

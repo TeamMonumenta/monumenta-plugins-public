@@ -1,15 +1,18 @@
 package pe.project.npcs.quest.actions;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import pe.project.Plugin;
 
 public class ActionRerunComponents implements ActionBase {
 	String mNpcName;
+	EntityType mEntityType;
 	boolean mLocked = false;
 
-	public ActionRerunComponents(String npcName) {
+	public ActionRerunComponents(String npcName, EntityType entityType) {
 		mNpcName = npcName;
+		mEntityType = entityType;
 	}
 
 	@Override
@@ -20,7 +23,7 @@ public class ActionRerunComponents implements ActionBase {
 		 */
 		if (!mLocked) {
 			mLocked = true;
-			plugin.mNpcManager.interactEvent(plugin, player, mNpcName);
+			plugin.mNpcManager.interactEvent(plugin, player, mNpcName, mEntityType);
 			mLocked = false;
 		} else {
 			plugin.getLogger().severe("Stopped infinite loop for NPC '" + mNpcName + "'");

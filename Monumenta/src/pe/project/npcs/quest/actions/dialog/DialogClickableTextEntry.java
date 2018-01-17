@@ -3,6 +3,7 @@ package pe.project.npcs.quest.actions.dialog;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.google.gson.JsonElement;
@@ -17,7 +18,8 @@ public class DialogClickableTextEntry implements DialogBase {
 	private QuestActions mActions;
 	private int mIdx;
 
-	public DialogClickableTextEntry(String npcName, String displayName, JsonElement element, int elementIdx) throws Exception {
+	public DialogClickableTextEntry(String npcName, String displayName, EntityType entityType,
+	                                JsonElement element, int elementIdx) throws Exception {
 		mIdx = elementIdx;
 
 		JsonObject object = element.getAsJsonObject();
@@ -53,7 +55,7 @@ public class DialogClickableTextEntry implements DialogBase {
 					throw new Exception("clickable_text player_text entry is not a string!");
 				}
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, displayName, delayTicks, value);
+				mActions = new QuestActions(npcName, displayName, entityType, delayTicks, value);
 			}
 		}
 
@@ -64,7 +66,8 @@ public class DialogClickableTextEntry implements DialogBase {
 
 	@Override
 	public void sendDialog(Plugin plugin, Player player) {
-		MessagingUtils.sendClickableNPCMessage(plugin, player, mText, "/questtrigger " + Integer.toString(mIdx));
+		MessagingUtils.sendClickableNPCMessage(plugin, player, mText,
+		                                       "/questtrigger " + Integer.toString(mIdx));
 	}
 
 	public void doActionsIfIdxMatches(Plugin plugin, Player player, int idx) {
