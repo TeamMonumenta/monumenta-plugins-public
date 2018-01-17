@@ -6,7 +6,6 @@ import java.util.Set;
 import org.bukkit.entity.Player;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import pe.project.utils.ScoreboardUtils;
 
@@ -32,48 +31,40 @@ public class PrerequisiteCheckScores implements PrerequisiteBase {
 	String mScoreName;
 	ScoreRange mRange;
 
-	public PrerequisiteCheckScores(JsonElement element) throws Exception {
-		JsonObject object = element.getAsJsonObject();
-		if (object == null) {
-			throw new Exception("check_scores value is not an object!");
-		}
+	public PrerequisiteCheckScores(String scoreName, JsonElement value) throws Exception {
+		mScoreName = scoreName;
 
-		Set<Entry<String, JsonElement>> entries = object.entrySet();
-		for (Entry<String, JsonElement> ent : entries) {
-			mScoreName = ent.getKey();
-			JsonElement value = ent.getValue();
-
-			if (value.isJsonPrimitive()) {
-				//	Single value
-				Integer score = value.getAsInt();
-				if (score == null) {
-					throw new Exception("check_score value for scoreboard '" + mScoreName + "' is not an integer");
-				}
-
-				mRange = new ScoreRange(score);
-			} else {
-				Integer imin = Integer.MIN_VALUE;
-				Integer imax = Integer.MAX_VALUE;
-
-				Set<Entry<String, JsonElement>> subentries = value.getAsJsonObject().entrySet();
-				for (Entry<String, JsonElement> subent : subentries) {
-					String key = subent.getKey();
-
-					if (key.equals("min")) {
-						imin = subent.getValue().getAsInt();
-					} else if (key.equals("max")) {
-						imax = subent.getValue().getAsInt();
-					} else {
-						throw new Exception("Unknown check_score value: '" + key + "'");
-					}
-				}
-
-				if (imin == Integer.MIN_VALUE && imax == Integer.MAX_VALUE) {
-					throw new Exception("Bogus check_score object with no min or max");
-				}
-
-				mRange = new ScoreRange(imin, imax);
+		if (value.isJsonPrimitive()) {
+			//	Single value
+			Integer score = value.getAsInt();
+			if (score == null) {
+				throw new Exception("check_score value for scoreboard '" + mScoreName + "' is not an integer");
 			}
+
+			mRange = new ScoreRange(score);
+		} else {
+			// Range of values
+			Integer imin = Integer.MIN_VALUE;
+			Integer imax = Integer.MAX_VALUE;
+
+			Set<Entry<String, JsonElement>> subentries = value.getAsJsonObject().entrySet();
+			for (Entry<String, JsonElement> subent : subentries) {
+				String rangeKey = subent.getKey();
+
+				if (rangeKey.equals("min")) {
+					imin = subent.getValue().getAsInt();
+				} else if (rangeKey.equals("max")) {
+					imax = subent.getValue().getAsInt();
+				} else {
+					throw new Exception("Unknown check_score value: '" + rangeKey + "'");
+				}
+			}
+
+			if (imin == Integer.MIN_VALUE && imax == Integer.MAX_VALUE) {
+				throw new Exception("Bogus check_score object with no min or max");
+			}
+
+			mRange = new ScoreRange(imin, imax);
 		}
 	}
 

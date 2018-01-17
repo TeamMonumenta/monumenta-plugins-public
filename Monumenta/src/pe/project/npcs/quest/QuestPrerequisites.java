@@ -27,26 +27,30 @@ class QuestPrerequisites {
 		Set<Entry<String, JsonElement>> entries = object.entrySet();
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
+			JsonElement value = ent.getValue();
 
-			if (!key.equals("check_scores") && !key.equals("items_in_inventory")) {
-				throw new Exception("Unknown prerequisites key: '" + key + "'");
-			}
-
-			// All prerequisite entries are JSON arrays
-			JsonArray array = object.getAsJsonArray(key);
-			if (array == null) {
-				throw new Exception("Prerequisites value for key '" + key + "' is not an array!");
-			}
-
-			Iterator<JsonElement> iter = array.iterator();
-			while (iter.hasNext()) {
-				JsonElement entry = iter.next();
-
-				if (key.equals("check_scores")) {
-					mPrerequisites.add(new PrerequisiteCheckScores(entry));
-				} else if (key.equals("items_in_inventory")) {
-					mPrerequisites.add(new PrerequisiteItemsInInventory(entry));
+			if (key.equals("check_scores")) {
+				JsonObject scoreObject = value.getAsJsonObject();
+				if (scoreObject == null) {
+					throw new Exception("check_scores value is not an object!");
 				}
+
+				Set<Entry<String, JsonElement>> scoreEntries = scoreObject.entrySet();
+				for (Entry<String, JsonElement> scoreEnt : scoreEntries) {
+					mPrerequisites.add(new PrerequisiteCheckScores(scoreEnt.getKey(), scoreEnt.getValue()));
+				}
+			} else if (key.equals("items_in_inventory")) {
+				JsonArray array = value.getAsJsonArray();
+				if (array == null) {
+					throw new Exception("Prerequisites value for key '" + key + "' is not an array!");
+				}
+
+				Iterator<JsonElement> iter = array.iterator();
+				while (iter.hasNext()) {
+					mPrerequisites.add(new PrerequisiteItemsInInventory(iter.next()));
+				}
+			} else {
+				throw new Exception("Unknown prerequisites key: '" + key + "'");
 			}
 		}
 	}
