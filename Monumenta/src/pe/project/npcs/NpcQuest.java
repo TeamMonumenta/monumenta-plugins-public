@@ -48,7 +48,7 @@ public class NpcQuest {
 			}
 
 			// Read the npc's display name
-			JsonElement displayName = object.get("displayName");
+			JsonElement displayName = object.get("display_name");
 			if (displayName == null) {
 				mDisplayName = mNpcName;
 			} else {
@@ -62,7 +62,7 @@ public class NpcQuest {
 			for (Entry<String, JsonElement> ent : entries) {
 				String key = ent.getKey();
 
-				if (!key.equals("npc") && !key.equals("displayName") && !key.equals("quest_components")) {
+				if (!key.equals("npc") && !key.equals("display_name") && !key.equals("quest_components")) {
 					throw new Exception("Unknown quest key: " + key);
 				}
 
