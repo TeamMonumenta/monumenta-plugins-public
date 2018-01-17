@@ -3,6 +3,7 @@ package pe.project.npcs.quest;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.google.gson.JsonElement;
@@ -14,7 +15,8 @@ public class QuestComponent {
 	private QuestPrerequisites mPrerequisites = null;
 	private QuestActions mActions = null;
 
-	public QuestComponent(String npcName, String displayName, JsonElement element) throws Exception {
+	public QuestComponent(String npcName, String displayName,
+	                      EntityType entityType, JsonElement element) throws Exception {
 		JsonObject object = element.getAsJsonObject();
 		if (object == null) {
 			throw new Exception("quest_components value is not an object!");
@@ -31,7 +33,8 @@ public class QuestComponent {
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
 
-			if (!key.equals("prerequisites") && !key.equals("actions") && !key.equals("delay_actions_by_ticks")) {
+			if (!key.equals("prerequisites") && !key.equals("actions")
+			&& !key.equals("delay_actions_by_ticks")) {
 				throw new Exception("Unknown quest_components key: " + key);
 			}
 
@@ -45,7 +48,7 @@ public class QuestComponent {
 			if (key.equals("prerequisites")) {
 				mPrerequisites = new QuestPrerequisites(value);
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, displayName, delayTicks, value);
+				mActions = new QuestActions(npcName, displayName, entityType, delayTicks, value);
 			}
 		}
 

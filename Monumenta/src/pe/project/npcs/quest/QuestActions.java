@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -25,7 +26,8 @@ public class QuestActions {
 	ArrayList<ActionBase> mActions = new ArrayList<ActionBase>();
 	int mDelayTicks = 0;
 
-	public QuestActions(String npcName, String displayName, int delayTicks, JsonElement element) throws Exception {
+	public QuestActions(String npcName, String displayName, EntityType entityType,
+	                    int delayTicks, JsonElement element) throws Exception {
 		mDelayTicks = delayTicks;
 
 		JsonArray array = element.getAsJsonArray();
@@ -60,7 +62,7 @@ public class QuestActions {
 				}
 
 				if (key.equals("dialog")) {
-					mActions.add(new ActionDialog(npcName, displayName, value));
+					mActions.add(new ActionDialog(npcName, displayName, entityType, value));
 				} else if (key.equals("set_scores")) {
 					mActions.add(new ActionSetScores(value));
 				} else if (key.equals("command")) {
@@ -68,7 +70,7 @@ public class QuestActions {
 				} else if (key.equals("function")) {
 					mActions.add(new ActionFunction(value));
 				} else if (key.equals("rerun_components")) {
-					mActions.add(new ActionRerunComponents(npcName));
+					mActions.add(new ActionRerunComponents(npcName, entityType));
 				}
 			}
 		}
@@ -84,7 +86,7 @@ public class QuestActions {
 			// If delayed, only one delayed group of actions is allowed per player
 			if (!player.hasMetadata(Constants.PLAYER_QUEST_ACTIONS_LOCKED_METAKEY)) {
 				player.setMetadata(Constants.PLAYER_QUEST_ACTIONS_LOCKED_METAKEY,
-								   new FixedMetadataValue(plugin, true));
+				                   new FixedMetadataValue(plugin, true));
 
 				player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 					@Override

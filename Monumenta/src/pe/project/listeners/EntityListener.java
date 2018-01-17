@@ -83,19 +83,20 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	//	An Entity hit another Entity.
+	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
+		Entity damager = event.getDamager();
 
-		//	If the entity getting hurt is the player.
+		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
-			Entity damager = event.getDamager();
 			if (damager instanceof LivingEntity) {
 				Player player = (Player)damagee;
-				mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager, event.getFinalDamage());
+				mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
+																		  event.getFinalDamage());
 			} else if (damager instanceof Firework) {
-				//	If we're hit by a rocket, cancel the damage.
+				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
 			} else {
 				if (damager instanceof Projectile) {
@@ -106,26 +107,27 @@ public class EntityListener implements Listener {
 					}
 				}
 			}
-		} else if (damagee instanceof LivingEntity) {
-			Entity damager = event.getDamager();
-
+		} else {
 			if (damager instanceof Player) {
-				if (damagee instanceof Villager) {
-					mPlugin.mNpcManager.interactEvent(mPlugin, (Player)damager, damagee.getCustomName());
+				Player player = (Player)damager;
+
+				if (mPlugin.mNpcManager.interactEvent(mPlugin, player, damagee.getCustomName(), damagee.getType())) {
+					// This resulted in a quest interaction - cancel the damage event
+					event.setCancelled(true);
+					return;
 				} else {
-					//	Make sure to not trigger class abilities off Throrns.
+					//  Make sure to not trigger class abilities off Throrns.
 					if (event.getCause() != DamageCause.THORNS) {
-						Player player = (Player)damager;
 
 						if (damagee.hasMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY)
-								&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+							&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
 							// This damage was just added by the player's class - don't process class effects again
 							return;
 						} else {
 							// New damage this tick - mark entity so that this event handler will be skipped if
 							// more damage is applied by the player's class
 							damagee.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
-							                    new FixedMetadataValue(mPlugin, player.getTicksLived()));
+												new FixedMetadataValue(mPlugin, player.getTicksLived()));
 						}
 
 						BaseClass _class = mPlugin.getClass(player);
@@ -145,7 +147,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		//	Don't hurt Villagers!
+		//  Don't hurt Villagers!
 		if (damagee instanceof Villager) {
 			event.setCancelled(true);
 		}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -18,7 +19,8 @@ import pe.project.utils.LocationUtils.LocationType;
 public class DialogClickableText implements DialogBase {
 	private ArrayList<DialogClickableTextEntry> mEntries = new ArrayList<DialogClickableTextEntry>();
 
-	public DialogClickableText(String npcName, String displayName, JsonElement element) throws Exception {
+	public DialogClickableText(String npcName, String displayName,
+	                           EntityType entityType, JsonElement element) throws Exception {
 		/*
 		 * Integer used to determine which of the available clickable entries was
 		 * clicked when a player clicks a chat message
@@ -30,11 +32,11 @@ public class DialogClickableText implements DialogBase {
 		int entryIdx = (new Random()).nextInt();
 
 		if (element.isJsonObject()) {
-			mEntries.add(new DialogClickableTextEntry(npcName, displayName, element, entryIdx));
+			mEntries.add(new DialogClickableTextEntry(npcName, displayName, entityType, element, entryIdx));
 		} else if (element.isJsonArray()) {
 			Iterator<JsonElement> iter = element.getAsJsonArray().iterator();
 			while (iter.hasNext()) {
-				mEntries.add(new DialogClickableTextEntry(npcName, displayName, iter.next(), entryIdx));
+				mEntries.add(new DialogClickableTextEntry(npcName, displayName, entityType, iter.next(), entryIdx));
 
 				entryIdx++;
 			}
