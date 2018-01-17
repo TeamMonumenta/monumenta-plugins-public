@@ -3,6 +3,7 @@ package pe.project.npcs.quest.prerequisites;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,6 +15,7 @@ import pe.project.utils.InventoryUtils;
 public class PrerequisiteItemsInInventory implements PrerequisiteBase {
 	String mName = "";
 	String mLore = "";
+	Material mType = Material.AIR;
 	int mCount = 1;
 
 	public PrerequisiteItemsInInventory(JsonElement element) throws Exception {
@@ -25,16 +27,10 @@ public class PrerequisiteItemsInInventory implements PrerequisiteBase {
 		Set<Entry<String, JsonElement>> entries = object.entrySet();
 		for (Entry<String, JsonElement> ent : entries) {
 			String key = ent.getKey();
+			JsonElement value = ent.getValue();
 
-			if (!key.equals("lore") && !key.equals("name") && !key.equals("count")) {
+			if (!key.equals("lore") && !key.equals("name") && !key.equals("count") && !key.equals("type")) {
 				throw new Exception("Unknown items_in_inventory key: " + key);
-			}
-
-			// All quest_components entries are single JSON things that should be passed
-			// to their respective handlers
-			JsonElement value = object.get(key);
-			if (value == null) {
-				throw new Exception("items_in_inventory value for key '" + key + "' is not parseable!");
 			}
 
 			if (key.equals("lore")) {
@@ -49,6 +45,18 @@ public class PrerequisiteItemsInInventory implements PrerequisiteBase {
 				}
 			} else if (key.equals("count")) {
 				mCount = value.getAsInt();
+			} else if (key.equals("type")) {
+				String typeStr = value.getAsString();
+				if (typeStr == null) {
+					throw new Exception("items_in_inventory type entry is not a string!");
+				}
+				try {
+					mType = Material.valueOf(typeStr);
+				} catch (IllegalArgumentException e) {
+					throw new Exception("Unknown Material '" + typeStr +
+					                    "' - it should be one of the values in this list: " +
+					                    "https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html");
+				}
 			}
 		}
 	}
@@ -62,7 +70,8 @@ public class PrerequisiteItemsInInventory implements PrerequisiteBase {
 			ItemStack item = player.getInventory().getItem(i);
 
 			if (InventoryUtils.testForItemWithName(item, mName) &&
-			    InventoryUtils.testForItemWithLore(item, mLore)) {
+			    InventoryUtils.testForItemWithLore(item, mLore) &&
+			    (mType.equals(Material.AIR) || mType.equals(item.getType()))) {
 				matchCount += item.getAmount();
 			}
 
