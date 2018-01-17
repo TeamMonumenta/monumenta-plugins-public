@@ -52,10 +52,10 @@ public class NpcQuest {
 			if (displayName == null) {
 				mDisplayName = mNpcName;
 			} else {
-		    mDisplayName = displayName.getAsString();
-		    if (mDisplayName == null) {
-			    mDisplayName = mNpcName;
-		    }
+				mDisplayName = displayName.getAsString();
+				if (mDisplayName == null) {
+					mDisplayName = mNpcName;
+				}
 			}
 
 			Set<Entry<String, JsonElement>> entries = object.entrySet();
@@ -78,7 +78,7 @@ public class NpcQuest {
 					while (iter.hasNext()) {
 						JsonElement entry = iter.next();
 
-						mComponents.add(new QuestComponent(mDisplayName, entry));
+						mComponents.add(new QuestComponent(mNpcName, mDisplayName, entry));
 					}
 				}
 			}

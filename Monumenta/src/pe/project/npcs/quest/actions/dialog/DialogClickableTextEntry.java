@@ -17,7 +17,7 @@ public class DialogClickableTextEntry implements DialogBase {
 	private QuestActions mActions;
 	private int mIdx;
 
-	public DialogClickableTextEntry(String npcName, JsonElement element, int elementIdx) throws Exception {
+	public DialogClickableTextEntry(String npcName, String displayName, JsonElement element, int elementIdx) throws Exception {
 		mIdx = elementIdx;
 
 		JsonObject object = element.getAsJsonObject();
@@ -53,7 +53,7 @@ public class DialogClickableTextEntry implements DialogBase {
 					throw new Exception("clickable_text player_text entry is not a string!");
 				}
 			} else if (key.equals("actions")) {
-				mActions = new QuestActions(npcName, delayTicks, value);
+				mActions = new QuestActions(npcName, displayName, delayTicks, value);
 			}
 		}
 
