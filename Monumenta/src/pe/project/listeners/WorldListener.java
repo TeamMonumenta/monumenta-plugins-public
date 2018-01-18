@@ -102,7 +102,13 @@ public class WorldListener implements Listener {
 			new Vector(0, 1, 0),
 			new Vector(0, -1, 0),
 			new Vector(0, 0, 1),
-			new Vector(0, 0, -1)
+			new Vector(0, 0, -1),
+
+			// Acacia fix
+			new Vector(-1, 1, 0),
+			new Vector(1, 1, 0),
+			new Vector(0, 1, -1),
+			new Vector(0, 1, 1)
 		);
 
 		while (!locList.isEmpty()) {
