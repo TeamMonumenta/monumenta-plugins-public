@@ -56,12 +56,7 @@ public class NpcManager {
 
 							if (sender != null) {
 								sender.sendMessage(ChatColor.RED + "Failed to load quest file '" + file.getPath() + "'");
-								String errorMessage = e.getLocalizedMessage();
-								if (errorMessage != null) {
-								  sender.sendMessage(ChatColor.RED + errorMessage);
-								} else {
-								  MessagingUtils.sendStackTrace(sender, e);
-								}
+							  MessagingUtils.sendStackTrace(sender, e);
 							}
 						}
 					}
