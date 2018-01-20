@@ -14,16 +14,37 @@ import pe.project.utils.ScoreboardUtils;
 
 public class ActionSetScores implements ActionBase {
 	protected class SetScore {
+		// This should be an enum, but idk how to set those up. -Nick
+		int mOperation;
+		private static final int SET_EXACT = 1;
+		private static final int SET_COPY = 2;
+
 		String mScoreboard;
+		String mSourceScore;
 		int mValue;
 
 		SetScore(String scoreboard, int value) {
 			mScoreboard = scoreboard;
 			mValue = value;
+			mOperation = SET_EXACT;
+		}
+
+		SetScore(String destinationScore, String sourceScore) {
+			mScoreboard = destinationScore;
+			mSourceScore = sourceScore;
+			mOperation = SET_COPY;
 		}
 
 		void apply(Player player) {
-			ScoreboardUtils.setScoreboardValue(player, mScoreboard, mValue);
+			switch (mOperation) {
+			  case SET_EXACT:
+			    ScoreboardUtils.setScoreboardValue(player, mScoreboard, mValue);
+			    break;
+			  case SET_COPY:
+			    int temp_score = ScoreboardUtils.getScoreboardValue(player, mSourceScore);
+			    ScoreboardUtils.setScoreboardValue(player, mScoreboard, temp_score);
+			    break;
+			}
 		}
 	}
 
@@ -43,7 +64,15 @@ public class ActionSetScores implements ActionBase {
 			while (scoreIter.hasNext()) {
 				Entry<String, JsonElement> scoreEntry = scoreIter.next();
 
-				mScoresToSet.add(new SetScore(scoreEntry.getKey(), scoreEntry.getValue().getAsInt()));
+				String key = scoreEntry.getKey();
+
+				String valueAsString = scoreEntry.getValue().getAsString();
+				if (valueAsString != null) {
+				  mScoresToSet.add(new SetScore(key, valueAsString));
+				} else {
+				  int valueAsInt = scoreEntry.getValue().getAsInt();
+			    mScoresToSet.add(new SetScore(key, valueAsInt));
+			  }
 			}
 		}
 	}
