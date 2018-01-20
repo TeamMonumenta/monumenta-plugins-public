@@ -37,13 +37,13 @@ public class ActionSetScores implements ActionBase {
 
 		void apply(Player player) {
 			switch (mOperation) {
-			  case SET_EXACT:
-			    ScoreboardUtils.setScoreboardValue(player, mScoreboard, mValue);
-			    break;
-			  case SET_COPY:
-			    int temp_score = ScoreboardUtils.getScoreboardValue(player, mSourceScore);
-			    ScoreboardUtils.setScoreboardValue(player, mScoreboard, temp_score);
-			    break;
+			case SET_EXACT:
+				ScoreboardUtils.setScoreboardValue(player, mScoreboard, mValue);
+				break;
+			case SET_COPY:
+				int temp_score = ScoreboardUtils.getScoreboardValue(player, mSourceScore);
+				ScoreboardUtils.setScoreboardValue(player, mScoreboard, temp_score);
+				break;
 			}
 		}
 	}
@@ -66,13 +66,19 @@ public class ActionSetScores implements ActionBase {
 
 				String key = scoreEntry.getKey();
 
-				String valueAsString = scoreEntry.getValue().getAsString();
-				if (valueAsString != null) {
-				  mScoresToSet.add(new SetScore(key, valueAsString));
-				} else {
-				  int valueAsInt = scoreEntry.getValue().getAsInt();
-			    mScoresToSet.add(new SetScore(key, valueAsInt));
-			  }
+				// First try to parse the item as an integer
+				try {
+					int valueAsInt = scoreEntry.getValue().getAsInt();
+					mScoresToSet.add(new SetScore(key, valueAsInt));
+				} catch (Exception e) {
+					// If that failed, try a string instead
+					String valueAsString = scoreEntry.getValue().getAsString();
+					if (valueAsString != null) {
+						mScoresToSet.add(new SetScore(key, valueAsString));
+					} else {
+						throw new Exception("set_scores entry is neither an integer nor a string!");
+					}
+				}
 			}
 		}
 	}
