@@ -75,6 +75,8 @@ public class ItemOverrides {
 
 		mItems.put(Material.MOB_SPAWNER, new MobSpawnerOverride());
 		mItems.put(Material.FLOWER_POT, new FlowerPotOverride());
+		mItems.put(Material.CHEST, new ChestOverride());
+		mItems.put(Material.TRAPPED_CHEST, new ChestOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
