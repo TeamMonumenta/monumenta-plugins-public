@@ -79,7 +79,8 @@ public class ItemOverrides {
 		mItems.put(Material.TRAPPED_CHEST, new ChestOverride());
 	}
 
-	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
+	                                     Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem itemOverride = mItems.get(itemType);
@@ -97,7 +98,8 @@ public class ItemOverrides {
 		return notCancelled;
 	}
 
-	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
+	                                    Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem itemOverride = mItems.get(itemType);
@@ -115,50 +117,30 @@ public class ItemOverrides {
 		return notCancelled;
 	}
 
-	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
+	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
+	                                           ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		OverrideItem override = mItems.get(itemType);
 
 		return (override != null) ? override.rightClickEntityInteraction(plugin, player, clickedEntity, itemInHand) : true;
 	}
 
-	public boolean physicsInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean physicsInteraction(Plugin plugin, Player player, Action action, ItemStack item,
+	                                  Block block) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem override = mItems.get(blockType);
 
 		return (override != null) ? override.physicsInteraction(plugin, player, block) : true;
 	}
 
-	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
-		//	Don't allow placing of certain items with Lore.
-		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() != GameMode.CREATIVE
-			&& !(ALLOW_LORE_MATS.contains(item.getType()))) {
-			return false;
-		}
-
-		//	If it's not not a certain lore item go ahead and run the normal override place interaction.
-		Material blockType = item.getType();
-		OverrideItem override = mItems.get(blockType);
-
-		return (override != null) ? override.blockPlaceInteraction(plugin, player, item, event) : true;
-	}
-
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	// Returns eventCancelled = true if disallowed, otherwise false
+	private boolean _safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
 		boolean eventCancelled = false;
-		OverrideItem override = mItems.get(block.getType());
-		if (override != null) {
-			eventCancelled = !override.blockBreakInteraction(plugin, player, block);
-		}
-
-		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
-				eventCancelled = true;
-			}
-		}
 
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (LocationUtils.getLocationType(plugin, block.getLocation()) != LocationType.None) {
+			if (LocationUtils.getLocationType(plugin, block.getLocation()) != LocationType.None &&
+			    LocationUtils.getLocationType(plugin, player.getLocation()) == LocationType.None) {
 				// Allow breaking if the player would be in survival mode at that spot
 				Location testLocation = block.getLocation();
 				testLocation.setY(10.0);
@@ -168,6 +150,46 @@ public class ItemOverrides {
 				}
 			}
 		}
+
+		return eventCancelled;
+	}
+
+	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
+	                                     BlockPlaceEvent event) {
+		boolean eventCancelled = false;
+
+		//  If it's not not a certain lore item go ahead and run the normal override place interaction.
+		OverrideItem override = mItems.get(item.getType());
+		if (override != null) {
+			eventCancelled |= !override.blockPlaceInteraction(plugin, player, item, event);
+		}
+
+		//  Don't allow placing of certain items with Lore.
+		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() != GameMode.CREATIVE
+		    && !(ALLOW_LORE_MATS.contains(item.getType()))) {
+			eventCancelled |= true;
+		}
+
+		eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, event.getBlockPlaced());
+
+		return !eventCancelled;
+	}
+
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+		boolean eventCancelled = false;
+
+		OverrideItem override = mItems.get(block.getType());
+		if (override != null) {
+			eventCancelled |= !override.blockBreakInteraction(plugin, player, block);
+		}
+
+		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
+		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
+		    plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
+			eventCancelled |= true;
+		}
+
+		eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, block);
 
 		return !eventCancelled;
 	}
