@@ -78,10 +78,15 @@ public class PrerequisiteItemsInInventory implements PrerequisiteBase {
 			if (mCount <= 0 && matchCount > 0) {
 				// Found an item where none should be - fail
 				return false;
-			} else if (matchCount >= mCount) {
+			} else if (mCount > 0 && matchCount >= mCount) {
 				// Found at least the correct number of items
 				return true;
 			}
+		}
+
+		// Searched entire inventory and didn't find any when didn't expect to
+		if (mCount <= 0 && matchCount <= 0) {
+			return true;
 		}
 
 		return false;
