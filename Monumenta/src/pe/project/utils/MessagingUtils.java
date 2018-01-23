@@ -27,7 +27,12 @@ import org.bukkit.entity.Player;
 import pe.project.Plugin;
 
 public class MessagingUtils {
+	public static String translatePlayerName(Player player, String message) {
+		return(message.replaceAll("@S",player.getName()));
+	}
+
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
+		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = new TextComponent( message );
 		formattedMessage.setColor( ChatColor.YELLOW );
 		player.spigot().sendMessage( ChatMessageType.ACTION_BAR, formattedMessage );
@@ -40,6 +45,7 @@ public class MessagingUtils {
 	}
 
 	public static void sendNPCMessage(Player player, String displayName, String message) {
+		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = new TextComponent( "[" + displayName + "] " );
 		formattedMessage.setColor( ChatColor.GOLD );
 		TextComponent tempText = new TextComponent( message );
@@ -50,6 +56,7 @@ public class MessagingUtils {
 	}
 
 	public static void sendRawMessage(Player player, String message) {
+		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = new TextComponent( ChatColor.translateAlternateColorCodes('&', message) );
 		player.spigot().sendMessage(formattedMessage);
 	}
