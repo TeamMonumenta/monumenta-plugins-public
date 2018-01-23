@@ -134,6 +134,7 @@ public class ItemOverrides {
 	}
 
 	// Returns eventCancelled = true if disallowed, otherwise false
+	@SuppressWarnings({"unused"})
 	private boolean _safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
 		boolean eventCancelled = false;
 
@@ -170,7 +171,8 @@ public class ItemOverrides {
 			eventCancelled |= true;
 		}
 
-		eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, event.getBlockPlaced());
+		// NOTE: This is disabled because while functionally nicer, players don't like it
+		//eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, event.getBlockPlaced());
 
 		return !eventCancelled;
 	}
@@ -189,7 +191,8 @@ public class ItemOverrides {
 			eventCancelled |= true;
 		}
 
-		eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, block);
+		// NOTE: This is disabled because, while functionally nicer, players don't like it
+		//eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, block);
 
 		return !eventCancelled;
 	}
