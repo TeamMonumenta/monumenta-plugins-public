@@ -29,7 +29,8 @@ class QuestPrerequisites {
 			String key = ent.getKey();
 			JsonElement value = ent.getValue();
 
-			if (key.equals("check_scores")) {
+			switch(key) {
+			case "check_scores":
 				JsonObject scoreObject = value.getAsJsonObject();
 				if (scoreObject == null) {
 					throw new Exception("check_scores value is not an object!");
@@ -39,7 +40,8 @@ class QuestPrerequisites {
 				for (Entry<String, JsonElement> scoreEnt : scoreEntries) {
 					mPrerequisites.add(new PrerequisiteCheckScores(scoreEnt.getKey(), scoreEnt.getValue()));
 				}
-			} else if (key.equals("items_in_inventory")) {
+				break;
+			case "items_in_inventory":
 				JsonArray array = value.getAsJsonArray();
 				if (array == null) {
 					throw new Exception("Prerequisites value for key '" + key + "' is not an array!");
@@ -49,7 +51,8 @@ class QuestPrerequisites {
 				while (iter.hasNext()) {
 					mPrerequisites.add(new PrerequisiteItemsInInventory(iter.next()));
 				}
-			} else {
+				break;
+			default:
 				throw new Exception("Unknown prerequisites key: '" + key + "'");
 			}
 		}

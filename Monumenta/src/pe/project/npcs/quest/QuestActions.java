@@ -20,7 +20,7 @@ import pe.project.npcs.quest.actions.ActionCommand;
 import pe.project.npcs.quest.actions.ActionDialog;
 import pe.project.npcs.quest.actions.ActionFunction;
 import pe.project.npcs.quest.actions.ActionRerunComponents;
-import pe.project.npcs.quest.actions.ActionSetScores;
+import pe.project.npcs.quest.actions.ActionSetScore;
 
 public class QuestActions {
 	ArrayList<ActionBase> mActions = new ArrayList<ActionBase>();
@@ -48,12 +48,6 @@ public class QuestActions {
 			for (Entry<String, JsonElement> ent : entries) {
 				String key = ent.getKey();
 
-				if (!key.equals("dialog") && !key.equals("set_scores") &&
-				    !key.equals("command") && !key.equals("function") &&
-				    !key.equals("rerun_components")) {
-					throw new Exception("Unknown actions key: " + key);
-				}
-
 				// All action entries are single JSON things that should be passed
 				// to their respective handlers
 				JsonElement value = object.get(key);
@@ -61,16 +55,32 @@ public class QuestActions {
 					throw new Exception("actions value for key '" + key + "' is not parseable!");
 				}
 
-				if (key.equals("dialog")) {
+				switch (key) {
+				case "dialog":
 					mActions.add(new ActionDialog(npcName, displayName, entityType, value));
-				} else if (key.equals("set_scores")) {
-					mActions.add(new ActionSetScores(value));
-				} else if (key.equals("command")) {
+					break;
+				case "set_scores":
+					JsonObject scoreObject = value.getAsJsonObject();
+					if (scoreObject == null) {
+						throw new Exception("check_scores value is not an object!");
+					}
+
+					Set<Entry<String, JsonElement>> scoreEntries = scoreObject.entrySet();
+					for (Entry<String, JsonElement> scoreEnt : scoreEntries) {
+						mActions.add(new ActionSetScore(scoreEnt.getKey(), scoreEnt.getValue()));
+					}
+					break;
+				case "command":
 					mActions.add(new ActionCommand(value));
-				} else if (key.equals("function")) {
+					break;
+				case "function":
 					mActions.add(new ActionFunction(value));
-				} else if (key.equals("rerun_components")) {
+					break;
+				case "rerun_components":
 					mActions.add(new ActionRerunComponents(npcName, entityType));
+					break;
+				default:
+					throw new Exception("Unknown actions key: " + key);
 				}
 			}
 		}
