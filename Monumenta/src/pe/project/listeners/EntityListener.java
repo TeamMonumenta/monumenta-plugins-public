@@ -1,6 +1,7 @@
 package pe.project.listeners;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -153,6 +154,20 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	public static EnumSet<DamageCause> damageCausesIgnoredInTowns = EnumSet.of(
+		DamageCause.FALL,
+		DamageCause.FALLING_BLOCK,
+		DamageCause.FIRE,
+		DamageCause.FIRE_TICK,
+		DamageCause.FLY_INTO_WALL,
+		DamageCause.MAGIC,
+		DamageCause.POISON,
+		DamageCause.PROJECTILE,
+		DamageCause.STARVATION,
+		DamageCause.THORNS,
+		DamageCause.WITHER
+	);
+
 	//	Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageEvent(EntityDamageEvent event) {
@@ -161,6 +176,14 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
 			DamageCause source = event.getCause();
+
+			LocationType locType = LocationUtils.getLocationType(mPlugin, player.getLocation());
+			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
+				if (damageCausesIgnoredInTowns.contains(source)) {
+					event.setCancelled(true);
+				}
+			}
+
 			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {
 				//	If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
 				Location playerLoc = player.getLocation();
