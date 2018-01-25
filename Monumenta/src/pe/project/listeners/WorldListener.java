@@ -34,7 +34,7 @@ public class WorldListener implements Listener {
 		mWorld = world;
 	}
 
-	//	A Chunk Loaded.
+	//  A Chunk Loaded.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ChunkLoadEvent(ChunkLoadEvent event) {
 		Entity[] entities = event.getChunk().getEntities();
@@ -95,20 +95,23 @@ public class WorldListener implements Listener {
 		// Start at the first block of the structure/tree (the sapling)
 		locList.add(event.getLocation());
 
+		// Starting block is reachable - prevent it from being re-checked
+		event.getLocation().getBlock().removeMetadata(Constants.TREE_METAKEY, mPlugin);
+
 		// Convenience list of offsets to get adjacent blocks
 		List<Vector> adjacentOffsets = Arrays.asList(
-			new Vector(1, 0, 0),
-			new Vector(-1, 0, 0),
-			new Vector(0, 1, 0),
-			new Vector(0, 0, 1),
-			new Vector(0, 0, -1),
+		                                   new Vector(1, 0, 0),
+		                                   new Vector(-1, 0, 0),
+		                                   new Vector(0, 1, 0),
+		                                   new Vector(0, 0, 1),
+		                                   new Vector(0, 0, -1),
 
-			// Acacia fix
-			new Vector(-1, 1, 0),
-			new Vector(1, 1, 0),
-			new Vector(0, 1, -1),
-			new Vector(0, 1, 1)
-		);
+		                                   // Acacia fix
+		                                   new Vector(-1, 1, 0),
+		                                   new Vector(1, 1, 0),
+		                                   new Vector(0, 1, -1),
+		                                   new Vector(0, 1, 1)
+		                               );
 
 		while (!locList.isEmpty()) {
 			Location loc = locList.remove();
@@ -117,17 +120,13 @@ public class WorldListener implements Listener {
 			for (Vector vec : adjacentOffsets) {
 				Location tmpLoc = loc.clone().add(vec);
 				Block blk = tmpLoc.getBlock();
-				if (
-					blk.hasMetadata(Constants.TREE_METAKEY) &&
-					!blk.hasMetadata(Constants.TREE_KEEP_METAKEY)
-				) {
+				if (blk.hasMetadata(Constants.TREE_METAKEY)) {
 					locList.add(tmpLoc);
-					// Prevent this block from being checked again
-					blk.setMetadata(Constants.TREE_KEEP_METAKEY, new FixedMetadataValue(mPlugin, true));
+
+					// This block is reachable - prevent it from being checked again
+					blk.removeMetadata(Constants.TREE_METAKEY, mPlugin);
 				}
 			}
-
-			loc.getBlock().removeMetadata(Constants.TREE_METAKEY, mPlugin);
 		}
 
 		/*
@@ -139,10 +138,6 @@ public class WorldListener implements Listener {
 		while (iter.hasNext()) {
 			BlockState bs = iter.next();
 			Block blk = bs.getBlock();
-
-			if (blk.hasMetadata(Constants.TREE_KEEP_METAKEY)) {
-				blk.removeMetadata(Constants.TREE_KEEP_METAKEY, mPlugin);
-			}
 
 			if (blk.hasMetadata(Constants.TREE_METAKEY)) {
 				blk.removeMetadata(Constants.TREE_METAKEY, mPlugin);
