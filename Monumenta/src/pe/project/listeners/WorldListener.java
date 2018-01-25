@@ -100,7 +100,6 @@ public class WorldListener implements Listener {
 			new Vector(1, 0, 0),
 			new Vector(-1, 0, 0),
 			new Vector(0, 1, 0),
-			new Vector(0, -1, 0),
 			new Vector(0, 0, 1),
 			new Vector(0, 0, -1),
 
@@ -118,8 +117,13 @@ public class WorldListener implements Listener {
 			for (Vector vec : adjacentOffsets) {
 				Location tmpLoc = loc.clone().add(vec);
 				Block blk = tmpLoc.getBlock();
-				if (blk.hasMetadata(Constants.TREE_METAKEY)) {
+				if (
+					blk.hasMetadata(Constants.TREE_METAKEY) &&
+					!blk.hasMetadata(Constants.TREE_KEEP_METAKEY)
+				) {
 					locList.add(tmpLoc);
+					// Prevent this block from being checked again
+					blk.setMetadata(Constants.TREE_KEEP_METAKEY, new FixedMetadataValue(mPlugin, true));
 				}
 			}
 
@@ -135,6 +139,10 @@ public class WorldListener implements Listener {
 		while (iter.hasNext()) {
 			BlockState bs = iter.next();
 			Block blk = bs.getBlock();
+
+			if (blk.hasMetadata(Constants.TREE_KEEP_METAKEY)) {
+				blk.removeMetadata(Constants.TREE_KEEP_METAKEY, mPlugin);
+			}
 
 			if (blk.hasMetadata(Constants.TREE_METAKEY)) {
 				blk.removeMetadata(Constants.TREE_METAKEY, mPlugin);
