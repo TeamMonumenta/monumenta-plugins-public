@@ -3,6 +3,7 @@ package pe.project.managers;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.EnumSet;
 
@@ -29,6 +30,9 @@ public class NpcManager {
 		if (Constants.NPCS_ENABLED) {
 			mNpcs = new HashMap<String, NpcQuest>();
 			ArrayList<File> listOfFiles;
+			ArrayList<String> listOfNpcs = new ArrayList<String>();
+			int numComponents = 0;
+			int numFiles = 0;
 
 			// Attempt to load all JSON files in subdirectories of "quests"
 			try {
@@ -50,11 +54,11 @@ public class NpcManager {
 							// Load this file into an NpcQuest object
 							NpcQuest npc = new NpcQuest(file.getPath());
 
-							if (sender != null) {
-								sender.sendMessage(ChatColor.GOLD + "Loaded " +
-								                   Integer.toString(npc.getComponents().size()) +
-								                   " quest components for NPC '" + npc.getNpcName() + "'");
-							}
+							// Keep track of loaded NPCs for debugging
+							int newComponents = npc.getComponents().size();
+							numComponents += newComponents;
+							numFiles++;
+							listOfNpcs.add(npc.getNpcName() + ":" + Integer.toString(newComponents));
 
 							// Track this type of entity from now on when entities are interacted with
 							mEntityTypes.add(npc.getEntityType());
@@ -77,6 +81,31 @@ public class NpcManager {
 							}
 						}
 					}
+				}
+			}
+
+			if (sender != null) {
+				sender.sendMessage(ChatColor.GOLD + "Loaded " +
+				                   Integer.toString(numComponents) +
+				                   " quest components from " + Integer.toString(numFiles) + " files");
+
+				Collections.sort(listOfNpcs);
+				String outMsg = "";
+				for (String npc : listOfNpcs) {
+					if (outMsg.isEmpty()) {
+						outMsg = npc;
+					} else {
+						outMsg = outMsg + ", " + npc;
+					}
+
+					if (outMsg.length() > 1000) {
+						sender.sendMessage(ChatColor.GOLD + outMsg);
+						outMsg = "";
+					}
+				}
+
+				if (!outMsg.isEmpty()) {
+					sender.sendMessage(ChatColor.GOLD + outMsg);
 				}
 			}
 		}
