@@ -159,7 +159,7 @@ public class Plugin extends JavaPlugin {
 		//	Add some slash commands
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
-			getCommand("playTimeStats").setExecutor(new PlayTimeStats(this, world));
+			getCommand("playTimeStats").setExecutor(new PlayTimeStats(world));
 			getCommand("chatRange").setExecutor(new ChatRangeCommand());
 			getCommand("isShitty").setExecutor(new IsShittyCommand());
 			getCommand("profiling").setExecutor(new ProfilingCommand(this));
