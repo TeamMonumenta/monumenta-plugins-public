@@ -52,6 +52,7 @@ public class QuestManager {
 		
 		//	Highwatch
 		_registerQuest(new SiegeOfHighwatch(mWorld));
+		_registerQuest(new VaultOfGlass(mWorld));
 		
 		//	Lowtide
 		_registerQuest(new TheSalmon(mWorld));
