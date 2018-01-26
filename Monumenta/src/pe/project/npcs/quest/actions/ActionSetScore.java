@@ -1,7 +1,5 @@
 package pe.project.npcs.quest.actions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
