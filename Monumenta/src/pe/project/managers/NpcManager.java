@@ -1,6 +1,8 @@
 package pe.project.managers;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.EnumSet;
 
@@ -12,6 +14,7 @@ import org.bukkit.entity.Player;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.npcs.NpcQuest;
+import pe.project.utils.FileUtils;
 import pe.project.utils.MessagingUtils;
 
 public class NpcManager {
@@ -25,12 +28,19 @@ public class NpcManager {
 	public void reload(Plugin plugin, CommandSender sender) {
 		if (Constants.NPCS_ENABLED) {
 			mNpcs = new HashMap<String, NpcQuest>();
+			ArrayList<File> listOfFiles;
 
-			String questLocation = plugin.getDataFolder() + File.separator +  "quests";
-			File[] listOfFiles = new File(questLocation).listFiles();
-
-			// TODO: Would be nice if this supported an arbitrary directory structure
-			// Perhaps walk all .json files?
+			// Attempt to load all JSON files in subdirectories of "quests"
+			try {
+				String questLocation = plugin.getDataFolder() + File.separator +  "quests";
+				listOfFiles = FileUtils.getFilesInDirectory(questLocation, ".json");
+			} catch (IOException e) {
+				plugin.getLogger().severe("Caught exception trying to reload NPCs: " + e);
+				if (sender != null) {
+					sender.sendMessage(ChatColor.RED + "Caught exception trying to reload NPCs: " + e);
+				}
+				return;
+			}
 
 			if (listOfFiles != null) {
 				for (File file : listOfFiles) {
@@ -63,7 +73,7 @@ public class NpcManager {
 
 							if (sender != null) {
 								sender.sendMessage(ChatColor.RED + "Failed to load quest file '" + file.getPath() + "'");
-							  MessagingUtils.sendStackTrace(sender, e);
+								MessagingUtils.sendStackTrace(sender, e);
 							}
 						}
 					}

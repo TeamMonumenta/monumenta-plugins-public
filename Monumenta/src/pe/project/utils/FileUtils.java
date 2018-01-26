@@ -1,13 +1,17 @@
 package pe.project.utils;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.FileVisitOption;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class FileUtils {
 	public static String readFile(String fileName) throws Exception, FileNotFoundException {
@@ -66,7 +70,8 @@ public class FileUtils {
 		}
 	}
 
-	public static void moveFile(String fromFile, String toFile) throws Exception, FileNotFoundException {
+	public static void moveFile(String fromFile, String toFile) throws Exception,
+	FileNotFoundException {
 		if (fromFile == null || fromFile.isEmpty()) {
 			throw new Exception("fromFile is null or empty");
 		}
@@ -86,5 +91,23 @@ public class FileUtils {
 
 		// Rename the file and overwrite anything there
 		sourceFile.renameTo(destFile);
+	}
+
+	/**
+	 * Returns a list of all files in the directory that are both regular files
+	 * AND end with the specified string
+	 */
+	public static ArrayList<File> getFilesInDirectory(String folderPath,
+			String endsWith) throws IOException {
+		ArrayList<File> matchedFiles = new ArrayList<File>();
+
+		Files.walk(Paths.get(folderPath), 100, FileVisitOption.FOLLOW_LINKS).forEach(path -> {
+			if (path.toString().toLowerCase().endsWith(endsWith)) {
+				// Note - this will pass directories that end with .json back to the caller too
+				matchedFiles.add(path.toFile());
+			}
+		});
+
+		return matchedFiles;
 	}
 }
