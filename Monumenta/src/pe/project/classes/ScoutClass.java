@@ -47,7 +47,7 @@ import pe.project.utils.ScoreboardUtils;
 
 public class ScoutClass extends BaseClass {
 	private static int SWIFTNESS_EFFECT_SPEED_LVL = 0;
-	private static int SWIFTNESS_EFFECT_JUMP_LVL = 2;
+	private static int SWIFTNESS_EFFECT_JUMP_LVL = 1;
 
 	private static int AGILITY_1_EFFECT_LVL = 0;
 	private static int AGILITY_2_EFFECT_LVL = 1;
