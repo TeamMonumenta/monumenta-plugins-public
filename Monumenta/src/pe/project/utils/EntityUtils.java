@@ -113,6 +113,43 @@ public class EntityUtils {
 		return null;
 	}
 
+	public static boolean hasLosToLocation(World world, Location fromLocation, Location toLocation, Vector direction, int range) {
+		BlockIterator bi;
+		try {
+			bi = new BlockIterator(world, fromLocation.toVector(), direction, 0, range);
+		}
+		catch(IllegalStateException e) { return false; }
+
+		int bx, by, bz;
+		int dist = 0;
+
+		int tx = toLocation.getBlockX();
+		int ty = toLocation.getBlockY();
+		int tz = toLocation.getBlockZ();
+
+		while( bi.hasNext() ) {
+			Block b = bi.next();
+			bx = b.getX();
+			by = b.getY();
+			bz = b.getZ();
+
+			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
+			if (LocationUtils.isLosBlockingBlock(b.getType())) {
+				break;
+			}
+
+			if (tx == bx && ty == by && tz == bz) {
+				return true;
+			} else if (dist > range) {
+				return false;
+			}
+
+			dist++;
+		}
+
+		return false;
+	}
+
     @SuppressWarnings({"unchecked", "rawtypes"})
 	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class arrowClass) {
 		Location loc = player.getEyeLocation();
