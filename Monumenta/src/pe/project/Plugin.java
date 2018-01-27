@@ -56,7 +56,7 @@ import pe.project.listeners.VehicleListener;
 import pe.project.listeners.WorldListener;
 import pe.project.managers.NpcManager;
 import pe.project.managers.POIManager;
-import pe.project.managers.QuestManager;
+import pe.project.managers.QuestCompassManager;
 import pe.project.managers.potion.PotionManager;
 import pe.project.server.properties.ServerProperties;
 import pe.project.timers.CombatLoggingTimers;
@@ -110,7 +110,7 @@ public class Plugin extends JavaPlugin {
 	public int mServerVersion = 0;
 	public int mDailyQuestVersion = 0;
 
-	public QuestManager mQuestManager;
+	public QuestCompassManager mQuestCompassManager;
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
@@ -119,6 +119,8 @@ public class Plugin extends JavaPlugin {
 	public SocketClient mSocketClient;
 
 	public ItemOverrides mItemOverrides;
+
+	public World mWorld;
 
 	//	Logic that is performed upon enabling the plugin.
 	@Override
@@ -133,8 +135,8 @@ public class Plugin extends JavaPlugin {
 		mPulseEffectTimers = new PulseEffectTimers(this);
 		mCombatLoggingTimers = new CombatLoggingTimers();
 
-		World world = Bukkit.getWorlds().get(0);
-		mProjectileEffectTimers = new ProjectileEffectTimers(world);
+		mWorld = Bukkit.getWorlds().get(0);
+		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
 
 		//	TODO: Move this out of here and into it's own ClassManager class.
 		//	Initialize Classes.
@@ -148,18 +150,18 @@ public class Plugin extends JavaPlugin {
 
 		//	TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
-		manager.registerEvents(new PlayerListener(this, world, mRandom), this);
+		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
-		manager.registerEvents(new EntityListener(this, world), this);
+		manager.registerEvents(new EntityListener(this, mWorld), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new ItemListener(this), this);
-		manager.registerEvents(new WorldListener(this, world), this);
+		manager.registerEvents(new WorldListener(this, mWorld), this);
 
 		//	TODO: Move this out of here and into it's own CommandManager class.
 		//	Add some slash commands
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
-			getCommand("playTimeStats").setExecutor(new PlayTimeStats(world));
+			getCommand("playTimeStats").setExecutor(new PlayTimeStats(mWorld));
 			getCommand("chatRange").setExecutor(new ChatRangeCommand());
 			getCommand("isShitty").setExecutor(new IsShittyCommand());
 			getCommand("profiling").setExecutor(new ProfilingCommand(this));
@@ -190,8 +192,8 @@ public class Plugin extends JavaPlugin {
 		}
 
 		mPotionManager = new PotionManager(this);
-		mQuestManager = new QuestManager(this, world);
-		mTrackingManager = new TrackingManager(this, world);
+		mQuestCompassManager = new QuestCompassManager(this);
+		mTrackingManager = new TrackingManager(this, mWorld);
 		mPOIManager = new POIManager(this);
 		mNpcManager = new NpcManager(this);
 
@@ -233,9 +235,9 @@ public class Plugin extends JavaPlugin {
 
 				//	4 times a second.
 				if (fourHertz) {
-					mTrackingManager.update(world, Constants.QUARTER_TICKS_PER_SECOND);
+					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
-					mCombatLoggingTimers.update(world, Constants.QUARTER_TICKS_PER_SECOND);
+					mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 				}
 
 				//	Every tick.

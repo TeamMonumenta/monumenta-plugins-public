@@ -1,74 +1,71 @@
 package pe.project.locations;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.World;
 
-import pe.project.locations.quest.Quest;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import pe.project.npcs.quest.QuestPrerequisites;
 
 public class LocationMarker {
-	private Quest mQuestOwner;
+	private QuestPrerequisites mPrerequisites;
 	private Location mLoc;
-	private String mDescription;
-	private int mMinRange;
-	private int mMaxRange;
+	private String mMessage;
 
-	public LocationMarker(Quest owner, Location loc, String description, int value) {
-		mQuestOwner = owner;
-		mLoc = loc;
-		mDescription = description;
-		mMinRange = value;
-		mMaxRange = value;
-	}
+	public LocationMarker(World world, JsonElement element) throws Exception {
+		JsonObject object = element.getAsJsonObject();
+		if (object == null) {
+			throw new Exception("locations value is not an object!");
+		}
 
-	public LocationMarker(Quest owner, Location loc, String description, int minRange, int maxRange) {
-		mQuestOwner = owner;
-		mLoc = loc;
-		mDescription = description;
-		mMinRange = minRange;
-		mMaxRange = maxRange;
+		// Reuse the same pre-requisites logic as the scripted quests
+		JsonElement prereq = object.get("prerequisites");
+		if (prereq == null) {
+			throw new Exception("Failed to parse location prerequisites!");
+		}
+		mPrerequisites = new QuestPrerequisites(prereq);
+
+		// Read x coordinate
+		JsonElement xElement = object.get("x");
+		int x = 0;
+		if (xElement == null) {
+			throw new Exception("Failed to parse location x value!");
+		}
+		x = xElement.getAsInt();
+
+		// Read z coordinate
+		JsonElement zElement = object.get("z");
+		int z = 0;
+		if (zElement == null) {
+			throw new Exception("Failed to parse location z value!");
+		}
+		z = zElement.getAsInt();
+
+		// Read message
+		JsonElement msgElement = object.get("message");
+		if (msgElement == null) {
+			throw new Exception("Failed to parse location message!");
+		}
+		mMessage = msgElement.getAsString();
+		if (mMessage == null) {
+			throw new Exception("Failed to parse location message as string!");
+		}
+
+		// Compute location
+		mLoc = new Location(world, x, 255, z);
 	}
 
 	public Location getLocation() {
 		return mLoc;
 	}
 
-	public String getMarkerDescription(Player player) {
-		List<LocationMarker> markers = mQuestOwner.getMarkers(player);
-
-		//	Loop through and count how many markers are with out range and also find out which number we are.
-		int count = 0;
-		int index = 0;
-		for (int i = 0; i < markers.size(); i++) {
-			LocationMarker currMarker = markers.get(i);
-
-			if (isWithinRange(currMarker.mMinRange, currMarker.mMaxRange)) {
-				count++;
-			}
-
-			if (this == currMarker) {
-				index = i;
-			}
-		}
-
-		String questNumber = "";
-		if (count > 1) {
-			questNumber = "[" +  (index+1) + "/" + count + "]";
-		}
-
-		String questName = (mQuestOwner != null) ? mQuestOwner.getQuestName() : "";
-		String message = ChatColor.AQUA + "" + ChatColor.BOLD + questName + ChatColor.RESET + " " + ChatColor.AQUA + questNumber + ": " + mDescription;
-
-		return message;
+	public String getMessage() {
+		return mMessage;
 	}
 
-	public boolean isWithinRange(int min, int max) {
-		return mMinRange >= min && mMaxRange <= max;
-	}
-
-	public boolean isActiveMarker(int value) {
-		return value >= mMinRange && value <= mMaxRange;
+	public boolean prerequisitesMet(Player player) {
+		return mPrerequisites.prerequisitesMet(player);
 	}
 }

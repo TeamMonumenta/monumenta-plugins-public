@@ -85,8 +85,8 @@ public class NpcQuest {
 				if (key.equals("quest_components")) {
 					JsonArray array = object.getAsJsonArray(key);
 					if (array == null) {
-						throw new Exception("Failed to parse 'quest_components' as array for file '" +
-						                    fileLocation + "' as JSON object");
+						throw new Exception("Failed to parse 'quest_components' for file '"
+						                    + fileLocation + "' as JSON array");
 					}
 
 					Iterator<JsonElement> iter = array.iterator();

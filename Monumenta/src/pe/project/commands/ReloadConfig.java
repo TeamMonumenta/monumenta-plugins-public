@@ -23,6 +23,7 @@ public class ReloadConfig implements CommandExecutor {
 
 		sender.sendMessage(ChatColor.GOLD + "Reloading config...");
 		mPlugin.mNpcManager.reload(mPlugin, sender);
+		mPlugin.mQuestCompassManager.reload(mPlugin, sender);
 
 		return true;
 	}

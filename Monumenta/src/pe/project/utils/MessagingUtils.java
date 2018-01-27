@@ -78,12 +78,12 @@ public class MessagingUtils {
 		}
 		formattedMessage.setColor( ChatColor.RED );
 
-		// Get the first 1000 characters of the stacktrace and send them to the player
+		// Get the first 300 characters of the stacktrace and send them to the player
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String sStackTrace = sw.toString();
-		sStackTrace = sStackTrace.substring(0, Math.min(sStackTrace.length(), 1000));
+		sStackTrace = sStackTrace.substring(0, Math.min(sStackTrace.length(), 300));
 
 		BaseComponent[] textStackTrace = new ComponentBuilder( sStackTrace.replace("\t","  ") ).color( ChatColor.RED ).create();
 		formattedMessage.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, textStackTrace ) );
