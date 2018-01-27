@@ -54,6 +54,7 @@ public class ItemOverrides {
 		mItems.put(Material.COMPASS, new CompassOverride());
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
 		mItems.put(Material.ANVIL, new AnvilOverride());
+		mItems.put(Material.ENCHANTMENT_TABLE, new EnchantmentTableOverride());
 		mItems.put(Material.GOLDEN_APPLE, new GoldenAppleOverride());
 		mItems.put(Material.ENDER_CHEST, new EnderChestOverride());
 		mItems.put(Material.SOIL, new FarmlandOverride());
