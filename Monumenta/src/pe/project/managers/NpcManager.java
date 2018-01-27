@@ -46,40 +46,35 @@ public class NpcManager {
 				return;
 			}
 
-			if (listOfFiles != null) {
-				for (File file : listOfFiles) {
-					String fileName = file.getName();
-					if (fileName.endsWith(".json")) {
-						try {
-							// Load this file into an NpcQuest object
-							NpcQuest npc = new NpcQuest(file.getPath());
+			for (File file : listOfFiles) {
+				try {
+					// Load this file into an NpcQuest object
+					NpcQuest npc = new NpcQuest(file.getPath());
 
-							// Keep track of loaded NPCs for debugging
-							int newComponents = npc.getComponents().size();
-							numComponents += newComponents;
-							numFiles++;
-							listOfNpcs.add(npc.getNpcName() + ":" + Integer.toString(newComponents));
+					// Keep track of statistics for pretty printing later
+					int newComponents = npc.getComponents().size();
+					numComponents += newComponents;
+					numFiles++;
+					listOfNpcs.add(npc.getNpcName() + ":" + Integer.toString(newComponents));
 
-							// Track this type of entity from now on when entities are interacted with
-							mEntityTypes.add(npc.getEntityType());
+					// Track this type of entity from now on when entities are interacted with
+					mEntityTypes.add(npc.getEntityType());
 
-							// Check if an existing NPC already exists with quest components
-							NpcQuest existingNpc = mNpcs.get(_squashNpcName(npc.getNpcName()));
-							if (existingNpc != null) {
-								// Existing NPC - add the new quest components to it
-								existingNpc.addFromQuest(plugin, npc);
-							} else {
-								mNpcs.put(_squashNpcName(npc.getNpcName()), npc);
-							}
-						} catch (Exception e) {
-							plugin.getLogger().severe("Caught exception: " + e);
-							e.printStackTrace();
+					// Check if an existing NPC already exists with quest components
+					NpcQuest existingNpc = mNpcs.get(_squashNpcName(npc.getNpcName()));
+					if (existingNpc != null) {
+						// Existing NPC - add the new quest components to it
+						existingNpc.addFromQuest(plugin, npc);
+					} else {
+						mNpcs.put(_squashNpcName(npc.getNpcName()), npc);
+					}
+				} catch (Exception e) {
+					plugin.getLogger().severe("Caught exception: " + e);
+					e.printStackTrace();
 
-							if (sender != null) {
-								sender.sendMessage(ChatColor.RED + "Failed to load quest file '" + file.getPath() + "'");
-								MessagingUtils.sendStackTrace(sender, e);
-							}
-						}
+					if (sender != null) {
+						sender.sendMessage(ChatColor.RED + "Failed to load quest file '" + file.getPath() + "'");
+						MessagingUtils.sendStackTrace(sender, e);
 					}
 				}
 			}

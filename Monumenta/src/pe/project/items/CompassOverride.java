@@ -55,7 +55,7 @@ public class CompassOverride extends OverrideItem {
 			}
 			//	Cycle active Quest.
 			else {
-				plugin.mQuestManager.cycleQuestTracker(player);
+				plugin.mQuestCompassManager.cycleQuestTracker(player);
 			}
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting places on this server shard.");
@@ -68,7 +68,7 @@ public class CompassOverride extends OverrideItem {
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (plugin.mServerProperties.getQuestCompassEnabled()) {
 			//	Show currently active quest.
-			plugin.mQuestManager.showCurrentQuest(player);
+			plugin.mQuestCompassManager.showCurrentQuest(player);
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting quest on this server shard.");
 		}

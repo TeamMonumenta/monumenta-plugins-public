@@ -16,10 +16,10 @@ import pe.project.npcs.quest.prerequisites.PrerequisiteCheckScores;
 import pe.project.npcs.quest.prerequisites.PrerequisiteItemsInInventory;
 import pe.project.npcs.quest.prerequisites.PrerequisiteLocation;
 
-class QuestPrerequisites {
+public class QuestPrerequisites {
 	ArrayList<PrerequisiteBase> mPrerequisites = new ArrayList<PrerequisiteBase>();
 
-	QuestPrerequisites(JsonElement element) throws Exception {
+	public QuestPrerequisites(JsonElement element) throws Exception {
 		JsonObject object = element.getAsJsonObject();
 		if (object == null) {
 			throw new Exception("prerequisites value is not an object!");
@@ -62,7 +62,7 @@ class QuestPrerequisites {
 		}
 	}
 
-	boolean prerequisitesMet(Player player) {
+	public boolean prerequisitesMet(Player player) {
 		for (PrerequisiteBase prerequisite : mPrerequisites) {
 			if (!prerequisite.prerequisiteMet(player)) {
 				return false;

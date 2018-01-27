@@ -34,7 +34,7 @@ public class QuestComponent {
 			String key = ent.getKey();
 
 			if (!key.equals("prerequisites") && !key.equals("actions")
-			&& !key.equals("delay_actions_by_ticks")) {
+				&& !key.equals("delay_actions_by_ticks")) {
 				throw new Exception("Unknown quest_components key: " + key);
 			}
 
