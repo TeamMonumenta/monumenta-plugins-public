@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import pe.project.npcs.quest.prerequisites.PrerequisiteBase;
 import pe.project.npcs.quest.prerequisites.PrerequisiteCheckScores;
 import pe.project.npcs.quest.prerequisites.PrerequisiteItemsInInventory;
+import pe.project.npcs.quest.prerequisites.PrerequisiteLocation;
 
 class QuestPrerequisites {
 	ArrayList<PrerequisiteBase> mPrerequisites = new ArrayList<PrerequisiteBase>();
@@ -51,6 +52,9 @@ class QuestPrerequisites {
 				while (iter.hasNext()) {
 					mPrerequisites.add(new PrerequisiteItemsInInventory(iter.next()));
 				}
+				break;
+			case "location":
+				mPrerequisites.add(new PrerequisiteLocation(value));
 				break;
 			default:
 				throw new Exception("Unknown prerequisites key: '" + key + "'");
