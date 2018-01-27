@@ -134,8 +134,12 @@ public class RogueClass extends BaseClass {
 							newLoc.setY(entity.getLocation().getY());
 							newLoc.setPitch(player.getLocation().getPitch());
 							newLoc.setYaw(player.getLocation().getYaw());
+							newLoc.setDirection(toPos.subtract(newLoc.toVector()).normalize());
 
-							player.teleport(newLoc);
+							//	+1 on the Y for eye height
+							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
+								player.teleport(newLoc);
+							}
 
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
 
