@@ -82,9 +82,9 @@ public class WarlockClass extends BaseClass {
 	private static int GRASPING_CLAWS_COOLDOWN = 24 * 20;
 
 	private static int SOUL_REND_ID = 75;
-	private static double SOUL_REND_HEAL_MULT = 0.333;
+	private static double SOUL_REND_HEAL_MULT = 0.4;
 	private static int SOUL_REND_RADIUS = 6;
-	private static int SOUL_REND_COOLDOWN = 10 * 20;
+	private static int SOUL_REND_COOLDOWN = 8 * 20;
 
 	public WarlockClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -122,6 +122,7 @@ public class WarlockClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 				if (InventoryUtils.isScytheItem(mainHand) && versatileMagic > 1) {	// If they also have a scythe in the mainHand
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 				}
 			}
 			//	Player has a scythe in their offHand
@@ -129,6 +130,7 @@ public class WarlockClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 				if (InventoryUtils.isWandItem(mainHand) && versatileMagic > 1) {		// If they also have a wand in the mainHand
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 				}
 			}
 		}
