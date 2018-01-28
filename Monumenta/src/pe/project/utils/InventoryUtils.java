@@ -115,6 +115,16 @@ public class InventoryUtils {
 
 		return false;
 	}
+	
+	public static boolean isScytheItem(ItemStack item) {
+		if (item != null) {
+			Material mat = item.getType();
+			return mat == Material.WOOD_HOE || mat == Material.STONE_HOE || mat == Material.GOLD_HOE
+					|| mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
+		}
+
+		return false;
+	}
 
 	public static boolean isWandItem(ItemStack item) {
 		if (item != null) {

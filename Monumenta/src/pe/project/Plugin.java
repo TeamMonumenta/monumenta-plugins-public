@@ -22,6 +22,7 @@ import pe.project.classes.ClericClass;
 import pe.project.classes.MageClass;
 import pe.project.classes.RogueClass;
 import pe.project.classes.ScoutClass;
+import pe.project.classes.WarlockClass;
 import pe.project.classes.WarriorClass;
 import pe.project.commands.Back;
 import pe.project.commands.BroadcastCommand;
@@ -76,8 +77,9 @@ public class Plugin extends JavaPlugin {
 		ROGUE(4),
 		ALCHEMIST(5),
 		SCOUT(6),
+		WARLOCK(7),
 
-		COUNT (6);	//	Please update when new classes are added!
+		COUNT (7);	//	Please update when new classes are added!
 
 		private int value;
 		private Classes(int value)	{	this.value = value;	}
@@ -145,6 +147,7 @@ public class Plugin extends JavaPlugin {
 		mClassMap.put(Classes.ROGUE.getValue(), new RogueClass(this, mRandom));
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
+		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
 
 		//	TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
