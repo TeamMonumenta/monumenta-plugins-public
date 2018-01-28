@@ -112,29 +112,23 @@ public class EntityListener implements Listener {
 			if (damager instanceof Player) {
 				Player player = (Player)damager;
 
-				if (mPlugin.mNpcManager.interactEvent(mPlugin, player, damagee.getCustomName(), damagee.getType())) {
-					// This resulted in a quest interaction - cancel the damage event
-					event.setCancelled(true);
-					return;
-				} else {
-					//  Make sure to not trigger class abilities off Throrns.
-					if (event.getCause() != DamageCause.THORNS) {
+				//  Make sure to not trigger class abilities off Throrns.
+				if (event.getCause() != DamageCause.THORNS) {
 
-						if (damagee.hasMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY)
-							&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
-							// This damage was just added by the player's class - don't process class effects again
-							return;
-						} else {
-							// New damage this tick - mark entity so that this event handler will be skipped if
-							// more damage is applied by the player's class
-							damagee.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
-												new FixedMetadataValue(mPlugin, player.getTicksLived()));
-						}
-
-						BaseClass _class = mPlugin.getClass(player);
-						_class.ModifyDamage(player, _class, event);
-						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+					if (damagee.hasMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY)
+						&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+						// This damage was just added by the player's class - don't process class effects again
+						return;
+					} else {
+						// New damage this tick - mark entity so that this event handler will be skipped if
+						// more damage is applied by the player's class
+						damagee.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
+											new FixedMetadataValue(mPlugin, player.getTicksLived()));
 					}
+
+					BaseClass _class = mPlugin.getClass(player);
+					_class.ModifyDamage(player, _class, event);
+					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
 				}
 			} else if (damager instanceof Arrow) {
 				Arrow arrow = (Arrow)damager;

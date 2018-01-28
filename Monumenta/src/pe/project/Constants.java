@@ -25,18 +25,13 @@ public class Constants {
 	//	USED FOR DEBUGGING PURPOSES WHEN COMPILING A JAR FOR OTHERS. (sadly it'll still contain the code in the jar, however it won't run)
 	public static final boolean CLASSES_ENABLED = true;
 	public static final boolean POIS_ENABLED = true;
-	public static final boolean NPCS_ENABLED = true;
 	public static final boolean TRACKING_MANAGER_ENABLED = true;
 	public static final boolean POTION_MANAGER_ENABLED = true;
-	public static final boolean QUEST_MANAGER_ENABLED = true;
 	public static final boolean COMMANDS_SERVER_ENABLED = true;
 
 	// Metadata keys
 	public static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
 	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
-	public static final String PLAYER_CLICKABLE_DIALOG_METAKEY = "MonumentaPlayerClickableDialog";
-	public static final String PLAYER_CLICKABLE_DIALOG_LOCATION_METAKEY = "MonumentaPlayerClickableDialogLocation";
-	public static final String PLAYER_QUEST_ACTIONS_LOCKED_METAKEY = "MonumentaPlayerQuestActionsLocked";
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 	public static final String ENTITY_DAMAGE_NONCE_METAKEY = "MonumentaEntityDamageNonce";
 	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";

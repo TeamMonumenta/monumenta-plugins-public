@@ -53,24 +53,8 @@ public class CompassOverride extends OverrideItem {
 					player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "You are not within range of a Point of Interest.");
 				}
 			}
-			//	Cycle active Quest.
-			else {
-				plugin.mQuestManager.cycleQuestTracker(player);
-			}
 		} else {
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting places on this server shard.");
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		if (plugin.mServerProperties.getQuestCompassEnabled()) {
-			//	Show currently active quest.
-			plugin.mQuestManager.showCurrentQuest(player);
-		} else {
-			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "No interesting quest on this server shard.");
 		}
 
 		return true;
