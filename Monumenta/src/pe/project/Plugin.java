@@ -38,10 +38,8 @@ import pe.project.commands.IsShittyCommand;
 import pe.project.commands.MinusExp;
 import pe.project.commands.PlayTimeStats;
 import pe.project.commands.ProfilingCommand;
-import pe.project.commands.QuestTrigger;
 import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
-import pe.project.commands.ReloadConfig;
 import pe.project.commands.SetGuildPrefix;
 import pe.project.commands.SetPlayerName;
 import pe.project.commands.TransferScores;
@@ -54,9 +52,7 @@ import pe.project.listeners.PlayerListener;
 import pe.project.listeners.SocketListener;
 import pe.project.listeners.VehicleListener;
 import pe.project.listeners.WorldListener;
-import pe.project.managers.NpcManager;
 import pe.project.managers.POIManager;
-import pe.project.managers.QuestCompassManager;
 import pe.project.managers.potion.PotionManager;
 import pe.project.server.properties.ServerProperties;
 import pe.project.timers.CombatLoggingTimers;
@@ -110,11 +106,9 @@ public class Plugin extends JavaPlugin {
 	public int mServerVersion = 0;
 	public int mDailyQuestVersion = 0;
 
-	public QuestCompassManager mQuestCompassManager;
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
-	public NpcManager mNpcManager;
 
 	public SocketClient mSocketClient;
 
@@ -179,7 +173,6 @@ public class Plugin extends JavaPlugin {
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
 			getCommand("minusexp").setExecutor(new MinusExp(this));
-			getCommand("reloadConfig").setExecutor(new ReloadConfig(this));
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));
@@ -187,15 +180,10 @@ public class Plugin extends JavaPlugin {
 		if (Constants.POIS_ENABLED) {
 			getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));
 		}
-		if (Constants.NPCS_ENABLED) {
-			getCommand("questTrigger").setExecutor(new QuestTrigger(this));
-		}
 
 		mPotionManager = new PotionManager(this);
-		mQuestCompassManager = new QuestCompassManager(this);
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mPOIManager = new POIManager(this);
-		mNpcManager = new NpcManager(this);
 
 		//	Load info.
 		_loadConfig();
