@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -28,43 +27,26 @@ import pe.project.Plugin;
 
 public class MessagingUtils {
 	public static String translatePlayerName(Player player, String message) {
-		return(message.replaceAll("@S",player.getName()));
+		return (message.replaceAll("@S", player.getName()));
 	}
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = new TextComponent( message );
-		formattedMessage.setColor( ChatColor.YELLOW );
-		player.spigot().sendMessage( ChatMessageType.ACTION_BAR, formattedMessage );
+		TextComponent formattedMessage = new TextComponent(message);
+		formattedMessage.setColor(ChatColor.YELLOW);
+		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, formattedMessage);
 	}
 
 	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
-		TextComponent formattedMessage = new TextComponent( message );
-		formattedMessage.setColor( ChatColor.RED );
-		player.spigot().sendMessage( ChatMessageType.ACTION_BAR, formattedMessage );
-	}
-
-	public static void sendNPCMessage(Player player, String displayName, String message) {
-		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = new TextComponent( "[" + displayName + "] " );
-		formattedMessage.setColor( ChatColor.GOLD );
-		TextComponent tempText = new TextComponent( message );
-		tempText.setColor( ChatColor.WHITE );
-		formattedMessage.addExtra(tempText);
-
-		player.spigot().sendMessage( formattedMessage );
+		TextComponent formattedMessage = new TextComponent(message);
+		formattedMessage.setColor(ChatColor.RED);
+		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, formattedMessage);
 	}
 
 	public static void sendRawMessage(Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = new TextComponent( ChatColor.translateAlternateColorCodes('&', message) );
-		player.spigot().sendMessage(formattedMessage);
-	}
-
-	public static void sendClickableNPCMessage(Plugin plugin, Player player, String message, String commandStr) {
-		TextComponent formattedMessage = new TextComponent( "[" + message + "]" );
-		formattedMessage.setColor( ChatColor.LIGHT_PURPLE );
-		formattedMessage.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, commandStr ) );
+		TextComponent formattedMessage = new TextComponent(ChatColor.translateAlternateColorCodes('&',
+		                                                   message));
 		player.spigot().sendMessage(formattedMessage);
 	}
 
@@ -72,11 +54,12 @@ public class MessagingUtils {
 		TextComponent formattedMessage;
 		String errorMessage = e.getLocalizedMessage();
 		if (errorMessage != null) {
-		  formattedMessage = new TextComponent( errorMessage );
+			formattedMessage = new TextComponent(errorMessage);
 		} else {
-		  formattedMessage = new TextComponent( "An error occured without a set message. Hover for stack trace." );
+			formattedMessage = new
+			TextComponent("An error occured without a set message. Hover for stack trace.");
 		}
-		formattedMessage.setColor( ChatColor.RED );
+		formattedMessage.setColor(ChatColor.RED);
 
 		// Get the first 300 characters of the stacktrace and send them to the player
 		StringWriter sw = new StringWriter();
@@ -85,8 +68,9 @@ public class MessagingUtils {
 		String sStackTrace = sw.toString();
 		sStackTrace = sStackTrace.substring(0, Math.min(sStackTrace.length(), 300));
 
-		BaseComponent[] textStackTrace = new ComponentBuilder( sStackTrace.replace("\t","  ") ).color( ChatColor.RED ).create();
-		formattedMessage.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, textStackTrace ) );
-		sender.spigot().sendMessage( formattedMessage );
+		BaseComponent[] textStackTrace = new ComponentBuilder(sStackTrace.replace("\t",
+		                                                      "  ")).color(ChatColor.RED).create();
+		formattedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, textStackTrace));
+		sender.spigot().sendMessage(formattedMessage);
 	}
 }
