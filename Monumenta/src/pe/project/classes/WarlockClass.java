@@ -62,24 +62,24 @@ public class WarlockClass extends BaseClass {
 	private static double AMPLIFYING_DOT_ANGLE = 0.33;
 	private static int AMPLIFYING_COOLDOWN = 16 * 20;
 
+	private static int BLASPHEMY_ID = 72;
 	private static int BLASPHEMY_RADIUS = 3;
 	private static float BLASPHEMY_KNOCKBACK_SPEED = 0.4f;
 	private static int BLASPHEMY_WITHER_LEVEL = 0;
-	private static int BLASPHEMY_WITHER_DURATION = 10 * 20;
+	private static int BLASPHEMY_WITHER_DURATION = 8 * 20;
+	private static int BLASPHEMY_COOLDOWN = 8 * 20;
 	
-	private static int CURSED_WOUND_1_EFFECT_LEVEL = 0;
-	private static int CURSED_WOUND_1_DURATION = 8 * 20;
+	private static int CURSED_WOUND_1_EFFECT_LEVEL = 1;
+	private static int CURSED_WOUND_1_DURATION = 5 * 20;
 	private static int CURSED_WOUND_2_EFFECT_LEVEL = 1;	
-	private static int CURSED_WOUND_2_DURATION = 7 * 20;
+	private static int CURSED_WOUND_2_DURATION = 10 * 20;
 	
 	private static int GRASPING_CLAWS_ID = 74;
 	private static int GRASPING_CLAWS_RADIUS = 6;
 	private static float GRASPING_CLAWS_SPEED = 0.25f;
-	private static int GRASPING_CLAWS_MAIN_EFFECT_LEVEL = 2;
-	private static int GRASPING_CLAWS_SECOND_EFFECT_LEVEL = 0;
-	private static int GRASPING_CLAWS_FIRE_DURATION = 7 * 20;
+	private static int GRASPING_CLAWS_DAMAGE = 6;
 	private static int GRASPING_CLAWS_DURATION = 7 * 20;
-	private static int GRASPING_CLAWS_COOLDOWN = 24 * 20;
+	private static int GRASPING_CLAWS_COOLDOWN = 20 * 20;
 
 	private static int SOUL_REND_ID = 75;
 	private static double SOUL_REND_HEAL_MULT = 0.4;
@@ -95,6 +95,8 @@ public class WarlockClass extends BaseClass {
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == AMPLIFYING_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Amplifying Hex is now off cooldown");
+		} else if (abilityID == BLASPHEMY_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Blasphemous Aura is now off cooldown");
 		} else if (abilityID == GRASPING_CLAWS_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Grasping Claws is now off cooldown");
 		} else if (abilityID == SOUL_REND_ID) {
@@ -142,9 +144,10 @@ public class WarlockClass extends BaseClass {
 	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		if (!(damager instanceof Player)) {
 			//	ABILITY: Blasphemous Aura
-			{
-				int blasphemy = ScoreboardUtils.getScoreboardValue(player, "BlasphemousAura");
-				if (blasphemy > 0) {
+			
+			int blasphemy = ScoreboardUtils.getScoreboardValue(player, "BlasphemousAura");
+			if (blasphemy > 0) {		
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), BLASPHEMY_ID)) {
 					Location loc = player.getLocation();
 					World world = player.getWorld();
 					
@@ -163,6 +166,8 @@ public class WarlockClass extends BaseClass {
 							}
 						}
 					}
+					
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), BLASPHEMY_ID, BLASPHEMY_COOLDOWN);
 				}
 			}
 		}
@@ -240,25 +245,37 @@ public class WarlockClass extends BaseClass {
 				ParticleUtils.playParticlesInWorld(world, Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
 				ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.1, 0.1, 0.1, 0.0);
 				
+				int targetCount = 0;
+				
 				List<Entity> entities = damagee.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
 				for (Entity entity : entities) {
 					if (EntityUtils.isHostileMob(entity)) {
+						targetCount++;
+						
 						LivingEntity mob = (LivingEntity)entity;
 						if (mob != damagee) {
 							MovementUtils.PullTowards(damagee, mob, GRASPING_CLAWS_SPEED);
-							if (graspingClaws == 2) {
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION , GRASPING_CLAWS_SECOND_EFFECT_LEVEL, true, false));			
-								mob.setFireTicks(GRASPING_CLAWS_FIRE_DURATION);						
-							}
 						}
-						else 
-						{
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION , GRASPING_CLAWS_MAIN_EFFECT_LEVEL, true, false));			
-							mob.setFireTicks(GRASPING_CLAWS_FIRE_DURATION);
+						
+						if (graspingClaws == 2) {
+							EntityUtils.damageEntity(mPlugin, mob, GRASPING_CLAWS_DAMAGE, player);				
 						}
 					}
 				}
 				
+				if (targetCount >= 1) {
+					if (targetCount >= 7) {
+						targetCount = 7;
+					}
+					
+					for (Entity entity : entities) {
+						if (EntityUtils.isHostileMob(entity)) {
+							LivingEntity mob = (LivingEntity)entity;
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, targetCount, true, false));			
+						}
+					}	
+				}
+ 				
 				//	Put Soul Rend on cooldown
 				mPlugin.mTimers.AddCooldown(player.getUniqueId(), GRASPING_CLAWS_ID, GRASPING_CLAWS_COOLDOWN);
 			}
@@ -294,7 +311,7 @@ public class WarlockClass extends BaseClass {
 										if (mob.getPotionEffect(PotionEffectType.WEAKNESS) != null) {debuffCount++;}
 										if (mob.getPotionEffect(PotionEffectType.SLOW_DIGGING) != null) {debuffCount++;}
 										if (mob.getPotionEffect(PotionEffectType.POISON) != null) {debuffCount++;}
-										if (mob.getFireTicks() > 0) {debuffCount++;}
+				//Disabled fire mattering	//if (mob.getFireTicks() > 0) {debuffCount++;}
 										
 										int damageMult = AMPLIFYING_1_EFFECT_DAMAGE;
 										if (amplifyingHex == 2) {
