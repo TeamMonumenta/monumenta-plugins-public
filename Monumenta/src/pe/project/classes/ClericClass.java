@@ -76,7 +76,7 @@ public class ClericClass extends BaseClass {
 	public static String CELESTIAL_1_TAGNAME = "Celestial_1";
 	public static String CELESTIAL_2_TAGNAME = "Celestial_2";
 	private static double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
-	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.30;
+	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
 	private static int HEALING_ID = 37;
 	private static int HEALING_RADIUS = 12;
@@ -174,7 +174,7 @@ public class ClericClass extends BaseClass {
 
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.25, 0.5, 0.5, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 40, 0.25, 0.5, 0.5, 0.001);
 						world.playSound(loc, "block.anvil.land", 0.15f, 1.5f);
 					}
 				}
@@ -303,8 +303,8 @@ public class ClericClass extends BaseClass {
 								p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
 
 								Location loc = p.getLocation();
-								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 15, 0.75, 0.75, 0.75, 0.001);
-								world.playSound(loc, "entity.player.levelup", 0.15f, 1.5f);
+								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 25, 0.75, 0.75, 0.75, 0.001);
+								world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
 							}
 						}
 

@@ -81,7 +81,7 @@ public class MageClass extends BaseClass {
 	private static int ARCANE_STRIKE_1_DAMAGE = 6;
 	private static int ARCANE_STRIKE_2_DAMAGE = 9;
 	private static int ARCANE_STRIKE_BURN_DAMAGE = 6;
-	private static int ARCANE_STRIKE_COOLDOWN = 6 * 20;
+	private static int ARCANE_STRIKE_COOLDOWN = 9 * 20;
 
 	private static int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
 	private static int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
