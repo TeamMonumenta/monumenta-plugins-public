@@ -52,7 +52,7 @@ public class ScoutClass extends BaseClass {
 	private static int AGILITY_1_EFFECT_LVL = 0;
 	private static int AGILITY_2_EFFECT_LVL = 1;
 	private static int AGILITY_1_RESISTANCE_LEVEL = 0;
-	private static int AGILITY_2_RESISTANCE_LEVEL = 1;
+	private static int AGILITY_2_RESISTANCE_LEVEL = 0;
 
 	private static int BOW_MASTER_1_DAMAGE = 3;
 	private static int BOW_MASTER_2_DAMAGE = 6;
@@ -366,8 +366,8 @@ public class ScoutClass extends BaseClass {
 		if (agility > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
-			if (InventoryUtils.isPickaxeItem(mainHand)) {
-				int effectLevel = agility == 1 ? AGILITY_1_RESISTANCE_LEVEL : AGILITY_2_RESISTANCE_LEVEL;
+			if (InventoryUtils.isPickaxeItem(mainHand) && agility > 1) {
+				int effectLevel = AGILITY_2_RESISTANCE_LEVEL;
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, effectLevel, true, false));
 			}
 		}

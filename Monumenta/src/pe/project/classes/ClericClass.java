@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,6 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -61,6 +63,13 @@ public class ClericClass extends BaseClass {
 	private static double HEAVENLY_BOON_RADIUS = 12;
 
 	//	CLEANSING
+	private static int CLEANSING_ID = 34; 
+	private static int CLEANSING_FAKE_ID = 10034;
+	private static int CLEANSING_DURATION = 15 * 20;
+	private static int CLEANSING_RESIST_LEVEL = 0;
+	private static int CLEANSING_RESIST_DURATION = 41;
+	private static int CLEANSING_RADIUS = 4;
+	private static int CLEANSING_COOLDOWN = 30 * 20;
 
 	private static int DIVINE_JUSTICE_DAMAGE = 5;
 	private static int DIVINE_JUSTICE_HEAL = 4;
@@ -94,6 +103,8 @@ public class ClericClass extends BaseClass {
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == CELESTIAL_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Celestial Blessing is now off cooldown");
+		} else if (abilityID == CLEANSING_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Cleansing Rain is now off cooldown");
 		} else if (abilityID == HEALING_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Hand of Light is now off cooldown");
 		}
@@ -103,7 +114,12 @@ public class ClericClass extends BaseClass {
 	public boolean has2SecondTrigger() {
 		return true;
 	}
-
+	
+	@Override
+	public boolean has1SecondTrigger() {
+		return true;
+	}
+	
 	@Override
 	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
@@ -128,6 +144,38 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			}
+			
+			// Kala's attempt to make Cleansing Rain
+			// Spoilers : It doesn't work
+			
+			/*boolean oneSecond = ((originalTime % 1) == 0);
+			
+			if (oneSecond) {
+				int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
+				if (cleansing > 0) {
+					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_FAKE_ID)) {
+						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 1, 0), 40, 1.2, 0.35, 1.2, 0.001);
+						
+						List<Entity> entities = player.getNearbyEntities(CLEANSING_RADIUS, CLEANSING_RADIUS, CLEANSING_RADIUS);
+						entities.add(player);
+						for (Entity entity : entities) {
+							if (entity instanceof Player) {
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.WITHER);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SLOW);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SLOW_DIGGING);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.POISON);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.WEAKNESS);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.BLINDNESS);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.CONFUSION);
+								
+								if (cleansing > 1) {
+									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_RESIST_DURATION, CLEANSING_RESIST_LEVEL, true, false));
+								}
+							}
+						} 
+					}
+				}
+			}*/
 		}
 	}
 
@@ -174,7 +222,7 @@ public class ClericClass extends BaseClass {
 
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 40, 0.25, 0.5, 0.5, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.5, 0.5, 0.001);
 						world.playSound(loc, "block.anvil.land", 0.15f, 1.5f);
 					}
 				}
@@ -196,7 +244,7 @@ public class ClericClass extends BaseClass {
 
 						World world = player.getWorld();
 						Location loc = killedEntity.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 5, 0.25, 0.25, 0.25, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
 						player.getWorld().playSound(loc, "block.enchantment_table.use", 1.5f, 1.5f);
 
 					}
@@ -212,33 +260,41 @@ public class ClericClass extends BaseClass {
 					double chance = heavenlyBoon == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
 
 					if (mRandom.nextDouble() < chance) {
+						ItemStack healPot;
+						//int healLevel = heavenlyBoon == 1 ? 0 : 1;
+						int healLevel = 0;
+						
+						healPot = ItemUtils.createStackedPotions(PotionEffectType.HEAL, 1, 0, healLevel, "Splash Potion of Healing");
+												
 						ItemStack potions;
-
+						
 						if (heavenlyBoon == 1) {
-							int rand = mRandom.nextInt(3);
-							if (rand == 0) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.HEAL, 1, 0, 0, "Splash Potion of Healing");
-							} else if (rand == 1) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 45 * 20, 0, "Splash Potion of Regeneration");
+							int rand = mRandom.nextInt(4);
+							if (rand == 0 || rand == 1) {
+								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 16 * 20, 0, "Splash Potion of Regeneration");
+							} else if (rand == 2) {
+								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0, "Splash Potion of Absorption");
+								//potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1,  * 20, 0, "Splash Potion of Fire Resistance");
 							} else {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1, 180 * 20, 0, "Splash Potion of Fire Resistance");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 20 * 20, 0, "Splash Potion of Speed");
 							}
 						} else {
 							int rand = mRandom.nextInt(5);
 							if (rand == 0) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 60 * 20, 0, "Splash Potion of Regeneration");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 42 * 20, 0, "Splash Potion of Regeneration");
 							} else if (rand == 1) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 90 * 20, 0, "Splash Potion of Absorption");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 48 * 20, 0, "Splash Potion of Absorption");
 							} else if (rand == 2) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 120 * 20, 0, "Splash Potion of Speed");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 48 * 20, 0, "Splash Potion of Speed");
 							} else if (rand == 3) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 120 * 20, 0, "Splash Potion of Strength");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 48 * 20, 0, "Splash Potion of Strength");
 							} else {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 120 * 20, 0, "Splash Potion of Resistance");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 48 * 20, 0, "Splash Potion of Resistance");
 							}
 						}
 
 						World world = Bukkit.getWorld(player.getWorld().getName());
+						EntityUtils.spawnCustomSplashPotion(world, player, healPot, player.getLocation());
 						EntityUtils.spawnCustomSplashPotion(world, player, potions, player.getLocation());
 					}
 				}
@@ -303,7 +359,7 @@ public class ClericClass extends BaseClass {
 								p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
 
 								Location loc = p.getLocation();
-								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 25, 0.75, 0.75, 0.75, 0.001);
+								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
 								world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
 							}
 						}
@@ -312,11 +368,27 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+				
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-
-				if ((offHand != null && offHand.getType() == Material.SHIELD) ||
-						mainHand != null && mainHand.getType() == Material.SHIELD) {
+				
+				// And here's the trigger for the failed attempt at Cleansing Rain
+				// Intent was to use the CLEANSING_FAKE_ID as the tracker for it,
+				// But for some reason it works inconsistently
+				/*
+				if ((player.getLocation()).getPitch() < -87) {
+					//	Activate Cleansing Rain IF Looking straight up
+					
+					int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
+					if (cleansing > 0) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_ID)) {
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_ID, CLEANSING_COOLDOWN);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_FAKE_ID, CLEANSING_DURATION);
+						}
+					}
+				} else 
+					*/
+				if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
 					if (healing > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {

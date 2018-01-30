@@ -108,6 +108,8 @@ public class MageClass extends BaseClass {
 	public void AbilityOffCooldown(Player player, int abilityID) {
 		if (abilityID == FROST_NOVA_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Frost Nova is now off cooldown");
+		} else if (abilityID == ARCANE_STRIKE_ID) {
+				MessagingUtils.sendActionBarMessage(mPlugin, player, "Arcane Strike is now off cooldown");
 		} else if (abilityID == MAGMA_SHIELD_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Magma Shield is now off cooldown");
 		}else if (abilityID == PRISMATIC_SHIELD_ID) {
