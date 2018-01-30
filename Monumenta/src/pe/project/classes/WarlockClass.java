@@ -124,7 +124,7 @@ public class WarlockClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 				if (InventoryUtils.isScytheItem(mainHand) && versatileMagic > 1) {	// If they also have a scythe in the mainHand
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
+				//	mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 				}
 			}
 			//	Player has a scythe in their offHand
@@ -132,7 +132,7 @@ public class WarlockClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 				if (InventoryUtils.isWandItem(mainHand) && versatileMagic > 1) {		// If they also have a wand in the mainHand
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+				//	mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 				}
 			}
 		}
@@ -182,7 +182,7 @@ public class WarlockClass extends BaseClass {
 		if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 			// Cursed Wound
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
-			if (cursedWound > 0) {
+			if (cursedWound > 0 && EntityUtils.isHostileMob(damagee)) {
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
 				if (cursedWound == 1) {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_1_DURATION, CURSED_WOUND_1_EFFECT_LEVEL, true, false));		
