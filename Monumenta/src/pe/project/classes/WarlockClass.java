@@ -78,7 +78,7 @@ public class WarlockClass extends BaseClass {
 
 	private static int GRASPING_CLAWS_ID = 74;
 	private static int GRASPING_CLAWS_RADIUS = 6;
-	private static float GRASPING_CLAWS_SPEED = 0.25f;
+	private static float GRASPING_CLAWS_SPEED = 0.35f;
 	private static int GRASPING_CLAWS_DAMAGE = 7;
 	private static int GRASPING_CLAWS_FIRE_DURATION = 7 * 20;
 	private static int GRASPING_CLAWS_DURATION = 7 * 20;
