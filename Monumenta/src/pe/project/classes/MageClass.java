@@ -343,7 +343,7 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		//	Prismatic Shield
 		{
 			double correctHealth = player.getHealth() - damage;
@@ -362,6 +362,7 @@ public class MageClass extends BaseClass {
 				}
 			}
 		}
+		return true;
 	}
 
 	private void _testItemInHand(Player player, ItemStack mainHand) {

@@ -40,14 +40,15 @@ import pe.project.utils.ScoreboardUtils;
 	PowerInjection
 	InvigoratingOdor
 PoisonTrail
+
 */
 
 public class AlchemistClass extends BaseClass {
 	private static int GRUESOME_ALCHEMY_ID = 51;
-	private static double GRUESOME_ALCHEMY_CHANCE = 0.20f;
+	private static double GRUESOME_ALCHEMY_CHANCE = 0.25f;
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
-	private static int GRUESOME_ALCHEMY_COOLDOWN = 5 * 60 * 20;
+	private static int GRUESOME_ALCHEMY_COOLDOWN = 3 * 60 * 20;
 
 	private static int PUTRID_FUMES_ID = 52;
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";

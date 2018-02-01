@@ -25,6 +25,7 @@ import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
@@ -34,7 +35,7 @@ import pe.project.utils.ScoreboardUtils;
 /*
 	CounterStrike
 	Frenzy
-	Obliteration
+	Riposte				[formerly Obliteration]
 	DefensiveLine
 	BruteForce
 	Toughness
@@ -46,12 +47,14 @@ public class WarriorClass extends BaseClass {
 
 	private static int FRENZY_DURATION = 5 * 20;
 
-	private static Integer OBLITERATION_ID = 25;
-	private static Integer OBLITERATION_COOLDOWN = 10 * 20;
-	private static float OBLITERATION_RADIUS = 3.0f;
-	private static int OBLITERATION_1_DAMAGE = 3;
-	private static int OBLITERATION_2_DAMAGE = 8;
-	private static double OBLITERATION_KNOCKUP = 1.0;
+	private static int RIPOSTE_ID = 25;
+	private static int RIPOSTE_COOLDOWN = 10 * 20;
+	private static int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
+	private static int RIPOSTE_SWORD_DURATION = 7 * 20;
+	private static int RIPOSTE_AXE_DURATION = 2 * 20;
+	private static int RIPOSTE_AXE_EFFECT_LEVEL = 4;
+	private static int RIPOSTE_SQRADIUS = 4;	//radius = 2, this is it squared
+	private static float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
 	private static Integer DEFENSIVE_LINE_ID = 26;
 	private static Integer DEFENSIVE_LINE_DURATION = 10 * 20;
@@ -63,7 +66,6 @@ public class WarriorClass extends BaseClass {
 	private static Integer BRUTE_FORCE_1_DAMAGE = 3;
 	private static Integer BRUTE_FORCE_2_DAMAGE = 7;
 	private static float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
-	private static Integer BRUTE_FORCE_PIECES_TO_REMOVE = 2;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -78,15 +80,15 @@ public class WarriorClass extends BaseClass {
 
 	@Override
 	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == OBLITERATION_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Obliteration is now off cooldown");
+		if (abilityID == RIPOSTE_ID) {
+			MessagingUtils.sendActionBarMessage(mPlugin, player, "Riposte is now off cooldown");
 		} else if (abilityID == DEFENSIVE_LINE_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Defensive Line is now off cooldown");
 		}
 	}
 
 	@Override
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		if (!(damager instanceof Player)) {
 			//	ABILITY: Counter Strike
 			{
@@ -110,63 +112,46 @@ public class WarriorClass extends BaseClass {
 					}
 				}
 			}
-		}
-	}
 
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
-		//	Obliteration
-		{
-			//	First we need to check if we're actually sneaking and holding an axe, if not we can bail out.
-			if (player.isSneaking() && InventoryUtils.isAxeItem(player.getInventory().getItemInMainHand())) {
-				int obliteration = ScoreboardUtils.getScoreboardValue(player, "Obliteration");
-				if (obliteration > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), OBLITERATION_ID)) {
-						double extraDamage = obliteration == 1 ? OBLITERATION_1_DAMAGE : OBLITERATION_2_DAMAGE;
+			// ABILITY: Riposte
+			{
+				if ((player.getLocation()).distanceSquared(damager.getLocation()) < RIPOSTE_SQRADIUS) {
+					// currently leaving the scoreboard as Obliteration for back-compatibility
+					int riposte = ScoreboardUtils.getScoreboardValue(player, "Obliteration");
+					if (riposte > 0) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), RIPOSTE_ID)) {
+							ItemStack mainHand = player.getInventory().getItemInMainHand();
+							MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
 
-						//	Attempt to destroy 2 random pieces of armor on all entities in a radius.
-						List<Entity> entities = player.getNearbyEntities(OBLITERATION_RADIUS, OBLITERATION_RADIUS, OBLITERATION_RADIUS);
-						for(int i = 0; i < entities.size(); i++) {
-							Entity e = entities.get(i);
-							if (EntityUtils.isHostileMob(e)) {
-								LivingEntity mob = (LivingEntity)e;
+							if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
+								World world = player.getWorld();
 
-								//	Test against Elite/Boss tags.
-								Set<String> tags = mob.getScoreboardTags();
-								if (!tags.contains("Elite") && !tags.contains("Boss")) {
-									InventoryUtils.removeRandomEquipment(mRandom, mob, BRUTE_FORCE_PIECES_TO_REMOVE);
-
-									//	Also knock all mobs up if this ability is tier 2.
-									if (obliteration >= 2) {
-										new BukkitRunnable() {
-											@Override
-											public void run() {
-												mob.setVelocity(new Vector(0.0f, OBLITERATION_KNOCKUP, 0.0f));
-
-												this.cancel();
-											}
-										}.runTaskTimer(mPlugin, 0, 1);
+								if (riposte > 1) {
+									if (InventoryUtils.isSwordItem(mainHand)) {
+										player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, false));
 									}
-
-									EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
-
-									World world = player.getWorld();
-									Location loc = player.getLocation();
-
-									ParticleUtils.playParticlesInWorld(world, Particle.EXPLOSION_NORMAL, loc, 100, 1.5, 1.5, 1.5, 0.001);
-									player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
-									player.playSound(loc, Sound.BLOCK_GRASS_BREAK, 1.0f, 1.0f);
+									else if (InventoryUtils.isAxeItem(mainHand)) {
+										damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
+									}
 								}
+
+								world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+								ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
+								ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
+								mPlugin.mTimers.AddCooldown(player.getUniqueId(), RIPOSTE_ID, RIPOSTE_COOLDOWN);
+
+								return false;
 							}
 						}
-
-						//	Put Obliteration on cooldown.
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), OBLITERATION_ID, OBLITERATION_COOLDOWN);
 					}
 				}
 			}
 		}
+		return true;
+	}
 
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		//	BRUTE FORCE!!!
 		{
 			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
