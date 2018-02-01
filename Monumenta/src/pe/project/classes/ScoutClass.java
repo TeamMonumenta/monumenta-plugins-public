@@ -19,6 +19,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -51,8 +52,8 @@ public class ScoutClass extends BaseClass {
 
 	private static int AGILITY_1_EFFECT_LVL = 0;
 	private static int AGILITY_2_EFFECT_LVL = 1;
-	private static int AGILITY_1_RESISTANCE_LEVEL = 0;
-	private static int AGILITY_2_RESISTANCE_LEVEL = 0;
+	private static int AGILITY_1_DAMAGE_BONUS = 1;
+	private static int AGILITY_2_DAMAGE_BONUS = 2;
 
 	private static int BOW_MASTER_1_DAMAGE = 3;
 	private static int BOW_MASTER_2_DAMAGE = 6;
@@ -92,9 +93,6 @@ public class ScoutClass extends BaseClass {
 	public void setupClassPotionEffects(Player player) {
 		_testForAgility(player);
 		_testForSwiftness(player);
-
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		_testItemInHand(player, mainHand);
 	}
 
 	@Override
@@ -112,11 +110,6 @@ public class ScoutClass extends BaseClass {
 	public void PlayerRespawnEvent(Player player) {
 		_testForAgility(player);
 		_testForSwiftness(player);
-	}
-
-	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
 	}
 
 	@Override
@@ -144,6 +137,16 @@ public class ScoutClass extends BaseClass {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
+		if (agility > 0) {
+			int agilityDamage = (agility == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+			EntityUtils.damageEntity(mPlugin, damagee, agilityDamage, player);
+		}
+		return false;
 	}
 
 	@Override
@@ -357,18 +360,6 @@ public class ScoutClass extends BaseClass {
 
 			if (swiftness > 1) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
-			}
-		}
-	}
-
-	private void _testItemInHand(Player player, ItemStack mainHand) {
-		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
-		if (agility > 0) {
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-
-			if (InventoryUtils.isPickaxeItem(mainHand) && agility > 1) {
-				int effectLevel = AGILITY_2_RESISTANCE_LEVEL;
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, effectLevel, true, false));
 			}
 		}
 	}

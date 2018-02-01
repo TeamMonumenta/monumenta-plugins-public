@@ -69,7 +69,7 @@ public class BaseClass {
 
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {}
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) { return true; }
 
 	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) { return true; }
 

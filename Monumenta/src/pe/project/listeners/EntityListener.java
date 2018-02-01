@@ -94,8 +94,11 @@ public class EntityListener implements Listener {
 		if (damagee instanceof Player) {
 			if (damager instanceof LivingEntity) {
 				Player player = (Player)damagee;
-				mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
-																		  event.getFinalDamage());
+				if(!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
+																		  event.getFinalDamage())) 	{
+					event.setCancelled(true);
+				}
+
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);

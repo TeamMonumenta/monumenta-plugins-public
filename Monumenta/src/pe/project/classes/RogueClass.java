@@ -250,7 +250,7 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		double correctHealth = player.getHealth() - damage;
 		if (correctHealth > 0 && correctHealth < ESCAPE_DEATH_HEALTH_TRIGGER) {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
@@ -293,6 +293,7 @@ public class RogueClass extends BaseClass {
 				}
 			}
 		}
+		return true;
 	}
 
 	@Override

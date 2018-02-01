@@ -63,7 +63,7 @@ public class ClericClass extends BaseClass {
 	private static double HEAVENLY_BOON_RADIUS = 12;
 
 	//	CLEANSING
-	private static int CLEANSING_ID = 34; 
+	private static int CLEANSING_ID = 34;
 	private static int CLEANSING_FAKE_ID = 10034;
 	private static int CLEANSING_DURATION = 15 * 20;
 	private static int CLEANSING_RESIST_LEVEL = 0;
@@ -114,12 +114,12 @@ public class ClericClass extends BaseClass {
 	public boolean has2SecondTrigger() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean has1SecondTrigger() {
 		return true;
 	}
-	
+
 	@Override
 	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
@@ -144,18 +144,18 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			}
-			
+
 			// Kala's attempt to make Cleansing Rain
 			// Spoilers : It doesn't work
-			
+
 			/*boolean oneSecond = ((originalTime % 1) == 0);
-			
+
 			if (oneSecond) {
 				int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
 				if (cleansing > 0) {
 					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_FAKE_ID)) {
 						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 1, 0), 40, 1.2, 0.35, 1.2, 0.001);
-						
+
 						List<Entity> entities = player.getNearbyEntities(CLEANSING_RADIUS, CLEANSING_RADIUS, CLEANSING_RADIUS);
 						entities.add(player);
 						for (Entity entity : entities) {
@@ -167,12 +167,12 @@ public class ClericClass extends BaseClass {
 								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.WEAKNESS);
 								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.BLINDNESS);
 								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.CONFUSION);
-								
+
 								if (cleansing > 1) {
 									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_RESIST_DURATION, CLEANSING_RESIST_LEVEL, true, false));
 								}
 							}
-						} 
+						}
 					}
 				}
 			}*/
@@ -180,14 +180,14 @@ public class ClericClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		//	Sanctified
 		if (EntityUtils.isUndead(damager)) {
 			if (damager instanceof Skeleton) {
 				Skeleton skelly = (Skeleton)damager;
 				ItemStack mainHand = skelly.getEquipment().getItemInMainHand();
 				if (mainHand != null && mainHand.getType() == Material.BOW) {
-					return;
+					return true;
 				}
 			}
 
@@ -206,6 +206,7 @@ public class ClericClass extends BaseClass {
 				}
 			}
 		}
+		return true;
 	}
 
 	@Override
@@ -263,11 +264,11 @@ public class ClericClass extends BaseClass {
 						ItemStack healPot;
 						//int healLevel = heavenlyBoon == 1 ? 0 : 1;
 						int healLevel = 0;
-						
+
 						healPot = ItemUtils.createStackedPotions(PotionEffectType.HEAL, 1, 0, healLevel, "Splash Potion of Healing");
-												
+
 						ItemStack potions;
-						
+
 						if (heavenlyBoon == 1) {
 							int rand = mRandom.nextInt(4);
 							if (rand == 0 || rand == 1) {
@@ -368,17 +369,17 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-				
+
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				
+
 				// And here's the trigger for the failed attempt at Cleansing Rain
 				// Intent was to use the CLEANSING_FAKE_ID as the tracker for it,
 				// But for some reason it works inconsistently
 				/*
 				if ((player.getLocation()).getPitch() < -87) {
 					//	Activate Cleansing Rain IF Looking straight up
-					
+
 					int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
 					if (cleansing > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_ID)) {
@@ -386,7 +387,7 @@ public class ClericClass extends BaseClass {
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_FAKE_ID, CLEANSING_DURATION);
 						}
 					}
-				} else 
+				} else
 					*/
 				if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
