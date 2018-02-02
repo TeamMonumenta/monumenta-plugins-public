@@ -328,6 +328,9 @@ public class EntityListener implements Listener {
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
+		// Don't apply effects to invulnerable entities
+		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
+
 		// Class effects from splashing potion
 		if (source instanceof Player) {
 			Player player = (Player)source;
@@ -361,6 +364,9 @@ public class EntityListener implements Listener {
 
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
+
+		// Don't apply effects to invulnerable entities
+		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
 
 		// Class effects from splashing potion
 		if (source instanceof Player) {
@@ -469,7 +475,8 @@ public class EntityListener implements Listener {
 
 		if ((type == EntityType.SNOWBALL)
 			&& (event.getHitEntity() instanceof LivingEntity)
-			&& (!(event.getHitEntity() instanceof Player))) {
+			&& (!(event.getHitEntity() instanceof Player))
+			&& (!event.getHitEntity().isInvulnerable())) {
 
 			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 300, 0, false);
 			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);
