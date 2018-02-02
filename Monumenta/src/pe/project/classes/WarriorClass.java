@@ -50,9 +50,9 @@ public class WarriorClass extends BaseClass {
 	private static int RIPOSTE_ID = 25;
 	private static int RIPOSTE_COOLDOWN = 10 * 20;
 	private static int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
-	private static int RIPOSTE_SWORD_DURATION = 7 * 20;
-	private static int RIPOSTE_AXE_DURATION = 2 * 20;
-	private static int RIPOSTE_AXE_EFFECT_LEVEL = 4;
+	private static int RIPOSTE_SWORD_DURATION = 5 * 20;
+	private static int RIPOSTE_AXE_DURATION = 3 * 20;
+	private static int RIPOSTE_AXE_EFFECT_LEVEL = 6;
 	private static int RIPOSTE_SQRADIUS = 4;	//radius = 2, this is it squared
 	private static float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
