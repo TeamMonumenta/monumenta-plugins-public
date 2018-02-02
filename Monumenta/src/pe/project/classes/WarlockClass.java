@@ -65,16 +65,16 @@ public class WarlockClass extends BaseClass {
 
 	private static int BLASPHEMY_ID = 72;
 	private static int BLASPHEMY_RADIUS = 3;
-	private static float BLASPHEMY_KNOCKBACK_SPEED = 0.4f;
+	private static float BLASPHEMY_KNOCKBACK_SPEED = 0.5f;
 	private static int BLASPHEMY_WITHER_LEVEL = 0;
 	private static int BLASPHEMY_WITHER_DURATION = 8 * 20;
 	private static int BLASPHEMY_1_COOLDOWN = 8 * 20;
 	private static int BLASPHEMY_2_COOLDOWN = 6 * 20;
 
-	private static int CURSED_WOUND_1_EFFECT_LEVEL = 1;
-	private static int CURSED_WOUND_1_DURATION = 5 * 20;
-	private static int CURSED_WOUND_2_EFFECT_LEVEL = 2;
-	private static int CURSED_WOUND_2_DURATION = 6 * 20;
+	private static int CURSED_WOUND_EFFECT_LEVEL = 1;
+	private static int CURSED_WOUND_DURATION = 6 * 20;
+	private static int CURSED_WOUND_RADIUS = 5;
+	private static int CURSED_WOUND_BURST_DAMAGE = 3;
 
 	private static int GRASPING_CLAWS_ID = 74;
 	private static int GRASPING_CLAWS_RADIUS = 6;
@@ -87,13 +87,13 @@ public class WarlockClass extends BaseClass {
 	private static int SOUL_REND_ID = 75;
 	private static double SOUL_REND_HEAL_MULT = 0.4;
 	private static int SOUL_REND_RADIUS = 7;
-	private static int SOUL_REND_COOLDOWN = 8 * 20;
+	private static int SOUL_REND_COOLDOWN = 7 * 20;
 
 	private static int CONSUMING_FLAMES_ID = 77;
 	private static int CONSUMING_FLAMES_1_RADIUS = 4;
 	private static int CONSUMING_FLAMES_2_RADIUS = 6;
-	private static int CONSUMING_FLAMES_DURATION = 8 * 20;
-	private static int CONSUMING_FLAMES_COOLDOWN = 15 * 20;
+	private static int CONSUMING_FLAMES_DURATION = 7 * 20;
+	private static int CONSUMING_FLAMES_COOLDOWN = 13 * 20;
 
 
 	public WarlockClass(Plugin plugin, Random random) {
@@ -129,6 +129,7 @@ public class WarlockClass extends BaseClass {
 		if (versatileMagic > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
+			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
 
 			if (InventoryUtils.isWandItem(offHand)) {
@@ -138,8 +139,13 @@ public class WarlockClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 			}
 
-			if (InventoryUtils.isWandItem(mainHand) || InventoryUtils.isScytheItem(offHand)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
+			if (versatileMagic > 1 ) {
+				if (InventoryUtils.isWandItem(mainHand)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
+				}
+				else if (InventoryUtils.isScytheItem(mainHand)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 0, true, false));
+				}
 			}
 		}
 	}
@@ -167,7 +173,7 @@ public class WarlockClass extends BaseClass {
 						if(EntityUtils.isHostileMob(e)) {
 							LivingEntity mob = (LivingEntity)e;
 							MovementUtils.KnockAway(player, mob, BLASPHEMY_KNOCKBACK_SPEED);
-							if (blasphemy >= 1) {
+							if (blasphemy > 1) {
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, BLASPHEMY_WITHER_DURATION, BLASPHEMY_WITHER_LEVEL, true, false));
 							}
 						}
@@ -192,11 +198,19 @@ public class WarlockClass extends BaseClass {
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
 			if (cursedWound > 0 && EntityUtils.isHostileMob(damagee)) {
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
-				if (cursedWound == 1) {
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_1_DURATION, CURSED_WOUND_1_EFFECT_LEVEL, true, false));
-				}
-				else if (cursedWound == 2) {
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_2_DURATION, CURSED_WOUND_2_EFFECT_LEVEL, true, false));
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+
+				if (PlayerUtils.isCritical(player) && cursedWound > 1) {
+					List<Entity> entities = player.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
+					for(int i = 0; i < entities.size(); i++) {
+						Entity e = entities.get(i);
+						if(EntityUtils.isHostileMob(e)) {
+							LivingEntity mob = (LivingEntity)e;
+							if (mob.getPotionEffect(PotionEffectType.WITHER) != null) {
+								EntityUtils.damageEntity(mPlugin, mob, CURSED_WOUND_BURST_DAMAGE, player);
+							}
+						}
+					}
 				}
 			}
 
@@ -250,8 +264,11 @@ public class WarlockClass extends BaseClass {
 
 						world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
 
+						damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, true, false));
+						damagee.setFireTicks(CONSUMING_FLAMES_DURATION);
+
 						int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
-						List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
+						List<Entity> entities = damagee.getNearbyEntities(radius, radius, radius);
 						for (Entity entity : entities) {
 							if (EntityUtils.isHostileMob(entity)) {
 								LivingEntity mob = (LivingEntity)entity;
@@ -296,13 +313,12 @@ public class WarlockClass extends BaseClass {
 							targetCount++;
 
 							LivingEntity mob = (LivingEntity)entity;
-							if (mob != damagee) {
-								MovementUtils.PullTowards(damagee, mob, GRASPING_CLAWS_SPEED);
-							}
-
 							if (graspingClaws > 1) {
 								EntityUtils.damageEntity(mPlugin, mob, GRASPING_CLAWS_DAMAGE, player);
-							//	mob.setFireTicks(GRASPING_CLAWS_FIRE_DURATION);
+							}
+
+							if (mob != damagee) {
+								MovementUtils.PullTowards(damagee, mob, GRASPING_CLAWS_SPEED);
 							}
 						}
 					}

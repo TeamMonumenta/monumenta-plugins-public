@@ -295,8 +295,9 @@ public class ClericClass extends BaseClass {
 						}
 
 						World world = Bukkit.getWorld(player.getWorld().getName());
-						EntityUtils.spawnCustomSplashPotion(world, player, healPot, player.getLocation());
-						EntityUtils.spawnCustomSplashPotion(world, player, potions, player.getLocation());
+						Location pos = (player.getLocation()).add(0,2,0);
+						EntityUtils.spawnCustomSplashPotion(world, player, healPot, pos);
+						EntityUtils.spawnCustomSplashPotion(world, player, potions, pos);
 					}
 				}
 			}
