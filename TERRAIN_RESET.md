@@ -81,7 +81,7 @@ tar xzf ~/Project_Epic-tutorial.good.jan-12-2018.tgz
 ```
 cd ~/project_epic/server_config/data
 git add .
-git commit -m "Changes for terrain reset on 2018_01_26"
+git commit -m "Changes for terrain reset on 2018_02_02"
 ```
 
 1. Copy the build server's config
@@ -100,8 +100,8 @@ vim ~/tmp/POST_RESET/server_config/server_config_template/spigot.yml
 ## Wrap it up and transfer to play server
 ```
 cd ~/tmp
-tar czf project_epic_build_template_pre_reset_2018_01_26.tgz POST_RESET TEMPLATE
-scp project_epic_build_template_pre_reset_2018_01_26.tgz 'play:/home/rock/tmp/'
+tar czf project_epic_build_template_pre_reset_2018_02_02.tgz POST_RESET TEMPLATE
+scp project_epic_build_template_pre_reset_2018_02_02.tgz 'play:/home/rock/tmp/'
 ```
 
 # For reset - Play Server Console
@@ -131,7 +131,7 @@ mark2 list
 1. Tarball the whole `project_epic` folder once everything is stopped as a backup
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_2018_01_26.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_2018_02_02.tgz project_epic
 ```
 
 1. Since the dungeon region files are giant and no longer needed, delete them and re-tarball to save space
@@ -153,7 +153,7 @@ rm server_config/plugins/*.jar
 1. Re-tarball the project for archival purposes
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_2018_01_26.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_2018_02_02.tgz project_epic
 ```
 
 1. Move the `project_epic` to ~/tmp where it will be processed for reset
@@ -179,8 +179,8 @@ cd ~/tmp
 
 1. Unpack the tarball (creates `POST_RESET` and `TEMPLATE` folders)
 ```
-tar xzf project_epic_build_template_pre_reset_2018_01_26.tgz
-mv project_epic_build_template_pre_reset_2018_01_26.tgz ~/1_ARCHIVE/
+tar xzf project_epic_build_template_pre_reset_2018_02_02.tgz
+mv project_epic_build_template_pre_reset_2018_02_02.tgz ~/1_ARCHIVE/
 ```
 
 ### Bungeecord
@@ -276,7 +276,7 @@ mv ~/tmp/POST_RESET ~/tmp/project_epic
 1. Tar the directory as a backup
 ```
 cd ~/tmp
-tar czf ~/1_ARCHIVE/project_epic_post_reset_2018_01_26.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_post_reset_2018_02_02.tgz project_epic
 ```
 
 1. Move the reset folder to the correct location
