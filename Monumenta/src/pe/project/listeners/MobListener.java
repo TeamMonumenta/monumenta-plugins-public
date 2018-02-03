@@ -5,6 +5,7 @@ import java.util.ListIterator;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	void CreatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
-		if ((entity instanceof LivingEntity) && !(entity instanceof Player)) {
+		if ((entity instanceof LivingEntity) && !(entity instanceof Player) && !(entity instanceof ArmorStand)) {
 			LivingEntity mob = (LivingEntity)entity;
 
 			//	Mark mobs not able to pick-up items.
