@@ -25,7 +25,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
-import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -63,12 +62,12 @@ public class ClericClass extends BaseClass {
 
 	//	CLEANSING
 	private static int CLEANSING_ID = 34;
-	private static int CLEANSING_FAKE_ID = 10034;
-	private static int CLEANSING_DURATION = 15 * 20;
-	private static int CLEANSING_RESIST_LEVEL = 0;
-	private static int CLEANSING_RESIST_DURATION = 41;
-	private static int CLEANSING_RADIUS = 4;
-	private static int CLEANSING_COOLDOWN = 30 * 20;
+	//private static int CLEANSING_FAKE_ID = 10034;
+	//private static int CLEANSING_DURATION = 15 * 20;
+	//private static int CLEANSING_RESIST_LEVEL = 0;
+	//private static int CLEANSING_RESIST_DURATION = 41;
+	//private static int CLEANSING_RADIUS = 4;
+	//private static int CLEANSING_COOLDOWN = 30 * 20;
 
 	private static int DIVINE_JUSTICE_DAMAGE = 5;
 	private static int DIVINE_JUSTICE_HEAL = 4;
