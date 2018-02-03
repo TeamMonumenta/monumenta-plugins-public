@@ -31,7 +31,6 @@ import org.bukkit.util.Vector;
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
-import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
