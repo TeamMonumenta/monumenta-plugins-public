@@ -39,6 +39,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -415,6 +416,12 @@ public class EntityListener implements Listener {
 				iter.remove();
 			}
 		}
+	}
+
+	// Never generate new trades
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void VillagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
+		event.setCancelled(true);
 	}
 
 	//	An Arrow hit something.
