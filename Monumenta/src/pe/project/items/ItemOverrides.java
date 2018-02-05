@@ -23,6 +23,7 @@ public class ItemOverrides {
 	 * players in survival even if they have lore text
 	 */
 	public static EnumSet<Material> ALLOW_LORE_MATS = EnumSet.of(
+		Material.ANVIL,
 		Material.CHEST,
 		Material.ENDER_CHEST,
 		Material.PACKED_ICE,
