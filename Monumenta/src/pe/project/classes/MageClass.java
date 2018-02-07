@@ -29,6 +29,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
+import pe.project.utils.MetadataUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
@@ -139,8 +140,7 @@ public class MageClass extends BaseClass {
 								// First check if the mob is burning
 								// If burning, must either not have the metadata value or it must not match this player doing damage
 								if (arcaneStrike > 1 && mob.getFireTicks() > 0
-										&& (!mob.hasMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY)
-											|| (mob.getMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY).get(0).asInt() != player.getTicksLived()))) {
+								    && MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) {
 									dmg += ARCANE_STRIKE_BURN_DAMAGE;
 								}
 

@@ -42,7 +42,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -57,6 +56,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
+import pe.project.utils.MetadataUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -80,8 +80,8 @@ public class EntityListener implements Listener {
 		Entity combuster = event.getCombuster();
 
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
-			combustee.setMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY,
-								  new FixedMetadataValue(mPlugin, combuster.getTicksLived()));
+			MetadataUtils.checkOnceThisTick(mPlugin, combuster,
+			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
 		}
 
 		if ((combustee instanceof Player)) {
@@ -126,15 +126,9 @@ public class EntityListener implements Listener {
 				//  Make sure to not trigger class abilities off Throrns.
 				if (event.getCause() != DamageCause.THORNS) {
 
-					if (damagee.hasMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY)
-						&& damagee.getMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
 						// This damage was just added by the player's class - don't process class effects again
 						return;
-					} else {
-						// New damage this tick - mark entity so that this event handler will be skipped if
-						// more damage is applied by the player's class
-						damagee.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
-											new FixedMetadataValue(mPlugin, player.getTicksLived()));
 					}
 
 					BaseClass _class = mPlugin.getClass(player);

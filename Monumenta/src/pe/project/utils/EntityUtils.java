@@ -23,7 +23,6 @@ import org.bukkit.entity.Slime;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
@@ -227,8 +226,7 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
-		target.setMetadata(Constants.ENTITY_DAMAGE_NONCE_METAKEY,
-						   new FixedMetadataValue(plugin, damager.getTicksLived()));
+		MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
 		target.damage(damage, damager);
 	}
 }

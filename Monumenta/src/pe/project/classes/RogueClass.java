@@ -29,6 +29,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.MessagingUtils;
+import pe.project.utils.MetadataUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
@@ -252,8 +253,7 @@ public class RogueClass extends BaseClass {
 		// If this projectile was dodged in the ProjectileHitPlayerEvent, cancel it's damage
 		if ((type == EntityType.ARROW || type == EntityType.TIPPED_ARROW
 		     || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL)
-		    && player.hasMetadata(ROGUE_DODGING_NONCE_METAKEY)
-		    && player.getMetadata(ROGUE_DODGING_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+		    && !MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY)) {
 			return false;
 		}
 
@@ -372,12 +372,7 @@ public class RogueClass extends BaseClass {
 	@Override
 	public boolean PlayerCombustByEntityEvent(Player player, Entity combuster) {
 		// If the player just dodged a projectile this tick, cancel the combust event
-		if (player.hasMetadata(ROGUE_DODGING_NONCE_METAKEY)
-		    && player.getMetadata(ROGUE_DODGING_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
-			return false;
-		}
-
-		return true;
+		return MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY);
 	}
 
 	@Override
