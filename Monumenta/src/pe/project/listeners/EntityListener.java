@@ -96,7 +96,7 @@ public class EntityListener implements Listener {
 			if (damager instanceof LivingEntity) {
 				Player player = (Player)damagee;
 				if(!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
-																		  event.getFinalDamage())) 	{
+				                                                              event.getFinalDamage())) 	{
 					event.setCancelled(true);
 				}
 
@@ -424,7 +424,7 @@ public class EntityListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	//	An Arrow hit something.
+	//  An Arrow hit something.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileHitEvent(ProjectileHitEvent event) {
 		EntityType type = event.getEntityType();

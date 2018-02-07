@@ -31,12 +31,12 @@ import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
 
 /*
-	ByMyBlade
-	AdvancingShadows
-	Dodging
-	EscapeDeath
-	ViciousCombos
-	SmokeScreen
+    ByMyBlade
+    AdvancingShadows
+    Dodging
+    EscapeDeath
+    ViciousCombos
+    SmokeScreen
 */
 
 public class RogueClass extends BaseClass {
@@ -112,7 +112,8 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand,
+	                                Material blockClicked) {
 		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK))) {
 			int advancingShadows = ScoreboardUtils.getScoreboardValue(player, "AdvancingShadows");
 			if (advancingShadows > 0) {
@@ -136,15 +137,22 @@ public class RogueClass extends BaseClass {
 							newLoc.setYaw(player.getLocation().getYaw());
 							newLoc.setDirection(toPos.subtract(newLoc.toVector()).normalize());
 
-							//	+1 on the Y for eye height
-							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
+							//  +1 on the Y for eye height
+							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0),
+							                                 entity.getEyeLocation(), newLoc.getDirection(), range)) {
 								player.teleport(newLoc);
 							}
 
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+							                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE,
+							                                                  ADVANCING_SHADOWS_STRENGTH_DURATION,
+							                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL,
+							                                                  true, false));
 
 							if (advancingShadows > 1) {
-								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE,
+								                                                 ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE,
+								                                                 ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
 								for (Entity mob : entities) {
 									if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
 										MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
@@ -166,22 +174,27 @@ public class RogueClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), SMOKESCREEN_ID)) {
 						ItemStack mainHand = player.getInventory().getItemInMainHand();
 						if (mainHand != null && mainHand.getType() != Material.BOW) {
-							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE, SMOKESCREEN_RANGE);
+							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE,
+							                                                 SMOKESCREEN_RANGE);
 							for (Entity entity : entities) {
 								if (EntityUtils.isHostileMob(entity)) {
 									LivingEntity mob = (LivingEntity)entity;
 
-									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 : SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
+									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
+									                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
 
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_EFFECT_LEVEL, false, true));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION,
+									                                     weaknessLevel, false, true));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION,
+									                                     SMOKESCREEN_SLOWNESS_EFFECT_LEVEL, false, true));
 								}
 							}
 						}
 
 						Location loc = player.getLocation();
 						World world = player.getWorld();
-						ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_LARGE, loc.add(0, 1, 0), 150, 2.0, 0.8, 2.0, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_LARGE, loc.add(0, 1, 0), 150, 2.0, 0.8,
+						                                   2.0, 0.001);
 						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), SMOKESCREEN_ID, SMOKESCREEN_COOLDOWN);
@@ -192,7 +205,8 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage,
+	                                                DamageCause cause) {
 		if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -201,7 +215,10 @@ public class RogueClass extends BaseClass {
 				if (byMyBlade > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), BY_MY_BLADE_ID)) {
 						int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, effectLevel, false, true));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+						                                 new PotionEffect(PotionEffectType.FAST_DIGGING,
+						                                                  BY_MY_BLADE_HASTE_DURATION,
+						                                                  effectLevel, false, true));
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), BY_MY_BLADE_ID, BY_MY_BLADE_COOLDOWN);
 
@@ -232,7 +249,11 @@ public class RogueClass extends BaseClass {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DODGING_ID)) {
 					World world = player.getWorld();
 					if (dodging > 1) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, DODGING_SPEED_EFFECT_DURATION, DODGING_SPEED_EFFECT_LEVEL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+						                                 new PotionEffect(PotionEffectType.SPEED,
+						                                                  DODGING_SPEED_EFFECT_DURATION,
+						                                                  DODGING_SPEED_EFFECT_LEVEL,
+						                                                  true, false));
 						world.playSound(player.getLocation(), "entity.firework.launch", 2.0f, 0.5f);
 					}
 
@@ -250,25 +271,35 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager,
+	                                                double damage) {
 		double correctHealth = player.getHealth() - damage;
 		if (correctHealth > 0 && correctHealth < ESCAPE_DEATH_HEALTH_TRIGGER) {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ESCAPE_DEATH_ID)) {
-					List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE);
+					List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE,
+					                                                 ESCAPE_DEATH_RANGE);
 					for (Entity entity : entities) {
 						if (EntityUtils.isHostileMob(entity)) {
 							LivingEntity mob = (LivingEntity)entity;
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS, ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
+							                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
+							                                     ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
 						}
 					}
 
 					if (escapeDeath > 1) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION, ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, false));
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER, ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+						                                 new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION,
+						                                                  ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+						                                 new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER,
+						                                                  ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+						                                 new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER,
+						                                                  ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
 					}
 
 					World world = player.getWorld();
@@ -279,10 +310,12 @@ public class RogueClass extends BaseClass {
 					Vector offset = new Vector(val, val, val);
 					int particles = escapeDeath == 1 ? 30 : 500;
 
-					ParticleUtils.playParticlesInWorld(world, Particle.SPELL_INSTANT, loc, particles, offset.getX(), offset.getY(), offset.getZ(), 0.001);
+					ParticleUtils.playParticlesInWorld(world, Particle.SPELL_INSTANT, loc, particles, offset.getX(),
+					                                   offset.getY(), offset.getZ(), 0.001);
 
 					if (escapeDeath > 1) {
-						ParticleUtils.playParticlesInWorld(world, Particle.CLOUD, loc, particles, offset.getX(), offset.getY(), offset.getZ(), 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.CLOUD, loc, particles, offset.getX(),
+						                                   offset.getY(), offset.getZ(), 0.001);
 					}
 
 					world.playSound(loc, "item.totem.use", 0.5f, 0.5f);
@@ -297,7 +330,8 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause,
+	                             boolean shouldGenDrops) {
 		if (EntityUtils.isEliteBoss(killedEntity)) {
 			int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
 			if (viciousCombos > 0) {
@@ -306,7 +340,8 @@ public class RogueClass extends BaseClass {
 				loc = loc.add(0, 0.5, 0);
 
 				if (viciousCombos > 1) {
-					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE);
+					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE,
+					                                                 VICIOUS_COMBOS_RANGE);
 					for (Entity entity : entities) {
 						if (EntityUtils.isHostileMob(entity)) {
 							LivingEntity mob = (LivingEntity)entity;
@@ -318,21 +353,25 @@ public class RogueClass extends BaseClass {
 				mPlugin.mTimers.removeAllCooldowns(player.getUniqueId());
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
 
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+				                                 new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION,
+				                                                  VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
-				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE,
+				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE,
+				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			}
 		}
 	}
 
 	@Override
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {
-		//	Make sure only players trigger this.
+		//  Make sure only players trigger this.
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
 
-			//	This test if the damagee is an instance of a Elite or Boss.
+			//  This test if the damagee is an instance of a Elite or Boss.
 			if (damagee instanceof LivingEntity && EntityUtils.isEliteBoss((LivingEntity)event.getEntity())) {
 				// Also make sure said player is weilding two swords.
 				ItemStack mainHand = player.getInventory().getItemInMainHand();

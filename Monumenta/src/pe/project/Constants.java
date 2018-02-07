@@ -35,7 +35,7 @@ public class Constants {
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 	public static final String ENTITY_DAMAGE_NONCE_METAKEY = "MonumentaEntityDamageNonce";
 	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";
-	public static final String ANVIL_CONFIRMATION_METAKEY = "MonumentaAnvilConfirmationMetakey";
+	public static final String ANVIL_CONFIRMATION_METAKEY = "MonumentaAnvilConfirmation";
 
 
 	// For /back and /forward
