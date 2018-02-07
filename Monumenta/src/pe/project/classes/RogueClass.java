@@ -1,5 +1,6 @@
 package pe.project.classes;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -12,12 +13,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
@@ -91,6 +95,8 @@ public class RogueClass extends BaseClass {
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
 	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL = 1;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
+
+	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
 
 	public RogueClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -241,9 +247,27 @@ public class RogueClass extends BaseClass {
 
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) {
-		//	Dodging
 		EntityType type = damager.getType();
-		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL) {
+
+		// If this projectile was dodged in the ProjectileHitPlayerEvent, cancel it's damage
+		if ((type == EntityType.ARROW || type == EntityType.TIPPED_ARROW
+		     || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL)
+		    && player.hasMetadata(ROGUE_DODGING_NONCE_METAKEY)
+		    && player.getMetadata(ROGUE_DODGING_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public void ProjectileHitPlayerEvent(Player player, Projectile damager) {
+		EntityType type = damager.getType();
+
+		//  Dodging
+		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW
+		    || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL) {
+
 			int dodging = ScoreboardUtils.getScoreboardValue(player, "Dodging");
 			if (dodging > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DODGING_ID)) {
@@ -262,12 +286,28 @@ public class RogueClass extends BaseClass {
 					int cooldown = dodging == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), DODGING_ID, cooldown);
 
-					return false;
+					// Remove effects from tipped arrows
+					// TODO: This is the same code as for removing from shields, should probably be
+					// a utility function
+					if (type == EntityType.TIPPED_ARROW) {
+						TippedArrow arrow = (TippedArrow)damager;
+						PotionData data = new PotionData(PotionType.AWKWARD);
+						arrow.setBasePotionData(data);
+
+						if (arrow.hasCustomEffects()) {
+							Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
+							while (effectIter.hasNext()) {
+								PotionEffect effect = effectIter.next();
+								arrow.removeCustomEffect(effect.getType());
+							}
+						}
+					}
+
+					// Set metadata indicating this event happened this tick
+					MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY);
 				}
 			}
 		}
-
-		return true;
 	}
 
 	@Override
@@ -326,6 +366,17 @@ public class RogueClass extends BaseClass {
 				}
 			}
 		}
+		return true;
+	}
+
+	@Override
+	public boolean PlayerCombustByEntityEvent(Player player, Entity combuster) {
+		// If the player just dodged a projectile this tick, cancel the combust event
+		if (player.hasMetadata(ROGUE_DODGING_NONCE_METAKEY)
+		    && player.getMetadata(ROGUE_DODGING_NONCE_METAKEY).get(0).asInt() == player.getTicksLived()) {
+			return false;
+		}
+
 		return true;
 	}
 

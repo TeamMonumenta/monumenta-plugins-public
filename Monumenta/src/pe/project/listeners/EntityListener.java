@@ -79,9 +79,16 @@ public class EntityListener implements Listener {
 		Entity combustee = event.getEntity();
 		Entity combuster = event.getCombuster();
 
-		if (combustee.getFireTicks() <= 0) {
+		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
 			combustee.setMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY,
 								  new FixedMetadataValue(mPlugin, combuster.getTicksLived()));
+		}
+
+		if ((combustee instanceof Player)) {
+			Player player = (Player)combustee;
+			if (!mPlugin.getClass(player).PlayerCombustByEntityEvent(player, combuster)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -429,12 +436,15 @@ public class EntityListener implements Listener {
 	public void ProjectileHitEvent(ProjectileHitEvent event) {
 		EntityType type = event.getEntityType();
 
-		if (type == EntityType.TIPPED_ARROW) {
-			Entity entity = event.getHitEntity();
-			if (entity != null) {
-				if (entity instanceof Player) {
-					Player player = (Player)entity;
+		Entity entity = event.getHitEntity();
+		if (entity != null) {
+			if (entity instanceof Player) {
+				Player player = (Player)entity;
 
+				// Give classes a chance to modify the projectile first
+				mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
+
+				if (type == EntityType.TIPPED_ARROW) {
 					TippedArrow arrow = (TippedArrow)event.getEntity();
 
 					if (player.isBlocking()) {
