@@ -129,7 +129,7 @@ public class WarlockClass extends BaseClass {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
 				}
 				else if (InventoryUtils.isScytheItem(mainHand)) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 1, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 0, true, false));
 				}
 			}
 		}
