@@ -19,7 +19,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -36,13 +35,13 @@ import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
 
 /*
-	Agility
-	Swiftness
-	Exploration
-	BowMastery
-	Tinkering
-	Volley
-	StandardBearer
+    Agility
+    Swiftness
+    Exploration
+    BowMastery
+    Tinkering
+    Volley
+    StandardBearer
 */
 
 public class ScoutClass extends BaseClass {
@@ -112,40 +111,28 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		{
-			//	Volley
-			int volley = ScoreboardUtils.getScoreboardValue(player, "Volley");
-			if (volley > 0) {
-				if (arrow.hasMetadata("Volley")) {
-					double damageMultiplier = volley == 1 ? VOLLEY_1_DAMAGE_INCREASE : VOLLEY_2_DAMAGE_INCREASE;
-					double oldDamage = event.getDamage();
+	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee,
+	                                          EntityDamageByEntityEvent event) {
+		//  Volley
+		int volley = ScoreboardUtils.getScoreboardValue(player, "Volley");
+		if (volley > 0) {
+			if (arrow.hasMetadata("Volley")) {
+				double damageMultiplier = volley == 1 ? VOLLEY_1_DAMAGE_INCREASE : VOLLEY_2_DAMAGE_INCREASE;
+				double oldDamage = event.getDamage();
 
-					double newDamage = oldDamage + (oldDamage * damageMultiplier);
-					event.setDamage(newDamage);
-				}
+				double newDamage = oldDamage + (oldDamage * damageMultiplier);
+				event.setDamage(newDamage);
 			}
 		}
-		{
-			//	Bow Mastery
-			int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
-			if (bowMastery > 0) {
-				if (arrow.isCritical()) {
-					int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-					EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, player);
-				}
+
+		//  Bow Mastery
+		int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
+		if (bowMastery > 0) {
+			if (arrow.isCritical()) {
+				int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+				EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, player);
 			}
 		}
-	}
-
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
-		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
-		if (agility > 0) {
-			int agilityDamage = (agility == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
-			EntityUtils.damageEntity(mPlugin, damagee, agilityDamage, player);
-		}
-		return false;
 	}
 
 	@Override
@@ -154,7 +141,7 @@ public class ScoutClass extends BaseClass {
 
 		boolean wasCritical = arrow.isCritical();
 
-		//	Volley
+		//  Volley
 		if (player.isSneaking()) {
 			int volley = ScoreboardUtils.getScoreboardValue(player, "Volley");
 			if (volley > 0) {
@@ -199,7 +186,7 @@ public class ScoutClass extends BaseClass {
 						mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
 					}
 
-					//	I hate this so much, you don't even know... [Rock]
+					//  I hate this so much, you don't even know... [Rock]
 					Location jankWorkAround = player.getLocation();
 					jankWorkAround.setY(-15);
 					arrow.teleport(jankWorkAround);
@@ -218,7 +205,7 @@ public class ScoutClass extends BaseClass {
 			projectiles.add(arrow);
 		}
 
-		//	Bow Mastery
+		//  Bow Mastery
 		int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
 		if (bowMastery > 0) {
 			if (wasCritical) {
@@ -236,7 +223,9 @@ public class ScoutClass extends BaseClass {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), STANDARD_BEARER_ID)) {
 				double range = arrow.getLocation().distance(player.getLocation());
 				if (range <= STANDARD_BEARER_TRIGGER_RANGE) {
-					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, STANDARD_BEARER_ID, STANDARD_BEARER_TAG_NAME, STANDARD_BEARER_DURATION, player.getLocation(), STANDARD_BEARER_TRIGGER_RADIUS);
+					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, STANDARD_BEARER_ID,
+					                                          STANDARD_BEARER_TAG_NAME, STANDARD_BEARER_DURATION, player.getLocation(),
+					                                          STANDARD_BEARER_TRIGGER_RADIUS);
 
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), STANDARD_BEARER_ID, STANDARD_BEARER_COOLDOWN);
 				}
@@ -245,8 +234,9 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
-		//	StandardBearer
+	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer,
+	                                   int abilityID) {
+		//  StandardBearer
 		{
 			if (abilityID == STANDARD_BEARER_ID) {
 				int standardBearer = ScoreboardUtils.getScoreboardValue(owner, "StandardBearer");
@@ -256,7 +246,8 @@ public class ScoutClass extends BaseClass {
 					double z = loc.getZ();
 					Location newLoc = new Location(loc.getWorld(), x, y, z);
 
-					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.VILLAGER_HAPPY, newLoc, 15, 0.75, 0.75, 0.75, 0.001);
+					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.VILLAGER_HAPPY, newLoc, 15, 0.75,
+					                                   0.75, 0.75, 0.001);
 
 					if (standardBearer > 1) {
 						AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
@@ -269,8 +260,9 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
-		//	StandardBearer
+	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer,
+	                                    int abilityID) {
+		//  StandardBearer
 		{
 			if (abilityID == STANDARD_BEARER_ID) {
 				int standardBearer = ScoreboardUtils.getScoreboardValue(owner, "StandardBearer");
@@ -286,7 +278,8 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand,
+	                                Material blockClicked) {
 		if (player.isSneaking()) {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
@@ -295,17 +288,20 @@ public class ScoutClass extends BaseClass {
 						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 						World world = player.getWorld();
 
-						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS);
-						for(Entity e : entities) {
-							if(EntityUtils.isHostileMob(e)) {
+						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS,
+						                                                 EAGLE_EYE_RADIUS);
+						for (Entity e : entities) {
+							if (EntityUtils.isHostileMob(e)) {
 								LivingEntity mob = (LivingEntity)e;
 
 								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 								if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION,
+									                                     EAGLE_EYE_EFFECT_LVL, true, false));
 									mob.setMetadata(EAGLE_EYE_TAG_NAME, new FixedMetadataValue(mPlugin, 1));
 
-									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
+									                                   10, 0.7, 0.7, 0.7, 0.001);
 									world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
 								}
 							}
@@ -335,30 +331,41 @@ public class ScoutClass extends BaseClass {
 
 			int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
 			if (eagleEye > 0) {
-				//	TODO: In the future we need to have the entities meta data remove after the durations....for now...we be lazy.
+				//  TODO: In the future we need to have the entities meta data remove after the durations....for now...we be lazy.
 				if (mob.hasMetadata(EAGLE_EYE_TAG_NAME) && mob.hasPotionEffect(PotionEffectType.GLOWING)) {
 					int extraDamage = (eagleEye == 1) ? EAGLE_EYE_1_EXTRA_DAMAGE : EAGLE_EYE_2_EXTRA_DAMAGE;
 					event.setDamage(event.getDamage() + extraDamage);
 				}
 			}
+
+			// Agility
+			int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
+			if (agility > 0) {
+				int extraDamage = (agility == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+				event.setDamage(event.getDamage() + extraDamage);
+			}
 		}
 	}
+
 
 	public void _testForAgility(Player player) {
 		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
 		if (agility > 0) {
 			int effectLevel = agility == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
 		}
 	}
 
 	public void _testForSwiftness(Player player) {
 		int swiftness = ScoreboardUtils.getScoreboardValue(player, "Swiftness");
 		if (swiftness > 0) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
 
 			if (swiftness > 1) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+				                                 new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
 			}
 		}
 	}
