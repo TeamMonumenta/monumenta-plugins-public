@@ -22,7 +22,7 @@ tar xzf ~/dungeon_template-keep-this-12-29-2017.tgz
 
 1. Once it finishes, rename the dungeons-out folder to `POST_RESET`. Things get added to this folder throughout reset until it becomes the new `project_epic` folder.
 ```
-mv dungeons-out POST_RESET
+mv ~/tmp/dungeons-out ~/tmp/POST_RESET
 ```
 
 1. Remove the no-longer-needed processing directories
@@ -40,7 +40,7 @@ rm -rf ~/tmp/Project_Epic-dungeon ~/tmp/Project_Epic-template
 
 ## Compiling and tagging the plugin - Your development system
 - Tag the current version of the plugin and push that tag to github. This lets us go back later and figure out what version of the plugin was used for which terrain reset.
-- You'll need to adapt the 2.16.0 number below for whatever the next version should be.
+- You'll need to adapt the 2.17.0 number below for whatever the next version should be.
 - Do this on your development system, there's no plugin code on the build server
 - Also push the newly compiled plugin to the build server so it will be included in terrain reset.
 ```
@@ -48,8 +48,8 @@ cd Monumenta-Plugins
 git fetch
 git checkout master
 git merge origin/master
-git tag 2.16.0
-git push origin 2.16.0
+git tag 2.17.0
+git push origin 2.17.0
 ./clean.sh && ./compile.sh && ./upload.sh
 ```
 
@@ -100,8 +100,8 @@ vim ~/tmp/POST_RESET/server_config/server_config_template/spigot.yml
 ## Wrap it up and transfer to play server
 ```
 cd ~/tmp
-tar czf project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz POST_RESET TEMPLATE
-scp project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz 'play:/home/rock/tmp/'
+tar czf ~/tmp/project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz ~/tmp/POST_RESET ~/tmp/TEMPLATE
+scp ~/tmp/project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz 'play:/home/rock/tmp/'
 ```
 
 # For reset - Play Server Console
@@ -131,29 +131,29 @@ mark2 list
 1. Tarball the whole `project_epic` folder once everything is stopped as a backup
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_$(date +%Y_%m_%d).tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_$(date +%Y_%m_%d).tgz ~/project_epic
 ```
 
 1. Since the dungeon region files are giant and no longer needed, delete them and re-tarball to save space
 ```
 cd ~/project_epic
 for x in white orange magenta lightblue yellow r1bonus tutorial purgatory roguelike; do
-	rm -r $x/Project_Epic-$x/region
-	rm -rf $x/plugins/CoreProtect
+	rm -r ~/project_epic/$x/Project_Epic-$x/region
+	rm -rf ~/project_epic/$x/plugins/CoreProtect
 done
-rm -rf purgatory tutorial
+rm -rf ~/project_epic/purgatory ~/project_epic/tutorial
 ```
 
 1. Remove the giant spigot jars from the `server_config` directory
 ```
-rm server_config/*.jar
-rm server_config/plugins/*.jar
+rm ~/project_epic/server_config/*.jar
+rm ~/project_epic/server_config/plugins/*.jar
 ```
 
 1. Re-tarball the project for archival purposes
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_$(date +%Y_%m_%d).tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_$(date +%Y_%m_%d).tgz ~/project_epic
 ```
 
 1. Move the `project_epic` to ~/tmp where it will be processed for reset
@@ -170,8 +170,8 @@ cd ~/MCEdit-And-Automation
 git fetch
 git rebase origin/master
 git status
-git tag 2.16.0
-git push origin 2.16.0
+git tag 2.17.0
+git push origin 2.17.0
 ```
 
 General steps on the play server:
@@ -179,7 +179,7 @@ General steps on the play server:
 cd ~/MCEdit-And-Automation
 git status
 git fetch
-git checkout 2.16.0
+git checkout 2.17.0
 git submodule update
 ```
 
@@ -192,8 +192,8 @@ cd ~/tmp
 
 1. Unpack the tarball (creates `POST_RESET` and `TEMPLATE` folders)
 ```
-tar xzf project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz
-mv project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz ~/1_ARCHIVE/
+tar xzf ~/tmp/project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz
+mv ~/tmp/project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz ~/1_ARCHIVE/
 ```
 
 ### Bungeecord
@@ -204,7 +204,7 @@ mv ~/tmp/PRE_RESET/bungee ~/tmp/POST_RESET/
 
 1. Increment the version number in `~/tmp/POST_RESET/bungee/config.yml` TODO IMPROVE
 ```
-motd: 'Monumenta : Beta 2.1   Version: 1.12.2'
+motd: 'Monumenta : Beta 2.1   Version: 1.12.2\nSomeone put the wrong message here...'
 ```
 
 ### Server config
@@ -223,7 +223,7 @@ vim ~/tmp/POST_RESET/server_config/server_config_template/plugins/Monumenta-Plug
 1. Copy the luckperms settings from the beta server
 ```
 rm -rf ~/tmp/POST_RESET/server_config/plugins/LuckPerms/yaml-storage
-mv ~/tmp/PRE_RESET/server_config/plugins/LuckPerms/yaml-storage POST_RESET/server_config/plugins/LuckPerms/yaml-storage
+mv ~/tmp/PRE_RESET/server_config/plugins/LuckPerms/yaml-storage ~/tmp/POST_RESET/server_config/plugins/LuckPerms/yaml-storage
 ```
 
 1. Server config template complete - delete the old `server_config` directory
@@ -262,9 +262,9 @@ mv ~/tmp/PRE_RESET/build ~/tmp/POST_RESET/
 1. Copy the whitelist, opslist, and banlist from the play server. Overwrite if prompted
 ```bash
 for x in betaplots lightblue magenta orange r1bonus r1plots region_1 roguelike tutorial white yellow; do
-	cp PRE_RESET/region_1/whitelist.json POST_RESET/$x/
-	cp PRE_RESET/region_1/banned-players.json POST_RESET/$x/
-	cp PRE_RESET/region_1/ops.json POST_RESET/$x/
+	cp ~/tmp/PRE_RESET/region_1/whitelist.json ~/tmp/POST_RESET/$x/
+	cp ~/tmp/PRE_RESET/region_1/banned-players.json ~/tmp/POST_RESET/$x/
+	cp ~/tmp/PRE_RESET/region_1/ops.json ~/tmp/POST_RESET/$x/
 done
 ```
 
@@ -272,7 +272,7 @@ done
 1. Run the configuration generator on each server shard in play server mode
 ```
 cd POST_RESET
-$HOME/MCEdit-And-Automation/utility_code/gen_server_config.py --play build betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
+~/MCEdit-And-Automation/utility_code/gen_server_config.py --play build betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 ```
 
 ### Final steps
@@ -308,12 +308,15 @@ cd ~/project_epic
 
 launch_server() (
 	cd $x
-	mark2 start &
+	mark2 start > /dev/null
+	print "Finished starting $x"
 )
 for x in betaplots build lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 do
-	launch_server $x
+	launch_server $x &
 done
+wait
+print 'All shards should be started. Please verify.'
 ```
 
 1. Use `mark2 attach` to verify that each and every server is up and running
