@@ -40,7 +40,7 @@ rm -rf ~/tmp/Project_Epic-dungeon ~/tmp/Project_Epic-template
 
 ## Compiling and tagging the plugin - Your development system
 - Tag the current version of the plugin and push that tag to github. This lets us go back later and figure out what version of the plugin was used for which terrain reset.
-- You'll need to adapt the 2.14.0 number below for whatever the next version should be.
+- You'll need to adapt the 2.16.0 number below for whatever the next version should be.
 - Do this on your development system, there's no plugin code on the build server
 - Also push the newly compiled plugin to the build server so it will be included in terrain reset.
 ```
@@ -48,8 +48,8 @@ cd Monumenta-Plugins
 git fetch
 git checkout master
 git merge origin/master
-git tag 2.14.0
-git push origin 2.14.0
+git tag 2.16.0
+git push origin 2.16.0
 ./clean.sh && ./compile.sh && ./upload.sh
 ```
 
@@ -81,7 +81,7 @@ tar xzf ~/Project_Epic-tutorial.good.jan-12-2018.tgz
 ```
 cd ~/project_epic/server_config/data
 git add .
-git commit -m "Changes for terrain reset on 2018_02_02"
+git commit -m "Changes for terrain reset on $(date +%Y_%m_%d)"
 ```
 
 1. Copy the build server's config
@@ -100,8 +100,8 @@ vim ~/tmp/POST_RESET/server_config/server_config_template/spigot.yml
 ## Wrap it up and transfer to play server
 ```
 cd ~/tmp
-tar czf project_epic_build_template_pre_reset_2018_02_02.tgz POST_RESET TEMPLATE
-scp project_epic_build_template_pre_reset_2018_02_02.tgz 'play:/home/rock/tmp/'
+tar czf project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz POST_RESET TEMPLATE
+scp project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz 'play:/home/rock/tmp/'
 ```
 
 # For reset - Play Server Console
@@ -131,7 +131,7 @@ mark2 list
 1. Tarball the whole `project_epic` folder once everything is stopped as a backup
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_2018_02_02.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_$(date +%Y_%m_%d).tgz project_epic
 ```
 
 1. Since the dungeon region files are giant and no longer needed, delete them and re-tarball to save space
@@ -153,7 +153,7 @@ rm server_config/plugins/*.jar
 1. Re-tarball the project for archival purposes
 ```
 cd ~
-tar czf ~/1_ARCHIVE/project_epic_pre_reset_2018_02_02.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_pre_reset_$(date +%Y_%m_%d).tgz project_epic
 ```
 
 1. Move the `project_epic` to ~/tmp where it will be processed for reset
@@ -161,14 +161,27 @@ tar czf ~/1_ARCHIVE/project_epic_pre_reset_2018_02_02.tgz project_epic
 mv project_epic ~/tmp/PRE_RESET
 ```
 
-### Updating the tools
-TODO
-MAKE SURE SHIT IS PUSHED
-cd
-stash
-pull
-submodule update
-pop
+### Make sure MCEdit-And-Automation is up to date
+Make sure all the latest code is committed and pushed for the MCEdit-And-Automation repository
+
+General steps on the build server:
+```
+cd ~/MCEdit-And-Automation
+git fetch
+git rebase origin/master
+git status
+git tag 2.16.0
+git push origin 2.16.0
+```
+
+General steps on the play server:
+```
+cd ~/MCEdit-And-Automation
+git status
+git fetch
+git checkout 2.16.0
+git submodule update
+```
 
 ## The actual reset
 ### Extract foundation
@@ -179,8 +192,8 @@ cd ~/tmp
 
 1. Unpack the tarball (creates `POST_RESET` and `TEMPLATE` folders)
 ```
-tar xzf project_epic_build_template_pre_reset_2018_02_02.tgz
-mv project_epic_build_template_pre_reset_2018_02_02.tgz ~/1_ARCHIVE/
+tar xzf project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz
+mv project_epic_build_template_pre_reset_$(date +%Y_%m_%d).tgz ~/1_ARCHIVE/
 ```
 
 ### Bungeecord
@@ -196,7 +209,7 @@ motd: 'Monumenta : Beta 2.1   Version: 1.12.2'
 
 ### Server config
 1. Update the server's `server_version` (and `daily_version` too if reset spans when the daily reset would be).
-First open the `PRE_RESET` version to find what the version(s) are, then increment them in the `POST_RESET` version
+First open the `PRE_RESET` version to find what the version(s) are, then increment only the version number in the `POST_RESET` version.
 <span style="color:red">DON'T SCREW THIS UP</span>
 ```
 cat ~/tmp/PRE_RESET/region_1/plugins/Monumenta-Plugins/config.yml
@@ -204,7 +217,7 @@ cat ~/tmp/PRE_RESET/region_1/plugins/Monumenta-Plugins/config.yml
 	daily_version: 70
 vim ~/tmp/POST_RESET/server_config/server_config_template/plugins/Monumenta-Plugins/config.yml
 	version: 110
-	daily_version: 71
+	daily_version: 70
 ```
 
 1. Copy the luckperms settings from the beta server
@@ -276,7 +289,7 @@ mv ~/tmp/POST_RESET ~/tmp/project_epic
 1. Tar the directory as a backup
 ```
 cd ~/tmp
-tar czf ~/1_ARCHIVE/project_epic_post_reset_2018_02_02.tgz project_epic
+tar czf ~/1_ARCHIVE/project_epic_post_reset_$(date +%Y_%m_%d).tgz project_epic
 ```
 
 1. Move the reset folder to the correct location
