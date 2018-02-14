@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -33,6 +35,7 @@ import pe.project.utils.EntityUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.InventoryUtils;
 
 /*
     Agility
@@ -82,6 +85,8 @@ public class ScoutClass extends BaseClass {
 	private static int STANDARD_BEARER_DURATION = 30 * 20;
 	private static int STANDARD_BEARER_TRIGGER_RADIUS = 12;
 	private static double STANDARD_BEARER_DAMAGE_MULTIPLIER = 1.25;
+
+	private static float PASSIVE_ARROW_SAVE = 0.20f;
 
 	public ScoutClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -138,6 +143,35 @@ public class ScoutClass extends BaseClass {
 	@Override
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
 		List<Projectile> projectiles;
+
+	// PASSIVE : 25% chance of not consuming an arrow
+		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			if (InventoryUtils.isBowItem(mainHand)) {
+				int infLevel = mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE);
+				if (infLevel == 0) {
+					Inventory playerInv = player.getInventory();
+					int firstArrow = playerInv.first(Material.ARROW);
+					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+
+					int arrowSlot = -1;
+					if (firstArrow == -1 && firstTippedArrow > -1) {
+						arrowSlot = firstTippedArrow;
+					} else if (firstArrow > - 1 && firstTippedArrow == -1) {
+						arrowSlot = firstArrow;
+					} else {
+						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					}
+
+					ItemStack arrowStack = playerInv.getItem(arrowSlot);
+					int arrowQuantity = arrowStack.getAmount();
+					if (arrowQuantity < 64) {
+						arrowStack.setAmount(arrowQuantity);
+					}
+					playerInv.setItem(arrowSlot, arrowStack);
+				}
+			}
+		}
 
 		boolean wasCritical = arrow.isCritical();
 
@@ -234,8 +268,7 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer,
-	                                   int abilityID) {
+	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
 		//  StandardBearer
 		{
 			if (abilityID == STANDARD_BEARER_ID) {
@@ -260,8 +293,7 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer,
-	                                    int abilityID) {
+	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {
 		//  StandardBearer
 		{
 			if (abilityID == STANDARD_BEARER_ID) {
@@ -278,8 +310,7 @@ public class ScoutClass extends BaseClass {
 	}
 
 	@Override
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand,
-	                                Material blockClicked) {
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (player.isSneaking()) {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");

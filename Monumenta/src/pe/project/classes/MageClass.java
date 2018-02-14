@@ -95,6 +95,8 @@ public class MageClass extends BaseClass {
 	private static int INTELLECT_MS_1_COOLDOWN = 14 * 20;
 	private static int INTELLECT_MS_2_COOLDOWN = 14 * 20;
 
+	private static int PASSIVE_EFFECT_DURATION = 25;
+
 	public MageClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
@@ -113,8 +115,23 @@ public class MageClass extends BaseClass {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Arcane Strike is now off cooldown");
 		} else if (abilityID == MAGMA_SHIELD_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Magma Shield is now off cooldown");
-		}else if (abilityID == PRISMATIC_SHIELD_ID) {
+		} else if (abilityID == PRISMATIC_SHIELD_ID) {
 			MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield is now off cooldown");
+		}
+	}
+
+	@Override
+	public boolean has1SecondTrigger() {
+		return true;
+	}
+
+	@Override
+	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+		//	Don't trigger this if dead!
+		if (!player.isDead() && oneSecond) {
+			if (player.getPotionEffect(PotionEffectType.SLOW) != null || player.getFireTicks() > 0) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_EFFECT_DURATION, 0, true, true));
+			}
 		}
 	}
 

@@ -25,6 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
@@ -62,12 +63,14 @@ public class ClericClass extends BaseClass {
 
 	//	CLEANSING
 	private static int CLEANSING_ID = 34;
-	//private static int CLEANSING_FAKE_ID = 10034;
-	//private static int CLEANSING_DURATION = 15 * 20;
-	//private static int CLEANSING_RESIST_LEVEL = 0;
-	//private static int CLEANSING_RESIST_DURATION = 41;
-	//private static int CLEANSING_RADIUS = 4;
-	//private static int CLEANSING_COOLDOWN = 30 * 20;
+	private static int CLEANSING_FAKE_ID = 10034;
+	private static int CLEANSING_DURATION = 15 * 20;
+	private static int CLEANSING_RESIST_LEVEL = 0;
+	private static int CLEANSING_STRENGTH_LEVEL = 0;
+	private static int CLEANSING_EFFECT_DURATION = 3 * 20;
+	private static int CLEANSING_RADIUS = 4;
+	private static int CLEANSING_1_COOLDOWN = 45 * 20;
+	private static int CLEANSING_2_COOLDOWN = 30 * 20;
 
 	private static int DIVINE_JUSTICE_DAMAGE = 5;
 	private static int DIVINE_JUSTICE_HEAL = 4;
@@ -92,6 +95,10 @@ public class ClericClass extends BaseClass {
 	private static double HEALING_DOT_ANGLE = 0.33;
 	private static int HEALING_1_COOLDOWN = 20 * 20;
 	private static int HEALING_2_COOLDOWN = 15 * 20;
+
+	private static int PASSIVE_HEAL_AMOUNT = 1;
+	private static int PASSIVE_HEAL_RADIUS = 5;
+	private static double PASSIVE_HP_THRESHOLD = 12.0;
 
 	public ClericClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -119,13 +126,27 @@ public class ClericClass extends BaseClass {
 	}
 
 	@Override
-	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
 		if (!player.isDead()) {
 			boolean threeSeconds = ((originalTime % 3) == 0);
 
-			//	Rejuvenation
 			if (threeSeconds) {
+			// Passive Heal Radius
+				World world = player.getWorld();
+				List<Entity> passiveEntities = player.getNearbyEntities(PASSIVE_HEAL_RADIUS, PASSIVE_HEAL_RADIUS, PASSIVE_HEAL_RADIUS);
+				for (Entity entity : passiveEntities) {
+					if (entity instanceof Player) {
+						Player p = (Player)entity;
+
+						if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
+							PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
+							ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
+						}
+					}
+				}
+
+			// 	Rejuvenation
 				int rejuvenation = ScoreboardUtils.getScoreboardValue(player, "Rejuvenation");
 				if (rejuvenation > 0) {
 					List<Entity> entities = player.getNearbyEntities(REJUVENATION_RADIUS, REJUVENATION_RADIUS, REJUVENATION_RADIUS);
@@ -136,6 +157,7 @@ public class ClericClass extends BaseClass {
 
 							//	If this is us or we're allowing anyone to get it.
 							if (p == player || rejuvenation > 1) {
+								ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 							}
 						}
@@ -143,37 +165,34 @@ public class ClericClass extends BaseClass {
 				}
 			}
 
-			// Kala's attempt to make Cleansing Rain
-			// Spoilers : It doesn't work
-
-			/*boolean oneSecond = ((originalTime % 1) == 0);
-
 			if (oneSecond) {
-				int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
+				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 				if (cleansing > 0) {
 					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_FAKE_ID)) {
-						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 1, 0), 40, 1.2, 0.35, 1.2, 0.001);
+						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 200, 2.5, 2, 2.5, 0.001);
+						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 30, 2, 1.5, 2, 0.001);
 
 						List<Entity> entities = player.getNearbyEntities(CLEANSING_RADIUS, CLEANSING_RADIUS, CLEANSING_RADIUS);
 						entities.add(player);
 						for (Entity entity : entities) {
 							if (entity instanceof Player) {
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.WITHER);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SLOW);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SLOW_DIGGING);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.POISON);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.WEAKNESS);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.BLINDNESS);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.CONFUSION);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.WITHER);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.SLOW);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.SLOW_DIGGING);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.POISON);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.WEAKNESS);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.BLINDNESS);
+								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.CONFUSION);
 
+								((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, false));
 								if (cleansing > 1) {
-									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_RESIST_DURATION, CLEANSING_RESIST_LEVEL, true, false));
+									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, false));
 								}
 							}
 						}
 					}
 				}
-			}*/
+			}
 		}
 	}
 
@@ -375,19 +394,21 @@ public class ClericClass extends BaseClass {
 				// And here's the trigger for the failed attempt at Cleansing Rain
 				// Intent was to use the CLEANSING_FAKE_ID as the tracker for it,
 				// But for some reason it works inconsistently
-				/*
-				if ((player.getLocation()).getPitch() < -87) {
-					//	Activate Cleansing Rain IF Looking straight up
 
-					int cleansing = ScoreboardUtils.getScoreboardValue(player, "CleansingRain");
+				if ((player.getLocation()).getPitch() < -45) {
+					//	Activate Cleansing Rain IF Looking upwards
+
+					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 					if (cleansing > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_ID)) {
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_ID, CLEANSING_COOLDOWN);
+							int cooldown = (cleansing == 1) ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_ID, cooldown);
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_FAKE_ID, CLEANSING_DURATION);
 						}
 					}
-				} else
-					*/
+				}
+
 				if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
 					if (healing > 0) {

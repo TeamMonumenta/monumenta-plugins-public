@@ -66,7 +66,7 @@ public class BaseClass {
 		return false;
 	}
 
-	public void PeriodicTrigger(Player player, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
+	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
 
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 

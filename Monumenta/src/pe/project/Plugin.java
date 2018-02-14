@@ -212,13 +212,14 @@ public class Plugin extends JavaPlugin {
 					//	Update periodic timers.
 					mPeriodicTimer++;
 
+					final boolean one = (mPeriodicTimer % Times.ONE.getValue()) == 0;
 					final boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
 					final boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
 						BaseClass pClass = Plugin.this.getClass(player);
-						pClass.PeriodicTrigger(player, two, fourty, sixty, mPeriodicTimer);
+						pClass.PeriodicTrigger(player, one, two, fourty, sixty, mPeriodicTimer);
 					}
 
 					mPeriodicTimer %= Times.ONE_TWENTY.getValue();

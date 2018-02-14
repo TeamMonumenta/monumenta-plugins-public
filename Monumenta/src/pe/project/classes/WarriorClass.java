@@ -9,6 +9,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +64,8 @@ public class WarriorClass extends BaseClass {
 	private static Integer BRUTE_FORCE_1_DAMAGE = 3;
 	private static Integer BRUTE_FORCE_2_DAMAGE = 7;
 	private static float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
+
+	private static double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -186,6 +190,10 @@ public class WarriorClass extends BaseClass {
 	@Override
 	public void PlayerRespawnEvent(Player player) {
 		_testToughness(player);
+
+		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		att.setBaseValue(0);
+		att.setBaseValue(PASSIVE_KNOCKBACK_RESISTANCE);
 	}
 
 	@Override

@@ -96,6 +96,15 @@ public class InventoryUtils {
 		return false;
 	}
 
+	public static boolean isBowItem(ItemStack item) {
+		if (item != null) {
+			Material mat = item.getType();
+			return mat == Material.BOW;
+		}
+
+		return false;
+	}
+
 	public static boolean isSwordItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
@@ -115,7 +124,7 @@ public class InventoryUtils {
 
 		return false;
 	}
-	
+
 	public static boolean isScytheItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
