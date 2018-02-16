@@ -59,8 +59,8 @@ public class WarlockClass extends BaseClass {
 
 	private static int CURSED_WOUND_EFFECT_LEVEL = 1;
 	private static int CURSED_WOUND_DURATION = 6 * 20;
-	private static int CURSED_WOUND_RADIUS = 5;
-	private static int CURSED_WOUND_BURST_DAMAGE = 3;
+	private static int CURSED_WOUND_RADIUS = 3;
+//	private static int CURSED_WOUND_BURST_DAMAGE = 3;
 
 	private static int GRASPING_CLAWS_ID = 74;
 	private static int GRASPING_CLAWS_RADIUS = 6;
@@ -110,29 +110,24 @@ public class WarlockClass extends BaseClass {
 
 /// VERSATILE MAGIC
 	private void _testItemsInHands(Player player, ItemStack mainHand, ItemStack offHand) {
-		int versatileMagic = ScoreboardUtils.getScoreboardValue(player, "VersatileMagic");
-		if (versatileMagic > 0) {
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
+		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+//		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
+//		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
 
-			if (InventoryUtils.isWandItem(offHand)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
-			}
-			else if (InventoryUtils.isScytheItem(offHand)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
-			}
-
-			if (versatileMagic > 1 ) {
-				if (InventoryUtils.isWandItem(mainHand)) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
-				}
-				else if (InventoryUtils.isScytheItem(mainHand)) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 0, true, false));
-				}
-			}
+		if (InventoryUtils.isWandItem(offHand)) {
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 		}
+		else if (InventoryUtils.isScytheItem(offHand)) {
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
+		}
+
+	/*	if (InventoryUtils.isWandItem(mainHand)) {
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
+		}
+		else if (InventoryUtils.isScytheItem(mainHand)) {
+			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 0, true, false));
+		}*/
 	}
 
 
@@ -186,14 +181,16 @@ public class WarlockClass extends BaseClass {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 
 				if (PlayerUtils.isCritical(player) && cursedWound > 1) {
-					List<Entity> entities = player.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
+					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
 					for(int i = 0; i < entities.size(); i++) {
 						Entity e = entities.get(i);
 						if(EntityUtils.isHostileMob(e)) {
 							LivingEntity mob = (LivingEntity)e;
-							if (mob.getPotionEffect(PotionEffectType.WITHER) != null) {
-								EntityUtils.damageEntity(mPlugin, mob, CURSED_WOUND_BURST_DAMAGE, player);
-							}
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+
+							//if (mob.getPotionEffect(PotionEffectType.WITHER) != null) {
+							//	EntityUtils.damageEntity(mPlugin, mob, CURSED_WOUND_BURST_DAMAGE, player);
+							//}
 						}
 					}
 				}
@@ -301,10 +298,10 @@ public class WarlockClass extends BaseClass {
 
 		if (player.isSneaking()) {
 		/// CONSUMING FLAMES
-		// Sneak and right click with a wand
+		// Sneak and right click with a scythe
 			int consumingFlames = ScoreboardUtils.getScoreboardValue(player, "ConsumingFlames");
 			if (consumingFlames > 0) {
-				if (InventoryUtils.isWandItem(player.getInventory().getItemInMainHand())) {
+				if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 					if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CONSUMING_FLAMES_ID)) {
 
@@ -341,7 +338,7 @@ public class WarlockClass extends BaseClass {
 		//	If sneaking and left click with a wand OR a scythe
 
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			if (InventoryUtils.isScytheItem(mainHand) || InventoryUtils.isWandItem(mainHand)) {
+			if (InventoryUtils.isScytheItem(mainHand)) {
 				if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 					int amplifyingHex = ScoreboardUtils.getScoreboardValue(player, "AmplifyingHex");
 					if (amplifyingHex > 0) {

@@ -13,6 +13,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -143,6 +144,7 @@ public class ScoutClass extends BaseClass {
 	@Override
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
 		List<Projectile> projectiles;
+		arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 
 	// PASSIVE : 25% chance of not consuming an arrow
 		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
@@ -167,6 +169,7 @@ public class ScoutClass extends BaseClass {
 					int arrowQuantity = arrowStack.getAmount();
 					if (arrowQuantity < 64) {
 						arrowStack.setAmount(arrowQuantity);
+						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 					}
 					playerInv.setItem(arrowSlot, arrowStack);
 				}
