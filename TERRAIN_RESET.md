@@ -9,6 +9,7 @@ Monumenta terrain reset process by Combustible
 cp -a ~/project_epic/dungeon/Project_Epic-dungeon ~/tmp/Project_Epic-dungeon
 ```
 
+1. Restart the dungeon shard using mark2
 1. Unpack the good copy of the dungeon template. This creates `~/tmp/Project_Epic-template`
 ```
 cd ~/tmp
@@ -61,6 +62,7 @@ mkdir -p ~/tmp/TEMPLATE/region_1
 cp -a ~/project_epic/region_1/Project_Epic-region_1 ~/tmp/TEMPLATE/region_1/
 cp -a ~/project_epic/bungee ~/tmp/TEMPLATE/
 ```
+1. Start the `region_1` server
 
 ## Purgatory
 1. Copy purgatory from the build server
