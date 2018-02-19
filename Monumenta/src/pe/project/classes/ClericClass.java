@@ -17,6 +17,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -322,31 +323,33 @@ public class ClericClass extends BaseClass {
 	}
 
 	@Override
-	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
-		//	HeavenlyBoon
-		{
-			int heavenlyBoon = ScoreboardUtils.getScoreboardValue(player, "HeavenlyBoon");
-			if (heavenlyBoon > 0) {
-				double range = potion.getLocation().distance(player.getLocation());
-				if (range <= HEAVENLY_BOON_TRIGGER_RANGE) {
-					PotionMeta meta = (PotionMeta)potion.getItem().getItemMeta();
+	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+										   ThrownPotion potion, PotionSplashEvent event) {
+		// Call the base class to make sure effects are correctly applied to other players
+		super.PlayerSplashPotionEvent(player, affectedEntities, potion, event);
 
-					List<Entity> entities = player.getNearbyEntities(HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS);
-					entities.add(player);
-					for(int i = 0; i < entities.size(); i++) {
-						Entity e = entities.get(i);
-						if(e instanceof Player) {
-							Player p = (Player)(e);
+		// HeavenlyBoon
+		int heavenlyBoon = ScoreboardUtils.getScoreboardValue(player, "HeavenlyBoon");
+		if (heavenlyBoon > 0) {
+			double range = potion.getLocation().distance(player.getLocation());
+			if (range <= HEAVENLY_BOON_TRIGGER_RANGE) {
+				PotionMeta meta = (PotionMeta)potion.getItem().getItemMeta();
 
-							List<PotionEffect> effectList = PotionUtils.getEffects(meta);
-							for (PotionEffect effect : effectList) {
-								PotionUtils.applyPotion(mPlugin, p, effect);
-							}
+				List<Entity> entities = player.getNearbyEntities(HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS);
+				entities.add(player);
+				for(int i = 0; i < entities.size(); i++) {
+					Entity e = entities.get(i);
+					if(e instanceof Player) {
+						Player p = (Player)(e);
+
+						List<PotionEffect> effectList = PotionUtils.getEffects(meta);
+						for (PotionEffect effect : effectList) {
+							PotionUtils.applyPotion(mPlugin, p, effect);
 						}
 					}
-
-					return false;
 				}
+
+				return false;
 			}
 		}
 

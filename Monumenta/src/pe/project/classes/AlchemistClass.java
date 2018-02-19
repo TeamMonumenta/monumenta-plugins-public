@@ -17,6 +17,7 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -202,7 +203,23 @@ public class AlchemistClass extends BaseClass {
 	}
 
 	@Override
-	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
+	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+										   ThrownPotion potion, PotionSplashEvent event) {
+		//  All affected players need to have the effect added to their potion manager.
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player) {
+				// Thrown by a player - negative effects are not allowed for other players
+				// Special for alchemist - don't apply negative effects to self either
+				if (PotionUtils.hasNegativeEffects(potion.getEffects())) {
+					// If a thrown potion contains any negative effects, don't apply *any* effects to other players
+					event.setIntensity(entity, 0);
+				}
+
+				mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
+												 event.getIntensity(entity));
+			}
+		}
+
 		if (potion.hasMetadata(PUTRID_FUMES_1_TAG)) {
 			AreaEffectCloud cloud = EntityUtils.spawnAreaEffectCloud(player.getWorld(), potion.getLocation(), potion.getEffects(), PUTRID_FUMES_1_RADIUS, PUTRID_FUMES_DURATION);
 			cloud.setSource(player);

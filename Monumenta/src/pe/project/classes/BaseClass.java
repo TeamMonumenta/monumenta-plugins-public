@@ -15,10 +15,13 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 
 import pe.project.Plugin;
+import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.timers.CooldownTimers;
+import pe.project.utils.PotionUtils;
 
 public class BaseClass {
 	protected Random mRandom;
@@ -98,7 +101,24 @@ public class BaseClass {
 
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {}
 
-	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities, ThrownPotion potion) {
+	// Called when a player throws a splash potion
+	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+										   ThrownPotion potion, PotionSplashEvent event) {
+		//  All affected players need to have the effect added to their potion manager.
+		for (LivingEntity entity : affectedEntities) {
+			if (entity instanceof Player) {
+				// Thrown by a player - negative effects are not allowed for other players
+				// Don't remove negative effects if it was the same player that threw the potion
+				if ((!entity.equals(player)) && PotionUtils.hasNegativeEffects(potion.getEffects())) {
+					// If a thrown potion contains any negative effects, don't apply *any* effects to other players
+					event.setIntensity(entity, 0);
+				}
+
+				mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
+												 event.getIntensity(entity));
+			}
+		}
+
 		return true;
 	}
 

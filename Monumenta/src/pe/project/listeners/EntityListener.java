@@ -315,7 +315,6 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	//	A players thrown potion splashed.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PotionSplashEvent(PotionSplashEvent event) {
 		ThrownPotion potion = event.getPotion();
@@ -333,20 +332,21 @@ public class EntityListener implements Listener {
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
 
-		// Class effects from splashing potion
 		if (source instanceof Player) {
+			// If thrown by a player, that player's class determines how entities are affected
 			Player player = (Player)source;
 
-			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion)) {
+			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
-		}
-
-		//	All affected players need to have the effect added to their potion manager.
-		for (LivingEntity entity : affectedEntities) {
-			if (entity instanceof Player) {
-				mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(), event.getIntensity(entity));
+		} else {
+			// If not thrown by a player, add tracked effects to the potion manager
+			for (LivingEntity entity : affectedEntities) {
+				if (entity instanceof Player) {
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
+													 event.getIntensity(entity));
+				}
 			}
 		}
 	}
