@@ -60,10 +60,12 @@ public class RogueClass extends BaseClass {
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
-	private static final double ADVANCING_SHADOWS_OFFSET = 4.0;
+	private static final double ADVANCING_SHADOWS_OFFSET = 3.2;
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
-	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+// QUICK VALUE FOR TESTING ONLY!
+// RESTORE THIS TO 20s BEFORE LAUNCH!
+	private static final int ADVANCING_SHADOWS_COOLDOWN = 20; //20 * 20;
 
 	private static final int DODGING_ID = 43;
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
@@ -90,11 +92,12 @@ public class RogueClass extends BaseClass {
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 
 	private static final int SMOKESCREEN_ID = 46;
-	private static final int SMOKESCREEN_RANGE = 6;
+	private static final int SMOKESCREEN_RANGE = 7;
 	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 = 0;
 	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2 = 1;
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
-	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL = 1;
+	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 = 1;
+	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2 = 2;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
@@ -133,43 +136,42 @@ public class RogueClass extends BaseClass {
 
 						LivingEntity entity = EntityUtils.GetEntityAtCursor(player, range, false, true, true);
 						if (entity != null && EntityUtils.isHostileMob(entity)) {
+							boolean proc = false;
+
 							Vector toPos = entity.getLocation().toVector();
 							Vector fromPos = player.getLocation().toVector();
 
-							Vector dir = fromPos.subtract(toPos).normalize();
+							Vector dir = (fromPos.subtract(toPos));
+							Vector normDir = dir.normalize();
 
-							Location newLoc = entity.getLocation().add(dir.multiply(ADVANCING_SHADOWS_OFFSET));
+							Location newLoc = entity.getLocation().add(normDir.multiply(ADVANCING_SHADOWS_OFFSET));
 							newLoc.setY(entity.getLocation().getY());
 							newLoc.setPitch(player.getLocation().getPitch());
 							newLoc.setYaw(player.getLocation().getYaw());
 							newLoc.setDirection(toPos.subtract(newLoc.toVector()).normalize());
 
-							//  +1 on the Y for eye height
-							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0),
-							                                 entity.getEyeLocation(), newLoc.getDirection(), range)) {
-								player.teleport(newLoc);
-							}
+							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
+								if (EntityUtils.hasPathToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
 
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-							                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE,
-							                                                  ADVANCING_SHADOWS_STRENGTH_DURATION,
-							                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL,
-							                                                  true, false));
-
-							if (advancingShadows > 1) {
-								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE,
-								                                                 ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE,
-								                                                 ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
-								for (Entity mob : entities) {
-									if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
-										MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+									if (toPos.distance(fromPos) > ADVANCING_SHADOWS_OFFSET) {
+										player.teleport(newLoc);
 									}
+
+									mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+
+									if (advancingShadows > 1) {
+										List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+										for (Entity mob : entities) {
+											if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
+												MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+											}
+										}
+									}
+
+									player.getWorld().playSound(player.getLocation(), "entity.endermen.teleport", 1.0f, 1.5f);
+									mPlugin.mTimers.AddCooldown(player.getUniqueId(), ADVANCING_SHADOWS_ID, ADVANCING_SHADOWS_COOLDOWN);
 								}
 							}
-
-							player.getWorld().playSound(player.getLocation(), "entity.endermen.teleport", 1.0f, 1.5f);
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), ADVANCING_SHADOWS_ID, ADVANCING_SHADOWS_COOLDOWN);
 						}
 					}
 				}
@@ -189,19 +191,18 @@ public class RogueClass extends BaseClass {
 
 									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
 									                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
+									int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
+					                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
 
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION,
-									                                     weaknessLevel, false, true));
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION,
-									                                     SMOKESCREEN_SLOWNESS_EFFECT_LEVEL, false, true));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, slownessLevel, false, true));
 								}
 							}
 						}
 
 						Location loc = player.getLocation();
 						World world = player.getWorld();
-						ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_LARGE, loc.add(0, 1, 0), 150, 2.0, 0.8,
-						                                   2.0, 0.001);
+						ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_LARGE, loc.add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.001);
 						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), SMOKESCREEN_ID, SMOKESCREEN_COOLDOWN);

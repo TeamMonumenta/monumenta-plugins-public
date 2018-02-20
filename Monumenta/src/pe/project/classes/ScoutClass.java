@@ -143,7 +143,6 @@ public class ScoutClass extends BaseClass {
 	@Override
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
 		List<Projectile> projectiles;
-		arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 
 	// PASSIVE : 25% chance of not consuming an arrow
 		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
@@ -151,6 +150,7 @@ public class ScoutClass extends BaseClass {
 			if (InventoryUtils.isBowItem(mainHand)) {
 				int infLevel = mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE);
 				if (infLevel == 0) {
+					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);

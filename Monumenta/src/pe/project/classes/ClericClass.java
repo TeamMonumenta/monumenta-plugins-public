@@ -99,7 +99,7 @@ public class ClericClass extends BaseClass {
 
 	private static int PASSIVE_HEAL_AMOUNT = 1;
 	private static int PASSIVE_HEAL_RADIUS = 5;
-	private static double PASSIVE_HP_THRESHOLD = 12.0;
+	private static double PASSIVE_HP_THRESHOLD = 10.0;
 
 	public ClericClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -158,8 +158,11 @@ public class ClericClass extends BaseClass {
 
 							//	If this is us or we're allowing anyone to get it.
 							if (p == player || rejuvenation > 1) {
-								ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+								double oldHealth = p.getHealth();
 								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
+								if (p.getHealth() > oldHealth) {
+									ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+								}
 							}
 						}
 					}
