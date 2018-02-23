@@ -136,7 +136,6 @@ public class RogueClass extends BaseClass {
 
 						LivingEntity entity = EntityUtils.GetEntityAtCursor(player, range, false, true, true);
 						if (entity != null && EntityUtils.isHostileMob(entity)) {
-							boolean proc = false;
 
 							Vector toPos = entity.getLocation().toVector();
 							Vector fromPos = player.getLocation().toVector();

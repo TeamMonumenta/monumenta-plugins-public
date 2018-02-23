@@ -180,13 +180,14 @@ public class ClericClass extends BaseClass {
 						entities.add(player);
 						for (Entity entity : entities) {
 							if (entity instanceof Player) {
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.WITHER);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.SLOW);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.SLOW_DIGGING);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.POISON);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.WEAKNESS);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.BLINDNESS);
-								mPlugin.mPotionManager.removePotion(player, PotionID.ALL, PotionEffectType.CONFUSION);
+								Player e = (Player)entity;
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.WITHER);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.SLOW);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.SLOW_DIGGING);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.POISON);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.WEAKNESS);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.BLINDNESS);
+								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.CONFUSION);
 
 								((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, false));
 								if (cleansing > 1) {
@@ -396,10 +397,6 @@ public class ClericClass extends BaseClass {
 
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-
-				// And here's the trigger for the failed attempt at Cleansing Rain
-				// Intent was to use the CLEANSING_FAKE_ID as the tracker for it,
-				// But for some reason it works inconsistently
 
 				if ((player.getLocation()).getPitch() < -45) {
 					//	Activate Cleansing Rain IF Looking upwards
