@@ -63,9 +63,7 @@ public class RogueClass extends BaseClass {
 	private static final double ADVANCING_SHADOWS_OFFSET = 3.2;
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
-// QUICK VALUE FOR TESTING ONLY!
-// RESTORE THIS TO 20s BEFORE LAUNCH!
-	private static final int ADVANCING_SHADOWS_COOLDOWN = 20; //20 * 20;
+	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 
 	private static final int DODGING_ID = 43;
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;

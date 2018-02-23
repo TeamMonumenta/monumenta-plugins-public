@@ -59,7 +59,7 @@ public class ClericClass extends BaseClass {
 	//	HEAVENLY_BOON
 	private static double HEAVENLY_BOON_1_CHANCE = 0.05;
 	private static double HEAVENLY_BOON_2_CHANCE = 0.08;
-	private static double HEAVENLY_BOON_TRIGGER_RANGE = 1.0;
+	private static double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
 	private static double HEAVENLY_BOON_RADIUS = 12;
 
 	//	CLEANSING
