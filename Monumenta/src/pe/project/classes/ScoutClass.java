@@ -147,13 +147,16 @@ public class ScoutClass extends BaseClass {
 	// PASSIVE : 25% chance of not consuming an arrow
 		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			if (InventoryUtils.isBowItem(mainHand)) {
-				int infLevel = mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE);
+			ItemStack offHand = player.getInventory().getItemInOffHand();
+			if (InventoryUtils.isBowItem(mainHand) || InventoryUtils.isBowItem(offHand)) {
+				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
 				if (infLevel == 0) {
 					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
 					Inventory playerInv = player.getInventory();
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+
+					player.getWorld().playSound(player.getLocation(), "entity.arrow.hit_player", 0.3f, 1.0f);
 
 					int arrowSlot = -1;
 					if (firstArrow == -1 && firstTippedArrow > -1) {

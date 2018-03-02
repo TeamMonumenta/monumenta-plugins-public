@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -64,10 +65,12 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
 import pe.project.server.reset.RegionReset;
+import pe.project.utils.ChestUtils;
 import pe.project.utils.CommandUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.LocationUtils;
+import pe.project.utils.ParticleUtils;
 import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -157,6 +160,12 @@ public class PlayerListener implements Listener {
 		}
 		//	Right Click.
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+			if (action == Action.RIGHT_CLICK_BLOCK) {
+				if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST) {
+					ChestUtils.chestTest(mPlugin, player, block);
+				}
+			}
+
 			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 			}

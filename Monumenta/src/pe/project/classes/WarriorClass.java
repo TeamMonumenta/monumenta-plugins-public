@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -51,7 +52,7 @@ public class WarriorClass extends BaseClass {
 	private static int RIPOSTE_SWORD_DURATION = 5 * 20;
 	private static int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static int RIPOSTE_AXE_EFFECT_LEVEL = 6;
-	private static int RIPOSTE_SQRADIUS = 4;	//radius = 2, this is it squared
+	private static double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
 	private static float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
 	private static Integer DEFENSIVE_LINE_ID = 26;
@@ -120,27 +121,29 @@ public class WarriorClass extends BaseClass {
 					int riposte = ScoreboardUtils.getScoreboardValue(player, "Obliteration");
 					if (riposte > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), RIPOSTE_ID)) {
-							ItemStack mainHand = player.getInventory().getItemInMainHand();
-							MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
+							if (!(damager instanceof Creeper)) {
+								ItemStack mainHand = player.getInventory().getItemInMainHand();
+								MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
 
-							if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
-								World world = player.getWorld();
+								if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
+									World world = player.getWorld();
 
-								if (riposte > 1) {
-									if (InventoryUtils.isSwordItem(mainHand)) {
-										player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, false));
+									if (riposte > 1) {
+										if (InventoryUtils.isSwordItem(mainHand)) {
+											player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, false));
+										}
+										else if (InventoryUtils.isAxeItem(mainHand)) {
+											damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
+										}
 									}
-									else if (InventoryUtils.isAxeItem(mainHand)) {
-										damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
-									}
+
+									world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+									ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
+									ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
+									mPlugin.mTimers.AddCooldown(player.getUniqueId(), RIPOSTE_ID, RIPOSTE_COOLDOWN);
+
+									return false;
 								}
-
-								world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
-								ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
-								ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
-								mPlugin.mTimers.AddCooldown(player.getUniqueId(), RIPOSTE_ID, RIPOSTE_COOLDOWN);
-
-								return false;
 							}
 						}
 					}
@@ -200,16 +203,19 @@ public class WarriorClass extends BaseClass {
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int frenzy = ScoreboardUtils.getScoreboardValue(player, "Frenzy");
 		if (frenzy > 0) {
-			int hasteAmp = frenzy == 1 ? 2 : 3;
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			if (!InventoryUtils.isPickaxeItem(mainHand)) {
+				int hasteAmp = frenzy == 1 ? 2 : 3;
 
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, false));
 
-			World world = Bukkit.getWorld(player.getWorld().getName());
-			Location loc = player.getLocation();
-			world.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
+				World world = Bukkit.getWorld(player.getWorld().getName());
+				Location loc = player.getLocation();
+				world.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
 
-			if (frenzy > 1) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, false));
+				if (frenzy > 1) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, false));
+				}
 			}
 		}
 	}
@@ -221,7 +227,8 @@ public class WarriorClass extends BaseClass {
 			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
-				if (offHand.getType() == Material.SHIELD && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				if ((offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
 					int defensiveLine = ScoreboardUtils.getScoreboardValue(player, "DefensiveLine");
 					if (defensiveLine > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID)) {
@@ -251,13 +258,20 @@ public class WarriorClass extends BaseClass {
 	}
 
 	private void _testItemInHand(Player player, ItemStack mainHand) {
+		int frenzy = ScoreboardUtils.getScoreboardValue(player, "Frenzy");
+		if (frenzy > 0) {
+			if (InventoryUtils.isPickaxeItem(mainHand)) {
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+				mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			}
+		}
+
 		int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
 		if (weaponMastery > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 
 			//	Player has an axe in their mainHands.
 			if (InventoryUtils.isAxeItem(mainHand)) {

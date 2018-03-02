@@ -72,6 +72,7 @@ public class ClericClass extends BaseClass {
 	private static int CLEANSING_RADIUS = 4;
 	private static int CLEANSING_1_COOLDOWN = 45 * 20;
 	private static int CLEANSING_2_COOLDOWN = 30 * 20;
+	private static double CLEANSING_ANGLE = 50.0;
 
 	private static int DIVINE_JUSTICE_DAMAGE = 5;
 	private static int DIVINE_JUSTICE_HEAL = 4;
@@ -224,7 +225,7 @@ public class ClericClass extends BaseClass {
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.END_ROD, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
 
 				if (sanctified > 1) {
-					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, true, false));
+					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
 				}
 			}
 		}
@@ -237,6 +238,7 @@ public class ClericClass extends BaseClass {
 		{
 			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 				if (EntityUtils.isUndead(damagee)) {
+
 					int divineJustice = ScoreboardUtils.getScoreboardValue(player, "DivineJustice");
 					if (divineJustice > 0) {
 						EntityUtils.damageEntity(mPlugin, damagee, DIVINE_JUSTICE_DAMAGE, player);
@@ -297,7 +299,7 @@ public class ClericClass extends BaseClass {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 16 * 20, 0, "Splash Potion of Regeneration");
 							} else if (rand == 2) {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0, "Splash Potion of Absorption");
-								//potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1,  * 20, 0, "Splash Potion of Fire Resistance");
+								//potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1, 0 * 20, 0, "Splash Potion of Fire Resistance");
 							} else {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 20 * 20, 0, "Splash Potion of Speed");
 							}
@@ -398,7 +400,7 @@ public class ClericClass extends BaseClass {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 
-				if ((player.getLocation()).getPitch() < -45) {
+				if ((player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
 					//	Activate Cleansing Rain IF Looking upwards
 
 					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
@@ -411,8 +413,7 @@ public class ClericClass extends BaseClass {
 						}
 					}
 				}
-
-				if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
+				else if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
 					if (healing > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {

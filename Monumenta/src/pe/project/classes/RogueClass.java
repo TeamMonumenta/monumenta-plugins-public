@@ -374,8 +374,7 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause,
-	                             boolean shouldGenDrops) {
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		if (EntityUtils.isEliteBoss(killedEntity)) {
 			int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
 			if (viciousCombos > 0) {
