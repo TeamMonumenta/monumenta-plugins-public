@@ -31,6 +31,9 @@ mv ~/tmp/dungeons-out ~/tmp/POST_RESET
 rm -rf ~/tmp/Project_Epic-dungeon ~/tmp/Project_Epic-template
 ```
 
+## Updating the item replacement list
+- You may have to use the `loot_table_to_replace_list.py` script to generate an updated replacement list from the loot tables.
+
 ## Purging old coreprotect data - In-game on play server
 - Before reset while the servers are up go to each of the dungeon shards and purge coreprotect data older than 30 days.
 - You must do this in-game! There is a note in the documentation about it not working from the console
@@ -41,7 +44,7 @@ rm -rf ~/tmp/Project_Epic-dungeon ~/tmp/Project_Epic-template
 
 ## Compiling and tagging the plugin - Your development system
 - Tag the current version of the plugin and push that tag to github. This lets us go back later and figure out what version of the plugin was used for which terrain reset.
-- You'll need to adapt the 2.18.0 number below for whatever the next version should be.
+- You'll need to adapt the 2.19.0 number below for whatever the next version should be.
 - Do this on your development system, there's no plugin code on the build server
 - Also push the newly compiled plugin to the build server so it will be included in terrain reset.
 ```
@@ -49,8 +52,8 @@ cd Monumenta-Plugins
 git fetch
 git checkout master
 git merge origin/master
-git tag 2.18.0
-git push origin 2.18.0
+git tag 2.19.0
+git push origin 2.19.0
 ./clean.sh && ./compile.sh && ./upload.sh
 ```
 
@@ -172,8 +175,8 @@ cd ~/MCEdit-And-Automation
 git fetch
 git rebase origin/master
 git status
-git tag 2.18.0
-git push origin 2.18.0
+git tag 2.19.0
+git push origin 2.19.0
 ```
 
 General steps on the play server:
@@ -181,7 +184,7 @@ General steps on the play server:
 cd ~/MCEdit-And-Automation
 git status
 git fetch
-git checkout 2.18.0
+git checkout 2.19.0
 git submodule update
 ```
 
