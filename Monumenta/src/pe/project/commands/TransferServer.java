@@ -83,6 +83,12 @@ public class TransferServer implements CommandExecutor {
 	}
 
 	private boolean _transferServer(CommandSender sender, Player player, boolean sendPlayerStuff, String server) {
+		/* Don't let the player transfer again if their inventory is still locked */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			sender.sendMessage(ChatColor.RED + "Player attempted to transfer with locked inventory!");
+			return false;
+		}
+
 		try {
 			if (sendPlayerStuff == true) {
 				player.sendMessage(ChatColor.GOLD + "Transferring you to " + server);
