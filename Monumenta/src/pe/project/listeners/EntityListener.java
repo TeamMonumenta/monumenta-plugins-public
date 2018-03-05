@@ -220,7 +220,9 @@ public class EntityListener implements Listener {
 	public void EntityInteractEvent(EntityInteractEvent event) {
 		Material material = event.getBlock().getType();
 
-		if (material == Material.TRIPWIRE || material == Material.TRIPWIRE_HOOK) {
+		if (material == Material.TRIPWIRE || material == Material.TRIPWIRE_HOOK
+			|| material == Material.WOOD_PLATE || material == Material.STONE_PLATE
+			|| material == Material.GOLD_PLATE || material == Material.IRON_PLATE) {
 			Entity entity = event.getEntity();
 
 			// Only items and players can activate tripwires
