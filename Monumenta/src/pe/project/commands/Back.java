@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -22,8 +23,23 @@ public class Back implements CommandExecutor {
 	}
 
 	@Override
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
+		Player player = null;
+		if (sender instanceof Player) {
+			player = (Player)sender;
+		} else if (sender instanceof ProxiedCommandSender) {
+			CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
+			if (callee instanceof Player) {
+				player = (Player)callee;
+			}
+		}
+
+		if (player == null) {
+			sender.sendMessage(ChatColor.RED + "This command must be run by/on a player!");
+			return false;
+		}
+
 		int num_steps = 1;
 
 		if (arg3.length == 1) {
@@ -37,12 +53,6 @@ public class Back implements CommandExecutor {
 			return false;
 		}
 
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "This command can only be run by players");
-			return true;
-		}
-
-		Player player = (Player)sender;
 		Stack<Location> backStack = null;
 		Stack<Location> forwardStack = null;
 		boolean endOfList = false;
