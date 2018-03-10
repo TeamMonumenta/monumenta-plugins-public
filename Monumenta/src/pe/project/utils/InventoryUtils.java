@@ -8,15 +8,26 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.Blaze;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.ElderGuardian;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Endermite;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -84,6 +95,106 @@ public class InventoryUtils {
 		}
 
 		return false;
+	}
+
+	public static int getCustomEnchantLevel(ItemStack item, String nameText) {
+		if (nameText == null || nameText.isEmpty()) {
+			return 0;
+		}
+
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null && !lore.isEmpty()) {
+					for (String loreEntry : lore) {
+						if (loreEntry.contains(nameText)) {
+							if (loreEntry.contains("V")) {
+								return 5;
+							}
+							else if (loreEntry.contains("IV")) {
+								return 4;
+							}
+							else if (loreEntry.contains("III")) {
+								return 3;
+							}
+							else if (loreEntry.contains("II")) {
+								return 2;
+							}
+
+							else
+							{
+								return 1;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	public static double meleeEnchants(Player player, Entity damagee, double damage, DamageCause cause) {
+		ItemStack weapon = player.getInventory().getItemInMainHand();
+		if (testForItemWithLore(weapon, "7Chaotic")) {
+			int chaoticLevel = getCustomEnchantLevel(weapon, "7Chaotic");
+
+			Random mRandom = new Random();
+			int rand = mRandom.nextInt(2 * chaoticLevel + 1) - chaoticLevel;
+
+			if (rand > 0) {
+				ParticleUtils.playParticlesInWorld(damagee.getWorld(), Particle.DAMAGE_INDICATOR, damagee.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
+			}
+
+			if (cause == DamageCause.ENTITY_SWEEP_ATTACK) {
+				rand = rand / 2;
+			}
+
+			damage = damage + rand;
+		}
+
+		if (testForItemWithLore(weapon, "7Ice Aspect")) {
+			int iceLevel = getCustomEnchantLevel(weapon, "7Ice Aspect");
+			int duration = iceLevel * 4 * 20 + 20;
+			LivingEntity target = (LivingEntity)damagee;
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2, false, true));
+			ParticleUtils.playParticlesInWorld(damagee.getWorld(), Particle.SNOWBALL, damagee.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
+
+			if (damagee instanceof Blaze) {
+				damage = damage + 1.0;
+			}
+		}
+
+		if (testForItemWithLore(weapon, "7Slayer")) {
+			int slayerLevel = getCustomEnchantLevel(weapon, "7Slayer");
+
+			if (damagee instanceof Creeper || damagee instanceof Blaze || damagee instanceof Enderman || damagee instanceof Endermite) {
+				damage = damage + 2.5 * slayerLevel;
+			}
+		}
+
+		if (testForItemWithLore(weapon, "7Thunder")) {
+			int thunderLevel = getCustomEnchantLevel(weapon, "7Thunder");
+
+			Random mRandom = new Random();
+			double rand = mRandom.nextDouble();
+
+			if (damage >= 4 && rand < thunderLevel * 0.1) {
+
+				LivingEntity target = (LivingEntity)damagee;
+				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 8, false, true));
+				target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 50, 8, false, true));
+
+				if (damagee instanceof Guardian) {
+					damage = damage + 1.0;
+				}
+
+				player.getWorld().playSound(player.getLocation(), "entity.lightning.impact", 0.4f, 1.0f);
+			}
+		}
+
+		return damage;
 	}
 
 	public static boolean isAxeItem(ItemStack item) {

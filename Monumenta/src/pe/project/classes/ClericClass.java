@@ -35,6 +35,7 @@ import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.PotionUtils.PotionInfo;
 
 /*
 	Sanctified
@@ -57,8 +58,8 @@ public class ClericClass extends BaseClass {
 	private static int REJUVENATION_HEAL_AMOUNT = 1;
 
 	//	HEAVENLY_BOON
-	private static double HEAVENLY_BOON_1_CHANCE = 0.05;
-	private static double HEAVENLY_BOON_2_CHANCE = 0.08;
+	private static double HEAVENLY_BOON_1_CHANCE = 0.06;
+	private static double HEAVENLY_BOON_2_CHANCE = 0.1;
 	private static double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
 	private static double HEAVENLY_BOON_RADIUS = 12;
 
@@ -286,17 +287,12 @@ public class ClericClass extends BaseClass {
 
 					if (mRandom.nextDouble() < chance) {
 						ItemStack healPot;
-						//int healLevel = heavenlyBoon == 1 ? 0 : 1;
-						int healLevel = 0;
-
-						healPot = ItemUtils.createStackedPotions(PotionEffectType.HEAL, 1, 0, healLevel, "Splash Potion of Healing");
-
 						ItemStack potions;
 
 						if (heavenlyBoon == 1) {
 							int rand = mRandom.nextInt(4);
 							if (rand == 0 || rand == 1) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 16 * 20, 0, "Splash Potion of Regeneration");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 20 * 20, 0, "Splash Potion of Regeneration");
 							} else if (rand == 2) {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0, "Splash Potion of Absorption");
 								//potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1, 0 * 20, 0, "Splash Potion of Fire Resistance");
@@ -306,21 +302,23 @@ public class ClericClass extends BaseClass {
 						} else {
 							int rand = mRandom.nextInt(5);
 							if (rand == 0) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 42 * 20, 0, "Splash Potion of Regeneration");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 50 * 20, 0, "Splash Potion of Regeneration");
 							} else if (rand == 1) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 48 * 20, 0, "Splash Potion of Absorption");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 50 * 20, 0, "Splash Potion of Absorption");
 							} else if (rand == 2) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 48 * 20, 0, "Splash Potion of Speed");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 50 * 20, 0, "Splash Potion of Speed");
 							} else if (rand == 3) {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 48 * 20, 0, "Splash Potion of Strength");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 50 * 20, 0, "Splash Potion of Strength");
 							} else {
-								potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 48 * 20, 0, "Splash Potion of Resistance");
+								potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 50 * 20, 0, "Splash Potion of Resistance");
 							}
 						}
 
+						ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
+
 						World world = Bukkit.getWorld(player.getWorld().getName());
 						Location pos = (player.getLocation()).add(0,2,0);
-						EntityUtils.spawnCustomSplashPotion(world, player, healPot, pos);
+						//EntityUtils.spawnCustomSplashPotion(world, player, healPot, pos);
 						EntityUtils.spawnCustomSplashPotion(world, player, potions, pos);
 					}
 				}
