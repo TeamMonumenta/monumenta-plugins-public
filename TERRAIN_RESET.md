@@ -263,6 +263,12 @@ done
 mv ~/tmp/PRE_RESET/build ~/tmp/POST_RESET/
 ```
 
+### Vanilla shard
+1. Vanilla shard is unaffected by reset
+```
+mv ~/tmp/PRE_RESET/vanilla ~/tmp/POST_RESET/
+```
+
 ### Whitelist / Opslist / Banlist
 1. Copy the whitelist, opslist, and banlist from the play server. Overwrite if prompted
 ```bash
@@ -277,8 +283,8 @@ done
 ### Load appropriate configuration for each server
 1. Run the configuration generator on each server shard in play server mode
 ```
-cd POST_RESET
-~/MCEdit-And-Automation/utility_code/gen_server_config.py --play build betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
+cd ~/tmp/POST_RESET
+~/MCEdit-And-Automation/utility_code/gen_server_config.py --play build vanilla betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 ```
 
 ### Final steps
@@ -317,7 +323,7 @@ launch_server() (
 	mark2 start > /dev/null
 	print "Finished starting $x"
 )
-for x in betaplots build lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
+for x in betaplots build vanilla lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 do
 	launch_server $x &
 done
