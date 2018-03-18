@@ -5,14 +5,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import org.bukkit.ChatColor;
 
-import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.NetworkUtils;
-import pe.project.utils.InventoryUtils;
 
 //	/transferserver <server name> <x1> <y1> <z1> <x2> <y2> <z2>
 
@@ -83,22 +80,8 @@ public class TransferServer implements CommandExecutor {
 	}
 
 	private boolean _transferServer(CommandSender sender, Player player, boolean sendPlayerStuff, String server) {
-		/* Don't let the player transfer again if their inventory is still locked */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			sender.sendMessage(ChatColor.RED + "Player attempted to transfer with locked inventory!");
-			return false;
-		}
-
 		try {
 			if (sendPlayerStuff == true) {
-				player.sendMessage(ChatColor.GOLD + "Transferring you to " + server);
-
-				/* Mark this player as inventory locked */
-				player.setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(mPlugin, true));
-
-				InventoryUtils.removeSpecialItems(player);
-
-				NetworkUtils.transferPlayerData(mPlugin, player, server);
 			} else {
 				player.sendMessage(ChatColor.GOLD + "Transferring you " + ChatColor.RED  + "without playerdata" + ChatColor.GOLD + " to " + server);
 				NetworkUtils.sendPlayer(mPlugin, player, server);

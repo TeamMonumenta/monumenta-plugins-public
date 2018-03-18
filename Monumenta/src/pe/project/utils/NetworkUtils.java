@@ -5,8 +5,6 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import pe.project.Plugin;
-import pe.project.network.packet.TransferPlayerDataPacket;
-import pe.project.player.PlayerData;
 import pe.project.network.packet.SendPlayerPacket;
 import pe.project.network.packet.GetServerListPacket;
 import pe.project.network.packet.BroadcastCommandPacket;
@@ -24,13 +22,6 @@ public class NetworkUtils {
 
 		// Success, print transfer message request to log
 		plugin.getLogger().info("Requested bungeecord transfer " + playerName + " to " + server);
-	}
-
-	public static void transferPlayerData(Plugin plugin, Player player, String server) throws Exception {
-		PacketUtils.SendPacket(plugin, new TransferPlayerDataPacket(server,
-																    player.getName(),
-																    player.getUniqueId(),
-																    PlayerData.convertToString(plugin, player)));
 	}
 
 	public static void getServerList(Plugin plugin, Player player) throws Exception {

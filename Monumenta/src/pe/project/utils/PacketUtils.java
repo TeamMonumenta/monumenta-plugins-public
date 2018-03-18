@@ -15,9 +15,7 @@ public class PacketUtils {
 	}
 
 	public static void ProcessPacket(Plugin plugin, String channel, String data) throws Exception {
-		if (channel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
-			TransferPlayerDataPacket.handlePacket(plugin, data);
-		} else if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {
+		if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {
 			SendPlayerPacket.handlePacket(plugin, data);
 		} else if (channel.equals(HeartbeatPacket.getStaticPacketChannel())) {
 			HeartbeatPacket.handlePacket(plugin, data);
