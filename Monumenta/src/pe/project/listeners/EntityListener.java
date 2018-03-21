@@ -137,13 +137,15 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					BaseClass _class = mPlugin.getClass(player);
-					_class.ModifyDamage(player, _class, event);
-					_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+					if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+						BaseClass _class = mPlugin.getClass(player);
+						_class.ModifyDamage(player, _class, event);
+						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+					}
 				}
 			} else if (damager instanceof Arrow) {
 				Arrow arrow = (Arrow)damager;
-				if (arrow.getShooter() instanceof Player) {
+				if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					Player player = (Player)arrow.getShooter();
 
 					BaseClass _class = mPlugin.getClass(player);
