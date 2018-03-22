@@ -64,8 +64,9 @@ public class POIConstants {
 		MntnHideaway(57, "MountainHideaway"),
 		MntnMine(58, "MountainMine"),
 		CursedForest(59, "CursedForest"),
-		KaulArena(60, null),
-		Total(61, null);
+		Litterbox(60, "Litterbox"),
+		KaulArena(61, null),
+		Total(62, null);
 
 		public int mValue;
 		public String mScoreboard;
