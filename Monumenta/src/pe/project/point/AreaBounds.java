@@ -1,7 +1,6 @@
 package pe.project.point;
 
 import org.bukkit.Location;
-
 import pe.project.utils.LocationUtils.LocationType;
 
 public class AreaBounds {
@@ -55,6 +54,7 @@ public class AreaBounds {
 		return mType;
 	}
 
+	@Override
 	public String toString() {
 		return "{" + mName + ", " + mType.toString() + ", " +
 			mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";

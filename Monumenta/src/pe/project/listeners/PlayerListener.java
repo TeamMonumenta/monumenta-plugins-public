@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -162,9 +163,9 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 			}
 
-			if (block.getType() == Material.CHEST) {
-				ChestUtils.chestTest(mPlugin, player, block);
-			}
+		//	if (block.getType() == Material.CHEST) {
+		//		ChestUtils.chestTest(mPlugin, player, block);
+		//	}
 
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
@@ -457,6 +458,17 @@ public class PlayerListener implements Listener {
 			}
 
 			event.setDamage(damage);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void	PlayerExpChangeEvent(PlayerExpChangeEvent event) {
+		Player player = event.getPlayer();
+		Integer xp = event.getAmount();
+
+		if (LocationUtils.OLDLABS.within(player.getLocation())) {
+			xp = xp / 3;
+			event.setAmount(xp);
 		}
 	}
 

@@ -30,6 +30,8 @@ public class LocationUtils {
 		}
 	}
 
+	public static final AreaBounds OLDLABS = new AreaBounds("oldLabs", LocationType.None, new Point(-416.0, 48.0, -976.0), new Point(574.0, 200.0,-750.0));
+
 	public static LocationType getLocationType(Plugin plugin, Entity entity) {
 		return getLocationType(plugin, entity.getLocation());
 	}
@@ -41,6 +43,11 @@ public class LocationUtils {
 	public static LocationType getLocationType(Plugin plugin, Point point) {
 		if (plugin.mServerProperties.getIsTownWorld()) {
 			return LocationType.Capital;
+		}
+
+
+		if (OLDLABS.within(point)) {
+			return OLDLABS.getType();
 		}
 
 		for (AreaBounds area : plugin.mServerProperties.mLocationBounds) {

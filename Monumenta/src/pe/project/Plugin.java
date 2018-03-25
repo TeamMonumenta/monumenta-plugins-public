@@ -54,6 +54,7 @@ import pe.project.listeners.SocketListener;
 import pe.project.listeners.VehicleListener;
 import pe.project.listeners.WorldListener;
 import pe.project.managers.POIManager;
+import pe.project.managers.ZoneManager;
 import pe.project.managers.potion.PotionManager;
 import pe.project.server.properties.ServerProperties;
 import pe.project.timers.CombatLoggingTimers;
@@ -111,6 +112,7 @@ public class Plugin extends JavaPlugin {
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
+	public ZoneManager mZoneManager;
 
 	public SocketClient mSocketClient;
 
@@ -187,6 +189,7 @@ public class Plugin extends JavaPlugin {
 		mPotionManager = new PotionManager(this);
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mPOIManager = new POIManager(this);
+		mZoneManager = new ZoneManager(this);
 
 		//	Load info.
 		_loadConfig();

@@ -53,6 +53,7 @@ import org.bukkit.util.Vector;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
+import pe.project.managers.ZoneManager;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
@@ -273,6 +274,7 @@ public class EntityListener implements Listener {
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
+		mPlugin.mZoneManager.applySpawnEffect(entity);
 	}
 
 	//	Player shoots an arrow.
