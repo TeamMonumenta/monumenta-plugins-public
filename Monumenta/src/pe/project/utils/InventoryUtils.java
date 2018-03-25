@@ -109,7 +109,7 @@ public class InventoryUtils {
 				if (lore != null && !lore.isEmpty()) {
 					for (String loreEntry : lore) {
 						if (loreEntry.contains(nameText)) {
-							if (loreEntry.contains("V")) {
+							if (loreEntry.contains(" V")) {
 								return 5;
 							}
 							else if (loreEntry.contains("IV")) {

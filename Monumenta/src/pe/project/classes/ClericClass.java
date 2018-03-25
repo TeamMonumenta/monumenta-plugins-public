@@ -191,6 +191,10 @@ public class ClericClass extends BaseClass {
 								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.BLINDNESS);
 								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.CONFUSION);
 
+								if (player.getFireTicks() > 0) {
+									player.setFireTicks(1);
+								}
+
 								((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, false));
 								if (cleansing > 1) {
 									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, false));
