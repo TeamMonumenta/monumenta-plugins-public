@@ -4,13 +4,18 @@ import java.util.List;
 import java.util.Stack;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.Action;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -87,4 +92,15 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerInteractEvent(PlayerInteractEvent event) {
+		Action action = event.getAction();
+		ItemStack item = event.getItem();
+
+		if (action == Action.RIGHT_CLICK_BLOCK &&
+			item != null &&
+			item.getType() == Material.FISHING_ROD) {
+			event.setCancelled(true);
+		}
+	}
 }
