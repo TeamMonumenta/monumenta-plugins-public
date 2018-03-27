@@ -1,15 +1,18 @@
 package pe.project.item.properties;
 
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
-public class MainhandRegeneration extends ItemProperty {
-	private static String PROPERTY_NAME = "* Mainhand Regeneration *";
+public class MainhandRegeneration implements ItemProperty {
+	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Mainhand Regeneration";
 
 	@Override
 	public String getProperty() {
@@ -17,13 +20,12 @@ public class MainhandRegeneration extends ItemProperty {
 	}
 
 	@Override
-	public boolean validSlot(EquipmentSlot slot) {
-		// Valid in all slots except main hand
-		return EquipmentSlot.HAND.equals(slot);
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player) {
+	public void applyProperty(Plugin plugin, Player player, int level) {
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 1000049, 0, true, false));
 	}
 

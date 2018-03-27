@@ -5,29 +5,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.ElderGuardian;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Endermite;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -40,6 +29,32 @@ public class InventoryUtils {
 	private static int CHESTPLATE_SLOT = 38;
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
+
+	enum ItemLevels {
+		/*
+		 * The space is important here to make sure that
+		 * we don't accidentaly match "IV" as "V" using endsWith()
+		 */
+		LEVEL_1(1, " I"),
+		LEVEL_2(2, " II"),
+		LEVEL_3(3, " III"),
+		LEVEL_4(4, " IV"),
+		LEVEL_5(5, " V");
+
+		private final int level;
+		private final String name;
+
+		ItemLevels(int level, String name) {
+			this.level = level;
+			this.name = name;
+		}
+		public int getLevel() {
+			return level;
+		}
+		public String getName() {
+			return name;
+		}
+	}
 
 	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player) {
 		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -107,26 +122,22 @@ public class InventoryUtils {
 			if (meta != null) {
 				List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						if (loreEntry.contains(nameText)) {
-							if (loreEntry.contains(" V")) {
-								return 5;
-							}
-							else if (loreEntry.contains("IV")) {
-								return 4;
-							}
-							else if (loreEntry.contains("III")) {
-								return 3;
-							}
-							else if (loreEntry.contains("II")) {
-								return 2;
-							}
+					//  Filter out the lore text that contain the nameText.
+					List<String> entries = lore.stream().filter(l -> l.startsWith(nameText)).collect(Collectors.toList());
 
-							else
-							{
-								return 1;
+					//  Make sure there's only a single copy of this lore text.
+					String loreEntry = entries.size() == 1 ? entries.get(0) : null;
+
+					//  If it exists, loop through the different "level" matchers and return the index of it if it exists.
+					if (loreEntry != null) {
+						for (ItemLevels level : ItemLevels.values()) {
+							if (loreEntry.endsWith(level.getName())) {
+								return level.getLevel();
 							}
 						}
+
+						// Default level is 1
+						return 1;
 					}
 				}
 			}
@@ -135,73 +146,11 @@ public class InventoryUtils {
 		return 0;
 	}
 
-	public static double meleeEnchants(Player player, Entity damagee, double damage, DamageCause cause) {
-		ItemStack weapon = player.getInventory().getItemInMainHand();
-		if (testForItemWithLore(weapon, "7Chaotic")) {
-			int chaoticLevel = getCustomEnchantLevel(weapon, "7Chaotic");
-
-			Random mRandom = new Random();
-			int rand = mRandom.nextInt(2 * chaoticLevel + 1) - chaoticLevel;
-
-			if (rand > 0) {
-				ParticleUtils.playParticlesInWorld(damagee.getWorld(), Particle.DAMAGE_INDICATOR, damagee.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
-			}
-
-			if (cause == DamageCause.ENTITY_SWEEP_ATTACK) {
-				rand = rand / 2;
-			}
-
-			damage = damage + rand;
-		}
-
-		if (testForItemWithLore(weapon, "7Ice Aspect")) {
-			int iceLevel = getCustomEnchantLevel(weapon, "7Ice Aspect");
-			int duration = iceLevel * 4 * 20 + 20;
-			LivingEntity target = (LivingEntity)damagee;
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2, false, true));
-			ParticleUtils.playParticlesInWorld(damagee.getWorld(), Particle.SNOWBALL, damagee.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
-
-			if (damagee instanceof Blaze) {
-				damage = damage + 1.0;
-			}
-		}
-
-		if (testForItemWithLore(weapon, "7Slayer")) {
-			int slayerLevel = getCustomEnchantLevel(weapon, "7Slayer");
-
-			if (damagee instanceof Creeper || damagee instanceof Blaze || damagee instanceof Enderman || damagee instanceof Endermite) {
-				damage = damage + 2.5 * slayerLevel;
-			}
-		}
-
-		if (testForItemWithLore(weapon, "7Thunder")) {
-			int thunderLevel = getCustomEnchantLevel(weapon, "7Thunder");
-
-			Random mRandom = new Random();
-			double rand = mRandom.nextDouble();
-
-			if (damage >= 4 && rand < thunderLevel * 0.1) {
-
-				LivingEntity target = (LivingEntity)damagee;
-				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 8, false, true));
-				target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 50, 8, false, true));
-
-				if (damagee instanceof Guardian) {
-					damage = damage + 1.0;
-				}
-
-				player.getWorld().playSound(player.getLocation(), "entity.lightning.impact", 0.4f, 1.0f);
-			}
-		}
-
-		return damage;
-	}
-
 	public static boolean isAxeItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
 			return mat == Material.WOOD_AXE || mat == Material.STONE_AXE || mat == Material.GOLD_AXE
-					|| mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
+			       || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
 		}
 
 		return false;
@@ -220,7 +169,7 @@ public class InventoryUtils {
 		if (item != null) {
 			Material mat = item.getType();
 			return mat == Material.WOOD_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLD_SWORD
-					|| mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
+			       || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
 		}
 
 		return false;
@@ -230,7 +179,7 @@ public class InventoryUtils {
 		if (item != null) {
 			Material mat = item.getType();
 			return mat == Material.WOOD_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLD_PICKAXE
-					|| mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
+			       || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
 		}
 
 		return false;
@@ -240,7 +189,7 @@ public class InventoryUtils {
 		if (item != null) {
 			Material mat = item.getType();
 			return mat == Material.WOOD_HOE || mat == Material.STONE_HOE || mat == Material.GOLD_HOE
-					|| mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
+			       || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
 		}
 
 		return false;
@@ -291,28 +240,28 @@ public class InventoryUtils {
 				return;
 			}
 
-			//	Head Slot
+			//  Head Slot
 			if (equipment[i] == 0) {
 				if (gear.getHelmet().getType() != Material.AIR) {
 					gear.setHelmet(new ItemStack(Material.AIR));
 					removedCount++;
 				}
 			}
-			//	Chestplate
+			//  Chestplate
 			else if (equipment[i] == 1) {
 				if (gear.getChestplate().getType() != Material.AIR) {
 					gear.setChestplate(new ItemStack(Material.AIR));
 					removedCount++;
 				}
 			}
-			//	Legs
+			//  Legs
 			else if (equipment[i] == 2) {
 				if (gear.getLeggings().getType() != Material.AIR) {
 					gear.setLeggings(new ItemStack(Material.AIR));
 					removedCount++;
 				}
 			}
-			//	Boots
+			//  Boots
 			else if (equipment[i] == 3) {
 				if (gear.getBoots().getType() != Material.AIR) {
 					gear.setBoots(new ItemStack(Material.AIR));
@@ -323,10 +272,10 @@ public class InventoryUtils {
 	}
 
 	public static void removeSpecialItems(Player player) {
-		//	Clear inventory
+		//  Clear inventory
 		_removeSpecialItemsFromInventory(player.getInventory());
 
-		//	Clear Ender Chest
+		//  Clear Ender Chest
 		_removeSpecialItemsFromInventory(player.getEnderChest());
 	}
 
@@ -352,26 +301,26 @@ public class InventoryUtils {
 	}
 
 	private static boolean _containsSpecialLore(ItemStack item) {
-		return	testForItemWithLore(item, "D4 Key") ||
-				testForItemWithLore(item, "D5 Key");
+		return  testForItemWithLore(item, "D4 Key") ||
+		        testForItemWithLore(item, "D5 Key");
 	}
 
 	public static String toBase64(Inventory inventory) throws IllegalStateException {
 		try {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
-            // Write the size of the inventory
-            dataOutput.writeInt(inventory.getSize());
+			// Write the size of the inventory
+			dataOutput.writeInt(inventory.getSize());
 
-            // Save every element in the list
-            for (int i = 0; i < inventory.getSize(); i++) {
-                dataOutput.writeObject(inventory.getItem(i));
-            }
+			// Save every element in the list
+			for (int i = 0; i < inventory.getSize(); i++) {
+				dataOutput.writeObject(inventory.getItem(i));
+			}
 
-            // Serialize that array
-            dataOutput.close();
-            return Base64Coder.encodeLines(outputStream.toByteArray());
+			// Serialize that array
+			dataOutput.close();
+			return Base64Coder.encodeLines(outputStream.toByteArray());
 		} catch (Exception e) {
 			throw new IllegalStateException("Unable to save item stacks.", e);
 		}
@@ -382,15 +331,15 @@ public class InventoryUtils {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
-			//	Write the size of the inventory.
+			//  Write the size of the inventory.
 			dataOutput.writeInt(items.length);
 
-			//	Save all the elements.
+			//  Save all the elements.
 			for (int i = 0; i < items.length; i++) {
 				dataOutput.writeObject(items[i]);
 			}
 
-			//	Serialize the array.
+			//  Serialize the array.
 			dataOutput.close();
 			return Base64Coder.encodeLines(outputStream.toByteArray());
 		} catch (Exception e) {
@@ -401,65 +350,51 @@ public class InventoryUtils {
 	public static Inventory fromBase64(String data) throws IOException {
 		try {
 			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            Inventory inventory = Bukkit.getServer().createInventory(null, dataInput.readInt());
+			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+			Inventory inventory = Bukkit.getServer().createInventory(null, dataInput.readInt());
 
-            // Read the serialized inventory
-            for (int i = 0; i < inventory.getSize(); i++) {
-                inventory.setItem(i, (ItemStack) dataInput.readObject());
-            }
+			// Read the serialized inventory
+			for (int i = 0; i < inventory.getSize(); i++) {
+				inventory.setItem(i, (ItemStack) dataInput.readObject());
+			}
 
-            dataInput.close();
-            return inventory;
+			dataInput.close();
+			return inventory;
 		} catch (ClassNotFoundException e) {
 			throw new IOException("Unable to decode class type.", e);
 		}
 	}
 
 	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
-    	try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            ItemStack[] items = new ItemStack[dataInput.readInt()];
+		try {
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+			ItemStack[] items = new ItemStack[dataInput.readInt()];
 
-            // Read the serialized inventory
-            for (int i = 0; i < items.length; i++) {
-            	items[i] = (ItemStack) dataInput.readObject();
-            }
+			// Read the serialized inventory
+			for (int i = 0; i < items.length; i++) {
+				items[i] = (ItemStack) dataInput.readObject();
+			}
 
-            dataInput.close();
-            return items;
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to decode class type.", e);
-        }
-	}
-
-	public static ItemStack getItemFromEquipment(EntityEquipment equipment, EquipmentSlot slot) {
-		switch (slot) {
-		case HEAD:		return equipment.getHelmet();
-		case CHEST:		return equipment.getChestplate();
-		case LEGS:		return equipment.getLeggings();
-		case FEET:		return equipment.getBoots();
-		case HAND:		return equipment.getItemInMainHand();
-		case OFF_HAND:	return equipment.getItemInOffHand();
+			dataInput.close();
+			return items;
+		} catch (ClassNotFoundException e) {
+			throw new IOException("Unable to decode class type.", e);
 		}
-
-		return null;
 	}
 
 	public static boolean isArmorSlotFromId(int slotId) {
-		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
+		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT
+		       || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
-	static void _shuffleArray(Random rand, int[] ar)
-	  {
-	    for (int i = ar.length - 1; i > 0; i--)
-	    {
-	      int index = rand.nextInt(i + 1);
-	      // Simple swap
-	      int a = ar[index];
-	      ar[index] = ar[i];
-	      ar[i] = a;
-	    }
-	  }
+	static void _shuffleArray(Random rand, int[] ar) {
+		for (int i = ar.length - 1; i > 0; i--) {
+			int index = rand.nextInt(i + 1);
+			// Simple swap
+			int a = ar[index];
+			ar[index] = ar[i];
+			ar[i] = a;
+		}
+	}
 }

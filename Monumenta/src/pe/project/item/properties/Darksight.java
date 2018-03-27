@@ -1,15 +1,18 @@
 package pe.project.item.properties;
 
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
-public class Darksight extends ItemProperty {
-	private static String PROPERTY_NAME = "* Darksight *";
+public class Darksight implements ItemProperty {
+	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Darksight";
 
 	@Override
 	public String getProperty() {
@@ -17,13 +20,12 @@ public class Darksight extends ItemProperty {
 	}
 
 	@Override
-	public boolean validSlot(EquipmentSlot slot) {
-		// Valid in all slots except main hand
-		return !EquipmentSlot.HAND.equals(slot);
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player) {
+	public void applyProperty(Plugin plugin, Player player, int level) {
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 1000000, 0, true, false));
 	}
 

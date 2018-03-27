@@ -1,89 +1,104 @@
 package pe.project.player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pe.project.Plugin;
 import pe.project.item.properties.ItemProperty;
 import pe.project.item.properties.ItemPropertyManager;
-import pe.project.utils.InventoryUtils;
 
 public class PlayerInventory {
-	HashMap<EquipmentSlot, List<ItemProperty>> mInventoryProperties = new HashMap<EquipmentSlot, List<ItemProperty>>();
+	private class SlotItemProperties {
+		List<ItemProperty> properties;
+	}
+
+	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
 	boolean mHasTickingProperty = false;
+	boolean mHasOnAttack = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
-		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			mInventoryProperties.put(slot, new ArrayList<ItemProperty>());
-		}
-
 		updateEquipmentProperties(plugin, player);
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
-		//	If there is no ticking property on our gear early out.
+		/* If there is no ticking property on our gear early out */
 		if (!mHasTickingProperty) {
 			return;
 		}
 
-		Iterator<Entry<EquipmentSlot, List<ItemProperty>>> iter = mInventoryProperties.entrySet().iterator();
-		while (iter.hasNext()) {
-			List<ItemProperty> list = iter.next().getValue();
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
 
-			for (ItemProperty property : list) {
-				property.tick(plugin, world, player);
+			if (property.hasTickingEffect()) {
+				property.tick(plugin, world, player, level);
 			}
 		}
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
-		//	Loop through existing equipment properties, remove all necessary ones.
-		cleanupProperties(plugin, player);
+		/*
+		 * Loop through existing equipment properties, remove all of them
+		 *
+		 * TODO: Modify this so only the removed effects are removed
+		 * This is probably hard to do without making any new objects
+		 * (which defeats the purpose)
+		 */
+		removeProperties(plugin, player);
 
-		//	Once that's done, loop through the current players inventory and re-register the properties.
-		_getEquipmentProperties(plugin, player);
+		/* Once that's done, loop through the current players inventory and re-register the properties */
+		getAndApplyProperties(plugin, player);
 	}
 
-	public void cleanupProperties(Plugin plugin, Player player) {
-		mHasTickingProperty = false;
-
-		Iterator<Entry<EquipmentSlot, List<ItemProperty>>> iter = mInventoryProperties.entrySet().iterator();
-		while (iter.hasNext()) {
-			List<ItemProperty> properties = iter.next().getValue();
-			for (ItemProperty p : properties) {
-				p.removeProperty(plugin, player);
-			}
-
-			properties.clear();
+	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, DamageCause cause) {
+		/* If there is no onAttack() property on our gear early out */
+		if (!mHasOnAttack) {
+			return damage;
 		}
+
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+
+			damage = property.onAttack(plugin, world, player, target, damage, level, cause);
+		}
+
+		return damage;
 	}
 
-	private void _getEquipmentProperties(Plugin plugin, Player player) {
-		final EntityEquipment equipment = player.getEquipment();
+	public void removeProperties(Plugin plugin, Player player) {
+		mHasTickingProperty = false;
+		mHasOnAttack = false;
 
-		Iterator<Entry<EquipmentSlot, List<ItemProperty>>> iter = mInventoryProperties.entrySet().iterator();
-		while (iter.hasNext()) {
-			Entry<EquipmentSlot, List<ItemProperty>> entry = iter.next();
-			EquipmentSlot slot = entry.getKey();
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
 
-			final List<ItemProperty> properties = ItemPropertyManager.getItemProperties(InventoryUtils.getItemFromEquipment(equipment, slot), slot, player);
-			for (ItemProperty p : properties) {
-				p.applyProperty(plugin, player);
+			property.removeProperty(plugin, player);
+		}
 
-				if (p.hasTickingEffect()) {
-					mHasTickingProperty = true;
-				}
+		mCurrentProperties.clear();
+	}
+
+	private void getAndApplyProperties(Plugin plugin, Player player) {
+		ItemPropertyManager.getItemProperties(mCurrentProperties, player);
+
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.applyProperty(plugin, player, level);
+			if (property.hasTickingEffect()) {
+				mHasTickingProperty = true;
 			}
-
-			entry.setValue(properties);
+			if (property.hasOnAttack()) {
+				mHasOnAttack = true;
+			}
 		}
 	}
 }

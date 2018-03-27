@@ -14,7 +14,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pe.project.Constants;
 import pe.project.Plugin;
@@ -91,6 +93,15 @@ public class PlayerTracking implements EntityTracking {
 		if (manager != null) {
 			manager.updateEquipmentProperties(mPlugin, player);
 		}
+	}
+
+	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, DamageCause cause) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			damage = manager.onAttack(plugin, world, player, target, damage, cause);
+		}
+
+		return damage;
 	}
 
 	@Override
@@ -222,7 +233,7 @@ public class PlayerTracking implements EntityTracking {
 		while (iter.hasNext()) {
 			Entry<Player, PlayerInventory> entry = iter.next();
 			Player player = entry.getKey();
-			entry.getValue().cleanupProperties(mPlugin, player);
+			entry.getValue().removeProperties(mPlugin, player);
 			PlayerData.removePlayerDataFile(mPlugin, player);
 		}
 

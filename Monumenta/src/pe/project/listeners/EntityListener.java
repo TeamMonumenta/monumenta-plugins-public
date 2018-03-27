@@ -8,7 +8,6 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -59,7 +58,6 @@ import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.MetadataUtils;
-import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -128,17 +126,18 @@ public class EntityListener implements Listener {
 
 				//  Make sure to not trigger class abilities off Throrns.
 				if (event.getCause() != DamageCause.THORNS) {
-
-					double damage = InventoryUtils.meleeEnchants(player, damagee, event.getDamage(), event.getCause());
-					damage = Math.max(damage, 0);
-					event.setDamage(damage);
-
-					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
-						// This damage was just added by the player's class - don't process class effects again
-						return;
-					}
-
 					if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
+							// This damage was just added by the player's class - don't process class effects again
+							return;
+						}
+
+						//	Apply any damage modifications that items they have may apply.
+						double damage = mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player.getWorld(), player,
+								(LivingEntity)damagee, event.getDamage(), event.getCause());
+
+						event.setDamage(Math.max(damage, 0));
+
 						BaseClass _class = mPlugin.getClass(player);
 						_class.ModifyDamage(player, _class, event);
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());

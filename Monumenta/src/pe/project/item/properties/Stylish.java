@@ -1,15 +1,18 @@
 package pe.project.item.properties;
 
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 
 import pe.project.Plugin;
 import pe.project.utils.ParticleUtils;
+import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
-public class Stylish extends ItemProperty {
-	private static String PROPERTY_NAME = "* Stylish *";
+public class Stylish implements ItemProperty {
+	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Stylish";
 
 	@Override
 	public boolean hasTickingEffect() {
@@ -22,13 +25,12 @@ public class Stylish extends ItemProperty {
 	}
 
 	@Override
-	public boolean validSlot(EquipmentSlot slot) {
-		// Stylish *shirt*
-		return EquipmentSlot.CHEST.equals(slot);
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.ARMOR);
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player) {
+	public void tick(Plugin plugin, World world, Player player, int level) {
 		ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 	}
 }

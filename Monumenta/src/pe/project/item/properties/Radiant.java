@@ -1,20 +1,19 @@
 package pe.project.item.properties;
 
-import org.bukkit.World;
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.World;
 
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
-public class Radiant extends ItemProperty {
-	private static String PROPERTY_NAME = "* Radiant *";
-
-	@Override
-	public boolean hasTickingEffect() {
-		return true;
-	}
+public class Radiant implements ItemProperty {
+	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Radiant";
 
 	@Override
 	public String getProperty() {
@@ -22,12 +21,12 @@ public class Radiant extends ItemProperty {
 	}
 
 	@Override
-	public boolean requireSoulbound() {
-		return true;
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player) {
+	public void applyProperty(Plugin plugin, Player player, int level) {
 		// Radiant is different from the others - it applies effects only for a short duration
 		// and doesn't remove them when you switch off
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.GLOWING, 600, 0, true, false));
@@ -35,7 +34,12 @@ public class Radiant extends ItemProperty {
 	}
 
 	@Override
-	public void tick(Plugin plugin, World world, Player player) {
-		applyProperty(plugin, player);
+	public boolean hasTickingEffect() {
+		return true;
+	}
+
+	@Override
+	public void tick(Plugin plugin, World world, Player player, int level) {
+		applyProperty(plugin, player, level);
 	}
 }

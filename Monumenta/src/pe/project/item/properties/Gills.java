@@ -1,15 +1,18 @@
 package pe.project.item.properties;
 
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
-public class Gills extends ItemProperty {
-	private static String PROPERTY_NAME = "* Gills *";
+public class Gills implements ItemProperty {
+	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Gills";
 
 	@Override
 	public String getProperty() {
@@ -17,13 +20,12 @@ public class Gills extends ItemProperty {
 	}
 
 	@Override
-	public boolean validSlot(EquipmentSlot slot) {
-		// Only valid in offhand slot
-		return EquipmentSlot.OFF_HAND.equals(slot);
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.OFFHAND);
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player) {
+	public void applyProperty(Plugin plugin, Player player, int level) {
 		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.WATER_BREATHING, 1000000, 0, true, false));
 	}
 

@@ -1,39 +1,118 @@
 package pe.project.item.properties;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.EnumMap;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-
-import pe.project.utils.InventoryUtils;
+import org.bukkit.inventory.PlayerInventory;
 
 public class ItemPropertyManager {
-	static List<ItemProperty> mProperties = new ArrayList<ItemProperty>();
+	/* NOTE:
+	 *
+	 * It is important that the specified slots do not overlap. That means you can have an item property
+	 * that works in MAINHAND and ARMOR, but not one that has both MAINHAND and INVENTORY because that item
+	 * will be checked twice.
+	 */
+	public enum ItemSlot {
+		MAINHAND,
+		OFFHAND,
+		ARMOR,     // Does NOT include offhand!
+		INVENTORY; // Includes everything, including armor, offhand, and hotbar
+	}
+
+	/*
+	 * Keep a static map of which properties apply to which slots
+	 * This can dramatically reduce the number of checks done when looking through player inventories.
+	 * Most items only apply to armor or mainhand, and we don't need to check every single item in the
+	 * player's inventory * against these properties every time the player's inventory changes
+	 */
+	static Map<ItemSlot, List<ItemProperty>> mProperties
+		= new EnumMap<ItemSlot, List<ItemProperty>>(ItemSlot.class);
 
 	//  Static list of Item Properties.
 	static {
-		mProperties.add(new Regeneration());
-		mProperties.add(new MainhandRegeneration());
-		mProperties.add(new Darksight());
-		mProperties.add(new Radiant());
-		mProperties.add(new Gills());
-		mProperties.add(new Stylish());
+		List<ItemProperty> init = new ArrayList<ItemProperty>();
+		init.add(new Regeneration());
+		init.add(new MainhandRegeneration());
+		init.add(new Darksight());
+		init.add(new Radiant());
+		init.add(new Gills());
+		init.add(new Stylish());
+
+		init.add(new Chaotic());
+		init.add(new IceAspect());
+		init.add(new Slayer());
+		init.add(new Thunder());
+
+		/* Build the map of which slots have which properties */
+		for (ItemProperty property : init) {
+			for (ItemSlot slot : property.validSlots()) {
+				List<ItemProperty> slotList = mProperties.get(slot);
+				if (slotList == null) {
+					slotList = new ArrayList<ItemProperty>();
+				}
+				slotList.add(property);
+				mProperties.put(slot, slotList);
+			}
+		}
 	}
 
-	public static List<ItemProperty> getItemProperties(ItemStack item, EquipmentSlot slot, Player player) {
-		List<ItemProperty> properties = new ArrayList<ItemProperty>();
+	public static ItemStack[] _getItems(PlayerInventory inv, ItemSlot slot) {
+		switch (slot) {
+		case MAINHAND:
+			return new ItemStack[] {inv.getItemInMainHand()};
+		case OFFHAND:
+			return new ItemStack[] {inv.getItemInOffHand()};
+		case ARMOR:
+			return inv.getArmorContents();
+		case INVENTORY:
+			return inv.getContents();
+		}
 
-		for (ItemProperty property : mProperties) {
-			if (property.validSlot(slot)
-			    && InventoryUtils.testForItemWithLore(item, property.getProperty())) {
-				if (!property.requireSoulbound() || InventoryUtils.isSoulboundToPlayer(item, player)) {
-					properties.add(property);
+		return null;
+	}
+
+	/*
+	 * Build a map containing all of the ItemProperty's that apply to a player and the
+	 * cumulative level of each property
+	 *
+	 * propertyMap is passed in by reference and updated by this function
+	 *
+	 * NOTE: propertyMap should already be clear'ed and the properties removed from the player
+	 */
+	public static void getItemProperties(Map<ItemProperty, Integer>propertyMap, Player player) {
+		final PlayerInventory inv = player.getInventory();
+
+		/* Step over the slots for which we have item properties */
+		for (Map.Entry<ItemSlot, List<ItemProperty>> entry : mProperties.entrySet()) {
+			ItemSlot slot = entry.getKey();
+			List<ItemProperty> slotProperties = entry.getValue();
+
+			if (slotProperties != null && !(slotProperties.isEmpty())) {
+				/* Step over the item(s) the player has in that slot */
+				for (ItemStack item : _getItems(inv, slot)) {
+					/* Step over the properties that apply to that slot */
+					for (ItemProperty property : slotProperties) {
+						/*
+						 * If this particular property applies levels,
+						 * add them to the running count
+						 */
+						int level = property.getLevelFromItem(item);
+						if (level > 0) {
+							Integer currentLevel = propertyMap.get(property);
+							if (currentLevel != null) {
+								currentLevel += level;
+							} else {
+								currentLevel = level;
+							}
+							propertyMap.put(property, currentLevel);
+						}
+					}
 				}
 			}
 		}
-
-		return properties;
 	}
 }
