@@ -42,6 +42,8 @@ public class ItemPropertyManager {
 		init.add(new Gills());
 		init.add(new Stylish());
 
+		init.add(new CurseOfCorruption());
+
 		init.add(new Chaotic());
 		init.add(new IceAspect());
 		init.add(new Slayer());
