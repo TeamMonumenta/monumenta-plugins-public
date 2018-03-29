@@ -30,6 +30,7 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
+	private int mShardZoneID = 0;
 	private boolean mQuestCompassEnabled = true;
 	private boolean mIsSleepingEnabled = true;
 
@@ -60,6 +61,10 @@ public class ServerProperties {
 
 	public int getPlotSurvivalMinHeight() {
 		return mPlotSurvivalMinHeight;
+	}
+
+	public int getShardZoneID() {
+		return mShardZoneID;
 	}
 
 	public boolean getQuestCompassEnabled() {
@@ -103,6 +108,7 @@ public class ServerProperties {
 					mQuestCompassEnabled       = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
 					mIsSleepingEnabled         = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 
+					mShardZoneID			   = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mLocationBounds            = _getPropertyValueLocationList(plugin, object, "locationBounds");
 

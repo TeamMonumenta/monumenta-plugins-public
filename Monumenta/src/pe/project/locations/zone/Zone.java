@@ -11,13 +11,15 @@ import pe.project.point.Point;
 
 public class Zone {
 
-	protected String mZoneName = null;
+	protected String mZoneName;
+	protected int mShardID;
 	protected Point mLowerCorner;
 	protected Point mUpperCorner;
 	protected List<SpawnEffect> mSEList = new ArrayList<SpawnEffect>();
 
-	public Zone(String zoneName, Point lowerCorner, Point upperCorner, List<SpawnEffect> effectList) {
+	public Zone(String zoneName, int shardID, Point lowerCorner, Point upperCorner, List<SpawnEffect> effectList) {
 		mZoneName = zoneName;
+		mShardID = shardID;
 		mLowerCorner = lowerCorner;
 		mUpperCorner = upperCorner;
 		mSEList = effectList;
@@ -33,7 +35,11 @@ public class Zone {
 				point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
 	}
 
-	public String getName() {
+	public int getZoneShardID() {
+		return mShardID;
+	}
+
+	public String getZoneName() {
 		return mZoneName;
 	}
 

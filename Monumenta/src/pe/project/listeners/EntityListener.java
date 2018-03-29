@@ -273,7 +273,6 @@ public class EntityListener implements Listener {
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
-		mPlugin.mZoneManager.applySpawnEffect(entity);
 	}
 
 	//	Player shoots an arrow.
