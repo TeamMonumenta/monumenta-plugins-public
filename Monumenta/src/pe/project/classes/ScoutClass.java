@@ -8,6 +8,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -30,12 +31,14 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.particlelib.ParticleEffect;
 
 /*
     Agility
@@ -59,7 +62,6 @@ public class ScoutClass extends BaseClass {
 	private static int BOW_MASTER_1_DAMAGE = 3;
 	private static int BOW_MASTER_2_DAMAGE = 6;
 
-	private static int EAGLE_EYE_ID = 64;
 	private static String EAGLE_EYE_TAG_NAME = "TagEagleEye";
 	private static int EAGLE_EYE_EFFECT_LVL = 0;
 	private static int EAGLE_EYE_DURATION = 10 * 20;
@@ -69,7 +71,6 @@ public class ScoutClass extends BaseClass {
 	private static int EAGLE_EYE_RADIUS = 20;
 	private static double EAGLE_EYE_DOT_ANGLE = 0.33;
 
-	private static int VOLLEY_ID = 65;
 	private static int VOLLEY_COOLDOWN = 15 * 20;
 	private static int VOLLEY_1_ARROW_COUNT = 7;
 	private static int VOLLEY_2_ARROW_COUNT = 10;
@@ -96,17 +97,6 @@ public class ScoutClass extends BaseClass {
 	public void setupClassPotionEffects(Player player) {
 		_testForAgility(player);
 		_testForSwiftness(player);
-	}
-
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == VOLLEY_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Volley is now off cooldown");
-		} else if (abilityID == STANDARD_BEARER_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Standard Bearer is now off cooldown");
-		} else if (abilityID == EAGLE_EYE_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Eagle Eye is now off cooldown");
-		}
 	}
 
 	@Override
@@ -184,7 +174,7 @@ public class ScoutClass extends BaseClass {
 		if (player.isSneaking()) {
 			int volley = ScoreboardUtils.getScoreboardValue(player, "Volley");
 			if (volley > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), VOLLEY_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.VOLLEY)) {
 					boolean isCritical = arrow.isCritical();
 					int fireTicks = arrow.getFireTicks();
 					int knockbackStrength = arrow.getKnockbackStrength();
@@ -223,14 +213,16 @@ public class ScoutClass extends BaseClass {
 						_arrow.setKnockbackStrength(knockbackStrength);
 
 						mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
+
 					}
+
 
 					//  I hate this so much, you don't even know... [Rock]
 					Location jankWorkAround = player.getLocation();
 					jankWorkAround.setY(-15);
 					arrow.teleport(jankWorkAround);
 
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), VOLLEY_ID, VOLLEY_COOLDOWN);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.VOLLEY, VOLLEY_COOLDOWN);
 				} else {
 					projectiles = new ArrayList<Projectile>();
 					projectiles.add(arrow);
@@ -259,14 +251,14 @@ public class ScoutClass extends BaseClass {
 	public void ProjectileHitEvent(Player player, Arrow arrow) {
 		int standardBearer = ScoreboardUtils.getScoreboardValue(player, "StandardBearer");
 		if (standardBearer > 0 && player.getGameMode() != GameMode.ADVENTURE) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), STANDARD_BEARER_ID)) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.STANDARD_BEARER)) {
 				double range = arrow.getLocation().distance(player.getLocation());
 				if (range <= STANDARD_BEARER_TRIGGER_RANGE) {
 					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, STANDARD_BEARER_ID,
 					                                          STANDARD_BEARER_TAG_NAME, STANDARD_BEARER_DURATION, player.getLocation(),
 					                                          STANDARD_BEARER_TRIGGER_RADIUS);
 
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), STANDARD_BEARER_ID, STANDARD_BEARER_COOLDOWN);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.STANDARD_BEARER, STANDARD_BEARER_COOLDOWN);
 				}
 			}
 		}
@@ -320,7 +312,7 @@ public class ScoutClass extends BaseClass {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
 				if (eagleEye > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), EAGLE_EYE_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.EAGLE_EYE)) {
 						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 						World world = player.getWorld();
 
@@ -343,7 +335,7 @@ public class ScoutClass extends BaseClass {
 							}
 						}
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), EAGLE_EYE_ID, EAGLE_EYE_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.EAGLE_EYE, EAGLE_EYE_COOLDOWN);
 					}
 				}
 			}

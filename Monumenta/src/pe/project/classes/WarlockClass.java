@@ -6,6 +6,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -20,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -40,7 +42,6 @@ import pe.project.utils.ScoreboardUtils;
 */
 
 public class WarlockClass extends BaseClass {
-	private static int AMPLIFYING_ID = 71;
 	private static int AMPLIFYING_1_EFFECT_DAMAGE = 5;
 	private static int AMPLIFYING_2_EFFECT_DAMAGE = 7;
 	private static int AMPLIFYING_RADIUS = 8;
@@ -49,7 +50,6 @@ public class WarlockClass extends BaseClass {
 	private static int AMPLIFYING_2_COOLDOWN = 12 * 20;
 	private static float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
 
-	private static int BLASPHEMY_ID = 72;
 	private static int BLASPHEMY_RADIUS = 3;
 	private static float BLASPHEMY_KNOCKBACK_SPEED = 0.5f;
 	private static int BLASPHEMY_WITHER_LEVEL = 0;
@@ -62,19 +62,16 @@ public class WarlockClass extends BaseClass {
 	private static int CURSED_WOUND_RADIUS = 3;
 //	private static int CURSED_WOUND_BURST_DAMAGE = 3;
 
-	private static int GRASPING_CLAWS_ID = 74;
 	private static int GRASPING_CLAWS_RADIUS = 6;
 	private static float GRASPING_CLAWS_SPEED = 0.25f;
 	private static int GRASPING_CLAWS_DAMAGE = 7;
 	private static int GRASPING_CLAWS_DURATION = 7 * 20;
 	private static int GRASPING_CLAWS_COOLDOWN = 16 * 20;
 
-	private static int SOUL_REND_ID = 75;
 	private static double SOUL_REND_HEAL_MULT = 0.4;
 	private static int SOUL_REND_RADIUS = 7;
 	private static int SOUL_REND_COOLDOWN = 6 * 20;
 
-	private static int CONSUMING_FLAMES_ID = 77;
 	private static int CONSUMING_FLAMES_1_RADIUS = 5;
 	private static int CONSUMING_FLAMES_2_RADIUS = 7;
 	private static int CONSUMING_FLAMES_DURATION = 7 * 20;
@@ -83,22 +80,6 @@ public class WarlockClass extends BaseClass {
 
 	public WarlockClass(Plugin plugin, Random random) {
 		super(plugin, random);
-	}
-
-
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == AMPLIFYING_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Amplifying Hex is now off cooldown");
-		} else if (abilityID == BLASPHEMY_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Blasphemous Aura is now off cooldown");
-		} else if (abilityID == GRASPING_CLAWS_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Grasping Claws is now off cooldown");
-		} else if (abilityID == SOUL_REND_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Soul Rend is now off cooldown");
-		} else if (abilityID == CONSUMING_FLAMES_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Consuming Flames is now off cooldown");
-		}
 	}
 
 
@@ -139,7 +120,7 @@ public class WarlockClass extends BaseClass {
 
 			int blasphemy = ScoreboardUtils.getScoreboardValue(player, "BlasphemousAura");
 			if (blasphemy > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), BLASPHEMY_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BLASPHEMY)) {
 					Location loc = player.getLocation();
 					World world = player.getWorld();
 
@@ -160,7 +141,7 @@ public class WarlockClass extends BaseClass {
 					}
 
 					int bduration = (blasphemy == 1) ? BLASPHEMY_1_COOLDOWN : BLASPHEMY_2_COOLDOWN;
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), BLASPHEMY_ID, bduration);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BLASPHEMY, bduration);
 				}
 			}
 		}
@@ -200,7 +181,7 @@ public class WarlockClass extends BaseClass {
 			int soulRend = ScoreboardUtils.getScoreboardValue(player, "SoulRend");
 			if (soulRend > 0) {
 				if (PlayerUtils.isCritical(player) && EntityUtils.isHostileMob(damagee)) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), SOUL_REND_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SOUL_REND)) {
 
 						double soulHealValue = damage * SOUL_REND_HEAL_MULT;
 
@@ -226,7 +207,7 @@ public class WarlockClass extends BaseClass {
 						}
 
 						//	Put Soul Rend on cooldown
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), SOUL_REND_ID, SOUL_REND_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SOUL_REND, SOUL_REND_COOLDOWN);
 					}
 				}
 			}
@@ -242,7 +223,7 @@ public class WarlockClass extends BaseClass {
 		int graspingClaws = ScoreboardUtils.getScoreboardValue(player, "GraspingClaws");
 		if (graspingClaws > 0) {
 			if (player.isSneaking()) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), GRASPING_CLAWS_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.GRASPING_CLAW)) {
 					Location loc = damagee.getLocation();
 					World world = damagee.getWorld();
 
@@ -285,7 +266,7 @@ public class WarlockClass extends BaseClass {
 					if (graspingClaws > 1) {EntityUtils.damageEntity(mPlugin, damagee, GRASPING_CLAWS_DAMAGE, player);}
 
 					//	Put Soul Rend on cooldown
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), GRASPING_CLAWS_ID, GRASPING_CLAWS_COOLDOWN);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GRASPING_CLAW, GRASPING_CLAWS_COOLDOWN);
 				}
 			}
 		}
@@ -303,7 +284,7 @@ public class WarlockClass extends BaseClass {
 			if (consumingFlames > 0) {
 				if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 					if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CONSUMING_FLAMES_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CONSUMING_FLAMES)) {
 
 							Location loc = player.getLocation();
 							World world = player.getWorld();
@@ -328,7 +309,7 @@ public class WarlockClass extends BaseClass {
 								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, CONSUMING_FLAMES_DURATION, 0, true, false));
 							}
 
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CONSUMING_FLAMES_ID, CONSUMING_FLAMES_COOLDOWN);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CONSUMING_FLAMES, CONSUMING_FLAMES_COOLDOWN);
 						}
 					}
 				}
@@ -342,7 +323,7 @@ public class WarlockClass extends BaseClass {
 				if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 					int amplifyingHex = ScoreboardUtils.getScoreboardValue(player, "AmplifyingHex");
 					if (amplifyingHex > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), AMPLIFYING_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.AMPLIFYING)) {
 							ParticleUtils.explodingConeEffect(mPlugin, player, AMPLIFYING_RADIUS, Particle.DRAGON_BREATH, 0.6f, Particle.SMOKE_NORMAL, 0.4f, AMPLIFYING_DOT_ANGLE);
 							player.getWorld().playSound(player.getLocation(), "entity.polar_bear.warning", 1.0f, 1.6f);
 
@@ -374,7 +355,7 @@ public class WarlockClass extends BaseClass {
 
 							//	Put Amplifying Hex on cooldown
 							int cooldown = (amplifyingHex == 1) ? AMPLIFYING_1_COOLDOWN : AMPLIFYING_2_COOLDOWN;
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), AMPLIFYING_ID, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.AMPLIFYING, cooldown);
 						}
 					}
 				}

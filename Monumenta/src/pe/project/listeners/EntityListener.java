@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,7 +53,6 @@ import org.bukkit.util.Vector;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
-import pe.project.managers.ZoneManager;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
@@ -106,6 +106,7 @@ public class EntityListener implements Listener {
 				if(!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
 				                                                              event.getFinalDamage())) 	{
 					event.setCancelled(true);
+
 				}
 
 			} else if (damager instanceof Firework) {
@@ -113,8 +114,10 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			} else {
 				if (damager instanceof Projectile) {
+					Projectile proj = (Projectile)damager;
 					Player player = (Player)damagee;
-					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, (Projectile)damager)) {
+					mPlugin.getClass(player).ProjectileHitPlayerEvent(player, proj);
+					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, proj)) {
 						damager.remove();
 						event.setCancelled(true);
 					}
@@ -387,11 +390,19 @@ public class EntityListener implements Listener {
 			mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
 		}
 
+		PotionData data = cloud.getBasePotionData();
+		PotionInfo info = PotionUtils.getPotionInfo(data);
+
 		//	All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player) {
 				// TODO: Base potion data from lingering potions isn't applied here. The straightforward implementation
 				// (check git history) results in full-duration effects being applied to the player, for example 8 minutes instead of 2
+
+				if (info != null) {
+					info.showParticles = true;
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, info);
+				}
 
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, effects);
@@ -446,7 +457,6 @@ public class EntityListener implements Listener {
 				Player player = (Player)entity;
 
 				// Give classes a chance to modify the projectile first
-				mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
 
 				if (type == EntityType.TIPPED_ARROW) {
 					TippedArrow arrow = (TippedArrow)event.getEntity();

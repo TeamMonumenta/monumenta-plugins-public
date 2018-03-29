@@ -4,9 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -25,15 +27,20 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.point.Raycast;
+import pe.project.point.RaycastData;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.LocationUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MetadataUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.particlelib.ParticleEffect;
 
 /*
     ByMyBlade
@@ -47,7 +54,6 @@ import pe.project.utils.ScoreboardUtils;
 public class RogueClass extends BaseClass {
 	private static final double PASSIVE_DAMAGE_MODIFIER = 2.0;
 
-	private static final int BY_MY_BLADE_ID = 41;
 	private static final int BY_MY_BLADE_HASTE_1_LVL = 1;
 	private static final int BY_MY_BLADE_HASTE_2_LVL = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
@@ -55,7 +61,6 @@ public class RogueClass extends BaseClass {
 	private static final double BY_MY_BLADE_DAMAGE_2 = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 
-	private static final int ADVANCING_SHADOWS_ID = 42;
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
@@ -65,13 +70,11 @@ public class RogueClass extends BaseClass {
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 
-	private static final int DODGING_ID = 43;
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
 	private static final int DODGING_SPEED_EFFECT_LEVEL = 0;
 	private static final int DODGING_COOLDOWN_1 = 10 * 20;
 	private static final int DODGING_COOLDOWN_2 = 8 * 20;
 
-	private static final int ESCAPE_DEATH_ID = 44;
 	private static final double ESCAPE_DEATH_HEALTH_TRIGGER = 10;
 	private static final int ESCAPE_DEATH_DURATION = 5 * 20;
 	private static final int ESCAPE_DEATH_DURATION_OTHER = 8 * 20;
@@ -89,7 +92,6 @@ public class RogueClass extends BaseClass {
 	private static final int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 
-	private static final int SMOKESCREEN_ID = 46;
 	private static final int SMOKESCREEN_RANGE = 7;
 	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 = 0;
 	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2 = 1;
@@ -105,21 +107,6 @@ public class RogueClass extends BaseClass {
 	}
 
 	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == BY_MY_BLADE_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "By My Blade is now off cooldown");
-		} else if (abilityID == ADVANCING_SHADOWS_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Advancing Shadows is now off cooldown");
-		} else if (abilityID == DODGING_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Dodging is now off cooldown");
-		} else if (abilityID == ESCAPE_DEATH_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death is now off cooldown");
-		} else if (abilityID == SMOKESCREEN_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Smokescreen is now off cooldown");
-		}
-	}
-
-	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand,
 	                                Material blockClicked) {
 		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK))) {
@@ -129,46 +116,56 @@ public class RogueClass extends BaseClass {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ADVANCING_SHADOWS_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS)) {
 						int range  = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 
-						LivingEntity entity = EntityUtils.GetEntityAtCursor(player, range, false, true, true);
+						//Basically makes sure if the target is in LoS and if there is a path.
+						Location eyeLoc = player.getEyeLocation();
+						Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
+						ray.throughBlocks = false;
+						ray.throughNonOccluding = false;
+						RaycastData data = ray.shootRaycast();
+
+						LivingEntity entity = data.getEntities().get(0);
+
 						if (entity != null && EntityUtils.isHostileMob(entity)) {
-
-							Vector toPos = entity.getLocation().toVector();
-							Vector fromPos = player.getLocation().toVector();
-
-							Vector dir = (fromPos.subtract(toPos));
-							Vector normDir = dir.normalize();
-
-							Location newLoc = entity.getLocation().add(normDir.multiply(ADVANCING_SHADOWS_OFFSET));
-							newLoc.setY(entity.getLocation().getY());
-							newLoc.setPitch(player.getLocation().getPitch());
-							newLoc.setYaw(player.getLocation().getYaw());
-							newLoc.setDirection(toPos.subtract(newLoc.toVector()).normalize());
-
-							if (EntityUtils.hasLosToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
-								if (EntityUtils.hasPathToLocation(player.getWorld(), newLoc.clone().add(0, 1, 0), entity.getEyeLocation(), newLoc.getDirection(), range)) {
-
-									if (toPos.distance(fromPos) > ADVANCING_SHADOWS_OFFSET) {
-										player.teleport(newLoc);
-									}
-
-									mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
-
-									if (advancingShadows > 1) {
-										List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
-										for (Entity mob : entities) {
-											if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
-												MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
-											}
-										}
-									}
-
-									player.getWorld().playSound(player.getLocation(), "entity.endermen.teleport", 1.0f, 1.5f);
-									mPlugin.mTimers.AddCooldown(player.getUniqueId(), ADVANCING_SHADOWS_ID, ADVANCING_SHADOWS_COOLDOWN);
+							Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
+							Location loc = player.getLocation();
+							while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET){
+								loc.add(dir);
+								if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET){
+									loc.subtract(dir.clone().multiply(1.15));
+									break;
 								}
 							}
+							loc.add(0, 1, 0);
+
+							//Just in case the player's teleportation loc is in a block.
+							while (loc.getBlock().getType().isSolid()){
+								loc.subtract(dir.clone().multiply(1.15));
+							}
+							ParticleEffect.SPELL_WITCH.display(0.2f, 0.5f, 0.2f, 1, 50, player.getLocation().add(0, 1.15, 0), 40);
+							ParticleEffect.SMOKE_LARGE.display(0.2f, 0.5f, 0.2f, 0.05f, 15, player.getLocation().add(0, 1.15, 0), 40)
+							;
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+
+							player.teleport(loc);
+
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+
+							if (advancingShadows > 1) {
+								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+								for (Entity mob : entities) {
+									if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
+										MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+									}
+								}
+							}
+
+							ParticleEffect.SPELL_WITCH.display(0.2f, 0.5f, 0.2f, 1, 50, player.getLocation().add(0, 1.15, 0), 40);
+							ParticleEffect.SMOKE_LARGE.display(0.2f, 0.5f, 0.2f, 0.05f, 15, player.getLocation().add(0, 1.15, 0), 40);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
 						}
 					}
 				}
@@ -177,7 +174,7 @@ public class RogueClass extends BaseClass {
 			if (player.isSneaking()) {
 				int smokeScreen = ScoreboardUtils.getScoreboardValue(player, "SmokeScreen");
 				if (smokeScreen > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), SMOKESCREEN_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SMOKESCREEN)) {
 						ItemStack mainHand = player.getInventory().getItemInMainHand();
 						if (mainHand != null && mainHand.getType() != Material.BOW) {
 							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE,
@@ -199,10 +196,12 @@ public class RogueClass extends BaseClass {
 
 						Location loc = player.getLocation();
 						World world = player.getWorld();
-						ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_LARGE, loc.add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.001);
+						ParticleEffect.SMOKE_LARGE.display(2.5f, 0.8f, 2.5f, 0.05f, 300, loc.clone().add(0,1,0), 40);
+						ParticleEffect.SMOKE_NORMAL.display(2.5f, 0.2f, 2.5f, 0.1f, 600, loc, 40);
 						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
+						world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.35f);
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), SMOKESCREEN_ID, SMOKESCREEN_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
 					}
 				}
 			}
@@ -218,14 +217,14 @@ public class RogueClass extends BaseClass {
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				int byMyBlade = ScoreboardUtils.getScoreboardValue(player, "ByMyBlade");
 				if (byMyBlade > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), BY_MY_BLADE_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BY_MY_BLADE)) {
 						int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
 						                                 new PotionEffect(PotionEffectType.FAST_DIGGING,
 						                                                  BY_MY_BLADE_HASTE_DURATION,
 						                                                  effectLevel, false, true));
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), BY_MY_BLADE_ID, BY_MY_BLADE_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BY_MY_BLADE, BY_MY_BLADE_COOLDOWN);
 
 						double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 						_damageMob(player, damagee, extraDamage);
@@ -233,9 +232,15 @@ public class RogueClass extends BaseClass {
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
 						loc.add(0, 1, 0);
-						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 15, 0.25, 0.5, 0.5, 0.001);
+						int count = 15;
+						world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+						if (byMyBlade > 1){
+							world.playSound(loc, Sound.ENTITY_IRONGOLEM_DEATH, 1, 1.65f);
+							ParticleEffect.SPELL_WITCH.display(0.2f, 0.65f, 0.2f, 1, 45, loc, 40);
+							count = 25;
+						}
+						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 						ParticleUtils.playParticlesInWorld(world, Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
-						world.playSound(loc, "item.shield.break", 2.0f, 0.5f);
 					}
 				}
 			}
@@ -261,14 +266,13 @@ public class RogueClass extends BaseClass {
 	@Override
 	public void ProjectileHitPlayerEvent(Player player, Projectile damager) {
 		EntityType type = damager.getType();
-
 		//  Dodging
 		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW
 		    || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL) {
 
 			int dodging = ScoreboardUtils.getScoreboardValue(player, "Dodging");
 			if (dodging > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DODGING_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DODGING)) {
 					World world = player.getWorld();
 					if (dodging > 1) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
@@ -282,7 +286,7 @@ public class RogueClass extends BaseClass {
 					world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
 
 					int cooldown = dodging == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), DODGING_ID, cooldown);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DODGING, cooldown);
 
 					// Remove effects from tipped arrows
 					// TODO: This is the same code as for removing from shields, should probably be
@@ -315,7 +319,7 @@ public class RogueClass extends BaseClass {
 		if (correctHealth > 0 && correctHealth < ESCAPE_DEATH_HEALTH_TRIGGER) {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ESCAPE_DEATH_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ESCAPE_DEATH)) {
 					List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE,
 					                                                 ESCAPE_DEATH_RANGE);
 					for (Entity entity : entities) {
@@ -360,7 +364,7 @@ public class RogueClass extends BaseClass {
 
 					MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
 
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), ESCAPE_DEATH_ID, ESCAPE_DEATH_COOLDOWN);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ESCAPE_DEATH, ESCAPE_DEATH_COOLDOWN);
 				}
 			}
 		}
@@ -400,10 +404,13 @@ public class RogueClass extends BaseClass {
 				                                 new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION,
 				                                                  VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
+				ParticleEffect.CRIT.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
+				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
 				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE,
 				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE,
-				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+                        VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			}
 		}
 	}

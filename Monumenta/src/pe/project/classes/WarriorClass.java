@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -30,6 +31,7 @@ import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.particlelib.ParticleEffect;
 
 /*
 	CounterStrike
@@ -46,7 +48,6 @@ public class WarriorClass extends BaseClass {
 
 	private static int FRENZY_DURATION = 5 * 20;
 
-	private static int RIPOSTE_ID = 25;
 	private static int RIPOSTE_COOLDOWN = 10 * 20;
 	private static int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
 	private static int RIPOSTE_SWORD_DURATION = 5 * 20;
@@ -55,7 +56,6 @@ public class WarriorClass extends BaseClass {
 	private static double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
 	private static float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	private static Integer DEFENSIVE_LINE_ID = 26;
 	private static Integer DEFENSIVE_LINE_DURATION = 10 * 20;
 	private static float DEFENSIVE_LINE_RADIUS = 8.0f;
 	private static Integer DEFENSIVE_LINE_1_COOLDOWN = 60 * 20;
@@ -77,15 +77,6 @@ public class WarriorClass extends BaseClass {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		_testItemInHand(player, mainHand);
 		_testToughness(player);
-	}
-
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == RIPOSTE_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Riposte is now off cooldown");
-		} else if (abilityID == DEFENSIVE_LINE_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Defensive Line is now off cooldown");
-		}
 	}
 
 	@Override
@@ -120,7 +111,7 @@ public class WarriorClass extends BaseClass {
 					// currently leaving the scoreboard as Obliteration for back-compatibility
 					int riposte = ScoreboardUtils.getScoreboardValue(player, "Obliteration");
 					if (riposte > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), RIPOSTE_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.RIPOSTE)) {
 							if (!(damager instanceof Creeper)) {
 								ItemStack mainHand = player.getInventory().getItemInMainHand();
 								MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
@@ -140,7 +131,7 @@ public class WarriorClass extends BaseClass {
 									world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
 									ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
 									ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
-									mPlugin.mTimers.AddCooldown(player.getUniqueId(), RIPOSTE_ID, RIPOSTE_COOLDOWN);
+									mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.RIPOSTE, RIPOSTE_COOLDOWN);
 
 									return false;
 								}
@@ -162,6 +153,9 @@ public class WarriorClass extends BaseClass {
 				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 					World world = Bukkit.getWorld(player.getWorld().getName());
 
+					Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
+					ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
+					ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.15f, 7, loc, 40);
 					List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
 					entities.add(damagee);
 					for(int i = 0; i < entities.size(); i++) {
@@ -173,9 +167,7 @@ public class WarriorClass extends BaseClass {
 							EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 
 							MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
-
-							Location loc = mob.getLocation();
-							ParticleUtils.playParticleInWorld(world, Particle.EXPLOSION_LARGE, loc, 1);
+							ParticleEffect.CLOUD.display(0, 0, 0, 0.15F, 7, mob.getLocation(), 40);
 						}
 					}
 				}
@@ -231,7 +223,7 @@ public class WarriorClass extends BaseClass {
 				if ((offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
 					int defensiveLine = ScoreboardUtils.getScoreboardValue(player, "DefensiveLine");
 					if (defensiveLine > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DEFENSIVE_LINE)) {
 							List<Entity> entities = player.getNearbyEntities(DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS);
 							entities.add(player);
 							for(int i = 0; i < entities.size(); i++) {
@@ -249,7 +241,7 @@ public class WarriorClass extends BaseClass {
 							ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
 
 							Integer cooldown = defensiveLine == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), DEFENSIVE_LINE_ID, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DEFENSIVE_LINE, cooldown);
 						}
 					}
 				}

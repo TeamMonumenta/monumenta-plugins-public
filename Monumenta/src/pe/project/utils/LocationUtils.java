@@ -3,6 +3,7 @@ package pe.project.utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
 import pe.project.point.AreaBounds;
@@ -57,6 +58,12 @@ public class LocationUtils {
 		}
 
 		return LocationType.None;
+	}
+
+	public static Vector getDirectionTo(Location to, Location from) {
+		Vector vFrom = from.toVector();
+		Vector vTo = to.toVector();
+		return vTo.subtract(vFrom).normalize();
 	}
 
 	public static boolean isLosBlockingBlock(Material mat) {

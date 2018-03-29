@@ -36,19 +36,19 @@ public class BaseClass {
 		mCooldowns = new CooldownTimers(plugin);
 	}
 
-	public void FakeAbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == ClericClass.CELESTIAL_1_FAKE_ID) {
+	public void FakeAbilityOffCooldown(Player player, Spells ability) {
+		if (ability == Spells.CELESTIAL_FAKE_1) {
 			player.removeMetadata(ClericClass.CELESTIAL_1_TAGNAME, mPlugin);
-		} else if (abilityID == ClericClass.CELESTIAL_2_FAKE_ID) {
+		} else if (ability == Spells.CELESTIAL_FAKE_2) {
 			player.removeMetadata(ClericClass.CELESTIAL_2_TAGNAME, mPlugin);
-		} else if (abilityID == ScoutClass.STANDARD_BEARER_FAKE_ID) {
+		} else if (ability == Spells.STANDARD_BEARER_FAKE) {
 			player.removeMetadata(ScoutClass.STANDARD_BEARER_TAG_NAME, mPlugin);
 		}
 	}
 
 	public void setupClassPotionEffects(Player player) {}
 
-	public void AbilityOffCooldown(Player player, int abilityID) {}
+	public void AbilityOffCooldown(Player player, Spells spell) {}
 
 	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
 	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}

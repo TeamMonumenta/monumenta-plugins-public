@@ -62,6 +62,7 @@ import pe.project.timers.CooldownTimers;
 import pe.project.timers.ProjectileEffectTimers;
 import pe.project.timers.PulseEffectTimers;
 import pe.project.tracking.TrackingManager;
+import pe.project.utils.MetadataUtils;
 import pe.project.utils.ScoreboardUtils;
 
 public class Plugin extends JavaPlugin {
@@ -111,8 +112,12 @@ public class Plugin extends JavaPlugin {
 
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
-	public PotionManager mPotionManager;
+	public static PotionManager mPotionManager;
 	public ZoneManager mZoneManager;
+
+	public static PotionManager getPotionManager(){
+		return mPotionManager;
+	}
 
 	public SocketClient mSocketClient;
 
@@ -255,6 +260,13 @@ public class Plugin extends JavaPlugin {
 
 		//	Save info.
 		mPOIManager.saveAllPOIs();
+
+		//Clear Metadata
+		for (World world : Bukkit.getWorlds()){
+			for (Player player : world.getPlayers()){
+				MetadataUtils.clearMetadata(player, this);
+			}
+		}
 	}
 
 	public Player getPlayer(UUID playerID) {

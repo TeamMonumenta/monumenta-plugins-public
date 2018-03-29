@@ -2,11 +2,14 @@ package pe.project.classes;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
@@ -25,6 +28,7 @@ import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -33,6 +37,7 @@ import pe.project.utils.MetadataUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
+import pe.project.utils.particlelib.ParticleEffect;
 
 /*
 	WandMastery
@@ -46,10 +51,14 @@ import pe.project.utils.ScoreboardUtils;
 */
 
 public class MageClass extends BaseClass {
-	private static int WAND_MASTERY_1 = 0;
-	private static int WAND_MASTERY_2 = 1;
 
-	private static int FROST_NOVA_ID = 12;
+	private static int MANA_LANCE_1_DAMAGE = 5;
+	private static int MANA_LANCE_2_DAMAGE = 10;
+	private static int MANA_LANCE_COOLDOWN = 3 * 20;
+	private static float MANA_LANCE_R = 91;
+	private static float MANA_LANCE_G = 187;
+	private static float MANA_LANCE_B = 255;
+
 	private static float FROST_NOVA_RADIUS = 6.0f;
 	private static int FROST_NOVA_1_DAMAGE = 3;
 	private static int FROST_NOVA_2_DAMAGE = 6;
@@ -58,16 +67,13 @@ public class MageClass extends BaseClass {
 	private static int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static int FROST_NOVA_DURATION = 8 * 20;
 
-	private static int PRISMATIC_SHIELD_ID = 13;
 	private static int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
 	private static int PRISMATIC_SHIELD_EFFECT_LVL_1 = 1;
 	private static int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
 	private static int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
 	private static int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static int PRISMATIC_SHIELD_1_COOLDOWN = 3 * 60 * 20;
-	private static int PRISMATIC_SHIELD_2_COOLDOWN = 2 * 60 * 20;
+	private static int PRISMATIC_SHIELD_COOLDOWN = 2 * 60 * 20;
 
-	private static int MAGMA_SHIELD_ID = 14;
 	private static int MAGMA_SHIELD_1_COOLDOWN = 21 * 20;
 	private static int MAGMA_SHIELD_2_COOLDOWN = 21 * 20;
 	private static int MAGMA_SHIELD_RADIUS = 6;
@@ -77,12 +83,11 @@ public class MageClass extends BaseClass {
 	private static float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
 	private static double MAGMA_SHIELD_DOT_ANGLE = 0.33;
 
-	private static int ARCANE_STRIKE_ID = 15;
 	private static float ARCANE_STRIKE_RADIUS = 4.0f;
-	private static int ARCANE_STRIKE_1_DAMAGE = 6;
-	private static int ARCANE_STRIKE_2_DAMAGE = 9;
-	private static int ARCANE_STRIKE_BURN_DAMAGE = 6;
-	private static int ARCANE_STRIKE_COOLDOWN = 9 * 20;
+	private static int ARCANE_STRIKE_1_DAMAGE = 5;
+	private static int ARCANE_STRIKE_2_DAMAGE = 8;
+	private static int ARCANE_STRIKE_BURN_DAMAGE = 4;
+	private static int ARCANE_STRIKE_COOLDOWN = 6 * 20;
 
 	private static int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
 	private static int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
@@ -90,10 +95,6 @@ public class MageClass extends BaseClass {
 	private static double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
 	private static int INTELLECT_XP = 3;
-	private static int INTELLECT_AS_COOLDOWN = 4 * 20;
-	private static int INTELLECT_FN_COOLDOWN = 8 * 20;
-	private static int INTELLECT_MS_1_COOLDOWN = 14 * 20;
-	private static int INTELLECT_MS_2_COOLDOWN = 14 * 20;
 
 	private static int PASSIVE_EFFECT_DURATION = 25;
 
@@ -101,24 +102,6 @@ public class MageClass extends BaseClass {
 		super(plugin, random);
 	}
 
-	@Override
-	public void setupClassPotionEffects(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		_testItemInHand(player, mainHand);
-	}
-
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == FROST_NOVA_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Frost Nova is now off cooldown");
-		} else if (abilityID == ARCANE_STRIKE_ID) {
-				MessagingUtils.sendActionBarMessage(mPlugin, player, "Arcane Strike is now off cooldown");
-		} else if (abilityID == MAGMA_SHIELD_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Magma Shield is now off cooldown");
-		} else if (abilityID == PRISMATIC_SHIELD_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield is now off cooldown");
-		}
-	}
 
 	@Override
 	public boolean has1SecondTrigger() {
@@ -143,7 +126,7 @@ public class MageClass extends BaseClass {
 			if (InventoryUtils.isWandItem(mainHand)) {
 				int arcaneStrike = ScoreboardUtils.getScoreboardValue(player, "ArcaneStrike");
 				if (arcaneStrike > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), ARCANE_STRIKE_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE)) {
 						int extraDamage = arcaneStrike == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 
 						List<Entity> entities = damagee.getNearbyEntities(ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS);
@@ -172,10 +155,7 @@ public class MageClass extends BaseClass {
 
 						world.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
 
-						boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-						int cooldown = intellectBonus ? INTELLECT_AS_COOLDOWN : ARCANE_STRIKE_COOLDOWN;
-
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), ARCANE_STRIKE_ID, cooldown);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
 					}
 				}
 			}
@@ -183,12 +163,6 @@ public class MageClass extends BaseClass {
 
 		return true;
 	}
-
-	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemInHand(player, mainHand);
-	}
-
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
@@ -210,7 +184,7 @@ public class MageClass extends BaseClass {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
 					if (magmaShield > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), MAGMA_SHIELD_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD)) {
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 							List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
 							for(Entity e : entities) {
@@ -236,11 +210,62 @@ public class MageClass extends BaseClass {
 
 							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
 
-							int cooldown = intellectBonus ? (magmaShield == 1 ? INTELLECT_MS_1_COOLDOWN : INTELLECT_MS_2_COOLDOWN) :
+							int cooldown = intellectBonus ? (magmaShield == 1 ? (MAGMA_SHIELD_1_COOLDOWN / 3) * 2 : (MAGMA_SHIELD_1_COOLDOWN / 3) * 2) :
 										(magmaShield == 1 ? MAGMA_SHIELD_1_COOLDOWN : MAGMA_SHIELD_2_COOLDOWN);
 
 
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), MAGMA_SHIELD_ID, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, cooldown);
+						}
+					}
+				}
+			}else{
+				//Mana Lance
+				if (action == Action.RIGHT_CLICK_AIR) {
+					int wandMastery = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
+					ItemStack mainHand = player.getInventory().getItemInMainHand();
+					if (InventoryUtils.isWandItem(mainHand)) {
+						if (wandMastery > 0){
+							if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MANA_LANCE)) {
+
+								int extraDamage = wandMastery == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
+
+								Location loc = player.getEyeLocation();
+								Vector dir = loc.getDirection();
+								loc.add(dir);
+								ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.125f, 10, loc, 40);
+								double pOffset = 0.35;
+								//double offset = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+
+								for (int i = 0; i < 8; i++){
+									loc.add(dir);
+
+									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
+									//ParticleEffect.SPELL_WITCH.display(0.05f, 0.05f, 0.05f, 1, 6, loc, 40);
+									for (int t = 0; t < 12; t ++){
+										Location pLoc = loc.clone();
+										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										double os3 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										pLoc.add(os1, os2, os3);
+										loc.getWorld().spigot().playEffect(pLoc, Effect.COLOURED_DUST, 0, 0, MANA_LANCE_R / 255, MANA_LANCE_G / 255, MANA_LANCE_B / 255, 1, 0, 100);
+										}
+									if (loc.getBlock().getType().isSolid()){
+										loc.subtract(dir.multiply(0.5));
+										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
+										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
+										break;
+									}
+									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)){
+										if (EntityUtils.isHostileMob(e)){
+											LivingEntity le = (LivingEntity) e;
+											EntityUtils.damageEntity(mPlugin, le, extraDamage, player);
+										}
+									}
+
+								}
+								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MANA_LANCE, MANA_LANCE_COOLDOWN);
+								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+							}
 						}
 					}
 				}
@@ -254,7 +279,7 @@ public class MageClass extends BaseClass {
 				if (InventoryUtils.isWandItem(mainHand)) {
 					int frostNova = ScoreboardUtils.getScoreboardValue(player, "FrostNova");
 					if (frostNova > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), FROST_NOVA_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FROST_NOVA)) {
 							List<Entity> entities = player.getNearbyEntities(FROST_NOVA_RADIUS, FROST_NOVA_RADIUS, FROST_NOVA_RADIUS);
 							entities.add(player);
 							for(int i = 0; i < entities.size(); i++) {
@@ -276,9 +301,9 @@ public class MageClass extends BaseClass {
 							}
 
 							int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
-							int cooldown = intellect < 2 ? FROST_NOVA_COOLDOWN : INTELLECT_FN_COOLDOWN;
+							int cooldown = intellect < 2 ? FROST_NOVA_COOLDOWN : (FROST_NOVA_COOLDOWN / 3) * 2;
 
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), FROST_NOVA_ID, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, cooldown);
 
 							World world = Bukkit.getWorld(player.getWorld().getName());
 							Location loc = player.getLocation();
@@ -291,6 +316,7 @@ public class MageClass extends BaseClass {
 				}
 			}
 		}
+
 	}
 
 	@Override
@@ -367,14 +393,16 @@ public class MageClass extends BaseClass {
 			if (correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
 				int prismatic = ScoreboardUtils.getScoreboardValue(player, "Prismatic");
 				if (prismatic > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), PRISMATIC_SHIELD_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD)) {
 						int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 						int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, false));
-
-						int cooldown = prismatic == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), PRISMATIC_SHIELD_ID, cooldown);
+						ParticleEffect.FIREWORKS_SPARK.display(0.2f, 0.35f, 0.2f, 0.5f, 150, player.getLocation().add(0, 1.15, 0), 40);
+						ParticleEffect.SPELL_INSTANT.display(0.2f, 0.35f, 0.2f, 1, 100, player.getLocation().add(0, 1.15, 0), 40);
+						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+						MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, PRISMATIC_SHIELD_COOLDOWN);
 					}
 				}
 			}
@@ -382,16 +410,4 @@ public class MageClass extends BaseClass {
 		return true;
 	}
 
-	private void _testItemInHand(Player player, ItemStack mainHand) {
-		//	Wand Mastery
-		int wandMastery = ScoreboardUtils.getScoreboardValue(player, "WandMastery");
-		if (wandMastery > 0) {
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-
-			if (InventoryUtils.isWandItem(mainHand)) {
-				int strengthAmp = wandMastery == 1 ? WAND_MASTERY_1 : WAND_MASTERY_2;
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
-			}
-		}
-	}
 }

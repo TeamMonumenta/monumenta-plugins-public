@@ -30,6 +30,7 @@ import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.utils.particlelib.ParticleEffect;
 
 public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {
@@ -54,6 +55,51 @@ public class EntityUtils {
 		}
 
 		return false;
+	}
+
+
+
+	/**
+	 * Gets the entity in the crosshair of the player
+	 * <p>
+	 * Utilizes raycasting for the detection.
+	 * @param player
+	 * @param range
+	 * @param targetPlayers
+	 * @param targetNonPlayers
+	 * @return The Entity in the crosshair of the player
+	 */
+	public static LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding){
+		LivingEntity entity = null;
+		Location loc = player.getEyeLocation();
+		Vector dir = loc.getDirection();
+		outerloop: for (int i = 0; i < (range * 2); i++){
+			loc.add(dir.clone().multiply(0.5));
+			//Is the block solid?
+
+			if (checkLos){
+				if (loc.getBlock().getType().isSolid()){
+					if (throughNonOccluding){
+						if (loc.getBlock().getType().isOccluding()){
+							break;
+						}
+					}else{
+						break;
+					}
+				}
+			}
+			for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)){
+				//	Make sure to only get living entities.
+				if( e instanceof LivingEntity ) {
+					//	Make sure we should be targeting this entity.
+					if( (targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player))) ) {
+						entity = (LivingEntity) e;
+						break outerloop;
+					}
+				}
+			}
+		}
+		return entity;
 	}
 
 	public static LivingEntity GetEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
@@ -244,7 +290,7 @@ public class EntityUtils {
 	public static boolean withinRangeOfMonster(Player player, double range) {
 		List<Entity> entities = player.getNearbyEntities(range, range, range);
 		for (Entity entity : entities) {
-			if (entity instanceof Monster) {
+			if (isHostileMob(entity)) {
 				return true;
 			}
 		}

@@ -8,6 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
@@ -24,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
@@ -45,13 +47,11 @@ PoisonTrail
 */
 
 public class AlchemistClass extends BaseClass {
-	private static int GRUESOME_ALCHEMY_ID = 51;
 	private static double GRUESOME_ALCHEMY_CHANCE = 0.25f;
 	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
 	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
 	private static int GRUESOME_ALCHEMY_COOLDOWN = 3 * 60 * 20;
 
-	private static int PUTRID_FUMES_ID = 52;
 	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
 	private static String PUTRID_FUMES_2_TAG = "PutridFumes2";
 	private static float PUTRID_FUMES_1_RADIUS = 3;
@@ -68,7 +68,6 @@ public class AlchemistClass extends BaseClass {
 	private static int BASILISK_POISON_1_DURATION = 15 * 20;
 	private static int BASILISK_POISON_2_DURATION = 12 * 20;
 
-	private static int POWER_INJECTION_ID = 55;
 	private static int POWER_INJECTION_RANGE = 8;
 	private static int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
 	private static int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
@@ -89,12 +88,6 @@ public class AlchemistClass extends BaseClass {
 		super(plugin, random);
 	}
 
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == PUTRID_FUMES_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Putrid Fumes is now off cooldown");
-		}
-	}
 
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
@@ -102,7 +95,7 @@ public class AlchemistClass extends BaseClass {
 		if (shouldGenDrops) {
 			int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
 			if (gruesomeAlchemy > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.GRUESOME_ALCHEMY)) {
 					if (mRandom.nextFloat() < GRUESOME_ALCHEMY_CHANCE) {
 						int count = gruesomeAlchemy == 1 ? GRUESOME_ALCHEMY_1_STACK_SIZE : GRUESOME_ALCHEMY_2_STACK_SIZE;
 						ItemStack stack = new ItemStack(Material.SPLASH_POTION, count);
@@ -128,7 +121,7 @@ public class AlchemistClass extends BaseClass {
 						World world = Bukkit.getWorld(player.getWorld().getName());
 						world.dropItemNaturally(killedEntity.getLocation(), stack);
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), GRUESOME_ALCHEMY_ID, GRUESOME_ALCHEMY_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GRUESOME_ALCHEMY, GRUESOME_ALCHEMY_COOLDOWN);
 					}
 				}
 			}
@@ -155,7 +148,7 @@ public class AlchemistClass extends BaseClass {
 			if (arrow.isCritical() && player.isSneaking()) {
 				int powerInjection = ScoreboardUtils.getScoreboardValue(player, "PowerInjection");
 				if (powerInjection > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), POWER_INJECTION_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.POWER_INJECTION)) {
 						LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, POWER_INJECTION_RANGE, true, true, true);
 						if (targetEntity != null && targetEntity instanceof Player) {
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
@@ -166,7 +159,7 @@ public class AlchemistClass extends BaseClass {
 								mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
 							}
 
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), POWER_INJECTION_ID, POWER_INJECTION_COOLDOWN);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.POWER_INJECTION, POWER_INJECTION_COOLDOWN);
 
 							arrow.remove();
 							return;
@@ -188,14 +181,14 @@ public class AlchemistClass extends BaseClass {
 	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), PUTRID_FUMES_ID)) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PUTRID_FUMES)) {
 				if (!PotionUtils.hasPositiveEffects(potion.getEffects())) {
 					int putridFumes = ScoreboardUtils.getScoreboardValue(player, "PutridFumes");
 					if (putridFumes > 0) {
 						String meta = putridFumes == 1 ? PUTRID_FUMES_1_TAG : PUTRID_FUMES_2_TAG;
 						potion.setMetadata(meta, new FixedMetadataValue(mPlugin, 0));
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), PUTRID_FUMES_ID, PUTRID_FUMES_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PUTRID_FUMES, PUTRID_FUMES_COOLDOWN);
 					}
 				}
 			}

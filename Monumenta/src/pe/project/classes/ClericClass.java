@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -26,6 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
@@ -36,6 +38,7 @@ import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
+import pe.project.utils.particlelib.ParticleEffect;
 
 /*
 	Sanctified
@@ -64,8 +67,6 @@ public class ClericClass extends BaseClass {
 	private static double HEAVENLY_BOON_RADIUS = 12;
 
 	//	CLEANSING
-	private static int CLEANSING_ID = 34;
-	private static int CLEANSING_FAKE_ID = 10034;
 	private static int CLEANSING_DURATION = 15 * 20;
 	private static int CLEANSING_RESIST_LEVEL = 0;
 	private static int CLEANSING_STRENGTH_LEVEL = 0;
@@ -79,7 +80,6 @@ public class ClericClass extends BaseClass {
 	private static int DIVINE_JUSTICE_HEAL = 4;
 	private static int DIVINE_JUSTICE_CRIT_HEAL = 1;
 
-	private static int CELESTIAL_ID = 36;
 	public static int CELESTIAL_1_FAKE_ID = 100361;
 	public static int CELESTIAL_2_FAKE_ID = 100362;
 	private static int CELESTIAL_COOLDOWN = 40 * 20;
@@ -91,7 +91,6 @@ public class ClericClass extends BaseClass {
 	private static double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
-	private static int HEALING_ID = 37;
 	private static int HEALING_RADIUS = 12;
 	private static int HEALING_1_HEAL = 10;
 	private static int HEALING_2_HEAL = 16;
@@ -107,16 +106,6 @@ public class ClericClass extends BaseClass {
 		super(plugin, random);
 	}
 
-	@Override
-	public void AbilityOffCooldown(Player player, int abilityID) {
-		if (abilityID == CELESTIAL_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Celestial Blessing is now off cooldown");
-		} else if (abilityID == CLEANSING_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Cleansing Rain is now off cooldown");
-		} else if (abilityID == HEALING_ID) {
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "Hand of Light is now off cooldown");
-		}
-	}
 
 	@Override
 	public boolean has2SecondTrigger() {
@@ -164,6 +153,7 @@ public class ClericClass extends BaseClass {
 								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 								if (p.getHealth() > oldHealth) {
 									ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+
 								}
 							}
 						}
@@ -174,7 +164,7 @@ public class ClericClass extends BaseClass {
 			if (oneSecond) {
 				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 				if (cleansing > 0) {
-					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_FAKE_ID)) {
+					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE)) {
 						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 200, 2.5, 2, 2.5, 0.001);
 						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 30, 2, 1.5, 2, 0.001);
 
@@ -183,13 +173,7 @@ public class ClericClass extends BaseClass {
 						for (Entity entity : entities) {
 							if (entity instanceof Player) {
 								Player e = (Player)entity;
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.WITHER);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.SLOW);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.SLOW_DIGGING);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.POISON);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.WEAKNESS);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.BLINDNESS);
-								mPlugin.mPotionManager.removePotion(e, PotionID.ALL, PotionEffectType.CONFUSION);
+								PotionUtils.clearNegatives(e);
 
 								if (player.getFireTicks() > 0) {
 									player.setFireTicks(1);
@@ -370,7 +354,7 @@ public class ClericClass extends BaseClass {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				int celestial = ScoreboardUtils.getScoreboardValue(player, "Celestial");
 				if (celestial > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CELESTIAL_ID)) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING)) {
 						World world = player.getWorld();
 
 						List<Entity> entities = player.getNearbyEntities(CELESTIAL_RADIUS, CELESTIAL_RADIUS, CELESTIAL_RADIUS);
@@ -380,7 +364,7 @@ public class ClericClass extends BaseClass {
 							if(e instanceof Player) {
 								Player p = (Player)(e);
 
-								int fakeID = celestial == 1 ? CELESTIAL_1_FAKE_ID : CELESTIAL_2_FAKE_ID;
+								Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
 
 								int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
 
@@ -394,7 +378,7 @@ public class ClericClass extends BaseClass {
 							}
 						}
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), CELESTIAL_ID, CELESTIAL_COOLDOWN);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING, CELESTIAL_COOLDOWN);
 					}
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
@@ -407,18 +391,18 @@ public class ClericClass extends BaseClass {
 
 					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 					if (cleansing > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), CLEANSING_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING)) {
 							int cooldown = (cleansing == 1) ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_ID, cooldown);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), CLEANSING_FAKE_ID, CLEANSING_DURATION);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE, CLEANSING_DURATION);
 						}
 					}
 				}
 				else if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
 					if (healing > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), HEALING_ID)) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HEALING)) {
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 							World world = player.getWorld();
 
@@ -449,7 +433,7 @@ public class ClericClass extends BaseClass {
 							ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 
 							int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), HEALING_ID, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.HEALING, cooldown);
 						}
 					}
 				}

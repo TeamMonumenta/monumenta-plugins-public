@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -11,10 +12,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import com.google.gson.JsonObject;
-
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+
+import com.google.gson.JsonObject;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
@@ -26,6 +27,38 @@ public class PotionUtils {
 	private static final int MINUTES_3 = MINUTES_1 * 3;
 	private static final int MINUTES_5 = MINUTES_1 * 5;
 	private static final int MINUTES_8 = MINUTES_1 * 8;
+
+	private static final PotionEffectType[] POSITIVE_EFFECTS = new PotionEffectType[]{
+		PotionEffectType.ABSORPTION,
+		PotionEffectType.DAMAGE_RESISTANCE,
+		PotionEffectType.FAST_DIGGING,
+		PotionEffectType.FIRE_RESISTANCE,
+		PotionEffectType.HEAL,
+		PotionEffectType.HEALTH_BOOST,
+		PotionEffectType.INCREASE_DAMAGE,
+		PotionEffectType.INVISIBILITY,
+		PotionEffectType.JUMP,
+		PotionEffectType.LEVITATION,
+		PotionEffectType.NIGHT_VISION,
+		PotionEffectType.REGENERATION,
+		PotionEffectType.SATURATION,
+		PotionEffectType.SPEED,
+		PotionEffectType.LUCK,
+		PotionEffectType.WATER_BREATHING
+	};
+
+	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[]{
+		PotionEffectType.BLINDNESS,
+		PotionEffectType.POISON,
+		PotionEffectType.CONFUSION,
+		PotionEffectType.SLOW,
+		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.WITHER,
+		PotionEffectType.WEAKNESS,
+		PotionEffectType.HARM,
+		PotionEffectType.HUNGER,
+		PotionEffectType.UNLUCK
+	};
 
 	public static class PotionInfo {
 		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0, false, true);
@@ -70,6 +103,7 @@ public class PotionUtils {
 			type = _type;
 			duration = _duration;
 			amplifier = _amplifier;
+			this.ambient = ambient;
 			showParticles = hasParticles;
 		}
 
@@ -105,6 +139,34 @@ public class PotionUtils {
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
+		if (type.isInstant()){
+			if (isUpgraded){
+				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true);
+			}else{
+				newInfo = new PotionInfo(type.getEffectType(), 0, 0, false, true);
+			}
+		}else{
+			if (type == PotionType.REGEN || type == PotionType.POISON){
+				if (isExtended) {
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 0, false, true);
+				} else if (isUpgraded) {
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF, 0, false, true);
+				} else {
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45, 0, false, true);
+				}
+			}else if (type == PotionType.LUCK){
+				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5, 0, false, true);
+			}else{
+				if (isExtended){
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8, 0, false, true);
+				}else if (isUpgraded){
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 1, false, true);
+				}else{
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3, 0, false, true);
+				}
+			}
+		}
+
 
 		if (type == PotionType.INSTANT_HEAL) {
 			if (isUpgraded) {
@@ -244,6 +306,12 @@ public class PotionUtils {
 		}
 
 		return false;
+	}
+
+	public static void clearNegatives(Player player){
+		for (PotionEffectType type : NEGATIVE_EFFECTS){
+			Plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+		}
 	}
 
 	public static boolean hasNegativeEffects(PotionEffectType type) {

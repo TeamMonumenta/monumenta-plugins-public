@@ -1,8 +1,12 @@
 package pe.project.utils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import pe.project.Constants;
 import pe.project.Plugin;
 
 public class MetadataUtils {
@@ -24,5 +28,13 @@ public class MetadataUtils {
 
 		entity.setMetadata(metakey, new FixedMetadataValue(plugin, entity.getTicksLived()));
 		return true;
+	}
+
+	public static void clearMetadata(Player player, Plugin plugin){
+		for (String meta : Constants.METADATA_KEYS_TO_BE_DESTROYED){
+			if (player.hasMetadata(meta)){
+				player.removeMetadata(meta, plugin);
+			}
+		}
 	}
 }
