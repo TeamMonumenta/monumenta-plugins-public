@@ -28,7 +28,6 @@ import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
@@ -40,7 +39,7 @@ import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.particlelib.ParticleEffect;
 
 /*
-	WandMastery
+	ManaLance
 	FrostNova
 	Prismatic
 	Magma
@@ -72,10 +71,10 @@ public class MageClass extends BaseClass {
 	private static int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
 	private static int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
 	private static int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static int PRISMATIC_SHIELD_COOLDOWN = 2 * 60 * 20;
+	private static int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
+	private static int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
 
-	private static int MAGMA_SHIELD_1_COOLDOWN = 21 * 20;
-	private static int MAGMA_SHIELD_2_COOLDOWN = 21 * 20;
+	private static int MAGMA_SHIELD_COOLDOWN = 21 * 20;
 	private static int MAGMA_SHIELD_RADIUS = 6;
 	private static int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
 	private static int MAGMA_SHIELD_1_DAMAGE = 5;
@@ -209,39 +208,34 @@ public class MageClass extends BaseClass {
 							world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
 
 							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-
-							int cooldown = intellectBonus ? (magmaShield == 1 ? (MAGMA_SHIELD_1_COOLDOWN / 3) * 2 : (MAGMA_SHIELD_1_COOLDOWN / 3) * 2) :
-										(magmaShield == 1 ? MAGMA_SHIELD_1_COOLDOWN : MAGMA_SHIELD_2_COOLDOWN);
-
+							int cooldown = intellectBonus ? (MAGMA_SHIELD_COOLDOWN / 3) * 2 : MAGMA_SHIELD_COOLDOWN;
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, cooldown);
 						}
 					}
 				}
-			}else{
+			} else {
 				//Mana Lance
 				if (action == Action.RIGHT_CLICK_AIR) {
-					int wandMastery = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
+					int manaLance = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (InventoryUtils.isWandItem(mainHand)) {
-						if (wandMastery > 0){
+						if (manaLance > 0) {
 							if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MANA_LANCE)) {
 
-								int extraDamage = wandMastery == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
+								int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 
 								Location loc = player.getEyeLocation();
 								Vector dir = loc.getDirection();
 								loc.add(dir);
 								ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.125f, 10, loc, 40);
 								double pOffset = 0.35;
-								//double offset = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
 
-								for (int i = 0; i < 8; i++){
+								for (int i = 0; i < 8; i++) {
 									loc.add(dir);
 
 									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
-									//ParticleEffect.SPELL_WITCH.display(0.05f, 0.05f, 0.05f, 1, 6, loc, 40);
-									for (int t = 0; t < 12; t ++){
+									for (int t = 0; t < 12; t ++) {
 										Location pLoc = loc.clone();
 										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
 										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
@@ -249,20 +243,20 @@ public class MageClass extends BaseClass {
 										pLoc.add(os1, os2, os3);
 										loc.getWorld().spigot().playEffect(pLoc, Effect.COLOURED_DUST, 0, 0, MANA_LANCE_R / 255, MANA_LANCE_G / 255, MANA_LANCE_B / 255, 1, 0, 100);
 										}
-									if (loc.getBlock().getType().isSolid()){
+									if (loc.getBlock().getType().isSolid()) {
 										loc.subtract(dir.multiply(0.5));
 										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
 										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
 										break;
 									}
-									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)){
-										if (EntityUtils.isHostileMob(e)){
+									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
+										if (EntityUtils.isHostileMob(e)) {
 											LivingEntity le = (LivingEntity) e;
 											EntityUtils.damageEntity(mPlugin, le, extraDamage, player);
 										}
 									}
-
 								}
+
 								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MANA_LANCE, MANA_LANCE_COOLDOWN);
 								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 							}
@@ -316,7 +310,6 @@ public class MageClass extends BaseClass {
 				}
 			}
 		}
-
 	}
 
 	@Override
@@ -402,7 +395,10 @@ public class MageClass extends BaseClass {
 						ParticleEffect.SPELL_INSTANT.display(0.2f, 0.35f, 0.2f, 1, 100, player.getLocation().add(0, 1.15, 0), 40);
 						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 						MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, PRISMATIC_SHIELD_COOLDOWN);
+
+						boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
+						int cooldown = intellectBonus ? PRISMATIC_SHIELD_INTELLECT_COOLDOWN : PRISMATIC_SHIELD_BASE_COOLDOWN;
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, cooldown);
 					}
 				}
 			}

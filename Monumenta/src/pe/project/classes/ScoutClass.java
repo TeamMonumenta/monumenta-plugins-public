@@ -8,7 +8,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -31,14 +30,11 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
-import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
-import pe.project.utils.MessagingUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.InventoryUtils;
-import pe.project.utils.particlelib.ParticleEffect;
 
 /*
     Agility
@@ -213,9 +209,7 @@ public class ScoutClass extends BaseClass {
 						_arrow.setKnockbackStrength(knockbackStrength);
 
 						mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
-
 					}
-
 
 					//  I hate this so much, you don't even know... [Rock]
 					Location jankWorkAround = player.getLocation();

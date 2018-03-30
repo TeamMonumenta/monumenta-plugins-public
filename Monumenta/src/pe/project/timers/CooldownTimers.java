@@ -30,7 +30,6 @@ public class CooldownTimers {
 		//	First check if the player has any cooldowns in the HashMap.
 		HashMap<Spells, Integer> player = mTimers.get(playerID);
 		if (player != null) {
-
 			//	Next check if the ability is in our HashMap, if not we're not on cooldown.
 			Integer ability = player.get(spell);
 			if (ability == null) {

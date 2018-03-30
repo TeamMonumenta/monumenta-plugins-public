@@ -52,22 +52,22 @@ public enum Spells {
 	private final boolean fake;
 	private final Classes classes;
 
-	Spells(String name, boolean fake, Classes classes){
+	Spells(String name, boolean fake, Classes classes) {
 		this.name = name;
 		this.fake = fake;
 		this.classes = classes;
 	}
 
 
-	public String getName(){
+	public String getName() {
 		return name;
 	}
 
-	public Classes getBelongingClass(){
+	public Classes getBelongingClass() {
 		return classes;
 	}
 
-	public boolean isFake(){
+	public boolean isFake() {
 		return fake;
 	}
 

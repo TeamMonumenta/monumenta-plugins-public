@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,7 +26,6 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
-import pe.project.Plugin.Classes;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Raycast;
 import pe.project.point.RaycastData;
@@ -131,9 +129,9 @@ public class RogueClass extends BaseClass {
 						if (entity != null && EntityUtils.isHostileMob(entity)) {
 							Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
 							Location loc = player.getLocation();
-							while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET){
+							while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 								loc.add(dir);
-								if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET){
+								if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 									loc.subtract(dir.clone().multiply(1.15));
 									break;
 								}
@@ -141,7 +139,7 @@ public class RogueClass extends BaseClass {
 							loc.add(0, 1, 0);
 
 							//Just in case the player's teleportation loc is in a block.
-							while (loc.getBlock().getType().isSolid()){
+							while (loc.getBlock().getType().isSolid()) {
 								loc.subtract(dir.clone().multiply(1.15));
 							}
 							ParticleEffect.SPELL_WITCH.display(0.2f, 0.5f, 0.2f, 1, 50, player.getLocation().add(0, 1.15, 0), 40);
@@ -234,7 +232,7 @@ public class RogueClass extends BaseClass {
 						loc.add(0, 1, 0);
 						int count = 15;
 						world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
-						if (byMyBlade > 1){
+						if (byMyBlade > 1) {
 							world.playSound(loc, Sound.ENTITY_IRONGOLEM_DEATH, 1, 1.65f);
 							ParticleEffect.SPELL_WITCH.display(0.2f, 0.65f, 0.2f, 1, 45, loc, 40);
 							count = 25;
@@ -266,6 +264,7 @@ public class RogueClass extends BaseClass {
 	@Override
 	public void ProjectileHitPlayerEvent(Player player, Projectile damager) {
 		EntityType type = damager.getType();
+
 		//  Dodging
 		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW
 		    || type == EntityType.SPECTRAL_ARROW || type == EntityType.SMALL_FIREBALL) {
@@ -410,7 +409,7 @@ public class RogueClass extends BaseClass {
 				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE,
 				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE,
-                        VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			}
 		}
 	}

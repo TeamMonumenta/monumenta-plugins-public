@@ -27,24 +27,20 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
-import pe.project.Plugin.Classes;
-import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
-import pe.project.utils.MessagingUtils;
 import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
-import pe.project.utils.particlelib.ParticleEffect;
 
 /*
 	Sanctified
 	Rejuvenation
 	HeavenlyBoon
-Cleansing
+	Cleansing
 	DivineJustice
 	Celestial
 	Healing
@@ -153,7 +149,6 @@ public class ClericClass extends BaseClass {
 								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 								if (p.getHealth() > oldHealth) {
 									ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
-
 								}
 							}
 						}
@@ -173,7 +168,7 @@ public class ClericClass extends BaseClass {
 						for (Entity entity : entities) {
 							if (entity instanceof Player) {
 								Player e = (Player)entity;
-								PotionUtils.clearNegatives(e);
+								PotionUtils.clearNegatives(mPlugin, e);
 
 								if (player.getFireTicks() > 0) {
 									player.setFireTicks(1);

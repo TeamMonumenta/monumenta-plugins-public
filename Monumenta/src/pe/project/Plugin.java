@@ -112,12 +112,8 @@ public class Plugin extends JavaPlugin {
 
 	public TrackingManager mTrackingManager;
 	public POIManager mPOIManager;
-	public static PotionManager mPotionManager;
+	public PotionManager mPotionManager;
 	public ZoneManager mZoneManager;
-
-	public static PotionManager getPotionManager(){
-		return mPotionManager;
-	}
 
 	public SocketClient mSocketClient;
 

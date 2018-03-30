@@ -11,16 +11,11 @@ public class RaycastData {
 	private List<LivingEntity> entities = new ArrayList<LivingEntity>();
 	private List<Block> blocks = new ArrayList<Block>();
 
-
-	public RaycastData(){
-
-	}
-
-	public List<LivingEntity> getEntities(){
+	public List<LivingEntity> getEntities() {
 		return entities;
 	}
 
-	public List<Block> getBlocks(){
+	public List<Block> getBlocks() {
 		return blocks;
 	}
 

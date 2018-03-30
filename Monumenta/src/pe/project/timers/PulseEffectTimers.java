@@ -30,8 +30,9 @@ public class PulseEffectTimers {
 			mAbilityID = abilityID;
 			mTagName = tagName;
 			mCooldown = cooldown;
-			mLocation = player.getLocation();
+			mLocation = loc;
 			mRadius = radius;
+
 			while(mLocation.getBlock().getType() != Material.AIR){
 				mLocation.add(0, 0.25, 0);
 			}

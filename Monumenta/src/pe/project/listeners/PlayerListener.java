@@ -100,6 +100,7 @@ public class PlayerListener implements Listener {
 			public void run() {
 				if (++tick == 20) {
 					Player player = event.getPlayer();
+
 					mPlugin.mTrackingManager.addEntity(player);
 					RegionReset.handle(mPlugin, player);
 					DailyReset.handle(mPlugin, player);

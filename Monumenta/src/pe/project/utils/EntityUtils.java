@@ -57,8 +57,6 @@ public class EntityUtils {
 		return false;
 	}
 
-
-
 	/**
 	 * Gets the entity in the crosshair of the player
 	 * <p>
@@ -69,37 +67,38 @@ public class EntityUtils {
 	 * @param targetNonPlayers
 	 * @return The Entity in the crosshair of the player
 	 */
-	public static LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding){
-		LivingEntity entity = null;
+	public static LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers,
+												  boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
 		Location loc = player.getEyeLocation();
 		Vector dir = loc.getDirection();
-		outerloop: for (int i = 0; i < (range * 2); i++){
+
+		for (int i = 0; i < (range * 2); i++) {
 			loc.add(dir.clone().multiply(0.5));
 			//Is the block solid?
 
-			if (checkLos){
-				if (loc.getBlock().getType().isSolid()){
-					if (throughNonOccluding){
-						if (loc.getBlock().getType().isOccluding()){
-							break;
+			if (checkLos) {
+				if (loc.getBlock().getType().isSolid()) {
+					if (throughNonOccluding) {
+						if (loc.getBlock().getType().isOccluding()) {
+							return null;
 						}
-					}else{
-						break;
+					} else {
+						return null;
 					}
 				}
 			}
-			for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)){
-				//	Make sure to only get living entities.
-				if( e instanceof LivingEntity ) {
-					//	Make sure we should be targeting this entity.
-					if( (targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player))) ) {
-						entity = (LivingEntity) e;
-						break outerloop;
+			for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
+				//  Make sure to only get living entities.
+				if (e instanceof LivingEntity) {
+					//  Make sure we should be targeting this entity.
+					if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
+						return (LivingEntity)e;
 					}
 				}
 			}
 		}
-		return entity;
+
+		return null;
 	}
 
 	public static LivingEntity GetEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {

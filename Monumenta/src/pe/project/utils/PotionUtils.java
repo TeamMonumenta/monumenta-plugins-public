@@ -139,14 +139,14 @@ public class PotionUtils {
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
-		if (type.isInstant()){
-			if (isUpgraded){
+		if (type.isInstant()) {
+			if (isUpgraded) {
 				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true);
-			}else{
+			} else {
 				newInfo = new PotionInfo(type.getEffectType(), 0, 0, false, true);
 			}
-		}else{
-			if (type == PotionType.REGEN || type == PotionType.POISON){
+		} else {
+			if (type == PotionType.REGEN || type == PotionType.POISON) {
 				if (isExtended) {
 					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 0, false, true);
 				} else if (isUpgraded) {
@@ -154,14 +154,14 @@ public class PotionUtils {
 				} else {
 					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45, 0, false, true);
 				}
-			}else if (type == PotionType.LUCK){
+			} else if (type == PotionType.LUCK) {
 				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5, 0, false, true);
-			}else{
-				if (isExtended){
+			} else {
+				if (isExtended) {
 					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8, 0, false, true);
-				}else if (isUpgraded){
+				} else if (isUpgraded) {
 					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 1, false, true);
-				}else{
+				} else {
 					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3, 0, false, true);
 				}
 			}
@@ -308,9 +308,9 @@ public class PotionUtils {
 		return false;
 	}
 
-	public static void clearNegatives(Player player){
+	public static void clearNegatives(Plugin plugin, Player player){
 		for (PotionEffectType type : NEGATIVE_EFFECTS){
-			Plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+			plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
 		}
 	}
 
