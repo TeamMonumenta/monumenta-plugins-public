@@ -151,7 +151,7 @@ public class WarriorClass extends BaseClass {
 				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 					Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 					ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
-					ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.15f, 7, loc, 40);
+					ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
 					List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
 					entities.add(damagee);
 					for(int i = 0; i < entities.size(); i++) {
@@ -163,7 +163,6 @@ public class WarriorClass extends BaseClass {
 							EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
 
 							MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
-							ParticleEffect.CLOUD.display(0, 0, 0, 0.15F, 7, mob.getLocation(), 40);
 						}
 					}
 				}
