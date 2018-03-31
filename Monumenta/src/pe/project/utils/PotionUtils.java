@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -28,7 +27,7 @@ public class PotionUtils {
 	private static final int MINUTES_5 = MINUTES_1 * 5;
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 
-	private static final PotionEffectType[] POSITIVE_EFFECTS = new PotionEffectType[]{
+	private static final PotionEffectType[] POSITIVE_EFFECTS = new PotionEffectType[] {
 		PotionEffectType.ABSORPTION,
 		PotionEffectType.DAMAGE_RESISTANCE,
 		PotionEffectType.FAST_DIGGING,
@@ -47,7 +46,7 @@ public class PotionUtils {
 		PotionEffectType.WATER_BREATHING
 	};
 
-	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[]{
+	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[] {
 		PotionEffectType.BLINDNESS,
 		PotionEffectType.POISON,
 		PotionEffectType.CONFUSION,
@@ -99,7 +98,8 @@ public class PotionUtils {
 			showParticles = effect.hasParticles();
 		}
 
-		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean ambient, boolean hasParticles) {
+		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean ambient,
+		                  boolean hasParticles) {
 			type = _type;
 			duration = _duration;
 			amplifier = _amplifier;
@@ -224,7 +224,8 @@ public class PotionUtils {
 		}
 
 		if (newInfo != null) {
-			return new PotionInfo(newInfo.type, newInfo.duration, newInfo.amplifier, newInfo.ambient, newInfo.showParticles);
+			return new PotionInfo(newInfo.type, newInfo.duration, newInfo.amplifier, newInfo.ambient,
+			                      newInfo.showParticles);
 		} else {
 			return null;
 		}
@@ -237,7 +238,8 @@ public class PotionUtils {
 		if (data != null) {
 			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, false);
 			if (info != null) {
-				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient, info.showParticles);
+				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient,
+				                                       info.showParticles);
 				effectsList.add(effect);
 			}
 		}
@@ -255,7 +257,7 @@ public class PotionUtils {
 	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
 		if (effect.getType().getName() == PotionEffectType.HEAL.getName()) {
 			double health = player.getHealth();
-			double healthToAdd = 4 * (effect.getAmplifier()+1);
+			double healthToAdd = 4 * (effect.getAmplifier() + 1);
 
 			health = Math.min(health + healthToAdd, 20);
 
@@ -266,7 +268,7 @@ public class PotionUtils {
 	}
 
 	public static boolean hasPositiveEffects(Collection<PotionEffect> effects) {
-		for (PotionEffect effect: effects) {
+		for (PotionEffect effect : effects) {
 			if (hasPositiveEffects(effect.getType())) {
 				return true;
 			}
@@ -277,30 +279,17 @@ public class PotionUtils {
 
 	public static boolean hasPositiveEffects(PotionEffectType type) {
 		String name = type.getName();
-		if (name.equals(PotionEffectType.ABSORPTION.getName())
-			|| name.equals(PotionEffectType.DAMAGE_RESISTANCE.getName())
-			|| name.equals(PotionEffectType.FAST_DIGGING.getName())
-			|| name.equals(PotionEffectType.FIRE_RESISTANCE.getName())
-			|| name.equals(PotionEffectType.HEAL.getName())
-			|| name.equals(PotionEffectType.HEALTH_BOOST.getName())
-			|| name.equals(PotionEffectType.INCREASE_DAMAGE.getName())
-			|| name.equals(PotionEffectType.INVISIBILITY.getName())
-			|| name.equals(PotionEffectType.JUMP.getName())
-			|| name.equals(PotionEffectType.LEVITATION.getName())
-			|| name.equals(PotionEffectType.LUCK.getName())
-			|| name.equals(PotionEffectType.NIGHT_VISION.getName())
-			|| name.equals(PotionEffectType.REGENERATION.getName())
-			|| name.equals(PotionEffectType.SATURATION.getName())
-			|| name.equals(PotionEffectType.SPEED.getName())
-			|| name.equals(PotionEffectType.WATER_BREATHING.getName())) {
-			return true;
+		for (PotionEffectType testType : POSITIVE_EFFECTS) {
+			if (name.equals(testType.getName())) {
+				return true;
+			}
 		}
 
 		return false;
 	}
 
 	public static boolean hasNegativeEffects(Collection<PotionEffect> effects) {
-		for (PotionEffect effect: effects) {
+		for (PotionEffect effect : effects) {
 			if (hasNegativeEffects(effect.getType())) {
 				return true;
 			}
@@ -309,25 +298,18 @@ public class PotionUtils {
 		return false;
 	}
 
-	public static void clearNegatives(Plugin plugin, Player player){
-		for (PotionEffectType type : NEGATIVE_EFFECTS){
+	public static void clearNegatives(Plugin plugin, Player player) {
+		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
 		}
 	}
 
 	public static boolean hasNegativeEffects(PotionEffectType type) {
 		String name = type.getName();
-		if (name.equals(PotionEffectType.BLINDNESS.getName())
-			|| name.equals(PotionEffectType.CONFUSION.getName())
-			|| name.equals(PotionEffectType.HARM.getName())
-			|| name.equals(PotionEffectType.HUNGER.getName())
-			|| name.equals(PotionEffectType.POISON.getName())
-			|| name.equals(PotionEffectType.SLOW.getName())
-			|| name.equals(PotionEffectType.SLOW_DIGGING.getName())
-			|| name.equals(PotionEffectType.UNLUCK.getName())
-			|| name.equals(PotionEffectType.WEAKNESS.getName())
-			|| name.equals(PotionEffectType.WITHER.getName())) {
-			return true;
+		for (PotionEffectType testType : NEGATIVE_EFFECTS) {
+			if (name.equals(testType.getName())) {
+				return true;
+			}
 		}
 
 		return false;

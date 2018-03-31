@@ -269,7 +269,6 @@ public class ClericClass extends BaseClass {
 					double chance = heavenlyBoon == 1 ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE;
 
 					if (mRandom.nextDouble() < chance) {
-						ItemStack healPot;
 						ItemStack potions;
 
 						if (heavenlyBoon == 1) {
@@ -278,7 +277,6 @@ public class ClericClass extends BaseClass {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 20 * 20, 0, "Splash Potion of Regeneration");
 							} else if (rand == 2) {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0, "Splash Potion of Absorption");
-								//potions = ItemUtils.createStackedPotions(PotionEffectType.FIRE_RESISTANCE, 1, 0 * 20, 0, "Splash Potion of Fire Resistance");
 							} else {
 								potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 20 * 20, 0, "Splash Potion of Speed");
 							}

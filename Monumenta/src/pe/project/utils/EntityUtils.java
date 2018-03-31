@@ -30,7 +30,6 @@ import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
-import pe.project.utils.particlelib.ParticleEffect;
 
 public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {

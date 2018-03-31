@@ -149,8 +149,6 @@ public class WarriorClass extends BaseClass {
 			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
 			if (bruteForce > 0) {
 				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
-					World world = Bukkit.getWorld(player.getWorld().getName());
-
 					Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 					ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
 					ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.15f, 7, loc, 40);

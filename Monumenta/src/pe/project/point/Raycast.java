@@ -1,6 +1,5 @@
 package pe.project.point;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;

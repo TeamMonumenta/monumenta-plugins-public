@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
