@@ -32,7 +32,6 @@ import pe.project.commands.ClearEffects;
 import pe.project.commands.DebugInfo;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
-import pe.project.commands.GetServerVersionCommand;
 import pe.project.commands.GiveSoulbound;
 import pe.project.commands.IncrementDaily;
 import pe.project.commands.IsShittyCommand;
@@ -107,7 +106,6 @@ public class Plugin extends JavaPlugin {
 	public ServerProperties mServerProperties = new ServerProperties();
 	private FileConfiguration mConfig;
 	private File mConfigFile;
-	public int mServerVersion = 0;
 	public int mDailyQuestVersion = 0;
 
 	public TrackingManager mTrackingManager;
@@ -160,7 +158,6 @@ public class Plugin extends JavaPlugin {
 		//	TODO: Move this out of here and into it's own CommandManager class.
 		//	Add some slash commands
 		if (Constants.COMMANDS_SERVER_ENABLED) {
-			getCommand("getServerVersion").setExecutor(new GetServerVersionCommand(this));
 			getCommand("playTimeStats").setExecutor(new PlayTimeStats(mWorld));
 			getCommand("chatRange").setExecutor(new ChatRangeCommand());
 			getCommand("isShitty").setExecutor(new IsShittyCommand());
@@ -282,12 +279,6 @@ public class Plugin extends JavaPlugin {
 		return mClassMap.get(Classes.NONE.getValue());
 	}
 
-	//	TODO: Move Config saving/loading out of Plugin and into it's own files that can be called into for updating server info.
-	public void updateVersion(int version) {
-		mServerVersion = version;
-		_saveConfig();
-	}
-
 	public void incrementDailyVersion() {
 		if (mServerProperties.getDailyResetEnabled()) {
 			mDailyQuestVersion++;
@@ -302,12 +293,10 @@ public class Plugin extends JavaPlugin {
 
 		mConfig = YamlConfiguration.loadConfiguration(mConfigFile);
 
-		mServerVersion = mConfig.getInt("version");
 		mDailyQuestVersion = mConfig.getInt("daily_version");
 	}
 
 	private void _saveConfig() {
-		mConfig.set("version", mServerVersion);
 		mConfig.set("daily_version", mDailyQuestVersion);
 
 		try {

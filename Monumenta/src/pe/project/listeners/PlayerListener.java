@@ -64,7 +64,6 @@ import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
-import pe.project.server.reset.RegionReset;
 import pe.project.utils.CommandUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
@@ -102,7 +101,6 @@ public class PlayerListener implements Listener {
 					Player player = event.getPlayer();
 
 					mPlugin.mTrackingManager.addEntity(player);
-					RegionReset.handle(mPlugin, player);
 					DailyReset.handle(mPlugin, player);
 
 					this.cancel();
