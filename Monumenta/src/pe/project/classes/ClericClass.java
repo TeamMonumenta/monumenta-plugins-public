@@ -354,9 +354,9 @@ public class ClericClass extends BaseClass {
 
 						List<Entity> entities = player.getNearbyEntities(CELESTIAL_RADIUS, CELESTIAL_RADIUS, CELESTIAL_RADIUS);
 						entities.add(player);
-						for(int i = 0; i < entities.size(); i++) {
+						for (int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
-							if(e instanceof Player) {
+							if (e instanceof Player) {
 								Player p = (Player)(e);
 
 								Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
@@ -380,59 +380,70 @@ public class ClericClass extends BaseClass {
 
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-
-				if ((player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
-					//	Activate Cleansing Rain IF Looking upwards
-
+				if ((offHand != null && offHand.getType() == Material.SHIELD) || (mainHand != null && mainHand.getType() == Material.SHIELD)) {
 					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
-					if (cleansing > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING)) {
-							int cooldown = (cleansing == 1) ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING, cooldown);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE, CLEANSING_DURATION);
-						}
-					}
-				}
-				else if ((offHand != null && offHand.getType() == Material.SHIELD) || mainHand != null && mainHand.getType() == Material.SHIELD) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-					if (healing > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HEALING)) {
-							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-							World world = player.getWorld();
-
-							List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
-							for(Entity e : entities) {
-								if(e instanceof Player) {
-									Player p = (Player)e;
-									if (p != player) {
-										Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-										if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
-											int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
-											PlayerUtils.healPlayer(p, healAmount);
-
-											Location loc = p.getLocation();
-
-											ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-											ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-											player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
-											player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
-										}
-									}
-								}
-							}
-
-							player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
-							player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
-
-							ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
-
-							int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.HEALING, cooldown);
+					boolean bothActive = (cleansing > 0 & healing > 0);
+					if (bothActive) {
+						if ((player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
+							activateCleansing(player, cleansing);
+						} else {
+							activateHealing(player, healing);
+						}
+					} else {
+						if (healing > 0) {
+							activateHealing(player, healing);
+						} else if (cleansing > 0) {
+							activateCleansing(player, cleansing);
 						}
 					}
 				}
 			}
+		}
+	}
+
+	private void activateCleansing(Player player, int cleansing) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING)) {
+			int cooldown = (cleansing == 1) ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
+			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING, cooldown);
+			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE, CLEANSING_DURATION);
+		}
+	}
+
+	private void activateHealing(Player player, int healing) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HEALING)) {
+			Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+			World world = player.getWorld();
+
+			List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
+			for (Entity e : entities) {
+				if (e instanceof Player) {
+					Player p = (Player)e;
+					if (p != player) {
+						Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+						if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
+							int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
+							PlayerUtils.healPlayer(p, healAmount);
+
+							Location loc = p.getLocation();
+
+							ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+							ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+							player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
+							player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
+						}
+					}
+				}
+			}
+
+			player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
+			player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
+
+			ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
+
+			int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.HEALING, cooldown);
 		}
 	}
 

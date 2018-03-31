@@ -417,7 +417,7 @@ public class PlayerListener implements Listener {
 			if (meta != null) {
 				//	Add base potion effect.
 				PotionData data = meta.getBasePotionData();
-				PotionInfo info = PotionUtils.getPotionInfo(data);
+				PotionInfo info = PotionUtils.getPotionInfo(data, false);
 
 				if (info != null) {
 					info.showParticles = true;

@@ -37,6 +37,7 @@ import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.particlelib.ParticleEffect;
+import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 /*
 	ManaLance
@@ -54,9 +55,9 @@ public class MageClass extends BaseClass {
 	private static int MANA_LANCE_1_DAMAGE = 5;
 	private static int MANA_LANCE_2_DAMAGE = 10;
 	private static int MANA_LANCE_COOLDOWN = 3 * 20;
-	private static float MANA_LANCE_R = 91;
-	private static float MANA_LANCE_G = 187;
-	private static float MANA_LANCE_B = 255;
+	private static int MANA_LANCE_R = 91;
+	private static int MANA_LANCE_G = 187;
+	private static int MANA_LANCE_B = 255;
 
 	private static float FROST_NOVA_RADIUS = 6.0f;
 	private static int FROST_NOVA_1_DAMAGE = 3;
@@ -241,8 +242,8 @@ public class MageClass extends BaseClass {
 										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
 										double os3 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
 										pLoc.add(os1, os2, os3);
-										loc.getWorld().spigot().playEffect(pLoc, Effect.COLOURED_DUST, 0, 0, MANA_LANCE_R / 255, MANA_LANCE_G / 255, MANA_LANCE_B / 255, 1, 0, 100);
-										}
+										ParticleEffect.REDSTONE.display(new OrdinaryColor(MANA_LANCE_R, MANA_LANCE_G, MANA_LANCE_B), pLoc, 40);
+									}
 									if (loc.getBlock().getType().isSolid()) {
 										loc.subtract(dir.multiply(0.5));
 										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);

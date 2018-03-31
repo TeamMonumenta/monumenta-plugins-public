@@ -387,11 +387,15 @@ public class EntityListener implements Listener {
 			mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
 		}
 
+		PotionData data = cloud.getBasePotionData();
+		PotionInfo info = PotionUtils.getPotionInfo(data, true);
+
 		//	All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player) {
-				// TODO: Base potion data from lingering potions isn't applied here. The straightforward implementation
-				// (check git history) results in full-duration effects being applied to the player, for example 8 minutes instead of 2
+				if (info != null){
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, info);
+				}
 
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, effects);
@@ -469,7 +473,7 @@ public class EntityListener implements Listener {
 						}
 					}
 
-					PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData());
+					PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData(), false);
 					List<PotionEffect> effects = arrow.getCustomEffects();
 
 					if (info != null) {

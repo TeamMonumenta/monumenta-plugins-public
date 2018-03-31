@@ -134,11 +134,12 @@ public class PotionUtils {
 		}
 	}
 
-	public static PotionInfo getPotionInfo(PotionData data) {
+	public static PotionInfo getPotionInfo(PotionData data, boolean lingering) {
 		PotionInfo newInfo = null;
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
+		int dividend = lingering ? 4 : 1;
 		if (type.isInstant()) {
 			if (isUpgraded) {
 				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true);
@@ -148,21 +149,21 @@ public class PotionUtils {
 		} else {
 			if (type == PotionType.REGEN || type == PotionType.POISON) {
 				if (isExtended) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 0, false, true);
 				} else if (isUpgraded) {
-					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF / dividend, 0, false, true);
 				} else {
-					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45 / dividend, 0, false, true);
 				}
 			} else if (type == PotionType.LUCK) {
-				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5, 0, false, true);
+				newInfo = new PotionInfo(type.getEffectType(), MINUTES_5 / dividend, 0, false, true);
 			} else {
 				if (isExtended) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_8 / dividend, 0, false, true);
 				} else if (isUpgraded) {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF, 1, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 1, false, true);
 				} else {
-					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), MINUTES_3 / dividend, 0, false, true);
 				}
 			}
 		}
@@ -234,7 +235,7 @@ public class PotionUtils {
 
 		PotionData data = meta.getBasePotionData();
 		if (data != null) {
-			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data);
+			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, false);
 			if (info != null) {
 				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient, info.showParticles);
 				effectsList.add(effect);
