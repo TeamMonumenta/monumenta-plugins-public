@@ -94,14 +94,6 @@ git commit -m "Changes for terrain reset on $(date +%Y_%m_%d)"
 cp -a ~/project_epic/server_config ~/tmp/POST_RESET/
 ```
 
-1. Update these things in the `POST_RESET/server_config/server_config_template`:
-```
-vim ~/tmp/POST_RESET/server_config/server_config_template/server.properties
-	difficulty=2
-vim ~/tmp/POST_RESET/server_config/server_config_template/spigot.yml
-	tab-complete: 9999
-```
-
 ## Wrap it up and transfer to play server
 ```
 cd ~/tmp
