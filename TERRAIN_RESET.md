@@ -132,10 +132,11 @@ tar czf ~/1_ARCHIVE/project_epic_pre_reset_full_backup_$(date +%Y_%m_%d).tgz pro
 ```
 
 1. Since the dungeon region files are giant and no longer needed, delete them and re-tarball to save space
+**NOTE:** don't delete region files this week, testing if they work for more than one week
 ```
 cd ~/project_epic
 for x in white orange magenta lightblue yellow r1bonus tutorial purgatory roguelike; do
-	rm -r ~/project_epic/$x/Project_Epic-$x/region
+	#rm -r ~/project_epic/$x/Project_Epic-$x/region
 	rm -rf ~/project_epic/$x/plugins/CoreProtect
 done
 rm -rf ~/project_epic/purgatory ~/project_epic/tutorial
