@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -52,6 +53,7 @@ import org.bukkit.util.Vector;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.classes.BaseClass;
+import pe.project.item.properties.ItemPropertyManager;
 import pe.project.managers.ZoneManager;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.InventoryUtils;
@@ -506,5 +508,10 @@ public class EntityListener implements Listener {
 			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 300, 0, false);
 			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void ItemSpawnEvent(ItemSpawnEvent event) {
+		ItemPropertyManager.ItemSpawnEvent(mPlugin, event.getEntity());
 	}
 }

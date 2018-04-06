@@ -46,7 +46,6 @@ import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
 import pe.project.items.ItemOverrides;
 import pe.project.listeners.EntityListener;
-import pe.project.listeners.ItemListener;
 import pe.project.listeners.MobListener;
 import pe.project.listeners.PlayerListener;
 import pe.project.listeners.SocketListener;
@@ -152,7 +151,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mWorld), this);
 		manager.registerEvents(new VehicleListener(this), this);
-		manager.registerEvents(new ItemListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
 		//	TODO: Move this out of here and into it's own CommandManager class.

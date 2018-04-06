@@ -5,9 +5,12 @@ import java.util.Map;
 import java.util.EnumMap;
 import java.util.List;
 
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import pe.project.Plugin;
 
 public class ItemPropertyManager {
 	/* NOTE:
@@ -20,7 +23,7 @@ public class ItemPropertyManager {
 		MAINHAND,
 		OFFHAND,
 		ARMOR,     // Does NOT include offhand!
-		INVENTORY; // Includes everything, including armor, offhand, and hotbar
+		INVENTORY, // Includes everything, including armor, offhand, and hotbar
 	}
 
 	/*
@@ -29,8 +32,9 @@ public class ItemPropertyManager {
 	 * Most items only apply to armor or mainhand, and we don't need to check every single item in the
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
-	static Map<ItemSlot, List<ItemProperty>> mProperties
+	private static Map<ItemSlot, List<ItemProperty>> mProperties
 		= new EnumMap<ItemSlot, List<ItemProperty>>(ItemSlot.class);
+	private static List<ItemProperty> mSpawnedProperties = new ArrayList<ItemProperty>();
 
 	//  Static list of Item Properties.
 	static {
@@ -41,6 +45,7 @@ public class ItemPropertyManager {
 		init.add(new Radiant());
 		init.add(new Gills());
 		init.add(new Stylish());
+		init.add(new Hope());
 
 		init.add(new CurseOfCorruption());
 
@@ -59,10 +64,14 @@ public class ItemPropertyManager {
 				slotList.add(property);
 				mProperties.put(slot, slotList);
 			}
+
+			if (property.hasOnSpawn()) {
+				mSpawnedProperties.add(property);
+			}
 		}
 	}
 
-	public static ItemStack[] _getItems(PlayerInventory inv, ItemSlot slot) {
+	private static ItemStack[] _getItems(PlayerInventory inv, ItemSlot slot) {
 		switch (slot) {
 		case MAINHAND:
 			return new ItemStack[] {inv.getItemInMainHand()};
@@ -112,6 +121,23 @@ public class ItemPropertyManager {
 							}
 							propertyMap.put(property, currentLevel);
 						}
+					}
+				}
+			}
+		}
+	}
+
+	/*
+	 * Check if the newly spawned item entity matches any of the spawned item properties
+	 */
+	public static void ItemSpawnEvent(Plugin plugin, Item item) {
+		if (item != null) {
+			ItemStack stack = item.getItemStack();
+			if (stack != null) {
+				for (ItemProperty property : mSpawnedProperties) {
+					int level = property.getLevelFromItem(stack);
+					if (level > 0) {
+						property.onSpawn(plugin, item, level);
 					}
 				}
 			}

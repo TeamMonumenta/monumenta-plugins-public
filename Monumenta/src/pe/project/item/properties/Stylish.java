@@ -15,11 +15,6 @@ public class Stylish implements ItemProperty {
 	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Stylish";
 
 	@Override
-	public boolean hasTickingEffect() {
-		return true;
-	}
-
-	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;
 	}
@@ -27,6 +22,11 @@ public class Stylish implements ItemProperty {
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.ARMOR);
+	}
+
+	@Override
+	public boolean hasTickingEffect() {
+		return true;
 	}
 
 	@Override

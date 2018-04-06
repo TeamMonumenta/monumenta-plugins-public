@@ -7,15 +7,24 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Item;
 
 import pe.project.Plugin;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 import pe.project.utils.InventoryUtils;
 
 public interface ItemProperty {
+	/*
+	 * Required - the name of the property
+	 */
 	public String getProperty();
 
-	public EnumSet<ItemSlot> validSlots();
+	/*
+	 * Describes which slots this property is valid in
+	 */
+	default public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.noneOf(ItemSlot.class);
+	}
 
 	/*
 	 * Computes what level the given item is for this particular ItemProperty.
@@ -58,6 +67,14 @@ public interface ItemProperty {
 	default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
 		return damage;
 	}
+
+	/*
+	 * Triggers when an item entity spawns in the world (possibly a player dropped item)
+	 */
+	default public boolean hasOnSpawn() {
+		return false;
+	}
+	default public void onSpawn(Plugin plugin, Item item, int level) { }
 
 	/*
 	 * TODO: Add an onRightClick() method so you can make items that cast spells

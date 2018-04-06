@@ -115,7 +115,7 @@ public class ItemUtils {
 	 * Items drop if they have lore that does not contain $$$
 	 */
 	public static float getItemDropChance(ItemStack item) {
-		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$$")) {
+		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$")) {
 			return 1.0f;
 		} else {
 			return -200.0f;
