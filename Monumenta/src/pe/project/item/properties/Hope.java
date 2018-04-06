@@ -1,5 +1,7 @@
 package pe.project.item.properties;
 
+import java.lang.reflect.Field;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,20 +31,31 @@ public class Hope implements ItemProperty {
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		item.setInvulnerable(true);
 
-		new BukkitRunnable() {
-			int count = 0;
-			int resetCount = 0;
+		/*
+		 * Use reflection to modify the item entity's age field directly.
+		 * This is because setTicksLived() doesn't seem to affect despawn time
+		 * Basically an exact copy of code from here:
+		 * https://www.spigotmc.org/threads/settickslived-not-working.240140/
+		 */
+		try {
+			Field itemField = item.getClass().getDeclaredField("item");
+			Field ageField;
+			Object entityItem;
 
+			itemField.setAccessible(true);
+			entityItem = itemField.get(item);
+
+			ageField = entityItem.getClass().getDeclaredField("age");
+			ageField.setAccessible(true);
+
+			ageField.set(entityItem, -1 * extraMinutesPerLevel * Constants.TICKS_PER_MINUTE);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		new BukkitRunnable() {
 			@Override
 			public void run() {
-				count++;
-				if ((resetCount < (level * extraMinutesPerLevel))
-						&& ((count * tickPeriod) > Constants.TICKS_PER_MINUTE)) {
-					resetCount++;
-					count = 0;
-					item.setTicksLived(1);
-				}
-
 				ParticleEffect.SPELL_INSTANT.display(0.2f, 0.2f, 0.2f, 0, 3, item.getLocation(), 40);
 				if (item == null || item.isDead()) {
 					this.cancel();
