@@ -72,12 +72,18 @@ public class PlayerTracking implements EntityTracking {
 		// Remove the metadata that prevents player from interacting with things (if present)
 		player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
 
+		// Remove the tag that prevents the spawn box from applying functions to the player
+		player.removeScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
+
 		mPlayers.put(player, new PlayerInventory(mPlugin, player));
 	}
 
 	@Override
 	public void removeEntity(Entity entity) {
 		Player player = (Player)entity;
+
+		// Add a scoreboard tag that prevents the spawn box from applying functions to the player
+		player.addScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
 
 		PlayerData.removePlayerDataFile(mPlugin, player);
 
