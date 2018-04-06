@@ -19,7 +19,7 @@ import pe.project.utils.ParticleUtils;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class IceAspect implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Ice Aspect";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
 
 	@Override
 	public String getProperty() {

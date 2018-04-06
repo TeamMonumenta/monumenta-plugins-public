@@ -15,7 +15,7 @@ import pe.project.utils.ParticleUtils;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Chaotic implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Chaotic";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Chaotic";
 
 	@Override
 	public String getProperty() {

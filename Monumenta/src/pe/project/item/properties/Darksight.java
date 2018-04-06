@@ -12,7 +12,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Darksight implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Darksight";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Darksight";
 
 	@Override
 	public String getProperty() {

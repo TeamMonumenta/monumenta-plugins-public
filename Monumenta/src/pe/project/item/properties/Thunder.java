@@ -16,7 +16,7 @@ import pe.project.Plugin;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Thunder implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Thunder";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Thunder";
 
 	@Override
 	public String getProperty() {

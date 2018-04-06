@@ -13,7 +13,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Radiant implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Radiant";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Radiant";
 
 	@Override
 	public String getProperty() {

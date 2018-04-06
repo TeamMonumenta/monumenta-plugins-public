@@ -16,7 +16,7 @@ import pe.project.Plugin;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Slayer implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Slayer";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Slayer";
 
 	@Override
 	public String getProperty() {

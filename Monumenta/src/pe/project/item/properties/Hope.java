@@ -11,7 +11,7 @@ import pe.project.Plugin;
 import pe.project.utils.particlelib.ParticleEffect;
 
 public class Hope implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.WHITE + "Hope";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
 
 	/* How much longer an item lasts per level */
 	private static final int extraMinutesPerLevel = 5;

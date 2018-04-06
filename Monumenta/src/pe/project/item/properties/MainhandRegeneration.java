@@ -12,7 +12,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class MainhandRegeneration implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Mainhand Regeneration";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Mainhand Regeneration";
 
 	@Override
 	public String getProperty() {

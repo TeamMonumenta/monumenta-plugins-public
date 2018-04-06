@@ -12,7 +12,7 @@ import pe.project.utils.ParticleUtils;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Stylish implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.LIGHT_PURPLE + "Stylish";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Stylish";
 
 	@Override
 	public String getProperty() {
