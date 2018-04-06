@@ -13,7 +13,7 @@ cp -a ~/project_epic/dungeon/Project_Epic-dungeon ~/tmp/Project_Epic-dungeon
 1. Unpack the good copy of the dungeon template. This creates `~/tmp/Project_Epic-template`
 ```
 cd ~/tmp
-tar xzf ~/dungeon_template-keep-this-12-29-2017.tgz
+tar xzf ~/assets/dungeon_template.tgz
 ```
 
 1. Run the dungeon generation script. It takes around two hours.
@@ -44,7 +44,7 @@ rm -rf ~/tmp/Project_Epic-dungeon ~/tmp/Project_Epic-template
 
 ## Compiling and tagging the plugin - Your development system
 - Tag the current version of the plugin and push that tag to github. This lets us go back later and figure out what version of the plugin was used for which terrain reset.
-- You'll need to adapt the 2.23.0 number below for whatever the next version should be.
+- You'll need to adapt the 2.24.0 number below for whatever the next version should be.
 - Do this on your development system, there's no plugin code on the build server
 - Also push the newly compiled plugin to the build server so it will be included in terrain reset.
 ```
@@ -52,8 +52,8 @@ cd Monumenta-Plugins
 git fetch
 git checkout master
 git merge origin/master
-git tag 2.23.0
-git push origin 2.23.0
+git tag 2.24.0
+git push origin 2.24.0
 ./clean.sh && ./compile.sh && ./upload.sh
 ```
 
@@ -78,7 +78,7 @@ cp -a ~/project_epic/purgatory ~/tmp/POST_RESET/
 ```
 mkdir ~/tmp/POST_RESET/tutorial
 cd ~/tmp/POST_RESET/tutorial
-tar xzf ~/Project_Epic-tutorial.good.jan-12-2018.tgz
+tar xzf ~/assets/Project_Epic-tutorial.tgz
 ```
 
 ## Server Config Template
@@ -168,8 +168,8 @@ cd ~/MCEdit-And-Automation
 git fetch
 git rebase origin/master
 git status
-git tag 2.23.0
-git push origin 2.23.0
+git tag 2.24.0
+git push origin 2.24.0
 ```
 
 General steps on the play server:
@@ -177,7 +177,7 @@ General steps on the play server:
 cd ~/MCEdit-And-Automation
 git status
 git fetch
-git checkout 2.23.0
+git checkout 2.24.0
 git submodule update
 ```
 
@@ -256,12 +256,6 @@ done
 mv ~/tmp/PRE_RESET/build ~/tmp/POST_RESET/
 ```
 
-### Vanilla shard
-1. Vanilla shard is unaffected by reset
-```
-mv ~/tmp/PRE_RESET/vanilla ~/tmp/POST_RESET/
-```
-
 ### Whitelist / Opslist / Banlist
 1. Copy the whitelist, opslist, and banlist from the play server. Overwrite if prompted
 ```bash
@@ -277,7 +271,7 @@ done
 1. Run the configuration generator on each server shard in play server mode
 ```
 cd ~/tmp/POST_RESET
-~/MCEdit-And-Automation/utility_code/gen_server_config.py --play build vanilla betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
+~/MCEdit-And-Automation/utility_code/gen_server_config.py --play build betaplots lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 ```
 
 ### Final steps
@@ -316,7 +310,7 @@ launch_server() (
 	mark2 start > /dev/null
 	print "Finished starting $x"
 )
-for x in betaplots build vanilla lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
+for x in betaplots build lightblue magenta orange purgatory r1bonus r1plots region_1 roguelike tutorial white yellow
 do
 	launch_server $x &
 done
@@ -328,6 +322,13 @@ print 'All shards should be started. Please verify.'
 1. Finally, start bungee
 ```
 cd bungee
+mark2 start
+```
+
+### Vanilla shard
+1. Vanilla shard is completely unaffected by reset - no backups, nothing
+```
+cd ~/3_VANILLA
 mark2 start
 ```
 
