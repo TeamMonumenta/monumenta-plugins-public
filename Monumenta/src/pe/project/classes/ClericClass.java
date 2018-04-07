@@ -381,21 +381,10 @@ public class ClericClass extends BaseClass {
 				if ((offHand != null && offHand.getType() == Material.SHIELD) || (mainHand != null && mainHand.getType() == Material.SHIELD)) {
 					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-					boolean bothActive = (cleansing > 0 & healing > 0);
-					if (bothActive) {
-						if ((player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
-							activateCleansing(player, cleansing);
-						} else {
-							activateHealing(player, healing);
-						}
-					} else {
-						if (healing > 0) {
-							activateHealing(player, healing);
-						}
-					// Removed at Ari's request since sfx + easy to trigger = annoying
-						// else if (cleansing > 0) {
-						//	activateCleansing(player, cleansing);
-						//}
+					if (cleansing > 0 && (player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
+						activateCleansing(player, cleansing);
+					} else if (healing > 0) {
+						activateHealing(player, healing);
 					}
 				}
 			}
