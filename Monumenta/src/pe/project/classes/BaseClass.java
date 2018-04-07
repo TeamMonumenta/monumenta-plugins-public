@@ -75,6 +75,8 @@ public class BaseClass {
 
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) { return true; }
 
+	public boolean PlayerDamagedEvent(Player player, DamageCause cause, double damage) { return true; }
+
 	public boolean PlayerCombustByEntityEvent(Player player, Entity damager) { return true; }
 
 	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) { return true; }

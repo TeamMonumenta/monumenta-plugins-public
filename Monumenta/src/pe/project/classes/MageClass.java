@@ -379,9 +379,8 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
-		//	Prismatic Shield
-		{
+	public boolean PlayerDamagedEvent(Player player, DamageCause cause, double damage) {
+		if (!player.isDead()) {
 			double correctHealth = player.getHealth() - damage;
 			if (correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
 				int prismatic = ScoreboardUtils.getScoreboardValue(player, "Prismatic");

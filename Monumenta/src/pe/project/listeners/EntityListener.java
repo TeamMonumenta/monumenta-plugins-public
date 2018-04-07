@@ -186,6 +186,10 @@ public class EntityListener implements Listener {
 			World world = player.getWorld();
 			DamageCause source = event.getCause();
 
+			if (!mPlugin.getClass(player).PlayerDamagedEvent(player, source, event.getDamage())) {
+				event.setCancelled(true);
+			}
+
 			LocationType locType = LocationUtils.getLocationType(mPlugin, player.getLocation());
 			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
 				if (damageCausesIgnoredInTowns.contains(source)) {
