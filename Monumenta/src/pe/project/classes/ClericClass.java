@@ -170,8 +170,8 @@ public class ClericClass extends BaseClass {
 								Player e = (Player)entity;
 								PotionUtils.clearNegatives(mPlugin, e);
 
-								if (player.getFireTicks() > 0) {
-									player.setFireTicks(1);
+								if (e.getFireTicks() > 0) {
+									e.setFireTicks(1);
 								}
 
 								((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, false));
@@ -391,9 +391,11 @@ public class ClericClass extends BaseClass {
 					} else {
 						if (healing > 0) {
 							activateHealing(player, healing);
-						} else if (cleansing > 0) {
-							activateCleansing(player, cleansing);
 						}
+					// Removed at Ari's request since sfx + easy to trigger = annoying
+						// else if (cleansing > 0) {
+						//	activateCleansing(player, cleansing);
+						//}
 					}
 				}
 			}
