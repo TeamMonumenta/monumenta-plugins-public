@@ -1,6 +1,7 @@
 package pe.project.listeners;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -8,9 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
-import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
-import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 
 import pe.project.Plugin;
 
@@ -57,6 +58,8 @@ public class VehicleListener implements Listener {
 			}
 		} else {
 			// Only players are allowed to enter vehicles
+			Location loc = entity.getLocation();
+			entity.teleport(loc);
 			event.setCancelled(true);
 		}
 	}
