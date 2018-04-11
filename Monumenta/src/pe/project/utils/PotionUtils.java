@@ -134,12 +134,15 @@ public class PotionUtils {
 		}
 	}
 
-	public static PotionInfo getPotionInfo(PotionData data, boolean lingering) {
+	/*
+	 * Dividend should be 1 for drink/splash, 4 for lingering potions, 8 for tipped arrows
+	 */
+	public static PotionInfo getPotionInfo(PotionData data, int dividend) {
 		PotionInfo newInfo = null;
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
-		int dividend = lingering ? 4 : 1;
+
 		if (type.isInstant()) {
 			if (isUpgraded) {
 				newInfo = new PotionInfo(type.getEffectType(), 0, 1, false, true);
@@ -168,67 +171,7 @@ public class PotionUtils {
 			}
 		}
 
-
-		if (type == PotionType.INSTANT_HEAL) {
-			if (isUpgraded) {
-				newInfo = PotionInfo.HEALING_STRONG;
-			} else {
-				newInfo = PotionInfo.HEALING;
-			}
-		} else if (type == PotionType.REGEN) {
-			if (isExtended) {
-				newInfo = PotionInfo.REGENERATION_LONG;
-			} else if (isUpgraded) {
-				newInfo = PotionInfo.REGENERATION_STRONG;
-			} else {
-				newInfo = PotionInfo.REGENERATION;
-			}
-		} else if (type == PotionType.SPEED) {
-			if (isExtended) {
-				newInfo = PotionInfo.SWIFTNESS_LONG;
-			} else if (isUpgraded) {
-				newInfo = PotionInfo.SWIFTNESS_STRONG;
-			} else {
-				newInfo = PotionInfo.SWIFTNESS;
-			}
-		} else if (type == PotionType.STRENGTH) {
-			if (isExtended) {
-				newInfo = PotionInfo.STRENGTH_LONG;
-			} else if (isUpgraded) {
-				newInfo = PotionInfo.STRENGTH_STRONG;
-			} else {
-				newInfo = PotionInfo.STRENGTH;
-			}
-		} else if (type == PotionType.JUMP) {
-			if (isExtended) {
-				newInfo = PotionInfo.LEAPING_LONG;
-			} else if (isUpgraded) {
-				newInfo = PotionInfo.LEAPING_STRONG;
-			} else {
-				newInfo = PotionInfo.LEAPING;
-			}
-		} else if (type == PotionType.NIGHT_VISION) {
-			if (isExtended) {
-				newInfo = PotionInfo.NIGHT_VISION_LONG;
-			} else {
-				newInfo = PotionInfo.NIGHT_VISION;
-			}
-		} else if (type == PotionType.FIRE_RESISTANCE) {
-			if (isExtended) {
-				newInfo = PotionInfo.FIRE_RESISTANCE_LONG;
-			} else {
-				newInfo = PotionInfo.FIRE_RESISTANCE;
-			}
-		} else if (type == PotionType.LUCK) {
-			newInfo = PotionInfo.LUCK;
-		}
-
-		if (newInfo != null) {
-			return new PotionInfo(newInfo.type, newInfo.duration, newInfo.amplifier, newInfo.ambient,
-			                      newInfo.showParticles);
-		} else {
-			return null;
-		}
+		return newInfo;
 	}
 
 	public static List<PotionEffect> getEffects(PotionMeta meta) {
@@ -236,7 +179,7 @@ public class PotionUtils {
 
 		PotionData data = meta.getBasePotionData();
 		if (data != null) {
-			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, false);
+			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, 1);
 			if (info != null) {
 				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient,
 				                                       info.showParticles);

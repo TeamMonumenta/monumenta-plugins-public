@@ -373,7 +373,6 @@ public class EntityListener implements Listener {
 		AreaEffectCloud cloud = event.getEntity();
 		ProjectileSource source = cloud.getSource();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
-		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 
 		// If we are in any type of safezone don't apply splash effects to non-players
 		if (LocationUtils.getLocationType(mPlugin, cloud.getLocation()) != LocationType.None) {
@@ -394,7 +393,8 @@ public class EntityListener implements Listener {
 		}
 
 		PotionData data = cloud.getBasePotionData();
-		PotionInfo info = PotionUtils.getPotionInfo(data, true);
+		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
+		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 
 		//	All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
@@ -479,8 +479,9 @@ public class EntityListener implements Listener {
 						}
 					}
 
-					PotionInfo info = PotionUtils.getPotionInfo(arrow.getBasePotionData(), false);
-					List<PotionEffect> effects = arrow.getCustomEffects();
+					PotionData data = arrow.getBasePotionData();
+					PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 8) : null;
+					List<PotionEffect> effects = arrow.hasCustomEffects() ? arrow.getCustomEffects() : null;
 
 					if (info != null) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
