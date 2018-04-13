@@ -44,39 +44,39 @@ PoisonTrail
 */
 
 public class AlchemistClass extends BaseClass {
-	private static double GRUESOME_ALCHEMY_CHANCE = 0.25f;
-	private static int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
-	private static int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
-	private static int GRUESOME_ALCHEMY_COOLDOWN = 3 * 60 * 20;
+	private static final double GRUESOME_ALCHEMY_CHANCE = 0.25f;
+	private static final int GRUESOME_ALCHEMY_1_STACK_SIZE = 16;
+	private static final int GRUESOME_ALCHEMY_2_STACK_SIZE = 32;
+	private static final int GRUESOME_ALCHEMY_COOLDOWN = 3 * 60 * 20;
 
-	private static String PUTRID_FUMES_1_TAG = "PutridFumes1";
-	private static String PUTRID_FUMES_2_TAG = "PutridFumes2";
-	private static float PUTRID_FUMES_1_RADIUS = 3;
-	private static float PUTRID_FUMES_2_RADIUS = 5;
-	private static int PUTRID_FUMES_DURATION = 15 * 20;
-	private static int PUTRID_FUMES_COOLDOWN = 10 * 20;
+	private static final String PUTRID_FUMES_1_TAG = "PutridFumes1";
+	private static final String PUTRID_FUMES_2_TAG = "PutridFumes2";
+	private static final float PUTRID_FUMES_1_RADIUS = 3;
+	private static final float PUTRID_FUMES_2_RADIUS = 5;
+	private static final int PUTRID_FUMES_DURATION = 15 * 20;
+	private static final int PUTRID_FUMES_COOLDOWN = 10 * 20;
 
-	private static int CAUSTIC_MIXTURE_1_DAMAGE = 6;
-	private static int CAUSTIC_MIXTURE_2_DAMAGE = 12;
-	private static String CAUSTIC_MIXTURE_TAG = "CausticMixture";
+	private static final int CAUSTIC_MIXTURE_1_DAMAGE = 6;
+	private static final int CAUSTIC_MIXTURE_2_DAMAGE = 12;
+	private static final String CAUSTIC_MIXTURE_TAG = "CausticMixture";
 
-	private static int BASILISK_POISON_1_EFFECT_LVL = 0;
-	private static int BASILISK_POISON_2_EFFECT_LVL = 1;
-	private static int BASILISK_POISON_1_DURATION = 15 * 20;
-	private static int BASILISK_POISON_2_DURATION = 12 * 20;
+	private static final int BASILISK_POISON_1_EFFECT_LVL = 0;
+	private static final int BASILISK_POISON_2_EFFECT_LVL = 1;
+	private static final int BASILISK_POISON_1_DURATION = 15 * 20;
+	private static final int BASILISK_POISON_2_DURATION = 12 * 20;
 
-	private static int POWER_INJECTION_RANGE = 8;
-	private static int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
-	private static int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
-	private static int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
-	private static int POWER_INJECTION_DURATION = 20 * 20;
-	private static int POWER_INJECTION_COOLDOWN = 30 * 20;
+	private static final int POWER_INJECTION_RANGE = 8;
+	private static final int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
+	private static final int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
+	private static final int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
+	private static final int POWER_INJECTION_DURATION = 20 * 20;
+	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
 
-	private static int INVIGORATING_ODOR_RESISTANCE_EFFECT_LVL = 0;
-	private static int INVIGORATING_ODOR_SPEED_EFFECT_LVL = 0;
-	private static int INVIGORATING_ODOR_REGENERATION_EFFECT_LVL = 0;
-	private static int INVIGORATING_ODOR_1_DURATION = 12 * 20;
-	private static int INVIGORATING_ODOR_2_DURATION = 15 * 20;
+	private static final int INVIGORATING_ODOR_RESISTANCE_EFFECT_LVL = 0;
+	private static final int INVIGORATING_ODOR_SPEED_EFFECT_LVL = 0;
+	private static final int INVIGORATING_ODOR_REGENERATION_EFFECT_LVL = 0;
+	private static final int INVIGORATING_ODOR_1_DURATION = 12 * 20;
+	private static final int INVIGORATING_ODOR_2_DURATION = 15 * 20;
 
 
 	//	POISON_TRAIL

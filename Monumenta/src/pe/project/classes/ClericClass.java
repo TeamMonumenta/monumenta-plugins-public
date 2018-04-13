@@ -33,8 +33,8 @@ import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
-import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
+import pe.project.utils.ScoreboardUtils;
 
 /*
 	Sanctified
@@ -53,50 +53,50 @@ public class ClericClass extends BaseClass {
 	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
 
-	private static int REJUVENATION_RADIUS = 12;
-	private static int REJUVENATION_HEAL_AMOUNT = 1;
+	private static final int REJUVENATION_RADIUS = 12;
+	private static final int REJUVENATION_HEAL_AMOUNT = 1;
 
 	//	HEAVENLY_BOON
-	private static double HEAVENLY_BOON_1_CHANCE = 0.06;
-	private static double HEAVENLY_BOON_2_CHANCE = 0.1;
-	private static double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
-	private static double HEAVENLY_BOON_RADIUS = 12;
+	private static final double HEAVENLY_BOON_1_CHANCE = 0.06;
+	private static final double HEAVENLY_BOON_2_CHANCE = 0.1;
+	private static final double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
+	private static final double HEAVENLY_BOON_RADIUS = 12;
 
 	//	CLEANSING
-	private static int CLEANSING_DURATION = 15 * 20;
-	private static int CLEANSING_RESIST_LEVEL = 0;
-	private static int CLEANSING_STRENGTH_LEVEL = 0;
-	private static int CLEANSING_EFFECT_DURATION = 3 * 20;
-	private static int CLEANSING_RADIUS = 4;
-	private static int CLEANSING_1_COOLDOWN = 45 * 20;
-	private static int CLEANSING_2_COOLDOWN = 30 * 20;
-	private static double CLEANSING_ANGLE = 50.0;
+	private static final int CLEANSING_DURATION = 15 * 20;
+	private static final int CLEANSING_RESIST_LEVEL = 0;
+	private static final int CLEANSING_STRENGTH_LEVEL = 0;
+	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
+	private static final int CLEANSING_RADIUS = 4;
+	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
+	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
+	private static final double CLEANSING_ANGLE = 50.0;
 
-	private static int DIVINE_JUSTICE_DAMAGE = 5;
-	private static int DIVINE_JUSTICE_HEAL = 4;
-	private static int DIVINE_JUSTICE_CRIT_HEAL = 1;
+	private static final int DIVINE_JUSTICE_DAMAGE = 5;
+	private static final int DIVINE_JUSTICE_HEAL = 4;
+	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
 
-	public static int CELESTIAL_1_FAKE_ID = 100361;
-	public static int CELESTIAL_2_FAKE_ID = 100362;
-	private static int CELESTIAL_COOLDOWN = 40 * 20;
-	private static int CELESTIAL_1_DURATION = 10 * 20;
-	private static int CELESTIAL_2_DURATION = 12 * 20;
-	private static double CELESTIAL_RADIUS = 12;
-	public static String CELESTIAL_1_TAGNAME = "Celestial_1";
-	public static String CELESTIAL_2_TAGNAME = "Celestial_2";
-	private static double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
-	private static double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
+	public static final int CELESTIAL_1_FAKE_ID = 100361;
+	public static final int CELESTIAL_2_FAKE_ID = 100362;
+	private static final int CELESTIAL_COOLDOWN = 40 * 20;
+	private static final int CELESTIAL_1_DURATION = 10 * 20;
+	private static final int CELESTIAL_2_DURATION = 12 * 20;
+	private static final double CELESTIAL_RADIUS = 12;
+	public static final String CELESTIAL_1_TAGNAME = "Celestial_1";
+	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
+	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
+	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
-	private static int HEALING_RADIUS = 12;
-	private static int HEALING_1_HEAL = 10;
-	private static int HEALING_2_HEAL = 16;
-	private static double HEALING_DOT_ANGLE = 0.33;
-	private static int HEALING_1_COOLDOWN = 20 * 20;
-	private static int HEALING_2_COOLDOWN = 15 * 20;
+	private static final int HEALING_RADIUS = 12;
+	private static final int HEALING_1_HEAL = 10;
+	private static final int HEALING_2_HEAL = 16;
+	private static final double HEALING_DOT_ANGLE = 0.33;
+	private static final int HEALING_1_COOLDOWN = 20 * 20;
+	private static final int HEALING_2_COOLDOWN = 15 * 20;
 
-	private static int PASSIVE_HEAL_AMOUNT = 1;
-	private static int PASSIVE_HEAL_RADIUS = 5;
-	private static double PASSIVE_HP_THRESHOLD = 10.0;
+	private static final int PASSIVE_HEAL_AMOUNT = 1;
+	private static final int PASSIVE_HEAL_RADIUS = 5;
+	private static final double PASSIVE_HP_THRESHOLD = 10.0;
 
 	public ClericClass(Plugin plugin, Random random) {
 		super(plugin, random);

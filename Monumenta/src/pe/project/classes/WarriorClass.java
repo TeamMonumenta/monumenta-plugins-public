@@ -42,29 +42,29 @@ import pe.project.utils.particlelib.ParticleEffect;
 */
 
 public class WarriorClass extends BaseClass {
-	private static float COUNTER_STRIKE_RADIUS = 5.0f;
+	private static final float COUNTER_STRIKE_RADIUS = 5.0f;
 
-	private static int FRENZY_DURATION = 5 * 20;
+	private static final int FRENZY_DURATION = 5 * 20;
 
-	private static int RIPOSTE_COOLDOWN = 10 * 20;
-	private static int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
-	private static int RIPOSTE_SWORD_DURATION = 5 * 20;
-	private static int RIPOSTE_AXE_DURATION = 3 * 20;
-	private static int RIPOSTE_AXE_EFFECT_LEVEL = 6;
-	private static double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
-	private static float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
+	private static final int RIPOSTE_COOLDOWN = 10 * 20;
+	private static final int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
+	private static final int RIPOSTE_SWORD_DURATION = 5 * 20;
+	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
+	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
+	private static final double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
+	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	private static Integer DEFENSIVE_LINE_DURATION = 10 * 20;
-	private static float DEFENSIVE_LINE_RADIUS = 8.0f;
-	private static Integer DEFENSIVE_LINE_1_COOLDOWN = 60 * 20;
-	private static Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
+	private static final Integer DEFENSIVE_LINE_DURATION = 10 * 20;
+	private static final float DEFENSIVE_LINE_RADIUS = 8.0f;
+	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 60 * 20;
+	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
-	private static float BRUTE_FORCE_RADIUS = 2.0f;
-	private static Integer BRUTE_FORCE_1_DAMAGE = 3;
-	private static Integer BRUTE_FORCE_2_DAMAGE = 7;
-	private static float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
+	private static final float BRUTE_FORCE_RADIUS = 2.0f;
+	private static final Integer BRUTE_FORCE_1_DAMAGE = 3;
+	private static final Integer BRUTE_FORCE_2_DAMAGE = 7;
+	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
 
-	private static double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
+	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);

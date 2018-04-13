@@ -51,47 +51,47 @@ import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 public class MageClass extends BaseClass {
 
-	private static int MANA_LANCE_1_DAMAGE = 5;
-	private static int MANA_LANCE_2_DAMAGE = 10;
-	private static int MANA_LANCE_COOLDOWN = 3 * 20;
-	private static int MANA_LANCE_R = 91;
-	private static int MANA_LANCE_G = 187;
-	private static int MANA_LANCE_B = 255;
+	private static final int MANA_LANCE_1_DAMAGE = 5;
+	private static final int MANA_LANCE_2_DAMAGE = 10;
+	private static final int MANA_LANCE_COOLDOWN = 3 * 20;
+	private static final int MANA_LANCE_R = 91;
+	private static final int MANA_LANCE_G = 187;
+	private static final int MANA_LANCE_B = 255;
 
-	private static float FROST_NOVA_RADIUS = 6.0f;
-	private static int FROST_NOVA_1_DAMAGE = 3;
-	private static int FROST_NOVA_2_DAMAGE = 6;
-	private static int FROST_NOVA_1_EFFECT_LVL = 2;
-	private static int FROST_NOVA_2_EFFECT_LVL = 3;
-	private static int FROST_NOVA_COOLDOWN = 18 * 20;
-	private static int FROST_NOVA_DURATION = 8 * 20;
+	private static final float FROST_NOVA_RADIUS = 6.0f;
+	private static final int FROST_NOVA_1_DAMAGE = 3;
+	private static final int FROST_NOVA_2_DAMAGE = 6;
+	private static final int FROST_NOVA_1_EFFECT_LVL = 2;
+	private static final int FROST_NOVA_2_EFFECT_LVL = 3;
+	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
+	private static final int FROST_NOVA_DURATION = 8 * 20;
 
-	private static int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
-	private static int PRISMATIC_SHIELD_EFFECT_LVL_1 = 1;
-	private static int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
-	private static int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
-	private static int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
-	private static int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
+	private static final int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
+	private static final int PRISMATIC_SHIELD_EFFECT_LVL_1 = 1;
+	private static final int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
+	private static final int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
+	private static final int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
+	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
+	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
 
-	private static int MAGMA_SHIELD_COOLDOWN = 21 * 20;
-	private static int MAGMA_SHIELD_RADIUS = 6;
-	private static int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
-	private static int MAGMA_SHIELD_1_DAMAGE = 5;
-	private static int MAGMA_SHIELD_2_DAMAGE = 12;
-	private static float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
-	private static double MAGMA_SHIELD_DOT_ANGLE = 0.33;
+	private static final int MAGMA_SHIELD_COOLDOWN = 21 * 20;
+	private static final int MAGMA_SHIELD_RADIUS = 6;
+	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
+	private static final int MAGMA_SHIELD_1_DAMAGE = 5;
+	private static final int MAGMA_SHIELD_2_DAMAGE = 12;
+	private static final float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
+	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
 
-	private static float ARCANE_STRIKE_RADIUS = 4.0f;
-	private static int ARCANE_STRIKE_1_DAMAGE = 5;
-	private static int ARCANE_STRIKE_2_DAMAGE = 8;
-	private static int ARCANE_STRIKE_BURN_DAMAGE = 4;
-	private static int ARCANE_STRIKE_COOLDOWN = 6 * 20;
+	private static final float ARCANE_STRIKE_RADIUS = 4.0f;
+	private static final int ARCANE_STRIKE_1_DAMAGE = 5;
+	private static final int ARCANE_STRIKE_2_DAMAGE = 8;
+	private static final int ARCANE_STRIKE_BURN_DAMAGE = 4;
+	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
 
-	private static int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
-	private static int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
-	private static int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
-	private static double ELEMENTAL_ARROWS_RADIUS = 3.0;
+	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
+	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
+	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
+	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
 	private static int INTELLECT_XP = 3;
 

@@ -32,9 +32,9 @@ import org.bukkit.util.Vector;
 import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
+import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.ScoreboardUtils;
-import pe.project.utils.InventoryUtils;
 
 /*
     Agility
@@ -47,41 +47,41 @@ import pe.project.utils.InventoryUtils;
 */
 
 public class ScoutClass extends BaseClass {
-	private static int SWIFTNESS_EFFECT_SPEED_LVL = 0;
-	private static int SWIFTNESS_EFFECT_JUMP_LVL = 2;
+	private static final int SWIFTNESS_EFFECT_SPEED_LVL = 0;
+	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 
-	private static int AGILITY_1_EFFECT_LVL = 0;
-	private static int AGILITY_2_EFFECT_LVL = 1;
-	private static int AGILITY_1_DAMAGE_BONUS = 1;
-	private static int AGILITY_2_DAMAGE_BONUS = 2;
+	private static final int AGILITY_1_EFFECT_LVL = 0;
+	private static final int AGILITY_2_EFFECT_LVL = 1;
+	private static final int AGILITY_1_DAMAGE_BONUS = 1;
+	private static final int AGILITY_2_DAMAGE_BONUS = 2;
 
-	private static int BOW_MASTER_1_DAMAGE = 3;
-	private static int BOW_MASTER_2_DAMAGE = 6;
+	private static final int BOW_MASTER_1_DAMAGE = 3;
+	private static final int BOW_MASTER_2_DAMAGE = 6;
 
-	private static String EAGLE_EYE_TAG_NAME = "TagEagleEye";
-	private static int EAGLE_EYE_EFFECT_LVL = 0;
-	private static int EAGLE_EYE_DURATION = 10 * 20;
-	private static int EAGLE_EYE_COOLDOWN = 30 * 20;
-	private static int EAGLE_EYE_1_EXTRA_DAMAGE = 3;
-	private static int EAGLE_EYE_2_EXTRA_DAMAGE = 6;
-	private static int EAGLE_EYE_RADIUS = 20;
-	private static double EAGLE_EYE_DOT_ANGLE = 0.33;
+	private static final String EAGLE_EYE_TAG_NAME = "TagEagleEye";
+	private static final int EAGLE_EYE_EFFECT_LVL = 0;
+	private static final int EAGLE_EYE_DURATION = 10 * 20;
+	private static final int EAGLE_EYE_COOLDOWN = 30 * 20;
+	private static final int EAGLE_EYE_1_EXTRA_DAMAGE = 3;
+	private static final int EAGLE_EYE_2_EXTRA_DAMAGE = 6;
+	private static final int EAGLE_EYE_RADIUS = 20;
+	private static final double EAGLE_EYE_DOT_ANGLE = 0.33;
 
-	private static int VOLLEY_COOLDOWN = 15 * 20;
-	private static int VOLLEY_1_ARROW_COUNT = 7;
-	private static int VOLLEY_2_ARROW_COUNT = 10;
-	private static double VOLLEY_1_DAMAGE_INCREASE = 0.75;
-	private static double VOLLEY_2_DAMAGE_INCREASE = 1.5;
+	private static final int VOLLEY_COOLDOWN = 15 * 20;
+	private static final int VOLLEY_1_ARROW_COUNT = 7;
+	private static final int VOLLEY_2_ARROW_COUNT = 10;
+	private static final double VOLLEY_1_DAMAGE_INCREASE = 0.75;
+	private static final double VOLLEY_2_DAMAGE_INCREASE = 1.5;
 
-	private static int STANDARD_BEARER_ID = 67;
-	public static int STANDARD_BEARER_FAKE_ID = 10078;
-	public static String STANDARD_BEARER_TAG_NAME = "TagBearer";
-	private static double STANDARD_BEARER_ARMOR = 2;
-	private static double STANDARD_BEARER_TRIGGER_RANGE = 2;
-	private static int STANDARD_BEARER_COOLDOWN = 60 * 20;
-	private static int STANDARD_BEARER_DURATION = 30 * 20;
-	private static int STANDARD_BEARER_TRIGGER_RADIUS = 12;
-	private static double STANDARD_BEARER_DAMAGE_MULTIPLIER = 1.25;
+	private static final int STANDARD_BEARER_ID = 67;
+	public static final int STANDARD_BEARER_FAKE_ID = 10078;
+	public static final String STANDARD_BEARER_TAG_NAME = "TagBearer";
+	private static final double STANDARD_BEARER_ARMOR = 2;
+	private static final double STANDARD_BEARER_TRIGGER_RANGE = 2;
+	private static final int STANDARD_BEARER_COOLDOWN = 60 * 20;
+	private static final int STANDARD_BEARER_DURATION = 30 * 20;
+	private static final int STANDARD_BEARER_TRIGGER_RADIUS = 12;
+	private static final double STANDARD_BEARER_DAMAGE_MULTIPLIER = 1.25;
 
 	private static float PASSIVE_ARROW_SAVE = 0.20f;
 
