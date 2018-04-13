@@ -1,12 +1,10 @@
 package pe.project.locations.zone;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 
-import pe.project.locations.zone.SpawnEffect;
 import pe.project.point.Point;
 
 public class Zone {

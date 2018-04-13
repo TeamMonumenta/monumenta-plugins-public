@@ -1,6 +1,5 @@
 package pe.project.managers;
 
-import java.awt.Event;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +14,9 @@ import org.bukkit.potion.PotionEffectType;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.locations.zone.SpawnEffect;
-import pe.project.locations.zone.Zone;
 import pe.project.locations.zone.SpawnEffect.SpawnEffectType;
+import pe.project.locations.zone.Zone;
 import pe.project.point.Point;
-import pe.project.server.properties.ServerProperties;
 
 public class ZoneManager {
 	Plugin mPlugin;
@@ -46,7 +44,6 @@ public class ZoneManager {
 								if (type == SpawnEffectType.Health) {
 									double addHealth = effect.getValue();
 
-									double eHealth = creature.getHealth();
 									AttributeInstance att = creature.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 									double maxHealth = att.getBaseValue();
 

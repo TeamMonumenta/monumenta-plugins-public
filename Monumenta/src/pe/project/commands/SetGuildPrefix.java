@@ -1,6 +1,7 @@
 package pe.project.commands;
 
 import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,7 +11,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 public class SetGuildPrefix implements CommandExecutor {
-    @SuppressWarnings("rawtypes")
 	public static String[] getEnumNames(Class<? extends Enum<?>> e) {
 		return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
 	}

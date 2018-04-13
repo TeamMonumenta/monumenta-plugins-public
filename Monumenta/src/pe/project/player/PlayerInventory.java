@@ -1,7 +1,6 @@
 package pe.project.player;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.World;
@@ -14,10 +13,6 @@ import pe.project.item.properties.ItemProperty;
 import pe.project.item.properties.ItemPropertyManager;
 
 public class PlayerInventory {
-	private class SlotItemProperties {
-		List<ItemProperty> properties;
-	}
-
 	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
 	boolean mHasTickingProperty = false;
 	boolean mHasOnAttack = false;
