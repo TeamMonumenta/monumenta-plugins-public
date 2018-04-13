@@ -1,5 +1,6 @@
 package pe.project.classes;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -39,41 +40,47 @@ import pe.project.utils.ScoreboardUtils;
 */
 
 public class WarlockClass extends BaseClass {
-	private static int AMPLIFYING_1_EFFECT_DAMAGE = 5;
-	private static int AMPLIFYING_2_EFFECT_DAMAGE = 7;
-	private static int AMPLIFYING_RADIUS = 8;
-	private static double AMPLIFYING_DOT_ANGLE = 0.33;
-	private static int AMPLIFYING_1_COOLDOWN = 16 * 20;
-	private static int AMPLIFYING_2_COOLDOWN = 12 * 20;
-	private static float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
+	private static final int AMPLIFYING_1_EFFECT_DAMAGE = 5;
+	private static final int AMPLIFYING_2_EFFECT_DAMAGE = 7;
+	private static final int AMPLIFYING_RADIUS = 8;
+	private static final double AMPLIFYING_DOT_ANGLE = 0.33;
+	private static final int AMPLIFYING_1_COOLDOWN = 16 * 20;
+	private static final int AMPLIFYING_2_COOLDOWN = 12 * 20;
+	private static final float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
 
-	private static int BLASPHEMY_RADIUS = 3;
-	private static float BLASPHEMY_KNOCKBACK_SPEED = 0.5f;
-	private static int BLASPHEMY_WITHER_LEVEL = 0;
-	private static int BLASPHEMY_WITHER_DURATION = 8 * 20;
-	private static int BLASPHEMY_1_COOLDOWN = 8 * 20;
-	private static int BLASPHEMY_2_COOLDOWN = 6 * 20;
+	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
+			PotionEffectType.WITHER,
+			PotionEffectType.SLOW,
+			PotionEffectType.WEAKNESS,
+			PotionEffectType.SLOW_DIGGING,
+			PotionEffectType.POISON
+	);
 
-	private static int CURSED_WOUND_EFFECT_LEVEL = 1;
-	private static int CURSED_WOUND_DURATION = 6 * 20;
-	private static int CURSED_WOUND_RADIUS = 3;
-//	private static int CURSED_WOUND_BURST_DAMAGE = 3;
+	private static final int BLASPHEMY_RADIUS = 3;
+	private static final float BLASPHEMY_KNOCKBACK_SPEED = 0.5f;
+	private static final int BLASPHEMY_WITHER_LEVEL = 0;
+	private static final int BLASPHEMY_WITHER_DURATION = 8 * 20;
+	private static final int BLASPHEMY_1_COOLDOWN = 8 * 20;
+	private static final int BLASPHEMY_2_COOLDOWN = 6 * 20;
 
-	private static int GRASPING_CLAWS_RADIUS = 6;
-	private static float GRASPING_CLAWS_SPEED = 0.25f;
-	private static int GRASPING_CLAWS_DAMAGE = 7;
-	private static int GRASPING_CLAWS_DURATION = 7 * 20;
-	private static int GRASPING_CLAWS_COOLDOWN = 16 * 20;
+	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
+	private static final int CURSED_WOUND_DURATION = 6 * 20;
+	private static final int CURSED_WOUND_RADIUS = 3;
 
-	private static double SOUL_REND_HEAL_MULT = 0.4;
-	private static int SOUL_REND_RADIUS = 7;
-	private static int SOUL_REND_COOLDOWN = 6 * 20;
+	private static final int GRASPING_CLAWS_RADIUS = 6;
+	private static final float GRASPING_CLAWS_SPEED = 0.25f;
+	private static final int GRASPING_CLAWS_DAMAGE = 7;
+	private static final int GRASPING_CLAWS_DURATION = 7 * 20;
+	private static final int GRASPING_CLAWS_COOLDOWN = 16 * 20;
 
-	private static int CONSUMING_FLAMES_1_RADIUS = 5;
-	private static int CONSUMING_FLAMES_2_RADIUS = 7;
-	private static int CONSUMING_FLAMES_DURATION = 7 * 20;
-	private static int CONSUMING_FLAMES_COOLDOWN = 13 * 20;
+	private static final double SOUL_REND_HEAL_MULT = 0.4;
+	private static final int SOUL_REND_RADIUS = 7;
+	private static final int SOUL_REND_COOLDOWN = 6 * 20;
 
+	private static final int CONSUMING_FLAMES_1_RADIUS = 5;
+	private static final int CONSUMING_FLAMES_2_RADIUS = 7;
+	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
+	private static final int CONSUMING_FLAMES_COOLDOWN = 13 * 20;
 
 	public WarlockClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -89,23 +96,13 @@ public class WarlockClass extends BaseClass {
 /// VERSATILE MAGIC
 	private void _testItemsInHands(Player player, ItemStack mainHand, ItemStack offHand) {
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-//		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-//		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
 
 		if (InventoryUtils.isWandItem(offHand)) {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
-		}
-		else if (InventoryUtils.isScytheItem(offHand)) {
+		} else if (InventoryUtils.isScytheItem(offHand)) {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 		}
-
-	/*	if (InventoryUtils.isWandItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, 0, true, false));
-		}
-		else if (InventoryUtils.isScytheItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, 0, true, false));
-		}*/
 	}
 
 
@@ -126,9 +123,9 @@ public class WarlockClass extends BaseClass {
 					world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
 
 					List<Entity> entities = player.getNearbyEntities(BLASPHEMY_RADIUS, BLASPHEMY_RADIUS, BLASPHEMY_RADIUS);
-					for(int i = 0; i < entities.size(); i++) {
+					for (int i = 0; i < entities.size(); i++) {
 						Entity e = entities.get(i);
-						if(EntityUtils.isHostileMob(e)) {
+						if (EntityUtils.isHostileMob(e)) {
 							LivingEntity mob = (LivingEntity)e;
 							MovementUtils.KnockAway(player, mob, BLASPHEMY_KNOCKBACK_SPEED);
 							if (blasphemy > 1) {
@@ -160,15 +157,11 @@ public class WarlockClass extends BaseClass {
 
 				if (PlayerUtils.isCritical(player) && cursedWound > 1) {
 					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
-					for(int i = 0; i < entities.size(); i++) {
+					for (int i = 0; i < entities.size(); i++) {
 						Entity e = entities.get(i);
-						if(EntityUtils.isHostileMob(e)) {
+						if (EntityUtils.isHostileMob(e)) {
 							LivingEntity mob = (LivingEntity)e;
 							mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
-
-							//if (mob.getPotionEffect(PotionEffectType.WITHER) != null) {
-							//	EntityUtils.damageEntity(mPlugin, mob, CURSED_WOUND_BURST_DAMAGE, player);
-							//}
 						}
 					}
 				}
@@ -185,8 +178,12 @@ public class WarlockClass extends BaseClass {
 						Location loc = player.getLocation();
 						World world = player.getWorld();
 
-						if (soulRend == 1) {ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);}
-						else if (soulRend == 2) {ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);}
+						if (soulRend == 1) {
+							ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);
+						} else if (soulRend == 2) {
+							ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);
+						}
+
 						world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
 						world.playSound(loc, "entity.player.attack.crit", 1.0f, 1.2f);
 
@@ -260,7 +257,9 @@ public class WarlockClass extends BaseClass {
 					}
 
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, targetCount, true, false));
-					if (graspingClaws > 1) {EntityUtils.damageEntity(mPlugin, damagee, GRASPING_CLAWS_DAMAGE, player);}
+					if (graspingClaws > 1) {
+						EntityUtils.damageEntity(mPlugin, damagee, GRASPING_CLAWS_DAMAGE, player);
+					}
 
 					//	Put Soul Rend on cooldown
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GRASPING_CLAW, GRASPING_CLAWS_COOLDOWN);
@@ -332,13 +331,9 @@ public class WarlockClass extends BaseClass {
 
 									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 									if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
-										int debuffCount = 0;
-
-										if (mob.getPotionEffect(PotionEffectType.WITHER) != null) {debuffCount++;}
-										if (mob.getPotionEffect(PotionEffectType.SLOW) != null) {debuffCount++;}
-										if (mob.getPotionEffect(PotionEffectType.WEAKNESS) != null) {debuffCount++;}
-										if (mob.getPotionEffect(PotionEffectType.SLOW_DIGGING) != null) {debuffCount++;}
-										if (mob.getPotionEffect(PotionEffectType.POISON) != null) {debuffCount++;}
+										int debuffCount = (int)DEBUFFS.stream()
+												.filter(effect -> (mob.getPotionEffect(effect) != null))
+												.count();
 
 										int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
 
