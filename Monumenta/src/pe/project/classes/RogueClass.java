@@ -132,7 +132,8 @@ public class RogueClass extends BaseClass {
 							while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 								loc.add(dir);
 								if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
-									loc.subtract(dir.clone().multiply(1.15));
+									double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
+									loc.subtract(dir.clone().multiply(multiplier));
 									break;
 								}
 							}
@@ -142,8 +143,8 @@ public class RogueClass extends BaseClass {
 							while (loc.getBlock().getType().isSolid()) {
 								loc.subtract(dir.clone().multiply(1.15));
 							}
-							ParticleEffect.SPELL_WITCH.display(0.2f, 0.5f, 0.2f, 1, 50, player.getLocation().add(0, 1.15, 0), 40);
-							ParticleEffect.SMOKE_LARGE.display(0.2f, 0.5f, 0.2f, 0.05f, 15, player.getLocation().add(0, 1.15, 0), 40)
+							ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
+							ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40)
 							;
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
 
@@ -160,8 +161,8 @@ public class RogueClass extends BaseClass {
 								}
 							}
 
-							ParticleEffect.SPELL_WITCH.display(0.2f, 0.5f, 0.2f, 1, 50, player.getLocation().add(0, 1.15, 0), 40);
-							ParticleEffect.SMOKE_LARGE.display(0.2f, 0.5f, 0.2f, 0.05f, 15, player.getLocation().add(0, 1.15, 0), 40);
+							ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
+							ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40);
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
 						}
@@ -197,7 +198,6 @@ public class RogueClass extends BaseClass {
 						ParticleEffect.SMOKE_LARGE.display(2.5f, 0.8f, 2.5f, 0.05f, 300, loc.clone().add(0,1,0), 40);
 						ParticleEffect.SMOKE_NORMAL.display(2.5f, 0.2f, 2.5f, 0.1f, 600, loc, 40);
 						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
-						world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.35f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
 					}
@@ -235,7 +235,7 @@ public class RogueClass extends BaseClass {
 						if (byMyBlade > 1) {
 							world.playSound(loc, Sound.ENTITY_IRONGOLEM_DEATH, 1, 1.65f);
 							ParticleEffect.SPELL_WITCH.display(0.2f, 0.65f, 0.2f, 1, 45, loc, 40);
-							count = 25;
+							count = 30;
 						}
 						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 						ParticleUtils.playParticlesInWorld(world, Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);

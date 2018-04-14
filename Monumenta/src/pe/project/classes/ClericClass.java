@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,12 +14,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 import pe.project.Plugin;
 import pe.project.utils.EntityUtils;
@@ -409,7 +410,7 @@ public class ClericClass extends BaseClass {
 			for (Entity e : entities) {
 				if (e instanceof Player) {
 					Player p = (Player)e;
-					if (p != player) {
+					if (p != player && p.getGameMode() != GameMode.SPECTATOR) {
 						Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 						if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
 							int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;

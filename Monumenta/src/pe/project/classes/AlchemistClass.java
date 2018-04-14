@@ -5,10 +5,6 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -18,13 +14,18 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.World;
 
-import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.Plugin;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.ParticleUtils;
@@ -148,18 +149,21 @@ public class AlchemistClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.POWER_INJECTION)) {
 						LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, POWER_INJECTION_RANGE, true, true, true);
 						if (targetEntity != null && targetEntity instanceof Player) {
-							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
+							Player targetPlayer = (Player) targetEntity;
+							if (targetPlayer.getGameMode() != GameMode.SPECTATOR) {
+								int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 
-							mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
+								mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
 
-							if (powerInjection > 1) {
-								mPlugin.mPotionManager.addPotion((Player)targetEntity, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+								if (powerInjection > 1) {
+									mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+								}
+
+								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.POWER_INJECTION, POWER_INJECTION_COOLDOWN);
+
+								arrow.remove();
+								return;
 							}
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.POWER_INJECTION, POWER_INJECTION_COOLDOWN);
-
-							arrow.remove();
-							return;
 						}
 					}
 				}
