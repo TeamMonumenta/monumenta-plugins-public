@@ -48,7 +48,7 @@ public class Hope implements ItemProperty {
 			ageField = entityItem.getClass().getDeclaredField("age");
 			ageField.setAccessible(true);
 
-			ageField.set(entityItem, -1 * extraMinutesPerLevel * Constants.TICKS_PER_MINUTE);
+			ageField.set(entityItem, -1 * extraMinutesPerLevel * Constants.TICKS_PER_MINUTE * level);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
