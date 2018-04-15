@@ -124,47 +124,50 @@ public class RogueClass extends BaseClass {
 						ray.throughNonOccluding = false;
 						RaycastData data = ray.shootRaycast();
 
-						LivingEntity entity = data.getEntities().get(0);
+						List<LivingEntity> rayEntities = data.getEntities();
+						if (rayEntities != null && !rayEntities.isEmpty()) {
+							LivingEntity entity = rayEntities.get(0);
 
-						if (entity != null && EntityUtils.isHostileMob(entity)) {
-							Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
-							Location loc = player.getLocation();
-							while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
-								loc.add(dir);
-								if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
-									double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
-									loc.subtract(dir.clone().multiply(multiplier));
-									break;
-								}
-							}
-							loc.add(0, 1, 0);
-
-							//Just in case the player's teleportation loc is in a block.
-							while (loc.getBlock().getType().isSolid()) {
-								loc.subtract(dir.clone().multiply(1.15));
-							}
-							ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
-							ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40)
-							;
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
-
-							player.teleport(loc);
-
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
-
-							if (advancingShadows > 1) {
-								List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
-								for (Entity mob : entities) {
-									if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
-										MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+							if (entity != null && EntityUtils.isHostileMob(entity)) {
+								Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
+								Location loc = player.getLocation();
+								while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
+									loc.add(dir);
+									if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
+										double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
+										loc.subtract(dir.clone().multiply(multiplier));
+										break;
 									}
 								}
-							}
+								loc.add(0, 1, 0);
 
-							ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
-							ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40);
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
+								//Just in case the player's teleportation loc is in a block.
+								while (loc.getBlock().getType().isSolid()) {
+									loc.subtract(dir.clone().multiply(1.15));
+								}
+								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
+								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40)
+								;
+								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+
+								player.teleport(loc);
+
+								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+
+								if (advancingShadows > 1) {
+									List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+									for (Entity mob : entities) {
+										if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
+											MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+										}
+									}
+								}
+
+								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
+								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40);
+								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
+							}
 						}
 					}
 				}
