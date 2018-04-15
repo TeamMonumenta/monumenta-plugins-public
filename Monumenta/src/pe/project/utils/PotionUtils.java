@@ -98,13 +98,13 @@ public class PotionUtils {
 			showParticles = effect.hasParticles();
 		}
 
-		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean ambient,
-		                  boolean hasParticles) {
+		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean _ambient,
+		                  boolean _showParticles) {
 			type = _type;
 			duration = _duration;
 			amplifier = _amplifier;
-			this.ambient = ambient;
-			showParticles = hasParticles;
+			ambient = _ambient;
+			showParticles = _showParticles;
 		}
 
 		public PotionEffectType type;
@@ -136,12 +136,18 @@ public class PotionUtils {
 
 	/*
 	 * Dividend should be 1 for drink/splash, 4 for lingering potions, 8 for tipped arrows
+	 * NOTE: This may return NULL for some broken potions!
 	 */
 	public static PotionInfo getPotionInfo(PotionData data, int dividend) {
 		PotionInfo newInfo = null;
 		PotionType type = data.getType();
 		boolean isExtended = data.isExtended();
 		boolean isUpgraded = data.isUpgraded();
+
+		/* Some bugged potion types don't actually have types... */
+		if (type == null || type.getEffectType() == null) {
+			return null;
+		}
 
 		if (type.isInstant()) {
 			if (isUpgraded) {
