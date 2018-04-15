@@ -52,6 +52,10 @@ commands:
     permission: monumenta.commands.giveSoulbound
     description: Appends the player's name into lore text on the given item
     usage: /execute @p[stuff] ~ ~ ~ givesoulbound item amount data datatag
+  hopeifyHeldItem:
+    permission: monumenta.commands.hopeifyHeldItem
+    description: Adds the hope enchant and the player's name to their held item
+    usage: /execute @p[stuff] ~ ~ ~ hopeifyHeldItem
   checkEmptyInventory:
     permission: monumenta.commands.checkEmptyInventory
     description: Return success if the player's inventory is empty, fails otherwise

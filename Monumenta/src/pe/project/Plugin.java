@@ -33,6 +33,7 @@ import pe.project.commands.DebugInfo;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
 import pe.project.commands.GiveSoulbound;
+import pe.project.commands.HopeifyHeldItem;
 import pe.project.commands.IncrementDaily;
 import pe.project.commands.IsShittyCommand;
 import pe.project.commands.MinusExp;
@@ -167,6 +168,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("transferServer").setExecutor(new TransferServer(this));
 			getCommand("broadcastCommand").setExecutor(new BroadcastCommand(this));
 			getCommand("giveSoulbound").setExecutor(new GiveSoulbound(this));
+			getCommand("hopeifyHeldItem").setExecutor(new HopeifyHeldItem(this));
 			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
 			getCommand("debugInfo").setExecutor(new DebugInfo(this));
 			getCommand("clearEffects").setExecutor(new ClearEffects(this));
