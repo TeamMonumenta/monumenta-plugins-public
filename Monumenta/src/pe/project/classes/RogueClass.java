@@ -236,7 +236,6 @@ public class RogueClass extends BaseClass {
 						int count = 15;
 						world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 						if (byMyBlade > 1) {
-							world.playSound(loc, Sound.ENTITY_IRONGOLEM_DEATH, 1, 1.65f);
 							ParticleEffect.SPELL_WITCH.display(0.2f, 0.65f, 0.2f, 1, 45, loc, 40);
 							count = 30;
 						}
