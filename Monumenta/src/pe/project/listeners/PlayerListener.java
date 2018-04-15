@@ -60,6 +60,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
@@ -433,6 +434,22 @@ public class PlayerListener implements Listener {
 				//	Add custom potion effects.
 				List<PotionEffect> effects = meta.getCustomEffects();
 				if (effects != null) {
+
+					// Kill the player if they drink a potion with instant damage 10+
+					for (PotionEffect effect : effects) {
+						if (effect.getType() != null &&
+								effect.getType().equals(PotionEffectType.HARM) &&
+								effect.getAmplifier() >= 9) {
+
+							player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+								@Override
+								public void run() {
+									player.setHealth(0);
+								}
+							}, 0);
+						}
+					}
+
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
 			}
