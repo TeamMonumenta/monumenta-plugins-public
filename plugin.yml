@@ -1,0 +1,16 @@
+main: mmbf.main.Main
+name: Monumenta_Bossfights
+version: 1.0
+author: rayman520
+description: <need better desc>
+commands:
+  bossfight:
+    description: bossfight
+    usage: "usage: /bossfight <boss_name> "
+    permission: BossFight.bossfight
+    permission-message: You don't have the permission to use this command.
+  mobspell:
+    description: Used to launch spells
+    usage: "usage: /mobspell <spell> "
+    permission: Mobspell.mobspell
+    permission-message: You don't have the permission to use this command.
