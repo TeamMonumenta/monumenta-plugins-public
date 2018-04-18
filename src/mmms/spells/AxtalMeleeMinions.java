@@ -115,22 +115,9 @@ public class AxtalMeleeMinions
 			@Override
             public void run() {
 				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-        			Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
         			launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
         			centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
-        			for(int j = 0; j < 5; j++)
-            		{
-        				while (particleLoc.distance(centerLoc) > 2)
-        				{
-        					particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-        					particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-        					particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-        				}
-        				particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, particleLoc, 10, 0, 0, 0, 0.01);
-        				particleLoc.setX(0);
-        				particleLoc.setY(0);
-        				particleLoc.setZ(0);
-            		}
+        			centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
 			}
 		};
 		for (int i = 0; i < (40 + repeats * 15) / 3; i++)

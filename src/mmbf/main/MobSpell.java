@@ -14,6 +14,7 @@ import mmms.spells.AxtalWitherAoe;
 import mmms.spells.CommandSpell;
 import mmms.spells.DetectionCircle;
 import mmms.spells.MaskedEldritchBeam;
+import mmms.spells.MaskedFrostNova;
 import mmms.spells.MaskedShadowGlade;
 import mmms.spells.MaskedSummonBlazes;
 
@@ -75,6 +76,9 @@ public class MobSpell implements CommandExecutor
 				break;
 			case "masked_eldritch_beam":
 				(new MaskedEldritchBeam(plugin)).onSpell(send, args);
+				break;
+			case "masked_frost_nova":
+				(new MaskedFrostNova(plugin)).onSpell(send, args);
 				break;
 			default:
 				send.sendMessage("Unknown spell: '" + args[0] + "'");

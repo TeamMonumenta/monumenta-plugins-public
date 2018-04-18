@@ -11,22 +11,22 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class AxtalWitherAoe
+public class MaskedFrostNova
 {
 	private Plugin plugin;
 	
-	public AxtalWitherAoe(mmbf.main.Main plugin2)
+	public MaskedFrostNova(mmbf.main.Main plugin2)
 	{	
 		plugin = plugin2;
 	}
 
-	int w = -80;
+	int w = 0;
 	Random rand = new Random();
 	
 	public boolean onSpell(CommandSender sender, String[] arg)
@@ -43,20 +43,20 @@ public class AxtalWitherAoe
 			System.out.println(ChatColor.RED + "Radius must be between 0 and 65535");
 			error = true;
 		}
-		int power = Integer.parseInt(arg[2]);
-		if (power < 0 || power > 5)
+		int time = Integer.parseInt(arg[2]);
+		if (time < 0 || time > 500)
 		{
-			System.out.println(ChatColor.RED + "Power must be between 0 and 5");
+			System.out.println(ChatColor.RED + "Power must be between 0 and 500 (ticks)");
 			error = true;
 		}
 		if (error)
 			return (true);
 		
-		spell(sender, radius, power);
+		spell(sender, radius, time);
 		return true;
 	}
 	
-	public void spell(CommandSender sender, int radius, int power)
+	public void spell(CommandSender sender, int radius, int time)
 	{
 		Entity launcher = null;
 		
@@ -85,11 +85,11 @@ public class AxtalWitherAoe
 			plist_targets[counter1] = player;
 			counter1++;
 		}
-		animation(radius, lLoc, launcher);
-		deal_damage(radius, power, plist_targets, launcher);
+		animation(radius, time, lLoc, launcher);
+		deal_damage(radius, time, plist_targets, launcher);
     }
 	
-	void		deal_damage(int radius, int power, Player plist[], Entity launcher)
+	void		deal_damage(int radius, int time, Player plist[], Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable dealer = new Runnable()
@@ -104,29 +104,38 @@ public class AxtalWitherAoe
             				double distance = plist[i].getLocation().distance(launcher.getLocation());
             				if (distance < radius)
             				{
-            					int pot_pow = (int)((double)power * ((double)((double)radius - distance) / (double)radius));
-            					plist[i].addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, pot_pow)));
-            					plist[i].addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 30, 1)));
+            					plist[i].addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, 2)));
+            					plist[i].addPotionEffect((new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4)));
             				}
             			}
             		}
             }
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, dealer , 80L);
+		scheduler.scheduleSyncDelayedTask(this.plugin, dealer , (long)time);
 	}
 	
-	void animation(int radius, Location loc, Entity launcher)
+	void animation(int radius, int time, Location loc, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		
 		Runnable anim_loop = new Runnable() {
+			@Override
+            public void run() {
+				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+        			launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+        			centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_SNOW_STEP, (float)((float)radius / 7), (float)(0.5 + rand.nextInt(150) / 100));
+        			centerLoc.getWorld().spawnParticle(Particle.SNOWBALL, centerLoc, 10, 1, 1, 1, 0.01);
+			}
+		};
+		
+		Runnable anim_loop2 = new Runnable() {
             @Override
             public void run() {
             		Location lloc = launcher.getLocation();
-            		int  n = rand.nextInt(50) + 100;
-            		double precision = n;
+            		double precision = rand.nextInt(50) + 100;
             		double increment = (2 * Math.PI) / precision;
             		Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
-            		double rad = radius * (w < 0 ? ((double)w / 80) : ((double)w / 5));
+            		double rad = (double)(radius * w) / 5;
             		double angle = 0;
             		for(int j = 0; j < precision; j++)
             		{
@@ -134,11 +143,9 @@ public class AxtalWitherAoe
             			particleLoc.setX(lloc.getX() + (rad * Math.cos(angle)));
             			particleLoc.setZ(lloc.getZ() + (rad * Math.sin(angle)));
             			particleLoc.setY(lloc.getY() + 1.5);
-            			particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
+            			particleLoc.getWorld().spawnParticle(Particle.SNOWBALL, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
             		}
-            		if (w < -20 && w % 2 == 0)
-            			particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_CAT_HISS, (float)((float)radius / 7), (float)(0.5 + ((float)(w + 60) / 100)));
-            		else if (w == -1)
+            		if (w == 0)
             		{
             			particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)((float)radius / 7), 0.77F);
             			particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)((float)radius / 7), 0.5F);
@@ -148,7 +155,9 @@ public class AxtalWitherAoe
             }
         };
         
-        for (int i = -80; i < 5; i++)
-        		scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , 1L * (i + 81));
+        for (int i = 0; i < time; i++)
+        		scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , i);
+        for (int i = 0; i < 6; i++)
+        		scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop2 , i + time);
 	}
 }

@@ -12,8 +12,6 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
@@ -31,6 +29,9 @@ public class MaskedEldritchBeam {
 	
 	Random rand = new Random();
 	Utils utils = new Utils(plugin);
+	
+	int anim_task_id[] = new int[20];
+	int dmg_task_id[] = new int[20];
 	
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -65,31 +66,30 @@ public class MaskedEldritchBeam {
 			return ;
 		}
 		System.out.println("hey");
+		int id = 0;
 		for (Player player : utils.playersInRange(launcher.getLocation(), 40))
 		{
-			launch(launcher, player);
-			animation(launcher, player);
+			launch(launcher, player, id);
+			animation(launcher, player, id);
+			id++;
 		}
 	}
 	
-	int dmg_task_id = 0;
-	
-	public void launch(Entity launcher, Player target)
+	public void launch(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable damage = new Runnable() {
 			@Override
             public void run() {
-				target.damage(2f);
+				target.damage(3f);
 				}
 		};
-		dmg_task_id = scheduler.scheduleSyncRepeatingTask(plugin, damage, 0L, 20L);
+		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, damage, 0L, 20L);
 	}
 	
 	int g_sound = 0;
-	int anim_task_id = 0;
 	
-	public void animation(Entity launcher, Player target)
+	public void animation(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable teleport = new Runnable() {
@@ -116,8 +116,8 @@ public class MaskedEldritchBeam {
 					tmpLoc.getWorld().spawnParticle(Particle.SPELL_MOB, tmpLoc, 1, 0.02, 0.02, 0.02, 1);
 					if (tmpLoc.getBlock().getType() != Material.AIR)
 					{
-						scheduler.cancelTask(anim_task_id);
-						scheduler.cancelTask(dmg_task_id);
+						scheduler.cancelTask(anim_task_id[id]);
+						scheduler.cancelTask(dmg_task_id[id]);
 						break;
 					}
 					else if (launLoc.distance(tmpLoc) > launLoc.distance(tarLoc))
@@ -130,12 +130,12 @@ public class MaskedEldritchBeam {
 				}
 				if (g_sound >= 80)
 				{
-					scheduler.cancelTask(anim_task_id);
-					scheduler.cancelTask(dmg_task_id);
+					scheduler.cancelTask(anim_task_id[id]);
+					scheduler.cancelTask(dmg_task_id[id]);
 				}
 			}
 		};
-		anim_task_id = scheduler.scheduleSyncRepeatingTask(plugin, teleport, 0L, 2L);
+		anim_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, teleport, 0L, 2L);
 	}
 	
 }

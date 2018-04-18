@@ -32,7 +32,7 @@ public class CAxtal
 	int taskIDupdate = 0;
 	Random rand = new Random();
 	MobSpell ms;
-	String spells[] = {	"axtal_wither_aoe 13 5",
+	String spells[] = {	"axtal_wither_aoe 13 4",
 						"axtal_melee_minions 10 3 3",
 						"axtal_sneakup",
 						"axtal_tnt_throw 5 15",
@@ -60,14 +60,18 @@ public class CAxtal
 			hp_del = hp_del / 2;
 			player_count--;
 		}
-		Bukkit.getServer().dispatchCommand(send, "summon minecraft:wither_skeleton ~ ~20 ~ {Attributes:[{Base:0.25d,Name:\"generic.movementSpeed\"},{Base:"+armor+".0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:64.0d,Name:\"generic.followRange\"},{Base:2.0d,Name:\"generic.attackDamage\"},{Base:"+bossTargetHp+".0d,Name:\"generic.maxHealth\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:1b,Spigot.ticksLived:145,Tags:[\"Tlax\"],Motion:[0.0d,0.0d,0.0d],Leashed:0b,Health:"+bossTargetHp+".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"§4§lShaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"§4§lC'Axtal\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"c659cdd4-e436-4977-a6a7-d5518ebecfbb\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFlMzg1NWY5NTJjZDRhMDNjMTQ4YTk0NmUzZjgxMmE1OTU1YWQzNWNiY2I1MjYyN2VhNGFjZDQ3ZDMwODEifX19\"}]}},AttributeModifiers:[]},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
+		Bukkit.getServer().dispatchCommand(send, "summon minecraft:wither_skeleton ~ ~20 ~ {Attributes:[{Base:0.25d,Name:\"generic.movementSpeed\"},{Base:"+armor+".0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:64.0d,Name:\"generic.followRange\"},{Base:2.0d,Name:\"generic.attackDamage\"},{Base:"+bossTargetHp+".0d,Name:\"generic.maxHealth\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:1b,Spigot.ticksLived:145,Tags:[\"Tlax\"],Motion:[0.0d,0.0d,0.0d],Leashed:0b,Health:"+bossTargetHp+".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"§4§lShaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"§4§lC'Axtal\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"c659cdd4-e436-4977-a6a7-d5518ebecfbb\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE2MzE0ZWFjMzQ0MTZjZTEwYWIyMmMyZTFjNGRjYjQ3MmEzZmViOThkNGUwNGQzZmJiYjg1YTlhNDcxYjE4In19fQ==\"}]}},AttributeModifiers:[]},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
 		List<Entity> lel = spawnPoint.getNearbyEntities(0.1, 20.1, 0.1);
 		if (lel.get(0) instanceof Damageable)
 			boss = (Damageable)(lel.get(0));
 		else
 			return (utils.errorMsg("Something went wrong with the bossfight, if it keeps happening, please contact a mod"));
-		SpellBossBar bossBar = new SpellBossBar();
+		SpellBossBar bossBar = new SpellBossBar(plugin);
 		bossBar.spell(boss, detection_range);
+		bossBar.setEvent(100, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]");
+		bossBar.setEvent(50, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]");
+		bossBar.setEvent(25, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]");
+		bossBar.setEvent(10, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]");
 		Bukkit.getServer().dispatchCommand(send, "effect @a[r="+detection_range+"] minecraft:blindness 2 2");
 		Bukkit.getServer().dispatchCommand(send, "title @a[r="+detection_range+"] title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
 		Bukkit.getServer().dispatchCommand(send, "title @a[r="+detection_range+"] subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
@@ -77,9 +81,12 @@ public class CAxtal
 	        @Override
 	        public void run()
 	        {
+	        		if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+	        			return ;
 	        		if (boss.getHealth() <= 0)
 	        		{
 	        			Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r="+detection_range+"] ~ ~ ~ 100 0.8");
+	        			ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"I am free... It ends at last. Is this was death feels like?..\",\"color\":\"dark_red\"}]").split(" "));
 	        			scheduler.cancelTask(taskIDpassive);
 	        			scheduler.cancelTask(taskIDactive);
 	        			scheduler.cancelTask(taskIDupdate);
@@ -97,6 +104,8 @@ public class CAxtal
 			@Override
 	        public void run()
 	        {
+				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+        				return ;
 				for (int i = 0; i < 5; i++)
 				{
 					if (spellsCD[i] > 0)
@@ -114,6 +123,8 @@ public class CAxtal
 			@Override
 	        public void run()
 	        {
+				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+        				return ;
 				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
 				{
 					String name = entity.getCustomName();
