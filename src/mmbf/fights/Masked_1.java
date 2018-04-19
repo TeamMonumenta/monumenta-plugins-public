@@ -78,8 +78,21 @@ public class Masked_1
 			@Override
 			public void run()
 			{
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
+				/* If no players are present, do nothing unless the boss is dead/despawned */
+				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty()) {
+					/*
+					 * If the boss is dead or despawned but no players are nearby
+					 * cancel the bossfight silently without triggering reward
+					 */
+					if (!boss.isValid()) {
+						scheduler.cancelTask(taskIDpassive);
+						scheduler.cancelTask(taskIDactive);
+						scheduler.cancelTask(taskIDupdate);
+						bossBar.remove();
+					}
+					return;
+				}
+
 				boss.teleport(spawnPoint.getLocation());
 				if (boss.getHealth() <= 0)
 				{
