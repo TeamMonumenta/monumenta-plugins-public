@@ -22,7 +22,7 @@ public class Masked_2
 {
 	Main plugin;
 	MobSpell ms;
-	
+
 	Utils utils = new Utils(plugin);
 	int detection_range = 50;
 	String targetingTag = "Masked";
@@ -37,13 +37,13 @@ public class Masked_2
 						"masked_summon_blazes"};
 	String passiveSpells[] = { "axtal_block_break" };
 	int spellsCD[] = new int[spells.length];
-	
+
 	public Masked_2(Main pl)
 	{
 		plugin = pl;
 		ms = new MobSpell(pl);
 	}
-	
+
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -70,32 +70,32 @@ public class Masked_2
 		bossBar.changeStyle(BarStyle.SOLID);
 		Runnable passive = new Runnable()
 		{
-	        @Override
-	        public void run()
-	        {
-	        		if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-	        			return ;
-	        		if (boss.getHealth() <= 0)
-	        		{
-	        			scheduler.cancelTask(taskIDpassive);
-	        			scheduler.cancelTask(taskIDactive);
-	        			scheduler.cancelTask(taskIDupdate);
-	        			bossBar.remove();
-	        			endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-	        		}
-	        		for (int i = 0; i < passiveSpells.length; i++)
-	        		{
-	        			ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
-	        		}
-	        }
+			@Override
+			public void run()
+			{
+					if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+						return ;
+					if (boss.getHealth() <= 0)
+					{
+						scheduler.cancelTask(taskIDpassive);
+						scheduler.cancelTask(taskIDactive);
+						scheduler.cancelTask(taskIDupdate);
+						bossBar.remove();
+						endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+					}
+					for (int i = 0; i < passiveSpells.length; i++)
+					{
+						ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+					}
+			}
 		};
 		Runnable active = new Runnable()
 		{
 			@Override
-	        public void run()
-	        {
+			public void run()
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				int sps = spells.length;
 				for (int i = 0; i < sps; i++)
 				{
@@ -107,15 +107,15 @@ public class Masked_2
 					chosen = rand.nextInt(sps);
 				spellsCD[chosen] = 3;
 				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
-	        }
+			}
 		};
 		Runnable update = new Runnable()
 		{
 			@Override
-	        public void run()
-	        {
+			public void run()
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				for (Entity entity : spawnPoint.getNearbyEntities(detection_range*2, detection_range*2, detection_range*2))
 				{
 					String name = entity.getCustomName();
@@ -128,7 +128,7 @@ public class Masked_2
 						}
 					}
 				}
-	        }
+			}
 		};
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);

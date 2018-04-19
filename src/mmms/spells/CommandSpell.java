@@ -9,13 +9,13 @@ import net.md_5.bungee.api.ChatColor;
 
 public class CommandSpell
 {
-	
+
 	public CommandSpell()
-	{	
+	{
 	}
-	
+
 	Random rand = new Random();
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length <= 1)

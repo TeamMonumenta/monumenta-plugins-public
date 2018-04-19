@@ -20,16 +20,16 @@ import org.bukkit.util.Vector;
 import net.md_5.bungee.api.ChatColor;
 
 public class AxtalSneakup {
-	
+
 	private Plugin plugin;
-	
+
 	public AxtalSneakup(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 1)
@@ -40,15 +40,15 @@ public class AxtalSneakup {
 		boolean error = false;
 		if (error)
 			return (true);
-		
+
 		spell(sender);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -67,11 +67,11 @@ public class AxtalSneakup {
 		launch(launcher, target);
 		animation(launcher, target);
 	}
-	
+
 	public List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
-		
+
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
@@ -81,7 +81,7 @@ public class AxtalSneakup {
 		}
 		return (out);
 	}
-	
+
 	public void launch(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -96,7 +96,7 @@ public class AxtalSneakup {
 		};
 		scheduler.scheduleSyncDelayedTask(this.plugin, teleport, 50);
 	}
-	
+
 	public void animation(Entity Launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

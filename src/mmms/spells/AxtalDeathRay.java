@@ -20,16 +20,16 @@ import org.bukkit.util.Vector;
 import net.md_5.bungee.api.ChatColor;
 
 public class AxtalDeathRay {
-	
+
 	private Plugin plugin;
-	
+
 	public AxtalDeathRay(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 1)
@@ -40,15 +40,15 @@ public class AxtalDeathRay {
 		boolean error = false;
 		if (error)
 			return (true);
-		
+
 		spell(sender);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -68,11 +68,11 @@ public class AxtalDeathRay {
 		launch(launcher, target);
 		animation(launcher, target);
 	}
-	
+
 	public List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
-		
+
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
@@ -82,7 +82,7 @@ public class AxtalDeathRay {
 		}
 		return (out);
 	}
-	
+
 	public void launch(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -130,9 +130,9 @@ public class AxtalDeathRay {
 		};
 		scheduler.scheduleSyncDelayedTask(this.plugin, teleport, 140);
 	}
-	
+
 	int g_sound = 0;
-	
+
 	public void animation(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

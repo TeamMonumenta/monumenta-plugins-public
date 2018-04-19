@@ -12,9 +12,9 @@ public class Main extends JavaPlugin
 		getCommand("bossfight").setExecutor(new BossFight(this));
 		getCommand("mobspell").setExecutor(new MobSpell(this));
     }
-   
+
     @Override
     public void onDisable() {
-       
+
     }
 }

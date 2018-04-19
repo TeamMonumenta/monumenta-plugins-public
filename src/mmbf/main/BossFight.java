@@ -7,13 +7,12 @@ import org.bukkit.command.CommandSender;
 import mmbf.fights.CAxtal;
 import mmbf.fights.Masked_1;
 import mmbf.fights.Masked_2;
-import mmbf.main.Main;
 import mmbf.utils.Utils;
 
 public class BossFight implements CommandExecutor
 {
 	Main plugin;
-	
+
 	public BossFight(Main pl)
 	{
 		plugin = pl;
@@ -27,7 +26,7 @@ public class BossFight implements CommandExecutor
 		Utils utils = new Utils(plugin);
 		Location endLoc = utils.getLocation(utils.calleeEntity(send).getLocation() ,args[1], args[2], args[3]);
 		String input = args[0].toLowerCase();
-		
+
 		switch (input)
 		{
 			case "caxtal":

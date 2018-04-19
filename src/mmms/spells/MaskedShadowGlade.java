@@ -21,16 +21,16 @@ public class MaskedShadowGlade
 {
 
 	private Plugin plugin;
-	
+
 	public MaskedShadowGlade(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
 	Utils utils = new Utils(plugin);
 	int Ccount = 0;
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 2)
@@ -70,68 +70,68 @@ public class MaskedShadowGlade
 		}
 		return true;
 	}
-	
+
 	public void spell(Location zoneStart)
 	{
 		System.out.println(zoneStart.toString());
 		animation(zoneStart);
 		damage(zoneStart);
 	}
-	
+
 	int j = 0;
 	public void animation(Location zoneStart)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		List<Player> pList = utils.playersInRange(zoneStart, 40);
-		
+
 		Runnable anim_loop = new Runnable() {
             @Override
             public void run() {
-            		for (Player player : pList)
-            		{
-            			Location pPos = player.getLocation();
-            			if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
-            			{
-            				pPos.getWorld().playSound(pPos, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
-            			}
-            		}
-            		zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
-            		if (j / Ccount >= 24)
-            		{
-            			for (Player player : pList)
-                		{
-                			Location pPos = player.getLocation();
-                			pPos.getWorld().playSound(pPos, Sound.ENTITY_ENDERDRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
-                		}
-            			zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
-            		}
-            		j++;
+					for (Player player : pList)
+					{
+						Location pPos = player.getLocation();
+						if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
+						{
+							pPos.getWorld().playSound(pPos, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
+						}
+					}
+					zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
+					if (j / Ccount >= 24)
+					{
+						for (Player player : pList)
+						{
+							Location pPos = player.getLocation();
+							pPos.getWorld().playSound(pPos, Sound.ENTITY_ENDERDRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
+						}
+						zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
+					}
+					j++;
             }
         };
-        
+
         for (int i = 0; i < 25; i++)
-        		scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (i * 4));
+				scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (i * 4));
 	}
-	
+
 	public void damage(Location zoneStart)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		List<Player> pList = utils.playersInRange(zoneStart, 40);
-		
+
 		Runnable burst = new Runnable() {
             @Override
             public void run() {
-            		for (Player player : pList)
-            		{
-            			Location pPos = player.getLocation();
-            			if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
-                		{
-            				pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, 1f, 0.7f);
-        					player.addPotionEffect((new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3)));
-        					player.addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1)));
+					for (Player player : pList)
+					{
+						Location pPos = player.getLocation();
+						if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
+						{
+							pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, 1f, 0.7f);
+							player.addPotionEffect((new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3)));
+							player.addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1)));
                          player.setFireTicks(20 * 7);
-            			}
-            		}
+						}
+					}
             }
         };
         scheduler.scheduleSyncDelayedTask(this.plugin, burst , 100L);

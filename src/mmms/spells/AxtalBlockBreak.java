@@ -10,9 +10,9 @@ import org.bukkit.entity.Entity;
 import net.md_5.bungee.api.ChatColor;
 
 public class AxtalBlockBreak {
-	
+
 	public AxtalBlockBreak()
-	{	
+	{
 	}
 
 	public boolean onSpell(CommandSender sender, String[] arg)
@@ -25,15 +25,15 @@ public class AxtalBlockBreak {
 		boolean error = false;
 		if (error)
 			return (true);
-		
+
 		spell(sender);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -54,7 +54,7 @@ public class AxtalBlockBreak {
 			animation(loc);
 		}
 	}
-	
+
 	public int check_blocks(Location loc)
 	{
 		int count = 0;
@@ -76,7 +76,7 @@ public class AxtalBlockBreak {
 		}
 		return (count);
 	}
-	
+
 	public void destroy_blocks(Location loc)
 	{
 		Location targetloc = new Location(loc.getWorld(), 0, 0, 0);
@@ -98,7 +98,7 @@ public class AxtalBlockBreak {
 			}
 		}
 	}
-	
+
 	public void animation(Location loc)
 	{
 		loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 3f, 0.6f);

@@ -18,18 +18,18 @@ import mmbf.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 
 public class DetectionCircle {
-	
+
 	private Plugin plugin;
-	
+
 	public DetectionCircle(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
 
 	Random rand = new Random();
 	int runs_left;
 	int taskID;
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 9)
@@ -38,7 +38,7 @@ public class DetectionCircle {
 			return (true);
 		}
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -65,7 +65,7 @@ public class DetectionCircle {
 		spell(center, target, radius, duration);
 		return true;
 	}
-	
+
 	public void spell(Location center, Location target, int radius, int duration)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -73,23 +73,23 @@ public class DetectionCircle {
 		Runnable loop = new Runnable()
 		{
 			@Override
-	        public void run()
+			public void run()
 			{
-	        		int  n = rand.nextInt(50) + 100;
-	        		double precision = n;
-	        		double increment = (2 * Math.PI) / precision;
-	        		Location particleLoc = new Location(center.getWorld(), 0, center.getY() + 5, 0);
-	        		double rad = radius;
-	        		double angle = 0;
-	        		for(int j = 0; j < precision; j++)
-	        		{
-	        			angle = (double)j * increment;
-	        			particleLoc.setX(center.getX() + (rad * Math.cos(angle)));
-	        			particleLoc.setZ(center.getZ() + (rad * Math.sin(angle)));
-	        			particleLoc.setY(center.getY() + 5 * (double)(rand.nextInt(120) - 60) / (60));
-	        			particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
-	        		}
-				
+					int  n = rand.nextInt(50) + 100;
+					double precision = n;
+					double increment = (2 * Math.PI) / precision;
+					Location particleLoc = new Location(center.getWorld(), 0, center.getY() + 5, 0);
+					double rad = radius;
+					double angle = 0;
+					for(int j = 0; j < precision; j++)
+					{
+						angle = (double)j * increment;
+						particleLoc.setX(center.getX() + (rad * Math.cos(angle)));
+						particleLoc.setZ(center.getZ() + (rad * Math.sin(angle)));
+						particleLoc.setY(center.getY() + 5 * (double)(rand.nextInt(120) - 60) / (60));
+						particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
+					}
+
 				for(Player player : Bukkit.getServer().getOnlinePlayers())
 				{
 					if (player.getLocation().distance(center) < radius && player.getGameMode() == GameMode.SURVIVAL)
@@ -102,7 +102,7 @@ public class DetectionCircle {
 				if (runs_left <= 0)
 					scheduler.cancelTask(taskID);
 				runs_left -= 5;
-	        	}
+				}
 		};
 		taskID = scheduler.scheduleSyncRepeatingTask(plugin, loop, 1L, 5L);
 	}

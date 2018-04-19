@@ -16,7 +16,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 
 public class SpellBossBar {
-	
+
 	Damageable mob = null;
 	BossBar bar;
 	int taskID = 0;
@@ -24,7 +24,7 @@ public class SpellBossBar {
 	MobSpell ms;
 	String events[] = new String[101];
 	int eventCursor = 100;
-	
+
 	public SpellBossBar(Main pl)
 	{
 		plugin = pl;
@@ -32,7 +32,7 @@ public class SpellBossBar {
 		for (int i = 0; i < 101; i++)
 			events[i] = "null";
 	}
-	
+
 	public void spell(Damageable target, int range)
 	{
 		mob = target;
@@ -50,7 +50,7 @@ public class SpellBossBar {
 			}
 		}
 	}
-	
+
 	public void update_bar(Damageable target, int range)
 	{
 		double maxHP = ((Attributable) target).getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
@@ -73,32 +73,32 @@ public class SpellBossBar {
 				bar.removePlayer(player);
 		}
 		double progress = target.getHealth() / maxHP;
-		
+
 		while (eventCursor > (progress * 100))
 		{
 			ms.spellCall((CommandSender)target, events[eventCursor].split(" "));
 			eventCursor--;
 		}
-		
+
 		bar.setProgress(progress);
 		bar.setTitle(target.getCustomName());
 	}
-	
+
 	public void setEvent(int id, String str)
 	{
 		events[id] = str;
 	}
-	
+
 	public void changeColor(BarColor color)
 	{
 		bar.setColor(color);
 	}
-	
+
 	public void changeStyle(BarStyle sty)
 	{
 		bar.setStyle(sty);
 	}
-	
+
 	public void remove()
 	{
 		bar.setVisible(false);

@@ -19,14 +19,14 @@ import net.md_5.bungee.api.ChatColor;
 public class AxtalMeleeMinions
 {
 	private Plugin plugin;
-	
+
 	public AxtalMeleeMinions(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 4)
@@ -55,15 +55,15 @@ public class AxtalMeleeMinions
 		}
 		if (error)
 			return (true);
-		
+
 		spell(sender, count, scope, repeats);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender, int count, int scope, int repeats)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -81,7 +81,7 @@ public class AxtalMeleeMinions
 		animation(lLoc, repeats, launcher);
 		spawn(sender, launcher, lLoc, count, scope, repeats);
 	}
-	
+
 	public void spawn(CommandSender sender, Entity esender, Location loc, int count, int scope, int repeats)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -97,17 +97,17 @@ public class AxtalMeleeMinions
 					{
 						double x = 0.5f * Math.cos(((double)rand.nextInt(628) / 100));
 						double z = 0.5f * Math.sin(((double)rand.nextInt(628) / 100));
-						skelly.setVelocity(new Vector(x, (double)0.5, z));
+						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
 			}
 		};
 		for (int i = 0; i < repeats; i++)
 		{
-    			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
+				scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
 		}
 	}
-	
+
 	public void animation (Location loc, int repeats, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -115,12 +115,12 @@ public class AxtalMeleeMinions
 			@Override
             public void run() {
 				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-        			launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-        			centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
-        			centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
+					launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+					centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
+					centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
 			}
 		};
 		for (int i = 0; i < (40 + repeats * 15) / 3; i++)
-    		scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (long)i * 3);
+			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (long)i * 3);
 	}
 }

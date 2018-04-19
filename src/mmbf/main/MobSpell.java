@@ -21,12 +21,12 @@ import mmms.spells.MaskedSummonBlazes;
 public class MobSpell implements CommandExecutor
 {
 	Main plugin;
-	
+
 	public MobSpell(Main pl)
 	{
 		plugin = pl;
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
 	{
@@ -34,11 +34,11 @@ public class MobSpell implements CommandExecutor
 				return (false);
 		return spellCall(send, args);
 	}
-	
+
 	public boolean spellCall(CommandSender send, String[] args)
 	{
 		String input = args[0].toLowerCase();
-		
+
 		switch (input)
 		{
 			case "commandspell":

@@ -17,12 +17,12 @@ import mmbf.main.Main;
 public class Utils
 {
 	Main plugin;
-	
+
 	public Utils(Plugin plugin2)
 	{
 		plugin = (Main) plugin2;
 	}
-	
+
 	public Entity calleeEntity(CommandSender sender)
 	{
 		Entity launcher = null;
@@ -36,11 +36,11 @@ public class Utils
 		}
 		return (launcher);
 	}
-	
+
 	public List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
-		
+
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
@@ -50,13 +50,13 @@ public class Utils
 		}
 		return (out);
 	}
-	
+
 	public boolean errorMsg(String str)
 	{
 		Bukkit.broadcastMessage(str);
 		return false;
 	}
-	
+
 	public Location getLocation(Location origin, String sx, String sy, String sz)
 	{
 		Location out = new Location(origin.getWorld(), 0, 0, 0);

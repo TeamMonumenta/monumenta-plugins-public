@@ -23,7 +23,7 @@ public class CAxtal
 	Main plugin;
 	Plugin spellPlug;
 	Command cmd;
-	
+
 	Utils utils = new Utils(plugin);
 	int detection_range = 200;
 	Damageable boss = null;
@@ -39,13 +39,13 @@ public class CAxtal
 						"axtal_death_ray"};
 	String passiveSpells[] = { "axtal_block_break" };
 	int spellsCD[] = {0,0,0,0,0};
-	
+
 	public CAxtal(Main pl)
 	{
 		plugin = pl;
 		ms = new MobSpell(pl);
 	}
-	
+
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -78,34 +78,34 @@ public class CAxtal
 		Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.wither.spawn master @a[r="+detection_range+"] ~ ~ ~ 10 0.7");
 		Runnable passive = new Runnable()
 		{
-	        @Override
-	        public void run()
-	        {
-	        		if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-	        			return ;
-	        		if (boss.getHealth() <= 0)
-	        		{
-	        			Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r="+detection_range+"] ~ ~ ~ 100 0.8");
-	        			ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"I am free... It ends at last. Is this was death feels like?..\",\"color\":\"dark_red\"}]").split(" "));
-	        			scheduler.cancelTask(taskIDpassive);
-	        			scheduler.cancelTask(taskIDactive);
-	        			scheduler.cancelTask(taskIDupdate);
-	        			bossBar.remove();
-	        			endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-	        		}
-	        		for (int i = 0; i < passiveSpells.length; i++)
-	        		{
-	        			ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
-	        		}
-	        }
+			@Override
+			public void run()
+			{
+					if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+						return ;
+					if (boss.getHealth() <= 0)
+					{
+						Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r="+detection_range+"] ~ ~ ~ 100 0.8");
+						ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"I am free... It ends at last. Is this was death feels like?..\",\"color\":\"dark_red\"}]").split(" "));
+						scheduler.cancelTask(taskIDpassive);
+						scheduler.cancelTask(taskIDactive);
+						scheduler.cancelTask(taskIDupdate);
+						bossBar.remove();
+						endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+					}
+					for (int i = 0; i < passiveSpells.length; i++)
+					{
+						ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+					}
+			}
 		};
 		Runnable active = new Runnable()
 		{
 			@Override
-	        public void run()
-	        {
+			public void run()
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				for (int i = 0; i < 5; i++)
 				{
 					if (spellsCD[i] > 0)
@@ -116,15 +116,15 @@ public class CAxtal
 					chosen = rand.nextInt(5);
 				spellsCD[chosen] = 3;
 				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
-	        }
+			}
 		};
 		Runnable update = new Runnable()
 		{
 			@Override
-	        public void run()
-	        {
+			public void run()
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
 				{
 					String name = entity.getCustomName();
@@ -137,12 +137,12 @@ public class CAxtal
 						}
 					}
 				}
-	        }
+			}
 		};
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
 		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 		return true;
-		
+
 	}
 }

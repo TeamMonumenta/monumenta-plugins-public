@@ -21,18 +21,18 @@ import net.md_5.bungee.api.ChatColor;
 public class MaskedEldritchBeam {
 
 	private Plugin plugin;
-	
+
 	public MaskedEldritchBeam(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
 	Utils utils = new Utils(plugin);
-	
+
 	int anim_task_id[] = new int[20];
 	int dmg_task_id[] = new int[20];
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 1)
@@ -43,15 +43,15 @@ public class MaskedEldritchBeam {
 		boolean error = false;
 		if (error)
 			return (true);
-		
+
 		spell(sender);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -74,7 +74,7 @@ public class MaskedEldritchBeam {
 			id++;
 		}
 	}
-	
+
 	public void launch(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -86,9 +86,9 @@ public class MaskedEldritchBeam {
 		};
 		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, damage, 0L, 20L);
 	}
-	
+
 	int g_sound = 0;
-	
+
 	public void animation(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -137,5 +137,5 @@ public class MaskedEldritchBeam {
 		};
 		anim_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, teleport, 0L, 2L);
 	}
-	
+
 }

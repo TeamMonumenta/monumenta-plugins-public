@@ -24,7 +24,7 @@ public class Masked_1
 {
 	Main plugin;
 	MobSpell ms;
-	
+
 	Utils utils = new Utils(plugin);
 	int detection_range = 50;
 	String targetingTag = "Masked";
@@ -39,13 +39,13 @@ public class Masked_1
 						"masked_summon_blazes"};
 	String passiveSpells[] = { "axtal_block_break" };
 	int spellsCD[] = new int[spells.length];
-	
+
 	public Masked_1(Main pl)
 	{
 		plugin = pl;
 		ms = new MobSpell(pl);
 	}
-	
+
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -74,51 +74,51 @@ public class Masked_1
 		bossBar.changeStyle(BarStyle.SOLID);
 		Runnable passive = new Runnable()
 		{
-	        @Override
-	        public void run()
-	        {
-	        		if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-	        			return ;
-	        		boss.teleport(spawnPoint.getLocation());
-	        		if (boss.getHealth() <= 0)
-	        		{
-	        			scheduler.cancelTask(taskIDpassive);
-	        			scheduler.cancelTask(taskIDactive);
-	        			scheduler.cancelTask(taskIDupdate);
-	        			bossBar.remove();
-	        			endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-	        			boss.teleport(new Location(spawnPoint.getWorld(), 0, -60, 0));
-	        		}
-	        		for (int i = 0; i < passiveSpells.length; i++)
-	        		{
-	        			ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
-	        		}
-	        		for (int j = 0; j < nearPList.size(); j++)
-	        		{
-	        			if (nearPList.get(j).getLocation().distance(boss.getLocation()) < 7)
-	        			{
-	        				nearPlistCD[j]++;
-	        				if (nearPlistCD[j] > 15)
-	        				{
-	        					Location lLoc = boss.getLocation();
-	        					Location tLoc = nearPList.get(j).getLocation();
-	        					Vector vect = new Vector(tLoc.getX() - lLoc.getX(), 0, tLoc.getZ() - lLoc.getZ());
-	        					vect.normalize().setY(0.7f).multiply(2);
-	        					nearPList.get(j).setVelocity(vect);
-	        				}
-	        			}
-	        			else
-	        				nearPlistCD[j] = 0;
-	        		}
-	        }
+			@Override
+			public void run()
+			{
+					if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+						return ;
+					boss.teleport(spawnPoint.getLocation());
+					if (boss.getHealth() <= 0)
+					{
+						scheduler.cancelTask(taskIDpassive);
+						scheduler.cancelTask(taskIDactive);
+						scheduler.cancelTask(taskIDupdate);
+						bossBar.remove();
+						endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+						boss.teleport(new Location(spawnPoint.getWorld(), 0, -60, 0));
+					}
+					for (int i = 0; i < passiveSpells.length; i++)
+					{
+						ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+					}
+					for (int j = 0; j < nearPList.size(); j++)
+					{
+						if (nearPList.get(j).getLocation().distance(boss.getLocation()) < 7)
+						{
+							nearPlistCD[j]++;
+							if (nearPlistCD[j] > 15)
+							{
+								Location lLoc = boss.getLocation();
+								Location tLoc = nearPList.get(j).getLocation();
+								Vector vect = new Vector(tLoc.getX() - lLoc.getX(), 0, tLoc.getZ() - lLoc.getZ());
+								vect.normalize().setY(0.7f).multiply(2);
+								nearPList.get(j).setVelocity(vect);
+							}
+						}
+						else
+							nearPlistCD[j] = 0;
+					}
+			}
 		};
 		Runnable active = new Runnable()
 		{
 			@Override
 			  public void run()
-	        {
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				int sps = spells.length;
 				for (int i = 0; i < sps; i++)
 				{
@@ -130,15 +130,15 @@ public class Masked_1
 					chosen = rand.nextInt(sps);
 				spellsCD[chosen] = 3;
 				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
-	        }
+			}
 		};
 		Runnable update = new Runnable()
 		{
 			@Override
-	        public void run()
-	        {
+			public void run()
+			{
 				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
-        				return ;
+						return ;
 				for (Entity entity : spawnPoint.getNearbyEntities(detection_range*2, detection_range*2, detection_range*2))
 				{
 					String name = entity.getCustomName();
@@ -151,7 +151,7 @@ public class Masked_1
 						}
 					}
 				}
-	        }
+			}
 		};
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);

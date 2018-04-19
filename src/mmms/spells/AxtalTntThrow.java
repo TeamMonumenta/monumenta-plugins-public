@@ -20,16 +20,16 @@ import org.bukkit.util.Vector;
 import net.md_5.bungee.api.ChatColor;
 
 public class AxtalTntThrow{
-	
+
 private Plugin plugin;
-	
+
 	public AxtalTntThrow(mmbf.main.Main plugin2)
-	{	
+	{
 		plugin = plugin2;
 	}
-	
+
 	Random rand = new Random();
-	
+
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 3)
@@ -52,15 +52,15 @@ private Plugin plugin;
 		}
 		if (error)
 			return (true);
-		
+
 		spell(sender, count, cooldown);
 		return true;
 	}
-	
+
 	public void spell(CommandSender sender, int count, int cooldown)
 	{
 		Entity launcher = null;
-		
+
 		if (sender instanceof Entity)
 			launcher = (Entity)sender;
 		else if (sender instanceof ProxiedCommandSender)
@@ -78,11 +78,11 @@ private Plugin plugin;
 		launch(sender, launcher, players, count, cooldown);
 		animation(launcher, count, cooldown);
 	}
-	
+
 	public List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
-		
+
 		for(Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
@@ -92,7 +92,7 @@ private Plugin plugin;
 		}
 		return (out);
 	}
-	
+
 	public void animation(Entity launcher, int count, int cooldown)
 	{
 		Location loc = launcher.getLocation();
@@ -113,11 +113,11 @@ private Plugin plugin;
 		};
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIG_ANGRY, 1, 0.77F);
 		for (int i = 0; i < (40 + count * cooldown); i++)
-    			scheduler.scheduleSyncDelayedTask(this.plugin, particles1, (long)(i));
+				scheduler.scheduleSyncDelayedTask(this.plugin, particles1, (long)(i));
 		for (int i = 0; i < count; i++)
 			scheduler.scheduleSyncDelayedTask(this.plugin, particles2, (long)(40 + i * cooldown));
 	}
-	
+
 	public void launch(CommandSender sender, Entity launcher, List<Player> plist, int count, int cooldown)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -139,7 +139,7 @@ private Plugin plugin;
 			}
 		};
 		for (int i = 0; i < count; i++)
-    		scheduler.scheduleSyncDelayedTask(this.plugin, single_launch , (long)(40 + i * cooldown));
+			scheduler.scheduleSyncDelayedTask(this.plugin, single_launch , (long)(40 + i * cooldown));
 	}
 }
 
