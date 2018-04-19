@@ -7,4 +7,88 @@
             <fileset file="plugin.yml"></fileset>
         </jar>
     </target>
+
+	<tstamp>
+		<format property="TODAY" pattern="yyyyMMdd-HHmmss"  locale="en,US" />
+	</tstamp>
+
+	<available file="utils" property="pmd.exists" value="anything"/>
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Monumenta_BossFights.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="api/spigot-api-1.12-R0.1-SNAPSHOT-shaded.jar"/>
+    </path>
+
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+
+    <target name="build-subprojects"/>
+
+	<target name="pmd" if="pmd.exists">
+		<path id="pmd.classpath">
+			<pathelement location="${basedir}"/>
+			<fileset dir="utils/pmd-bin-5.8.1/lib/">
+				<include name="*.jar"/>
+			</fileset>
+		</path>
+
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
+		<pmd rulesetfiles="java-imports,java-unusedcode">
+			<sourceLanguage name="java" version="1.8"/>
+			<formatter type="text" toConsole="true"/>
+			<fileset dir="src">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+
+	<target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+			<compilerarg line="-encoding ISO-8859-1"/>
+			<compilerarg line="-Xlint:all"/>
+			<compilerarg line="-Xmaxwarns"/>
+			<compilerarg line="9999"/>
+            <src path="src"/>
+            <classpath refid="Monumenta_BossFights.classpath"/>
+        </javac>
+    </target>
+
+	<target name="jar">
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+			<arg value="describe"/>
+			<arg value="--tags"/>
+			<arg value="--always"/>
+			<arg value="--dirty"/>
+		</exec>
+		<condition property="repository.version" value="${git.revision}" else="unknown">
+			<and>
+				<isset property="git.revision"/>
+				<length string="${git.revision}" trim="yes" length="0" when="greater"/>
+			</and>
+		</condition>
+		<mkdir dir="bin"/>
+		<jar destfile="out/Monumenta_BossFights_${repository.version}_${TODAY}.jar" basedir="bin/">
+			<manifest>
+				<attribute name="Main-Class" value="pe.project.Plugin"/>
+			</manifest>
+			<zipfileset dir="./" includes="plugin.yml" fullpath="plugin.yml"/>
+		</jar>
+    </target>
 </project>
