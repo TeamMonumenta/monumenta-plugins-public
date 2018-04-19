@@ -118,8 +118,10 @@ public class Masked_1
 			@Override
 			public void run()
 			{
+				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
+					return;
+
 				int sps = spells.length;
 				for (int i = 0; i < sps; i++)
 				{
@@ -138,20 +140,11 @@ public class Masked_1
 			@Override
 			public void run()
 			{
+				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
-				for (Entity entity : spawnPoint.getNearbyEntities(detection_range * 2, detection_range * 2, detection_range * 2))
-				{
-					String name = entity.getCustomName();
-					if (name != null)
-					{
-						if (entity.getCustomName().equalsIgnoreCase(mobName))
-						{
-							boss = (Damageable)entity;
-							bossBar.update_bar(boss, detection_range);
-						}
-					}
-				}
+					return;
+
+				bossBar.update_bar(boss, detection_range);
 			}
 		};
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);

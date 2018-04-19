@@ -82,8 +82,10 @@ public class CAxtal
 			@Override
 			public void run()
 			{
+				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
+					return;
+
 				if (boss.getHealth() <= 0)
 				{
 					Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r=" + detection_range + "] ~ ~ ~ 100 0.8");
@@ -105,8 +107,10 @@ public class CAxtal
 			@Override
 			public void run()
 			{
+				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
+					return;
+
 				for (int i = 0; i < 5; i++)
 				{
 					if (spellsCD[i] > 0)
@@ -124,20 +128,11 @@ public class CAxtal
 			@Override
 			public void run()
 			{
+				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return ;
-				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
-				{
-					String name = entity.getCustomName();
-					if (name != null)
-					{
-						if (entity.getCustomName().equalsIgnoreCase("§4§lC'Axtal"))
-						{
-							boss = (Damageable)entity;
-							bossBar.update_bar(boss, detection_range);
-						}
-					}
-				}
+					return;
+
+				bossBar.update_bar(boss, detection_range);
 			}
 		};
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
