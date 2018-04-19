@@ -63,7 +63,7 @@ public class CAxtal
 		}
 		Bukkit.getServer().dispatchCommand(send, "summon minecraft:wither_skeleton ~ ~20 ~ {Attributes:[{Base:0.25d,Name:\"generic.movementSpeed\"},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:64.0d,Name:\"generic.followRange\"},{Base:2.0d,Name:\"generic.attackDamage\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:1b,Spigot.ticksLived:145,Tags:[\"Tlax\"],Motion:[0.0d,0.0d,0.0d],Leashed:0b,Health:" + bossTargetHp + ".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"§4§lShaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"§4§lC'Axtal\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"c659cdd4-e436-4977-a6a7-d5518ebecfbb\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE2MzE0ZWFjMzQ0MTZjZTEwYWIyMmMyZTFjNGRjYjQ3MmEzZmViOThkNGUwNGQzZmJiYjg1YTlhNDcxYjE4In19fQ==\"}]}},AttributeModifiers:[]},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
 		List<Entity> lel = spawnPoint.getNearbyEntities(0.1, 20.1, 0.1);
-		if (lel.get(0) instanceof Damageable)
+		if (lel != null && !lel.isEmpty() && lel.get(0) instanceof Damageable)
 			boss = (Damageable)(lel.get(0));
 		else
 			return (utils.errorMsg("Something went wrong with the bossfight, if it keeps happening, please contact a mod"));
@@ -82,7 +82,7 @@ public class CAxtal
 			@Override
 			public void run()
 			{
-				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return ;
 				if (boss.getHealth() <= 0)
 				{
@@ -105,7 +105,7 @@ public class CAxtal
 			@Override
 			public void run()
 			{
-				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return ;
 				for (int i = 0; i < 5; i++)
 				{
@@ -124,7 +124,7 @@ public class CAxtal
 			@Override
 			public void run()
 			{
-				if (utils.playersInRange(boss.getLocation(), detection_range).get(0) == null)
+				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return ;
 				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
 				{
