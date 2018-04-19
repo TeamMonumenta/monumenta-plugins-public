@@ -18,7 +18,8 @@ import org.bukkit.util.Vector;
 import mmbf.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 
-public class MaskedEldritchBeam {
+public class MaskedEldritchBeam
+{
 
 	private Plugin plugin;
 
@@ -78,11 +79,13 @@ public class MaskedEldritchBeam {
 	public void launch(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable damage = new Runnable() {
+		Runnable damage = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				target.damage(3f);
-				}
+			}
 		};
 		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, damage, 0L, 20L);
 	}
@@ -92,9 +95,11 @@ public class MaskedEldritchBeam {
 	public void animation(Entity launcher, Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable() {
+		Runnable teleport = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				tarLoc.getWorld().playSound(tarLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 80f) * 1.5f));

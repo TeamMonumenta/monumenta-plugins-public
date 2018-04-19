@@ -41,7 +41,7 @@ public class Utils
 	{
 		List<Player> out = new ArrayList<Player>();
 
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
 			{
@@ -67,7 +67,7 @@ public class Utils
 				out.setX(origin.getX());
 				char[] tmp = sx.toCharArray();
 				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i+1];
+					tmp[i] = tmp[i + 1];
 				tmp[tmp.length - 1] = 0;
 				sx = String.valueOf(tmp);
 			}
@@ -84,7 +84,7 @@ public class Utils
 				out.setY(origin.getY());
 				char[] tmp = sy.toCharArray();
 				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i+1];
+					tmp[i] = tmp[i + 1];
 				tmp[tmp.length - 1] = 0;
 				sy = String.valueOf(tmp);
 			}
@@ -101,7 +101,7 @@ public class Utils
 				out.setZ(origin.getZ());
 				char[] tmp = sz.toCharArray();
 				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i+1];
+					tmp[i] = tmp[i + 1];
 				tmp[tmp.length - 1] = 0;
 				sz = String.valueOf(tmp);
 			}

@@ -24,20 +24,20 @@ public class BossFight implements CommandExecutor
 		if (args.length < 4)
 			return (false);
 		Utils utils = new Utils(plugin);
-		Location endLoc = utils.getLocation(utils.calleeEntity(send).getLocation() ,args[1], args[2], args[3]);
+		Location endLoc = utils.getLocation(utils.calleeEntity(send).getLocation() , args[1], args[2], args[3]);
 		String input = args[0].toLowerCase();
 
 		switch (input)
 		{
-			case "caxtal":
-				(new CAxtal(plugin)).spawn(send, endLoc);
-				break;
-			case "masked_1":
-				(new Masked_1(plugin)).spawn(send, endLoc);
-				break;
-			case "masked_2":
-				(new Masked_2(plugin)).spawn(send, endLoc);
-				break;
+		case "caxtal":
+			(new CAxtal(plugin)).spawn(send, endLoc);
+			break;
+		case "masked_1":
+			(new Masked_1(plugin)).spawn(send, endLoc);
+			break;
+		case "masked_2":
+			(new Masked_2(plugin)).spawn(send, endLoc);
+			break;
 		}
 		return true;
 	}

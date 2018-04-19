@@ -94,9 +94,11 @@ public class AxtalRangedFlyingMinions
 	public void spawn(CommandSender sender, Entity esender, Location loc, int count, int scope, int repeats, int duration)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_spawn = new Runnable() {
+		Runnable single_spawn = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				int nb_to_spawn = count + (rand.nextInt(2 * scope) - scope);
 				for (int j = 0; j < nb_to_spawn; j++)
 				{
@@ -119,33 +121,35 @@ public class AxtalRangedFlyingMinions
 		};
 		for (int i = 0; i < repeats; i++)
 		{
-				scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
+			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
 		}
 	}
 
-	public void animation (Location loc, int repeats, Entity launcher)
+	public void animation(Location loc, int repeats, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable anim_loop = new Runnable() {
+		Runnable anim_loop = new Runnable()
+		{
 			@Override
-            public void run() {
-				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-					Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
-					launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-					centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_GHAST_AMBIENT, 1f, 0.5f);
-					for(int j = 0; j < 5; j++)
+			public void run()
+			{
+				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+				Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
+				launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+				centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_GHAST_AMBIENT, 1f, 0.5f);
+				for (int j = 0; j < 5; j++)
+				{
+					while (particleLoc.distance(centerLoc) > 2)
 					{
-						while (particleLoc.distance(centerLoc) > 2)
-						{
-							particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-							particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-							particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-						}
-						particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, particleLoc, 4, 0, 0, 0, 0.01);
-						particleLoc.setX(0);
-						particleLoc.setY(0);
-						particleLoc.setZ(0);
+						particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
 					}
+					particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, particleLoc, 4, 0, 0, 0, 0.01);
+					particleLoc.setX(0);
+					particleLoc.setY(0);
+					particleLoc.setZ(0);
+				}
 			}
 		};
 		for (int i = 0; i < (40 + repeats * 15) / 3; i++)

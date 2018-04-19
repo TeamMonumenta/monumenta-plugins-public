@@ -19,9 +19,10 @@ import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class AxtalTntThrow{
+public class AxtalTntThrow
+{
 
-private Plugin plugin;
+	private Plugin plugin;
 
 	public AxtalTntThrow(mmbf.main.Main plugin2)
 	{
@@ -83,7 +84,7 @@ private Plugin plugin;
 	{
 		List<Player> out = new ArrayList<Player>();
 
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
 			{
@@ -97,23 +98,27 @@ private Plugin plugin;
 	{
 		Location loc = launcher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable particles1 = new Runnable() {
+		Runnable particles1 = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				launcher.teleport(loc);
 				loc.getWorld().spawnParticle(Particle.LAVA, loc, 4, 0, 0, 0, 0.01);
 			}
 		};
-		Runnable particles2 = new Runnable() {
+		Runnable particles2 = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07);
 				loc.getWorld().playSound(loc, Sound.ENTITY_IRONGOLEM_HURT, 1, 0.77F);
 			}
 		};
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIG_ANGRY, 1, 0.77F);
 		for (int i = 0; i < (40 + count * cooldown); i++)
-				scheduler.scheduleSyncDelayedTask(this.plugin, particles1, (long)(i));
+			scheduler.scheduleSyncDelayedTask(this.plugin, particles1, (long)(i));
 		for (int i = 0; i < count; i++)
 			scheduler.scheduleSyncDelayedTask(this.plugin, particles2, (long)(40 + i * cooldown));
 	}
@@ -121,9 +126,11 @@ private Plugin plugin;
 	public void launch(CommandSender sender, Entity launcher, List<Player> plist, int count, int cooldown)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_launch = new Runnable() {
+		Runnable single_launch = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Player Target = plist.get(rand.nextInt(plist.size()));
 				Location SLoc = launcher.getLocation();
 				SLoc.setY(SLoc.getY() + 1.7f);
@@ -133,7 +140,7 @@ private Plugin plugin;
 				Location pLoc = Target.getLocation();
 				Location tLoc = tnt.get(0).getLocation();
 				Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-				vect.normalize().multiply((pLoc.distance(tLoc))/20).setY(0.7f);
+				vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
 				tnt.get(0).setVelocity(vect);
 				tnt.get(1).setVelocity(vect);
 			}

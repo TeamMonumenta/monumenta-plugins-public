@@ -15,7 +15,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 
-public class SpellBossBar {
+public class SpellBossBar
+{
 
 	Damageable mob = null;
 	BossBar bar;
@@ -40,9 +41,9 @@ public class SpellBossBar {
 		mob.setHealth(maxHP);
 		bar = Bukkit.getServer().createBossBar(target.getCustomName(), BarColor.RED, BarStyle.SEGMENTED_10, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
-        bar.setProgress(mob.getHealth() / maxHP);
-        System.out.println(mob.getCustomName());
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		bar.setProgress(mob.getHealth() / maxHP);
+		System.out.println(mob.getCustomName());
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(mob.getLocation()) < range)
 			{
@@ -63,7 +64,7 @@ public class SpellBossBar {
 				eventCursor--;
 			}
 		}
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(target.getLocation()) < range)
 			{

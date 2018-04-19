@@ -67,9 +67,11 @@ public class MaskedSummonBlazes
 	public void spawn(CommandSender sender, Entity esender, Location loc, int count, int repeats)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_spawn = new Runnable() {
+		Runnable single_spawn = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				for (int j = 0; j < count; j++)
 				{
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon blaze " + loc.getX() + " " + loc.getY() + " " + loc.getZ());
@@ -87,33 +89,35 @@ public class MaskedSummonBlazes
 		};
 		for (int i = 0; i < repeats; i++)
 		{
-				scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(45 + 5 * i));
+			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(45 + 5 * i));
 		}
 	}
 
-	public void animation (Location loc, int repeats, Entity launcher)
+	public void animation(Location loc, int repeats, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable anim_loop = new Runnable() {
+		Runnable anim_loop = new Runnable()
+		{
 			@Override
-            public void run() {
-				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-					Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
-					launcher.teleport(loc);
-					centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 2f);
-					for(int j = 0; j < 5; j++)
+			public void run()
+			{
+				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+				Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
+				launcher.teleport(loc);
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 2f);
+				for (int j = 0; j < 5; j++)
+				{
+					while (particleLoc.distance(centerLoc) > 2)
 					{
-						while (particleLoc.distance(centerLoc) > 2)
-						{
-							particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-							particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-							particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-						}
-						particleLoc.getWorld().spawnParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01);
-						particleLoc.setX(0);
-						particleLoc.setY(0);
-						particleLoc.setZ(0);
+						particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
 					}
+					particleLoc.getWorld().spawnParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01);
+					particleLoc.setX(0);
+					particleLoc.setY(0);
+					particleLoc.setZ(0);
+				}
 			}
 		};
 		for (int i = 0; i < (45) / 3; i++)

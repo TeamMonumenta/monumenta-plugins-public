@@ -19,7 +19,8 @@ import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class AxtalSneakup {
+public class AxtalSneakup
+{
 
 	private Plugin plugin;
 
@@ -72,7 +73,7 @@ public class AxtalSneakup {
 	{
 		List<Player> out = new ArrayList<Player>();
 
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
 			{
@@ -85,9 +86,11 @@ public class AxtalSneakup {
 	public void launch(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable() {
+		Runnable teleport = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Location newloc = target.getLocation();
 				Vector vect = newloc.getDirection().multiply(-3.0f);
 				newloc.add(vect).setY(target.getLocation().getY() + 0.1f);
@@ -101,15 +104,19 @@ public class AxtalSneakup {
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
-		Runnable teleport = new Runnable() {
+		Runnable teleport = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Launcher.getWorld().playSound(Launcher.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 3f, 0.7f);
 			}
 		};
-		Runnable particle = new Runnable() {
+		Runnable particle = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Location particleLoc = Launcher.getLocation().add(new Location(Launcher.getWorld(), -0.5f, 0f, 0.5f));
 				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
 			}

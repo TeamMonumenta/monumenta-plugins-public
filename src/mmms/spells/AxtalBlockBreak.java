@@ -9,7 +9,8 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import net.md_5.bungee.api.ChatColor;
 
-public class AxtalBlockBreak {
+public class AxtalBlockBreak
+{
 
 	public AxtalBlockBreak()
 	{

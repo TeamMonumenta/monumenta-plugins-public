@@ -19,7 +19,8 @@ import org.bukkit.util.Vector;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class AxtalDeathRay {
+public class AxtalDeathRay
+{
 
 	private Plugin plugin;
 
@@ -73,7 +74,7 @@ public class AxtalDeathRay {
 	{
 		List<Player> out = new ArrayList<Player>();
 
-		for(Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
 			{
@@ -86,9 +87,11 @@ public class AxtalDeathRay {
 	public void launch(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable() {
+		Runnable teleport = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				Vector vect = new Vector(tarLoc.getX() - launLoc.getX(), tarLoc.getY() - launLoc.getY(), tarLoc.getZ() - launLoc.getZ());
@@ -136,9 +139,11 @@ public class AxtalDeathRay {
 	public void animation(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable() {
+		Runnable teleport = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				tarLoc.getWorld().playSound(tarLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 200f) * 1.5f));

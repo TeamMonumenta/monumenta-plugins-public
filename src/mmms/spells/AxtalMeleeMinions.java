@@ -85,9 +85,11 @@ public class AxtalMeleeMinions
 	public void spawn(CommandSender sender, Entity esender, Location loc, int count, int scope, int repeats)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_spawn = new Runnable() {
+		Runnable single_spawn = new Runnable()
+		{
 			@Override
-            public void run() {
+			public void run()
+			{
 				int nb_to_spawn = count + (rand.nextInt(2 * scope) - scope);
 				for (int j = 0; j < nb_to_spawn; j++)
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"Soul\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skull\",Count:1b}],ArmorDropChances:[0.085F,0.085F,-327.67F,-327.67F],Attributes:[{Name:generic.maxHealth,Base:10},{Name:generic.attackDamage,Base:6}],Health:10.0f,DeathLootTable:\"empty\",ActiveEffects:[{Id:14,Amplifier:0,Duration:222220,ShowParticles:0b}],Team:\"Tlax\"}");
@@ -104,20 +106,22 @@ public class AxtalMeleeMinions
 		};
 		for (int i = 0; i < repeats; i++)
 		{
-				scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
+			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
 		}
 	}
 
-	public void animation (Location loc, int repeats, Entity launcher)
+	public void animation(Location loc, int repeats, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable anim_loop = new Runnable() {
+		Runnable anim_loop = new Runnable()
+		{
 			@Override
-            public void run() {
-				Location centerLoc = new Location (loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-					launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-					centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
-					centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
+			public void run()
+			{
+				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+				launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
+				centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
 			}
 		};
 		for (int i = 0; i < (40 + repeats * 15) / 3; i++)
