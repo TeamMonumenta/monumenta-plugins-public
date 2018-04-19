@@ -25,6 +25,7 @@ public class ItemOverrides {
 	public static EnumSet<Material> ALLOW_LORE_MATS = EnumSet.of(
 		Material.ANVIL,
 		Material.CHEST,
+		Material.BANNER,
 		Material.ENDER_CHEST,
 		Material.PACKED_ICE,
 		Material.WOOL,
