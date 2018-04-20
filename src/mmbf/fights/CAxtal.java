@@ -79,7 +79,7 @@ public class CAxtal
 				if (boss.getHealth() <= 0)
 				{
 					Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r=" + detection_range + "] ~ ~ ~ 100 0.8");
-					ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"I am free... It ends at last. Is this what death feels like?..\",\"color\":\"dark_red\"}]").split(" "));
+					ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]").split(" "));
 					scheduler.cancelTask(taskIDpassive);
 					scheduler.cancelTask(taskIDactive);
 					scheduler.cancelTask(taskIDupdate);
@@ -119,7 +119,7 @@ public class CAxtal
 						}
 					}
 				}
-				
+
 				int chosen = rand.nextInt(5);
 				while (spellsCD[chosen] > 0)
 					chosen = rand.nextInt(5);
