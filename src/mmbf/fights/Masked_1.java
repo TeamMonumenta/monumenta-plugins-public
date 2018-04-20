@@ -40,7 +40,7 @@ public class Masked_1
 	int taskIDupdate = 0;
 	Random rand = new Random();
 	String spells[] = { "masked_eldritch_beam",
-	                    "commandspell execute @e[tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 2",
+	                    "custom_1",
 	                    "masked_summon_blazes"
 	                  };
 	String passiveSpells[] = { "axtal_block_break" };
@@ -149,7 +149,13 @@ public class Masked_1
 				while (spellsCD[chosen] > 0)
 					chosen = rand.nextInt(sps);
 				spellsCD[chosen] = 3;
-				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
+				if (spells[chosen].equalsIgnoreCase("custom_1"))
+				{
+					Location bossLoc = boss.getLocation();
+					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + bossLoc.getX() + ",y=" + bossLoc.getY() + ",z=" + bossLoc.getZ() + ",r=" + detection_range + "tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
+				}
+				else
+					ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
 			}
 		};
 
@@ -161,8 +167,6 @@ public class Masked_1
 				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
-
-				bossBar.update_bar(boss, detection_range);
 			}
 		};
 
