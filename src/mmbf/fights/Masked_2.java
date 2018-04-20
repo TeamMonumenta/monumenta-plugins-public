@@ -137,6 +137,7 @@ public class Masked_2
 				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
+				bossBar.update_bar(boss, detection_range);
 			}
 		};
 

@@ -106,6 +106,20 @@ public class CAxtal
 					if (spellsCD[i] > 0)
 						spellsCD[i]--;
 				}
+				// preventing lose of hook
+				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
+				{
+					String name = entity.getCustomName();
+					if (name != null)
+					{
+						if (entity.getCustomName().equalsIgnoreCase(mobName))
+						{
+							boss = (Damageable)entity;
+							bossBar.update_bar(boss, detection_range);
+						}
+					}
+				}
+				
 				int chosen = rand.nextInt(5);
 				while (spellsCD[chosen] > 0)
 					chosen = rand.nextInt(5);
@@ -121,6 +135,7 @@ public class CAxtal
 				/* Don't progress if players aren't present */
 				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
+				bossBar.update_bar(boss, detection_range);
 			}
 		};
 
