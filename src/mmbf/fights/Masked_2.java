@@ -1,20 +1,21 @@
 package mmbf.fights;
 
-import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import mmbf.main.Main;
 import mmbf.main.MobSpell;
+
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
@@ -60,15 +61,8 @@ public class Masked_2
 			player_count--;
 		}
 		Bukkit.getServer().dispatchCommand(send, "summon wither_skeleton ~ ~1 ~ {CustomName:\"" + mobName + "\",Tags:[\"" + targetingTag + "\"],ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:diamond_leggings\",Count:1b},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:skull\",Damage:3,Count:1b,tag:{SkullOwner:{Id:\"bf8d8d03-3eb1-4fa0-9e32-ab87363f2106\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2NhMmM4YTE4NWE5NmQ1NzQ4ZmVlZTgyZGQ2NzMxOWI3OGM3MTgzN2Y0MWI0ZWVkNWU2NmU4MDJjYjViYiJ9fX0=\"}]}}}}],HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{display:{Name:\"Arcane Gladius\"},ench:[{id:16,lvl:1},{id:19,lvl:1}]}},{}],ArmorDropChances:[-327.67F,-327.67F,-327.67F,-327.67F],Attributes:[{Name:generic.movementSpeed,Base:0.3},{Name:generic.followRange,Base:60},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Health:" + bossTargetHp + ",PersistenceRequired:1,Team:\"mask\",DeathLootTable:\"empty\"}");
-		List<Entity> lel = spawnPoint.getNearbyEntities(0.1, 3.1, 0.1);
-		if (lel != null && !lel.isEmpty() && lel.get(0) instanceof Damageable)
-			boss = (Damageable)(lel.get(0));
-		else
-			return (utils.errorMsg("Something went wrong with the bossfight, if it keeps happening, please contact a mod"));
 		SpellBossBar bossBar = new SpellBossBar(plugin);
-		bossBar.spell(boss, detection_range);
-		bossBar.changeColor(BarColor.RED);
-		bossBar.changeStyle(BarStyle.SOLID);
+
 		Runnable passive = new Runnable()
 		{
 			@Override
@@ -136,9 +130,50 @@ public class Masked_2
 				bossBar.update_bar(boss, detection_range);
 			}
 		};
-		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
-		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
-		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+
+		/* Only start the boss finder task, which launches the rest */
+		new BukkitRunnable()
+		{
+			int failcount = 0;
+
+			@Override
+			public void run()
+			{
+				failcount++;
+
+				for (Entity entity : spawnPoint.getNearbyEntities(detection_range, detection_range, detection_range))
+				{
+					String name = entity.getCustomName();
+					if (name != null)
+					{
+						if (name.equalsIgnoreCase(mobName))
+						{
+							boss = (Damageable)entity;
+						}
+					}
+				}
+
+				/* Found the boss entity - start the rest of the fight */
+				if (boss != null)
+				{
+					bossBar.spell(boss, detection_range);
+					bossBar.changeColor(BarColor.RED);
+					bossBar.changeStyle(BarStyle.SOLID);
+
+					taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
+					taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
+					taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+					this.cancel();
+				}
+
+				/* If the boss hasn't been summoned by now, abort the entire fight */
+				if (failcount > 50)
+				{
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 0, 1);
+
 		return true;
 	}
 }

@@ -1,22 +1,26 @@
 package mmbf.fights;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import mmbf.main.Main;
 import mmbf.main.MobSpell;
+
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
@@ -62,19 +66,13 @@ public class Masked_1
 			player_count--;
 		}
 		Bukkit.getServer().dispatchCommand(send, "summon wither_skeleton ~ ~1 ~ {CustomName:\"" + mobName + "\",Tags:[\"" + targetingTag + "\"],ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:diamond_leggings\",Count:1b},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:skull\",Damage:3,Count:1b,tag:{SkullOwner:{Id:\"bf8d8d03-3eb1-4fa0-9e32-ab87363f2106\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2NhMmM4YTE4NWE5NmQ1NzQ4ZmVlZTgyZGQ2NzMxOWI3OGM3MTgzN2Y0MWI0ZWVkNWU2NmU4MDJjYjViYiJ9fX0=\"}]}}}}],HandItems:[{id:\"minecraft:bow\",Count:1b,tag:{display:{Name:\"§8§lShadow's Flames\"},ench:[{id:48,lvl:2},{id:49,lvl:1},{id:50,lvl:1}]}},{}],ArmorDropChances:[-327.67F,-327.67F,-327.67F,-327.67F],Attributes:[{Name:generic.knockbackResistance,Base:1},{Name:generic.movementSpeed,Base:0.0},{Name:generic.followRange,Base:60},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Health:" + bossTargetHp + ",PersistenceRequired:1,Team:\"mask\",DeathLootTable:\"empty\"}");
-		List<Entity> lel = spawnPoint.getNearbyEntities(0.1, 3.1, 0.1);
-		if (lel != null && !lel.isEmpty() && lel.get(0) instanceof Damageable)
-			boss = (Damageable)(lel.get(0));
-		else
-			return (utils.errorMsg("Something went wrong with the bossfight, if it keeps happening, please contact a mod"));
 		SpellBossBar bossBar = new SpellBossBar(plugin);
-		List<Player> nearPList = utils.playersInRange(spawnPoint.getLocation(), 100);
-		int[] nearPlistCD = new int[nearPList.size()];
-		bossBar.spell(boss, detection_range);
-		bossBar.changeColor(BarColor.WHITE);
-		bossBar.changeStyle(BarStyle.SOLID);
+
 		Runnable passive = new Runnable()
 		{
+			/* Tracks how long players have been too close to the boss */
+			Map<UUID, Integer> playerNearTime = new HashMap<UUID, Integer>();
+
 			@Override
 			public void run()
 			{
@@ -107,25 +105,30 @@ public class Masked_1
 				{
 					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
 				}
-				for (int j = 0; j < nearPList.size(); j++)
+
+				/* Push players away that have been too close for too long */
+				for (Player player : utils.playersInRange(boss.getLocation(), detection_range))
 				{
-					if (nearPList.get(j).getLocation().distance(boss.getLocation()) < 7)
-					{
-						nearPlistCD[j]++;
-						if (nearPlistCD[j] > 15)
-						{
+					Integer nearTime = 0;
+					Location pLoc = player.getLocation();
+					if (pLoc.distance(boss.getLocation()) < 7) {
+						nearTime = playerNearTime.get(player.getUniqueId());
+						if (nearTime == null) {
+							nearTime = 0;
+						}
+						nearTime++;
+						if (nearTime > 15) {
 							Location lLoc = boss.getLocation();
-							Location tLoc = nearPList.get(j).getLocation();
-							Vector vect = new Vector(tLoc.getX() - lLoc.getX(), 0, tLoc.getZ() - lLoc.getZ());
+							Vector vect = new Vector(pLoc.getX() - lLoc.getX(), 0, pLoc.getZ() - lLoc.getZ());
 							vect.normalize().setY(0.7f).multiply(2);
-							nearPList.get(j).setVelocity(vect);
+							player.setVelocity(vect);
 						}
 					}
-					else
-						nearPlistCD[j] = 0;
+					playerNearTime.put(player.getUniqueId(), nearTime);
 				}
 			}
 		};
+
 		Runnable active = new Runnable()
 		{
 			@Override
@@ -148,6 +151,7 @@ public class Masked_1
 				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
 			}
 		};
+
 		Runnable update = new Runnable()
 		{
 			@Override
@@ -160,9 +164,50 @@ public class Masked_1
 				bossBar.update_bar(boss, detection_range);
 			}
 		};
-		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
-		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
-		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+
+		/* Only start the boss finder task, which launches the rest */
+		new BukkitRunnable()
+		{
+			int failcount = 0;
+
+			@Override
+			public void run()
+			{
+				failcount++;
+
+				for (Entity entity : spawnPoint.getNearbyEntities(detection_range, detection_range, detection_range))
+				{
+					String name = entity.getCustomName();
+					if (name != null)
+					{
+						if (name.equalsIgnoreCase(mobName))
+						{
+							boss = (Damageable)entity;
+						}
+					}
+				}
+
+				/* Found the boss entity - start the rest of the fight */
+				if (boss != null)
+				{
+					bossBar.spell(boss, detection_range);
+					bossBar.changeColor(BarColor.WHITE);
+					bossBar.changeStyle(BarStyle.SOLID);
+
+					taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
+					taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
+					taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+					this.cancel();
+				}
+
+				/* If the boss hasn't been summoned by now, abort the entire fight */
+				if (failcount > 50)
+				{
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 0, 1);
+
 		return true;
 	}
 }
