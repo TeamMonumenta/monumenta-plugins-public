@@ -40,7 +40,7 @@ public class Masked_1
 	int taskIDupdate = 0;
 	Random rand = new Random();
 	String spells[] = { "masked_eldritch_beam",
-	                    "commandspell execute @e[tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 1",
+	                    "commandspell execute @e[tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 2",
 	                    "masked_summon_blazes"
 	                  };
 	String passiveSpells[] = { "axtal_block_break" };
