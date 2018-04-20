@@ -28,7 +28,7 @@ public class Masked_2
 	Utils utils = new Utils(plugin);
 	int detection_range = 50;
 	String targetingTag = "Masked";
-	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Masked Man";
+	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Masked Man" + ChatColor.RED;
 	Damageable boss = null;
 	int taskIDpassive = 0;
 	int taskIDactive = 0;
