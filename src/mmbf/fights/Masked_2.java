@@ -95,6 +95,10 @@ public class Masked_2
 				{
 					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
 				}
+				/* if boss is in water, tp to center*/
+				if (boss.getLocation().getY() < 157)
+					boss.teleport(spawnPoint);
+					
 			}
 		};
 		Runnable active = new Runnable()
