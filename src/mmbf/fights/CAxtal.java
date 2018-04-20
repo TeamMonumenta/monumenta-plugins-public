@@ -3,6 +3,7 @@ package mmbf.fights;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
@@ -27,7 +28,7 @@ public class CAxtal
 
 	Utils utils = new Utils(plugin);
 	int detection_range = 200;
-	String mobName = "§4§lC'Axtal";
+	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "C'Axtal";
 	Damageable boss = null;
 	int taskIDpassive = 0;
 	int taskIDactive = 0;

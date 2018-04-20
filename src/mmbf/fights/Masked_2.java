@@ -5,6 +5,7 @@ import java.util.Random;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -27,7 +28,7 @@ public class Masked_2
 	Utils utils = new Utils(plugin);
 	int detection_range = 50;
 	String targetingTag = "Masked";
-	String mobName = "§4§lMasked Man";
+	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Masked Man";
 	Damageable boss = null;
 	int taskIDpassive = 0;
 	int taskIDactive = 0;
