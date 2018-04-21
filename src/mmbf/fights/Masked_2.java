@@ -98,7 +98,7 @@ public class Masked_2
 				/* if boss is in water, tp to center*/
 				if (boss.getLocation().getY() < 157)
 					boss.teleport(spawnPoint);
-					
+
 			}
 		};
 		Runnable active = new Runnable()
@@ -123,7 +123,11 @@ public class Masked_2
 				if (spells[chosen].equalsIgnoreCase("custom_1"))
 				{
 					Location bossLoc = boss.getLocation();
-					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + bossLoc.getX() + ",y=" + bossLoc.getY() + ",z=" + bossLoc.getZ() + ",r=" + detection_range + "tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
+					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + (int)bossLoc.getX() +
+					                                   ",y=" + (int)bossLoc.getY() +
+													   ",z=" + (int)bossLoc.getZ() +
+													   ",r=" + detection_range +
+													   ",tag=MaskedSpawn,c=1] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
 				}
 				else
 					ms.spellCall((CommandSender)boss, spells[chosen].split(" "));

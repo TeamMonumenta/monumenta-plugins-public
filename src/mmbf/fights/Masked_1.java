@@ -129,7 +129,6 @@ public class Masked_1
 				}
 			}
 		};
-
 		Runnable active = new Runnable()
 		{
 			@Override
@@ -152,13 +151,16 @@ public class Masked_1
 				if (spells[chosen].equalsIgnoreCase("custom_1"))
 				{
 					Location bossLoc = boss.getLocation();
-					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + bossLoc.getX() + ",y=" + bossLoc.getY() + ",z=" + bossLoc.getZ() + ",r=" + detection_range + "tag=MaskedSpawn] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
+					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + (int)bossLoc.getX() +
+					                                   ",y=" + (int)bossLoc.getY() +
+													   ",z=" + (int)bossLoc.getZ() +
+													   ",r=" + detection_range +
+													   ",tag=MaskedSpawn,c=1] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
 				}
 				else
 					ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
 			}
 		};
-
 		Runnable update = new Runnable()
 		{
 			@Override
