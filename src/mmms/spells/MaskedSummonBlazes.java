@@ -59,7 +59,7 @@ public class MaskedSummonBlazes
 		}
 		Utils utils = new Utils(plugin);
 		Location lLoc = launcher.getLocation();
-		int count = utils.playersInRange(launcher.getLocation(), 140d).size();
+		int count = utils.playersInRange(launcher.getLocation(), 25).size();
 		count = count >= 3 ? 4 : count;
 		animation(lLoc, 2, launcher);
 		spawn(sender, launcher, lLoc, count, 2);
