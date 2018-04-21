@@ -171,11 +171,16 @@ public class CAxtal
 				/* Found the boss entity - start the rest of the fight */
 				if (boss != null)
 				{
+					//create bossbar
 					bossBar.spell(boss, detection_range);
-					bossBar.setEvent(100, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(50, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(25, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(10, "commandspell execute @e[tag=Tlax] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]");
+					//schedule hp messages
+					String loc = "x=" + (int)boss.getLocation().getX() + ",y=" + (int)boss.getLocation().getY() + ",z=" + (int)boss.getLocation().getZ() + ",r=" + detection_range + "";
+					bossBar.setEvent(100, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]");
+					bossBar.setEvent(50, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]");
+					bossBar.setEvent(25, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]");
+					bossBar.setEvent(10, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]");
+					
+					//launch event related spawn commands
 					Bukkit.getServer().dispatchCommand(send, "effect @a[r=" + detection_range + "] minecraft:blindness 2 2");
 					Bukkit.getServer().dispatchCommand(send, "title @a[r=" + detection_range + "] title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
 					Bukkit.getServer().dispatchCommand(send, "title @a[r=" + detection_range + "] subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
