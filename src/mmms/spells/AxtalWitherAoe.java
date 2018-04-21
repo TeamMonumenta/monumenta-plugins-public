@@ -3,19 +3,20 @@ package mmms.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 
-import net.md_5.bungee.api.ChatColor;
+import mmbf.utils.Utils;
 
 public class AxtalWitherAoe
 {
@@ -74,22 +75,11 @@ public class AxtalWitherAoe
 			return ;
 		}
 		Location lLoc = launcher.getLocation();
-		Player plist_targets[] = new Player[20];
-		for (int i = 0; i < 20; i++)
-		{
-			plist_targets[i] = null;
-		}
-		int counter1 = 0;
-		for (Player player : Bukkit.getServer().getOnlinePlayers())
-		{
-			plist_targets[counter1] = player;
-			counter1++;
-		}
 		animation(radius, lLoc, launcher);
-		deal_damage(radius, power, plist_targets, launcher);
+		deal_damage(radius, power, launcher);
 	}
 
-	void        deal_damage(int radius, int power, Player plist[], Entity launcher)
+	void deal_damage(int radius, int power, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable dealer = new Runnable()
@@ -97,18 +87,12 @@ public class AxtalWitherAoe
 			@Override
 			public void run()
 			{
-				for (int i = 0; i < 20; i++)
+				for (Player player : Utils.playersInRange(launcher.getLocation(), radius))
 				{
-					if (plist[i] != null)
-					{
-						double distance = plist[i].getLocation().distance(launcher.getLocation());
-						if (distance < radius)
-						{
-							int pot_pow = (int)((double)power * (((double)radius - distance) / (double)radius));
-							plist[i].addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, pot_pow)));
-							plist[i].addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 30, 1)));
-						}
-					}
+					double distance = player.getLocation().distance(launcher.getLocation());
+					int pot_pow = (int)((double)power * (((double)radius - distance) / (double)radius));
+					player.addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, pot_pow)));
+					player.addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 30, 1)));
 				}
 			}
 		};

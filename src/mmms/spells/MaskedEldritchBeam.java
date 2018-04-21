@@ -68,7 +68,7 @@ public class MaskedEldritchBeam
 		}
 		System.out.println("hey");
 		int id = 0;
-		for (Player player : utils.playersInRange(launcher.getLocation(), 40))
+		for (Player player : Utils.playersInRange(launcher.getLocation(), 40))
 		{
 			launch(launcher, player, id);
 			animation(launcher, player, id);

@@ -82,7 +82,7 @@ public class MaskedShadowGlade
 	public void animation(Location zoneStart)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		List<Player> pList = utils.playersInRange(zoneStart, 40);
+		List<Player> pList = Utils.playersInRange(zoneStart, 40);
 
 		Runnable anim_loop = new Runnable()
 		{
@@ -118,7 +118,7 @@ public class MaskedShadowGlade
 	public void damage(Location zoneStart)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		List<Player> pList = utils.playersInRange(zoneStart, 40);
+		List<Player> pList = Utils.playersInRange(zoneStart, 40);
 
 		Runnable burst = new Runnable()
 		{

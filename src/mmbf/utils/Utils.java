@@ -37,7 +37,7 @@ public class Utils
 		return (launcher);
 	}
 
-	public List<Player> playersInRange(Location loc, double range)
+	static public List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
 

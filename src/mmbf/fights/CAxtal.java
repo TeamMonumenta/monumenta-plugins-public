@@ -55,7 +55,7 @@ public class CAxtal
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Entity spawnPoint = utils.calleeEntity(send);
 		int bossTargetHp = 0;
-		int player_count = utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
+		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 1024;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0)
@@ -73,7 +73,7 @@ public class CAxtal
 			public void run()
 			{
 				/* Don't progress if players aren't present */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
 				if (boss.getHealth() <= 0)
@@ -98,7 +98,7 @@ public class CAxtal
 			public void run()
 			{
 				/* Don't progress if players aren't present */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
 				for (int i = 0; i < 5; i++)
@@ -133,7 +133,7 @@ public class CAxtal
 			public void run()
 			{
 				/* Don't progress if players aren't present */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 				bossBar.update_bar(boss, detection_range);
 			}

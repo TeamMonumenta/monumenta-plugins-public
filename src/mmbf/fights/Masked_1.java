@@ -57,7 +57,7 @@ public class Masked_1
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Entity spawnPoint = utils.calleeEntity(send);
 		int bossTargetHp = 0;
-		int player_count = utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
+		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 256;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0)
@@ -78,7 +78,7 @@ public class Masked_1
 			public void run()
 			{
 				/* If no players are present, do nothing unless the boss is dead/despawned */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty()) {
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty()) {
 					/*
 					 * If the boss is dead or despawned but no players are nearby
 					 * cancel the bossfight silently without triggering reward
@@ -108,7 +108,7 @@ public class Masked_1
 				}
 
 				/* Push players away that have been too close for too long */
-				for (Player player : utils.playersInRange(boss.getLocation(), detection_range))
+				for (Player player : Utils.playersInRange(boss.getLocation(), detection_range))
 				{
 					Integer nearTime = 0;
 					Location pLoc = player.getLocation();
@@ -135,7 +135,7 @@ public class Masked_1
 			public void run()
 			{
 				/* Don't progress if players aren't present */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
 				int sps = spells.length;
@@ -167,7 +167,7 @@ public class Masked_1
 			public void run()
 			{
 				/* Don't progress if players aren't present */
-				if (utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 				bossBar.update_bar(boss, detection_range);
 			}

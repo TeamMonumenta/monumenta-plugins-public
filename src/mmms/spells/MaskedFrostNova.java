@@ -3,19 +3,20 @@ package mmms.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 
-import net.md_5.bungee.api.ChatColor;
+import mmbf.utils.Utils;
 
 public class MaskedFrostNova
 {
@@ -74,22 +75,11 @@ public class MaskedFrostNova
 			return ;
 		}
 		Location lLoc = launcher.getLocation();
-		Player plist_targets[] = new Player[20];
-		for (int i = 0; i < 20; i++)
-		{
-			plist_targets[i] = null;
-		}
-		int counter1 = 0;
-		for (Player player : Bukkit.getServer().getOnlinePlayers())
-		{
-			plist_targets[counter1] = player;
-			counter1++;
-		}
 		animation(radius, time, lLoc, launcher);
-		deal_damage(radius, time, plist_targets, launcher);
+		deal_damage(radius, time, launcher);
 	}
 
-	void        deal_damage(int radius, int time, Player plist[], Entity launcher)
+	void deal_damage(int radius, int time, Entity launcher)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable dealer = new Runnable()
@@ -97,17 +87,10 @@ public class MaskedFrostNova
 			@Override
 			public void run()
 			{
-				for (int i = 0; i < 20; i++)
+				for (Player player : Utils.playersInRange(launcher.getLocation(), radius))
 				{
-					if (plist[i] != null)
-					{
-						double distance = plist[i].getLocation().distance(launcher.getLocation());
-						if (distance < radius)
-						{
-							plist[i].addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, 2)));
-							plist[i].addPotionEffect((new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4)));
-						}
-					}
+					player.damage(12.0f);
+					player.addPotionEffect((new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4)));
 				}
 			}
 		};
