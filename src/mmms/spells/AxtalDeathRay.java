@@ -77,9 +77,7 @@ public class AxtalDeathRay
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
-			{
 				out.add(player);
-			}
 		}
 		return (out);
 	}

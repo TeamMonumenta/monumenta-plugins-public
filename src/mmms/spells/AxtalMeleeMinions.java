@@ -105,9 +105,7 @@ public class AxtalMeleeMinions
 			}
 		};
 		for (int i = 0; i < repeats; i++)
-		{
 			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
-		}
 	}
 
 	public void animation(Location loc, int repeats, Entity launcher)

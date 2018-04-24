@@ -73,9 +73,7 @@ public class MaskedSummonBlazes
 			public void run()
 			{
 				for (int j = 0; j < count; j++)
-				{
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon blaze " + loc.getX() + " " + loc.getY() + " " + loc.getZ());
-				}
 				for (Entity blaz : esender.getNearbyEntities(0.2, 0.2, 0.2))
 				{
 					if (blaz.getType() == EntityType.BLAZE)
@@ -88,9 +86,7 @@ public class MaskedSummonBlazes
 			}
 		};
 		for (int i = 0; i < repeats; i++)
-		{
 			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(45 + 5 * i));
-		}
 	}
 
 	public void animation(Location loc, int repeats, Entity launcher)

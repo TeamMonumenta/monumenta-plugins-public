@@ -93,9 +93,7 @@ public class MaskedShadowGlade
 				{
 					Location pPos = player.getLocation();
 					if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
-					{
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
-					}
 				}
 				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
 				if (j / Ccount >= 24)

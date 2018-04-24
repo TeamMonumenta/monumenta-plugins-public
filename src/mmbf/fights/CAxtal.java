@@ -64,14 +64,15 @@ public class CAxtal
 			hp_del = hp_del / 2;
 			player_count--;
 		}
-		Bukkit.getServer().dispatchCommand(send, "summon minecraft:wither_skeleton ~ ~20 ~ {Attributes:[{Base:0.25d,Name:\"generic.movementSpeed\"},{Base:" + armor +
-				".0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:64.0d,Name:\"generic.followRange\"},{Base:2.0d,Name:\"generic.attackDamage\"},{Base:" + bossTargetHp +
-				".0d,Name:\"generic.maxHealth\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:1b,Spigot.ticksLived:145,Tags:[\"Tlax\"],Motion:[0.0d,0.0d,0.0d],Leashed:0b,Health:" + bossTargetHp +
-				".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"" + ChatColor.RED + ChatColor.BOLD +
-				"Shaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"" + mobName +
-				"\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"05b9f5c4-fb70-40cd-a2c2-628bcd40e0e7\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE2MzE0ZWFjMzQ0MTZjZTEwYWIyMmMyZTFjNGRjYjQ3MmEzZmViOThkNGUwNGQzZmJiYjg1YTlhNDcxYjE4In19fQ==\"}]}},display:{Lore:[\"" +
-				ChatColor.DARK_GRAY + "The mask is overrun by the jungle's wrath.\"],Name:\"" +
-				ChatColor.RED + ChatColor.BOLD + "C'Axtal's Corrupted Mask\"}},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
+		Bukkit.getServer().dispatchCommand(send,
+		                                   "summon minecraft:wither_skeleton ~ ~20 ~ {Attributes:[{Base:0.25d,Name:\"generic.movementSpeed\"},{Base:" + armor +
+		                                   ".0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:64.0d,Name:\"generic.followRange\"},{Base:2.0d,Name:\"generic.attackDamage\"},{Base:" + bossTargetHp +
+		                                   ".0d,Name:\"generic.maxHealth\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:1b,Spigot.ticksLived:145,Tags:[\"Tlax\"],Motion:[0.0d,0.0d,0.0d],Leashed:0b,Health:" + bossTargetHp +
+		                                   ".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"" + ChatColor.RED + ChatColor.BOLD +
+		                                   "Shaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"" + mobName +
+		                                   "\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"05b9f5c4-fb70-40cd-a2c2-628bcd40e0e7\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE2MzE0ZWFjMzQ0MTZjZTEwYWIyMmMyZTFjNGRjYjQ3MmEzZmViOThkNGUwNGQzZmJiYjg1YTlhNDcxYjE4In19fQ==\"}]}},display:{Lore:[\"" +
+		                                   ChatColor.DARK_GRAY + "The mask is overrun by the jungle's wrath.\"],Name:\"" +
+		                                   ChatColor.RED + ChatColor.BOLD + "C'Axtal's Corrupted Mask\"}},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
 		SpellBossBar bossBar = new SpellBossBar(plugin);
 
 		Runnable passive = new Runnable()
@@ -94,9 +95,7 @@ public class CAxtal
 					endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
 				for (int i = 0; i < passiveSpells.length; i++)
-				{
 					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
-				}
 			}
 		};
 		Runnable active = new Runnable()
@@ -162,9 +161,7 @@ public class CAxtal
 					if (name != null)
 					{
 						if (name.equalsIgnoreCase(mobName))
-						{
 							boss = (Damageable)entity;
-						}
 					}
 				}
 
@@ -179,7 +176,7 @@ public class CAxtal
 					bossBar.setEvent(50, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]");
 					bossBar.setEvent(25, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]");
 					bossBar.setEvent(10, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]");
-					
+
 					//launch event related spawn commands
 					Bukkit.getServer().dispatchCommand(send, "effect @a[r=" + detection_range + "] minecraft:blindness 2 2");
 					Bukkit.getServer().dispatchCommand(send, "title @a[r=" + detection_range + "] title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
@@ -194,9 +191,7 @@ public class CAxtal
 
 				/* If the boss hasn't been summoned by now, abort the entire fight */
 				if (failcount > 50)
-				{
 					this.cancel();
-				}
 			}
 		}.runTaskTimer(plugin, 0, 1);
 

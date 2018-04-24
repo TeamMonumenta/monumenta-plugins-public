@@ -46,9 +46,7 @@ public class SpellBossBar
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(mob.getLocation()) < range)
-			{
 				bar.addPlayer(player);
-			}
 		}
 	}
 
@@ -67,9 +65,7 @@ public class SpellBossBar
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(target.getLocation()) < range)
-			{
 				bar.addPlayer(player);
-			}
 			else
 				bar.removePlayer(player);
 		}

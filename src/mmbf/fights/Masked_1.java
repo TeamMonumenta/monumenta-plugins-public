@@ -66,8 +66,9 @@ public class Masked_1
 			hp_del = hp_del / 2;
 			player_count--;
 		}
-		Bukkit.getServer().dispatchCommand(send, "summon wither_skeleton ~ ~1 ~ {CustomName:\"" + mobName + "\",Tags:[\"" + targetingTag + "\"],ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:diamond_leggings\",Count:1b},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:skull\",Damage:3,Count:1b,tag:{SkullOwner:{Id:\"bf8d8d03-3eb1-4fa0-9e32-ab87363f2106\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2NhMmM4YTE4NWE5NmQ1NzQ4ZmVlZTgyZGQ2NzMxOWI3OGM3MTgzN2Y0MWI0ZWVkNWU2NmU4MDJjYjViYiJ9fX0=\"}]}}}}],HandItems:[{id:\"minecraft:bow\",Count:1b,tag:{display:{Name:\"" +
-				ChatColor.DARK_GRAY + ChatColor.BOLD + "Shadow's Flames\"},ench:[{id:48,lvl:2},{id:49,lvl:1},{id:50,lvl:1}]}},{}],ArmorDropChances:[-327.67F,-327.67F,-327.67F,-327.67F],Attributes:[{Name:generic.knockbackResistance,Base:1},{Name:generic.movementSpeed,Base:0.0},{Name:generic.followRange,Base:60},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Health:" + bossTargetHp + ",PersistenceRequired:1,Team:\"mask\",DeathLootTable:\"empty\"}");
+		Bukkit.getServer().dispatchCommand(send,
+		                                   "summon wither_skeleton ~ ~1 ~ {CustomName:\"" + mobName + "\",Tags:[\"" + targetingTag + "\"],ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:diamond_leggings\",Count:1b},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:skull\",Damage:3,Count:1b,tag:{SkullOwner:{Id:\"bf8d8d03-3eb1-4fa0-9e32-ab87363f2106\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2NhMmM4YTE4NWE5NmQ1NzQ4ZmVlZTgyZGQ2NzMxOWI3OGM3MTgzN2Y0MWI0ZWVkNWU2NmU4MDJjYjViYiJ9fX0=\"}]}}}}],HandItems:[{id:\"minecraft:bow\",Count:1b,tag:{display:{Name:\"" +
+		                                   ChatColor.DARK_GRAY + ChatColor.BOLD + "Shadow's Flames\"},ench:[{id:48,lvl:2},{id:49,lvl:1},{id:50,lvl:1}]}},{}],ArmorDropChances:[-327.67F,-327.67F,-327.67F,-327.67F],Attributes:[{Name:generic.knockbackResistance,Base:1},{Name:generic.movementSpeed,Base:0.0},{Name:generic.followRange,Base:60},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Health:" + bossTargetHp + ",PersistenceRequired:1,Team:\"mask\",DeathLootTable:\"empty\"}");
 		SpellBossBar bossBar = new SpellBossBar(plugin);
 
 		Runnable passive = new Runnable()
@@ -79,12 +80,14 @@ public class Masked_1
 			public void run()
 			{
 				/* If no players are present, do nothing unless the boss is dead/despawned */
-				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty()) {
+				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
+				{
 					/*
 					 * If the boss is dead or despawned but no players are nearby
 					 * cancel the bossfight silently without triggering reward
 					 */
-					if (!boss.isValid()) {
+					if (!boss.isValid())
+					{
 						scheduler.cancelTask(taskIDpassive);
 						scheduler.cancelTask(taskIDactive);
 						scheduler.cancelTask(taskIDupdate);
@@ -104,22 +107,21 @@ public class Masked_1
 					boss.teleport(new Location(spawnPoint.getWorld(), 0, -60, 0));
 				}
 				for (int i = 0; i < passiveSpells.length; i++)
-				{
 					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
-				}
 
 				/* Push players away that have been too close for too long */
 				for (Player player : Utils.playersInRange(boss.getLocation(), detection_range))
 				{
 					Integer nearTime = 0;
 					Location pLoc = player.getLocation();
-					if (pLoc.distance(boss.getLocation()) < 7) {
+					if (pLoc.distance(boss.getLocation()) < 7)
+					{
 						nearTime = playerNearTime.get(player.getUniqueId());
-						if (nearTime == null) {
+						if (nearTime == null)
 							nearTime = 0;
-						}
 						nearTime++;
-						if (nearTime > 15) {
+						if (nearTime > 15)
+						{
 							Location lLoc = boss.getLocation();
 							Vector vect = new Vector(pLoc.getX() - lLoc.getX(), 0, pLoc.getZ() - lLoc.getZ());
 							vect.normalize().setY(0.7f).multiply(2);
@@ -154,9 +156,9 @@ public class Masked_1
 					Location bossLoc = boss.getLocation();
 					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + (int)bossLoc.getX() +
 					                                   ",y=" + (int)bossLoc.getY() +
-													   ",z=" + (int)bossLoc.getZ() +
-													   ",r=" + detection_range +
-													   ",tag=MaskedSpawn,c=1] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
+					                                   ",z=" + (int)bossLoc.getZ() +
+					                                   ",r=" + detection_range +
+					                                   ",tag=MaskedSpawn,c=1] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
 				}
 				else
 					ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
@@ -190,9 +192,7 @@ public class Masked_1
 					if (name != null)
 					{
 						if (name.equalsIgnoreCase(mobName))
-						{
 							boss = (Damageable)entity;
-						}
 					}
 				}
 
@@ -211,9 +211,7 @@ public class Masked_1
 
 				/* If the boss hasn't been summoned by now, abort the entire fight */
 				if (failcount > 50)
-				{
 					this.cancel();
-				}
 			}
 		}.runTaskTimer(plugin, 0, 1);
 
