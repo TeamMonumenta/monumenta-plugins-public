@@ -61,14 +61,7 @@ public class Utils
 		if (sx.charAt(0) == '~')
 		{
 			if (sx.length() > 1)
-			{
-				out.setX(origin.getX());
-				char[] tmp = sx.toCharArray();
-				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i + 1];
-				tmp[tmp.length - 1] = 0;
-				sx = String.valueOf(tmp);
-			}
+				sx = sx.substring(1);
 			else
 				sx = Integer.toString(0);
 			out.setX(origin.getX() + Double.parseDouble(sx));
@@ -78,14 +71,7 @@ public class Utils
 		if (sy.charAt(0) == '~')
 		{
 			if (sy.length() > 1)
-			{
-				out.setY(origin.getY());
-				char[] tmp = sy.toCharArray();
-				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i + 1];
-				tmp[tmp.length - 1] = 0;
-				sy = String.valueOf(tmp);
-			}
+				sy = sy.substring(1);
 			else
 				sy = Integer.toString(0);
 			out.setY(origin.getY() + Double.parseDouble(sy));
@@ -95,14 +81,7 @@ public class Utils
 		if (sz.charAt(0) == '~')
 		{
 			if (sz.length() > 1)
-			{
-				out.setZ(origin.getZ());
-				char[] tmp = sz.toCharArray();
-				for (int i = 0; i < tmp.length - 1; i++)
-					tmp[i] = tmp[i + 1];
-				tmp[tmp.length - 1] = 0;
-				sz = String.valueOf(tmp);
-			}
+				sz = sz.substring(1);
 			else
 				sz = Integer.toString(0);
 			out.setZ(origin.getZ() + Double.parseDouble(sz));

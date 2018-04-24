@@ -4,32 +4,30 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 
 import mmbf.utils.Utils;
-import net.md_5.bungee.api.ChatColor;
 
 public class MaskedShadowGlade
 {
+	private Plugin mPlugin;
+	Random mRand = new Random();
+	Utils mUtils = new Utils(mPlugin);
+	int mCount = 0;
 
-	private Plugin plugin;
-
-	public MaskedShadowGlade(mmbf.main.Main plugin2)
+	public MaskedShadowGlade(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
-	Utils utils = new Utils(plugin);
-	int Ccount = 0;
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -44,10 +42,10 @@ public class MaskedShadowGlade
 			System.out.println(ChatColor.RED + "Count must be between 0 and 4");
 			return (false);
 		}
-		Ccount = count;
+		mCount = count;
 		boolean[] isQuadrantDone = new boolean[4];
 		Location[] possibleLocs = new Location[4];
-		Location sendLoc = utils.calleeEntity(sender).getLocation();
+		Location sendLoc = mUtils.calleeEntity(sender).getLocation();
 		int j = 0;
 		for (int x = 0; x < 2; x++)
 		{
@@ -60,7 +58,7 @@ public class MaskedShadowGlade
 		int chosen;
 		while (count > 0)
 		{
-			chosen = rand.nextInt(4);
+			chosen = mRand.nextInt(4);
 			if (!isQuadrantDone[chosen])
 			{
 				count--;
@@ -73,7 +71,6 @@ public class MaskedShadowGlade
 
 	public void spell(Location zoneStart)
 	{
-		System.out.println(zoneStart.toString());
 		animation(zoneStart);
 		damage(zoneStart);
 	}
@@ -95,22 +92,22 @@ public class MaskedShadowGlade
 					if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
 				}
-				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
-				if (j / Ccount >= 24)
+				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / mCount) * 10, 4, 0, 4, 0.01);
+				if (j / mCount >= 24)
 				{
 					for (Player player : pList)
 					{
 						Location pPos = player.getLocation();
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_ENDERDRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
 					}
-					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / Ccount) * 10, 4, 0, 4, 0.01);
+					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / mCount) * 10, 4, 0, 4, 0.01);
 				}
 				j++;
 			}
 		};
 
 		for (int i = 0; i < 25; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (i * 4));
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, (i * 4));
 	}
 
 	public void damage(Location zoneStart)
@@ -136,6 +133,6 @@ public class MaskedShadowGlade
 				}
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, burst , 100L);
+		scheduler.scheduleSyncDelayedTask(mPlugin, burst, 100L);
 	}
 }

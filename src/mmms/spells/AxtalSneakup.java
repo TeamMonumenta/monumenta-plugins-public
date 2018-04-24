@@ -5,31 +5,28 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class AxtalSneakup
 {
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	private Plugin plugin;
-
-	public AxtalSneakup(mmbf.main.Main plugin2)
+	public AxtalSneakup(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -64,7 +61,7 @@ public class AxtalSneakup
 			return ;
 		}
 		List<Player> players = playersInRange(launcher.getLocation(), 80);
-		Player target = players.get(rand.nextInt(players.size()));
+		Player target = players.get(mRand.nextInt(players.size()));
 		launch(launcher, target);
 		animation(launcher, target);
 	}
@@ -95,7 +92,7 @@ public class AxtalSneakup
 				launcher.teleport(newloc);
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, teleport, 50);
+		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 50);
 	}
 
 	public void animation(Entity Launcher, Player target)
@@ -119,8 +116,8 @@ public class AxtalSneakup
 				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, teleport, 49);
+		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 49);
 		for (int i = 0; i < 50; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, particle, i);
+			scheduler.scheduleSyncDelayedTask(mPlugin, particle, i);
 	}
 }

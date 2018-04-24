@@ -20,15 +20,14 @@ import mmbf.utils.Utils;
 
 public class MaskedFrostNova
 {
-	private Plugin plugin;
-
-	public MaskedFrostNova(mmbf.main.Main plugin2)
-	{
-		plugin = plugin2;
-	}
-
+	private Plugin mPlugin;
+	Random mRand = new Random();
 	int w = 0;
-	Random rand = new Random();
+
+	public MaskedFrostNova(mmbf.main.Main plugin)
+	{
+		mPlugin = plugin;
+	}
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -94,7 +93,7 @@ public class MaskedFrostNova
 				}
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, dealer , (long)time);
+		scheduler.scheduleSyncDelayedTask(mPlugin, dealer, time);
 	}
 
 	void animation(int radius, int time, Location loc, Entity launcher)
@@ -108,7 +107,7 @@ public class MaskedFrostNova
 			{
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				launcher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_SNOW_STEP, ((float)radius / 7), (float)(0.5 + rand.nextInt(150) / 100));
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_SNOW_STEP, ((float)radius / 7), (float)(0.5 + mRand.nextInt(150) / 100));
 				centerLoc.getWorld().spawnParticle(Particle.SNOWBALL, centerLoc, 10, 1, 1, 1, 0.01);
 			}
 		};
@@ -119,7 +118,7 @@ public class MaskedFrostNova
 			public void run()
 			{
 				Location lloc = launcher.getLocation();
-				double precision = rand.nextInt(50) + 100;
+				double precision = mRand.nextInt(50) + 100;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
 				double rad = (double)(radius * w) / 5;
@@ -143,8 +142,8 @@ public class MaskedFrostNova
 		};
 
 		for (int i = 0; i < time; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , i);
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i);
 		for (int i = 0; i < 6; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop2 , i + time);
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop2, i + time);
 	}
 }

@@ -3,36 +3,35 @@ package mmms.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
-import net.md_5.bungee.api.ChatColor;
 
 public class MaskedSummonBlazes
 {
-	private Plugin plugin;
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	public MaskedSummonBlazes(mmbf.main.Main plugin2)
+	public MaskedSummonBlazes(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 1)
 		{
-			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Melee_Minions_1 <Count> <Scope> <Repeats>");
+			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Masked_Summon_Blazes");
 			return (true);
 		}
 
@@ -73,20 +72,16 @@ public class MaskedSummonBlazes
 			public void run()
 			{
 				for (int j = 0; j < count; j++)
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon blaze " + loc.getX() + " " + loc.getY() + " " + loc.getZ());
-				for (Entity blaz : esender.getNearbyEntities(0.2, 0.2, 0.2))
 				{
-					if (blaz.getType() == EntityType.BLAZE)
-					{
-						double x = 0.5f * Math.cos(((double)rand.nextInt(628) / 100));
-						double z = 0.5f * Math.sin(((double)rand.nextInt(628) / 100));
-						blaz.setVelocity(new Vector(x, 0.3, z));
-					}
+					Entity blaz = loc.getWorld().spawnEntity(loc, EntityType.BLAZE);
+					double x = 0.5f * Math.cos(((double)mRand.nextInt(628) / 100));
+					double z = 0.5f * Math.sin(((double)mRand.nextInt(628) / 100));
+					blaz.setVelocity(new Vector(x, 0.3, z));
 				}
 			}
 		};
 		for (int i = 0; i < repeats; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(45 + 5 * i));
+			scheduler.scheduleSyncDelayedTask(mPlugin, single_spawn, 45 + 5 * i);
 	}
 
 	public void animation(Location loc, int repeats, Entity launcher)
@@ -105,9 +100,9 @@ public class MaskedSummonBlazes
 				{
 					while (particleLoc.distance(centerLoc) > 2)
 					{
-						particleLoc.setX(loc.getX() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-						particleLoc.setZ(loc.getZ() + ((double)(rand.nextInt(4000) - 2000) / 1000));
-						particleLoc.setY(loc.getY() + ((double)(rand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setX(loc.getX() + ((double)(mRand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setZ(loc.getZ() + ((double)(mRand.nextInt(4000) - 2000) / 1000));
+						particleLoc.setY(loc.getY() + ((double)(mRand.nextInt(4000) - 2000) / 1000));
 					}
 					particleLoc.getWorld().spawnParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01);
 					particleLoc.setX(0);
@@ -117,6 +112,6 @@ public class MaskedSummonBlazes
 			}
 		};
 		for (int i = 0; i < (45) / 3; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (long)i * 3);
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 3);
 	}
 }

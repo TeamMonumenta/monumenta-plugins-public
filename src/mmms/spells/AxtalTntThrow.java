@@ -5,31 +5,29 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class AxtalTntThrow
 {
 
-	private Plugin plugin;
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	public AxtalTntThrow(mmbf.main.Main plugin2)
+	public AxtalTntThrow(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -116,9 +114,9 @@ public class AxtalTntThrow
 		};
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIG_ANGRY, 1, 0.77F);
 		for (int i = 0; i < (40 + count * cooldown); i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, particles1, (long)(i));
+			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, (long)(i));
 		for (int i = 0; i < count; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, particles2, (long)(40 + i * cooldown));
+			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, (long)(40 + i * cooldown));
 	}
 
 	public void launch(CommandSender sender, Entity launcher, List<Player> plist, int count, int cooldown)
@@ -129,7 +127,7 @@ public class AxtalTntThrow
 			@Override
 			public void run()
 			{
-				Player Target = plist.get(rand.nextInt(plist.size()));
+				Player Target = plist.get(mRand.nextInt(plist.size()));
 				Location SLoc = launcher.getLocation();
 				SLoc.setY(SLoc.getY() + 1.7f);
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + SLoc.getX() + " " + SLoc.getY() + " " + SLoc.getZ() + " {Fuse:50}");
@@ -144,7 +142,7 @@ public class AxtalTntThrow
 			}
 		};
 		for (int i = 0; i < count; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, single_launch , (long)(40 + i * cooldown));
+			scheduler.scheduleSyncDelayedTask(mPlugin, single_launch, (long)(40 + i * cooldown));
 	}
 }
 

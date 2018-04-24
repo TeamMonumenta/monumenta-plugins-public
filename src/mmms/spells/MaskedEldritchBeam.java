@@ -1,35 +1,29 @@
 package mmms.spells;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
-import net.md_5.bungee.api.ChatColor;
 
 public class MaskedEldritchBeam
 {
+	private Plugin mPlugin;
 
-	private Plugin plugin;
-
-	public MaskedEldritchBeam(mmbf.main.Main plugin2)
+	public MaskedEldritchBeam(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
-	Utils utils = new Utils(plugin);
 
 	int anim_task_id[] = new int[20];
 	int dmg_task_id[] = new int[20];
@@ -66,7 +60,6 @@ public class MaskedEldritchBeam
 			System.out.println("wither_aoe spell failed");
 			return ;
 		}
-		System.out.println("hey");
 		int id = 0;
 		for (Player player : Utils.playersInRange(launcher.getLocation(), 40))
 		{
@@ -87,7 +80,7 @@ public class MaskedEldritchBeam
 				target.damage(3f);
 			}
 		};
-		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, damage, 0L, 20L);
+		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(mPlugin, damage, 0L, 20L);
 	}
 
 	int g_sound = 0;
@@ -127,11 +120,8 @@ public class MaskedEldritchBeam
 					}
 					else if (launLoc.distance(tmpLoc) > launLoc.distance(tarLoc))
 						break;
-					else
-					{
-						if (tarLoc.distance(tmpLoc) < 0.5)
-							break;
-					}
+					else if (tarLoc.distance(tmpLoc) < 0.5)
+						break;
 				}
 				if (g_sound >= 80)
 				{
@@ -140,7 +130,7 @@ public class MaskedEldritchBeam
 				}
 			}
 		};
-		anim_task_id[id] = scheduler.scheduleSyncRepeatingTask(plugin, teleport, 0L, 2L);
+		anim_task_id[id] = scheduler.scheduleSyncRepeatingTask(mPlugin, teleport, 0L, 2L);
 	}
 
 }

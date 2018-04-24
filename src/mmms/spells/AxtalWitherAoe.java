@@ -20,15 +20,15 @@ import mmbf.utils.Utils;
 
 public class AxtalWitherAoe
 {
-	private Plugin plugin;
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	public AxtalWitherAoe(mmbf.main.Main plugin2)
+	public AxtalWitherAoe(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
 
 	int w = -80;
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -96,7 +96,7 @@ public class AxtalWitherAoe
 				}
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, dealer , 80L);
+		scheduler.scheduleSyncDelayedTask(mPlugin, dealer, 80L);
 	}
 
 	void animation(int radius, Location loc, Entity launcher)
@@ -108,7 +108,7 @@ public class AxtalWitherAoe
 			public void run()
 			{
 				Location lloc = launcher.getLocation();
-				int  n = rand.nextInt(50) + 100;
+				int  n = mRand.nextInt(50) + 100;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
@@ -135,6 +135,6 @@ public class AxtalWitherAoe
 		};
 
 		for (int i = -80; i < 5; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , 1L * (i + 81));
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, 1L * (i + 81));
 	}
 }

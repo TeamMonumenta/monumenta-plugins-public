@@ -3,29 +3,27 @@ package mmms.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class AxtalMeleeMinions
 {
-	private Plugin plugin;
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	public AxtalMeleeMinions(mmbf.main.Main plugin2)
+	public AxtalMeleeMinions(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -90,22 +88,22 @@ public class AxtalMeleeMinions
 			@Override
 			public void run()
 			{
-				int nb_to_spawn = count + (rand.nextInt(2 * scope) - scope);
+				int nb_to_spawn = count + (mRand.nextInt(2 * scope) - scope);
 				for (int j = 0; j < nb_to_spawn; j++)
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"Soul\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skull\",Count:1b}],ArmorDropChances:[0.085F,0.085F,-327.67F,-327.67F],Attributes:[{Name:generic.maxHealth,Base:10},{Name:generic.attackDamage,Base:6}],Health:10.0f,DeathLootTable:\"empty\",ActiveEffects:[{Id:14,Amplifier:0,Duration:222220,ShowParticles:0b}],Team:\"Tlax\"}");
 				for (Entity skelly : esender.getNearbyEntities(0.2, 0.2, 0.2))
 				{
 					if (skelly.getType() == EntityType.SKELETON)
 					{
-						double x = 0.5f * Math.cos(((double)rand.nextInt(628) / 100));
-						double z = 0.5f * Math.sin(((double)rand.nextInt(628) / 100));
+						double x = 0.5f * Math.cos(((double)mRand.nextInt(628) / 100));
+						double z = 0.5f * Math.sin(((double)mRand.nextInt(628) / 100));
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
 			}
 		};
 		for (int i = 0; i < repeats; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, single_spawn, (long)(40 + 15 * i));
+			scheduler.scheduleSyncDelayedTask(mPlugin, single_spawn, 40 + 15 * i);
 	}
 
 	public void animation(Location loc, int repeats, Entity launcher)
@@ -123,6 +121,6 @@ public class AxtalMeleeMinions
 			}
 		};
 		for (int i = 0; i < (40 + repeats * 15) / 3; i++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, anim_loop , (long)i * 3);
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 3);
 	}
 }

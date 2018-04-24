@@ -1,21 +1,19 @@
 package mmms.spells;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
-import org.bukkit.entity.Entity;
-import net.md_5.bungee.api.ChatColor;
 
 public class AxtalBlockBreak
 {
-
-	public AxtalBlockBreak()
-	{
-	}
-
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
 		if (arg.length != 1)
@@ -49,16 +47,18 @@ public class AxtalBlockBreak
 			return ;
 		}
 		Location loc = launcher.getLocation();
-		if (check_blocks(loc) > 2)
+		List<Location> badBlockList = check_blocks(loc);
+		if (badBlockList.size() > 2)
 		{
-			destroy_blocks(loc);
+			for (Location targetLoc : badBlockList)
+				targetLoc.getBlock().setType(Material.AIR);
 			animation(loc);
 		}
 	}
 
-	public int check_blocks(Location loc)
+	public List<Location> check_blocks(Location loc)
 	{
-		int count = 0;
+		List<Location> badBlockList = new ArrayList<Location>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		for (int x = -1; x <= 1; x++)
 		{
@@ -71,33 +71,11 @@ public class AxtalBlockBreak
 					testloc.setZ(loc.getZ() + (double)z);
 					Material material = testloc.getBlock().getType();
 					if (testloc.getBlock().getType() != Material.BEDROCK && material.isSolid())
-						count++;
+						badBlockList.add(testloc.clone());
 				}
 			}
 		}
-		return (count);
-	}
-
-	public void destroy_blocks(Location loc)
-	{
-		Location targetloc = new Location(loc.getWorld(), 0, 0, 0);
-		for (int x = -1; x <= 1; x++)
-		{
-			targetloc.setX(loc.getX() + (double)x);
-			for (int y = 1; y <= 3; y++)
-			{
-				targetloc.setY(loc.getY() + (double)y);
-				for (int z = -1; z <= 1; z++)
-				{
-					targetloc.setZ(loc.getZ() + (double)z);
-					Material material = targetloc.getBlock().getType();
-					if (targetloc.getBlock().getType() != Material.BEDROCK && material.isSolid())
-						targetloc.getBlock().setType(Material.AIR);
-
-
-				}
-			}
-		}
+		return badBlockList;
 	}
 
 	public void animation(Location loc)

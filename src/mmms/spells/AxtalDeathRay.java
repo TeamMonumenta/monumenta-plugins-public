@@ -1,35 +1,32 @@
 package mmms.spells;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-import net.md_5.bungee.api.ChatColor;
+import mmbf.utils.Utils;
 
 public class AxtalDeathRay
 {
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	private Plugin plugin;
-
-	public AxtalDeathRay(mmbf.main.Main plugin2)
+	public AxtalDeathRay(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
-
-	Random rand = new Random();
 
 	public boolean onSpell(CommandSender sender, String[] arg)
 	{
@@ -63,25 +60,13 @@ public class AxtalDeathRay
 			System.out.println("wither_aoe spell failed");
 			return ;
 		}
-		System.out.println("hey");
-		List<Player> players = playersInRange(launcher.getLocation(), 60);
-		Player target = players.get(rand.nextInt(players.size()));
+		List<Player> players = Utils.playersInRange(launcher.getLocation(), 60);
+		Player target = players.get(mRand.nextInt(players.size()));
 		launch(launcher, target);
 		animation(launcher, target);
 	}
 
-	public List<Player> playersInRange(Location loc, double range)
-	{
-		List<Player> out = new ArrayList<Player>();
-
-		for (Player player : Bukkit.getServer().getOnlinePlayers())
-		{
-			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
-				out.add(player);
-		}
-		return (out);
-	}
-
+	// TODO: These two methods need to be combined...
 	public void launch(Entity launcher, Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -107,21 +92,10 @@ public class AxtalDeathRay
 					tmpLoc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, tmpLoc, 1, 0.02, 0.02, 0.02, 0);
 					summonLoc = tmpLoc;
 					if (tmpLoc.getBlock().getType().isSolid())
-					{
-						System.out.println("found block after" + i + "tries");
 						break;
-					}
 					else if (launLoc.distance(tmpLoc) > launLoc.distance(tarLoc))
 						break;
-					else
-					{
-						if (tarLoc.distance(tmpLoc) < 0.5)
-						{
-							System.out.println("found player after" + i + "tries");
-							break;
-						}
-					}
-					if (i == 199)
+					else if (tarLoc.distance(tmpLoc) < 0.5)
 						break;
 				}
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + summonLoc.getX() + " " + summonLoc.getY() + " " + summonLoc.getZ() + " {Fuse:1}");
@@ -129,7 +103,7 @@ public class AxtalDeathRay
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + summonLoc.getX() + " " + summonLoc.getY() + " " + summonLoc.getZ() + " {Fuse:5}");
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(this.plugin, teleport, 140);
+		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 140);
 	}
 
 	int g_sound = 0;
@@ -167,15 +141,12 @@ public class AxtalDeathRay
 						break;
 					else if (launLoc.distance(tmpLoc) > launLoc.distance(tarLoc))
 						break;
-					else
-					{
-						if (tarLoc.distance(tmpLoc) < 0.5)
-							break;
-					}
+					else if (tarLoc.distance(tmpLoc) < 0.5)
+						break;
 				}
 			}
 		};
 		for (int j = 0; j < 140; j++)
-			scheduler.scheduleSyncDelayedTask(this.plugin, teleport, (long)j);
+			scheduler.scheduleSyncDelayedTask(mPlugin, teleport, j);
 	}
 }

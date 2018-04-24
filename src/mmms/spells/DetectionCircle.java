@@ -3,31 +3,30 @@ package mmms.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import mmbf.utils.Utils;
-import net.md_5.bungee.api.ChatColor;
 
 public class DetectionCircle
 {
+	private Plugin mPlugin;
+	Random mRand = new Random();
 
-	private Plugin plugin;
-
-	public DetectionCircle(mmbf.main.Main plugin2)
+	public DetectionCircle(mmbf.main.Main plugin)
 	{
-		plugin = plugin2;
+		mPlugin = plugin;
 	}
 
-	Random rand = new Random();
 	int runs_left;
 	int taskID;
 
@@ -60,7 +59,7 @@ public class DetectionCircle
 		if (duration < 0 || duration > 65535)
 			System.out.println(ChatColor.RED + "Duration must be between 0 and 65535");
 
-		Utils utils = new Utils(plugin);
+		Utils utils = new Utils(mPlugin);
 		Location center = utils.getLocation(launcher.getLocation(), arg[1], arg[2], arg[3]);
 		Location target = utils.getLocation(launcher.getLocation(), arg[6], arg[7], arg[8]);
 		spell(center, target, radius, duration);
@@ -76,7 +75,7 @@ public class DetectionCircle
 			@Override
 			public void run()
 			{
-				int  n = rand.nextInt(50) + 100;
+				int  n = mRand.nextInt(50) + 100;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(center.getWorld(), 0, center.getY() + 5, 0);
@@ -87,7 +86,7 @@ public class DetectionCircle
 					angle = (double)j * increment;
 					particleLoc.setX(center.getX() + (rad * Math.cos(angle)));
 					particleLoc.setZ(center.getZ() + (rad * Math.sin(angle)));
-					particleLoc.setY(center.getY() + 5 * (double)(rand.nextInt(120) - 60) / (60));
+					particleLoc.setY(center.getY() + 5 * (double)(mRand.nextInt(120) - 60) / (60));
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
 				}
 
@@ -105,6 +104,6 @@ public class DetectionCircle
 				runs_left -= 5;
 			}
 		};
-		taskID = scheduler.scheduleSyncRepeatingTask(plugin, loop, 1L, 5L);
+		taskID = scheduler.scheduleSyncRepeatingTask(mPlugin, loop, 1L, 5L);
 	}
 }
