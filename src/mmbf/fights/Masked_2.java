@@ -25,7 +25,6 @@ public class Masked_2
 	Main plugin;
 	MobSpell ms;
 
-	Utils utils = new Utils(plugin);
 	int detection_range = 50;
 	String targetingTag = "Masked";
 	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Masked Man" + ChatColor.RED;
@@ -50,7 +49,7 @@ public class Masked_2
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Entity spawnPoint = utils.calleeEntity(send);
+		Entity spawnPoint = Utils.calleeEntity(send);
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 256;

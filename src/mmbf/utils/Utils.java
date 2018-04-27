@@ -10,20 +10,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
-import mmbf.main.Main;
 
 public class Utils
 {
-	Main plugin;
-
-	public Utils(Plugin plugin2)
-	{
-		plugin = (Main) plugin2;
-	}
-
-	public Entity calleeEntity(CommandSender sender)
+	public static Entity calleeEntity(CommandSender sender)
 	{
 		Entity launcher = null;
 		if (sender instanceof Entity)
@@ -37,7 +27,7 @@ public class Utils
 		return (launcher);
 	}
 
-	static public List<Player> playersInRange(Location loc, double range)
+	public static List<Player> playersInRange(Location loc, double range)
 	{
 		List<Player> out = new ArrayList<Player>();
 
@@ -49,13 +39,13 @@ public class Utils
 		return (out);
 	}
 
-	public boolean errorMsg(String str)
+	public static boolean errorMsg(String str)
 	{
 		Bukkit.broadcastMessage(str);
 		return false;
 	}
 
-	public Location getLocation(Location origin, String sx, String sy, String sz)
+	public static Location getLocation(Location origin, String sx, String sy, String sz)
 	{
 		Location out = new Location(origin.getWorld(), 0, 0, 0);
 		if (sx.charAt(0) == '~')

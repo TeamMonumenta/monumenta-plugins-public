@@ -23,8 +23,7 @@ public class BossFight implements CommandExecutor
 	{
 		if (args.length < 4)
 			return (false);
-		Utils utils = new Utils(plugin);
-		Location endLoc = utils.getLocation(utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]);
+		Location endLoc = Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]);
 		String input = args[0].toLowerCase();
 
 		switch (input)

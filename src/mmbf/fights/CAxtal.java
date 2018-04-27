@@ -26,7 +26,6 @@ public class CAxtal
 	Plugin spellPlug;
 	Command cmd;
 
-	Utils utils = new Utils(plugin);
 	int detection_range = 200;
 	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "C'Axtal";
 	Damageable boss = null;
@@ -53,7 +52,7 @@ public class CAxtal
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Entity spawnPoint = utils.calleeEntity(send);
+		Entity spawnPoint = Utils.calleeEntity(send);
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 1024;

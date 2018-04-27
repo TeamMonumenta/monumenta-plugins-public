@@ -59,9 +59,8 @@ public class DetectionCircle
 		if (duration < 0 || duration > 65535)
 			System.out.println(ChatColor.RED + "Duration must be between 0 and 65535");
 
-		Utils utils = new Utils(mPlugin);
-		Location center = utils.getLocation(launcher.getLocation(), arg[1], arg[2], arg[3]);
-		Location target = utils.getLocation(launcher.getLocation(), arg[6], arg[7], arg[8]);
+		Location center = Utils.getLocation(launcher.getLocation(), arg[1], arg[2], arg[3]);
+		Location target = Utils.getLocation(launcher.getLocation(), arg[6], arg[7], arg[8]);
 		spell(center, target, radius, duration);
 		return true;
 	}
