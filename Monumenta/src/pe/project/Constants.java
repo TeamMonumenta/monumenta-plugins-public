@@ -44,14 +44,4 @@ public class Constants {
 	public static final String PLAYER_BACK_STACK_METAKEY = "MonumentaBackStack";
 	public static final String PLAYER_FORWARD_STACK_METAKEY = "MonumentaForwardStack";
 	public static final String PLAYER_SKIP_BACK_ADD_METAKEY = "MonumentaSkipAddToBackList";
-
-	public static final String[] METADATA_KEYS_TO_BE_DESTROYED = new String[]{
-			PLAYER_ITEMS_LOCKED_METAKEY,
-			ENTITY_DAMAGE_NONCE_METAKEY,
-			ENTITY_COMBUST_NONCE_METAKEY,
-			ANVIL_CONFIRMATION_METAKEY,
-			PLAYER_BACK_STACK_METAKEY,
-			PLAYER_FORWARD_STACK_METAKEY,
-			PLAYER_SKIP_BACK_ADD_METAKEY
-	};
 }

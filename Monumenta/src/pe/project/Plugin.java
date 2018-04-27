@@ -258,12 +258,7 @@ public class Plugin extends JavaPlugin {
 		//	Save info.
 		mPOIManager.saveAllPOIs();
 
-		//Clear Metadata
-		for (World world : Bukkit.getWorlds()){
-			for (Player player : world.getPlayers()){
-				MetadataUtils.clearMetadata(player, this);
-			}
-		}
+		MetadataUtils.removeAllMetadata(this);
 	}
 
 	public Player getPlayer(UUID playerID) {
