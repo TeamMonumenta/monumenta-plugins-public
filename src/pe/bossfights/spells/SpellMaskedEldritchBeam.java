@@ -1,9 +1,6 @@
-package mmms.spells;
+package pe.bossfights.spells;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -16,60 +13,34 @@ import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
 
-public class MaskedEldritchBeam
+public class SpellMaskedEldritchBeam implements SpellBase
 {
 	private Plugin mPlugin;
+	private Entity mLauncher;
+	// TODO: This seriously needs cleanup...
+	private int anim_task_id[] = new int[20];
+	private int dmg_task_id[] = new int[20];
+	private int g_sound = 0;
 
-	public MaskedEldritchBeam(mmbf.main.Main plugin)
+	public SpellMaskedEldritchBeam(Plugin plugin, Entity launcher)
 	{
 		mPlugin = plugin;
+		mLauncher = launcher;
 	}
 
-	int anim_task_id[] = new int[20];
-	int dmg_task_id[] = new int[20];
-
-	public boolean onSpell(CommandSender sender, String[] arg)
+	@Override
+	public void run()
 	{
-		if (arg.length != 1)
-		{
-			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Tnt_Throw <Count> <Cooldown>");
-			return (true);
-		}
-		boolean error = false;
-		if (error)
-			return (true);
-
-		spell(sender);
-		return true;
-	}
-
-	public void spell(CommandSender sender)
-	{
-		Entity launcher = null;
-
-		if (sender instanceof Entity)
-			launcher = (Entity)sender;
-		else if (sender instanceof ProxiedCommandSender)
-		{
-			CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
-			if (callee instanceof Entity)
-				launcher = (Entity)callee;
-		}
-		if (launcher == null)
-		{
-			System.out.println("wither_aoe spell failed");
-			return ;
-		}
 		int id = 0;
-		for (Player player : Utils.playersInRange(launcher.getLocation(), 40))
+		for (Player player : Utils.playersInRange(mLauncher.getLocation(), 40))
 		{
-			launch(launcher, player, id);
-			animation(launcher, player, id);
+			launch(player, id);
+			animation(player, id);
 			id++;
 		}
 	}
 
-	public void launch(Entity launcher, Player target, int id)
+	private void launch(Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable damage = new Runnable()
@@ -83,9 +54,7 @@ public class MaskedEldritchBeam
 		dmg_task_id[id] = scheduler.scheduleSyncRepeatingTask(mPlugin, damage, 0L, 20L);
 	}
 
-	int g_sound = 0;
-
-	public void animation(Entity launcher, Player target, int id)
+	private void animation(Player target, int id)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable teleport = new Runnable()
@@ -93,7 +62,7 @@ public class MaskedEldritchBeam
 			@Override
 			public void run()
 			{
-				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
+				Location launLoc = mLauncher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				tarLoc.getWorld().playSound(tarLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 80f) * 1.5f));
 				launLoc.getWorld().playSound(launLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 80f) * 1.5f));
@@ -132,5 +101,4 @@ public class MaskedEldritchBeam
 		};
 		anim_task_id[id] = scheduler.scheduleSyncRepeatingTask(mPlugin, teleport, 0L, 2L);
 	}
-
 }

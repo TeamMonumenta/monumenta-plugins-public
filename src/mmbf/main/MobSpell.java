@@ -13,10 +13,10 @@ import mmms.spells.AxtalTntThrow;
 import mmms.spells.AxtalWitherAoe;
 import mmms.spells.CommandSpell;
 import mmms.spells.DetectionCircle;
-import mmms.spells.MaskedEldritchBeam;
-import mmms.spells.MaskedFrostNova;
-import mmms.spells.MaskedShadowGlade;
-import mmms.spells.MaskedSummonBlazes;
+import pe.bossfights.commands.MaskedEldritchBeam;
+import pe.bossfights.commands.MaskedFrostNova;
+import pe.bossfights.commands.MaskedShadowGlade;
+import pe.bossfights.commands.MaskedSummonBlazes;
 
 public class MobSpell implements CommandExecutor
 {

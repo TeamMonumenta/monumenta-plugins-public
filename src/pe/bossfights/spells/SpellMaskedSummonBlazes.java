@@ -1,11 +1,8 @@
-package mmms.spells;
+package pe.bossfights.spells;
 
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.Location;
@@ -17,53 +14,29 @@ import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
 
-public class MaskedSummonBlazes
+public class SpellMaskedSummonBlazes implements SpellBase
 {
 	private Plugin mPlugin;
-	Random mRand = new Random();
+	private Entity mLauncher;
+	private Random mRand = new Random();
 
-	public MaskedSummonBlazes(mmbf.main.Main plugin)
+	public SpellMaskedSummonBlazes(Plugin plugin, Entity launcher)
 	{
 		mPlugin = plugin;
+		mLauncher = launcher;
 	}
 
-	public boolean onSpell(CommandSender sender, String[] arg)
+	@Override
+	public void run()
 	{
-		if (arg.length != 1)
-		{
-			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Masked_Summon_Blazes");
-			return (true);
-		}
-
-		spell(sender);
-		return true;
-	}
-
-	public void spell(CommandSender sender)
-	{
-		Entity launcher = null;
-
-		if (sender instanceof Entity)
-			launcher = (Entity)sender;
-		else if (sender instanceof ProxiedCommandSender)
-		{
-			CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
-			if (callee instanceof Entity)
-				launcher = (Entity)callee;
-		}
-		if (launcher == null)
-		{
-			System.out.println("wither_aoe spell failed");
-			return ;
-		}
-		Location lLoc = launcher.getLocation();
-		int count = Utils.playersInRange(launcher.getLocation(), 25).size();
+		Location lLoc = mLauncher.getLocation();
+		int count = Utils.playersInRange(mLauncher.getLocation(), 25).size();
 		count = count >= 3 ? 4 : count;
-		animation(lLoc, 2, launcher);
-		spawn(sender, launcher, lLoc, count, 2);
+		animation(lLoc, 2);
+		spawn(lLoc, count, 2);
 	}
 
-	public void spawn(CommandSender sender, Entity esender, Location loc, int count, int repeats)
+	private void spawn(Location loc, int count, int repeats)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable single_spawn = new Runnable()
@@ -84,7 +57,7 @@ public class MaskedSummonBlazes
 			scheduler.scheduleSyncDelayedTask(mPlugin, single_spawn, 45 + 5 * i);
 	}
 
-	public void animation(Location loc, int repeats, Entity launcher)
+	private void animation(Location loc, int repeats)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable anim_loop = new Runnable()
@@ -94,7 +67,7 @@ public class MaskedSummonBlazes
 			{
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				Location particleLoc = new Location(loc.getWorld(), 0, 0, 0);
-				launcher.teleport(loc);
+				mLauncher.teleport(loc);
 				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 2f);
 				for (int j = 0; j < 5; j++)
 				{
@@ -111,7 +84,7 @@ public class MaskedSummonBlazes
 				}
 			}
 		};
-		for (int i = 0; i < (45) / 3; i++)
+		for (int i = 0; i < (45 + 5 * repeats) / 3; i++)
 			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 3);
 	}
 }

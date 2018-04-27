@@ -1,11 +1,9 @@
-package mmms.spells;
+package pe.bossfights.spells;
 
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,65 +15,49 @@ import org.bukkit.Sound;
 
 import mmbf.utils.Utils;
 
-public class MaskedShadowGlade
+public class SpellMaskedShadowGlade implements SpellBase
 {
 	private Plugin mPlugin;
-	Random mRand = new Random();
-	Utils mUtils = new Utils(mPlugin);
-	int mCount = 0;
+	private int mCount;
+	private Location mLoc;
+	private Random mRand = new Random();
+	private int j = 0;
 
-	public MaskedShadowGlade(mmbf.main.Main plugin)
+	public SpellMaskedShadowGlade(Plugin plugin, Location loc, int count)
 	{
 		mPlugin = plugin;
+		mLoc = loc;
+		mCount = count;
 	}
 
-	public boolean onSpell(CommandSender sender, String[] arg)
+	@Override
+	public void run()
 	{
-		if (arg.length != 2)
-		{
-			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Melee_Minions_1 <Count> <Scope> <Repeats>");
-			return (true);
-		}
-		int count = Integer.parseInt(arg[1]);
-		if (count < 0 || count > 4)
-		{
-			System.out.println(ChatColor.RED + "Count must be between 0 and 4");
-			return (false);
-		}
-		mCount = count;
 		boolean[] isQuadrantDone = new boolean[4];
 		Location[] possibleLocs = new Location[4];
-		Location sendLoc = mUtils.calleeEntity(sender).getLocation();
 		int j = 0;
 		for (int x = 0; x < 2; x++)
 		{
 			for (int y = 0; y < 2; y++)
 			{
-				possibleLocs[j] = new Location(sendLoc.getWorld(), sendLoc.getX() - 8.25 + x * 12.5, sendLoc.getY() - 5, sendLoc.getZ() - 8.25 + y * 12.5);
+				possibleLocs[j] = new Location(mLoc.getWorld(), mLoc.getX() - 8.25 + x * 12.5, mLoc.getY() - 5, mLoc.getZ() - 8.25 + y * 12.5);
 				j++;
 			}
 		}
 		int chosen;
-		while (count > 0)
+		while (mCount > 0)
 		{
 			chosen = mRand.nextInt(4);
 			if (!isQuadrantDone[chosen])
 			{
-				count--;
+				mCount--;
 				isQuadrantDone[chosen] = true;
-				spell(possibleLocs[chosen]);
+				animation(possibleLocs[chosen]);
+				damage(possibleLocs[chosen]);
 			}
 		}
-		return true;
 	}
 
-	public void spell(Location zoneStart)
-	{
-		animation(zoneStart);
-		damage(zoneStart);
-	}
-
-	int j = 0;
 	public void animation(Location zoneStart)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
