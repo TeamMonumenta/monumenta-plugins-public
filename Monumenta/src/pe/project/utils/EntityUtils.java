@@ -308,7 +308,11 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
-		MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
-		target.damage(damage, damager);
+		if (damager != null) {
+			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
+			target.damage(damage, damager);
+		} else {
+			target.damage(damage);
+		}
 	}
 }

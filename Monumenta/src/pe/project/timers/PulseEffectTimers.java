@@ -15,7 +15,9 @@ import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import pe.project.Plugin;
@@ -23,15 +25,17 @@ import pe.project.classes.BaseClass;
 
 public class PulseEffectTimers {
 	class EffectInfo {
-		public EffectInfo(Plugin plugin, Player player, BaseClass playerClass, int abilityID, String tagName, int cooldown, Location loc, int radius) {
+		public EffectInfo(Plugin plugin, Player player, BaseClass playerClass, int abilityID, String tagName, int duration, int cooldown, Location loc, int radius, boolean targetPlayers) {
 			mPlugin = plugin;
 			mOwner = player;
 			mClass = playerClass;
 			mAbilityID = abilityID;
 			mTagName = tagName;
+			mDuration = duration;
 			mCooldown = cooldown;
 			mLocation = loc;
 			mRadius = radius;
+			mTargetPlayers = targetPlayers;
 
 			while(mLocation.getBlock().getType() != Material.AIR){
 				mLocation.add(0, 0.25, 0);
@@ -44,35 +48,35 @@ public class PulseEffectTimers {
 			armorStand.setMarker(true);
 			armorStand.setVisible(false);
 			armorStand.setGravity(false);
-
-			Block block = mLocation.getBlock();
-			block.setType(Material.STANDING_BANNER);
-
-			if (block.getState() instanceof Banner) {
-				Banner banner = (Banner)block.getState();
-				banner.setBaseColor(DyeColor.CYAN);
-
-				banner.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRAIGHT_CROSS));
-				banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.CIRCLE_MIDDLE));
-				banner.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
-				banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_BOTTOM));
-				banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_TOP));
-
-				banner.update();
-			}
 		}
 
-		public boolean Update(int tickPerSecond) {
-			mCooldown -= tickPerSecond;
+		public boolean Update(int tickPerUpdate) {
+			mDuration -= tickPerUpdate;
 
-			if (mCooldown > 0) {
-				List<Entity> entities = mMarkerEntity.getNearbyEntities(mRadius, mRadius, mRadius);
-				for (Entity e : entities) {
-					if (e instanceof Player) {
-						Player player = (Player)e;
-						mClass.PulseEffectApplyEffect(mOwner, mLocation, player, mAbilityID);
-						player.setMetadata(mTagName, new FixedMetadataValue(mPlugin, 0));
-						mPreviouslyEffected.add(player);
+			if (mDuration > 0) {
+				if (mDuration % mCooldown == 0) {
+					List<Entity> entities = mMarkerEntity.getNearbyEntities(mRadius, mRadius, mRadius);
+
+					if (!mTargetPlayers) {
+						entities.add(mMarkerEntity);
+					}
+
+					for (Entity e : entities) {
+						if (mTargetPlayers) {
+							if (e instanceof Player) {
+								Player player = (Player)e;
+								mClass.PulseEffectApplyEffect(mOwner, mLocation, player, mAbilityID);
+								player.setMetadata(mTagName, new FixedMetadataValue(mPlugin, 0));
+								mPreviouslyEffected.add(player);
+							}
+						} else {
+							if (e instanceof Entity) {
+								if (!(e instanceof Player) && !(e instanceof Villager)) {
+									mClass.PulseEffectApplyEffect(mOwner, mLocation, e, mAbilityID);
+									mPreviouslyEffected.add(e);
+								}
+							}
+						}
 					}
 				}
 			} else {
@@ -84,9 +88,16 @@ public class PulseEffectTimers {
 
 		public void Cleanup() {
 			for (int i = 0; i < mPreviouslyEffected.size(); i++) {
-				Player player = mPreviouslyEffected.get(i);
-				player.removeMetadata(mTagName, mPlugin);
-				mClass.PulseEffectRemoveEffect(mOwner, mLocation, player, mAbilityID);
+				Entity e = mPreviouslyEffected.get(i);
+				if (mTargetPlayers) {
+					if (e instanceof Player) {
+						Player p = (Player)e;
+						p.removeMetadata(mTagName, mPlugin);
+						mClass.PulseEffectRemoveEffect(mOwner, mLocation, p, mAbilityID);
+					}
+				} else {
+					mClass.PulseEffectRemoveEffect(mOwner, mLocation, e, mAbilityID);
+				}
 			}
 
 			mPreviouslyEffected.clear();
@@ -107,11 +118,13 @@ public class PulseEffectTimers {
 		BaseClass mClass;
 		int mAbilityID;
 		String mTagName;
+		int mDuration;
 		int mCooldown;
 		Location mLocation;
 		int mRadius;
+		boolean mTargetPlayers;
 
-		Vector<Player> mPreviouslyEffected = new Vector<Player>();
+		Vector<Entity> mPreviouslyEffected = new Vector<Entity>();
 	}
 
 	private Vector<EffectInfo> mPulseEffects = null;
@@ -122,12 +135,12 @@ public class PulseEffectTimers {
 		mPlugin = plugin;
 	}
 
-	public void AddPulseEffect(Player player, BaseClass playerClass, int abilityID, String tagName, int cooldown, Location loc, int radius) {
-		EffectInfo info = new EffectInfo(mPlugin, player, playerClass, abilityID, tagName, cooldown, loc, radius);
+	public void AddPulseEffect(Player player, BaseClass playerClass, int abilityID, String tagName, int duration, int cooldown, Location loc, int radius, boolean targetPlayers) {
+		EffectInfo info = new EffectInfo(mPlugin, player, playerClass, abilityID, tagName, duration, cooldown, loc, radius, targetPlayers);
 		mPulseEffects.add(info);
 	}
 
-	public void Update(int tickPerSecond) {
+	public void Update(int tickPerUpdate) {
 		int size = mPulseEffects.size();
 		for (int i = 0; i < size; i++) {
 			EffectInfo info = mPulseEffects.get(i);
@@ -136,8 +149,9 @@ public class PulseEffectTimers {
 			info.Cleanup();
 
 			//	Loop through and apply the effects to the new people within range.
-			boolean remove = info.Update(tickPerSecond);
+			boolean remove = info.Update(tickPerUpdate);
 			if (remove) {
+				info.Cleanup();
 				info.Remove();
 				mPulseEffects.remove(i);
 

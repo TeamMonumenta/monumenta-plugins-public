@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,9 +13,15 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Banner;
+import org.bukkit.block.Block;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -249,10 +257,31 @@ public class ScoutClass extends BaseClass {
 				double range = arrow.getLocation().distance(player.getLocation());
 				if (range <= STANDARD_BEARER_TRIGGER_RANGE) {
 					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, STANDARD_BEARER_ID,
-					                                          STANDARD_BEARER_TAG_NAME, STANDARD_BEARER_DURATION, player.getLocation(),
-					                                          STANDARD_BEARER_TRIGGER_RADIUS);
+					                                          STANDARD_BEARER_TAG_NAME, STANDARD_BEARER_DURATION, 1, player.getLocation(),
+					                                          STANDARD_BEARER_TRIGGER_RADIUS, true);
 
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.STANDARD_BEARER, STANDARD_BEARER_COOLDOWN);
+
+					Location L = player.getLocation();
+					while(L.getBlock().getType() != Material.AIR){
+						L.add(0, 0.25, 0);
+					}
+
+					Block block = L.getBlock();
+					block.setType(Material.STANDING_BANNER);
+
+					if (block.getState() instanceof Banner) {
+						Banner banner = (Banner)block.getState();
+						banner.setBaseColor(DyeColor.CYAN);
+
+						banner.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRAIGHT_CROSS));
+						banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.CIRCLE_MIDDLE));
+						banner.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
+						banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_BOTTOM));
+						banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.TRIANGLES_TOP));
+
+						banner.update();
+					}
 				}
 			}
 		}
@@ -270,13 +299,13 @@ public class ScoutClass extends BaseClass {
 					double z = loc.getZ();
 					Location newLoc = new Location(loc.getWorld(), x, y, z);
 
-					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.VILLAGER_HAPPY, newLoc, 15, 0.75,
+					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.VILLAGER_HAPPY, newLoc, 5, 0.75,
 					                                   0.75, 0.75, 0.001);
 
 					if (standardBearer > 1) {
 						AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
 						double baseValue = att.getBaseValue();
-						att.setBaseValue(Math.min(baseValue + STANDARD_BEARER_ARMOR, 30));
+						att.setBaseValue(2); //Math.min(baseValue + STANDARD_BEARER_ARMOR, 30));
 					}
 				}
 			}
@@ -289,12 +318,12 @@ public class ScoutClass extends BaseClass {
 		{
 			if (abilityID == STANDARD_BEARER_ID) {
 				int standardBearer = ScoreboardUtils.getScoreboardValue(owner, "StandardBearer");
-				if (standardBearer > 0) {
-					if (standardBearer > 1) {
-						AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-						double baseValue = att.getBaseValue();
-						att.setBaseValue(Math.max(baseValue - STANDARD_BEARER_ARMOR, 0));
-					}
+				if (standardBearer > 1) {
+					AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+					double baseValue = att.getBaseValue();
+					att.setBaseValue(0); //Math.max(baseValue - STANDARD_BEARER_ARMOR, 0));
+
+					mPlugin.mPotionManager.addPotion(owner, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.LUCK, 400, 5, true, false));
 				}
 			}
 		}

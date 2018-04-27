@@ -51,7 +51,10 @@ public class BaseClass {
 	public void AbilityOffCooldown(Player player, Spells spell) {}
 
 	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
+	public void PulseEffectApplyEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {}
+
 	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
+	public void PulseEffectRemoveEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {}
 
 	public boolean has1SecondTrigger() {
 		return false;
@@ -69,7 +72,7 @@ public class BaseClass {
 		return false;
 	}
 
-	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
+	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
 
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 

@@ -115,7 +115,7 @@ public class ClericClass extends BaseClass {
 	}
 
 	@Override
-	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
 		if (!player.isDead()) {
 			boolean threeSeconds = ((originalTime % 3) == 0);
@@ -157,12 +157,12 @@ public class ClericClass extends BaseClass {
 				}
 			}
 
-			if (oneSecond) {
+			if (twoHertz) {
 				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 				if (cleansing > 0) {
 					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE)) {
-						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 200, 2.5, 2, 2.5, 0.001);
-						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 30, 2, 1.5, 2, 0.001);
+						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
+						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
 
 						List<Entity> entities = player.getNearbyEntities(CLEANSING_RADIUS, CLEANSING_RADIUS, CLEANSING_RADIUS);
 						entities.add(player);

@@ -108,9 +108,9 @@ public class MageClass extends BaseClass {
 	}
 
 	@Override
-	public void PeriodicTrigger(Player player, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//	Don't trigger this if dead!
-		if (!player.isDead() && oneSecond) {
+		if (!player.isDead() && twoHertz) {
 			if (player.getPotionEffect(PotionEffectType.SLOW) != null || player.getFireTicks() > 0) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_EFFECT_DURATION, 0, true, true));
 			}

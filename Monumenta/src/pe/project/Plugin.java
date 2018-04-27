@@ -201,26 +201,29 @@ public class Plugin extends JavaPlugin {
 			@Override
 			public void run() {
 				final boolean oneHertz = ticks == 0;
+				final boolean twoHertz = (ticks % 10) == 0;
 				final boolean fourHertz = (ticks % 5) == 0;
 				final boolean twentyHertz = true;
 
 				//	Once a second.
-				if (oneHertz) {
+				// NOW IT'S TWICE A SECOND MOTHAFUCKAAAASSSSSSSSS!!!!!!!!!!
+				// FREQUENCY ANARCHY HAPPENING UP IN HERE
+
+				if (twoHertz) {
 					//	Update cooldowns.
-					mTimers.UpdateCooldowns(Constants.TICKS_PER_SECOND);
-					mPulseEffectTimers.Update(Constants.TICKS_PER_SECOND);
+					mTimers.UpdateCooldowns(Constants.HALF_TICKS_PER_SECOND);
 
 					//	Update periodic timers.
 					mPeriodicTimer++;
 
-					final boolean one = (mPeriodicTimer % Times.ONE.getValue()) == 0;
+					final boolean one = (ticks % 20 == 0); //(mPeriodicTimer % Times.ONE.getValue()) == 0;
 					final boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
 					final boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
 						BaseClass pClass = Plugin.this.getClass(player);
-						pClass.PeriodicTrigger(player, one, two, fourty, sixty, mPeriodicTimer);
+						pClass.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 					}
 
 					mPeriodicTimer %= Times.ONE_TWENTY.getValue();
@@ -231,6 +234,7 @@ public class Plugin extends JavaPlugin {
 					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
 					mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
+					mPulseEffectTimers.Update(Constants.QUARTER_TICKS_PER_SECOND);
 				}
 
 				//	Every tick.

@@ -1,12 +1,15 @@
 package pe.project.classes;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -23,12 +26,20 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Banner;
+import org.bukkit.block.Block;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.Plugin;
 import pe.project.utils.EntityUtils;
+import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.ParticleUtils;
+import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
 import pe.project.utils.ScoreboardUtils;
@@ -61,12 +72,17 @@ public class AlchemistClass extends BaseClass {
 	private static final int CAUSTIC_MIXTURE_2_DAMAGE = 12;
 	private static final String CAUSTIC_MIXTURE_TAG = "CausticMixture";
 
+	private static final int CAUSTIC_BLADE_1_DURATION = 10 * 20;
+	private static final int CAUSTIC_BLADE_2_DURATION = 15 * 20;
+	private static final int CAUSTIC_BLADE_COOLDOWN = 6 * 20;
+	private static final double CAUSTIC_BLADE_DISTANCE_MULT = 0.5;
+
 	private static final int BASILISK_POISON_1_EFFECT_LVL = 0;
 	private static final int BASILISK_POISON_2_EFFECT_LVL = 1;
 	private static final int BASILISK_POISON_1_DURATION = 15 * 20;
 	private static final int BASILISK_POISON_2_DURATION = 12 * 20;
 
-	private static final int POWER_INJECTION_RANGE = 8;
+	private static final int POWER_INJECTION_RANGE = 16;
 	private static final int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
 	private static final int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
 	private static final int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
@@ -79,8 +95,14 @@ public class AlchemistClass extends BaseClass {
 	private static final int INVIGORATING_ODOR_1_DURATION = 12 * 20;
 	private static final int INVIGORATING_ODOR_2_DURATION = 15 * 20;
 
-
-	//	POISON_TRAIL
+	public static final int TOXIC_TRAIL_ID = 56;
+	public static final String TOXIC_TRAIL_TAG_NAME = "TagToxic";
+	private static final int TOXIC_TRAIL_1_DURATION = 3 * 20;
+	private static final int TOXIC_TRAIL_2_DURATION = 5 * 20;
+	private static final int TOXIC_TRAIL_COOLDOWN = 20;
+	private static final int TOXIC_TRAIL_RADIUS = 3;
+	private static final double TOXIC_TRAIL_DAMAGE = 2;
+	private static final int TOXIC_TRAIL_SLOW_LEVEL = 0;
 
 	public AlchemistClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -279,6 +301,107 @@ public class AlchemistClass extends BaseClass {
 
 						Location loc = entity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
+					}
+				}
+			}
+		}
+	}
+
+	// =================
+	// = CAUSTIC BLADE =
+	// =================
+
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+		int causticBlade = ScoreboardUtils.getScoreboardValue(player, "CausticBlade");
+		if (causticBlade > 0 && EntityUtils.isHostileMob(damagee)) {
+			if (PlayerUtils.isCritical(player)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CAUSTIC_BLADE)) {
+
+					int potionDuration = causticBlade == 0 ? CAUSTIC_BLADE_1_DURATION : CAUSTIC_BLADE_2_DURATION;
+
+					ItemStack potion1;
+					ItemStack potion2 = null;
+
+					int rand = mRandom.nextInt(3);
+					if (rand == 0) {
+						potion1 = ItemUtils.createStackedPotions(PotionEffectType.SLOW, 3, potionDuration, 0, "Splash Potion of Slowness");
+					} else if (rand == 1) {
+						potion1 = ItemUtils.createStackedPotions(PotionEffectType.WEAKNESS, 1, potionDuration, 0, "Splash Potion of Weakness");
+					} else {
+						potion1 = ItemUtils.createStackedPotions(PotionEffectType.WITHER, 2, potionDuration, 0, "Splash Potion of Wither");
+					}
+
+					if (causticBlade > 1) {
+						rand = (rand + mRandom.nextInt(2)) % 3;
+						if (rand == 0) {
+							potion2 = ItemUtils.createStackedPotions(PotionEffectType.SLOW, 3, potionDuration, 0, "Splash Potion of Slowness");
+						} else if (rand == 1) {
+							potion2 = ItemUtils.createStackedPotions(PotionEffectType.WEAKNESS, 1, potionDuration, 0, "Splash Potion of Weakness");
+						} else {
+							potion2 = ItemUtils.createStackedPotions(PotionEffectType.WITHER, 2, potionDuration, 0, "Splash Potion of Wither");
+						}
+
+					}
+
+
+					World world = Bukkit.getWorld(player.getWorld().getName());
+					Location pos = damagee.getLocation().add(((damagee.getLocation()).subtract(player.getLocation())).multiply(CAUSTIC_BLADE_DISTANCE_MULT));
+					pos.setY(damagee.getLocation().getY()+2.0);
+
+					EntityUtils.spawnCustomSplashPotion(world, player, potion1, pos);
+					if (causticBlade > 1) {EntityUtils.spawnCustomSplashPotion(world, player, potion2, pos.add(0.1,0.1,0.1));}
+					ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.TOTEM, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
+
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CAUSTIC_BLADE, CAUSTIC_BLADE_COOLDOWN);
+				}
+			}
+		}
+
+		return true;
+	}
+
+
+    // ===============
+	// = TOXIC TRAIL =
+	// ===============
+
+	@Override
+	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+		if (oneSecond) {
+			if (!player.isDead()) {
+				int toxicTrail = ScoreboardUtils.getScoreboardValue(player, "ToxicTrail");
+				if (toxicTrail > 0) {// && player.getGameMode() != GameMode.SPECTATOR) {
+					int toxicDuration = toxicTrail == 1? TOXIC_TRAIL_1_DURATION : TOXIC_TRAIL_2_DURATION;
+					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, TOXIC_TRAIL_ID,
+					                                          TOXIC_TRAIL_TAG_NAME, toxicDuration, TOXIC_TRAIL_COOLDOWN, player.getLocation(),
+					                                          TOXIC_TRAIL_RADIUS, false);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void PulseEffectApplyEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {
+		{
+			if (abilityID == TOXIC_TRAIL_ID) {
+				int toxicTrail = ScoreboardUtils.getScoreboardValue(owner, "ToxicTrail");
+				if (toxicTrail > 0) {
+					if (owner.getGameMode() == GameMode.SURVIVAL || owner.getGameMode() == GameMode.ADVENTURE) {
+						double x = loc.getX();
+						double y = loc.getY() + 0.25;
+						double z = loc.getZ();
+						Location newLoc = new Location(loc.getWorld(), x, y, z);
+
+						ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.SPELL_MOB_AMBIENT, newLoc, 30, 0.75, 0.15, 0.75, 0.001);
+						if (effectedEntity instanceof LivingEntity) {
+							LivingEntity e = (LivingEntity)effectedEntity;
+							EntityUtils.damageEntity(mPlugin, e, TOXIC_TRAIL_DAMAGE, null);
+
+							if (toxicTrail > 1) {
+								e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, TOXIC_TRAIL_2_DURATION, TOXIC_TRAIL_SLOW_LEVEL, true, false));
+							}
+						}
 					}
 				}
 			}
