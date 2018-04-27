@@ -1,6 +1,9 @@
 package mmbf.fights;
 
-import java.util.Random;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -20,6 +23,11 @@ import mmbf.main.MobSpell;
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
+import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.SpellMaskedFrostNova;
+import pe.bossfights.spells.SpellMaskedShadowGlade;
+import pe.bossfights.spells.SpellMaskedSummonBlazes;
+
 public class Masked_2
 {
 	Main plugin;
@@ -32,13 +40,9 @@ public class Masked_2
 	int taskIDpassive = 0;
 	int taskIDactive = 0;
 	int taskIDupdate = 0;
-	Random rand = new Random();
-	String spells[] = { "masked_frost_nova 9 70",
-	                    "custom_1",
-	                    "masked_summon_blazes"
-	                  };
+
+	List<SpellBase> activeSpells = new ArrayList<SpellBase>();
 	String passiveSpells[] = { "axtal_block_break" };
-	int spellsCD[] = new int[spells.length];
 
 	public Masked_2(Main pl)
 	{
@@ -109,27 +113,9 @@ public class Masked_2
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
-				int sps = spells.length;
-				for (int i = 0; i < sps; i++)
-				{
-					if (spellsCD[i] > 0)
-						spellsCD[i]--;
-				}
-				int chosen = rand.nextInt(sps);
-				while (spellsCD[chosen] > 0)
-					chosen = rand.nextInt(sps);
-				spellsCD[chosen] = 3;
-				if (spells[chosen].equalsIgnoreCase("custom_1"))
-				{
-					Location bossLoc = boss.getLocation();
-					ms.spellCall((CommandSender)boss, ("commandspell execute @e[x=" + (int)bossLoc.getX() +
-					                                   ",y=" + (int)bossLoc.getY() +
-					                                   ",z=" + (int)bossLoc.getZ() +
-					                                   ",r=" + detection_range +
-					                                   ",tag=MaskedSpawn,c=1] ~ ~ ~ mobspell masked_shadow_glade 2").split(" "));
-				}
-				else
-					ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
+				/* Run an active spell from the list of available spells */
+				Collections.shuffle(activeSpells);
+				activeSpells.get(0).run();
 			}
 		};
 		Runnable update = new Runnable()
@@ -167,6 +153,12 @@ public class Masked_2
 				/* Found the boss entity - start the rest of the fight */
 				if (boss != null)
 				{
+					activeSpells = Arrays.asList(
+						new SpellMaskedFrostNova(plugin, boss, 9, 70),
+						new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
+						new SpellMaskedSummonBlazes(plugin, boss)
+					);
+
 					bossBar.spell(boss, detection_range);
 					bossBar.changeColor(BarColor.RED);
 					bossBar.changeStyle(BarStyle.SOLID);
