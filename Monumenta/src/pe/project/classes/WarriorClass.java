@@ -149,20 +149,24 @@ public class WarriorClass extends BaseClass {
 			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
 			if (bruteForce > 0) {
 				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
-					Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
-					ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
-					ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
-					List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
-					entities.add(damagee);
-					for(int i = 0; i < entities.size(); i++) {
-						Entity e = entities.get(i);
-						if(EntityUtils.isHostileMob(e)) {
-							LivingEntity mob = (LivingEntity)e;
+					ItemStack mainHand = player.getInventory().getItemInMainHand();
+					if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand)) {
 
-							Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
-							EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
+						Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
+						ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
+						ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
+						List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
+						entities.add(damagee);
+						for(int i = 0; i < entities.size(); i++) {
+							Entity e = entities.get(i);
+							if(EntityUtils.isHostileMob(e)) {
+								LivingEntity mob = (LivingEntity)e;
 
-							MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+								Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
+								EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
+
+								MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+							}
 						}
 					}
 				}

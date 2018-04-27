@@ -305,7 +305,7 @@ public class ScoutClass extends BaseClass {
 					if (standardBearer > 1) {
 						AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
 						double baseValue = att.getBaseValue();
-						att.setBaseValue(2); //Math.min(baseValue + STANDARD_BEARER_ARMOR, 30));
+						att.setBaseValue(Math.min(baseValue + STANDARD_BEARER_ARMOR, 30));
 					}
 				}
 			}
@@ -321,9 +321,7 @@ public class ScoutClass extends BaseClass {
 				if (standardBearer > 1) {
 					AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
 					double baseValue = att.getBaseValue();
-					att.setBaseValue(0); //Math.max(baseValue - STANDARD_BEARER_ARMOR, 0));
-
-					mPlugin.mPotionManager.addPotion(owner, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.LUCK, 400, 5, true, false));
+					att.setBaseValue(Math.max(baseValue - STANDARD_BEARER_ARMOR, 0));
 				}
 			}
 		}

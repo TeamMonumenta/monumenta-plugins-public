@@ -55,28 +55,28 @@ public class PulseEffectTimers {
 
 			if (mDuration > 0) {
 				if (mDuration % mCooldown == 0) {
-					List<Entity> entities = mMarkerEntity.getNearbyEntities(mRadius, mRadius, mRadius);
+					if (mRadius > 0) {
+						List<Entity> entities = mMarkerEntity.getNearbyEntities(mRadius, mRadius, mRadius);
 
-					if (!mTargetPlayers) {
-						entities.add(mMarkerEntity);
-					}
-
-					for (Entity e : entities) {
-						if (mTargetPlayers) {
-							if (e instanceof Player) {
-								Player player = (Player)e;
-								mClass.PulseEffectApplyEffect(mOwner, mLocation, player, mAbilityID);
-								player.setMetadata(mTagName, new FixedMetadataValue(mPlugin, 0));
-								mPreviouslyEffected.add(player);
-							}
-						} else {
-							if (e instanceof Entity) {
-								if (!(e instanceof Player) && !(e instanceof Villager)) {
-									mClass.PulseEffectApplyEffect(mOwner, mLocation, e, mAbilityID);
-									mPreviouslyEffected.add(e);
+						for (Entity e : entities) {
+							if (mTargetPlayers) {
+								if (e instanceof Player) {
+									Player player = (Player)e;
+									mClass.PulseEffectApplyEffect(mOwner, mLocation, player, mAbilityID);
+									player.setMetadata(mTagName, new FixedMetadataValue(mPlugin, 0));
+									mPreviouslyEffected.add(player);
+								}
+							} else {
+								if (e instanceof Entity) {
+									if (!(e instanceof Player) && !(e instanceof Villager)) {
+										mClass.PulseEffectApplyEffect(mOwner, mLocation, e, mAbilityID);
+										mPreviouslyEffected.add(e);
+									}
 								}
 							}
 						}
+					} else {
+						mClass.PulseEffectApplyEffect(mOwner, mLocation, mMarkerEntity, mAbilityID);
 					}
 				}
 			} else {
@@ -101,6 +101,10 @@ public class PulseEffectTimers {
 			}
 
 			mPreviouslyEffected.clear();
+		}
+
+		public void Complete() {
+			mClass.PulseEffectComplete(mOwner, mLocation, mMarkerEntity, mAbilityID);
 		}
 
 		public void Remove() {
@@ -152,6 +156,7 @@ public class PulseEffectTimers {
 			boolean remove = info.Update(tickPerUpdate);
 			if (remove) {
 				info.Cleanup();
+				info.Complete();
 				info.Remove();
 				mPulseEffects.remove(i);
 

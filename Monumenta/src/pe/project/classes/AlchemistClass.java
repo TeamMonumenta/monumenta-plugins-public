@@ -10,10 +10,13 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -23,8 +26,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -32,27 +37,28 @@ import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.enchantments.Enchantment;
 
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.Plugin;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
+import pe.project.utils.MovementUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
+import pe.project.utils.particlelib.ParticleEffect;
 import pe.project.utils.ScoreboardUtils;
 
 /*
-	GruesomeAlchemy
-	PutridFumes
-	CausticMixture
 	BasiliskPoison
 	PowerInjection
-	InvigoratingOdor
-PoisonTrail
-
+	ToxicTrail
+	Caustic Blade
+	BombArrow
+	IronTincture
 */
 
 public class AlchemistClass extends BaseClass {
@@ -71,6 +77,20 @@ public class AlchemistClass extends BaseClass {
 	private static final int CAUSTIC_MIXTURE_1_DAMAGE = 6;
 	private static final int CAUSTIC_MIXTURE_2_DAMAGE = 12;
 	private static final String CAUSTIC_MIXTURE_TAG = "CausticMixture";
+
+	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
+	private static final int IRON_TINCTURE_USE_COOLDOWN = 40 * 20;
+	private static final double IRON_TINCTURE_VELOCITY = 0.7;
+
+	private static final int BOMB_ARROW_COOLDOWN = 30 * 20;
+	private static final int BOMB_ARROW_TRIGGER_RANGE = 32;
+	private static final int BOMB_ARROW_ID = 67;
+	public static final String BOMB_ARROW_TAG_NAME = "TagBearer";
+	private static final int BOMB_ARROW_DURATION = 4 * 20;
+	private static final float BOMB_ARROW_KNOCKBACK_SPEED = 0.5f;
+	private static final int BOMB_ARROW_1_DAMAGE = 12;
+	private static final int BOMB_ARROW_2_DAMAGE = 20;
+	private static final int BOMB_ARROW_RADIUS = 3;
 
 	private static final int CAUSTIC_BLADE_1_DURATION = 10 * 20;
 	private static final int CAUSTIC_BLADE_2_DURATION = 15 * 20;
@@ -102,13 +122,15 @@ public class AlchemistClass extends BaseClass {
 	private static final int TOXIC_TRAIL_COOLDOWN = 20;
 	private static final int TOXIC_TRAIL_RADIUS = 3;
 	private static final double TOXIC_TRAIL_DAMAGE = 2;
-	private static final int TOXIC_TRAIL_SLOW_LEVEL = 0;
+	private static final int TOXIC_TRAIL_SLOW_LEVEL = 1;
+
+	Arrow blinkArrow = null;
 
 	public AlchemistClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 
-
+/*
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		//	GruesomeAlchemy
@@ -146,7 +168,7 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}
+	}*/
 
 	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
@@ -202,6 +224,24 @@ public class AlchemistClass extends BaseClass {
 	}
 
 	@Override
+	public void ProjectileHitEvent(Player player, Arrow arrow) {
+		int bombArrow = ScoreboardUtils.getScoreboardValue(player, "BombArrow");
+		if (bombArrow > 0 && player.getGameMode() != GameMode.ADVENTURE && player.isSneaking()) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BOMB_ARROW)) {
+				double range = arrow.getLocation().distance(player.getLocation());
+				if (range <= BOMB_ARROW_TRIGGER_RANGE) {
+					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, BOMB_ARROW_ID, BOMB_ARROW_TAG_NAME, BOMB_ARROW_DURATION, 20, arrow.getLocation(), 0, false);
+
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BOMB_ARROW, BOMB_ARROW_COOLDOWN);
+					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+					blinkArrow = arrow;
+				}
+			}
+		}
+	}
+
+	/*
+	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PUTRID_FUMES)) {
@@ -216,8 +256,9 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}
+	}*/
 
+	/*
 	@Override
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 										   ThrownPotion potion, PotionSplashEvent event) {
@@ -284,8 +325,9 @@ public class AlchemistClass extends BaseClass {
 		}
 
 		return true;
-	}
+	}*/
 
+	/*
 	@Override
 	public void AreaEffectCloudApplyEvent(Collection<LivingEntity> entities, Player player) {
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
@@ -301,6 +343,42 @@ public class AlchemistClass extends BaseClass {
 
 						Location loc = entity.getLocation();
 						ParticleUtils.playParticlesInWorld(world, Particle.TOTEM, loc.add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.001);
+					}
+				}
+			}
+		}
+	}*/
+
+	// =================
+	// = IRON TINCTURE =
+	// =================
+
+	@Override
+	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
+		{
+			if (player.isSneaking()) {
+				if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+					int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
+					if (ironTincture > 0) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
+
+							Location loc = player.getLocation().add(0,1.8,0);
+							ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
+
+							Item tincture = (player.getWorld()).dropItem(loc, itemTincture);
+							tincture.setPickupDelay(40);
+
+							Vector vel = player.getEyeLocation().getDirection().normalize();
+							vel.multiply(IRON_TINCTURE_VELOCITY);
+
+							tincture.setVelocity(vel);
+							tincture.setCustomName("IronTinctureTrigger");
+							tincture.setCustomNameVisible(true);
+							tincture.setGlowing(true);
+
+
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_THROW_COOLDOWN);
+						}
 					}
 				}
 			}
@@ -373,9 +451,10 @@ public class AlchemistClass extends BaseClass {
 				int toxicTrail = ScoreboardUtils.getScoreboardValue(player, "ToxicTrail");
 				if (toxicTrail > 0) {// && player.getGameMode() != GameMode.SPECTATOR) {
 					int toxicDuration = toxicTrail == 1? TOXIC_TRAIL_1_DURATION : TOXIC_TRAIL_2_DURATION;
-					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, TOXIC_TRAIL_ID,
-					                                          TOXIC_TRAIL_TAG_NAME, toxicDuration, TOXIC_TRAIL_COOLDOWN, player.getLocation(),
-					                                          TOXIC_TRAIL_RADIUS, false);
+					Location loc = player.getLocation();
+					loc = loc.subtract((player.getEyeLocation().getDirection().normalize()).multiply(0.25));
+
+					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, TOXIC_TRAIL_ID, TOXIC_TRAIL_TAG_NAME, toxicDuration, TOXIC_TRAIL_COOLDOWN, loc, TOXIC_TRAIL_RADIUS, false);
 				}
 			}
 		}
@@ -393,7 +472,7 @@ public class AlchemistClass extends BaseClass {
 						double z = loc.getZ();
 						Location newLoc = new Location(loc.getWorld(), x, y, z);
 
-						ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.SPELL_MOB_AMBIENT, newLoc, 30, 0.75, 0.15, 0.75, 0.001);
+						ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.SPELL_MOB_AMBIENT, newLoc, 30, 0.75, 0.3, 0.75, 0.001);
 						if (effectedEntity instanceof LivingEntity) {
 							LivingEntity e = (LivingEntity)effectedEntity;
 							EntityUtils.damageEntity(mPlugin, e, TOXIC_TRAIL_DAMAGE, null);
@@ -402,6 +481,50 @@ public class AlchemistClass extends BaseClass {
 								e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, TOXIC_TRAIL_2_DURATION, TOXIC_TRAIL_SLOW_LEVEL, true, false));
 							}
 						}
+					}
+				}
+			}
+
+			if (abilityID == BOMB_ARROW_ID) {
+				int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
+				if (bombArrow > 0) {
+					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
+					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
+					owner.getWorld().playSound(loc, "entity.tnt.primed", 5.0f, 0.25f);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void PulseEffectComplete(Player owner, Location loc, Entity marker, int abilityID) {
+		if (abilityID == BOMB_ARROW_ID) {
+			int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
+			if (bombArrow > 0) {
+				if (blinkArrow != null) {
+					loc = blinkArrow.getLocation();
+					blinkArrow.remove();
+					blinkArrow = null;
+				}
+
+				loc = loc.add(0,1.2,0);
+				owner.getWorld().playSound(loc, "entity.generic.explode", 0.7f, 1.0f);
+				owner.getWorld().playSound(loc, "entity.generic.explode", 0.9f, 1.0f);
+
+				ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
+				List<Entity> entities = marker.getNearbyEntities(BOMB_ARROW_RADIUS, BOMB_ARROW_RADIUS, BOMB_ARROW_RADIUS);
+
+				int baseDamage = bombArrow == 1 ? BOMB_ARROW_1_DAMAGE : BOMB_ARROW_2_DAMAGE;
+
+				for(int i = 0; i < entities.size(); i++) {
+					Entity e = entities.get(i);
+					if(EntityUtils.isHostileMob(e)) {
+						double d = e.getLocation().distance(loc);
+						double ds = Math.min(1, 1.5 - d/3);
+
+						LivingEntity mob = (LivingEntity)e;
+						EntityUtils.damageEntity(mPlugin, mob, baseDamage * ds, owner);
+						MovementUtils.KnockAway((LivingEntity)marker, mob, BOMB_ARROW_KNOCKBACK_SPEED);
 					}
 				}
 			}
