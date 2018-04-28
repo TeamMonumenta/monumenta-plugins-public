@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 
 import mmbf.utils.Utils;
 
-public class SpellMaskedFrostNova implements SpellBase
+public class SpellMaskedFrostNova implements Spell
 {
 	private Plugin mPlugin;
 	private Random mRand = new Random();

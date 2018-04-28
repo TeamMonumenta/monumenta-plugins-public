@@ -23,7 +23,7 @@ import mmbf.main.MobSpell;
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
-import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
 
 public class CAxtal
@@ -46,7 +46,7 @@ public class CAxtal
 	                    "axtal_tnt_throw 5 15",
 	                    "axtal_death_ray"
 	                  };
-	List<SpellBase> passiveSpells = new ArrayList<SpellBase>();
+	List<Spell> passiveSpells = new ArrayList<Spell>();
 	int spellsCD[] = {0, 0, 0, 0, 0};
 
 	public CAxtal(Main pl)
@@ -100,7 +100,7 @@ public class CAxtal
 					bossBar.remove();
 					endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
-				for (SpellBase spell : passiveSpells)
+				for (Spell spell : passiveSpells)
 					spell.run();
 			}
 		};

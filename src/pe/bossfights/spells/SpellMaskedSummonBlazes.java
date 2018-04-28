@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
 
-public class SpellMaskedSummonBlazes implements SpellBase
+public class SpellMaskedSummonBlazes implements Spell
 {
 	private Plugin mPlugin;
 	private Entity mLauncher;

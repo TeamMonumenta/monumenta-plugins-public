@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
 
-public class SpellMaskedEldritchBeam implements SpellBase
+public class SpellMaskedEldritchBeam implements Spell
 {
 	private Plugin mPlugin;
 	private Entity mLauncher;

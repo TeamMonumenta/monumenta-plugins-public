@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class SpellBlockBreak implements SpellBase
+public class SpellBlockBreak implements Spell
 {
 	private Entity mLauncher;
 

@@ -28,7 +28,7 @@ import mmbf.main.MobSpell;
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
-import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
@@ -47,8 +47,8 @@ public class Masked_1
 	int taskIDactive = 0;
 	int taskIDupdate = 0;
 
-	List<SpellBase> activeSpells = new ArrayList<SpellBase>();
-	List<SpellBase> passiveSpells = new ArrayList<SpellBase>();
+	List<Spell> activeSpells = new ArrayList<Spell>();
+	List<Spell> passiveSpells = new ArrayList<Spell>();
 
 	public Masked_1(Main pl)
 	{
@@ -111,7 +111,7 @@ public class Masked_1
 					boss.teleport(new Location(spawnPoint.getWorld(), 0, -60, 0));
 				}
 
-				for (SpellBase spell : passiveSpells)
+				for (Spell spell : passiveSpells)
 					spell.run();
 
 				/* Push players away that have been too close for too long */

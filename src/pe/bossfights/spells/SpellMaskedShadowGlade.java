@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 
 import mmbf.utils.Utils;
 
-public class SpellMaskedShadowGlade implements SpellBase
+public class SpellMaskedShadowGlade implements Spell
 {
 	private Plugin mPlugin;
 	private int mCount;

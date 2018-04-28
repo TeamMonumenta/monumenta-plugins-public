@@ -1,6 +1,6 @@
 package pe.bossfights.spells;
 
-public interface SpellBase
+public interface Spell
 {
 	public void run();
 }
