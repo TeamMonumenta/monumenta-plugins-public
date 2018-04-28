@@ -29,6 +29,7 @@ import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
 import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
@@ -47,7 +48,7 @@ public class Masked_1
 	int taskIDupdate = 0;
 
 	List<SpellBase> activeSpells = new ArrayList<SpellBase>();
-	String passiveSpells[] = { "axtal_block_break" };
+	List<SpellBase> passiveSpells = new ArrayList<SpellBase>();
 
 	public Masked_1(Main pl)
 	{
@@ -109,8 +110,9 @@ public class Masked_1
 					endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 					boss.teleport(new Location(spawnPoint.getWorld(), 0, -60, 0));
 				}
-				for (int i = 0; i < passiveSpells.length; i++)
-					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+
+				for (SpellBase spell : passiveSpells)
+					spell.run();
 
 				/* Push players away that have been too close for too long */
 				for (Player player : Utils.playersInRange(boss.getLocation(), detection_range))
@@ -188,6 +190,9 @@ public class Masked_1
 						new SpellMaskedEldritchBeam(plugin, boss),
 						new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
 						new SpellMaskedSummonBlazes(plugin, boss)
+					);
+					passiveSpells = Arrays.asList(
+						new SpellBlockBreak(boss)
 					);
 
 					bossBar.spell(boss, detection_range);

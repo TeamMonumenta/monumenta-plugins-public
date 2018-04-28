@@ -4,7 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import mmms.spells.AxtalBlockBreak;
+import pe.bossfights.commands.BlockBreak;
 import mmms.spells.AxtalDeathRay;
 import mmms.spells.AxtalMeleeMinions;
 import mmms.spells.AxtalRangedFlyingMinions;
@@ -60,7 +60,7 @@ public class MobSpell implements CommandExecutor
 			(new AxtalSneakup(plugin)).onSpell(send, args);
 			break;
 		case "axtal_block_break":
-			(new AxtalBlockBreak()).onSpell(send, args);
+			(new BlockBreak()).onSpell(send, args);
 			break;
 		case "axtal_death_ray":
 			(new AxtalDeathRay(plugin)).onSpell(send, args);

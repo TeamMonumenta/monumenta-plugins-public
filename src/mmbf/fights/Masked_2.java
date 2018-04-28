@@ -24,6 +24,7 @@ import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
 import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
@@ -42,7 +43,7 @@ public class Masked_2
 	int taskIDupdate = 0;
 
 	List<SpellBase> activeSpells = new ArrayList<SpellBase>();
-	String passiveSpells[] = { "axtal_block_break" };
+	List<SpellBase> passiveSpells = new ArrayList<SpellBase>();
 
 	public Masked_2(Main pl)
 	{
@@ -96,8 +97,8 @@ public class Masked_2
 					bossBar.remove();
 					endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
-				for (int i = 0; i < passiveSpells.length; i++)
-					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+				for (SpellBase spell : passiveSpells)
+					spell.run();
 				/* if boss is in water, tp to center*/
 				if (boss.getLocation().getY() < 157)
 					boss.teleport(spawnPoint);
@@ -157,6 +158,9 @@ public class Masked_2
 						new SpellMaskedFrostNova(plugin, boss, 9, 70),
 						new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
 						new SpellMaskedSummonBlazes(plugin, boss)
+					);
+					passiveSpells = Arrays.asList(
+						new SpellBlockBreak(boss)
 					);
 
 					bossBar.spell(boss, detection_range);

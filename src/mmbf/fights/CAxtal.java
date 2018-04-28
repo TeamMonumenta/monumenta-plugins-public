@@ -1,5 +1,8 @@
 package mmbf.fights;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -19,6 +22,9 @@ import mmbf.main.MobSpell;
 
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
+
+import pe.bossfights.spells.SpellBase;
+import pe.bossfights.spells.SpellBlockBreak;
 
 public class CAxtal
 {
@@ -40,7 +46,7 @@ public class CAxtal
 	                    "axtal_tnt_throw 5 15",
 	                    "axtal_death_ray"
 	                  };
-	String passiveSpells[] = { "axtal_block_break" };
+	List<SpellBase> passiveSpells = new ArrayList<SpellBase>();
 	int spellsCD[] = {0, 0, 0, 0, 0};
 
 	public CAxtal(Main pl)
@@ -94,8 +100,8 @@ public class CAxtal
 					bossBar.remove();
 					endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 				}
-				for (int i = 0; i < passiveSpells.length; i++)
-					ms.spellCall((CommandSender)boss, passiveSpells[i].split(" "));
+				for (SpellBase spell : passiveSpells)
+					spell.run();
 			}
 		};
 		Runnable active = new Runnable()
@@ -121,6 +127,9 @@ public class CAxtal
 						if (entity.getCustomName().equalsIgnoreCase(mobName))
 						{
 							boss = (Damageable)entity;
+							passiveSpells = Arrays.asList(
+								new SpellBlockBreak(boss)
+							);
 							bossBar.update_bar(boss, detection_range);
 						}
 					}
@@ -168,6 +177,10 @@ public class CAxtal
 				/* Found the boss entity - start the rest of the fight */
 				if (boss != null)
 				{
+					passiveSpells = Arrays.asList(
+						new SpellBlockBreak(boss)
+					);
+
 					//create bossbar
 					bossBar.spell(boss, detection_range);
 					//schedule hp messages
