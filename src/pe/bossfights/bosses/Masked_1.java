@@ -1,6 +1,5 @@
 package pe.bossfights.bosses;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,14 +13,11 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
@@ -31,12 +27,12 @@ import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
 import pe.bossfights.utils.Utils;
-import pe.bossfights.utils.Utils.ArgumentException;
+import org.bukkit.attribute.Attribute;
 
 public class Masked_1 implements Boss
 {
 	Plugin plugin;
-	Damageable boss;
+	LivingEntity boss;
 	Location spawnLoc;
 	Location endLoc;
 
@@ -50,7 +46,7 @@ public class Masked_1 implements Boss
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
 
-	public Masked_1(Plugin pl, Damageable bossIn, Location spawnLocIn, Location endLocIn)
+	public Masked_1(Plugin pl, LivingEntity bossIn, Location spawnLocIn, Location endLocIn)
 	{
 		plugin = pl;
 		boss = bossIn;
@@ -162,12 +158,9 @@ public class Masked_1 implements Boss
 			hp_del = hp_del / 2;
 			player_count--;
 		}
-		/* TODO: Set health, maxhealth, armor */
-		/*
-		Bukkit.getServer().dispatchCommand(send,
-		                                   "summon wither_skeleton ~ ~1 ~ {CustomName:\"" + mobName + "\",ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:diamond_leggings\",Count:1b},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:1052688}}},{id:\"minecraft:skull\",Damage:3,Count:1b,tag:{SkullOwner:{Id:\"bf8d8d03-3eb1-4fa0-9e32-ab87363f2106\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2NhMmM4YTE4NWE5NmQ1NzQ4ZmVlZTgyZGQ2NzMxOWI3OGM3MTgzN2Y0MWI0ZWVkNWU2NmU4MDJjYjViYiJ9fX0=\"}]}}}}],HandItems:[{id:\"minecraft:bow\",Count:1b,tag:{display:{Name:\"" +
-		                                   ChatColor.DARK_GRAY + ChatColor.BOLD + "Shadow's Flames\"},ench:[{id:48,lvl:2},{id:49,lvl:1},{id:50,lvl:1}]}},{}],ArmorDropChances:[-327.67F,-327.67F,-327.67F,-327.67F],Attributes:[{Name:generic.knockbackResistance,Base:1},{Name:generic.movementSpeed,Base:0.0},{Name:generic.followRange,Base:60},{Base:" + armor + ".0d,Name:\"generic.armor\"},{Base:" + bossTargetHp + ".0d,Name:\"generic.maxHealth\"}],Health:" + bossTargetHp + ",PersistenceRequired:1,Team:\"mask\",DeathLootTable:\"empty\"}");
-		*/
+		boss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+		boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
+		boss.setHealth(bossTargetHp);
 	}
 
 	public void death()

@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -19,7 +18,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.World;
 
 import pe.bossfights.bosses.Boss;
 import pe.bossfights.bosses.CAxtal;
@@ -59,9 +57,9 @@ public class BossManager implements Listener, CommandExecutor
 			return false;
 		}
 
-		if (!(targetEntity instanceof Damageable))
+		if (!(targetEntity instanceof LivingEntity))
 		{
-			send.sendMessage(ChatColor.RED + "Target entity is not damageable!");
+			send.sendMessage(ChatColor.RED + "Target entity is not a LivingEntity!");
 			return false;
 		}
 
@@ -69,13 +67,13 @@ public class BossManager implements Listener, CommandExecutor
 		switch (args[0].toLowerCase())
 		{
 		case "caxtal":
-			boss = new CAxtal(mPlugin, (Damageable)targetEntity, targetEntity.getLocation(), endLoc);
+			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
 		case "masked_1":
-			boss = new Masked_1(mPlugin, (Damageable)targetEntity, targetEntity.getLocation(), endLoc);
+			boss = new Masked_1(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
 		case "masked_2":
-			boss = new Masked_2(mPlugin, (Damageable)targetEntity, targetEntity.getLocation(), endLoc);
+			boss = new Masked_2(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
 		default:
 			//TODO helpful message
