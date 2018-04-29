@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import mmbf.main.Main;
-import mmbf.main.MobSpell;
 
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
@@ -32,7 +31,6 @@ import pe.bossfights.spells.SpellMaskedSummonBlazes;
 public class Masked_2
 {
 	Main plugin;
-	MobSpell ms;
 
 	int detection_range = 50;
 	String targetingTag = "Masked";
@@ -48,7 +46,6 @@ public class Masked_2
 	public Masked_2(Main pl)
 	{
 		plugin = pl;
-		ms = new MobSpell(pl);
 	}
 
 	public boolean spawn(CommandSender send, Location endLoc)
@@ -115,6 +112,7 @@ public class Masked_2
 					return;
 
 				/* Run an active spell from the list of available spells */
+				// TODO: Add the cooldown back in to prevent re-running the same command twice in a row
 				Collections.shuffle(activeSpells);
 				activeSpells.get(0).run();
 			}

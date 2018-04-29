@@ -1,7 +1,8 @@
 package mmbf.fights;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -24,6 +25,11 @@ import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
 
 import pe.bossfights.spells.Spell;
+import pe.bossfights.spells.SpellAxtalDeathRay;
+import pe.bossfights.spells.SpellAxtalMeleeMinions;
+import pe.bossfights.spells.SpellAxtalSneakup;
+import pe.bossfights.spells.SpellAxtalTntThrow;
+import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
 
 public class CAxtal
@@ -40,14 +46,9 @@ public class CAxtal
 	int taskIDupdate = 0;
 	Random rand = new Random();
 	MobSpell ms;
-	String spells[] = { "axtal_wither_aoe 13 4",
-	                    "axtal_melee_minions 10 3 3",
-	                    "axtal_sneakup",
-	                    "axtal_tnt_throw 5 15",
-	                    "axtal_death_ray"
-	                  };
+
+	List<Spell> activeSpells = new ArrayList<Spell>();
 	List<Spell> passiveSpells = new ArrayList<Spell>();
-	int spellsCD[] = {0, 0, 0, 0, 0};
 
 	public CAxtal(Main pl)
 	{
@@ -113,11 +114,6 @@ public class CAxtal
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
-				for (int i = 0; i < 5; i++)
-				{
-					if (spellsCD[i] > 0)
-						spellsCD[i]--;
-				}
 				// preventing lose of hook
 				for (Entity entity : spawnPoint.getNearbyEntities(200, 100, 200))
 				{
@@ -127,6 +123,13 @@ public class CAxtal
 						if (entity.getCustomName().equalsIgnoreCase(mobName))
 						{
 							boss = (Damageable)entity;
+							activeSpells = Arrays.asList(
+								new SpellAxtalWitherAoe(plugin, boss, 13, 4),
+								new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
+								new SpellAxtalSneakup(plugin, boss),
+								new SpellAxtalTntThrow(plugin, boss, 5, 15),
+								new SpellAxtalDeathRay(plugin, boss)
+							);
 							passiveSpells = Arrays.asList(
 								new SpellBlockBreak(boss)
 							);
@@ -135,11 +138,10 @@ public class CAxtal
 					}
 				}
 
-				int chosen = rand.nextInt(5);
-				while (spellsCD[chosen] > 0)
-					chosen = rand.nextInt(5);
-				spellsCD[chosen] = 3;
-				ms.spellCall((CommandSender)boss, spells[chosen].split(" "));
+				/* Run an active spell from the list of available spells */
+				// TODO: Add the cooldown back in to prevent re-running the same command twice in a row
+				Collections.shuffle(activeSpells);
+				activeSpells.get(0).run();
 			}
 		};
 		Runnable update = new Runnable()
@@ -177,6 +179,13 @@ public class CAxtal
 				/* Found the boss entity - start the rest of the fight */
 				if (boss != null)
 				{
+					activeSpells = Arrays.asList(
+						new SpellAxtalWitherAoe(plugin, boss, 13, 4),
+						new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
+						new SpellAxtalSneakup(plugin, boss),
+						new SpellAxtalTntThrow(plugin, boss, 5, 15),
+						new SpellAxtalDeathRay(plugin, boss)
+					);
 					passiveSpells = Arrays.asList(
 						new SpellBlockBreak(boss)
 					);
