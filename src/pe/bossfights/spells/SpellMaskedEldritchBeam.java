@@ -20,7 +20,7 @@ public class SpellMaskedEldritchBeam implements Spell
 	// TODO: This seriously needs cleanup...
 	private int anim_task_id[] = new int[20];
 	private int dmg_task_id[] = new int[20];
-	private int g_sound = 0;
+	private int g_sound;
 
 	public SpellMaskedEldritchBeam(Plugin plugin, Entity launcher)
 	{
@@ -32,6 +32,7 @@ public class SpellMaskedEldritchBeam implements Spell
 	public void run()
 	{
 		int id = 0;
+		g_sound = 0;
 		for (Player player : Utils.playersInRange(mLauncher.getLocation(), 40))
 		{
 			launch(player, id);

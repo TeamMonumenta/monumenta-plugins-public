@@ -21,7 +21,7 @@ public class SpellMaskedShadowGlade implements Spell
 	private int mCount;
 	private Location mLoc;
 	private Random mRand = new Random();
-	private int j = 0;
+	private int j;
 
 	public SpellMaskedShadowGlade(Plugin plugin, Location loc, int count)
 	{
@@ -33,15 +33,16 @@ public class SpellMaskedShadowGlade implements Spell
 	@Override
 	public void run()
 	{
+		j = 0;
 		boolean[] isQuadrantDone = new boolean[4];
 		Location[] possibleLocs = new Location[4];
-		int j = 0;
+		int i = 0;
 		for (int x = 0; x < 2; x++)
 		{
 			for (int y = 0; y < 2; y++)
 			{
-				possibleLocs[j] = new Location(mLoc.getWorld(), mLoc.getX() - 8.25 + x * 12.5, mLoc.getY() - 5, mLoc.getZ() - 8.25 + y * 12.5);
-				j++;
+				possibleLocs[i] = new Location(mLoc.getWorld(), mLoc.getX() - 8.25 + x * 12.5, mLoc.getY() - 5, mLoc.getZ() - 8.25 + y * 12.5);
+				i++;
 			}
 		}
 		int chosen;

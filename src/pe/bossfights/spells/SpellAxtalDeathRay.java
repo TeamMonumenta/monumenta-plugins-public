@@ -20,7 +20,7 @@ public class SpellAxtalDeathRay implements Spell
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private Random mRand = new Random();
-	private int g_sound = 0;
+	private int g_sound;
 
 	public SpellAxtalDeathRay(Plugin plugin, Entity launcher)
 	{
@@ -31,6 +31,7 @@ public class SpellAxtalDeathRay implements Spell
 	@Override
 	public void run()
 	{
+		g_sound = 0;
 		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 60);
 		Player target = players.get(mRand.nextInt(players.size()));
 		launch(target);

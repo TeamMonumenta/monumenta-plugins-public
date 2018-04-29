@@ -22,7 +22,7 @@ public class SpellMaskedFrostNova implements Spell
 	private Entity mLauncher;
 	private int mRadius;
 	private int mTime;
-	private int w = 0;
+	private int w;
 
 	public SpellMaskedFrostNova(Plugin plugin, Entity launcher, int radius, int time)
 	{
@@ -35,6 +35,7 @@ public class SpellMaskedFrostNova implements Spell
 	@Override
 	public void run()
 	{
+		w = 0;
 		animation(mLauncher.getLocation());
 		deal_damage();
 	}

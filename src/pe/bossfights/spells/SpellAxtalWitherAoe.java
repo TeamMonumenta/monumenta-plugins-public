@@ -22,7 +22,7 @@ public class SpellAxtalWitherAoe implements Spell
 	private int mRadius;
 	private int mPower;
 	private Random mRand = new Random();
-	private int w = -80;
+	private int w;
 
 	public SpellAxtalWitherAoe(Plugin plugin, Entity launcher, int radius, int power)
 	{
@@ -35,6 +35,7 @@ public class SpellAxtalWitherAoe implements Spell
 	@Override
 	public void run()
 	{
+		w = -80;
 		animation();
 		deal_damage();
 	}
