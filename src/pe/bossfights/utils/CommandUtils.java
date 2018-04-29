@@ -3,6 +3,8 @@ package pe.bossfights.utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.Location;
+import org.bukkit.Bukkit;
 
 public class CommandUtils
 {
@@ -51,5 +53,21 @@ public class CommandUtils
 		if (launcher == null)
 			throw new ArgumentException("Unable to determine target entity");
 		return launcher;
+	}
+
+	/* Command should use @s for targeting selector */
+	public static String getExecuteCommandOnNearbyPlayers(Location loc, int radius, String command)
+	{
+		String executeCmd = "execute @a[x=" + (int)loc.getX() +
+		                    ",y=" + (int)loc.getY() +
+		                    ",z=" + (int)loc.getZ() +
+		                    ",r=" + radius + "] ~ ~ ~ ";
+		return executeCmd + command;
+	}
+
+	public static void executeCommandOnNearbyPlayers(Location loc, int radius, String command)
+	{
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
 	}
 }

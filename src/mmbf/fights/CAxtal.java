@@ -19,7 +19,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import mmbf.main.Main;
-import mmbf.main.MobSpell;
 
 import mmbf.utils.SpellBossBar;
 import mmbf.utils.Utils;
@@ -31,6 +30,7 @@ import pe.bossfights.spells.SpellAxtalSneakup;
 import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.utils.CommandUtils;
 
 public class CAxtal
 {
@@ -45,7 +45,6 @@ public class CAxtal
 	int taskIDactive = 0;
 	int taskIDupdate = 0;
 	Random rand = new Random();
-	MobSpell ms;
 
 	List<Spell> activeSpells = new ArrayList<Spell>();
 	List<Spell> passiveSpells = new ArrayList<Spell>();
@@ -53,7 +52,6 @@ public class CAxtal
 	public CAxtal(Main pl)
 	{
 		plugin = pl;
-		ms = new MobSpell(pl);
 	}
 
 	public boolean spawn(CommandSender send, Location endLoc)
@@ -93,8 +91,8 @@ public class CAxtal
 
 				if (boss.getHealth() <= 0)
 				{
-					Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.enderdragon.death master @a[r=" + detection_range + "] ~ ~ ~ 100 0.8");
-					ms.spellCall(Bukkit.getConsoleSender(), ("commandspell execute @e[tag=BossCenter] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]").split(" "));
+					CommandUtils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
+					CommandUtils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "tellraw @s [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]");
 					scheduler.cancelTask(taskIDpassive);
 					scheduler.cancelTask(taskIDactive);
 					scheduler.cancelTask(taskIDupdate);
@@ -193,17 +191,17 @@ public class CAxtal
 					//create bossbar
 					bossBar.spell(boss, detection_range);
 					//schedule hp messages
-					String loc = "x=" + (int)boss.getLocation().getX() + ",y=" + (int)boss.getLocation().getY() + ",z=" + (int)boss.getLocation().getZ() + ",r=" + detection_range + "";
-					bossBar.setEvent(100, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(50, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(25, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]");
-					bossBar.setEvent(10, "commandspell execute @e[tag=Tlax," + loc + "] ~ ~ ~ /tellraw @a[r=50] [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]");
+					Location loc = boss.getLocation();
+					bossBar.setEvent(100, CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(50,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(25,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(10,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
 
 					//launch event related spawn commands
-					Bukkit.getServer().dispatchCommand(send, "effect @a[r=" + detection_range + "] minecraft:blindness 2 2");
-					Bukkit.getServer().dispatchCommand(send, "title @a[r=" + detection_range + "] title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
-					Bukkit.getServer().dispatchCommand(send, "title @a[r=" + detection_range + "] subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
-					Bukkit.getServer().dispatchCommand(send, "playsound minecraft:entity.wither.spawn master @a[r=" + detection_range + "] ~ ~ ~ 10 0.7");
+					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "effect @s minecraft:blindness 2 2");
+					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
+					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
+					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 
 					taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 					taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);

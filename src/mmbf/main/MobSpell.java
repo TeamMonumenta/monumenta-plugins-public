@@ -1,6 +1,5 @@
 package mmbf.main;
 
-import mmms.spells.CommandSpell;
 import mmms.spells.DetectionCircle;
 
 import org.bukkit.ChatColor;
@@ -48,10 +47,6 @@ public class MobSpell implements CommandExecutor
 		{
 			switch (input)
 			{
-			case "commandspell":
-				//TODO UPGRADE
-				(new CommandSpell()).onSpell(send, args);
-				break;
 			case "axtal_wither_aoe":
 				usage = "axtal_wither_aoe <radius> <power>";
 				CommandUtils.assertArgCount(args, 2);
