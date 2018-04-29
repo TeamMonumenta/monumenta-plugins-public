@@ -1,12 +1,9 @@
-package mmms.spells;
+package pe.bossfights.spells;
 
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -18,56 +15,30 @@ import org.bukkit.util.Vector;
 
 import mmbf.utils.Utils;
 
-public class AxtalDeathRay
+public class SpellAxtalDeathRay implements Spell
 {
 	private Plugin mPlugin;
-	Random mRand = new Random();
+	private Entity mLauncher;
+	private Random mRand = new Random();
+	private int g_sound = 0;
 
-	public AxtalDeathRay(mmbf.main.Main plugin)
+	public SpellAxtalDeathRay(Plugin plugin, Entity launcher)
 	{
 		mPlugin = plugin;
+		mLauncher = launcher;
 	}
 
-	public boolean onSpell(CommandSender sender, String[] arg)
+	@Override
+	public void run()
 	{
-		if (arg.length != 1)
-		{
-			System.out.println(ChatColor.RED + "wrong number of parameters given!\n" + ChatColor.GREEN + "Usage: " + ChatColor.DARK_GREEN + "/mobspell Tnt_Throw <Count> <Cooldown>");
-			return (true);
-		}
-		boolean error = false;
-		if (error)
-			return (true);
-
-		spell(sender);
-		return true;
-	}
-
-	public void spell(CommandSender sender)
-	{
-		Entity launcher = null;
-
-		if (sender instanceof Entity)
-			launcher = (Entity)sender;
-		else if (sender instanceof ProxiedCommandSender)
-		{
-			CommandSender callee = ((ProxiedCommandSender)sender).getCallee();
-			if (callee instanceof Entity)
-				launcher = (Entity)callee;
-		}
-		if (launcher == null)
-		{
-			System.out.println("wither_aoe spell failed");
-			return ;
-		}
-		List<Player> players = Utils.playersInRange(launcher.getLocation(), 60);
+		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 60);
 		Player target = players.get(mRand.nextInt(players.size()));
-		launch(launcher, target);
-		animation(launcher, target);
+		launch(target);
+		animation(target);
 	}
 
 	// TODO: These two methods need to be combined...
-	public void launch(Entity launcher, Player target)
+	public void launch(Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable teleport = new Runnable()
@@ -75,7 +46,7 @@ public class AxtalDeathRay
 			@Override
 			public void run()
 			{
-				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
+				Location launLoc = mLauncher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				Vector vect = new Vector(tarLoc.getX() - launLoc.getX(), tarLoc.getY() - launLoc.getY(), tarLoc.getZ() - launLoc.getZ());
 				vect.normalize();
@@ -106,9 +77,7 @@ public class AxtalDeathRay
 		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 140);
 	}
 
-	int g_sound = 0;
-
-	public void animation(Entity launcher, Player target)
+	public void animation(Player target)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable teleport = new Runnable()
@@ -116,7 +85,7 @@ public class AxtalDeathRay
 			@Override
 			public void run()
 			{
-				Location launLoc = launcher.getLocation().add(0, 1.6f, 0);
+				Location launLoc = mLauncher.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				tarLoc.getWorld().playSound(tarLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 200f) * 1.5f));
 				launLoc.getWorld().playSound(launLoc, Sound.UI_TOAST_IN, 2, (0.5f + ((float)g_sound / 200f) * 1.5f));

@@ -1,19 +1,20 @@
 package mmbf.main;
 
+import mmms.spells.CommandSpell;
+import mmms.spells.DetectionCircle;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import pe.bossfights.spells.SpellAxtalDeathRay;
+import pe.bossfights.spells.SpellAxtalMeleeMinions;
+import pe.bossfights.spells.SpellAxtalRangedFlyingMinions;
+import pe.bossfights.spells.SpellAxtalSneakup;
+import pe.bossfights.spells.SpellAxtalTntThrow;
+import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
-import mmms.spells.AxtalDeathRay;
-import mmms.spells.AxtalMeleeMinions;
-import mmms.spells.AxtalRangedFlyingMinions;
-import mmms.spells.AxtalSneakup;
-import mmms.spells.AxtalTntThrow;
-import mmms.spells.AxtalWitherAoe;
-import mmms.spells.CommandSpell;
-import mmms.spells.DetectionCircle;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
@@ -48,22 +49,47 @@ public class MobSpell implements CommandExecutor
 			switch (input)
 			{
 			case "commandspell":
+				//TODO UPGRADE
 				(new CommandSpell()).onSpell(send, args);
 				break;
 			case "axtal_wither_aoe":
-				(new AxtalWitherAoe(plugin)).onSpell(send, args);
+				usage = "axtal_wither_aoe <radius> <power>";
+				CommandUtils.assertArgCount(args, 2);
+				(new SpellAxtalWitherAoe(plugin,
+				                         CommandUtils.calleeEntity(send),
+				                         CommandUtils.parseInt(args[1], 0, 2000),
+				                         CommandUtils.parseInt(args[2], 0, 5))).run();
 				break;
 			case "axtal_melee_minions":
-				(new AxtalMeleeMinions(plugin)).onSpell(send, args);
+				usage = "axtal_melee_minions <count> <scope> <repeats>";
+				CommandUtils.assertArgCount(args, 3);
+				(new SpellAxtalMeleeMinions(plugin,
+				                            CommandUtils.calleeEntity(send),
+				                            CommandUtils.parseInt(args[1], 0, 64),
+				                            CommandUtils.parseInt(args[2], 0, 32),
+				                            CommandUtils.parseInt(args[3], 0, 5))).run();
 				break;
 			case "axtal_ranged_flying_minions":
-				(new AxtalRangedFlyingMinions(plugin)).onSpell(send, args);
+				usage = "axtal_ranged_flying_minions <count> <scope> <repeats>";
+				CommandUtils.assertArgCount(args, 3);
+				(new SpellAxtalRangedFlyingMinions(plugin,
+				                                   CommandUtils.calleeEntity(send),
+				                                   CommandUtils.parseInt(args[1], 0, 64),
+				                                   CommandUtils.parseInt(args[2], 0, 32),
+				                                   CommandUtils.parseInt(args[3], 0, 5))).run();
 				break;
 			case "axtal_tnt_throw":
-				(new AxtalTntThrow(plugin)).onSpell(send, args);
+				usage = "axtal_tnt_throw <count> <cooldown>";
+				CommandUtils.assertArgCount(args, 2);
+				(new SpellAxtalTntThrow(plugin,
+				                        CommandUtils.calleeEntity(send),
+				                        CommandUtils.parseInt(args[1], 0, 64),
+				                        CommandUtils.parseInt(args[2], 0, 60))).run();
 				break;
 			case "axtal_sneakup":
-				(new AxtalSneakup(plugin)).onSpell(send, args);
+				usage = "axtal_sneakup";
+				CommandUtils.assertArgCount(args, 0);
+				(new SpellAxtalSneakup(plugin, CommandUtils.calleeEntity(send))).run();
 				break;
 			case "axtal_block_break":
 			case "block_break":
@@ -72,9 +98,12 @@ public class MobSpell implements CommandExecutor
 				(new SpellBlockBreak(CommandUtils.calleeEntity(send))).run();
 				break;
 			case "axtal_death_ray":
-				(new AxtalDeathRay(plugin)).onSpell(send, args);
+				usage = "axtal_death_ray";
+				CommandUtils.assertArgCount(args, 0);
+				(new SpellAxtalDeathRay(plugin, CommandUtils.calleeEntity(send))).run();
 				break;
 			case "detection_circle":
+				//TODO UPGRADE
 				(new DetectionCircle(plugin)).onSpell(send, args);
 				break;
 			case "masked_summon_blazes":
@@ -96,7 +125,7 @@ public class MobSpell implements CommandExecutor
 				break;
 			case "masked_frost_nova":
 				usage = "masked_frost_nova <radius> <time>";
-				CommandUtils.assertArgCount(args, 1);
+				CommandUtils.assertArgCount(args, 2);
 				(new SpellMaskedFrostNova(plugin,
 				                          CommandUtils.calleeEntity(send),
 				                          CommandUtils.parseInt(args[1], 0, 2000),

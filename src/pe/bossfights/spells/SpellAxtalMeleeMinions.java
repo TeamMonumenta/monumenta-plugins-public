@@ -1,0 +1,85 @@
+package pe.bossfights.spells;
+
+import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.Sound;
+import org.bukkit.util.Vector;
+
+public class SpellAxtalMeleeMinions implements Spell
+{
+	private Plugin mPlugin;
+	private Entity mLauncher;
+	private int mCount;
+	private int mScope;
+	private int mRepeats;
+	private Random mRand = new Random();
+
+	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope, int repeats)
+	{
+		mPlugin = plugin;
+		mLauncher = launcher;
+		mCount = count;
+		mScope = scope;
+		mRepeats = repeats;
+	}
+
+	@Override
+	public void run()
+	{
+		animation();
+		spawn();
+	}
+
+	public void spawn()
+	{
+		Location loc = mLauncher.getLocation();
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		Runnable single_spawn = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				int nb_to_spawn = mCount + (mRand.nextInt(2 * mScope) - mScope);
+				for (int j = 0; j < nb_to_spawn; j++)
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"Soul\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skull\",Count:1b}],ArmorDropChances:[0.085F,0.085F,-327.67F,-327.67F],Attributes:[{Name:generic.maxHealth,Base:10},{Name:generic.attackDamage,Base:6}],Health:10.0f,DeathLootTable:\"empty\",ActiveEffects:[{Id:14,Amplifier:0,Duration:222220,ShowParticles:0b}],Team:\"Tlax\"}");
+				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2))
+				{
+					if (skelly.getType() == EntityType.SKELETON)
+					{
+						double x = 0.5f * Math.cos(((double)mRand.nextInt(628) / 100));
+						double z = 0.5f * Math.sin(((double)mRand.nextInt(628) / 100));
+						skelly.setVelocity(new Vector(x, 0.5, z));
+					}
+				}
+			}
+		};
+		for (int i = 0; i < mRepeats; i++)
+			scheduler.scheduleSyncDelayedTask(mPlugin, single_spawn, 40 + 15 * i);
+	}
+
+	public void animation()
+	{
+		Location loc = mLauncher.getLocation();
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		Runnable anim_loop = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
+				centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
+			}
+		};
+		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++)
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 3);
+	}
+}
