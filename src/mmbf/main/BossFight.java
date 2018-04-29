@@ -1,13 +1,17 @@
 package mmbf.main;
 
-import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import mmbf.fights.CAxtal;
 import mmbf.fights.Masked_1;
 import mmbf.fights.Masked_2;
-import mmbf.utils.Utils;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.Location;
+
+import pe.bossfights.utils.Utils;
+import pe.bossfights.utils.Utils.ArgumentException;
+import net.md_5.bungee.api.ChatColor;
 
 public class BossFight implements CommandExecutor
 {
@@ -23,7 +27,16 @@ public class BossFight implements CommandExecutor
 	{
 		if (args.length < 4)
 			return (false);
-		Location endLoc = Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]);
+		Location endLoc;
+		try
+		{
+			endLoc = Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]);
+		}
+		catch (ArgumentException ex)
+		{
+			send.sendMessage(ChatColor.RED + ex.getMessage());
+			return false;
+		}
 		String input = args[0].toLowerCase();
 
 		switch (input)

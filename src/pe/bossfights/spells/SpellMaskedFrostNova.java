@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 
-import mmbf.utils.Utils;
+import pe.bossfights.utils.Utils;
 
 public class SpellMaskedFrostNova implements Spell
 {

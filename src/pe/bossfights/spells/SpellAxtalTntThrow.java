@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-import mmbf.utils.Utils;
+import pe.bossfights.utils.Utils;
 
 public class SpellAxtalTntThrow implements Spell
 {

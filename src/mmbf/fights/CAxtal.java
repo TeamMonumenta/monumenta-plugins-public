@@ -21,7 +21,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 import mmbf.main.Main;
 
 import mmbf.utils.SpellBossBar;
-import mmbf.utils.Utils;
 
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellAxtalDeathRay;
@@ -30,7 +29,8 @@ import pe.bossfights.spells.SpellAxtalSneakup;
 import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
-import pe.bossfights.utils.CommandUtils;
+import pe.bossfights.utils.Utils;
+import pe.bossfights.utils.Utils.ArgumentException;
 
 public class CAxtal
 {
@@ -57,7 +57,16 @@ public class CAxtal
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Entity spawnPoint = Utils.calleeEntity(send);
+		Entity spawnPoint;
+		try
+		{
+			spawnPoint = Utils.calleeEntity(send);
+		}
+		catch (ArgumentException ex)
+		{
+			send.sendMessage(ChatColor.RED + ex.getMessage());
+			return false;
+		}
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 1024;
@@ -75,7 +84,7 @@ public class CAxtal
 		                                   ".0f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:iron_axe\",Count:1b,tag:{ench:[{lvl:4s,id:16s},{lvl:1s,id:20s}],display:{Name:\"" + ChatColor.RED + ChatColor.BOLD +
 		                                   "Shaman's Crusher\"}},Damage:0s},{}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"" + mobName +
 		                                   "\",Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:chainmail_leggings\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}]},Damage:0s},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{ench:[{lvl:3s,id:4s},{lvl:5s,id:3s}],display:{color:4473924}},Damage:0s},{id:\"minecraft:skull\",Count:1b,tag:{SkullOwner:{Id:\"05b9f5c4-fb70-40cd-a2c2-628bcd40e0e7\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE2MzE0ZWFjMzQ0MTZjZTEwYWIyMmMyZTFjNGRjYjQ3MmEzZmViOThkNGUwNGQzZmJiYjg1YTlhNDcxYjE4In19fQ==\"}]}},display:{Lore:[\"" +
-										   ChatColor.GRAY + "Hope\",\"" +
+		                                   ChatColor.GRAY + "Hope\",\"" +
 		                                   ChatColor.DARK_GRAY + "The mask is overrun by the jungle's wrath.\"],Name:\"" +
 		                                   ChatColor.RED + ChatColor.BOLD + "C'Axtal's Corrupted Mask\"}},Damage:3s}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,CustomNameVisible:1b}");
 		SpellBossBar bossBar = new SpellBossBar(plugin);
@@ -91,8 +100,8 @@ public class CAxtal
 
 				if (boss.getHealth() <= 0)
 				{
-					CommandUtils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-					CommandUtils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "tellraw @s [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]");
+					Utils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
+					Utils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "tellraw @s [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]");
 					scheduler.cancelTask(taskIDpassive);
 					scheduler.cancelTask(taskIDactive);
 					scheduler.cancelTask(taskIDupdate);
@@ -122,15 +131,15 @@ public class CAxtal
 						{
 							boss = (Damageable)entity;
 							activeSpells = Arrays.asList(
-								new SpellAxtalWitherAoe(plugin, boss, 13, 4),
-								new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
-								new SpellAxtalSneakup(plugin, boss),
-								new SpellAxtalTntThrow(plugin, boss, 5, 15),
-								new SpellAxtalDeathRay(plugin, boss)
-							);
+							                   new SpellAxtalWitherAoe(plugin, boss, 13, 4),
+							                   new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
+							                   new SpellAxtalSneakup(plugin, boss),
+							                   new SpellAxtalTntThrow(plugin, boss, 5, 15),
+							                   new SpellAxtalDeathRay(plugin, boss)
+							               );
 							passiveSpells = Arrays.asList(
-								new SpellBlockBreak(boss)
-							);
+							                    new SpellBlockBreak(boss)
+							                );
 							bossBar.update_bar(boss, detection_range);
 						}
 					}
@@ -178,30 +187,30 @@ public class CAxtal
 				if (boss != null)
 				{
 					activeSpells = Arrays.asList(
-						new SpellAxtalWitherAoe(plugin, boss, 13, 4),
-						new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
-						new SpellAxtalSneakup(plugin, boss),
-						new SpellAxtalTntThrow(plugin, boss, 5, 15),
-						new SpellAxtalDeathRay(plugin, boss)
-					);
+					                   new SpellAxtalWitherAoe(plugin, boss, 13, 4),
+					                   new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
+					                   new SpellAxtalSneakup(plugin, boss),
+					                   new SpellAxtalTntThrow(plugin, boss, 5, 15),
+					                   new SpellAxtalDeathRay(plugin, boss)
+					               );
 					passiveSpells = Arrays.asList(
-						new SpellBlockBreak(boss)
-					);
+					                    new SpellBlockBreak(boss)
+					                );
 
 					//create bossbar
 					bossBar.spell(boss, detection_range);
 					//schedule hp messages
 					Location loc = boss.getLocation();
-					bossBar.setEvent(100, CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
-					bossBar.setEvent(50,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
-					bossBar.setEvent(25,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
-					bossBar.setEvent(10,  CommandUtils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
+					bossBar.setEvent(100, Utils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(50,  Utils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(25,  Utils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
+					bossBar.setEvent(10,  Utils.getExecuteCommandOnNearbyPlayers(loc, detection_range, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
 
 					//launch event related spawn commands
-					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "effect @s minecraft:blindness 2 2");
-					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
-					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
-					CommandUtils.executeCommandOnNearbyPlayers(loc, detection_range, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+					Utils.executeCommandOnNearbyPlayers(loc, detection_range, "effect @s minecraft:blindness 2 2");
+					Utils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s title [\"\",{\"text\":\"C'Axtal\",\"color\":\"dark_red\",\"bold\":true}]");
+					Utils.executeCommandOnNearbyPlayers(loc, detection_range, "title @s subtitle [\"\",{\"text\":\"The Soulspeaker\",\"color\":\"red\",\"bold\":true}]");
+					Utils.executeCommandOnNearbyPlayers(loc, detection_range, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 
 					taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 					taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);

@@ -25,13 +25,14 @@ import org.bukkit.util.Vector;
 import mmbf.main.Main;
 
 import mmbf.utils.SpellBossBar;
-import mmbf.utils.Utils;
 
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
+import pe.bossfights.utils.Utils;
+import pe.bossfights.utils.Utils.ArgumentException;
 
 public class Masked_1
 {
@@ -56,7 +57,16 @@ public class Masked_1
 	public boolean spawn(CommandSender send, Location endLoc)
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Entity spawnPoint = Utils.calleeEntity(send);
+		Entity spawnPoint;
+		try
+		{
+			spawnPoint = Utils.calleeEntity(send);
+		}
+		catch (ArgumentException ex)
+		{
+			send.sendMessage(ChatColor.RED + ex.getMessage());
+			return false;
+		}
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(spawnPoint.getLocation(), detection_range).size();
 		int hp_del = 256;

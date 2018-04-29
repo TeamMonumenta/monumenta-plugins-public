@@ -1,7 +1,5 @@
 package mmbf.main;
 
-import mmms.spells.DetectionCircle;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,12 +12,13 @@ import pe.bossfights.spells.SpellAxtalSneakup;
 import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.spells.SpellDetectionCircle;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
-import pe.bossfights.utils.CommandUtils;
-import pe.bossfights.utils.CommandUtils.ArgumentException;
+import pe.bossfights.utils.Utils;
+import pe.bossfights.utils.Utils.ArgumentException;
 
 public class MobSpell implements CommandExecutor
 {
@@ -49,82 +48,87 @@ public class MobSpell implements CommandExecutor
 			{
 			case "axtal_wither_aoe":
 				usage = "axtal_wither_aoe <radius> <power>";
-				CommandUtils.assertArgCount(args, 2);
+				Utils.assertArgCount(args, 2);
 				(new SpellAxtalWitherAoe(plugin,
-				                         CommandUtils.calleeEntity(send),
-				                         CommandUtils.parseInt(args[1], 0, 2000),
-				                         CommandUtils.parseInt(args[2], 0, 5))).run();
+				                         Utils.calleeEntity(send),
+				                         Utils.parseInt(args[1], 0, 2000),
+				                         Utils.parseInt(args[2], 0, 5))).run();
 				break;
 			case "axtal_melee_minions":
 				usage = "axtal_melee_minions <count> <scope> <repeats>";
-				CommandUtils.assertArgCount(args, 3);
+				Utils.assertArgCount(args, 3);
 				(new SpellAxtalMeleeMinions(plugin,
-				                            CommandUtils.calleeEntity(send),
-				                            CommandUtils.parseInt(args[1], 0, 64),
-				                            CommandUtils.parseInt(args[2], 0, 32),
-				                            CommandUtils.parseInt(args[3], 0, 5))).run();
+				                            Utils.calleeEntity(send),
+				                            Utils.parseInt(args[1], 0, 64),
+				                            Utils.parseInt(args[2], 0, 32),
+				                            Utils.parseInt(args[3], 0, 5))).run();
 				break;
 			case "axtal_ranged_flying_minions":
 				usage = "axtal_ranged_flying_minions <count> <scope> <repeats>";
-				CommandUtils.assertArgCount(args, 3);
+				Utils.assertArgCount(args, 3);
 				(new SpellAxtalRangedFlyingMinions(plugin,
-				                                   CommandUtils.calleeEntity(send),
-				                                   CommandUtils.parseInt(args[1], 0, 64),
-				                                   CommandUtils.parseInt(args[2], 0, 32),
-				                                   CommandUtils.parseInt(args[3], 0, 5))).run();
+				                                   Utils.calleeEntity(send),
+				                                   Utils.parseInt(args[1], 0, 64),
+				                                   Utils.parseInt(args[2], 0, 32),
+				                                   Utils.parseInt(args[3], 0, 5))).run();
 				break;
 			case "axtal_tnt_throw":
 				usage = "axtal_tnt_throw <count> <cooldown>";
-				CommandUtils.assertArgCount(args, 2);
+				Utils.assertArgCount(args, 2);
 				(new SpellAxtalTntThrow(plugin,
-				                        CommandUtils.calleeEntity(send),
-				                        CommandUtils.parseInt(args[1], 0, 64),
-				                        CommandUtils.parseInt(args[2], 0, 60))).run();
+				                        Utils.calleeEntity(send),
+				                        Utils.parseInt(args[1], 0, 64),
+				                        Utils.parseInt(args[2], 0, 60))).run();
 				break;
 			case "axtal_sneakup":
 				usage = "axtal_sneakup";
-				CommandUtils.assertArgCount(args, 0);
-				(new SpellAxtalSneakup(plugin, CommandUtils.calleeEntity(send))).run();
+				Utils.assertArgCount(args, 0);
+				(new SpellAxtalSneakup(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "axtal_block_break":
 			case "block_break":
 				usage = "block_break";
-				CommandUtils.assertArgCount(args, 0);
-				(new SpellBlockBreak(CommandUtils.calleeEntity(send))).run();
+				Utils.assertArgCount(args, 0);
+				(new SpellBlockBreak(Utils.calleeEntity(send))).run();
 				break;
 			case "axtal_death_ray":
 				usage = "axtal_death_ray";
-				CommandUtils.assertArgCount(args, 0);
-				(new SpellAxtalDeathRay(plugin, CommandUtils.calleeEntity(send))).run();
+				Utils.assertArgCount(args, 0);
+				(new SpellAxtalDeathRay(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "detection_circle":
-				//TODO UPGRADE
-				(new DetectionCircle(plugin)).onSpell(send, args);
+				usage = "detection_circle <centerx> <centery> <centerz> <radius> <duration> <targetx> <targety> <targetz>";
+				Utils.assertArgCount(args, 8);
+				(new SpellDetectionCircle(plugin,
+				                          Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]),
+				                          Utils.parseInt(args[1], 0, 2000),
+				                          Utils.parseInt(args[1], 0, 65535),
+				                          Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[6], args[7], args[8]))).run();
 				break;
 			case "masked_summon_blazes":
 				usage = "masked_summon_blazes";
-				CommandUtils.assertArgCount(args, 0);
-				(new SpellMaskedSummonBlazes(plugin, CommandUtils.calleeEntity(send))).run();
+				Utils.assertArgCount(args, 0);
+				(new SpellMaskedSummonBlazes(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "masked_shadow_glade":
 				usage = "masked_shadow_glade <count>";
-				CommandUtils.assertArgCount(args, 1);
+				Utils.assertArgCount(args, 1);
 				(new SpellMaskedShadowGlade(plugin,
-				                            CommandUtils.calleeEntity(send).getLocation(),
-				                            CommandUtils.parseInt(args[1], 1, 4))).run();
+				                            Utils.calleeEntity(send).getLocation(),
+				                            Utils.parseInt(args[1], 1, 4))).run();
 				break;
 			case "masked_eldritch_beam":
 				usage = "masked_eldritch_beam";
-				CommandUtils.assertArgCount(args, 0);
-				(new SpellMaskedEldritchBeam(plugin, CommandUtils.calleeEntity(send))).run();
+				Utils.assertArgCount(args, 0);
+				(new SpellMaskedEldritchBeam(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "masked_frost_nova":
 				usage = "masked_frost_nova <radius> <time>";
-				CommandUtils.assertArgCount(args, 2);
+				Utils.assertArgCount(args, 2);
 				(new SpellMaskedFrostNova(plugin,
-				                          CommandUtils.calleeEntity(send),
-				                          CommandUtils.parseInt(args[1], 0, 2000),
-				                          CommandUtils.parseInt(args[2], 0, 500))).run();
+				                          Utils.calleeEntity(send),
+				                          Utils.parseInt(args[1], 0, 2000),
+				                          Utils.parseInt(args[2], 0, 500))).run();
 				break;
 			default:
 				send.sendMessage("Unknown spell: '" + args[0] + "'");
