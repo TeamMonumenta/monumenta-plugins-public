@@ -3,6 +3,7 @@ package mmbf.main;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import pe.bossfights.BossManager;
 
 public class Main extends JavaPlugin
 {
@@ -10,8 +11,12 @@ public class Main extends JavaPlugin
 	public void onEnable()
 	{
 		Bukkit.getConsoleSender().sendMessage("[Monumenta_bossfights] Plugin enabled!");
-		getCommand("bossfight").setExecutor(new BossFight(this));
+
+		BossManager bossManager = new BossManager(this);
+		getServer().getPluginManager().registerEvents(bossManager, this);
+
 		getCommand("mobspell").setExecutor(new MobSpell(this));
+		getCommand("bossfight").setExecutor(bossManager);
 	}
 
 	@Override

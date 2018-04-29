@@ -1,19 +1,15 @@
 package mmbf.utils;
 
-import org.bukkit.entity.Player;
-
-import mmbf.main.Main;
-import mmbf.main.MobSpell;
-
-import org.bukkit.entity.Damageable;
-import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.command.CommandSender;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class SpellBossBar
 {
@@ -21,15 +17,13 @@ public class SpellBossBar
 	Damageable mob = null;
 	BossBar bar;
 	int taskID = 0;
-	Main plugin;
-	MobSpell ms;
+	Plugin plugin;
 	String events[] = new String[101];
 	int eventCursor = 100;
 
-	public SpellBossBar(Main pl)
+	public SpellBossBar(Plugin pl)
 	{
 		plugin = pl;
-		ms = new MobSpell(pl);
 		for (int i = 0; i < 101; i++)
 			events[i] = "null";
 	}
@@ -58,7 +52,7 @@ public class SpellBossBar
 			bar.setVisible(false);
 			while (eventCursor >= 0)
 			{
-				ms.spellCall((CommandSender)target, events[eventCursor].split(" "));
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), events[eventCursor]);
 				eventCursor--;
 			}
 		}
@@ -73,7 +67,7 @@ public class SpellBossBar
 
 		while (eventCursor > (progress * 100))
 		{
-			ms.spellCall((CommandSender)target, events[eventCursor].split(" "));
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), events[eventCursor]);
 			eventCursor--;
 		}
 
