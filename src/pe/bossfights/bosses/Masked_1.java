@@ -63,7 +63,7 @@ public class Masked_1 implements Boss
 		               );
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
-							// Teleport the supplied boss to spawnLoc whenever "true" (always)
+							// Teleport the boss to spawnLoc whenever "true" (always)
 							new SpellConditionalTeleport(boss, spawnLoc, b -> true)
 		                );
 

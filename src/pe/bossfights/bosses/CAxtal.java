@@ -21,6 +21,7 @@ import pe.bossfights.spells.SpellAxtalSneakup;
 import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.utils.Utils;
 import org.bukkit.attribute.Attribute;
 
@@ -56,7 +57,12 @@ public class CAxtal implements Boss
 		                   new SpellAxtalDeathRay(plugin, boss)
 		               );
 		passiveSpells = Arrays.asList(
-		                    new SpellBlockBreak(boss)
+		                    new SpellBlockBreak(boss),
+		                    // Teleport the boss to spawnLoc if he gets too far away from where he spawned
+		                    new SpellConditionalTeleport(boss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 110),
+		                    // Teleport the boss to spawnLoc if he is stuck in bedrock
+		                    new SpellConditionalTeleport(boss, spawnLoc, b -> ((b.getLocation().getBlock().getType() == Material.BEDROCK) ||
+		                                                                       (b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK)))
 		                );
 
 		bossBar = new SpellBossBar(plugin);
