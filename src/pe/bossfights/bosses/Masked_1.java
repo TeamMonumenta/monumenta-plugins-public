@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
@@ -61,7 +62,9 @@ public class Masked_1 implements Boss
 		                   new SpellMaskedSummonBlazes(plugin, boss)
 		               );
 		passiveSpells = Arrays.asList(
-		                    new SpellBlockBreak(boss)
+		                    new SpellBlockBreak(boss),
+							// Teleport the supplied boss to spawnLoc whenever "true" (always)
+							new SpellConditionalTeleport(boss, spawnLoc, b -> true)
 		                );
 
 		bossBar.spell(boss, detection_range);
@@ -82,9 +85,6 @@ public class Masked_1 implements Boss
 					boss.teleport(new Location(spawnLoc.getWorld(), 0, -60, 0));
 					return;
 				}
-
-				/* TODO: Convert this to a spell */
-				boss.teleport(spawnLoc);
 
 				for (Spell spell : passiveSpells)
 					spell.run();

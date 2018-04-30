@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
@@ -52,11 +53,13 @@ public class Masked_2 implements Boss
 
 		activeSpells = Arrays.asList(
 		                   new SpellMaskedFrostNova(plugin, boss, 9, 70),
-		                   new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
+		                   new SpellMaskedShadowGlade(plugin, spawnLoc, 2),
 		                   new SpellMaskedSummonBlazes(plugin, boss)
 		               );
 		passiveSpells = Arrays.asList(
-		                    new SpellBlockBreak(boss)
+		                    new SpellBlockBreak(boss),
+							// Teleport the supplied boss to spawnLoc whenever condition is true
+							new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getY() < 157)
 		                );
 
 		bossBar.spell(boss, detection_range);
@@ -77,10 +80,6 @@ public class Masked_2 implements Boss
 
 				for (Spell spell : passiveSpells)
 					spell.run();
-
-				/* if boss is in water, tp to center*/
-				if (boss.getLocation().getY() < 157)
-					boss.teleport(spawnLoc);
 			}
 		};
 		Runnable active = new Runnable()
