@@ -17,6 +17,7 @@ import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
+import pe.bossfights.spells.SpellPushPlayersAway;
 import pe.bossfights.utils.Utils;
 import pe.bossfights.utils.Utils.ArgumentException;
 
@@ -90,6 +91,13 @@ public class MobSpell implements CommandExecutor
 				usage = "block_break";
 				Utils.assertArgCount(args, 0);
 				(new SpellBlockBreak(Utils.calleeEntity(send))).run();
+				break;
+			case "push_players_away":
+				usage = "push_players_away <radius> <maxtime> - NOTE: When running via command, only maxtime=0 will work";
+				Utils.assertArgCount(args, 2);
+				(new SpellPushPlayersAway(Utils.calleeEntity(send),
+				                          Utils.parseInt(args[1], 0, 64),
+				                          Utils.parseInt(args[2], 0, 0))).run();
 				break;
 			case "axtal_death_ray":
 				usage = "axtal_death_ray";

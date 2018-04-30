@@ -2,24 +2,20 @@ package pe.bossfights.bosses;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import mmbf.utils.SpellBossBar;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.Vector;
 
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
@@ -27,8 +23,8 @@ import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
+import pe.bossfights.spells.SpellPushPlayersAway;
 import pe.bossfights.utils.Utils;
-import org.bukkit.attribute.Attribute;
 
 public class Masked_1 implements Boss
 {
@@ -62,6 +58,7 @@ public class Masked_1 implements Boss
 		               );
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
+		                    new SpellPushPlayersAway(boss, 7, 15),
 							// Teleport the boss to spawnLoc whenever "true" (always)
 							new SpellConditionalTeleport(boss, spawnLoc, b -> true)
 		                );
@@ -72,9 +69,6 @@ public class Masked_1 implements Boss
 
 		Runnable passive = new Runnable()
 		{
-			/* Tracks how long players have been too close to the boss */
-			Map<UUID, Integer> playerNearTime = new HashMap<UUID, Integer>();
-
 			@Override
 			public void run()
 			{
@@ -89,29 +83,6 @@ public class Masked_1 implements Boss
 
 				for (Spell spell : passiveSpells)
 					spell.run();
-
-				/* Push players away that have been too close for too long */
-				/* TODO: Convert this to a spell */
-				for (Player player : Utils.playersInRange(boss.getLocation(), detection_range))
-				{
-					Integer nearTime = 0;
-					Location pLoc = player.getLocation();
-					if (pLoc.distance(boss.getLocation()) < 7)
-					{
-						nearTime = playerNearTime.get(player.getUniqueId());
-						if (nearTime == null)
-							nearTime = 0;
-						nearTime++;
-						if (nearTime > 15)
-						{
-							Location lLoc = boss.getLocation();
-							Vector vect = new Vector(pLoc.getX() - lLoc.getX(), 0, pLoc.getZ() - lLoc.getZ());
-							vect.normalize().setY(0.7f).multiply(2);
-							player.setVelocity(vect);
-						}
-					}
-					playerNearTime.put(player.getUniqueId(), nearTime);
-				}
 			}
 		};
 		Runnable active = new Runnable()
