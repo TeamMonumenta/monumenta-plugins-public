@@ -32,12 +32,11 @@ public class CAxtal implements Boss
 	Location spawnLoc;
 	Location endLoc;
 
-	int detection_range = 200;
+	int detection_range = 110;
 	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "C'Axtal";
 
 	int taskIDpassive;
 	int taskIDactive;
-	int taskIDupdate;
 	List<Spell> activeSpells;
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
@@ -59,7 +58,7 @@ public class CAxtal implements Boss
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
 		                    // Teleport the boss to spawnLoc if he gets too far away from where he spawned
-		                    new SpellConditionalTeleport(boss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 110),
+		                    new SpellConditionalTeleport(boss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > detection_range),
 		                    // Teleport the boss to spawnLoc if he is stuck in bedrock
 		                    new SpellConditionalTeleport(boss, spawnLoc, b -> ((b.getLocation().getBlock().getType() == Material.BEDROCK) ||
 		                                                                       (b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK)))
@@ -85,6 +84,8 @@ public class CAxtal implements Boss
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
+				bossBar.update_bar(boss, detection_range);
+
 				for (Spell spell : passiveSpells)
 					spell.run();
 			}
@@ -104,21 +105,9 @@ public class CAxtal implements Boss
 				activeSpells.get(0).run();
 			}
 		};
-		Runnable update = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				/* Don't progress if players aren't present */
-				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return;
-				bossBar.update_bar(boss, detection_range);
-			}
-		};
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
-		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
 		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 	}
 
@@ -157,7 +146,6 @@ public class CAxtal implements Boss
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.cancelTask(taskIDpassive);
 		scheduler.cancelTask(taskIDactive);
-		scheduler.cancelTask(taskIDupdate);
 		bossBar.remove();
 	}
 }

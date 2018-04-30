@@ -37,7 +37,6 @@ public class Masked_2 implements Boss
 
 	int taskIDpassive;
 	int taskIDactive;
-	int taskIDupdate;
 	List<Spell> activeSpells;
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
@@ -78,6 +77,8 @@ public class Masked_2 implements Boss
 					return;
 				}
 
+				bossBar.update_bar(boss, detection_range);
+
 				for (Spell spell : passiveSpells)
 					spell.run();
 			}
@@ -97,21 +98,9 @@ public class Masked_2 implements Boss
 				activeSpells.get(0).run();
 			}
 		};
-		Runnable update = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				/* Don't progress if players aren't present */
-				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
-					return;
-				bossBar.update_bar(boss, detection_range);
-			}
-		};
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		taskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
-		taskIDupdate = scheduler.scheduleSyncRepeatingTask(plugin, update, 1L, 5L);
 		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 	}
 
@@ -142,7 +131,6 @@ public class Masked_2 implements Boss
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		scheduler.cancelTask(taskIDpassive);
 		scheduler.cancelTask(taskIDactive);
-		scheduler.cancelTask(taskIDupdate);
 		bossBar.remove();
 	}
 }
