@@ -28,10 +28,12 @@ public class Utils
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
-			if (player.getLocation().distance(loc) < range && player.getGameMode() == GameMode.SURVIVAL)
+			if (player.getLocation().distance(loc) < range &&
+			    player.getGameMode() == GameMode.SURVIVAL &&
+			    player.getHealth() > 0)
 				out.add(player);
 		}
-		return (out);
+		return out;
 	}
 
 	public static Location getLocation(Location origin, String sx, String sy, String sz)
@@ -67,7 +69,7 @@ public class Utils
 		}
 		else
 			out.setZ(Double.parseDouble(sz));
-		return (out);
+		return out;
 	}
 
 	public static void assertArgCount(String[] arg, int expectedCount) throws ArgumentException
