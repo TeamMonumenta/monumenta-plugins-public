@@ -28,44 +28,40 @@ public class Masked_1 extends Boss
 	public static final String identityTag = "boss_masked_1";
 	public static final int detectionRange = 50;
 
-	Plugin plugin;
-	LivingEntity boss;
-	Location spawnLoc;
-	Location endLoc;
+	LivingEntity mBoss;
+	Location mEndLoc;
 
-	public Masked_1(Plugin pl, LivingEntity bossIn, Location spawnLocIn, Location endLocIn)
+	public Masked_1(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc)
 	{
-		plugin = pl;
-		boss = bossIn;
-		spawnLoc = spawnLocIn;
-		endLoc = endLocIn;
+		mBoss = boss;
+		mEndLoc = endLoc;
 
 		SpellBossBar bossBar = new SpellBossBar(plugin);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new SpellMaskedEldritchBeam(plugin, boss),
-		                                                 new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
-		                                                 new SpellMaskedSummonBlazes(plugin, boss)
+		                                                 new SpellMaskedEldritchBeam(plugin, mBoss),
+		                                                 new SpellMaskedShadowGlade(plugin, mBoss.getLocation(), 2),
+		                                                 new SpellMaskedSummonBlazes(plugin, mBoss)
 		                                             ));
 		List<Spell> passiveSpells = Arrays.asList(
-		                                new SpellBlockBreak(boss),
-		                                new SpellPushPlayersAway(boss, 7, 15),
+		                                new SpellBlockBreak(mBoss),
+		                                new SpellPushPlayersAway(mBoss, 7, 15),
 		                                // Teleport the boss to spawnLoc whenever "true" (always)
-		                                new SpellConditionalTeleport(boss, spawnLoc, b -> true)
+		                                new SpellConditionalTeleport(mBoss, spawnLoc, b -> true)
 		                            );
 
-		bossBar.spell(boss, detectionRange);
+		bossBar.spell(mBoss, detectionRange);
 		bossBar.changeColor(BarColor.WHITE);
 		bossBar.changeStyle(BarStyle.SOLID);
 
-		super.constructBoss(pl, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
 	@Override
 	public void init()
 	{
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(boss.getLocation(), detectionRange).size();
+		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 256;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0)
@@ -74,15 +70,15 @@ public class Masked_1 extends Boss
 			hp_del = hp_del / 2;
 			player_count--;
 		}
-		boss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
-		boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		boss.setHealth(bossTargetHp);
+		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
+		mBoss.setHealth(bossTargetHp);
 	}
 
 	@Override
 	public void death()
 	{
-		endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-		boss.teleport(new Location(spawnLoc.getWorld(), 0, -60, 0));
+		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+		mBoss.teleport(mBoss.getLocation().add(0, -300, 0));
 	}
 }
