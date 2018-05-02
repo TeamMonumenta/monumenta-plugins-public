@@ -63,13 +63,37 @@ public abstract class Boss
 		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 	}
 
-	/* Called only the first time the boss is summoned into the world */
-	public abstract void init();
+	/*
+	 * Called only the first time the boss is summoned into the world
+	 *
+	 * Useful to set the bosses health / armor / etc. based on # of players
+	 */
+	public void init() {};
 
-	/* Called when the boss dies */
-	public abstract void death();
+	/*
+	 * Called when the boss dies
+	 *
+	 * Useful to use setblock or a command to trigger post-fight logic
+	 */
+	public void death() {};
 
-	/* Called when the chunk the boss is in unloads. Also called after death() */
+	/*
+	 * Called when the mob is unloading and we need to save its metadata
+	 *
+	 * Needed whenever the boss needs more parameters to instantiate than just
+	 * the boss mob itself (tele to spawn location, end location to set block, etc.)
+	 */
+	public String serialize()
+	{
+		return "";
+	}
+
+	/*
+	 * Called when the chunk the boss is in unloads. Also called after death()
+	 *
+	 * Probably don't need to override this method, but if you do, call it
+	 * via super.unload()
+	 */
 	public void unload()
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -77,5 +101,12 @@ public abstract class Boss
 		scheduler.cancelTask(mTaskIDactive);
 		if (mBossBar != null)
 			mBossBar.remove();
+
+		if (mBoss.isValid() && mBoss.getHealth() > 0)
+		{
+			String content = serialize();
+
+			//TODO: Call utility which writes data to mob
+		}
 	}
 }

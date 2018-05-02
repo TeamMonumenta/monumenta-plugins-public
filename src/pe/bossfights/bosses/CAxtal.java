@@ -1,5 +1,9 @@
 package pe.bossfights.bosses;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,11 +32,36 @@ public class CAxtal extends Boss
 	public static final int detectionRange = 110;
 
 	LivingEntity mBoss;
+	Location mSpawnLoc;
 	Location mEndLoc;
+
+	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	{
+		//TODO: Get serial data from lore
+		String content = "";
+
+		if (content == null || content.isEmpty())
+			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");
+
+		Gson gson = new Gson();
+		JsonObject object = gson.fromJson(content, JsonObject.class);
+
+		if (!(object.has("spawnX") && object.has("spawnY") && object.has("spawnZ") &&
+		      object.has("endX") && object.has("endY") && object.has("endZ")))
+			throw new Exception("Failed to instantiate " + identityTag + ": missing required data element");
+
+		Location spawnLoc = new Location(boss.getWorld(), object.get("spawnX").getAsDouble(),
+		                                 object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
+		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
+		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
+
+		return new CAxtal(plugin, boss, spawnLoc, endLoc);
+	}
 
 	public CAxtal(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc)
 	{
 		mBoss = boss;
+		mSpawnLoc = endLoc;
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
@@ -95,5 +124,21 @@ public class CAxtal extends Boss
 		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+	}
+
+	@Override
+	public String serialize()
+	{
+		Gson gson = new GsonBuilder().create();
+		JsonObject root = new JsonObject();
+
+		root.addProperty("spawnX", mSpawnLoc.getX());
+		root.addProperty("spawnY", mSpawnLoc.getY());
+		root.addProperty("spawnZ", mSpawnLoc.getZ());
+		root.addProperty("endX", mEndLoc.getX());
+		root.addProperty("endY", mEndLoc.getY());
+		root.addProperty("endZ", mEndLoc.getZ());
+
+		return gson.toJson(root);
 	}
 }

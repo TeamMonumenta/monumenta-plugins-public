@@ -42,6 +42,7 @@ public class BossManager implements Listener, CommandExecutor
 	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
 	{
 		if (args.length < 4)
+			//TODO helpful message
 			return false;
 
 		Location endLoc;
@@ -111,21 +112,22 @@ public class BossManager implements Listener, CommandExecutor
 
 			Set<String> tags = entity.getScoreboardTags();
 			if (tags != null && !tags.isEmpty()) {
-				if (tags.contains(CAxtal.identityTag)) {
-					// TODO: Read these from the entity directly
-					Location spawnLoc = entity.getLocation();
-					Location endLoc = entity.getLocation();
-					mBosses.put(entity.getUniqueId(), new CAxtal(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
-				} else if (tags.contains(Masked_1.identityTag)) {
-					// TODO: Read these from the entity directly
-					Location spawnLoc = entity.getLocation();
-					Location endLoc = entity.getLocation();
-					mBosses.put(entity.getUniqueId(), new Masked_1(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
-				} else if (tags.contains(Masked_2.identityTag)) {
-					// TODO: Read these from the entity directly
-					Location spawnLoc = entity.getLocation();
-					Location endLoc = entity.getLocation();
-					mBosses.put(entity.getUniqueId(), new Masked_2(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
+				Boss boss = null;
+				try {
+					if (tags.contains(CAxtal.identityTag)) {
+						boss = CAxtal.deserialize(mPlugin, (LivingEntity)entity);
+					} else if (tags.contains(Masked_1.identityTag)) {
+						boss = Masked_1.deserialize(mPlugin, (LivingEntity)entity);
+					} else if (tags.contains(Masked_2.identityTag)) {
+						boss = Masked_2.deserialize(mPlugin, (LivingEntity)entity);
+					}
+				} catch (Exception ex) {
+					//TODO warning
+
+				}
+
+				if (boss != null) {
+					mBosses.put(entity.getUniqueId(), boss);
 				}
 			}
 		}
@@ -156,6 +158,7 @@ public class BossManager implements Listener, CommandExecutor
 		Entity entity = event.getEntity();
 		if (!(entity instanceof LivingEntity))
 			return;
+
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
