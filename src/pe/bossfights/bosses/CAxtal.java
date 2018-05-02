@@ -24,9 +24,9 @@ import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.utils.Utils;
 
-public class CAxtal implements Boss
+public class CAxtal extends Boss
 {
-	public static final String identityTag = "BOSS_CAXTAL";
+	public static final String identityTag = "boss_caxtal";
 
 	Plugin plugin;
 	LivingEntity boss;
@@ -43,6 +43,7 @@ public class CAxtal implements Boss
 
 	public CAxtal(Plugin pl, LivingEntity bossIn, Location spawnLocIn, Location endLocIn)
 	{
+		super(identityTag, bossIn);
 		plugin = pl;
 		boss = bossIn;
 		spawnLoc = spawnLocIn;

@@ -3,6 +3,7 @@ package pe.bossfights;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -63,6 +64,8 @@ public class BossManager implements Listener, CommandExecutor
 			return false;
 		}
 
+		send.sendMessage(args[0].toLowerCase());
+		send.sendMessage(Masked_1.identityTag);
 		Boss boss;
 		switch (args[0].toLowerCase())
 		{
@@ -81,6 +84,7 @@ public class BossManager implements Listener, CommandExecutor
 		}
 
 		/* Set up boss health / armor / etc */
+		mBosses.put(targetEntity.getUniqueId(), boss);
 		boss.init();
 
 		return true;
@@ -93,15 +97,37 @@ public class BossManager implements Listener, CommandExecutor
 
 		for (Entity entity : entities)
 		{
+			if (!(entity instanceof LivingEntity))
+				continue;
+
+			// TODO: Sanity check (this should never happen)
+			/*
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null)
 			{
 				// TODO WARNING - this should never happen
 			}
+			*/
 
-			// Check if boss
-			// Read data from items
-			// Instantiate boss
+			Set<String> tags = entity.getScoreboardTags();
+			if (tags != null && !tags.isEmpty()) {
+				if (tags.contains(CAxtal.identityTag)) {
+					// TODO: Read these from the entity directly
+					Location spawnLoc = entity.getLocation();
+					Location endLoc = entity.getLocation();
+					mBosses.put(entity.getUniqueId(), new CAxtal(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
+				} else if (tags.contains(Masked_1.identityTag)) {
+					// TODO: Read these from the entity directly
+					Location spawnLoc = entity.getLocation();
+					Location endLoc = entity.getLocation();
+					mBosses.put(entity.getUniqueId(), new Masked_1(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
+				} else if (tags.contains(Masked_2.identityTag)) {
+					// TODO: Read these from the entity directly
+					Location spawnLoc = entity.getLocation();
+					Location endLoc = entity.getLocation();
+					mBosses.put(entity.getUniqueId(), new Masked_2(mPlugin, (LivingEntity)entity, spawnLoc, endLoc));
+				}
+			}
 		}
 	}
 
@@ -112,6 +138,9 @@ public class BossManager implements Listener, CommandExecutor
 
 		for (Entity entity : entities)
 		{
+			if (!(entity instanceof LivingEntity))
+				continue;
+
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null)
 			{
@@ -125,6 +154,8 @@ public class BossManager implements Listener, CommandExecutor
 	public void EntityDeathEvent(EntityDeathEvent event)
 	{
 		Entity entity = event.getEntity();
+		if (!(entity instanceof LivingEntity))
+			return;
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{

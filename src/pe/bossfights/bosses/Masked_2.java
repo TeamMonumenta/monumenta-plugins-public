@@ -24,9 +24,9 @@ import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
 import pe.bossfights.utils.Utils;
 
-public class Masked_2 implements Boss
+public class Masked_2 extends Boss
 {
-	public static final String identityTag = "BOSS_MASKED_2";
+	public static final String identityTag = "boss_masked_2";
 
 	Plugin plugin;
 	LivingEntity boss;
@@ -43,6 +43,7 @@ public class Masked_2 implements Boss
 
 	public Masked_2(Plugin pl, LivingEntity bossIn, Location spawnLocIn, Location endLocIn)
 	{
+		super(identityTag, bossIn);
 		plugin = pl;
 		boss = bossIn;
 		spawnLoc = spawnLocIn;
