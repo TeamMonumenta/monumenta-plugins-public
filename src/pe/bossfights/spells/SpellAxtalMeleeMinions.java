@@ -1,5 +1,6 @@
 package pe.bossfights.spells;
 
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -19,15 +20,28 @@ public class SpellAxtalMeleeMinions implements Spell
 	private int mCount;
 	private int mScope;
 	private int mRepeats;
+	private int mNearbyRadius;
+	private int mMaxNearby;
 	private Random mRand = new Random();
 
-	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope, int repeats)
+	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope,
+	                              int repeats, int nearbyRadius, int maxNearby)
 	{
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCount = count;
 		mScope = scope;
 		mRepeats = repeats;
+		mNearbyRadius = nearbyRadius;
+		mMaxNearby = maxNearby;
+	}
+
+	@Override
+	public boolean canRun()
+	{
+		List<Entity> nearbyEntities = mLauncher.getNearbyEntities(mNearbyRadius, mNearbyRadius, mNearbyRadius);
+
+		return (nearbyEntities.stream().filter(e -> e.getType() == EntityType.SKELETON).count() < mMaxNearby);
 	}
 
 	@Override

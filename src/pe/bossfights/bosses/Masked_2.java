@@ -1,11 +1,11 @@
 package pe.bossfights.bosses;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import mmbf.utils.SpellBossBar;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellConditionalTeleport;
@@ -23,7 +24,6 @@ import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
 import pe.bossfights.utils.Utils;
-import org.bukkit.attribute.Attribute;
 
 public class Masked_2 implements Boss
 {
@@ -37,7 +37,7 @@ public class Masked_2 implements Boss
 
 	int taskIDpassive;
 	int taskIDactive;
-	List<Spell> activeSpells;
+	SpellManager activeSpells;
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
 
@@ -50,15 +50,15 @@ public class Masked_2 implements Boss
 
 		bossBar = new SpellBossBar(plugin);
 
-		activeSpells = Arrays.asList(
-		                   new SpellMaskedFrostNova(plugin, boss, 9, 70),
-		                   new SpellMaskedShadowGlade(plugin, spawnLoc, 2),
-		                   new SpellMaskedSummonBlazes(plugin, boss)
-		               );
+		activeSpells = new SpellManager(Arrays.asList(
+		                                    new SpellMaskedFrostNova(plugin, boss, 9, 70),
+		                                    new SpellMaskedShadowGlade(plugin, spawnLoc, 2),
+		                                    new SpellMaskedSummonBlazes(plugin, boss)
+		                                ));
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
-							// Teleport the boss to spawnLoc whenever condition is true
-							new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getY() < 157)
+		                    // Teleport the boss to spawnLoc whenever condition is true
+		                    new SpellConditionalTeleport(boss, spawnLoc, b -> b.getLocation().getY() < 157)
 		                );
 
 		bossBar.spell(boss, detection_range);
@@ -92,10 +92,7 @@ public class Masked_2 implements Boss
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
-				/* Run an active spell from the list of available spells */
-				// TODO: Add the cooldown back in to prevent re-running the same command twice in a row
-				Collections.shuffle(activeSpells);
-				activeSpells.get(0).run();
+				activeSpells.runNextSpell();
 			}
 		};
 

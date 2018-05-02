@@ -1,11 +1,11 @@
 package pe.bossfights.bosses;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import mmbf.utils.SpellBossBar;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellAxtalDeathRay;
 import pe.bossfights.spells.SpellAxtalMeleeMinions;
@@ -23,7 +24,6 @@ import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellConditionalTeleport;
 import pe.bossfights.utils.Utils;
-import org.bukkit.attribute.Attribute;
 
 public class CAxtal implements Boss
 {
@@ -37,7 +37,7 @@ public class CAxtal implements Boss
 
 	int taskIDpassive;
 	int taskIDactive;
-	List<Spell> activeSpells;
+	SpellManager activeSpells;
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
 
@@ -48,13 +48,13 @@ public class CAxtal implements Boss
 		spawnLoc = spawnLocIn;
 		endLoc = endLocIn;
 
-		activeSpells = Arrays.asList(
-		                   new SpellAxtalWitherAoe(plugin, boss, 13, 4),
-		                   new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3),
-		                   new SpellAxtalSneakup(plugin, boss),
-		                   new SpellAxtalTntThrow(plugin, boss, 5, 15),
-		                   new SpellAxtalDeathRay(plugin, boss)
-		               );
+		activeSpells = new SpellManager(Arrays.asList(
+		                                    new SpellAxtalWitherAoe(plugin, boss, 13, 4),
+		                                    new SpellAxtalMeleeMinions(plugin, boss, 10, 3, 3, 20, 12),
+		                                    new SpellAxtalSneakup(plugin, boss),
+		                                    new SpellAxtalTntThrow(plugin, boss, 5, 15),
+		                                    new SpellAxtalDeathRay(plugin, boss)
+		                                ));
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
 		                    // Teleport the boss to spawnLoc if he gets too far away from where he spawned
@@ -99,10 +99,7 @@ public class CAxtal implements Boss
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
-				/* Run an active spell from the list of available spells */
-				// TODO: Add the cooldown back in to prevent re-running the same command twice in a row
-				Collections.shuffle(activeSpells);
-				activeSpells.get(0).run();
+				activeSpells.runNextSpell();
 			}
 		};
 

@@ -1,7 +1,6 @@
 package pe.bossfights.bosses;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import mmbf.utils.SpellBossBar;
@@ -17,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellConditionalTeleport;
@@ -38,7 +38,7 @@ public class Masked_1 implements Boss
 
 	int taskIDpassive;
 	int taskIDactive;
-	List<Spell> activeSpells;
+	SpellManager activeSpells;
 	List<Spell> passiveSpells;
 	SpellBossBar bossBar;
 
@@ -51,16 +51,16 @@ public class Masked_1 implements Boss
 
 		bossBar = new SpellBossBar(plugin);
 
-		activeSpells = Arrays.asList(
-		                   new SpellMaskedEldritchBeam(plugin, boss),
-		                   new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
-		                   new SpellMaskedSummonBlazes(plugin, boss)
-		               );
+		activeSpells = new SpellManager(Arrays.asList(
+		                                    new SpellMaskedEldritchBeam(plugin, boss),
+		                                    new SpellMaskedShadowGlade(plugin, boss.getLocation(), 2),
+		                                    new SpellMaskedSummonBlazes(plugin, boss)
+		                                ));
 		passiveSpells = Arrays.asList(
 		                    new SpellBlockBreak(boss),
 		                    new SpellPushPlayersAway(boss, 7, 15),
-							// Teleport the boss to spawnLoc whenever "true" (always)
-							new SpellConditionalTeleport(boss, spawnLoc, b -> true)
+		                    // Teleport the boss to spawnLoc whenever "true" (always)
+		                    new SpellConditionalTeleport(boss, spawnLoc, b -> true)
 		                );
 
 		bossBar.spell(boss, detection_range);
@@ -94,10 +94,7 @@ public class Masked_1 implements Boss
 				if (Utils.playersInRange(boss.getLocation(), detection_range).isEmpty())
 					return;
 
-				/* Run an active spell from the list of available spells */
-				// TODO: Add the cooldown back in to prevent re-running the same command twice in a row
-				Collections.shuffle(activeSpells);
-				activeSpells.get(0).run();
+				activeSpells.runNextSpell();
 			}
 		};
 

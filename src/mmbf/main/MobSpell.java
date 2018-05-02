@@ -56,13 +56,15 @@ public class MobSpell implements CommandExecutor
 				                         Utils.parseInt(args[2], 0, 5))).run();
 				break;
 			case "axtal_melee_minions":
-				usage = "axtal_melee_minions <count> <scope> <repeats>";
-				Utils.assertArgCount(args, 3);
+				usage = "axtal_melee_minions <count> <scope> <repeats> <nearbyRadius> <maxNearby>";
+				Utils.assertArgCount(args, 5);
 				(new SpellAxtalMeleeMinions(plugin,
 				                            Utils.calleeEntity(send),
 				                            Utils.parseInt(args[1], 0, 64),
 				                            Utils.parseInt(args[2], 0, 32),
-				                            Utils.parseInt(args[3], 0, 5))).run();
+				                            Utils.parseInt(args[3], 0, 5),
+				                            Utils.parseInt(args[4], 0, 1000),
+				                            Utils.parseInt(args[5], 0, 1000))).run();
 				break;
 			case "axtal_ranged_flying_minions":
 				usage = "axtal_ranged_flying_minions <count> <scope> <repeats>";
