@@ -7,7 +7,6 @@ import mmbf.utils.SpellBossBar;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,13 +26,14 @@ import pe.bossfights.utils.Utils;
 
 public class CAxtal implements Boss
 {
+	public static final String identityTag = "BOSS_CAXTAL";
+
 	Plugin plugin;
 	LivingEntity boss;
 	Location spawnLoc;
 	Location endLoc;
 
 	int detection_range = 110;
-	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "C'Axtal";
 
 	int taskIDpassive;
 	int taskIDactive;
@@ -108,6 +108,7 @@ public class CAxtal implements Boss
 		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 	}
 
+	@Override
 	public void init()
 	{
 		int bossTargetHp = 0;
@@ -131,6 +132,7 @@ public class CAxtal implements Boss
 		Utils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
+	@Override
 	public void death()
 	{
 		Utils.executeCommandOnNearbyPlayers(boss.getLocation(), detection_range, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
@@ -138,6 +140,7 @@ public class CAxtal implements Boss
 		endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
+	@Override
 	public void unload()
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

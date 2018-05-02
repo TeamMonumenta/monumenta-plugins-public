@@ -9,7 +9,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,13 +27,14 @@ import pe.bossfights.utils.Utils;
 
 public class Masked_1 implements Boss
 {
+	public static final String identityTag = "BOSS_MASKED_1";
+
 	Plugin plugin;
 	LivingEntity boss;
 	Location spawnLoc;
 	Location endLoc;
 
 	int detection_range = 50;
-	String mobName = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Masked Man";
 
 	int taskIDpassive;
 	int taskIDactive;
@@ -103,6 +103,7 @@ public class Masked_1 implements Boss
 		taskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
 	}
 
+	@Override
 	public void init()
 	{
 		int bossTargetHp = 0;
@@ -120,12 +121,14 @@ public class Masked_1 implements Boss
 		boss.setHealth(bossTargetHp);
 	}
 
+	@Override
 	public void death()
 	{
 		endLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 		boss.teleport(new Location(spawnLoc.getWorld(), 0, -60, 0));
 	}
 
+	@Override
 	public void unload()
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

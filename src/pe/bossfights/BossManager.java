@@ -66,13 +66,13 @@ public class BossManager implements Listener, CommandExecutor
 		Boss boss;
 		switch (args[0].toLowerCase())
 		{
-		case "caxtal":
+		case CAxtal.identityTag:
 			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
-		case "masked_1":
+		case Masked_1.identityTag:
 			boss = new Masked_1(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
-		case "masked_2":
+		case Masked_2.identityTag:
 			boss = new Masked_2(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
 		default:
