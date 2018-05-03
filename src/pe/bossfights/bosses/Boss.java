@@ -17,8 +17,8 @@ public abstract class Boss
 {
 	LivingEntity mBoss;
 	SpellBossBar mBossBar;
-	int mTaskIDpassive;
-	int mTaskIDactive;
+	int mTaskIDpassive = -1;
+	int mTaskIDactive = -1;
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, SpellBossBar bossBar)
@@ -29,6 +29,7 @@ public abstract class Boss
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
 
+		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable passive = new Runnable()
 		{
 			@Override
@@ -41,26 +42,29 @@ public abstract class Boss
 				if (mBossBar != null)
 					mBossBar.update_bar(mBoss, detectionRange);
 
-				for (Spell spell : passiveSpells)
-					spell.run();
+				if (passiveSpells != null)
+					for (Spell spell : passiveSpells)
+						spell.run();
 			}
 		};
-		Runnable active = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				/* Don't progress if players aren't present */
-				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
-					return;
-
-				activeSpells.runNextSpell();
-			}
-		};
-
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
-		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+
+		if (activeSpells != null)
+		{
+			Runnable active = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					/* Don't progress if players aren't present */
+					if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
+						return;
+
+					activeSpells.runNextSpell();
+				}
+			};
+			mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+		}
 	}
 
 	/*
@@ -85,7 +89,7 @@ public abstract class Boss
 	 */
 	public String serialize()
 	{
-		return "";
+		return null;
 	}
 
 	/*
@@ -97,16 +101,20 @@ public abstract class Boss
 	public void unload()
 	{
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		scheduler.cancelTask(mTaskIDpassive);
-		scheduler.cancelTask(mTaskIDactive);
+		if (mTaskIDpassive != -1)
+			scheduler.cancelTask(mTaskIDpassive);
+		if (mTaskIDactive != -1)
+			scheduler.cancelTask(mTaskIDactive);
 		if (mBossBar != null)
 			mBossBar.remove();
 
 		if (mBoss.isValid() && mBoss.getHealth() > 0)
 		{
 			String content = serialize();
-
-			//TODO: Call utility which writes data to mob
+			if (content != null && !content.isEmpty())
+			{
+				//TODO: Call utility which writes data to mob
+			}
 		}
 	}
 }

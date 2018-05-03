@@ -2,8 +2,8 @@ package pe.bossfights;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 
 import pe.bossfights.bosses.Boss;
 import pe.bossfights.bosses.CAxtal;
+import pe.bossfights.bosses.GenericBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
 import pe.bossfights.utils.Utils;
@@ -70,6 +72,9 @@ public class BossManager implements Listener, CommandExecutor
 		Boss boss;
 		switch (args[0].toLowerCase())
 		{
+		case GenericBoss.identityTag:
+			boss = new GenericBoss(mPlugin, (LivingEntity)targetEntity);
+			break;
 		case CAxtal.identityTag:
 			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
@@ -91,6 +96,38 @@ public class BossManager implements Listener, CommandExecutor
 		return true;
 	}
 
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void EntitySpawnEvent(EntitySpawnEvent event)
+	{
+		Entity entity = event.getEntity();
+
+		if (!(entity instanceof LivingEntity))
+			return;
+
+		// TODO: Sanity check (this should never happen)
+		/*
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null)
+		{
+			// TODO WARNING - this should never happen
+		}
+		*/
+
+		Set<String> tags = entity.getScoreboardTags();
+		if (tags != null && !tags.isEmpty())
+		{
+			Boss boss = null;
+			if (tags.contains(GenericBoss.identityTag))
+				boss = new GenericBoss(mPlugin, (LivingEntity)entity);
+
+			if (boss != null) {
+				mBosses.put(entity.getUniqueId(), boss);
+				boss.init();
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ChunkLoadEvent(ChunkLoadEvent event)
 	{
@@ -106,29 +143,32 @@ public class BossManager implements Listener, CommandExecutor
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null)
 			{
-				// TODO WARNING - this should never happen
+			    // TODO WARNING - this should never happen
 			}
 			*/
 
 			Set<String> tags = entity.getScoreboardTags();
-			if (tags != null && !tags.isEmpty()) {
+			if (tags != null && !tags.isEmpty())
+			{
 				Boss boss = null;
-				try {
-					if (tags.contains(CAxtal.identityTag)) {
+				try
+				{
+					if (tags.contains(GenericBoss.identityTag))
+						boss = new GenericBoss(mPlugin, (LivingEntity)entity);
+					else if (tags.contains(CAxtal.identityTag))
 						boss = CAxtal.deserialize(mPlugin, (LivingEntity)entity);
-					} else if (tags.contains(Masked_1.identityTag)) {
+					else if (tags.contains(Masked_1.identityTag))
 						boss = Masked_1.deserialize(mPlugin, (LivingEntity)entity);
-					} else if (tags.contains(Masked_2.identityTag)) {
+					else if (tags.contains(Masked_2.identityTag))
 						boss = Masked_2.deserialize(mPlugin, (LivingEntity)entity);
-					}
-				} catch (Exception ex) {
+				}
+				catch (Exception ex)
+				{
 					//TODO warning
-
 				}
 
-				if (boss != null) {
+				if (boss != null)
 					mBosses.put(entity.getUniqueId(), boss);
-				}
 			}
 		}
 	}
