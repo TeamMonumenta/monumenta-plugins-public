@@ -1,10 +1,13 @@
 package pe.bossfights;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,12 +35,15 @@ import pe.bossfights.utils.Utils.ArgumentException;
 public class BossManager implements Listener, CommandExecutor
 {
 	Plugin mPlugin;
-
-	Map<UUID, Boss> mBosses = new HashMap<UUID, Boss>();
+	Map<UUID, Boss> mBosses;
 
 	public BossManager(Plugin plugin)
 	{
 		mPlugin = plugin;
+		mBosses = new HashMap<UUID, Boss>();
+
+		/* When starting up, look for bosses in all current world entities */
+		ProcessEntities(Bukkit.getWorlds().get(0).getEntities());
 	}
 
 	@Override
@@ -110,7 +116,7 @@ public class BossManager implements Listener, CommandExecutor
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
-			// TODO WARNING - this should never happen
+		    // TODO WARNING - this should never happen
 		}
 		*/
 
@@ -121,18 +127,16 @@ public class BossManager implements Listener, CommandExecutor
 			if (tags.contains(GenericBoss.identityTag))
 				boss = new GenericBoss(mPlugin, (LivingEntity)entity);
 
-			if (boss != null) {
+			if (boss != null)
+			{
 				mBosses.put(entity.getUniqueId(), boss);
 				boss.init();
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void ChunkLoadEvent(ChunkLoadEvent event)
+	private void ProcessEntities(List<Entity> entities)
 	{
-		Entity[] entities = event.getChunk().getEntities();
-
 		for (Entity entity : entities)
 		{
 			if (!(entity instanceof LivingEntity))
@@ -174,6 +178,12 @@ public class BossManager implements Listener, CommandExecutor
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
+	public void ChunkLoadEvent(ChunkLoadEvent event)
+	{
+		ProcessEntities(Arrays.asList(event.getChunk().getEntities()));
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void ChunkUnloadEvent(ChunkUnloadEvent event)
 	{
 		Entity[] entities = event.getChunk().getEntities();
@@ -207,5 +217,12 @@ public class BossManager implements Listener, CommandExecutor
 
 			// TODO: Un-tagify drops
 		}
+	}
+
+	public void unloadAll()
+	{
+		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet())
+			entry.getValue().unload();
+		mBosses.clear();
 	}
 }

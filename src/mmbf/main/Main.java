@@ -8,24 +8,24 @@ import pe.bossfights.utils.MetadataUtils;
 
 public class Main extends JavaPlugin
 {
+	BossManager mBossManager;
+
 	@Override
 	public void onEnable()
 	{
-		//TODO: Iterate loaded entities and refresh their boss status
-
 		Bukkit.getConsoleSender().sendMessage("[Monumenta_bossfights] Plugin enabled!");
 
-		BossManager bossManager = new BossManager(this);
-		getServer().getPluginManager().registerEvents(bossManager, this);
+		mBossManager = new BossManager(this);
+		getServer().getPluginManager().registerEvents(mBossManager, this);
 
 		getCommand("mobspell").setExecutor(new MobSpell(this));
-		getCommand("bossfight").setExecutor(bossManager);
+		getCommand("bossfight").setExecutor(mBossManager);
 	}
 
 	@Override
 	public void onDisable()
 	{
-		//TODO: Iterate and serialize all loaded bosses and cancel the fights
+		mBossManager.unloadAll();
 
 		getServer().getScheduler().cancelTasks(this);
 
