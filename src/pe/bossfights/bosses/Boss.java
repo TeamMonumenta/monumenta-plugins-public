@@ -2,13 +2,12 @@ package pe.bossfights.bosses;
 
 import java.util.List;
 
-import mmbf.utils.SpellBossBar;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import pe.bossfights.BossBarManager;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.utils.Utils;
@@ -16,12 +15,12 @@ import pe.bossfights.utils.Utils;
 public abstract class Boss
 {
 	LivingEntity mBoss;
-	SpellBossBar mBossBar;
+	BossBarManager mBossBar;
 	int mTaskIDpassive = -1;
 	int mTaskIDactive = -1;
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, SpellBossBar bossBar)
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar)
 	{
 		mBoss = boss;
 		mBossBar = bossBar;
@@ -40,7 +39,7 @@ public abstract class Boss
 					return;
 
 				if (mBossBar != null)
-					mBossBar.update_bar(mBoss, detectionRange);
+					mBossBar.update();
 
 				if (passiveSpells != null)
 					for (Spell spell : passiveSpells)

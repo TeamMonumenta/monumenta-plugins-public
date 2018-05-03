@@ -1,15 +1,11 @@
 package pe.bossfights.bosses;
 
-import java.util.Arrays;
-import java.util.List;
-
-import mmbf.utils.SpellBossBar;
-
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import pe.bossfights.spells.Spell;
-import pe.bossfights.spells.SpellBlockBreak;
+import pe.bossfights.BossBarManager;
 
 public class GenericBoss extends Boss
 {
@@ -22,8 +18,7 @@ public class GenericBoss extends Boss
 	{
 		mBoss = boss;
 
-		SpellBossBar bossBar = new SpellBossBar(plugin);
-		bossBar.spell(mBoss, detectionRange);
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
 
 		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, bossBar);
 	}

@@ -7,8 +7,6 @@ import com.google.gson.JsonObject;
 import java.util.Arrays;
 import java.util.List;
 
-import mmbf.utils.SpellBossBar;
-
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -17,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
+import pe.bossfights.BossBarManager;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;
@@ -65,8 +64,6 @@ public class Masked_1 extends Boss
 		mSpawnLoc = endLoc;
 		mEndLoc = endLoc;
 
-		SpellBossBar bossBar = new SpellBossBar(plugin);
-
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 		                                                 new SpellMaskedEldritchBeam(plugin, mBoss),
 		                                                 new SpellMaskedShadowGlade(plugin, mBoss.getLocation(), 2),
@@ -79,9 +76,7 @@ public class Masked_1 extends Boss
 		                                new SpellConditionalTeleport(mBoss, spawnLoc, b -> true)
 		                            );
 
-		bossBar.spell(mBoss, detectionRange);
-		bossBar.changeColor(BarColor.WHITE);
-		bossBar.changeStyle(BarStyle.SOLID);
+		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
 	}

@@ -6,15 +6,18 @@ import com.google.gson.JsonObject;
 
 import java.util.Arrays;
 import java.util.List;
-
-import mmbf.utils.SpellBossBar;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
+import pe.bossfights.BossBarManager;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellAxtalDeathRay;
@@ -80,16 +83,12 @@ public class CAxtal extends Boss
 		                                        (b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK)))
 		                            );
 
-		SpellBossBar bossBar = new SpellBossBar(plugin);
-
-		//create bossbar
-		bossBar.spell(mBoss, detectionRange);
-		//schedule hp messages
-		Location loc = mBoss.getLocation();
-		bossBar.setEvent(100, Utils.getExecuteCommandOnNearbyPlayers(loc, detectionRange, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
-		bossBar.setEvent(50,  Utils.getExecuteCommandOnNearbyPlayers(loc, detectionRange, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
-		bossBar.setEvent(25,  Utils.getExecuteCommandOnNearbyPlayers(loc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
-		bossBar.setEvent(10,  Utils.getExecuteCommandOnNearbyPlayers(loc, detectionRange, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
+		Map<Integer, String> events = new HashMap<Integer, String>();
+		events.put(100, Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
+		events.put(50,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
+		events.put(25,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
+		events.put(10,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
+		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
 	}
