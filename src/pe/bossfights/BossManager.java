@@ -3,6 +3,7 @@ package pe.bossfights;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import pe.bossfights.bosses.CAxtal;
 import pe.bossfights.bosses.GenericBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
+import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 import pe.bossfights.utils.Utils.ArgumentException;
 
@@ -49,9 +51,11 @@ public class BossManager implements Listener, CommandExecutor
 	@Override
 	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
 	{
-		if (args.length < 4)
-			//TODO helpful message
+		if (args.length != 4)
+		{
+			send.sendMessage(ChatColor.RED + "This command requires exactly four arguments!");
 			return false;
+		}
 
 		Location endLoc;
 		Entity targetEntity;
@@ -91,7 +95,9 @@ public class BossManager implements Listener, CommandExecutor
 			boss = new Masked_2(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
 		default:
-			//TODO helpful message
+			send.sendMessage(ChatColor.RED + "Invalid boss name!");
+			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
+			                 CAxtal.identityTag + "," + Masked_1.identityTag + "," + Masked_2.identityTag + "]");
 			return false;
 		}
 
@@ -111,14 +117,9 @@ public class BossManager implements Listener, CommandExecutor
 		if (!(entity instanceof LivingEntity))
 			return;
 
-		// TODO: Sanity check (this should never happen)
-		/*
-		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null)
-		{
-		    // TODO WARNING - this should never happen
-		}
-		*/
+		/* This should never happen */
+		if (mBosses.get(entity.getUniqueId()) != null)
+			mPlugin.getLogger().log(Level.SEVERE, "EntitySpawnEvent: Boss spawned that is already tracked!");
 
 		Set<String> tags = entity.getScoreboardTags();
 		if (tags != null && !tags.isEmpty())
@@ -142,14 +143,9 @@ public class BossManager implements Listener, CommandExecutor
 			if (!(entity instanceof LivingEntity))
 				continue;
 
-			// TODO: Sanity check (this should never happen)
-			/*
-			Boss boss = mBosses.get(entity.getUniqueId());
-			if (boss != null)
-			{
-			    // TODO WARNING - this should never happen
-			}
-			*/
+			/* This should never happen */
+			if (mBosses.get(entity.getUniqueId()) != null)
+				mPlugin.getLogger().log(Level.SEVERE, "ProcessEntities: Adding boss that is already tracked!");
 
 			Set<String> tags = entity.getScoreboardTags();
 			if (tags != null && !tags.isEmpty())
@@ -168,7 +164,7 @@ public class BossManager implements Listener, CommandExecutor
 				}
 				catch (Exception ex)
 				{
-					//TODO warning
+					mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
 				}
 
 				if (boss != null)
@@ -183,7 +179,7 @@ public class BossManager implements Listener, CommandExecutor
 		ProcessEntities(Arrays.asList(event.getChunk().getEntities()));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void ChunkUnloadEvent(ChunkUnloadEvent event)
 	{
 		Entity[] entities = event.getChunk().getEntities();
@@ -202,7 +198,7 @@ public class BossManager implements Listener, CommandExecutor
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void EntityDeathEvent(EntityDeathEvent event)
 	{
 		Entity entity = event.getEntity();
@@ -215,7 +211,11 @@ public class BossManager implements Listener, CommandExecutor
 			boss.death();
 			boss.unload();
 
-			// TODO: Un-tagify drops
+			/*
+			 * Remove special serialization data from drops. Should not be
+			 * necessary since loaded bosses already have this data stripped
+			 */
+			SerializationUtils.stripSerializationDataFromDrops(event);
 		}
 	}
 

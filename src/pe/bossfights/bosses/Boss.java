@@ -1,6 +1,7 @@
 package pe.bossfights.bosses;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -15,6 +16,7 @@ import pe.bossfights.utils.Utils;
 
 public abstract class Boss
 {
+	Plugin mPlugin;
 	LivingEntity mBoss;
 	BossBarManager mBossBar;
 	int mTaskIDpassive = -1;
@@ -23,6 +25,7 @@ public abstract class Boss
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar)
 	{
+		mPlugin = plugin;
 		mBoss = boss;
 		mBossBar = bossBar;
 
@@ -113,7 +116,14 @@ public abstract class Boss
 			String content = serialize();
 			if (content != null && !content.isEmpty())
 			{
-				SerializationUtils.storeDataOnEntity(mBoss, content);
+				try
+				{
+					SerializationUtils.storeDataOnEntity(mBoss, content);
+				}
+				catch (Exception ex)
+				{
+					mPlugin.getLogger().log(Level.SEVERE, "Failed to save data to entity: ", ex);
+				}
 			}
 		}
 	}

@@ -6,11 +6,11 @@ description: <need better desc>
 commands:
   bossfight:
     description: bossfight
-    usage: "usage: /bossfight <boss_name> "
+    usage: "usage: /bossfight <boss_name> <x> <y> <z>"
     permission: BossFight.bossfight
     permission-message: You don't have the permission to use this command.
   mobspell:
     description: Used to launch spells
-    usage: "usage: /mobspell <spell> "
+    usage: "usage: /mobspell <spell> [arguments]"
     permission: Mobspell.mobspell
     permission-message: You don't have the permission to use this command.

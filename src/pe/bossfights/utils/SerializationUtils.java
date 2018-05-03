@@ -2,8 +2,10 @@ package pe.bossfights.utils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,7 +16,7 @@ public class SerializationUtils
 	private static final String SERIALCONST = "SERIALDATA=";
 	private static final int SERIALLEN = 50;
 
-	public static List<String> serializeStringToLore(String data)
+	private static List<String> serializeStringToLore(String data)
 	{
 		List<String> ret = new LinkedList<String>();
 		for (int start = 0; start < data.length(); start += SERIALLEN)
@@ -22,7 +24,7 @@ public class SerializationUtils
 		return ret;
 	}
 
-	public static String deserializeStringFromLore(List<String> lore)
+	private static String deserializeStringFromLore(List<String> lore)
 	{
 		String retval = "";
 		for (String str : lore)
@@ -32,16 +34,13 @@ public class SerializationUtils
 	}
 
 
-	public static void storeDataOnEntity(LivingEntity entity, String data)
+	public static void storeDataOnEntity(LivingEntity entity, String data) throws Exception
 	{
 		boolean placeholderItem = false;
 
 		EntityEquipment equip = entity.getEquipment();
 		if (equip == null)
-		{
-			//TODO: ERROR!
-			return;
-		}
+			throw new Exception("Boss equipment is null!");
 
 		ItemStack item = equip.getItemInOffHand();
 		if (item == null)
@@ -52,10 +51,7 @@ public class SerializationUtils
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null)
-		{
-			// TODO: ERROR!
-			return;
-		}
+			throw new Exception("Boss item meta is null!");
 
 		if (placeholderItem)
 			meta.setDisplayName(SERIALCONST);
@@ -79,10 +75,7 @@ public class SerializationUtils
 	{
 		EntityEquipment equip = entity.getEquipment();
 		if (equip == null)
-		{
-			//TODO: ERROR!
 			return "";
-		}
 
 		ItemStack item = equip.getItemInOffHand();
 		if (item == null || !item.hasItemMeta())
@@ -97,12 +90,30 @@ public class SerializationUtils
 
 		/* Don't leave any serialization data on the entity */
 		currentLore.removeIf(lore -> lore.startsWith(SERIALCONST));
-		meta.setLore(currentLore);
 
 		/* If this item's only purpose for existing was to hold data, remove it */
 		if (meta.hasDisplayName() && meta.getDisplayName().equals(SERIALCONST))
 			equip.setItemInOffHand(null);
 
 		return data;
+	}
+
+	public static void stripSerializationDataFromDrops(EntityDeathEvent event)
+	{
+		ListIterator<ItemStack> iter = event.getDrops().listIterator();
+		while (iter.hasNext())
+		{
+			ItemStack item = iter.next();
+			if (item.hasItemMeta())
+			{
+				ItemMeta meta = item.getItemMeta();
+
+				if (meta.hasDisplayName() && meta.getDisplayName().equals(SERIALCONST))
+					iter.remove();
+
+				if (meta.hasLore())
+					meta.getLore().removeIf(lore -> lore.startsWith(SERIALCONST));
+			}
+		}
 	}
 }
