@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import pe.bossfights.BossBarManager;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
+import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 
 public abstract class Boss
@@ -112,7 +113,7 @@ public abstract class Boss
 			String content = serialize();
 			if (content != null && !content.isEmpty())
 			{
-				//TODO: Call utility which writes data to mob
+				SerializationUtils.storeDataOnEntity(mBoss, content);
 			}
 		}
 	}

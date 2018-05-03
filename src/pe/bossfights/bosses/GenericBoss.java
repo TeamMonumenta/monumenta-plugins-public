@@ -14,6 +14,11 @@ public class GenericBoss extends Boss
 
 	LivingEntity mBoss;
 
+	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	{
+		return new GenericBoss(plugin, boss);
+	}
+
 	public GenericBoss(Plugin plugin, LivingEntity boss)
 	{
 		mBoss = boss;

@@ -24,6 +24,7 @@ import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
 import pe.bossfights.spells.SpellPushPlayersAway;
+import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 
 public class Masked_1 extends Boss
@@ -37,8 +38,7 @@ public class Masked_1 extends Boss
 
 	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
-		//TODO: Get serial data from lore
-		String content = "";
+		String content = SerializationUtils.retrieveDataFromEntity(boss);
 
 		if (content == null || content.isEmpty())
 			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");

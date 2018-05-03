@@ -158,7 +158,7 @@ public class BossManager implements Listener, CommandExecutor
 				try
 				{
 					if (tags.contains(GenericBoss.identityTag))
-						boss = new GenericBoss(mPlugin, (LivingEntity)entity);
+						boss = GenericBoss.deserialize(mPlugin, (LivingEntity)entity);
 					else if (tags.contains(CAxtal.identityTag))
 						boss = CAxtal.deserialize(mPlugin, (LivingEntity)entity);
 					else if (tags.contains(Masked_1.identityTag))

@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -27,6 +27,7 @@ import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellConditionalTeleport;
+import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 
 public class CAxtal extends Boss
@@ -40,8 +41,7 @@ public class CAxtal extends Boss
 
 	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
-		//TODO: Get serial data from lore
-		String content = "";
+		String content = SerializationUtils.retrieveDataFromEntity(boss);
 
 		if (content == null || content.isEmpty())
 			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");
