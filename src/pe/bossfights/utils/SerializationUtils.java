@@ -43,7 +43,7 @@ public class SerializationUtils
 			throw new Exception("Boss equipment is null!");
 
 		ItemStack item = equip.getItemInOffHand();
-		if (item == null)
+		if (item == null || item.getType() == Material.AIR)
 		{
 			item = new ItemStack(Material.GREEN_RECORD);
 			placeholderItem = true;
@@ -69,6 +69,9 @@ public class SerializationUtils
 		}
 		else
 			meta.setLore(addLore);
+
+		item.setItemMeta(meta);
+		equip.setItemInOffHand(item);
 	}
 
 	public static String retrieveDataFromEntity(LivingEntity entity)
@@ -78,7 +81,7 @@ public class SerializationUtils
 			return "";
 
 		ItemStack item = equip.getItemInOffHand();
-		if (item == null || !item.hasItemMeta())
+		if (item == null || item.getType() == Material.AIR || !item.hasItemMeta())
 			return "";
 
 		ItemMeta meta = item.getItemMeta();

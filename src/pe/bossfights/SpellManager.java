@@ -1,5 +1,6 @@
 package pe.bossfights;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,7 +31,14 @@ public class SpellManager
 
 	public SpellManager(List<Spell> spells)
 	{
-		mReadySpells = spells;
+		/*
+		 * Need a new copy of the list because the passed-in version doesn't
+		 * support removing during iteration... Weird
+		 */
+		mReadySpells = new ArrayList<Spell>();
+		for (Spell spell : spells)
+			mReadySpells.add(spell);
+
 		mCooldownSpells = new LinkedList<Spell>();
 		mCooldown = (int)Math.floor(((double)mReadySpells.size() - 1.0) / 2.0);
 	}

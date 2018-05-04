@@ -15,7 +15,6 @@ public class BossBarManager
 {
 	private LivingEntity mBoss;
 	private int mRange;
-	private double mBossMaxHP;
 	private Map<Integer, String> mEvents;
 	private int mEventCursor;
 	private BossBar mBar;
@@ -24,7 +23,6 @@ public class BossBarManager
 	{
 		mBoss = boss;
 		mRange = range;
-		mBossMaxHP = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 		mEvents = events;
 		mEventCursor = 100;
 
@@ -49,7 +47,7 @@ public class BossBarManager
 				mBar.removePlayer(player);
 		}
 
-		double progress = mBoss.getHealth() / mBossMaxHP;
+		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 
 		while (mEvents != null && mEventCursor > (progress * 100))
 		{
