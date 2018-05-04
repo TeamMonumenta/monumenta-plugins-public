@@ -77,10 +77,12 @@ public class CAxtal extends Boss
 		List<Spell> passiveSpells = Arrays.asList(
 		                                new SpellBlockBreak(mBoss),
 		                                // Teleport the boss to spawnLoc if he gets too far away from where he spawned
-		                                new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > detectionRange),
+		                                new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 		                                // Teleport the boss to spawnLoc if he is stuck in bedrock
 		                                new SpellConditionalTeleport(mBoss, spawnLoc, b -> ((b.getLocation().getBlock().getType() == Material.BEDROCK) ||
-		                                        (b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK)))
+		                                                                                    (b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK) ||
+		                                                                                    (b.getLocation().getBlock().getType() == Material.LAVA) ||
+		                                                                                    (b.getLocation().getBlock().getType() == Material.STATIONARY_LAVA)))
 		                            );
 
 		Map<Integer, String> events = new HashMap<Integer, String>();
