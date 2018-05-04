@@ -64,7 +64,7 @@ public class CAxtal extends Boss
 	public CAxtal(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc)
 	{
 		mBoss = boss;
-		mSpawnLoc = endLoc;
+		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(

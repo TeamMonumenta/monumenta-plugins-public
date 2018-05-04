@@ -61,7 +61,7 @@ public class Masked_1 extends Boss
 	public Masked_1(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc)
 	{
 		mBoss = boss;
-		mSpawnLoc = endLoc;
+		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
