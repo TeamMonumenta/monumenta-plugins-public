@@ -71,8 +71,7 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
 	private static final int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
 	private static final int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
-	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
+	private static final int PRISMATIC_SHIELD_COOLDOWN = 3 * 60 * 20;
 
 	private static final int MAGMA_SHIELD_COOLDOWN = 21 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
@@ -92,8 +91,6 @@ public class MageClass extends BaseClass {
 	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
-
-	private static int INTELLECT_XP = 3;
 
 	private static int PASSIVE_EFFECT_DURATION = 25;
 
@@ -154,20 +151,16 @@ public class MageClass extends BaseClass {
 
 						world.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
 
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
+						int intellectBonus = Math.min(ScoreboardUtils.getScoreboardValue(player, "Intellect"), 2);
+						int cooldown = (int) Math.ceil(ARCANE_STRIKE_COOLDOWN * (6-intellectBonus)/6);
+
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, cooldown);
 					}
 				}
 			}
 		}
 
 		return true;
-	}
-	@Override
-	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
-		int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
-		if (shouldGenDrops && intellect > 0) {
-			player.giveExp(INTELLECT_XP);
-		}
 	}
 
 	@Override
@@ -207,8 +200,8 @@ public class MageClass extends BaseClass {
 							world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
 							world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
 
-							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-							int cooldown = intellectBonus ? (MAGMA_SHIELD_COOLDOWN / 3) * 2 : MAGMA_SHIELD_COOLDOWN;
+							int intellectBonus = Math.min(ScoreboardUtils.getScoreboardValue(player, "Intellect"), 2);
+							int cooldown = (int) Math.ceil(MAGMA_SHIELD_COOLDOWN * (6-intellectBonus)/6);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, cooldown);
 						}
@@ -294,8 +287,8 @@ public class MageClass extends BaseClass {
 								}
 							}
 
-							int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
-							int cooldown = intellect < 2 ? FROST_NOVA_COOLDOWN : (FROST_NOVA_COOLDOWN / 3) * 2;
+							int intellectBonus = Math.min(ScoreboardUtils.getScoreboardValue(player, "Intellect"), 2);
+							int cooldown = (int) Math.ceil(FROST_NOVA_COOLDOWN * (6-intellectBonus)/6);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, cooldown);
 
@@ -395,8 +388,8 @@ public class MageClass extends BaseClass {
 						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 						MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
 
-						boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-						int cooldown = intellectBonus ? PRISMATIC_SHIELD_INTELLECT_COOLDOWN : PRISMATIC_SHIELD_BASE_COOLDOWN;
+						int intellectBonus = Math.min(ScoreboardUtils.getScoreboardValue(player, "Intellect"), 2);
+						int cooldown = (int) Math.ceil(PRISMATIC_SHIELD_COOLDOWN * (6-intellectBonus)/6);
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, cooldown);
 					}
 				}

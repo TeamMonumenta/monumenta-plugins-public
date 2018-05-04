@@ -130,7 +130,7 @@ public class AlchemistClass extends BaseClass {
 		super(plugin, random);
 	}
 
-/*
+
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		//	GruesomeAlchemy
@@ -168,7 +168,7 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}*/
+	}
 
 	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
@@ -240,7 +240,7 @@ public class AlchemistClass extends BaseClass {
 		}
 	}
 
-	/*
+
 	@Override
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		if (player.isSneaking()) {
@@ -256,9 +256,9 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}*/
+	}
 
-	/*
+
 	@Override
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 										   ThrownPotion potion, PotionSplashEvent event) {
@@ -325,9 +325,8 @@ public class AlchemistClass extends BaseClass {
 		}
 
 		return true;
-	}*/
+	}
 
-	/*
 	@Override
 	public void AreaEffectCloudApplyEvent(Collection<LivingEntity> entities, Player player) {
 		int causticMixture = ScoreboardUtils.getScoreboardValue(player, "CausticMixture");
@@ -347,7 +346,7 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-	}*/
+	}
 
 	// =================
 	// = IRON TINCTURE =
