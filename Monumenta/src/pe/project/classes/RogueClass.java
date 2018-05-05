@@ -128,7 +128,7 @@ public class RogueClass extends BaseClass {
 						if (rayEntities != null && !rayEntities.isEmpty()) {
 							LivingEntity entity = rayEntities.get(0);
 
-							if (entity != null && EntityUtils.isHostileMob(entity)) {
+							if (entity != null && !entity.isDead() && EntityUtils.isHostileMob(entity)) {
 								Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
 								Location loc = player.getLocation();
 								while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
