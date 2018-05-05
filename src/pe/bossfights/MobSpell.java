@@ -1,4 +1,4 @@
-package mmbf.main;
+package pe.bossfights;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -23,9 +23,9 @@ import pe.bossfights.utils.Utils.ArgumentException;
 
 public class MobSpell implements CommandExecutor
 {
-	Main plugin;
+	Plugin plugin;
 
-	public MobSpell(Main pl)
+	public MobSpell(Plugin pl)
 	{
 		plugin = pl;
 	}

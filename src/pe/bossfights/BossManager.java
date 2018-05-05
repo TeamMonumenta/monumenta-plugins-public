@@ -23,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.Location;
-import org.bukkit.plugin.Plugin;
 
 import pe.bossfights.bosses.Boss;
 import pe.bossfights.bosses.CAxtal;
@@ -179,6 +178,16 @@ public class BossManager implements Listener, CommandExecutor
 		ProcessEntities(Arrays.asList(event.getChunk().getEntities()));
 	}
 
+	public void unload(LivingEntity entity)
+	{
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null)
+		{
+			boss.unload();
+			mBosses.remove(entity.getUniqueId());
+		}
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void ChunkUnloadEvent(ChunkUnloadEvent event)
 	{
@@ -189,12 +198,7 @@ public class BossManager implements Listener, CommandExecutor
 			if (!(entity instanceof LivingEntity))
 				continue;
 
-			Boss boss = mBosses.get(entity.getUniqueId());
-			if (boss != null)
-			{
-				boss.unload();
-				mBosses.remove(entity.getUniqueId());
-			}
+			unload((LivingEntity)entity);
 		}
 	}
 

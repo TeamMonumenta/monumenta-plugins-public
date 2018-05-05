@@ -13,9 +13,9 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.plugin.Plugin;
 
 import pe.bossfights.BossBarManager;
+import pe.bossfights.Plugin;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellBlockBreak;

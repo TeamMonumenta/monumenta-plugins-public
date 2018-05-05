@@ -1,14 +1,13 @@
-package mmbf.main;
+package pe.bossfights;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import pe.bossfights.BossManager;
 import pe.bossfights.utils.MetadataUtils;
 
-public class Main extends JavaPlugin
+public class Plugin extends JavaPlugin
 {
-	BossManager mBossManager;
+	public BossManager mBossManager;
 
 	@Override
 	public void onEnable()

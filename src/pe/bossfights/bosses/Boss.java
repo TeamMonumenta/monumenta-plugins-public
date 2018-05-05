@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import pe.bossfights.BossBarManager;
+import pe.bossfights.Plugin;
 import pe.bossfights.SpellManager;
 import pe.bossfights.spells.Spell;
 import pe.bossfights.utils.SerializationUtils;
@@ -60,6 +61,17 @@ public abstract class Boss
 				@Override
 				public void run()
 				{
+					/* Check if somehow the boss entity is missing even though this is still running */
+					boolean bossCheck = true;
+					for (Entity entity : mBoss.getNearbyEntities(0.2, 0.2, 0.2))
+						if (entity.getUniqueId().equals(mBoss.getUniqueId()))
+							bossCheck = false;
+					if (bossCheck) {
+						mPlugin.getLogger().log(Level.SEVERE, "BUG! Boss is missing but still has active attacks. Unloading...");
+						mPlugin.mBossManager.unload(mBoss);
+						return;
+					}
+
 					/* Don't progress if players aren't present */
 					if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
 						return;

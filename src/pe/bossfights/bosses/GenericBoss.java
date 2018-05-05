@@ -3,9 +3,9 @@ package pe.bossfights.bosses;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 import pe.bossfights.BossBarManager;
+import pe.bossfights.Plugin;
 
 public class GenericBoss extends Boss
 {
