@@ -29,7 +29,6 @@ public class Utils
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
 		{
 			if (player.getLocation().distance(loc) < range &&
-			    player.getGameMode() != GameMode.CREATIVE &&
 			    player.getGameMode() != GameMode.SPECTATOR &&
 			    player.getHealth() > 0)
 				out.add(player);
