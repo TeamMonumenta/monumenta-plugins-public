@@ -6,12 +6,13 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataStoreBase;
 import org.bukkit.metadata.MetadataValue;
-
-import pe.project.Plugin;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.World;
 
 public class MetadataUtils {
 	/* This method can be used to wrap code that should only execute once per tick
@@ -38,7 +39,9 @@ public class MetadataUtils {
 		_removeAllMetadataHelper("getEntityMetadata", plugin.getServer(), plugin);
 		_removeAllMetadataHelper("getPlayerMetadata", plugin.getServer(), plugin);
 		_removeAllMetadataHelper("getWorldMetadata", plugin.getServer(), plugin);
-		_removeAllMetadataHelper("getBlockMetadata", plugin.mWorld, plugin);
+		for (World world : Bukkit.getWorlds()) {
+			_removeAllMetadataHelper("getBlockMetadata", world, plugin);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
