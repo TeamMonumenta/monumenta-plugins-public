@@ -111,8 +111,8 @@ public class MobSpell implements CommandExecutor
 				Utils.assertArgCount(args, 8);
 				(new SpellDetectionCircle(plugin,
 				                          Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[1], args[2], args[3]),
-				                          Utils.parseInt(args[1], 0, 2000),
-				                          Utils.parseInt(args[1], 0, 65535),
+				                          Utils.parseInt(args[4], 0, 2000),
+				                          Utils.parseInt(args[5], 0, 65535),
 				                          Utils.getLocation(Utils.calleeEntity(send).getLocation(), args[6], args[7], args[8]))).run();
 				break;
 			case "masked_summon_blazes":
