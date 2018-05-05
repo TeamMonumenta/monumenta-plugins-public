@@ -30,6 +30,7 @@ import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.ItemUtils;
 import pe.project.utils.MessagingUtils;
 import pe.project.utils.MetadataUtils;
 import pe.project.utils.MovementUtils;
@@ -57,6 +58,7 @@ public class MageClass extends BaseClass {
 	private static final int MANA_LANCE_R = 91;
 	private static final int MANA_LANCE_G = 187;
 	private static final int MANA_LANCE_B = 255;
+	private static final int MANA_LANCE_STAGGER_DURATION = (int) (0.95 * 20);
 
 	private static final float FROST_NOVA_RADIUS = 6.0f;
 	private static final int FROST_NOVA_1_DAMAGE = 3;
@@ -209,7 +211,7 @@ public class MageClass extends BaseClass {
 				}
 			} else {
 				//Mana Lance
-				if (action == Action.RIGHT_CLICK_AIR) {
+				if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.isInteractable(blockClicked))) {
 					int manaLance = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (InventoryUtils.isWandItem(mainHand)) {
@@ -228,7 +230,7 @@ public class MageClass extends BaseClass {
 									loc.add(dir);
 
 									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
-									for (int t = 0; t < 12; t ++) {
+									for (int t = 0; t < 18; t++) {
 										Location pLoc = loc.clone();
 										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
 										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
@@ -246,6 +248,7 @@ public class MageClass extends BaseClass {
 										if (EntityUtils.isHostileMob(e)) {
 											LivingEntity le = (LivingEntity) e;
 											EntityUtils.damageEntity(mPlugin, le, extraDamage, player);
+											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 										}
 									}
 								}
