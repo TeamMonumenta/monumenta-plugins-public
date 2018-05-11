@@ -41,12 +41,12 @@ public abstract class Boss
 			@Override
 			public void run()
 			{
-				/* Don't progress if players aren't present */
-				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
-					return;
-
 				if (mBossBar != null)
 					mBossBar.update();
+
+				/* Don't run abilities if players aren't present */
+				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
+					return;
 
 				if (passiveSpells != null)
 					for (Spell spell : passiveSpells)
