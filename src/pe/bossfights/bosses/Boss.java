@@ -67,7 +67,7 @@ public abstract class Boss
 						if (entity.getUniqueId().equals(mBoss.getUniqueId()))
 							bossCheck = false;
 					if (bossCheck) {
-						mPlugin.getLogger().log(Level.SEVERE, "BUG! Boss is missing but still has active attacks. Unloading...");
+						mPlugin.getLogger().log(Level.WARNING, "BUG! Boss is missing but still has active attacks. Unloading...");
 						mPlugin.mBossManager.unload(mBoss);
 						return;
 					}

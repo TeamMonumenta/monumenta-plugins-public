@@ -1,8 +1,6 @@
 package pe.bossfights;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +42,13 @@ public class BossManager implements Listener, CommandExecutor
 		mBosses = new HashMap<UUID, Boss>();
 
 		/* When starting up, look for bosses in all current world entities */
-		ProcessEntities(Bukkit.getWorlds().get(0).getEntities());
+		for (Entity entity : Bukkit.getWorlds().get(0).getEntities())
+		{
+			if (!(entity instanceof LivingEntity))
+				continue;
+
+			ProcessEntity((LivingEntity)entity);
+		}
 	}
 
 	@Override
@@ -116,66 +120,52 @@ public class BossManager implements Listener, CommandExecutor
 		if (!(entity instanceof LivingEntity))
 			return;
 
+		ProcessEntity((LivingEntity)entity);
+	}
+
+	private void ProcessEntity(LivingEntity entity)
+	{
 		/* This should never happen */
-		if (mBosses.get(entity.getUniqueId()) != null)
-			mPlugin.getLogger().log(Level.SEVERE, "EntitySpawnEvent: Boss spawned that is already tracked!");
+		if (mBosses.get(entity.getUniqueId()) != null) {
+			mPlugin.getLogger().log(Level.WARNING, "ProcessEntity: Attempted to add boss that was already tracked!");
+			return;
+		}
 
 		Set<String> tags = entity.getScoreboardTags();
 		if (tags != null && !tags.isEmpty())
 		{
 			Boss boss = null;
-			if (tags.contains(GenericBoss.identityTag))
-				boss = new GenericBoss(mPlugin, (LivingEntity)entity);
+			try
+			{
+				if (tags.contains(GenericBoss.identityTag))
+					boss = GenericBoss.deserialize(mPlugin, entity);
+				else if (tags.contains(CAxtal.identityTag))
+					boss = CAxtal.deserialize(mPlugin, entity);
+				else if (tags.contains(Masked_1.identityTag))
+					boss = Masked_1.deserialize(mPlugin, entity);
+				else if (tags.contains(Masked_2.identityTag))
+					boss = Masked_2.deserialize(mPlugin, entity);
+			}
+			catch (Exception ex)
+			{
+				mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
+			}
 
 			if (boss != null)
-			{
 				mBosses.put(entity.getUniqueId(), boss);
-				boss.init();
-			}
-		}
-	}
-
-	private void ProcessEntities(List<Entity> entities)
-	{
-		for (Entity entity : entities)
-		{
-			if (!(entity instanceof LivingEntity))
-				continue;
-
-			/* This should never happen */
-			if (mBosses.get(entity.getUniqueId()) != null)
-				mPlugin.getLogger().log(Level.SEVERE, "ProcessEntities: Adding boss that is already tracked!");
-
-			Set<String> tags = entity.getScoreboardTags();
-			if (tags != null && !tags.isEmpty())
-			{
-				Boss boss = null;
-				try
-				{
-					if (tags.contains(GenericBoss.identityTag))
-						boss = GenericBoss.deserialize(mPlugin, (LivingEntity)entity);
-					else if (tags.contains(CAxtal.identityTag))
-						boss = CAxtal.deserialize(mPlugin, (LivingEntity)entity);
-					else if (tags.contains(Masked_1.identityTag))
-						boss = Masked_1.deserialize(mPlugin, (LivingEntity)entity);
-					else if (tags.contains(Masked_2.identityTag))
-						boss = Masked_2.deserialize(mPlugin, (LivingEntity)entity);
-				}
-				catch (Exception ex)
-				{
-					mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
-				}
-
-				if (boss != null)
-					mBosses.put(entity.getUniqueId(), boss);
-			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ChunkLoadEvent(ChunkLoadEvent event)
 	{
-		ProcessEntities(Arrays.asList(event.getChunk().getEntities()));
+		for (Entity entity : event.getChunk().getEntities())
+		{
+			if (!(entity instanceof LivingEntity))
+				continue;
+
+			ProcessEntity((LivingEntity)entity);
+		}
 	}
 
 	public void unload(LivingEntity entity)
