@@ -44,8 +44,8 @@ public class WarlockClass extends BaseClass {
 	private static final int AMPLIFYING_2_EFFECT_DAMAGE = 7;
 	private static final int AMPLIFYING_RADIUS = 8;
 	private static final double AMPLIFYING_DOT_ANGLE = 0.33;
-	private static final int AMPLIFYING_1_COOLDOWN = 16 * 20;
-	private static final int AMPLIFYING_2_COOLDOWN = 12 * 20;
+	private static final int AMPLIFYING_1_COOLDOWN = 12 * 20;
+	private static final int AMPLIFYING_2_COOLDOWN = 10 * 20;
 	private static final float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
 
 	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
@@ -66,21 +66,25 @@ public class WarlockClass extends BaseClass {
 	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
 	private static final int CURSED_WOUND_RADIUS = 3;
+	private static final int CURSED_WOUND_DAMAGE = 1;
 
 	private static final int GRASPING_CLAWS_RADIUS = 6;
 	private static final float GRASPING_CLAWS_SPEED = 0.25f;
-	private static final int GRASPING_CLAWS_DAMAGE = 7;
+	private static final int GRASPING_CLAWS_1_DAMAGE = 3;
+	private static final int GRASPING_CLAWS_2_DAMAGE = 7;
 	private static final int GRASPING_CLAWS_DURATION = 7 * 20;
 	private static final int GRASPING_CLAWS_COOLDOWN = 16 * 20;
 
-	private static final double SOUL_REND_HEAL_MULT = 0.4;
+	private static final double SOUL_REND_HEAL_1_MULT = 0.4;
+	private static final double SOUL_REND_HEAL_2_MULT = 0.5;
 	private static final int SOUL_REND_RADIUS = 7;
 	private static final int SOUL_REND_COOLDOWN = 6 * 20;
 
 	private static final int CONSUMING_FLAMES_1_RADIUS = 5;
 	private static final int CONSUMING_FLAMES_2_RADIUS = 7;
+	private static final int CONSUMING_FLAMES_DAMAGE = 1;
 	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
-	private static final int CONSUMING_FLAMES_COOLDOWN = 13 * 20;
+	private static final int CONSUMING_FLAMES_COOLDOWN = 11 * 20;
 
 	public WarlockClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -98,9 +102,7 @@ public class WarlockClass extends BaseClass {
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
 
-		if (InventoryUtils.isWandItem(offHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
-		} else if (InventoryUtils.isScytheItem(offHand)) {
+		if (InventoryUtils.isScytheItem(mainHand)) {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
 		}
 	}
@@ -152,8 +154,10 @@ public class WarlockClass extends BaseClass {
 			// Cursed Wound
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
 			if (cursedWound > 0 && EntityUtils.isHostileMob(damagee)) {
+
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+				EntityUtils.damageEntity(mPlugin, damagee, CURSED_WOUND_DAMAGE, player);
 
 				if (PlayerUtils.isCritical(player) && cursedWound > 1) {
 					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
@@ -173,7 +177,8 @@ public class WarlockClass extends BaseClass {
 				if (PlayerUtils.isCritical(player) && EntityUtils.isHostileMob(damagee)) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SOUL_REND)) {
 
-						double soulHealValue = damage * SOUL_REND_HEAL_MULT;
+						double healMult = (soulRend == 1) ? SOUL_REND_HEAL_1_MULT : SOUL_REND_HEAL_2_MULT;
+						double soulHealValue = damage * healMult;
 
 						Location loc = player.getLocation();
 						World world = player.getWorld();
@@ -227,15 +232,15 @@ public class WarlockClass extends BaseClass {
 
 					int targetCount = 1;
 
+					int damage = (graspingClaws == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
+
 					List<Entity> entities = damagee.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
 					for (Entity entity : entities) {
 						if (EntityUtils.isHostileMob(entity)) {
 							targetCount++;
 
 							LivingEntity mob = (LivingEntity)entity;
-							if (graspingClaws > 1) {
-								EntityUtils.damageEntity(mPlugin, mob, GRASPING_CLAWS_DAMAGE, player);
-							}
+							EntityUtils.damageEntity(mPlugin, mob, damage, player);
 
 							if (mob != damagee) {
 								MovementUtils.PullTowards(damagee, mob, GRASPING_CLAWS_SPEED);
@@ -258,7 +263,7 @@ public class WarlockClass extends BaseClass {
 
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, targetCount, true, false));
 					if (graspingClaws > 1) {
-						EntityUtils.damageEntity(mPlugin, damagee, GRASPING_CLAWS_DAMAGE, player);
+						EntityUtils.damageEntity(mPlugin, damagee, damage, player);
 					}
 
 					//	Put Soul Rend on cooldown
@@ -297,6 +302,8 @@ public class WarlockClass extends BaseClass {
 									LivingEntity mob = (LivingEntity)entity;
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, true, false));
 									mob.setFireTicks(CONSUMING_FLAMES_DURATION);
+
+									EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);
 									effect = true;
 								}
 							}
