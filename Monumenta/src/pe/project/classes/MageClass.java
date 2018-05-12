@@ -52,9 +52,10 @@ import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 public class MageClass extends BaseClass {
 
-	private static final int MANA_LANCE_1_DAMAGE = 5;
+	private static final int MANA_LANCE_1_DAMAGE = 8;
 	private static final int MANA_LANCE_2_DAMAGE = 10;
-	private static final int MANA_LANCE_COOLDOWN = 3 * 20;
+	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
+	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
 	private static final int MANA_LANCE_R = 91;
 	private static final int MANA_LANCE_G = 187;
 	private static final int MANA_LANCE_B = 255;
@@ -94,33 +95,18 @@ public class MageClass extends BaseClass {
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
-	private static int PASSIVE_EFFECT_DURATION = 25;
+	private static double PASSIVE_DAMAGE = 1.5;
 
 	public MageClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 
-
-	@Override
-	public boolean has1SecondTrigger() {
-		return true;
-	}
-
-	@Override
-	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
-		//	Don't trigger this if dead!
-		if (!player.isDead() && twoHertz) {
-			if (player.getPotionEffect(PotionEffectType.SLOW) != null || player.getFireTicks() > 0) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_EFFECT_DURATION, 0, true, true));
-			}
-		}
-	}
-
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+
 		//	Arcane Strike
 		{
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			if (InventoryUtils.isWandItem(mainHand)) {
 				int arcaneStrike = ScoreboardUtils.getScoreboardValue(player, "ArcaneStrike");
 				if (arcaneStrike > 0) {
@@ -160,6 +146,10 @@ public class MageClass extends BaseClass {
 					}
 				}
 			}
+		}
+
+		if (InventoryUtils.isWandItem(mainHand)) {
+			EntityUtils.damageEntity(mPlugin, damagee, PASSIVE_DAMAGE, player);
 		}
 
 		return true;
@@ -219,6 +209,7 @@ public class MageClass extends BaseClass {
 							if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MANA_LANCE)) {
 
 								int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
+								int cooldown = manaLance == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
 
 								Location loc = player.getEyeLocation();
 								Vector dir = loc.getDirection();
@@ -253,7 +244,7 @@ public class MageClass extends BaseClass {
 									}
 								}
 
-								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MANA_LANCE, MANA_LANCE_COOLDOWN);
+								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MANA_LANCE, cooldown);
 								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 							}
 						}
