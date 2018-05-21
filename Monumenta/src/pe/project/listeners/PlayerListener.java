@@ -72,7 +72,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 import pe.project.Plugin;
 import pe.project.point.Point;
 import pe.project.server.reset.DailyReset;
-//import pe.project.utils.ChestUtils;
+import pe.project.utils.ChestUtils;
 import pe.project.utils.CommandUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
@@ -169,11 +169,11 @@ public class PlayerListener implements Listener {
 			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 			}
-/*
+
 			if (block.getType() == Material.CHEST) {
 				ChestUtils.chestScalingLuck(mPlugin, player, block);
 			}
-*/
+
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 			}
