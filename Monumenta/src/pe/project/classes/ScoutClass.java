@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,10 +17,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -66,12 +63,11 @@ public class ScoutClass extends BaseClass {
 	private static final int BOW_MASTER_1_DAMAGE = 3;
 	private static final int BOW_MASTER_2_DAMAGE = 6;
 
-	private static final String EAGLE_EYE_TAG_NAME = "TagEagleEye";
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
-	private static final int EAGLE_EYE_COOLDOWN = 30 * 20;
-	private static final int EAGLE_EYE_1_EXTRA_DAMAGE = 3;
-	private static final int EAGLE_EYE_2_EXTRA_DAMAGE = 6;
+	private static final int EAGLE_EYE_COOLDOWN = 20 * 20;	//Was 30
+	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; //20%
+	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; //35%
 	private static final int EAGLE_EYE_RADIUS = 20;
 	private static final double EAGLE_EYE_DOT_ANGLE = 0.33;
 
@@ -337,17 +333,19 @@ public class ScoutClass extends BaseClass {
 						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 						World world = player.getWorld();
 
-						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS,
-						                                                 EAGLE_EYE_RADIUS);
+						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS);
 						for (Entity e : entities) {
-							if (EntityUtils.isHostileMob(e)) {
+							if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
 								LivingEntity mob = (LivingEntity)e;
 
 								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 								if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION,
-									                                     EAGLE_EYE_EFFECT_LVL, true, false));
-									mob.setMetadata(EAGLE_EYE_TAG_NAME, new FixedMetadataValue(mPlugin, 1));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+
+									int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
+									// Half strength vs bosses
+									eagleLevel = EntityUtils.isBoss(e) ? eagleLevel / 2 : eagleLevel;
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
 									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
 									                                   10, 0.7, 0.7, 0.7, 0.001);
@@ -374,28 +372,13 @@ public class ScoutClass extends BaseClass {
 			}
 		}
 
-		Entity entity = event.getEntity();
-		if (EntityUtils.isHostileMob(entity)) {
-			LivingEntity mob = (LivingEntity)entity;
-
-			int eagleEye = ScoreboardUtils.getScoreboardValue(player, "Tinkering");
-			if (eagleEye > 0) {
-				//  TODO: In the future we need to have the entities meta data remove after the durations....for now...we be lazy.
-				if (mob.hasMetadata(EAGLE_EYE_TAG_NAME) && mob.hasPotionEffect(PotionEffectType.GLOWING)) {
-					int extraDamage = (eagleEye == 1) ? EAGLE_EYE_1_EXTRA_DAMAGE : EAGLE_EYE_2_EXTRA_DAMAGE;
-					event.setDamage(event.getDamage() + extraDamage);
-				}
-			}
-
-			// Agility
-			int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
-			if (agility > 0) {
-				int extraDamage = (agility == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
-				event.setDamage(event.getDamage() + extraDamage);
-			}
+		// Agility
+		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");
+		if (agility > 0) {
+			int extraDamage = (agility == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+			event.setDamage(event.getDamage() + extraDamage);
 		}
 	}
-
 
 	public void _testForAgility(Player player) {
 		int agility = ScoreboardUtils.getScoreboardValue(player, "Agility");

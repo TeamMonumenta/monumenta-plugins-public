@@ -60,11 +60,15 @@ public class WarriorClass extends BaseClass {
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
-	private static final Integer BRUTE_FORCE_1_DAMAGE = 3;
-	private static final Integer BRUTE_FORCE_2_DAMAGE = 7;
+	private static final Integer BRUTE_FORCE_1_DAMAGE = 2;
+	private static final Integer BRUTE_FORCE_2_DAMAGE = 4;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
 
 	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
+
+	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
+	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
+	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -144,12 +148,13 @@ public class WarriorClass extends BaseClass {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+
 		//	BRUTE FORCE!!!
 		{
 			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
 			if (bruteForce > 0) {
 				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
-					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand)) {
 
 						Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
@@ -170,6 +175,21 @@ public class WarriorClass extends BaseClass {
 						}
 					}
 				}
+			}
+		}
+
+		if (InventoryUtils.isAxeItem(mainHand)) {
+			int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
+			if (weaponMastery > 0) {
+				int axeDamage = (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
+				EntityUtils.damageEntity(mPlugin, damagee, axeDamage, player);
+			}
+		}
+
+		if (InventoryUtils.isSwordItem(mainHand)) {
+			int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
+			if (weaponMastery > 1) {
+				EntityUtils.damageEntity(mPlugin, damagee, WEAPON_MASTERY_SWORD_2_DAMAGE, player);
 			}
 		}
 
@@ -260,17 +280,9 @@ public class WarriorClass extends BaseClass {
 		int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
 		if (weaponMastery > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INCREASE_DAMAGE);
 
-			//	Player has an axe in their mainHands.
-			if (InventoryUtils.isAxeItem(mainHand)) {
-				int strengthAmp = weaponMastery == 1 ? 0 : 1;
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1000000, strengthAmp, true, false));
-			}
 			//	Player has an sword in their mainHand.
-			else if (InventoryUtils.isSwordItem(mainHand)) {
+			if (InventoryUtils.isSwordItem(mainHand)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 			}
 		}

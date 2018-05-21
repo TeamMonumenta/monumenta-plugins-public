@@ -1,11 +1,15 @@
 package pe.project.utils;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.attribute.Attribute;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
@@ -56,6 +60,18 @@ public class PlayerUtils {
 		player.sendMessage(ChatColor.YELLOW + "If you feel that this strike is unjustified feel free to send a message and screenshot of this to a moderator on the Discord.");
 
 		player.teleport(player.getWorld().getSpawnLocation());
+	}
+
+	public static List<Player> getNearbyPlayers(Location loc, double radius) {
+		List<Player> players = new LinkedList<Player>();
+
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (loc.distance(player.getLocation()) <= radius) {
+				players.add(player);
+			}
+		}
+
+		return players;
 	}
 
 	public static void healPlayer(Player player, double healAmount) {

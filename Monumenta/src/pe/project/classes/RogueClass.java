@@ -380,7 +380,7 @@ public class RogueClass extends BaseClass {
 
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
-		if (EntityUtils.isEliteBoss(killedEntity)) {
+		if (EntityUtils.isElite(killedEntity)) {
 			int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
 			if (viciousCombos > 0) {
 				World world = player.getWorld();
@@ -422,8 +422,8 @@ public class RogueClass extends BaseClass {
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
 
-			//  This test if the damagee is an instance of a Elite or Boss.
-			if (damagee instanceof LivingEntity && EntityUtils.isEliteBoss((LivingEntity)event.getEntity())) {
+			//  This test if the damagee is an instance of a Elite.
+			if (damagee instanceof LivingEntity && EntityUtils.isElite((LivingEntity)event.getEntity())) {
 				// Also make sure said player is weilding two swords.
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -435,7 +435,7 @@ public class RogueClass extends BaseClass {
 	}
 
 	private void _damageMob(Player player, LivingEntity damagee, double damage) {
-		double correctDamage = EntityUtils.isEliteBoss(damagee) ? (damage * PASSIVE_DAMAGE_MODIFIER) : damage;
+		double correctDamage = EntityUtils.isElite(damagee) ? (damage * PASSIVE_DAMAGE_MODIFIER) : damage;
 		EntityUtils.damageEntity(mPlugin, damagee, correctDamage, player);
 	}
 }

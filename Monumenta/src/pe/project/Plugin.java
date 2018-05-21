@@ -200,12 +200,10 @@ public class Plugin extends JavaPlugin {
 
 			@Override
 			public void run() {
-				final boolean oneHertz = ticks == 0;
 				final boolean twoHertz = (ticks % 10) == 0;
 				final boolean fourHertz = (ticks % 5) == 0;
 				final boolean twentyHertz = true;
 
-				//	Once a second.
 				// NOW IT'S TWICE A SECOND MOTHAFUCKAAAASSSSSSSSS!!!!!!!!!!
 				// FREQUENCY ANARCHY HAPPENING UP IN HERE
 

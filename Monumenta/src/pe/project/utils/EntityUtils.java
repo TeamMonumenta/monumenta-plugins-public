@@ -25,11 +25,14 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
 import pe.project.Constants;
 import pe.project.Plugin;
+import pe.project.utils.particlelib.ParticleEffect;
 
 public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {
@@ -39,9 +42,14 @@ public class EntityUtils {
 				type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE;
 	}
 
-	public static boolean isEliteBoss(LivingEntity mob) {
-		Set<String> tags = mob.getScoreboardTags();
-		return tags.contains("Elite") || tags.contains("Boss");
+	public static boolean isElite(Entity entity) {
+		Set<String> tags = entity.getScoreboardTags();
+		return tags.contains("Elite");
+	}
+
+	public static boolean isBoss(Entity entity) {
+		Set<String> tags = entity.getScoreboardTags();
+		return tags.contains("Boss");
 	}
 
 	public static boolean isHostileMob(Entity entity) {
@@ -54,6 +62,30 @@ public class EntityUtils {
 		}
 
 		return false;
+	}
+
+	public static void applyFreeze(Plugin plugin, int ticks, LivingEntity mob) {
+		if (!mob.hasAI() || isBoss(mob)) {
+			return;
+		}
+
+		mob.setAI(false);
+		new BukkitRunnable() {
+			int i = 0;
+			@Override
+			public void run() {
+
+				if (i % 5 == 0) {
+					ParticleEffect.SNOWBALL.display(0.25f, (float)(mob.getHeight() / 2), 0.25f, 0, 15, mob.getLocation(), 40);
+				}
+
+				i++;
+				if (i >= ticks || mob.isDead()) {
+					this.cancel();
+					mob.setAI(true);
+				}
+			}
+		}.runTaskTimer(plugin, 0, 1);
 	}
 
 	/**
@@ -308,6 +340,14 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
+
+		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
+		if (unluck != null) {
+			int vulnLevel = unluck.getAmplifier();
+			double damageMult = 1.05 + 0.05 * vulnLevel;
+			damage = damage * damageMult;
+		}
+
 		if (damager != null) {
 			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
 			target.damage(damage, damager);

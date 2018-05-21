@@ -154,6 +154,18 @@ public class EntityListener implements Listener {
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 				}
 			}
+
+			if (damagee instanceof LivingEntity) {
+				LivingEntity mob = (LivingEntity) damagee;
+				PotionEffect unluck = mob.getPotionEffect(PotionEffectType.UNLUCK);
+				if (unluck != null) {
+					int vulnLevel = unluck.getAmplifier();
+					double damageMult = 1.05 + 0.05 * vulnLevel;
+
+					double baseDamage = event.getDamage();
+					event.setDamage(baseDamage * damageMult);
+				}
+			}
 		}
 
 		//  Don't hurt Villagers!

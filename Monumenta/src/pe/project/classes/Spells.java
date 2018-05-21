@@ -49,6 +49,7 @@ public enum Spells {
 	PUTRID_FUMES("Putrid Fumes", false, Classes.ALCHEMIST),
 	CAUSTIC_BLADE("Caustic Blade", false, Classes.ALCHEMIST),
 	IRON_TINCTURE("Iron Tincture", false, Classes.ALCHEMIST),
+	ENFEEBLING_ELIXIR("Enfeebling Elixir", false, Classes.ALCHEMIST),
 	BOMB_ARROW("Bomb Arrow", false, Classes.ALCHEMIST);
 
 	private final String name;

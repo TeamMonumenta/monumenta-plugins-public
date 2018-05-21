@@ -86,27 +86,24 @@ public class WarlockClass extends BaseClass {
 	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
 	private static final int CONSUMING_FLAMES_COOLDOWN = 11 * 20;
 
+	private static final int PASSIVE_DURATION = 6 * 20;
+
 	public WarlockClass(Plugin plugin, Random random) {
 		super(plugin, random);
 	}
 
-
+/// PASSIVE
 	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		_testItemsInHands(player, mainHand, offHand);
-	}
+	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
+		if (EntityUtils.isHostileMob(killedEntity)) {
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-
-/// VERSATILE MAGIC
-	private void _testItemsInHands(Player player, ItemStack mainHand, ItemStack offHand) {
-		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.SPEED);
-
-		if (InventoryUtils.isScytheItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 1000000, 0, true, false));
+			if (InventoryUtils.isScytheItem(mainHand) || InventoryUtils.isScytheItem(offHand)) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, true, false));
+			}
 		}
 	}
-
 
 /// BLASPHEMOUS AURA
 	@Override
