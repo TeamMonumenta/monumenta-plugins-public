@@ -170,7 +170,7 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 			}
 
-			if (block.getType() == Material.CHEST) {
+			if (action == Action.RIGHT_CLICK_BLOCK && block != null && block.getType() == Material.CHEST) {
 				ChestUtils.chestScalingLuck(mPlugin, player, block);
 			}
 
