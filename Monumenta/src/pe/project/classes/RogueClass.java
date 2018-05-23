@@ -3,6 +3,7 @@ package pe.project.classes;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,6 +40,7 @@ import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
 import pe.project.utils.particlelib.ParticleEffect;
+import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 /*
     ByMyBlade
@@ -98,6 +100,8 @@ public class RogueClass extends BaseClass {
 	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2 = 2;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
+	private static final int DAGGER_THROW_COOLDOWN = 3 * 20;
+
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
 
 	public RogueClass(Plugin plugin, Random random) {
@@ -108,12 +112,70 @@ public class RogueClass extends BaseClass {
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand,
 	                                Material blockClicked) {
 		if (action.equals(Action.RIGHT_CLICK_AIR) || (action.equals(Action.RIGHT_CLICK_BLOCK))) {
-			int advancingShadows = ScoreboardUtils.getScoreboardValue(player, "AdvancingShadows");
-			if (advancingShadows > 0) {
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				ItemStack offHand = player.getInventory().getItemInOffHand();
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+				int daggerThrow = ScoreboardUtils.getScoreboardValue(player, "DaggerThrow");
+				int advancingShadows = ScoreboardUtils.getScoreboardValue(player, "AdvancingShadows");
+				boolean dagger = false;
+
+				if (daggerThrow > 0) {
+					if (player.isSneaking()) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DAGGER_THROW)) {
+
+							dagger = true;
+							ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.FLAME, player.getLocation().add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
+
+							Location loc = player.getEyeLocation();
+							Vector dir = loc.getDirection();
+
+							double pOffset = 0.35;
+
+							for (int a = -1; a <= 1; a++) {
+								double angle = a * 1.047;
+
+								Vector newDir = new Vector(Math.cos(angle) * dir.getX() + Math.sin(angle) * dir.getZ(), dir.getY(), Math.cos(angle) * dir.getZ() - Math.sin(angle) * dir.getX());
+								loc.add(newDir);
+
+								boolean hit = false;
+
+								for (int i = 0; i < 8; i++) {
+									loc.add(newDir);
+
+									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
+									for (int t = 0; t < 18; t++) {
+										Location pLoc = loc.clone();
+										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										double os3 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
+										pLoc.add(os1, os2, os3);
+										ParticleEffect.REDSTONE.display(new OrdinaryColor(96, 96, 96), pLoc, 40);
+									}
+									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
+										if (EntityUtils.isHostileMob(e)) {
+											LivingEntity le = (LivingEntity) e;
+											EntityUtils.damageEntity(mPlugin, le, 5, player);
+											hit = true;
+										}
+									}
+									if (loc.getBlock().getType().isSolid() || hit) {
+										loc.subtract(dir.multiply(0.5));
+										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
+										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
+										break;
+									}
+								}
+							}
+
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DAGGER_THROW, DAGGER_THROW_COOLDOWN);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+						}
+					}
+				}
+
+				if (advancingShadows > 0 && !dagger) {
+
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS)) {
 						int range  = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 
@@ -423,7 +485,7 @@ public class RogueClass extends BaseClass {
 			Entity damagee = event.getEntity();
 
 			//  This test if the damagee is an instance of a Elite.
-			if (damagee instanceof LivingEntity && EntityUtils.isElite((LivingEntity)event.getEntity())) {
+			if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {
 				// Also make sure said player is weilding two swords.
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
