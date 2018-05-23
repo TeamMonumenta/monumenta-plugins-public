@@ -53,7 +53,8 @@ public class WarlockClass extends BaseClass {
 			PotionEffectType.SLOW,
 			PotionEffectType.WEAKNESS,
 			PotionEffectType.SLOW_DIGGING,
-			PotionEffectType.POISON
+			PotionEffectType.POISON,
+			PotionEffectType.UNLUCK
 	);
 
 	private static final int BLASPHEMY_RADIUS = 3;

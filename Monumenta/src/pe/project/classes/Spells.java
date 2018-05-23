@@ -17,6 +17,7 @@ public enum Spells {
 	DODGING("Dodging", false, Classes.ROGUE),
 	ESCAPE_DEATH("Escape Death", false, Classes.ROGUE),
 	SMOKESCREEN("Smokescreen", false, Classes.ROGUE),
+	DAGGER_THROW("Dagger Throw", false, Classes.ROGUE),
 
 	//Cleric
 	CELESTIAL_BLESSING("Celestial Blessing", false, Classes.CLERIC),
@@ -50,7 +51,7 @@ public enum Spells {
 	CAUSTIC_BLADE("Caustic Blade", false, Classes.ALCHEMIST),
 	IRON_TINCTURE("Iron Tincture", false, Classes.ALCHEMIST),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir", false, Classes.ALCHEMIST),
-	BOMB_ARROW("Bomb Arrow", false, Classes.ALCHEMIST);
+	BOMB_ARROW("Unstable Arrows", false, Classes.ALCHEMIST);
 
 	private final String name;
 	private final boolean fake;
