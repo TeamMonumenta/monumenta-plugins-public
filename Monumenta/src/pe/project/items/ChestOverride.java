@@ -12,10 +12,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 
 import pe.project.Plugin;
+import pe.project.utils.ChestUtils;
 
 public class ChestOverride extends OverrideItem {
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+		if (player != null && player.getGameMode() != GameMode.SPECTATOR) {
+			ChestUtils.chestScalingLuck(plugin, player, block);
+		}
+
 		if (player == null || player.getGameMode() != GameMode.SPECTATOR) {
 			return true;
 		}
