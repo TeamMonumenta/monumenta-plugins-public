@@ -55,6 +55,7 @@ import pe.project.Plugin;
 import pe.project.classes.BaseClass;
 import pe.project.item.properties.ItemPropertyManager;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.utils.EntityUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
@@ -157,14 +158,7 @@ public class EntityListener implements Listener {
 
 			if (damagee instanceof LivingEntity) {
 				LivingEntity mob = (LivingEntity) damagee;
-				PotionEffect unluck = mob.getPotionEffect(PotionEffectType.UNLUCK);
-				if (unluck != null) {
-					int vulnLevel = unluck.getAmplifier();
-					double damageMult = 1.05 + 0.05 * vulnLevel;
-
-					double baseDamage = event.getDamage();
-					event.setDamage(baseDamage * damageMult);
-				}
+				event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
 			}
 		}
 

@@ -52,7 +52,8 @@ import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 */
 
 public class RogueClass extends BaseClass {
-	private static final double PASSIVE_DAMAGE_MODIFIER = 2.0;
+	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
+	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
 
 	private static final int BY_MY_BLADE_HASTE_1_LVL = 1;
 	private static final int BY_MY_BLADE_HASTE_2_LVL = 3;
@@ -65,15 +66,15 @@ public class RogueClass extends BaseClass {
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
-	private static final double ADVANCING_SHADOWS_OFFSET = 3.2;
+	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
 	private static final int DODGING_SPEED_EFFECT_LEVEL = 0;
-	private static final int DODGING_COOLDOWN_1 = 10 * 20;
-	private static final int DODGING_COOLDOWN_2 = 8 * 20;
+	private static final int DODGING_COOLDOWN_1 = 12 * 20;
+	private static final int DODGING_COOLDOWN_2 = 10 * 20;
 
 	private static final double ESCAPE_DEATH_HEALTH_TRIGGER = 10;
 	private static final int ESCAPE_DEATH_DURATION = 5 * 20;
@@ -91,6 +92,8 @@ public class RogueClass extends BaseClass {
 	private static final int VICIOUS_COMBOS_DAMAGE = 24;
 	private static final int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
+	private static final int VICIOUS_COMBOS_COOL_1 = 1 * 20;
+	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
 
 	private static final int SMOKESCREEN_RANGE = 7;
 	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 = 0;
@@ -100,7 +103,13 @@ public class RogueClass extends BaseClass {
 	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2 = 2;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
-	private static final int DAGGER_THROW_COOLDOWN = 3 * 20;
+	private static final int DAGGER_THROW_COOLDOWN = 12 * 20;
+	private static final int DAGGER_THROW_RANGE = 8;
+	private static final int DAGGER_THROW_1_DAMAGE = 6;
+	private static final int DAGGER_THROW_2_DAMAGE = 12;
+	private static final int DAGGER_THROW_DURATION = 10 * 20;
+	private static final int DAGGER_THROW_1_VULN = 3;
+	private static final int DAGGER_THROW_2_VULN = 7;
 
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
 
@@ -124,58 +133,64 @@ public class RogueClass extends BaseClass {
 					if (player.isSneaking()) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DAGGER_THROW)) {
 
-							dagger = true;
-							ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.FLAME, player.getLocation().add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
+							World world = player.getWorld();
 
+							dagger = true;
 							Location loc = player.getEyeLocation();
 							Vector dir = loc.getDirection();
 
-							double pOffset = 0.35;
+							double damage = (daggerThrow == 1) ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
+							int vulnLevel = (daggerThrow == 1) ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 
-							for (int a = -1; a <= 1; a++) {
-								double angle = a * 1.047;
-
+							for (int a = -1; a < 2; a++) {
+								double angle = a * 0.463; //25o. Set to 0.524 for 30o or 0.349 for 20o
 								Vector newDir = new Vector(Math.cos(angle) * dir.getX() + Math.sin(angle) * dir.getZ(), dir.getY(), Math.cos(angle) * dir.getZ() - Math.sin(angle) * dir.getX());
-								loc.add(newDir);
+								newDir.normalize();
 
 								boolean hit = false;
 
-								for (int i = 0; i < 8; i++) {
-									loc.add(newDir);
+								for (int i = 1; i <= DAGGER_THROW_RANGE; i++) {
+									Location mLoc = (loc.clone()).add((newDir.clone()).multiply(i));
+									Location pLoc = mLoc.clone();
 
-									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
-									for (int t = 0; t < 18; t++) {
-										Location pLoc = loc.clone();
-										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										double os3 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										pLoc.add(os1, os2, os3);
-										ParticleEffect.REDSTONE.display(new OrdinaryColor(96, 96, 96), pLoc, 40);
+									for (int t = 0; t < 10; t++) {
+										pLoc.add((newDir.clone()).multiply(0.1));
+										ParticleEffect.REDSTONE.display(new OrdinaryColor(64, 64, 64), pLoc, 10);
 									}
-									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
-										if (EntityUtils.isHostileMob(e)) {
+
+									for (Entity e : mLoc.getWorld().getNearbyEntities(mLoc, 1, 1, 1)) {
+										if (EntityUtils.isHostileMob(e) && !hit) {
 											LivingEntity le = (LivingEntity) e;
-											EntityUtils.damageEntity(mPlugin, le, 5, player);
+
+											EntityUtils.damageEntity(mPlugin, le, damage, player);
+											le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
+
 											hit = true;
 										}
 									}
-									if (loc.getBlock().getType().isSolid() || hit) {
-										loc.subtract(dir.multiply(0.5));
-										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
-										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
+
+									if (mLoc.getBlock().getType().isSolid() || hit) {
+										mLoc.subtract((newDir.clone()).multiply(0.5));
+										ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
+
+										if (hit) {
+											world.playSound(loc, "block.anvil.place", 0.4f, 2.5f);
+										}
+
 										break;
 									}
 								}
 							}
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DAGGER_THROW, DAGGER_THROW_COOLDOWN);
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.5f);
+							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.25f);
+							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.0f);
 						}
 					}
 				}
 
-				if (advancingShadows > 0 && !dagger) {
-
+				if (advancingShadows > 0 && !dagger && !player.isSneaking()) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS)) {
 						int range  = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 
@@ -442,16 +457,19 @@ public class RogueClass extends BaseClass {
 
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
-		if (EntityUtils.isElite(killedEntity)) {
-			int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
-			if (viciousCombos > 0) {
-				World world = player.getWorld();
-				Location loc = killedEntity.getLocation();
-				loc = loc.add(0, 0.5, 0);
+		int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
+		if (viciousCombos > 0) {
+			World world = player.getWorld();
+			Location loc = killedEntity.getLocation();
+			loc = loc.add(0, 0.5, 0);
+
+			if (EntityUtils.isElite(killedEntity)) {
+				mPlugin.mTimers.removeAllCooldowns(player.getUniqueId());
+				MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,	new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
 				if (viciousCombos > 1) {
-					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE,
-					                                                 VICIOUS_COMBOS_RANGE);
+					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE);
 					for (Entity entity : entities) {
 						if (EntityUtils.isHostileMob(entity)) {
 							LivingEntity mob = (LivingEntity)entity;
@@ -460,21 +478,24 @@ public class RogueClass extends BaseClass {
 					}
 				}
 
-				mPlugin.mTimers.removeAllCooldowns(player.getUniqueId());
-				MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
-
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-				                                 new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION,
-				                                                  VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
-
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
 				ParticleEffect.CRIT.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
 				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
-				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE,
-				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE,
-				                                   VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			}
+			else if (EntityUtils.isHostileMob(killedEntity)) {
+				int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
+				mPlugin.mTimers.UpdateCooldowns(timeReduction);
+
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
+				ParticleEffect.CRIT.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 50, loc, 40);
+				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 50, loc, 40);
+				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+			}
+
+
 		}
 	}
 
@@ -484,20 +505,26 @@ public class RogueClass extends BaseClass {
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
 
+			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			ItemStack offHand = player.getInventory().getItemInOffHand();
+			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 			//  This test if the damagee is an instance of a Elite.
-			if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {
-				// Also make sure said player is weilding two swords.
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				ItemStack offHand = player.getInventory().getItemInOffHand();
-				if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_MODIFIER);
+				if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {
+					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
+				} else if (damagee instanceof LivingEntity && EntityUtils.isBoss(event.getEntity())) {
+					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
 				}
 			}
 		}
 	}
 
 	private void _damageMob(Player player, LivingEntity damagee, double damage) {
-		double correctDamage = EntityUtils.isElite(damagee) ? (damage * PASSIVE_DAMAGE_MODIFIER) : damage;
+		double correctDamage = damage;
+		if (EntityUtils.isElite(damagee)) {
+			correctDamage = damage * PASSIVE_DAMAGE_ELITE_MODIFIER;
+		} else if (EntityUtils.isBoss(damagee)) {
+			correctDamage = damage * PASSIVE_DAMAGE_BOSS_MODIFIER;
+		}
 		EntityUtils.damageEntity(mPlugin, damagee, correctDamage, player);
 	}
 }

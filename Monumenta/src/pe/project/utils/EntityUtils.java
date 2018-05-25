@@ -341,12 +341,7 @@ public class EntityUtils {
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
 
-		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
-		if (unluck != null) {
-			int vulnLevel = unluck.getAmplifier();
-			double damageMult = 1.05 + 0.05 * vulnLevel;
-			damage = damage * damageMult;
-		}
+		damage = damage * vulnerabilityMult(target);
 
 		if (damager != null) {
 			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
@@ -354,5 +349,20 @@ public class EntityUtils {
 		} else {
 			target.damage(damage);
 		}
+	}
+
+	public static double vulnerabilityMult(LivingEntity target) {
+		PotionEffect unluck = target.getPotionEffect(PotionEffectType.UNLUCK);
+		if (unluck != null) {
+			double vulnLevel = 1 + unluck.getAmplifier();
+
+			if (EntityUtils.isBoss(target)) {
+				vulnLevel = vulnLevel / 2;
+			}
+
+			return 1 + 0.05 * vulnLevel;
+		}
+
+		return 1;
 	}
 }

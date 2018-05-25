@@ -65,7 +65,7 @@ public class ScoutClass extends BaseClass {
 
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
-	private static final int EAGLE_EYE_COOLDOWN = 20 * 20;	//Was 30
+	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;	//Was 30
 	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; //20%
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; //35%
 	private static final int EAGLE_EYE_RADIUS = 20;
@@ -343,8 +343,6 @@ public class ScoutClass extends BaseClass {
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 
 									int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
-									// Half strength vs bosses
-									eagleLevel = EntityUtils.isBoss(e) ? eagleLevel / 2 : eagleLevel;
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
 									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
