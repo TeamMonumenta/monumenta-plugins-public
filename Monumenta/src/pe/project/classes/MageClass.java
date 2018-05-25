@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -204,7 +205,7 @@ public class MageClass extends BaseClass {
 					int manaLance = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (InventoryUtils.isWandItem(mainHand)) {
-						if (manaLance > 0) {
+						if (manaLance > 0 && player.getGameMode() != GameMode.SPECTATOR) {
 							if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MANA_LANCE)) {
 
 								int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
