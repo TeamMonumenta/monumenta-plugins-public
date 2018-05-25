@@ -80,6 +80,7 @@ public class ItemOverrides {
 		mItems.put(Material.FLOWER_POT, new FlowerPotOverride());
 		mItems.put(Material.CHEST, new ChestOverride());
 		mItems.put(Material.TRAPPED_CHEST, new ChestOverride());
+		mItems.put(Material.HOPPER, new HopperOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
