@@ -286,7 +286,10 @@ public class AlchemistClass extends BaseClass {
 				int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
 				if (ironTincture > 0) {
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
-					if ((!InventoryUtils.isBowItem(mainHand) && mainHand.getType() != Material.SPLASH_POTION)|| mainHand == null) {
+					if (mainHand == null ||
+							(!InventoryUtils.isBowItem(mainHand)
+							 && mainHand.getType() != Material.SPLASH_POTION
+							 && mainHand.getType() != Material.LINGERING_POTION)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
 
 							Location loc = player.getLocation().add(0, 1.8, 0);
