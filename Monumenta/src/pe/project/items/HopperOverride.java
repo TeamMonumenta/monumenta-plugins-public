@@ -11,8 +11,8 @@ public class HopperOverride extends OverrideItem {
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
 		if (player != null && player.getGameMode() != GameMode.CREATIVE) {
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 }
