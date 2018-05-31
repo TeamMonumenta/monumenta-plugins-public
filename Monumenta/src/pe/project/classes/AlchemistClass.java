@@ -58,17 +58,19 @@ import pe.project.utils.particlelib.ParticleEffect.BlockData;
 
 public class AlchemistClass extends BaseClass {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
+	private static final int GRUESOME_ALCHEMY_VULN = 4; //25%
 
-	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 2;
-	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 4;
-	private static final int BRUTAL_ALCHEMY_WITHER_1_DURATION = 3 * 20;
-	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 5 * 20;
+	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 3;
+	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 6;
+	private static final int BRUTAL_ALCHEMY_WITHER_1_DURATION = 4 * 20;
+	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 6 * 20;
 
-	private static final int ENFEEBLING_COOLDOWN_1 = 15 * 20;
-	private static final int ENFEEBLING_COOLDOWN_2 = 10 * 20;
-	private static final int ENFEEBLING_DURATION = 5 * 20;
-	private static final float ENFEEBLING_KNOCKBACK_1_SPEED = 0.3f;
-	private static final float ENFEEBLING_KNOCKBACK_2_SPEED = 0.45f;
+	private static final int ENFEEBLING_COOLDOWN = 20 * 20;
+	private static final int ENFEEBLING_DURATION_1 = 6 * 20;
+	private static final int ENFEEBLING_DURATION_2 = 9 * 20;
+	private static final float ENFEEBLING_KNOCKBACK_1_SPEED = 0.35f;
+	private static final float ENFEEBLING_KNOCKBACK_2_SPEED = 0.5f;
+	private static final int ENFEEBLING_JUMP_LEVEL = 1;
 	private static final int ENFEEBLING_RADIUS = 3;
 
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
@@ -80,10 +82,10 @@ public class AlchemistClass extends BaseClass {
 	private static final int BOMB_ARROW_TRIGGER_RANGE = 32;
 	private static final int BOMB_ARROW_ID = 67;
 	public static final String BOMB_ARROW_TAG_NAME = "TagBearer";
-	private static final int BOMB_ARROW_DURATION = 4 * 20;
+	private static final int BOMB_ARROW_DURATION = 3 * 20;
 	private static final float BOMB_ARROW_KNOCKBACK_SPEED = 0.55f;
-	private static final int BOMB_ARROW_1_DAMAGE = 12;
-	private static final int BOMB_ARROW_2_DAMAGE = 20;
+	private static final int BOMB_ARROW_1_DAMAGE = 15;
+	private static final int BOMB_ARROW_2_DAMAGE = 24;
 	private static final int BOMB_ARROW_RADIUS = 3;
 
 	private static final int BASILISK_POISON_1_EFFECT_LVL = 1;
@@ -92,13 +94,14 @@ public class AlchemistClass extends BaseClass {
 	private static final int BASILISK_POISON_2_DURATION = 6 * 20;
 
 	private static final int POWER_INJECTION_RANGE = 16;
-	private static final int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 0;
-	private static final int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 1;
+	private static final int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
+	private static final int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
 	private static final int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
 	private static final int POWER_INJECTION_DURATION = 20 * 20;
 	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
 
 	Arrow blinkArrow = null;
+	Arrow unstableArrow = null;
 
 	public AlchemistClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -138,7 +141,9 @@ public class AlchemistClass extends BaseClass {
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 
 							mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
-							mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+							if (powerInjection > 1) {
+								mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+							}
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.POWER_INJECTION, POWER_INJECTION_COOLDOWN);
 
@@ -146,6 +151,15 @@ public class AlchemistClass extends BaseClass {
 							return;
 						}
 					}
+				}
+			}
+		}
+
+		if (player.isSneaking()) {
+			int bombArrow = ScoreboardUtils.getScoreboardValue(player, "BombArrow");
+			if (bombArrow > 0) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BOMB_ARROW)) {
+					unstableArrow = arrow;
 				}
 			}
 		}
@@ -159,18 +173,16 @@ public class AlchemistClass extends BaseClass {
 
 	@Override
 	public void ProjectileHitEvent(Player player, Arrow arrow) {
-		int bombArrow = ScoreboardUtils.getScoreboardValue(player, "BombArrow");
-		if (bombArrow > 0 && player.getGameMode() != GameMode.ADVENTURE && player.isSneaking()) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BOMB_ARROW)) {
-				double range = arrow.getLocation().distance(player.getLocation());
-				if (range <= BOMB_ARROW_TRIGGER_RANGE) {
-					mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, BOMB_ARROW_ID, BOMB_ARROW_TAG_NAME, BOMB_ARROW_DURATION, 20, arrow.getLocation(), 0, false);
+		if (arrow == unstableArrow && unstableArrow != null) {
+			double range = arrow.getLocation().distance(player.getLocation());
+			if (range <= BOMB_ARROW_TRIGGER_RANGE) {
+				mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, BOMB_ARROW_ID, BOMB_ARROW_TAG_NAME, BOMB_ARROW_DURATION, 20, arrow.getLocation(), 0, false);
 
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BOMB_ARROW, BOMB_ARROW_COOLDOWN);
-					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					blinkArrow = arrow;
-				}
+				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BOMB_ARROW, BOMB_ARROW_COOLDOWN);
+				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+				blinkArrow = arrow;
 			}
+			unstableArrow = null;
 		}
 	}
 
@@ -194,29 +206,38 @@ public class AlchemistClass extends BaseClass {
 		int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
 		int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
 
-		boolean added = false;
 		int potCount = 0;
 
 		if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
-			Inventory inv = player.getInventory();
-			for (ItemStack item : inv.getContents()) {
-				if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-					int amount = item.getAmount();
-					potCount += amount;
-				}
+			int newPot = 1;
+			double r = (brutalAlchemy + gruesomeAlchemy - 1) * 0.334;
+
+			if (mRandom.nextDouble() < r) {
+				newPot++;
 			}
 
-			if (potCount > 0 && potCount < 32) {
+			for (int a = 0; a < newPot; a++) {
+				boolean added = false;
+				Inventory inv = player.getInventory();
 				for (ItemStack item : inv.getContents()) {
 					if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
 						int amount = item.getAmount();
-						item.setAmount(amount + 1);
-						added = true;
-						break;
+						potCount += amount;
 					}
 				}
-			} else if (!added && potCount == 0) {
-				inv.addItem(getAlchemistPotion());
+
+				if (potCount > 0 && potCount < 32) {
+					for (ItemStack item : inv.getContents()) {
+						if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+							int amount = item.getAmount();
+							item.setAmount(amount + 1);
+							added = true;
+							break;
+						}
+					}
+				} else if (!added && potCount == 0) {
+					inv.addItem(getAlchemistPotion());
+				}
 			}
 		}
 	}
@@ -264,7 +285,7 @@ public class AlchemistClass extends BaseClass {
 						if (EntityUtils.isHostileMob(entity)) {
 							entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, 1 + gruesomeAlchemy, false, true));
 							if (gruesomeAlchemy > 1) {
-								entity.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, 2, false, true));
+								entity.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
 							}
 						}
 					}
@@ -363,8 +384,10 @@ public class AlchemistClass extends BaseClass {
 			if (player.isSneaking()) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR)) {
 
-					int cooldown = enfeeblingElixir == 1 ? ENFEEBLING_COOLDOWN_1 : ENFEEBLING_COOLDOWN_2;
+					int duration = (enfeeblingElixir == 1) ? ENFEEBLING_DURATION_1 : ENFEEBLING_DURATION_2;
+
 					float kbSpeed = (enfeeblingElixir == 1) ? ENFEEBLING_KNOCKBACK_1_SPEED : ENFEEBLING_KNOCKBACK_2_SPEED;
+					int weaknessLevel = enfeeblingElixir;
 
 					List<Entity> entities = damagee.getNearbyEntities(ENFEEBLING_RADIUS, ENFEEBLING_RADIUS, ENFEEBLING_RADIUS);
 					for (Entity e : entities) {
@@ -372,16 +395,19 @@ public class AlchemistClass extends BaseClass {
 							LivingEntity mob = (LivingEntity)e;
 
 							MovementUtils.KnockAway(damagee, mob, kbSpeed);
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, ENFEEBLING_DURATION, 0, true, false));
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
 						}
 					}
 
 					MovementUtils.KnockAway(player, damagee, kbSpeed);
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, ENFEEBLING_DURATION, 0, true, false));
+					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
+
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
 
 					ParticleEffect.SPELL_MOB.display(2, 1.5f, 2, 0, 100, damagee.getLocation(), 40);
 					damagee.getWorld().playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR, cooldown);
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR, ENFEEBLING_COOLDOWN);
 				}
 			}
 		}
