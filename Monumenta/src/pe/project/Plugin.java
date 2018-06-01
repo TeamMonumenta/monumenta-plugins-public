@@ -43,6 +43,7 @@ import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
 import pe.project.commands.SetGuildPrefix;
 import pe.project.commands.SetPlayerName;
+import pe.project.commands.TrackedEffect;
 import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
 import pe.project.items.ItemOverrides;
@@ -172,6 +173,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
 			getCommand("debugInfo").setExecutor(new DebugInfo(this));
 			getCommand("clearEffects").setExecutor(new ClearEffects(this));
+			getCommand("trackedEffect").setExecutor(new TrackedEffect(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));

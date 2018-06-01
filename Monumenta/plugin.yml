@@ -68,6 +68,10 @@ commands:
     permission: monumenta.commands.cleareffects
     description: Clears all status effects from the player
     usage: /execute @p[stuff] ~ ~ ~ cleareffects
+  trackedeffect:
+    permission: monumenta.commands.trackedeffect
+    description: Like /effect but use potion manager to track effect
+    usage: /execute @p[stuff] ~ ~ ~ trackedeffect <PotionEffectType> <seconds> <amplifier>
   incrementDaily:
     permission: monumenta.commands.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
