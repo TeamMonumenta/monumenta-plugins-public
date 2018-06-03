@@ -184,6 +184,12 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItemInHand();
 		Player player = event.getPlayer();
 
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (!mPlugin.mItemOverrides.blockPlaceInteraction(mPlugin, player, item, event)) {
 			event.setCancelled(true);
 		}
@@ -400,6 +406,14 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerFishEvent(PlayerFishEvent event) {
+		Player player = event.getPlayer();
+
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getState() == State.FISHING) {
 			mPlugin.mTrackingManager.mFishingHook.addEntity(event.getPlayer(), event.getHook());
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
@@ -414,6 +428,13 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
+
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		ItemStack item = event.getItem();
 		if (item.getType() == Material.POTION) {
 			PotionMeta meta = ItemUtils.getPotionMeta(item);
@@ -484,6 +505,12 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Integer xp = event.getAmount();
 
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setAmount(0);
+			return;
+		}
+
 		if (LocationUtils.OLDLABS.within(player.getLocation())) {
 			xp = xp / 3;
 			event.setAmount(xp);
@@ -542,6 +569,12 @@ public class PlayerListener implements Listener {
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
 		World world = loc.getWorld();
+
+		/* Don't let the player interact with the world when transferring */
+		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
 
 		for (double y = 10; y > 0; y--) {
 			loc = loc.subtract(0, 1, 0);

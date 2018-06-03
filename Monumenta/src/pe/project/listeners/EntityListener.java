@@ -83,12 +83,28 @@ public class EntityListener implements Listener {
 		Entity combuster = event.getCombuster();
 
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
+			Player player = (Player)combustee;
+
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
+
 			MetadataUtils.checkOnceThisTick(mPlugin, combuster,
 			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
+
 		}
 
 		if ((combustee instanceof Player)) {
 			Player player = (Player)combustee;
+
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (!mPlugin.getClass(player).PlayerCombustByEntityEvent(player, combuster)) {
 				event.setCancelled(true);
 			}
@@ -103,8 +119,15 @@ public class EntityListener implements Listener {
 
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
+			Player player = (Player)damagee;
+
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (damager instanceof LivingEntity) {
-				Player player = (Player)damagee;
 				if(!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
 				                                                              event.getFinalDamage())) 	{
 					event.setCancelled(true);
@@ -115,7 +138,6 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			} else {
 				if (damager instanceof Projectile) {
-					Player player = (Player)damagee;
 					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, (Projectile)damager)) {
 						damager.remove();
 						event.setCancelled(true);
@@ -127,6 +149,13 @@ public class EntityListener implements Listener {
 				Player player = (Player)damager;
 
 				//  Make sure to not trigger class abilities off Throrns.
+
+				/* Don't let the player interact with the world when transferring */
+				if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+					event.setCancelled(true);
+					return;
+				}
+
 				if (event.getCause() != DamageCause.THORNS) {
 					if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
@@ -190,6 +219,12 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
 			DamageCause source = event.getCause();
+
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
 
 			if (!mPlugin.getClass(player).PlayerDamagedEvent(player, source, event.getDamage())) {
 				event.setCancelled(true);
@@ -261,6 +296,13 @@ public class EntityListener implements Listener {
 		//	If hurt by a player in adventure mode we want to prevent the break;
 		if (damager instanceof Player) {
 			Player player = (Player)damager;
+
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
 			}
@@ -289,6 +331,12 @@ public class EntityListener implements Listener {
 	//	Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+		ProjectileSource shooter = event.getEntity().getShooter();
+		if (shooter != null && shooter instanceof Player && ((Player)shooter).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getEntityType() == EntityType.SNOWBALL) {
 			Snowball origBall = (Snowball)event.getEntity();
 			if (origBall.getShooter() instanceof Player) {
@@ -353,6 +401,9 @@ public class EntityListener implements Listener {
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
 
+		/* Don't let the player interact with the world when transferring */
+		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
+
 		if (source instanceof Player) {
 			// If thrown by a player, that player's class determines how entities are affected
 			Player player = (Player)source;
@@ -389,6 +440,9 @@ public class EntityListener implements Listener {
 
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
+
+		/* Don't let the player interact with the world when transferring */
+		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
 		// Class effects from splashing potion
 		if (source instanceof Player) {
@@ -456,45 +510,40 @@ public class EntityListener implements Listener {
 		EntityType type = event.getEntityType();
 
 		Entity entity = event.getHitEntity();
-		if (entity != null) {
-			if (entity instanceof Player) {
-				Player player = (Player)entity;
+		if (entity != null && entity instanceof Player) {
+			Player player = (Player)entity;
 
-				// Give classes a chance to modify the projectile first
-				mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
+			// Give classes a chance to modify the projectile first
+			mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
 
-				if (type == EntityType.TIPPED_ARROW) {
-					TippedArrow arrow = (TippedArrow)event.getEntity();
+			if (type == EntityType.TIPPED_ARROW) {
+				TippedArrow arrow = (TippedArrow)event.getEntity();
 
-					if (player.isBlocking()) {
-						Vector to = player.getLocation().toVector();
-						Vector from = arrow.getLocation().toVector();
+				/* Don't let the player interact with the world when transferring */
+				if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+					_removePotionDataFromArrow(arrow);
+					return;
+				}
 
-						if (to.subtract(from).dot(player.getLocation().getDirection()) < 0) {
-							PotionData data = new PotionData(PotionType.AWKWARD);
-							arrow.setBasePotionData(data);
+				if (player.isBlocking()) {
+					Vector to = player.getLocation().toVector();
+					Vector from = arrow.getLocation().toVector();
 
-							if (arrow.hasCustomEffects()) {
-								Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
-								while (effectIter.hasNext()) {
-									PotionEffect effect = effectIter.next();
-									arrow.removeCustomEffect(effect.getType());
-								}
-							}
-						}
+					if (to.subtract(from).dot(player.getLocation().getDirection()) < 0) {
+						_removePotionDataFromArrow(arrow);
 					}
+				}
 
-					PotionData data = arrow.getBasePotionData();
-					PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 8) : null;
-					List<PotionEffect> effects = arrow.hasCustomEffects() ? arrow.getCustomEffects() : null;
+				PotionData data = arrow.getBasePotionData();
+				PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 8) : null;
+				List<PotionEffect> effects = arrow.hasCustomEffects() ? arrow.getCustomEffects() : null;
 
-					if (info != null) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
-					}
+				if (info != null) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
+				}
 
-					if (effects != null) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
-					}
+				if (effects != null) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
 			}
 		}
@@ -519,6 +568,20 @@ public class EntityListener implements Listener {
 			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);
 		}
 	}
+
+	private void _removePotionDataFromArrow(TippedArrow arrow) {
+		PotionData data = new PotionData(PotionType.AWKWARD);
+		arrow.setBasePotionData(data);
+
+		if (arrow.hasCustomEffects()) {
+			Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
+			while (effectIter.hasNext()) {
+				PotionEffect effect = effectIter.next();
+				arrow.removeCustomEffect(effect.getType());
+			}
+		}
+	}
+
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ItemSpawnEvent(ItemSpawnEvent event) {
