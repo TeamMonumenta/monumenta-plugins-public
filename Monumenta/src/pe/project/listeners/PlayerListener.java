@@ -211,15 +211,17 @@ public class PlayerListener implements Listener {
 
 		Entity clickedEntity = event.getRightClicked();
 		ItemStack itemInHand = player.getEquipment().getItemInMainHand();
-		
+
 		if (clickedEntity instanceof ItemFrame) {
 			ItemFrame frame = (ItemFrame) clickedEntity;
-			if (frame.isInvulnerable())
+			if (frame.isInvulnerable()) {
 				event.setCancelled(true);
+			}
 		}
 
-		if (!mPlugin.mItemOverrides.rightClickEntityInteraction(mPlugin, player, clickedEntity, itemInHand))
+		if (!mPlugin.mItemOverrides.rightClickEntityInteraction(mPlugin, player, clickedEntity, itemInHand)) {
 			event.setCancelled(true);
+		}
 	}
 
 	// Player interacts with an armor stand

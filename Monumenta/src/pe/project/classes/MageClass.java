@@ -114,14 +114,14 @@ public class MageClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE)) {
 						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
 							int extraDamage = arcaneStrike == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
-	
+
 							List<Entity> entities = damagee.getNearbyEntities(ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS);
 							entities.add(damagee);
 							for(Entity e : entities) {
 								if(EntityUtils.isHostileMob(e)) {
 									LivingEntity mob = (LivingEntity)e;
 									int dmg = extraDamage;
-	
+
 									// Arcane strike fire damage for level 2.
 									// First check if the mob is burning
 									// If burning, must either not have the metadata value or it must not match this player doing damage
@@ -129,18 +129,18 @@ public class MageClass extends BaseClass {
 									    && MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) {
 										dmg += ARCANE_STRIKE_BURN_DAMAGE;
 									}
-	
+
 									EntityUtils.damageEntity(mPlugin, mob, dmg, player);
 								}
 							}
-	
+
 							World world = Bukkit.getWorld(player.getWorld().getName());
 							Location loc = damagee.getLocation();
 							ParticleUtils.playParticlesInWorld(world, Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
 							ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
-	
+
 							world.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
-	
+
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
 						}
 					}
@@ -164,8 +164,7 @@ public class MageClass extends BaseClass {
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				if ((offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW) ||
-						(mainHand.getType() == Material.SHIELD && offHand.getType() != Material.BOW)
+				if ((offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW) || (mainHand.getType() == Material.SHIELD)
 						&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
