@@ -17,6 +17,7 @@ import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
@@ -53,7 +54,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(Entity entity) {
-		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast) {
+		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return ((Wolf)entity).isAngry();

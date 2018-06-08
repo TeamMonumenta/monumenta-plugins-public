@@ -123,7 +123,7 @@ public class WarriorClass extends BaseClass {
 
 									if (riposte > 1) {
 										if (InventoryUtils.isSwordItem(mainHand)) {
-											player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, false));
+											player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
 										}
 										else if (InventoryUtils.isAxeItem(mainHand)) {
 											damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
@@ -218,14 +218,14 @@ public class WarriorClass extends BaseClass {
 			if (!InventoryUtils.isPickaxeItem(mainHand)) {
 				int hasteAmp = frenzy == 1 ? 2 : 3;
 
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
 
 				World world = Bukkit.getWorld(player.getWorld().getName());
 				Location loc = player.getLocation();
 				world.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
 
 				if (frenzy > 1) {
-					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, false));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));
 				}
 			}
 		}
@@ -253,7 +253,7 @@ public class WarriorClass extends BaseClass {
 
 									target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
 									boolean self = (target == player);
-									mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, false));
+									mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, true));
 								}
 							}
 

@@ -254,7 +254,7 @@ public class RogueClass extends BaseClass {
 				if (smokeScreen > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SMOKESCREEN)) {
 						ItemStack mainHand = player.getInventory().getItemInMainHand();
-						if (mainHand != null && mainHand.getType() != Material.BOW) {
+						if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
 							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE,
 							                                                 SMOKESCREEN_RANGE);
 							for (Entity entity : entities) {
