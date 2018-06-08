@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
@@ -62,11 +63,19 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
 
+	public static List<Player> getNearbyPlayers(Player player, double radius, boolean includeSourcePlayer) {
+		List<Player> players = getNearbyPlayers(player.getLocation(), radius);
+		if (!includeSourcePlayer) {
+			players.removeIf(p -> (p == player));
+		}
+		return players;
+	}
+
 	public static List<Player> getNearbyPlayers(Location loc, double radius) {
 		List<Player> players = new LinkedList<Player>();
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (loc.distance(player.getLocation()) <= radius) {
+			if (loc.distance(player.getLocation()) <= radius && player.getGameMode() != GameMode.SPECTATOR) {
 				players.add(player);
 			}
 		}

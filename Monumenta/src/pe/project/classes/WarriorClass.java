@@ -243,18 +243,12 @@ public class WarriorClass extends BaseClass {
 					int defensiveLine = ScoreboardUtils.getScoreboardValue(player, "DefensiveLine");
 					if (defensiveLine > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DEFENSIVE_LINE)) {
-							List<Entity> entities = player.getNearbyEntities(DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS, DEFENSIVE_LINE_RADIUS);
-							entities.add(player);
-							for(int i = 0; i < entities.size(); i++) {
-								Entity e = entities.get(i);
-								if(e instanceof Player) {
-									Player target = (Player)e;
-									Location loc = target.getLocation();
+							for (Player target : PlayerUtils.getNearbyPlayers(player, DEFENSIVE_LINE_RADIUS, true)) {
+								Location loc = target.getLocation();
 
-									target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
-									boolean self = (target == player);
-									mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, true));
-								}
+								target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
+								boolean self = (target == player);
+								mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, true));
 							}
 
 							ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);

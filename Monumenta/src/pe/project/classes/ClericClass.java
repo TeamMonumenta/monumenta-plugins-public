@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
@@ -14,7 +13,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.Location;
@@ -121,36 +119,25 @@ public class ClericClass extends BaseClass {
 			boolean threeSeconds = ((originalTime % 3) == 0);
 
 			if (threeSeconds) {
-			// Passive Heal Radius
+				// Passive Heal Radius
 				World world = player.getWorld();
-				List<Entity> passiveEntities = player.getNearbyEntities(PASSIVE_HEAL_RADIUS, PASSIVE_HEAL_RADIUS, PASSIVE_HEAL_RADIUS);
-				for (Entity entity : passiveEntities) {
-					if (entity instanceof Player) {
-						Player p = (Player)entity;
-
-						if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
-							PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
-							ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
-						}
+				for (Player p : PlayerUtils.getNearbyPlayers(player, PASSIVE_HEAL_RADIUS, false)) {
+					if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
+						PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
+						ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
 					}
 				}
 
-			// 	Rejuvenation
+				// 	Rejuvenation
 				int rejuvenation = ScoreboardUtils.getScoreboardValue(player, "Rejuvenation");
 				if (rejuvenation > 0) {
-					List<Entity> entities = player.getNearbyEntities(REJUVENATION_RADIUS, REJUVENATION_RADIUS, REJUVENATION_RADIUS);
-					entities.add(player);
-					for (Entity entity : entities) {
-						if (entity instanceof Player) {
-							Player p = (Player)entity;
-
-							//	If this is us or we're allowing anyone to get it.
-							if (p == player || rejuvenation > 1) {
-								double oldHealth = p.getHealth();
-								PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
-								if (p.getHealth() > oldHealth) {
-									ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
-								}
+					for (Player p : PlayerUtils.getNearbyPlayers(player, REJUVENATION_RADIUS, true)) {
+						//	If this is us or we're allowing anyone to get it.
+						if (p == player || rejuvenation > 1) {
+							double oldHealth = p.getHealth();
+							PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
+							if (p.getHealth() > oldHealth) {
+								ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 							}
 						}
 					}
@@ -164,21 +151,17 @@ public class ClericClass extends BaseClass {
 						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
 						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
 
-						List<Entity> entities = player.getNearbyEntities(CLEANSING_RADIUS, CLEANSING_RADIUS, CLEANSING_RADIUS);
-						entities.add(player);
-						for (Entity entity : entities) {
-							if (entity instanceof Player) {
-								Player e = (Player)entity;
-								PotionUtils.clearNegatives(mPlugin, e);
+						for (Player e : PlayerUtils.getNearbyPlayers(player, CLEANSING_RADIUS, true)) {
+							PotionUtils.clearNegatives(mPlugin, e);
 
-								if (e.getFireTicks() > 0) {
-									e.setFireTicks(1);
-								}
+							if (e.getFireTicks() > 1) {
+								e.setFireTicks(1);
+							}
 
-								((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, true));
-								if (cleansing > 1) {
-									((LivingEntity)entity).addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, true));
-								}
+							// TODO: This should use the potion manager!
+							e.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, true));
+							if (cleansing > 1) {
+								e.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, true));
 							}
 						}
 					}
@@ -320,18 +303,11 @@ public class ClericClass extends BaseClass {
 			double range = potion.getLocation().distance(player.getLocation());
 			if (range <= HEAVENLY_BOON_TRIGGER_RANGE) {
 				PotionMeta meta = (PotionMeta)potion.getItem().getItemMeta();
+				List<PotionEffect> effectList = PotionUtils.getEffects(meta);
 
-				List<Entity> entities = player.getNearbyEntities(HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS, HEAVENLY_BOON_RADIUS);
-				entities.add(player);
-				for(int i = 0; i < entities.size(); i++) {
-					Entity e = entities.get(i);
-					if(e instanceof Player) {
-						Player p = (Player)(e);
-
-						List<PotionEffect> effectList = PotionUtils.getEffects(meta);
-						for (PotionEffect effect : effectList) {
-							PotionUtils.applyPotion(mPlugin, p, effect);
-						}
+				for (Player p : PlayerUtils.getNearbyPlayers(player, HEAVENLY_BOON_RADIUS, true)) {
+					for (PotionEffect effect : effectList) {
+						PotionUtils.applyPotion(mPlugin, p, effect);
 					}
 				}
 
@@ -350,26 +326,17 @@ public class ClericClass extends BaseClass {
 				if (celestial > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING)) {
 						World world = player.getWorld();
+						Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
+						int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
 
-						List<Entity> entities = player.getNearbyEntities(CELESTIAL_RADIUS, CELESTIAL_RADIUS, CELESTIAL_RADIUS);
-						entities.add(player);
-						for (int i = 0; i < entities.size(); i++) {
-							Entity e = entities.get(i);
-							if (e instanceof Player) {
-								Player p = (Player)(e);
+						for (Player p : PlayerUtils.getNearbyPlayers(player, CELESTIAL_RADIUS, true)) {
+							mPlugin.mTimers.AddCooldown(p.getUniqueId(), fakeID, duration);
 
-								Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
+							p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
 
-								int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-
-								mPlugin.mTimers.AddCooldown(p.getUniqueId(), fakeID, duration);
-
-								p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
-
-								Location loc = p.getLocation();
-								ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
-								world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
-							}
+							Location loc = p.getLocation();
+							ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
+							world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
 						}
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING, CELESTIAL_COOLDOWN);
@@ -405,25 +372,19 @@ public class ClericClass extends BaseClass {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HEALING)) {
 			Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 			World world = player.getWorld();
+			int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
 
-			List<Entity> entities = player.getNearbyEntities(HEALING_RADIUS, HEALING_RADIUS, HEALING_RADIUS);
-			for (Entity e : entities) {
-				if (e instanceof Player) {
-					Player p = (Player)e;
-					if (p != player && p.getGameMode() != GameMode.SPECTATOR) {
-						Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-						if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
-							int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
-							PlayerUtils.healPlayer(p, healAmount);
+			for (Player p : PlayerUtils.getNearbyPlayers(player, HEALING_RADIUS, false)) {
+				Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+				if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
+					PlayerUtils.healPlayer(p, healAmount);
 
-							Location loc = p.getLocation();
+					Location loc = p.getLocation();
 
-							ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-							ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-							player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
-							player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
-						}
-					}
+					ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+					ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+					player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
+					player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
 				}
 			}
 
