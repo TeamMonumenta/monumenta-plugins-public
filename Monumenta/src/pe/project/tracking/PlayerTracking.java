@@ -226,8 +226,14 @@ public class PlayerTracking implements EntityTracking {
 			}
 
 			int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
-			if (shinyGreen == 1 && patreon >= 10) {
+			if (shinyGreen == 1 && patreon >= 20) {
 				ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				return;
+			}
+
+			int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
+			if (shinyRed == 1 && patreon >= 30) {
+				ParticleUtils.playParticlesInWorld(world, Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
 		}
