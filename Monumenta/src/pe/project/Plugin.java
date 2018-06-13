@@ -41,6 +41,7 @@ import pe.project.commands.PlayTimeStats;
 import pe.project.commands.ProfilingCommand;
 import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
+import pe.project.commands.RemoveTags;
 import pe.project.commands.SetGuildPrefix;
 import pe.project.commands.SetPlayerName;
 import pe.project.commands.TrackedEffect;
@@ -173,6 +174,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
 			getCommand("debugInfo").setExecutor(new DebugInfo(this));
 			getCommand("clearEffects").setExecutor(new ClearEffects(this));
+			getCommand("removeTags").setExecutor(new RemoveTags(this));
 			getCommand("trackedEffect").setExecutor(new TrackedEffect(this));
 			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
 			getCommand("back").setExecutor(new Back(this));
