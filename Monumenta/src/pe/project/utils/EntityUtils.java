@@ -54,12 +54,15 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(Entity entity) {
-		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear) {
+		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return ((Wolf)entity).isAngry();
 		} else if (entity instanceof Rabbit) {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
+		} else if (entity instanceof PolarBear) {
+			LivingEntity target = ((PolarBear)entity).getTarget();
+			return target != null && target instanceof Player;	//	If a player is the target of a Polar Bear it's hostile.
 		}
 
 		return false;
