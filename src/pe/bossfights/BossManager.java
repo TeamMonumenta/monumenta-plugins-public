@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import pe.bossfights.bosses.Boss;
 import pe.bossfights.bosses.CAxtal;
 import pe.bossfights.bosses.GenericBoss;
+import pe.bossfights.bosses.InvisibleBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
 import pe.bossfights.utils.SerializationUtils;
@@ -88,6 +89,9 @@ public class BossManager implements Listener, CommandExecutor
 		case GenericBoss.identityTag:
 			boss = new GenericBoss(mPlugin, (LivingEntity)targetEntity);
 			break;
+		case InvisibleBoss.identityTag:
+			boss = new InvisibleBoss(mPlugin, (LivingEntity)targetEntity);
+			break;
 		case CAxtal.identityTag:
 			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
@@ -100,7 +104,8 @@ public class BossManager implements Listener, CommandExecutor
 		default:
 			send.sendMessage(ChatColor.RED + "Invalid boss name!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
-			                 CAxtal.identityTag + "," + Masked_1.identityTag + "," + Masked_2.identityTag + "]");
+			                 InvisibleBoss.identityTag + "," + CAxtal.identityTag + "," +
+			                 Masked_1.identityTag + "," + Masked_2.identityTag + "]");
 			return false;
 		}
 
@@ -126,7 +131,8 @@ public class BossManager implements Listener, CommandExecutor
 	private void ProcessEntity(LivingEntity entity)
 	{
 		/* This should never happen */
-		if (mBosses.get(entity.getUniqueId()) != null) {
+		if (mBosses.get(entity.getUniqueId()) != null)
+		{
 			mPlugin.getLogger().log(Level.WARNING, "ProcessEntity: Attempted to add boss that was already tracked!");
 			return;
 		}
@@ -139,6 +145,8 @@ public class BossManager implements Listener, CommandExecutor
 			{
 				if (tags.contains(GenericBoss.identityTag))
 					boss = GenericBoss.deserialize(mPlugin, entity);
+				else if (tags.contains(InvisibleBoss.identityTag))
+					boss = InvisibleBoss.deserialize(mPlugin, entity);
 				else if (tags.contains(CAxtal.identityTag))
 					boss = CAxtal.deserialize(mPlugin, entity);
 				else if (tags.contains(Masked_1.identityTag))
