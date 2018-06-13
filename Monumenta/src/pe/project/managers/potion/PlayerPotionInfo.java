@@ -38,6 +38,13 @@ public class PlayerPotionInfo {
 		if (potionMap != null) {
 			potionMap.removePotionMap(player, id);
 		}
+		/*
+		 * If we are removing all effects, make really sure to remove even
+		 * non-potion-manager-tracked effects
+		 */
+		if (id == PotionID.ALL) {
+			player.removePotionEffect(type);
+		}
 	}
 
 	public void clearPotionIDType(Player player, PotionID id) {
