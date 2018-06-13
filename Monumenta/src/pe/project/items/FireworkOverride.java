@@ -5,24 +5,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import pe.project.Plugin;
 import pe.project.managers.potion.PotionManager.PotionID;
+import pe.project.Plugin;
+import pe.project.utils.ItemUtils;
 
 public class FireworkOverride extends OverrideItem {
-    @Override
-    public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-    	if (item != null && block != null) {
-    		ItemMeta meta = item.getItemMeta();
-    		if (meta != null) {
-    			if (meta.hasDisplayName() && meta.getDisplayName().contains("Signal Flare")) {
-    				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
-    			}
-    		}
-    	}
+	@Override
+	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+		if (item != null && block != null) {
+			Material blockType = block.getType();
+			if (!ItemUtils.isInteractable(blockType)) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					if (meta.hasDisplayName() && meta.getDisplayName().contains("Signal Flare")) {
+						plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }
