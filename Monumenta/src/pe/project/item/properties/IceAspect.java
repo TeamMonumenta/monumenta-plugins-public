@@ -9,12 +9,10 @@ import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import pe.project.Plugin;
-import pe.project.utils.InventoryUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
 
@@ -29,11 +27,6 @@ public class IceAspect implements ItemProperty {
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
-	}
-
-	@Override
-	public int getLevelFromItem(ItemStack item) {
-		return InventoryUtils.getCustomEnchantLevel(item, PROPERTY_NAME);
 	}
 
 	@Override
