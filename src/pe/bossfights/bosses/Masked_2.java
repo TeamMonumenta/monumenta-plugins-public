@@ -54,7 +54,7 @@ public class Masked_2 extends Boss
 		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
 		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
 
-		return new Masked_1(plugin, boss, spawnLoc, endLoc);
+		return new Masked_2(plugin, boss, spawnLoc, endLoc);
 	}
 
 	public Masked_2(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc)
