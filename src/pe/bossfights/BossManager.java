@@ -28,6 +28,7 @@ import pe.bossfights.bosses.GenericBoss;
 import pe.bossfights.bosses.InvisibleBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
+import pe.bossfights.bosses.Virius;
 import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 import pe.bossfights.utils.Utils.ArgumentException;
@@ -101,11 +102,14 @@ public class BossManager implements Listener, CommandExecutor
 		case Masked_2.identityTag:
 			boss = new Masked_2(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
+		case Virius.identityTag:
+			boss = new Virius(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
+			break;
 		default:
 			send.sendMessage(ChatColor.RED + "Invalid boss name!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
 			                 InvisibleBoss.identityTag + "," + CAxtal.identityTag + "," +
-			                 Masked_1.identityTag + "," + Masked_2.identityTag + "]");
+			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + Virius.identityTag + "]");
 			return false;
 		}
 
@@ -153,6 +157,8 @@ public class BossManager implements Listener, CommandExecutor
 					boss = Masked_1.deserialize(mPlugin, entity);
 				else if (tags.contains(Masked_2.identityTag))
 					boss = Masked_2.deserialize(mPlugin, entity);
+				else if (tags.contains(Virius.identityTag))
+					boss = Virius.deserialize(mPlugin, entity);
 			}
 			catch (Exception ex)
 			{
