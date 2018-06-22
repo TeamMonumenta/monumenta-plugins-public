@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -17,9 +16,8 @@ import org.bukkit.Material;
 import pe.bossfights.BossBarManager;
 import pe.bossfights.Plugin;
 import pe.bossfights.SpellManager;
-import pe.bossfights.spells.Spell;
 import pe.bossfights.spells.SpellChangeFloor;
-import pe.bossfights.spells.SpellPushPlayersAway;
+import pe.bossfights.spells.SpellViriusLaser;
 import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 
@@ -61,15 +59,13 @@ public class Virius extends Boss
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new SpellChangeFloor(plugin, mBoss, detectionRange, 4, Material.MAGMA)
+		                                                 new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA),
+		                                                 new SpellViriusLaser(plugin, mBoss, detectionRange)
 		                                             ));
-		List<Spell> passiveSpells = Arrays.asList(
-		                                new SpellPushPlayersAway(mBoss, 7, 15)
-		                            );
 
 		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
+		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
 	}
 
 	@Override

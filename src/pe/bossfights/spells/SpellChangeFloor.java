@@ -3,20 +3,26 @@ package pe.bossfights.spells;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 
 import pe.bossfights.utils.Utils;
 
 public class SpellChangeFloor implements Spell
 {
 	private Plugin mPlugin;
-	private Entity mLauncher;
+	private LivingEntity mBoss;
 	private int mRange;
 	private int mRadius;
 	private Material mMaterial;
@@ -33,20 +39,21 @@ public class SpellChangeFloor implements Spell
 	                                               );
 
 
-	public SpellChangeFloor(Plugin plugin, Entity launcher, int range, int radius, Material material)
+	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material)
 	{
 		mPlugin = plugin;
-		mLauncher = launcher;
+		mBoss = launcher;
 		mRange = range;
 		mRadius = radius;
 		mMaterial = material;
+		mIgnoredMats.add(material);
 	}
 
 	@Override
 	public void run()
 	{
-		for (Player player : Utils.playersInRange(mLauncher.getLocation(), mRange))
-			launch(player);
+		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		launch(players.get((new Random()).nextInt(players.size())));
 	}
 
 	public void launch(Player target)
@@ -56,24 +63,34 @@ public class SpellChangeFloor implements Spell
 		 * Second phase - convert top layer of ground under player to mMaterial, particles
 		 * Third phase - cleanup converted blocks
 		 */
-		final int PHASE1_TICKS = 10;
-		final int PHASE2_TICKS = 1000;
+		final int PHASE1_TICKS = 30;
+		final int PHASE2_TICKS = 800;
 
 		new BukkitRunnable()
 		{
 			int mTicks = 0;
 			List<BlockState> restoreBlocks = new LinkedList<BlockState>();
+			Random mRandom = new Random();
 
 			@Override
 			public void run()
 			{
+				if (mTicks > 0 && mTicks < PHASE2_TICKS)
+				{
+					// Particles over the changed blocks
+					for (BlockState state : restoreBlocks)
+					{
+						Location loc = state.getLocation().add(0.5f, 1f, 0.5f);
+						loc.getWorld().spawnParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0);
+					}
+				}
+
 				if (mTicks == 0)
 				{
-					// TODO: Play some sound here, maybe particles around the mob?
-				}
-				else if (mTicks == PHASE1_TICKS)
-				{
-					// TODO: Play a sound
+		            target.playSound(target.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 4f);
+		            mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 5f);
+					mBoss.getLocation().getWorld().spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0);
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3), true);
 
 					// Get a list of blocks that should be changed
 					for (int dx = -mRadius; dx < mRadius; dx++)
@@ -83,27 +100,25 @@ public class SpellChangeFloor implements Spell
 							for (int dz = -mRadius; dz < mRadius; dz++)
 							{
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
-								if (!mIgnoredMats.contains(state.getType()))
+								if (!mIgnoredMats.contains(state.getType()) && (mRandom.nextInt(16) > 6))
 									restoreBlocks.add(state);
 							}
 						}
 					}
-
+				}
+				else if (mTicks == PHASE1_TICKS)
+				{
 					// Set the blocks to the specified material
 					for (BlockState state : restoreBlocks)
 						state.getLocation().getBlock().setType(mMaterial);
-				}
-				else if (mTicks > PHASE1_TICKS && mTicks < PHASE2_TICKS)
-				{
-					// TODO: Play particles over changed blocks
 				}
 				else if (mTicks == PHASE2_TICKS)
 				{
 					// Restore the block states saved earlier
 					for (BlockState state : restoreBlocks)
-						state.update();
+						state.update(true);
 				}
-				else if ((mTicks < PHASE1_TICKS && mLauncher.isDead()) || mTicks > PHASE2_TICKS)
+				else if ((mTicks < PHASE1_TICKS && mBoss.isDead()) || mTicks > PHASE2_TICKS)
 					this.cancel();
 				mTicks++;
 			}
