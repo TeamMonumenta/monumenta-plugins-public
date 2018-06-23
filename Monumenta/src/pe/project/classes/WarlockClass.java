@@ -51,10 +51,10 @@ public class WarlockClass extends BaseClass {
 	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
 			PotionEffectType.WITHER,
 			PotionEffectType.SLOW,
-			PotionEffectType.WEAKNESS,
-			PotionEffectType.SLOW_DIGGING,
-			PotionEffectType.POISON,
-			PotionEffectType.UNLUCK
+	        PotionEffectType.WEAKNESS,
+	        PotionEffectType.SLOW_DIGGING,
+	        PotionEffectType.POISON,
+	        PotionEffectType.UNLUCK
 	);
 
 	private static final int BLASPHEMY_RADIUS = 3;
@@ -93,7 +93,7 @@ public class WarlockClass extends BaseClass {
 		super(plugin, random);
 	}
 
-/// PASSIVE
+	// PASSIVE
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		if (EntityUtils.isHostileMob(killedEntity)) {
@@ -106,11 +106,11 @@ public class WarlockClass extends BaseClass {
 		}
 	}
 
-/// BLASPHEMOUS AURA
+	// BLASPHEMOUS AURA
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		if (!(damager instanceof Player)) {
-			//	ABILITY: Blasphemous Aura
+			// ABILITY: Blasphemous Aura
 
 			int blasphemy = ScoreboardUtils.getScoreboardValue(player, "BlasphemousAura");
 			if (blasphemy > 0) {
@@ -142,12 +142,11 @@ public class WarlockClass extends BaseClass {
 		return true;
 	}
 
-
-/// CURSED WOUND and SOUL REND
+	// CURSED WOUND and SOUL REND
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 
-	// First we need to check if we're holding a scythe, if not we can bail out of both
+		// First we need to check if we're holding a scythe, if not we can bail out of both
 		if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 			// Cursed Wound
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
@@ -174,7 +173,6 @@ public class WarlockClass extends BaseClass {
 			if (soulRend > 0) {
 				if (PlayerUtils.isCritical(player) && EntityUtils.isHostileMob(damagee)) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SOUL_REND)) {
-
 						double healMult = (soulRend == 1) ? SOUL_REND_HEAL_1_MULT : SOUL_REND_HEAL_2_MULT;
 						double soulHealValue = damage * healMult;
 
@@ -196,14 +194,14 @@ public class WarlockClass extends BaseClass {
 							if (entity instanceof Player) {
 								Player p = (Player)entity;
 
-								//	If this is us or we're allowing anyone to get it.
+								// If this is us or we're allowing anyone to get it.
 								if (p == player || soulRend > 1) {
 									PlayerUtils.healPlayer(p, soulHealValue);
 								}
 							}
 						}
 
-						//	Put Soul Rend on cooldown
+						// Put Soul Rend on cooldown
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SOUL_REND, SOUL_REND_COOLDOWN);
 					}
 				}
@@ -213,8 +211,7 @@ public class WarlockClass extends BaseClass {
 		return true;
 	}
 
-
-	/// GRASPING CLAWS
+	// GRASPING CLAWS
 	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		int graspingClaws = ScoreboardUtils.getScoreboardValue(player, "GraspingClaws");
@@ -229,7 +226,6 @@ public class WarlockClass extends BaseClass {
 					ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.1, 0.1, 0.1, 0.0);
 
 					int targetCount = 1;
-
 					int damage = (graspingClaws == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 
 					List<Entity> entities = damagee.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
@@ -247,9 +243,7 @@ public class WarlockClass extends BaseClass {
 					}
 
 					if (targetCount >= 1) {
-						if (targetCount >= 7) {
-							targetCount = 7;
-						}
+						Math.min(targetCount, 7);
 
 						for (Entity entity : entities) {
 							if (EntityUtils.isHostileMob(entity)) {
@@ -264,32 +258,26 @@ public class WarlockClass extends BaseClass {
 						EntityUtils.damageEntity(mPlugin, damagee, damage, player);
 					}
 
-					//	Put Soul Rend on cooldown
+					// Put Soul Rend on cooldown
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GRASPING_CLAW, GRASPING_CLAWS_COOLDOWN);
 				}
 			}
 		}
 	}
 
-
-
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-
 		if (player.isSneaking()) {
-		/// CONSUMING FLAMES
-		// Sneak and right click with a scythe
+			/// CONSUMING FLAMES - Sneak and right click with a scythe
 			int consumingFlames = ScoreboardUtils.getScoreboardValue(player, "ConsumingFlames");
 			if (consumingFlames > 0) {
 				if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 					if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CONSUMING_FLAMES)) {
-
 							Location loc = player.getLocation();
 							World world = player.getWorld();
 
 							ParticleUtils.playParticlesInWorld(world, Particle.FLAME, loc.add(0, 1, 0), 60, 1.75, 0.75, 1.75, 0.0);
-
 							world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
 
 							boolean effect = false;
@@ -316,12 +304,11 @@ public class WarlockClass extends BaseClass {
 				}
 			}
 
-		/// AMPLIFYING HEX
-		//	If sneaking and left click with a wand OR a scythe
-
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			if (InventoryUtils.isScytheItem(mainHand)) {
-				if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+			// AMPLIFYING HEX
+			// If sneaking and left click with a wand OR a scythe
+			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				if (InventoryUtils.isScytheItem(mainHand)) {
 					int amplifyingHex = ScoreboardUtils.getScoreboardValue(player, "AmplifyingHex");
 					if (amplifyingHex > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.AMPLIFYING)) {
@@ -330,8 +317,8 @@ public class WarlockClass extends BaseClass {
 
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 							List<Entity> entities = player.getNearbyEntities(AMPLIFYING_RADIUS, AMPLIFYING_RADIUS, AMPLIFYING_RADIUS);
-							for(Entity e : entities) {
-								if(EntityUtils.isHostileMob(e)) {
+							for (Entity e : entities) {
+								if (EntityUtils.isHostileMob(e)) {
 									LivingEntity mob = (LivingEntity)e;
 
 									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
@@ -339,7 +326,6 @@ public class WarlockClass extends BaseClass {
 										int debuffCount = (int)DEBUFFS.stream()
 												.filter(effect -> (mob.getPotionEffect(effect) != null))
 												.count();
-
 										int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
 
 										if (debuffCount > 0) {
@@ -350,7 +336,7 @@ public class WarlockClass extends BaseClass {
 								}
 							}
 
-							//	Put Amplifying Hex on cooldown
+							// Put Amplifying Hex on cooldown
 							int cooldown = (amplifyingHex == 1) ? AMPLIFYING_1_COOLDOWN : AMPLIFYING_2_COOLDOWN;
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.AMPLIFYING, cooldown);
 						}
