@@ -29,6 +29,7 @@ import pe.project.commands.BroadcastCommand;
 import pe.project.commands.ChatRangeCommand;
 import pe.project.commands.CheckEmptyInventory;
 import pe.project.commands.ClearEffects;
+import pe.project.commands.DeathMsg;
 import pe.project.commands.DebugInfo;
 import pe.project.commands.Forward;
 import pe.project.commands.GetScore;
@@ -180,6 +181,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("back").setExecutor(new Back(this));
 			getCommand("forward").setExecutor(new Forward(this));
 			getCommand("minusexp").setExecutor(new MinusExp(this));
+			getCommand("deathMsg").setExecutor(new DeathMsg(this));
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));

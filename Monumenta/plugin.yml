@@ -5,6 +5,10 @@ commands:
   playTimeStats:
     description: "Get the current playtime stats of everyone online"
     usage: /playTimeStats
+  deathMsg:
+    permission: monumenta.commands.deathmsg
+    description: Toggles death messages on and off
+    usage: /deathmsg <on|off>
   chatRange:
     description: Set the default chat range that you can hear people from.
     usage: /chatRange <range>
