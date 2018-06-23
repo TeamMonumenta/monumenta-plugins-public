@@ -246,18 +246,7 @@ public class AlchemistClass extends BaseClass {
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		ItemStack item = potion.getItem();
 		if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					ParticleEffect.SPELL.display(0.1f, 0.1f, 0.1f, 0, 3, potion.getLocation(), 40);
-					if (potion.isDead() || potion == null) {
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
-
+			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
 	}

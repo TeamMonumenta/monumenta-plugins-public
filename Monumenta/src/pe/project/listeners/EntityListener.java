@@ -555,9 +555,10 @@ public class EntityListener implements Listener {
 				Player player = (Player)source;
 
 				mPlugin.getClass(player).ProjectileHitEvent(player, arrow);
-				mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			}
 		}
+
+		mPlugin.mProjectileEffectTimers.removeEntity(event.getEntity());
 
 		if ((type == EntityType.SNOWBALL)
 			&& (event.getHitEntity() instanceof LivingEntity)
