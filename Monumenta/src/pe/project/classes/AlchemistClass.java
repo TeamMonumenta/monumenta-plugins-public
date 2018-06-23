@@ -100,8 +100,9 @@ public class AlchemistClass extends BaseClass {
 	private static final int POWER_INJECTION_DURATION = 20 * 20;
 	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
 
-	Arrow blinkArrow = null;
-	Arrow unstableArrow = null;
+	//	[Rock]: This is bad and could work incorrectly if there are multiple alchemist playing at the same time. :( Please fix me!
+	Arrow mBlinkArrow = null;
+	Arrow mUnstableArrow = null;
 
 	public AlchemistClass(Plugin plugin, Random random) {
 		super(plugin, random);
@@ -131,7 +132,6 @@ public class AlchemistClass extends BaseClass {
 					if (targetEntity != null && targetEntity instanceof Player) {
 						Player targetPlayer = (Player) targetEntity;
 						if (targetPlayer.getGameMode() != GameMode.SPECTATOR) {
-
 							World zaWarudo = player.getWorld();
 
 							ParticleUtils.playParticlesInWorld(zaWarudo, Particle.FLAME, targetPlayer.getLocation().add(0, 1, 0), 30, 1.0, 1.0, 1.0, 0.001);
@@ -159,7 +159,7 @@ public class AlchemistClass extends BaseClass {
 			int bombArrow = ScoreboardUtils.getScoreboardValue(player, "BombArrow");
 			if (bombArrow > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BOMB_ARROW)) {
-					unstableArrow = arrow;
+					mUnstableArrow = arrow;
 				}
 			}
 		}
@@ -173,16 +173,17 @@ public class AlchemistClass extends BaseClass {
 
 	@Override
 	public void ProjectileHitEvent(Player player, Arrow arrow) {
-		if (arrow == unstableArrow && unstableArrow != null) {
+		if (arrow == mUnstableArrow && mUnstableArrow != null) {
 			double range = arrow.getLocation().distance(player.getLocation());
 			if (range <= BOMB_ARROW_TRIGGER_RANGE) {
 				mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, BOMB_ARROW_ID, BOMB_ARROW_TAG_NAME, BOMB_ARROW_DURATION, 20, arrow.getLocation(), 0, false);
 
 				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BOMB_ARROW, BOMB_ARROW_COOLDOWN);
 				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-				blinkArrow = arrow;
+				mBlinkArrow = arrow;
 			}
-			unstableArrow = null;
+
+			mUnstableArrow = null;
 		}
 	}
 
@@ -205,7 +206,6 @@ public class AlchemistClass extends BaseClass {
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
 		int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
-
 		int potCount = 0;
 
 		if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
@@ -296,10 +296,7 @@ public class AlchemistClass extends BaseClass {
 	}
 
 
-	// =================
-	// = IRON TINCTURE =
-	// =================
-
+	//	IRON TINCTURE
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (player.isSneaking()) {
@@ -312,7 +309,6 @@ public class AlchemistClass extends BaseClass {
 							 && mainHand.getType() != Material.SPLASH_POTION
 							 && mainHand.getType() != Material.LINGERING_POTION)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
-
 							Location loc = player.getLocation().add(0, 1.8, 0);
 							ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
 							player.getWorld().playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
@@ -368,7 +364,6 @@ public class AlchemistClass extends BaseClass {
 
 							}.runTaskTimer(mPlugin, 0, 2);
 
-
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_THROW_COOLDOWN);
 						}
 					}
@@ -383,7 +378,6 @@ public class AlchemistClass extends BaseClass {
 		if (enfeeblingElixir > 0 && EntityUtils.isHostileMob(damagee)) {
 			if (player.isSneaking()) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR)) {
-
 					int duration = (enfeeblingElixir == 1) ? ENFEEBLING_DURATION_1 : ENFEEBLING_DURATION_2;
 
 					float kbSpeed = (enfeeblingElixir == 1) ? ENFEEBLING_KNOCKBACK_1_SPEED : ENFEEBLING_KNOCKBACK_2_SPEED;
@@ -432,10 +426,10 @@ public class AlchemistClass extends BaseClass {
 		if (abilityID == BOMB_ARROW_ID) {
 			int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
 			if (bombArrow > 0) {
-				if (blinkArrow != null) {
-					loc = blinkArrow.getLocation();
-					blinkArrow.remove();
-					blinkArrow = null;
+				if (mBlinkArrow != null) {
+					loc = mBlinkArrow.getLocation();
+					mBlinkArrow.remove();
+					mBlinkArrow = null;
 				}
 
 				loc = loc.add(0, 1.2, 0);
