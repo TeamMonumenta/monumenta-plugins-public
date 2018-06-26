@@ -206,7 +206,6 @@ public class AlchemistClass extends BaseClass {
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
 		int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
-		int potCount = 0;
 
 		if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
 			int newPot = 1;
@@ -219,6 +218,7 @@ public class AlchemistClass extends BaseClass {
 			for (int a = 0; a < newPot; a++) {
 				boolean added = false;
 				Inventory inv = player.getInventory();
+				int potCount = 0;
 				for (ItemStack item : inv.getContents()) {
 					if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
 						int amount = item.getAmount();
