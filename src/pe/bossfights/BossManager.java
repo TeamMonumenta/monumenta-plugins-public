@@ -29,6 +29,7 @@ import pe.bossfights.bosses.InvisibleBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
 import pe.bossfights.bosses.Virius;
+import pe.bossfights.bosses.Orangyboi;
 import pe.bossfights.utils.SerializationUtils;
 import pe.bossfights.utils.Utils;
 import pe.bossfights.utils.Utils.ArgumentException;
@@ -82,8 +83,6 @@ public class BossManager implements Listener, CommandExecutor
 			return false;
 		}
 
-		send.sendMessage(args[0].toLowerCase());
-		send.sendMessage(Masked_1.identityTag);
 		Boss boss;
 		switch (args[0].toLowerCase())
 		{
@@ -105,11 +104,15 @@ public class BossManager implements Listener, CommandExecutor
 		case Virius.identityTag:
 			boss = new Virius(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
+		case Orangyboi.identityTag:
+			boss = new Orangyboi(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
+			break;
 		default:
 			send.sendMessage(ChatColor.RED + "Invalid boss name!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
 			                 InvisibleBoss.identityTag + "," + CAxtal.identityTag + "," +
-			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + Virius.identityTag + "]");
+			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + Virius.identityTag + "," +
+							 Orangyboi.identityTag + "]");
 			return false;
 		}
 
@@ -159,6 +162,8 @@ public class BossManager implements Listener, CommandExecutor
 					boss = Masked_2.deserialize(mPlugin, entity);
 				else if (tags.contains(Virius.identityTag))
 					boss = Virius.deserialize(mPlugin, entity);
+				else if (tags.contains(Orangyboi.identityTag))
+					boss = Orangyboi.deserialize(mPlugin, entity);
 			}
 			catch (Exception ex)
 			{
