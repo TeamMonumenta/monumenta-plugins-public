@@ -150,6 +150,7 @@ public class MobListener implements Listener {
 				mPlugin.getClass(player).EntityDeathEvent(player, livingEntity,
 														  entity.getLastDamageCause().getCause(),
 														  shouldGenDrops);
+				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
 			}
 		}
 	}

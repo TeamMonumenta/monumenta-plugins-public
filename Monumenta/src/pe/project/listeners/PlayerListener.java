@@ -34,6 +34,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
@@ -77,6 +79,7 @@ import pe.project.utils.CommandUtils;
 import pe.project.utils.InventoryUtils;
 import pe.project.utils.ItemUtils;
 import pe.project.utils.LocationUtils;
+import pe.project.utils.PlayerUtils;
 import pe.project.utils.LocationUtils.LocationType;
 import pe.project.utils.PotionUtils;
 import pe.project.utils.PotionUtils.PotionInfo;
@@ -157,6 +160,7 @@ public class PlayerListener implements Listener {
 
 		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
+		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
 
 		// Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -705,6 +709,27 @@ public class PlayerListener implements Listener {
 					v.add(new Vector(0, 0.5, 0));
 					player.setVelocity(v.multiply(1)); // Set the velocity.
 				}
+			}
+		}
+	}
+
+	// This serves as a workaround for damaging players since PVP has been toggled off. EntityDamgedByEntityEvent doesn't work for Player v Player
+	@EventHandler
+	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
+		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
+			Player player = event.getPlayer();
+			double maxDist = 3;
+			Player target = null;
+			for (Player p : PlayerUtils.getNearbyPlayers(player.getLocation(), 3D)) {
+				if (PlayerUtils.hasLineOfSight(player, p)) {
+					if (p.getLocation().distance(player.getLocation()) < maxDist) {
+						maxDist = p.getLocation().distance(player.getLocation());
+						target = p;
+					}
+				}
+			}
+			if (target != null) {
+				mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
 			}
 		}
 	}

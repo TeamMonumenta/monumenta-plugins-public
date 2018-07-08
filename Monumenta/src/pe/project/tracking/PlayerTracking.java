@@ -16,6 +16,8 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pe.project.Constants;
@@ -105,6 +107,17 @@ public class PlayerTracking implements EntityTracking {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
 			damage = manager.onAttack(plugin, world, player, target, damage, cause);
+		}
+
+		return damage;
+	}
+
+	public double onShootAttack(Plugin plugin, Player player, Projectile proj, EntityDamageByEntityEvent event) {
+		double damage = event.getDamage();
+
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			damage = manager.onShootAttack(plugin, player, proj, event);
 		}
 
 		return damage;

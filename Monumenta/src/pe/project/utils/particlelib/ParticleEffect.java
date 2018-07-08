@@ -388,7 +388,9 @@ public enum ParticleEffect {
 	ENDROD("endrod", 43, 9),
 	DAMAGEINDICATOR("damageindicator", 44, 9),
 	SWEEPATTACK("sweepattack", 45, 9),
-	FALLINGDUST("fallingdust", 46, 10, ParticleProperty.REQUIRES_DATA);
+	FALLINGDUST("fallingdust", 46, 10, ParticleProperty.REQUIRES_DATA),
+	TOTEM("totem", 47, 11, ParticleProperty.DIRECTIONAL),
+	SPIT("spit", 48, 11, ParticleProperty.DIRECTIONAL);
 
 	private static final Map<String, ParticleEffect> NAME_MAP = new HashMap<String, ParticleEffect>();
 	private static final Map<Integer, ParticleEffect> ID_MAP = new HashMap<Integer, ParticleEffect>();

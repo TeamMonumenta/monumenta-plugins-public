@@ -1,6 +1,7 @@
 package pe.project.utils;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,6 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import pe.project.Plugin;
+import pe.project.utils.particlelib.ParticleEffect;
+import pe.project.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 public class ParticleUtils {
 	public static void playParticleInWorld(World world, Particle type, Location loc, int count) {
@@ -60,6 +63,22 @@ public class ParticleUtils {
 			}
 
 		}.runTaskTimer(plugin, 0, 1);
+	}
+
+	/**
+	 * Plays Colored particle effects.
+	 *
+	 * Only works for REDSTONE, and SPELL_MOB
+	 */
+	public static void playColorEffect(ParticleEffect effect, int r, int g, int b, double xOffset, double yOffset, double zOffset, Location loc, int amount) {
+		for (int i = 0; i < amount; i++) {
+			double x = ThreadLocalRandom.current().nextDouble(-xOffset, xOffset);
+			double y = ThreadLocalRandom.current().nextDouble(-yOffset, yOffset);
+			double z = ThreadLocalRandom.current().nextDouble(-zOffset, zOffset);
+			Location l = loc.clone();
+			l.add(x, y, z);
+			effect.display(new OrdinaryColor(r, g, b), l, 40);
+		}
 	}
 
 	public static void explodingConeEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {

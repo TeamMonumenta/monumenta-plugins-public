@@ -128,11 +128,16 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
-				if(!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
-				                                                              event.getFinalDamage())) 	{
+				if (!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
+				        event.getFinalDamage()))  {
 					event.setCancelled(true);
 				}
 
+				if (!mPlugin.getSpecialization(player).PlayerDamagedByLivingEntityEvent(player, event)) {
+					event.setCancelled(true);
+				}
+
+				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
@@ -172,6 +177,14 @@ public class EntityListener implements Listener {
 						BaseClass _class = mPlugin.getClass(player);
 						_class.ModifyDamage(player, _class, event);
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
+
+						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
+					}
+					if (damagee instanceof Player) {
+						// We don't damage players right?
+						event.setCancelled(true);
+						Player p = (Player) damagee;
+						mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, p);
 					}
 				}
 			} else if (damager instanceof Arrow) {
@@ -182,6 +195,10 @@ public class EntityListener implements Listener {
 					BaseClass _class = mPlugin.getClass(player);
 					_class.ModifyDamage(player, _class, event);
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
+					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
+
+					double damage = mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, arrow, event);
+					event.setDamage(Math.max(damage, 0));
 				}
 			}
 
@@ -373,7 +390,11 @@ public class EntityListener implements Listener {
 			Arrow arrow = (Arrow)event.getEntity();
 			if (arrow.getShooter() instanceof Player) {
 				Player player = (Player)arrow.getShooter();
+				if (!mPlugin.getSpecialization(player).PlayerShotArrowEvent(player, arrow)) {
+					event.setCancelled(true);
+				}
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
+				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
 			}
 		} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 			SplashPotion potion = (SplashPotion)event.getEntity();

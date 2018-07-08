@@ -59,6 +59,15 @@ import pe.project.managers.POIManager;
 import pe.project.managers.ZoneManager;
 import pe.project.managers.potion.PotionManager;
 import pe.project.server.properties.ServerProperties;
+import pe.project.specializations.AssassinSpecialization;
+import pe.project.specializations.BaseSpecialization;
+import pe.project.specializations.ClassSpecialization;
+import pe.project.specializations.CyromancerSpecialization;
+import pe.project.specializations.PyromancerSpecialization;
+import pe.project.specializations.ReaperSpecialization;
+import pe.project.specializations.SniperSpecialization;
+import pe.project.specializations.SwordsageSpecialization;
+import pe.project.specializations.TenebristSpecialization;
 import pe.project.timers.CombatLoggingTimers;
 import pe.project.timers.CooldownTimers;
 import pe.project.timers.ProjectileEffectTimers;
@@ -99,6 +108,7 @@ public class Plugin extends JavaPlugin {
 	}
 
 	public HashMap<Integer, BaseClass> mClassMap = new HashMap<Integer, BaseClass>();
+	public HashMap<Integer, BaseSpecialization> mSpecializationMap = new HashMap<Integer, BaseSpecialization>();
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public PulseEffectTimers mPulseEffectTimers = null;
@@ -148,6 +158,15 @@ public class Plugin extends JavaPlugin {
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
+
+		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.SWORDSAGE.getId(), new SwordsageSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.ASSASSIN.getId(), new AssassinSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.PYROMANCER.getId(), new PyromancerSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.CYROMANCER.getId(), new CyromancerSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom));
 
 		//	TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
@@ -280,6 +299,18 @@ public class Plugin extends JavaPlugin {
 
 		//	We Seem to be missing a class.
 		return mClassMap.get(Classes.NONE.getValue());
+	}
+
+	public BaseSpecialization getSpecialization(Player player) {
+		if (Constants.SPECIALIZATIONS_ENABLED) {
+			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Specialization");
+			if (playerClass >= 0 && playerClass <= ClassSpecialization.values().length) {
+				return mSpecializationMap.get(playerClass);
+			}
+		}
+
+		//	We Seem to be missing a class.
+		return mSpecializationMap.get(0);
 	}
 
 	public void incrementDailyVersion() {

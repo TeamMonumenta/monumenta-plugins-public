@@ -44,4 +44,9 @@ public class Chaotic implements ItemProperty {
 
 		return damage;
 	}
+
+	@Override
+	public boolean hasOnAttack() {
+		return true;
+	}
 }

@@ -22,6 +22,7 @@ public class ItemPropertyManager {
 	public enum ItemSlot {
 		MAINHAND,
 		OFFHAND,
+		HAND,      // Includes both offhand and mainhand
 		ARMOR,     // Does NOT include offhand!
 		INVENTORY, // Includes everything, including armor, offhand, and hotbar
 	}
@@ -46,6 +47,7 @@ public class ItemPropertyManager {
 		init.add(new Gills());
 		init.add(new Stylish());
 		init.add(new Hope());
+		init.add(new Frost());
 
 		init.add(new CurseOfCorruption());
 
@@ -81,6 +83,8 @@ public class ItemPropertyManager {
 			return inv.getArmorContents();
 		case INVENTORY:
 			return inv.getContents();
+		case HAND:
+			return new ItemStack[] {inv.getItemInMainHand(), inv.getItemInOffHand()};
 		}
 
 		return null;

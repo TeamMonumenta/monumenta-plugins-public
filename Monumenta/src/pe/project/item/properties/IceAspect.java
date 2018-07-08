@@ -31,8 +31,8 @@ public class IceAspect implements ItemProperty {
 
 	@Override
 	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
-		int duration = level * 4 * 20 + 20;
-		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2, false, true));
+		int duration = 20 * 5;
+		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level - 1, false, true));
 		ParticleUtils.playParticlesInWorld(world, Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {
@@ -40,5 +40,10 @@ public class IceAspect implements ItemProperty {
 		}
 
 		return damage;
+	}
+
+	@Override
+	public boolean hasOnAttack() {
+		return true;
 	}
 }

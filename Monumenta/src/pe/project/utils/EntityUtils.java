@@ -54,7 +54,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(Entity entity) {
-		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast) {
+		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return ((Wolf)entity).isAngry();
@@ -84,12 +84,16 @@ public class EntityUtils {
 				}
 
 				i++;
-				if (i >= ticks || mob.isDead()) {
+				if (i >= ticks || mob.isDead() || mob.hasAI()) {
 					this.cancel();
 					mob.setAI(true);
 				}
 			}
 		}.runTaskTimer(plugin, 0, 1);
+	}
+
+	public static boolean isFrozen(LivingEntity mob) {
+		return !mob.hasAI();
 	}
 
 	/**

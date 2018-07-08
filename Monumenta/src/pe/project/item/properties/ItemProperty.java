@@ -3,11 +3,13 @@ package pe.project.item.properties;
 import java.util.EnumSet;
 
 import org.bukkit.World;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.entity.Item;
 
 import pe.project.Plugin;
 import pe.project.item.properties.ItemPropertyManager.ItemSlot;
@@ -66,6 +68,13 @@ public interface ItemProperty {
 	}
 	default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
 		return damage;
+	}
+
+	default public boolean hasOnShootAttack() {
+		return false;
+	}
+	default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
+		return event.getDamage();
 	}
 
 	/*

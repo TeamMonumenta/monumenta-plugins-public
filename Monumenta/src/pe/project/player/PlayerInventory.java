@@ -6,6 +6,8 @@ import java.util.Map;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import pe.project.Plugin;
@@ -16,6 +18,7 @@ public class PlayerInventory {
 	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
 	boolean mHasTickingProperty = false;
 	boolean mHasOnAttack = false;
+	boolean mHasOnShootAttack = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player);
@@ -67,9 +70,26 @@ public class PlayerInventory {
 		return damage;
 	}
 
+	public double onShootAttack(Plugin plugin, Player player, Projectile proj, EntityDamageByEntityEvent event) {
+		double damage = event.getDamage();
+
+		if (!mHasOnShootAttack) {
+			return damage;
+		}
+
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+			damage = property.onShootAttack(plugin, player, level, proj, event);
+		}
+
+		return damage;
+	}
+
 	public void removeProperties(Plugin plugin, Player player) {
 		mHasTickingProperty = false;
 		mHasOnAttack = false;
+		mHasOnShootAttack = false;
 
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
@@ -94,6 +114,8 @@ public class PlayerInventory {
 			if (property.hasOnAttack()) {
 				mHasOnAttack = true;
 			}
+
+			mHasOnShootAttack = property.hasOnShootAttack();
 		}
 	}
 }
