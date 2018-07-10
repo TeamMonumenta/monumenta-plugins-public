@@ -10,7 +10,7 @@ import pe.bossfights.Plugin;
 public class GenericBoss extends Boss
 {
 	public static final String identityTag = "boss_generic";
-	public static final int detectionRange = 30;
+	public static final int detectionRange = 40;
 
 	LivingEntity mBoss;
 
