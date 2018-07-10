@@ -163,9 +163,9 @@ public class EntityListener implements Listener {
 							return;
 						}
 
-						//	Apply any damage modifications that items they have may apply.
+						// Apply any damage modifications that items they have may apply.
 						double damage = mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player.getWorld(), player,
-								(LivingEntity)damagee, event.getDamage(), event.getCause());
+						                                                           (LivingEntity)damagee, event.getDamage(), event.getCause());
 
 						event.setDamage(Math.max(damage, 0));
 
@@ -211,7 +211,7 @@ public class EntityListener implements Listener {
 		DamageCause.WITHER
 	);
 
-	//	Entity Hurt Event.
+	// Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
@@ -238,7 +238,7 @@ public class EntityListener implements Listener {
 			}
 
 			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {
-				//	If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
+				// If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
 				Location playerLoc = player.getLocation();
 
 				for (double y = -0.5; y <= 0.5; y += 1) {
@@ -250,14 +250,14 @@ public class EntityListener implements Listener {
 
 							Material type = player.getWorld().getBlockAt(new Location(world, nx, ny, nz)).getType();
 							if (type == Material.BEDROCK) {
-								//	Remove their vehicle if they had one.
+								// Remove their vehicle if they had one.
 								Entity vehicle = player.getVehicle();
 								if (vehicle != null) {
 									vehicle.eject();
 									vehicle.remove();
 								}
 
-								//	Also Give the player a strike.
+								// Also Give the player a strike.
 								PlayerUtils.awardStrike(player, "being somewhere you probably shouldn't have been.");
 
 								return;
@@ -288,12 +288,12 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	//	Hanging Entity hurt by another entity.
+	// Hanging Entity hurt by another entity.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void HangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
-		//	If hurt by a player in adventure mode we want to prevent the break;
+		// If hurt by a player in adventure mode we want to prevent the break;
 		if (damager instanceof Player) {
 			Player player = (Player)damager;
 
@@ -307,7 +307,7 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
-		//	If hurt by an arrow from a player in adventure mode.
+		// If hurt by an arrow from a player in adventure mode.
 		else if (damager instanceof Arrow || damager instanceof TippedArrow) {
 			Arrow arrow = (Arrow)damager;
 
@@ -321,14 +321,14 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	//	Entity Spawn Event.
+	// Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
 	}
 
-	//	Player shoots an arrow.
+	// Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
 		ProjectileSource shooter = event.getEntity().getShooter();
@@ -375,7 +375,7 @@ public class EntityListener implements Listener {
 				Player player = (Player)arrow.getShooter();
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
 			}
-		} else if(event.getEntityType() == EntityType.SPLASH_POTION) {
+		} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 			SplashPotion potion = (SplashPotion)event.getEntity();
 			if (potion.getShooter() instanceof Player) {
 				Player player = (Player)potion.getShooter();
@@ -417,13 +417,13 @@ public class EntityListener implements Listener {
 			for (LivingEntity entity : affectedEntities) {
 				if (entity instanceof Player) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
-													 event.getIntensity(entity));
+					                                 event.getIntensity(entity));
 				}
 			}
 		}
 	}
 
-	//	Entity ran into the effect cloud.
+	// Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		AreaEffectCloud cloud = event.getEntity();
@@ -455,10 +455,10 @@ public class EntityListener implements Listener {
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 
-		//	All affected players need to have the effect added to their potion manager.
+		// All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player) {
-				if (info != null){
+				if (info != null) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, info);
 				}
 
@@ -469,8 +469,8 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	//	Entity Explode Event
-	//	Cancel explosions in safezones
+	// Entity Explode Event
+	// Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
@@ -490,7 +490,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			//	If this block is "unbreakable" than we want to remove it from the list.
+			// If this block is "unbreakable" than we want to remove it from the list.
 			if (mPlugin.mServerProperties.mUnbreakableBlocks.contains(block.getType()) ||
 					!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();

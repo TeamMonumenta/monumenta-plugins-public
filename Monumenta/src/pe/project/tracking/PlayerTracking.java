@@ -127,9 +127,9 @@ public class PlayerTracking implements EntityTracking {
 				Location location = player.getLocation();
 				Point loc = new Point(location);
 
-				//	First we'll check if the player is too high, if so they shouldn't be here.
+				// First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
-					//	Double check to make sure their on the ground as it can trigger a false positive.
+					// Double check to make sure their on the ground as it can trigger a false positive.
 					Block below = world.getBlockAt(location.subtract(0, 1, 0));
 					if (below != null && below.getType() == Material.AIR) {
 						continue;
@@ -152,7 +152,7 @@ public class PlayerTracking implements EntityTracking {
 
 							} else if (mode == GameMode.ADVENTURE && neededMat
 							           && loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
-									   && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
+							           && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
 								_transitionToSurvival(player);
 							}
 						} else {
@@ -163,7 +163,7 @@ public class PlayerTracking implements EntityTracking {
 					}
 				}
 
-				//	Give potion effects to those in a City;
+				// Give potion effects to those in a City;
 				if (inSafeZone) {
 					if (applyEffects) {
 						if (inCapital) {
@@ -183,7 +183,7 @@ public class PlayerTracking implements EntityTracking {
 				}
 			}
 
-			//	Extra Effects.
+			// Extra Effects.
 			inventory.tick(mPlugin, world, player);
 			_updatePatreonEffects(player, world);
 
@@ -208,8 +208,8 @@ public class PlayerTracking implements EntityTracking {
 		mPlugin.getClass(player).setupClassPotionEffects(player);
 	}
 
-	//	TODO: We should move this out of being ticked and into an event based system as well as store all
-	//	Patrons in a list so we're not testing against every player 4 times a second.
+	// TODO: We should move this out of being ticked and into an event based system as well as store all
+	// Patrons in a list so we're not testing against every player 4 times a second.
 	void _updatePatreonEffects(Player player, World world) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		if (patreon > 0) {
