@@ -83,7 +83,7 @@ public class EntityListener implements Listener {
 		Entity combuster = event.getCombuster();
 
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
-			Player player = (Player)combustee;
+			Player player = (Player)combuster;
 
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
