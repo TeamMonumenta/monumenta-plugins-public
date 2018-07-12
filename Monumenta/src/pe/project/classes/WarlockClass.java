@@ -12,8 +12,8 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -58,22 +58,23 @@ public class WarlockClass extends BaseClass {
 	);
 
 	private static final int BLASPHEMY_RADIUS = 3;
-	private static final float BLASPHEMY_KNOCKBACK_SPEED = 0.5f;
-	private static final int BLASPHEMY_WITHER_LEVEL = 0;
-	private static final int BLASPHEMY_WITHER_DURATION = 8 * 20;
-	private static final int BLASPHEMY_1_COOLDOWN = 8 * 20;
-	private static final int BLASPHEMY_2_COOLDOWN = 6 * 20;
+	private static final float BLASPHEMY_KNOCKBACK_SPEED = 0.3f;
+	private static final int BLASPHEMY_1_VULN_LEVEL = 3;
+	private static final int BLASPHEMY_2_VULN_LEVEL = 5;
+	private static final int BLASPHEMY_VULN_DURATION = 6 * 20;
 
 	private static final int CURSED_WOUND_EFFECT_LEVEL = 1;
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
 	private static final int CURSED_WOUND_RADIUS = 3;
-	private static final int CURSED_WOUND_DAMAGE = 1;
+	private static final int CURSED_WOUND_1_DAMAGE = 1;
+	private static final int CURSED_WOUND_2_DAMAGE = 2;
 
 	private static final int GRASPING_CLAWS_RADIUS = 6;
-	private static final float GRASPING_CLAWS_SPEED = 0.25f;
+	private static final float GRASPING_CLAWS_SPEED = 0.175f;
+	private static final int GRASPING_CLAWS_EFFECT_LEVEL = 3;
 	private static final int GRASPING_CLAWS_1_DAMAGE = 3;
 	private static final int GRASPING_CLAWS_2_DAMAGE = 7;
-	private static final int GRASPING_CLAWS_DURATION = 7 * 20;
+	private static final int GRASPING_CLAWS_DURATION = 8 * 20;
 	private static final int GRASPING_CLAWS_COOLDOWN = 16 * 20;
 
 	private static final double SOUL_REND_HEAL_1_MULT = 0.4;
@@ -85,7 +86,7 @@ public class WarlockClass extends BaseClass {
 	private static final int CONSUMING_FLAMES_2_RADIUS = 7;
 	private static final int CONSUMING_FLAMES_DAMAGE = 1;
 	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
-	private static final int CONSUMING_FLAMES_COOLDOWN = 11 * 20;
+	private static final int CONSUMING_FLAMES_COOLDOWN = 10 * 20;
 
 	private static final int PASSIVE_DURATION = 6 * 20;
 
@@ -101,7 +102,7 @@ public class WarlockClass extends BaseClass {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			if (InventoryUtils.isScytheItem(mainHand) || InventoryUtils.isScytheItem(offHand)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, false, true));
 			}
 		}
 	}
@@ -111,31 +112,32 @@ public class WarlockClass extends BaseClass {
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		if (!(damager instanceof Player)) {
 			// ABILITY: Blasphemous Aura
+			if (damager instanceof Skeleton) {
+				Skeleton skelly = (Skeleton)damager;
+				ItemStack mainHand = skelly.getEquipment().getItemInMainHand();
+				if (mainHand != null && mainHand.getType() == Material.BOW) {
+					return true;
+				}
+			}
 
 			int blasphemy = ScoreboardUtils.getScoreboardValue(player, "BlasphemousAura");
 			if (blasphemy > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BLASPHEMY)) {
-					Location loc = player.getLocation();
-					World world = player.getWorld();
+				Location loc = player.getLocation();
+				World world = player.getWorld();
 
-					ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-					ParticleUtils.playParticlesInWorld(world, Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-					world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
+				ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
+				ParticleUtils.playParticlesInWorld(world, Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
+				world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
 
-					List<Entity> entities = player.getNearbyEntities(BLASPHEMY_RADIUS, BLASPHEMY_RADIUS, BLASPHEMY_RADIUS);
-					for (int i = 0; i < entities.size(); i++) {
-						Entity e = entities.get(i);
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity mob = (LivingEntity)e;
-							MovementUtils.KnockAway(player, mob, BLASPHEMY_KNOCKBACK_SPEED);
-							if (blasphemy > 1) {
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, BLASPHEMY_WITHER_DURATION, BLASPHEMY_WITHER_LEVEL, true, false));
-							}
-						}
+				List<Entity> entities = player.getNearbyEntities(BLASPHEMY_RADIUS, BLASPHEMY_RADIUS, BLASPHEMY_RADIUS);
+				MovementUtils.KnockAway(player, damager, BLASPHEMY_KNOCKBACK_SPEED);
+				for (int i = 0; i < entities.size(); i++) {
+					Entity e = entities.get(i);
+					if (EntityUtils.isHostileMob(e)) {
+						LivingEntity mob = (LivingEntity)e;
+						int vulnLevel = (blasphemy == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
 					}
-
-					int bduration = (blasphemy == 1) ? BLASPHEMY_1_COOLDOWN : BLASPHEMY_2_COOLDOWN;
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BLASPHEMY, bduration);
 				}
 			}
 		}
@@ -153,17 +155,19 @@ public class WarlockClass extends BaseClass {
 			if (cursedWound > 0 && EntityUtils.isHostileMob(damagee)) {
 
 				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
-				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
-				EntityUtils.damageEntity(mPlugin, damagee, CURSED_WOUND_DAMAGE, player);
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
+				int damageMult = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
+				EntityUtils.damageEntity(mPlugin, damagee, damageMult, player);
+			}
 
-				if (PlayerUtils.isCritical(player) && cursedWound > 1) {
-					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
-					for (int i = 0; i < entities.size(); i++) {
-						Entity e = entities.get(i);
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity mob = (LivingEntity)e;
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
-						}
+
+			if (PlayerUtils.isCritical(player) && cursedWound > 1) {
+				List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
+				for (int i = 0; i < entities.size(); i++) {
+					Entity e = entities.get(i);
+					if (EntityUtils.isHostileMob(e)) {
+						LivingEntity mob = (LivingEntity)e;
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 					}
 				}
 			}
@@ -207,63 +211,47 @@ public class WarlockClass extends BaseClass {
 				}
 			}
 		}
-
 		return true;
 	}
 
+
+
 	// GRASPING CLAWS
 	@Override
-	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public void ProjectileHitEvent(Player player, Arrow arrow) {
 		int graspingClaws = ScoreboardUtils.getScoreboardValue(player, "GraspingClaws");
 		if (graspingClaws > 0) {
 			if (player.isSneaking()) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.GRASPING_CLAW)) {
-					Location loc = damagee.getLocation();
-					World world = damagee.getWorld();
+
+					Location loc = arrow.getLocation();
+					World world = arrow.getWorld();
 
 					world.playSound(loc, "block.enchantment_table.use", 1.0f, 0.8f);
 					ParticleUtils.playParticlesInWorld(world, Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
-					ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc.add(0, 1, 0), 50, 0.1, 0.1, 0.1, 0.0);
+					ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc, 75, 1, 1, 1, 0.0);
 
-					int targetCount = 1;
 					int damage = (graspingClaws == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 
-					List<Entity> entities = damagee.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
+					List<Entity> entities = arrow.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
 					for (Entity entity : entities) {
 						if (EntityUtils.isHostileMob(entity)) {
-							targetCount++;
-
 							LivingEntity mob = (LivingEntity)entity;
 							EntityUtils.damageEntity(mPlugin, mob, damage, player);
-
-							if (mob != damagee) {
-								MovementUtils.PullTowards(damagee, mob, GRASPING_CLAWS_SPEED);
-							}
+							MovementUtils.PullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
+							EntityUtils.damageEntity(mPlugin, mob, damage, player);
 						}
 					}
 
-					if (targetCount >= 1) {
-						Math.min(targetCount, 7);
-
-						for (Entity entity : entities) {
-							if (EntityUtils.isHostileMob(entity)) {
-								LivingEntity mob = (LivingEntity)entity;
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, targetCount, true, false));
-							}
-						}
-					}
-
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, targetCount, true, false));
-					if (graspingClaws > 1) {
-						EntityUtils.damageEntity(mPlugin, damagee, damage, player);
-					}
-
-					// Put Soul Rend on cooldown
+					// Put Grasping Claws on cooldown
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GRASPING_CLAW, GRASPING_CLAWS_COOLDOWN);
 				}
 			}
 		}
 	}
+
+
 
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
@@ -286,7 +274,7 @@ public class WarlockClass extends BaseClass {
 							for (Entity entity : entities) {
 								if (EntityUtils.isHostileMob(entity)) {
 									LivingEntity mob = (LivingEntity)entity;
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, true, false));
+									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
 									mob.setFireTicks(CONSUMING_FLAMES_DURATION);
 
 									EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);
@@ -295,7 +283,7 @@ public class WarlockClass extends BaseClass {
 							}
 
 							if (consumingFlames > 1 && effect) {
-								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, CONSUMING_FLAMES_DURATION, 0, true, false));
+								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, CONSUMING_FLAMES_DURATION, 0, false, true));
 							}
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CONSUMING_FLAMES, CONSUMING_FLAMES_COOLDOWN);
@@ -327,7 +315,9 @@ public class WarlockClass extends BaseClass {
 												.filter(effect -> (mob.getPotionEffect(effect) != null))
 												.count();
 										int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
-
+										if (consumingFlames > 1 && mob.getFireTicks() > 0) {
+											debuffCount++;
+										}
 										if (debuffCount > 0) {
 											EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
 											MovementUtils.KnockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);

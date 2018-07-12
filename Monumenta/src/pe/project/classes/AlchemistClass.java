@@ -59,6 +59,7 @@ import pe.project.utils.particlelib.ParticleEffect.BlockData;
 public class AlchemistClass extends BaseClass {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
 	private static final int GRUESOME_ALCHEMY_VULN = 4; //25%
+	private static final int GRUESOME_ALCHEMY_SLOW = 2;
 
 	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 3;
 	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 6;
@@ -272,7 +273,7 @@ public class AlchemistClass extends BaseClass {
 				if (gruesomeAlchemy > 0) {
 					for (LivingEntity entity : affectedEntities) {
 						if (EntityUtils.isHostileMob(entity)) {
-							entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, 1 + gruesomeAlchemy, false, true));
+							entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_SLOW, false, true));
 							if (gruesomeAlchemy > 1) {
 								entity.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
 							}
