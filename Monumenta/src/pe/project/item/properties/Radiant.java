@@ -34,11 +34,6 @@ public class Radiant implements ItemProperty {
 	}
 
 	@Override
-	public boolean hasTickingEffect() {
-		return true;
-	}
-
-	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
 		applyProperty(plugin, player, level);
 	}

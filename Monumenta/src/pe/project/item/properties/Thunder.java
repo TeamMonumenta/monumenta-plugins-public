@@ -46,9 +46,4 @@ public class Thunder implements ItemProperty {
 
 		return damage;
 	}
-
-	@Override
-	public boolean hasOnAttack() {
-		return true;
-	}
 }

@@ -25,11 +25,6 @@ public class Stylish implements ItemProperty {
 	}
 
 	@Override
-	public boolean hasTickingEffect() {
-		return true;
-	}
-
-	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
 		ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, player.getLocation().add(0, 1.5, 0), 5, 0.4, 0.4, 0.4, 0);
 	}

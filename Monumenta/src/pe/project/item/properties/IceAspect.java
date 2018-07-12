@@ -41,9 +41,4 @@ public class IceAspect implements ItemProperty {
 
 		return damage;
 	}
-
-	@Override
-	public boolean hasOnAttack() {
-		return true;
-	}
 }

@@ -28,11 +28,6 @@ public class Frost implements ItemProperty {
 	}
 
 	@Override
-	public boolean hasOnShootAttack() {
-		return true;
-	}
-
-	@Override
 	public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
 		double damage = event.getDamage();
 		int duration = 20 * 4;

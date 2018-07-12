@@ -15,28 +15,22 @@ import pe.project.item.properties.ItemProperty;
 import pe.project.item.properties.ItemPropertyManager;
 
 public class PlayerInventory {
+	/*
+	 * This list contains all of a player's currently valid item properties,
+	 * including ones that are on duplicate specialized lists below
+	 */
 	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
-	boolean mHasTickingProperty = false;
-	boolean mHasOnAttack = false;
-	boolean mHasOnShootAttack = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player);
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
-		/* If there is no ticking property on our gear early out */
-		if (!mHasTickingProperty) {
-			return;
-		}
-
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();
 
-			if (property.hasTickingEffect()) {
-				property.tick(plugin, world, player, level);
-			}
+			property.tick(plugin, world, player, level);
 		}
 	}
 
@@ -55,11 +49,6 @@ public class PlayerInventory {
 	}
 
 	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, DamageCause cause) {
-		/* If there is no onAttack() property on our gear early out */
-		if (!mHasOnAttack) {
-			return damage;
-		}
-
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();
@@ -73,13 +62,10 @@ public class PlayerInventory {
 	public double onShootAttack(Plugin plugin, Player player, Projectile proj, EntityDamageByEntityEvent event) {
 		double damage = event.getDamage();
 
-		if (!mHasOnShootAttack) {
-			return damage;
-		}
-
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();
+
 			damage = property.onShootAttack(plugin, player, level, proj, event);
 		}
 
@@ -87,10 +73,6 @@ public class PlayerInventory {
 	}
 
 	public void removeProperties(Plugin plugin, Player player) {
-		mHasTickingProperty = false;
-		mHasOnAttack = false;
-		mHasOnShootAttack = false;
-
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 
@@ -108,14 +90,6 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.applyProperty(plugin, player, level);
-			if (property.hasTickingEffect()) {
-				mHasTickingProperty = true;
-			}
-			if (property.hasOnAttack()) {
-				mHasOnAttack = true;
-			}
-
-			mHasOnShootAttack = property.hasOnShootAttack();
 		}
 	}
 }

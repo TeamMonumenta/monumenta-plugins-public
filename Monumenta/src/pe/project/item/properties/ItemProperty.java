@@ -53,32 +53,25 @@ public interface ItemProperty {
 	default public void removeProperty(Plugin plugin, Player player) { }
 
 
-	/* If hasTickingEffect returns true, the tick() method will be called once per second */
-	default public boolean hasTickingEffect() {
-		return false;
-	}
+	/* This method will be called once per second */
 	default public void tick(Plugin plugin, World world, Player player, int level) { }
 
 	/*
-	 * If hasOnAttack() returns true, the onAttack() method will be called whenever the
-	 * player damages something while they have any levels of this property
+	 * The onAttack() method will be called whenever the player damages something while
+	 * they have any levels of this property
 	 */
-	default public boolean hasOnAttack() {
-		return false;
-	}
 	default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
 		return damage;
 	}
 
-	default public boolean hasOnShootAttack() {
-		return false;
-	}
 	default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
 		return event.getDamage();
 	}
 
 	/*
 	 * Triggers when an item entity spawns in the world (possibly a player dropped item)
+	 *
+	 * IMPORTANT - To use this, you must also override hasOnSpawn() to return true
 	 */
 	default public boolean hasOnSpawn() {
 		return false;
