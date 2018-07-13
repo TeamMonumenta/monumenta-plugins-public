@@ -9,29 +9,10 @@ commands:
     permission: monumenta.commands.deathmsg
     description: Toggles death messages on and off
     usage: /deathmsg <on|off>
-  chatRange:
-    description: Set the default chat range that you can hear people from.
-    usage: /chatRange <range>
-  isShitty:
-    permission: monumenta.commands.isshitty
-    description: How sketchy is this person?
-    usage: /isShitty <playerName>
   refreshPOITimer:
     permission: monumenta.commands.refreshpoitimer
     description: refresh an internal score from the scoreboard value.
     usage: /refreshpoitimer
-  profiling:
-    permission: monumenta.commands.profiling
-    description: Get Profiling info on the running game.
-    usage: /profiling
-  setGuildPrefix:
-    permission: monumenta.commands.setGuildPrefix
-    description: Used to set the prefix tag on a guild
-    usage: /setGuildPrefix <team> <prefix> [prefix color] [name color]
-  setPlayerName:
-    permission: monumenta.commands.setPlayerName
-    description: ???
-    usage: N/A
   transferScores:
     permission: monumenta.commands.transferScores
     description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.

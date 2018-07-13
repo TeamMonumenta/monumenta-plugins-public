@@ -26,7 +26,6 @@ import pe.project.classes.WarlockClass;
 import pe.project.classes.WarriorClass;
 import pe.project.commands.Back;
 import pe.project.commands.BroadcastCommand;
-import pe.project.commands.ChatRangeCommand;
 import pe.project.commands.CheckEmptyInventory;
 import pe.project.commands.ClearEffects;
 import pe.project.commands.DeathMsg;
@@ -36,15 +35,11 @@ import pe.project.commands.GetScore;
 import pe.project.commands.GiveSoulbound;
 import pe.project.commands.HopeifyHeldItem;
 import pe.project.commands.IncrementDaily;
-import pe.project.commands.IsShittyCommand;
 import pe.project.commands.MinusExp;
 import pe.project.commands.PlayTimeStats;
-import pe.project.commands.ProfilingCommand;
 import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
 import pe.project.commands.RemoveTags;
-import pe.project.commands.SetGuildPrefix;
-import pe.project.commands.SetPlayerName;
 import pe.project.commands.TrackedEffect;
 import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
@@ -180,11 +175,6 @@ public class Plugin extends JavaPlugin {
 		//	Add some slash commands
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			getCommand("playTimeStats").setExecutor(new PlayTimeStats(mWorld));
-			getCommand("chatRange").setExecutor(new ChatRangeCommand());
-			getCommand("isShitty").setExecutor(new IsShittyCommand());
-			getCommand("profiling").setExecutor(new ProfilingCommand(this));
-			getCommand("setGuildPrefix").setExecutor(new SetGuildPrefix());
-			getCommand("setPlayerName").setExecutor(new SetPlayerName());
 			getCommand("transferScores").setExecutor(new TransferScores());
 			getCommand("getScore").setExecutor(new GetScore());
 			getCommand("transferServer").setExecutor(new TransferServer(this));
