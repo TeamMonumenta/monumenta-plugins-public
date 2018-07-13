@@ -152,22 +152,22 @@ public class WarlockClass extends BaseClass {
 		if (InventoryUtils.isScytheItem(player.getInventory().getItemInMainHand())) {
 			// Cursed Wound
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
-			if (cursedWound > 0 && EntityUtils.isHostileMob(damagee)) {
+			if (cursedWound > 0) {
+				if (EntityUtils.isHostileMob(damagee)) {
+					ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
+					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
+					int damageMult = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
+					EntityUtils.damageEntity(mPlugin, damagee, damageMult, player);
+				}
 
-				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
-				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
-				int damageMult = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
-				EntityUtils.damageEntity(mPlugin, damagee, damageMult, player);
-			}
-
-
-			if (PlayerUtils.isCritical(player) && cursedWound > 1) {
-				List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
-				for (int i = 0; i < entities.size(); i++) {
-					Entity e = entities.get(i);
-					if (EntityUtils.isHostileMob(e)) {
-						LivingEntity mob = (LivingEntity)e;
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+				if (cursedWound > 1 && PlayerUtils.isCritical(player)) {
+					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
+					for (int i = 0; i < entities.size(); i++) {
+						Entity e = entities.get(i);
+						if (EntityUtils.isHostileMob(e)) {
+							LivingEntity mob = (LivingEntity)e;
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+						}
 					}
 				}
 			}
