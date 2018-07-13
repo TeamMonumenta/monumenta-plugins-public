@@ -180,7 +180,7 @@ public class EventListener implements Listener {
 
 		// Get and validate the player
 		ProxiedPlayer playerInfo = mMain.getProxy().getPlayer(uuid);
-		if (serverInfo == null) {
+		if (playerInfo == null) {
 			mMain.getLogger().warning("Cannot transfer unknown player '" + player + "' from '" + sendingServer + "' to '" + destination + "'");
 			return;
 		}
