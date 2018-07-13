@@ -77,10 +77,10 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
 	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 21 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 18 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
-	private static final int MAGMA_SHIELD_1_DAMAGE = 5;
+	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
 	private static final int MAGMA_SHIELD_2_DAMAGE = 12;
 	private static final float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
 	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
