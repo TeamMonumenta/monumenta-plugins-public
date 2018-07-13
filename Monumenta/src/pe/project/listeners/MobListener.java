@@ -40,10 +40,18 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	void CreatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
+
+		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
+		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CURED ||
+		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if ((entity instanceof LivingEntity) && !(entity instanceof Player) && !(entity instanceof ArmorStand)) {
 			LivingEntity mob = (LivingEntity)entity;
 
-			//	Mark mobs not able to pick-up items.
+			// Mark mobs not able to pick-up items.
 			mob.setCanPickupItems(false);
 
 			// Overwrite drop chances for mob armor and held items
