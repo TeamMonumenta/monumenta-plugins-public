@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +27,6 @@ import pe.project.player.PlayerInventory;
 import pe.project.point.Point;
 import pe.project.utils.LocationUtils;
 import pe.project.utils.LocationUtils.LocationType;
-import pe.project.utils.NetworkUtils;
 import pe.project.utils.ParticleUtils;
 import pe.project.utils.PlayerUtils;
 import pe.project.utils.ScoreboardUtils;
@@ -44,32 +42,9 @@ public class PlayerTracking implements EntityTracking {
 	@Override
 	public void addEntity(Entity entity) {
 		Player player = (Player)entity;
-		try {
-			mPlugin.mPotionManager.clearAllEffects(player);
-			mPlugin.getClass(player).setupClassPotionEffects(player);
 
-			PlayerData.loadPlayerData(mPlugin, player);
-			PlayerData.removePlayerDataFile(mPlugin, player);
-			mPlugin.mPotionManager.refreshClassEffects(player);
-		} catch (Exception e) {
-			mPlugin.getLogger().severe("Failed to load playerdata for player '" + player.getName() + "'");
-			e.printStackTrace();
-
-			player.sendMessage(ChatColor.RED + "Something very bad happened while transferring your player data.");
-			player.sendMessage(ChatColor.RED + "  As a precaution, the server has attempted to move you to Purgatory.");
-			player.sendMessage(ChatColor.RED + "  If for some reason you aren't on purgatory, take a screenshot and log off.");
-			player.sendMessage(ChatColor.RED + "  Please post in #moderator-help and tag @admin");
-			player.sendMessage(ChatColor.RED + "  Include details about what you were doing");
-			player.sendMessage(ChatColor.RED + "  such as joining or leaving a dungeon (and which one!)");
-
-			try {
-				NetworkUtils.sendPlayer(mPlugin, player, "purgatory");
-			} catch (Exception ex) {
-				mPlugin.getLogger().severe("CRITICAL: Failed to send failed player '" + player.getName() + "' to purgatory");
-				ex.printStackTrace();
-			}
-
-		}
+		// Initialize the player, either by loading data from disk or from the player
+		PlayerData.initializePlayer(mPlugin, player);
 
 		// Remove the metadata that prevents player from interacting with things (if present)
 		player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
@@ -77,6 +52,7 @@ public class PlayerTracking implements EntityTracking {
 		// Remove the tag that prevents the spawn box from applying functions to the player
 		player.removeScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
 
+		// Load the players inventory / custom enchantments and apply them
 		mPlayers.put(player, new PlayerInventory(mPlugin, player));
 	}
 
@@ -86,8 +62,6 @@ public class PlayerTracking implements EntityTracking {
 
 		// Add a scoreboard tag that prevents the spawn box from applying functions to the player
 		player.addScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
-
-		PlayerData.removePlayerDataFile(mPlugin, player);
 
 		mPlayers.remove(player);
 	}
@@ -213,12 +187,14 @@ public class PlayerTracking implements EntityTracking {
 				vehicle.remove();
 			}
 		}
+
+		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
 	void _transitionToSurvival(Player player) {
 		player.setGameMode(GameMode.SURVIVAL);
 
-		mPlugin.getClass(player).setupClassPotionEffects(player);
+		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
 	// TODO: We should move this out of being ticked and into an event based system as well as store all
@@ -259,7 +235,6 @@ public class PlayerTracking implements EntityTracking {
 			Entry<Player, PlayerInventory> entry = iter.next();
 			Player player = entry.getKey();
 			entry.getValue().removeProperties(mPlugin, player);
-			PlayerData.removePlayerDataFile(mPlugin, player);
 		}
 
 		mPlayers.clear();

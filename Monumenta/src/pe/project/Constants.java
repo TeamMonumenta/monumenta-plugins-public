@@ -14,6 +14,7 @@ public class Constants {
 
 	public static final int FIVE_MINUTES = TICKS_PER_MINUTE * 5;
 	public static final int TEN_MINUTES = TICKS_PER_MINUTE * 10;
+	public static final int THIRTY_MINUTES = TICKS_PER_MINUTE * 30;
 	public static final int THREE_HOURS = TICKS_PER_MINUTE * 180;
 
 	public static final PotionEffect CAPITAL_SPEED_EFFECT = new PotionEffect(PotionEffectType.SPEED, TICKS_PER_SECOND, 1, true, false);
