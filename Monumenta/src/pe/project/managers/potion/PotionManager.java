@@ -103,14 +103,12 @@ public class PotionManager {
 		}
 	}
 
-	public void clearAllPotions(Player player, boolean fromManager) {
-		Collection<PotionEffect> effects = player.getActivePotionEffects();
-		for (PotionEffect effect : effects) {
-			player.removePotionEffect(effect.getType());
-		}
 
-		if (fromManager) {
-			mPotionManager.remove(player.getUniqueId());
+	public void clearAllPotions(Player player) {
+		mPotionManager.remove(player.getUniqueId());
+
+		for (PotionEffect type : player.getActivePotionEffects()) {
+			player.removePotionEffect(type.getType());
 		}
 	}
 
@@ -160,12 +158,28 @@ public class PotionManager {
 	public void loadFromJsonObject(Player player, JsonObject object) throws Exception {
 		JsonElement potionInfo = object.get("potion_info");
 		if (potionInfo != null) {
-			clearAllPotions(player, false);
+			clearAllPotions(player);
 
 			PlayerPotionInfo info = new PlayerPotionInfo();
 			info.loadFromJsonObject(potionInfo.getAsJsonObject());
 
 			mPotionManager.put(player.getUniqueId(), info);
+		}
+	}
+
+	public void loadFromPlayer(Player player) {
+		mPotionManager.remove(player.getUniqueId());
+
+		for (PotionEffect type : player.getActivePotionEffects()) {
+			/*
+			 * Assume that any potions greater than 30 minutes were not
+			 * potions the player drank - and clear them from the player
+			 */
+			if (type.getDuration() > Constants.THIRTY_MINUTES) {
+				addPotion(player, PotionID.APPLIED_POTION, type);
+			} else {
+				player.removePotionEffect(type.getType());
+			}
 		}
 	}
 
@@ -177,14 +191,6 @@ public class PotionManager {
 			return gson.toJson(object);
 		} else {
 			return "{}";
-		}
-	}
-
-	public void clearAllEffects(Player player) {
-		mPotionManager.remove(player.getUniqueId());
-
-		for (PotionEffect type : player.getActivePotionEffects()) {
-			player.removePotionEffect(type.getType());
 		}
 	}
 }

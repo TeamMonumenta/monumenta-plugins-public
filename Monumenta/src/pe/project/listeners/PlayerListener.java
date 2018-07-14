@@ -395,7 +395,7 @@ public class PlayerListener implements Listener {
 		}
 
 		// Clear effects
-		mPlugin.mPotionManager.clearAllEffects(player);
+		mPlugin.mPotionManager.clearAllPotions(player);
 	}
 
 	// The player has respawned.
@@ -409,7 +409,7 @@ public class PlayerListener implements Listener {
 			public void run() {
 				Player player = Bukkit.getPlayer(name);
 
-				mPlugin.mPotionManager.clearAllEffects(player);
+				mPlugin.mPotionManager.clearAllPotions(player);
 
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
