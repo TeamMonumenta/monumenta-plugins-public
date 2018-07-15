@@ -10,7 +10,7 @@ import pe.project.managers.potion.PotionManager.PotionID;
 
 public class ChestUtils {
 
-	private static final int CHEST_LUCK_RADIUS = 32;
+	private static final int CHEST_LUCK_RADIUS = 64;
 
 	public static void chestScalingLuck(Plugin plugin, Player player, Block block) {
 		int chestLuck = ScoreboardUtils.getScoreboardValue(player, "ChestLuckToggle");
