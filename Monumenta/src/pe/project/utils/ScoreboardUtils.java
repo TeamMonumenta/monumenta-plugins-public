@@ -1,5 +1,7 @@
 package pe.project.utils;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -16,6 +18,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ScoreboardUtils {
+	public static final String[] NOT_TRANSFERRED_OBJECTIVES_VALS =
+		new String[] { "Apartment", "AptIdle", "DailyQuest", "DailyVersion" };
+	public static final Set<String> NOT_TRANSFERRED_OBJECTIVES =
+		new HashSet<>(Arrays.asList(NOT_TRANSFERRED_OBJECTIVES_VALS));
+
 	public static int getScoreboardValue(Player player, String scoreboardValue) {
 		Objective objective = player.getScoreboard().getObjective(scoreboardValue);
 		if (objective != null) {
@@ -140,6 +147,10 @@ public class ScoreboardUtils {
 			JsonObject scoreboardObject = scoreIter.next().getAsJsonObject();
 
 			String name = scoreboardObject.get("name").getAsString();
+			if (NOT_TRANSFERRED_OBJECTIVES.contains(name)) {
+				/* This objective is not transferred/loaded */
+				continue;
+			}
 			int scoreVal = scoreboardObject.get("score").getAsInt();
 
 			Objective objective = scoreboard.getObjective(name);
