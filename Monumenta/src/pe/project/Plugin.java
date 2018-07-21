@@ -44,6 +44,7 @@ import pe.project.commands.TestNoScore;
 import pe.project.commands.TrackedEffect;
 import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
+import pe.project.commands.UpdateApartments;
 import pe.project.items.ItemOverrides;
 import pe.project.listeners.EntityListener;
 import pe.project.listeners.MobListener;
@@ -193,6 +194,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("minusexp").setExecutor(new MinusExp(this));
 			getCommand("deathMsg").setExecutor(new DeathMsg(this));
 			getCommand("testNoScore").setExecutor(new TestNoScore());
+			getCommand("updateApartments").setExecutor(new UpdateApartments());
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));

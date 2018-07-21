@@ -81,3 +81,7 @@ commands:
     permission: monumenta.commands.testnoscore
     description: Succeeds if no entry exists with a particular score on a scoreboard
     usage: /testnoscore <objective> <value>
+  updateapartments:
+    permission: monumenta.commands.updateapartments
+    description: Updates player apartment scores
+    usage: /updateapartments
