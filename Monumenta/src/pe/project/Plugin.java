@@ -40,6 +40,7 @@ import pe.project.commands.PlayTimeStats;
 import pe.project.commands.RefreshClassEffects;
 import pe.project.commands.RefreshPOITimerCommand;
 import pe.project.commands.RemoveTags;
+import pe.project.commands.TestNoScore;
 import pe.project.commands.TrackedEffect;
 import pe.project.commands.TransferScores;
 import pe.project.commands.TransferServer;
@@ -191,6 +192,7 @@ public class Plugin extends JavaPlugin {
 			getCommand("forward").setExecutor(new Forward(this));
 			getCommand("minusexp").setExecutor(new MinusExp(this));
 			getCommand("deathMsg").setExecutor(new DeathMsg(this));
+			getCommand("testNoScore").setExecutor(new TestNoScore());
 		}
 		if (Constants.CLASSES_ENABLED) {
 			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));

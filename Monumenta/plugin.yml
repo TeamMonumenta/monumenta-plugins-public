@@ -77,3 +77,7 @@ commands:
     permission: monumenta.commands.removetags
     description: Removes all of the target entity's scoreboard tags
     usage: /execute @p[stuff] ~ ~ ~ removetags
+  testnoscore:
+    permission: monumenta.commands.testnoscore
+    description: Succeeds if no entry exists with a particular score on a scoreboard
+    usage: /testnoscore <objective> <value>
