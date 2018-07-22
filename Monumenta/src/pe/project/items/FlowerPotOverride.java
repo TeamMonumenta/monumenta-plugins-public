@@ -12,6 +12,6 @@ public class FlowerPotOverride extends OverrideItem {
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		// Don't allow non-creative players to put saplings with lore text in flower pots
-		return (player == null || player.getGameMode() == GameMode.CREATIVE || !item.hasItemMeta() || !item.getItemMeta().hasLore());
+		return (player == null || player.getGameMode() == GameMode.CREATIVE || item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore());
 	}
 }
