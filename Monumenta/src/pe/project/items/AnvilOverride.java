@@ -12,8 +12,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import pe.project.Constants;
 import pe.project.Plugin;
 import pe.project.utils.InventoryUtils;
+import pe.project.utils.ScoreboardUtils;
 
 public class AnvilOverride extends OverrideItem {
+	final static String REPAIR_OBJECTIVE = "RepairT";
+
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action,
 	                                          ItemStack item, Block block) {
@@ -33,6 +36,9 @@ public class AnvilOverride extends OverrideItem {
 			plugin.mWorld.playSound(player.getLocation(), "block.anvil.use", 1.0f, 1.0f);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 			block.setType(Material.AIR);
+
+			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE);
+			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount + 1);
 		} else {
 			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");
 			block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));
