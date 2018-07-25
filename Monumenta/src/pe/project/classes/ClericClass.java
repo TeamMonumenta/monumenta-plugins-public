@@ -376,7 +376,9 @@ public class ClericClass extends BaseClass {
 
 			for (Player p : PlayerUtils.getNearbyPlayers(player, HEALING_RADIUS, false)) {
 				Vector toMobVector = p.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-				if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE) {
+				// Only heal players in the correct direction
+				// Only heal players that have a class score > 0 (so it doesn't work on arena contenders)
+				if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE && ScoreboardUtils.getScoreboardValue(player, "Class") > 0) {
 					PlayerUtils.healPlayer(p, healAmount);
 
 					Location loc = p.getLocation();
