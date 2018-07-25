@@ -173,8 +173,8 @@ public class BaseCharge implements Spell
 
 			if (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid())
 			{
-				// No longer air - need to go back a step so we don't tele the boss into a block
-				endLoc.subtract(baseVect.multiply(9));
+				// No longer air - need to go back a bit so we don't tele the boss into a block
+				endLoc.subtract(baseVect.multiply(11));
 				// Charge terminated at a block
 				break;
 			}
