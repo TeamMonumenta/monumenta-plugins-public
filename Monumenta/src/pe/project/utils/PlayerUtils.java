@@ -15,6 +15,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import pe.project.Plugin;
+import pe.project.managers.potion.PotionManager.PotionID;
+
 public class PlayerUtils {
 	public static boolean isCritical(Player player) {
 		return player.getFallDistance() > 0.0F &&
@@ -50,7 +53,7 @@ public class PlayerUtils {
 		return yawLos && pitchLos;
 	}
 
-	public static void awardStrike(Player player, String reason) {
+	public static void awardStrike(Plugin plugin, Player player, String reason) {
 		int strikes = ScoreboardUtils.getScoreboardValue(player, "Strikes");
 		strikes++;
 		ScoreboardUtils.setScoreboardValue(player, "Strikes", strikes);
@@ -64,8 +67,10 @@ public class PlayerUtils {
 		player.sendMessage(ChatColor.YELLOW + "You have been teleported to spawn and given slowness for 5 minutes.");
 		player.sendMessage(ChatColor.YELLOW + "There is no further punishment, but please do follow the rules.");
 
+		plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
+		                                new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
+
 		player.teleport(player.getWorld().getSpawnLocation());
-		player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5 * 20 * 60, 3, false, true));
 	}
 
 	public static List<Player> getNearbyPlayers(Player player, double radius, boolean includeSourcePlayer) {

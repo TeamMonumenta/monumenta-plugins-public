@@ -275,7 +275,7 @@ public class EntityListener implements Listener {
 								}
 
 								// Also Give the player a strike.
-								PlayerUtils.awardStrike(player, "being somewhere you probably shouldn't have been.");
+								PlayerUtils.awardStrike(mPlugin, player, "being somewhere you probably shouldn't have been.");
 
 								return;
 							}

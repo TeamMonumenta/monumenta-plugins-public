@@ -122,7 +122,7 @@ public class PlayerTracking implements EntityTracking {
 						continue;
 					}
 
-					PlayerUtils.awardStrike(player, "breaking rule #5, leaving the bounds of the map.");
+					PlayerUtils.awardStrike(mPlugin, player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
 					LocationType zone = LocationUtils.getLocationType(mPlugin, player);
 					inSafeZone = (zone != LocationType.None);
