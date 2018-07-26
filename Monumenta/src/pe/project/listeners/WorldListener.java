@@ -40,6 +40,8 @@ public class WorldListener implements Listener {
 		Entity[] entities = event.getChunk().getEntities();
 
 		for (Entity entity : entities) {
+			mPlugin.mTrackingManager.addEntity(entity);
+
 			if (entity instanceof Monster) {
 				Monster mob = (Monster)entity;
 

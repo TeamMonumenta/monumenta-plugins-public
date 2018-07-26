@@ -2,18 +2,28 @@ package pe.project.tracking;
 
 import java.util.List;
 
-import org.bukkit.World;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
+import org.bukkit.entity.Villager;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.World;
 
 import pe.project.Constants;
 import pe.project.Plugin;
 
 public class TrackingManager {
-	Plugin mPlugin = null;
+	private static final String UNPUSHABLE_TEAM = "UNPUSHABLE_TEAM";
+	private static final String UNPUSHABLE_TAG = "UNPUSHABLE";
+	private static final String PUSHABLE_TAG = "PUSHABLE";
+
+	private Plugin mPlugin;
+	private Team mUnpushableTeam;
 
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
@@ -23,6 +33,16 @@ public class TrackingManager {
 
 	public TrackingManager(Plugin plugin, World world) {
 		mPlugin = plugin;
+
+		// Create a new team (or clear it if it exists) on the scoreboard to use to
+		// make entities unpushable
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		mUnpushableTeam = scoreboard.getTeam(UNPUSHABLE_TEAM);
+		if (mUnpushableTeam != null) {
+			mUnpushableTeam.unregister();
+		}
+		mUnpushableTeam = scoreboard.registerNewTeam(UNPUSHABLE_TEAM);
+		mUnpushableTeam.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();
@@ -46,6 +66,16 @@ public class TrackingManager {
 
 	public void addEntity(Entity entity) {
 		if (Constants.TRACKING_MANAGER_ENABLED) {
+			// Check whether this entity should be pushable
+			if (!(entity instanceof Monster)) {
+				if ((entity instanceof Villager && (!entity.getScoreboardTags().contains(PUSHABLE_TAG))) ||
+					entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
+
+					// This entity should not be pushable - join to the unpushable team
+					mUnpushableTeam.addEntry(entity.getUniqueId().toString());
+				}
+			}
+
 			if (entity instanceof Player) {
 				mPlayers.addEntity(entity);
 			} else if (entity instanceof Creeper) {
