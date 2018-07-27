@@ -30,11 +30,10 @@ public class ZoneManager {
 	public void applySpawnEffect(Plugin plugin, Entity entity) {
 		//int shardID = plugin.mServerProperties.getShardZoneID();
 		for (Zone zone : mZones) {
-			for (SpawnEffect effect : zone.getSpawnEffects()) {
-				if (true) { //(zone.getZoneShardID() == shardID) {
-					if (entity.getType() == effect.getEntityType()) {
-						if (zone.withinZone(entity.getLocation())) {
-
+			if (zone.withinZone(entity.getLocation())) {
+				for (SpawnEffect effect : zone.getSpawnEffects()) {
+					if (true) { //(zone.getZoneShardID() == shardID) {
+						if (entity.getType() == effect.getEntityType()) {
 							LivingEntity creature = (LivingEntity)entity;
 							String name = creature.getCustomName();
 							String goalName = effect.getName();
@@ -48,6 +47,7 @@ public class ZoneManager {
 									double maxHealth = att.getBaseValue();
 
 									att.setBaseValue(maxHealth + addHealth);
+									creature.setHealth(maxHealth + addHealth);
 								}
 								else if (type == SpawnEffectType.Potion) {
 									List<PotionEffect> potionList = effect.getPotionEffects();
