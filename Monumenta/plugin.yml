@@ -19,8 +19,8 @@ commands:
     usage: /transferScores <oldPlayerName> <newPlayerName>
   getScore:
     permission: monumenta.commands.getScore
-    description: Prints out a specific player's/dummy's passed in scoreboard value.
-    usage: /getScore <player/dummy name> <scoreboardName>
+    description: Gets a scoreboard value.
+    usage: /getScore <scoreboard> OR /getScore <name> <scoreboard> OR /execute @[...] ~ ~ ~ <scoreboard>
   refreshClassEffects:
     permission: monumenta.commands.refreshClassEffects
     description: Refreshes class effects for affected player (either sender or target of /execute)
