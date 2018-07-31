@@ -15,17 +15,17 @@ public class PacketUtils {
 	}
 
 	public static void ProcessPacket(Plugin plugin, String channel, String data) throws Exception {
-		if (channel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
+		if (channel.equals(TransferPlayerDataPacket.StaticPacketChannel)) {
 			TransferPlayerDataPacket.handlePacket(plugin, data);
-		} else if (channel.equals(SendPlayerPacket.getStaticPacketChannel())) {
+		} else if (channel.equals(SendPlayerPacket.StaticPacketChannel)) {
 			SendPlayerPacket.handlePacket(plugin, data);
-		} else if (channel.equals(HeartbeatPacket.getStaticPacketChannel())) {
+		} else if (channel.equals(HeartbeatPacket.StaticPacketChannel)) {
 			HeartbeatPacket.handlePacket(plugin, data);
-		} else if (channel.equals(GetServerListPacket.getStaticPacketChannel())) {
+		} else if (channel.equals(GetServerListPacket.StaticPacketChannel)) {
 			GetServerListPacket.handlePacket(plugin, data);
-		} else if (channel.equals(BroadcastCommandPacket.getStaticPacketChannel())) {
+		} else if (channel.equals(BroadcastCommandPacket.StaticPacketChannel)) {
 			BroadcastCommandPacket.handlePacket(plugin, data);
-		} else if (channel.equals(ForwardErrorPacket.getStaticPacketChannel())) {
+		} else if (channel.equals(ForwardErrorPacket.StaticPacketChannel)) {
 			ForwardErrorPacket.handlePacket(plugin, data);
 		}
 	}

@@ -10,17 +10,11 @@ import pe.project.Plugin;
 import pe.project.utils.PacketUtils;
 
 public class ForwardErrorPacket implements Packet {
-
-	// TODO - Ugh, this is so annoying
-	// Want to just be able to call TransferPlayerDataPacket.getPacketChannel() without an object
-	// But making that static just causes other problems
-	public static String getStaticPacketChannel() {
-		return "Monumenta.Bungee.Error.Forward";
-	}
+	public static final String StaticPacketChannel = "Monumenta.Bungee.Error.Forward";
 
 	@Override
 	public String getPacketChannel() {
-		return "Monumenta.Bungee.Error.Forward";
+		return StaticPacketChannel;
 	}
 
 	@Override
@@ -35,7 +29,7 @@ public class ForwardErrorPacket implements Packet {
 		}
 
 		String failedChannel = rcvStrings[0];
-		if (failedChannel.equals(TransferPlayerDataPacket.getStaticPacketChannel())) {
+		if (failedChannel.equals(TransferPlayerDataPacket.StaticPacketChannel)) {
 			// Failed to transfer the player to the requested server
 			// Notify player and unfreeze their inventory
 			String server = rcvStrings[1];

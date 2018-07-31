@@ -6,6 +6,8 @@ import pe.project.Plugin;
 import pe.project.utils.PacketUtils;
 
 public class SendPlayerPacket implements Packet {
+	public static final String StaticPacketChannel = "Monumenta.Bungee.SendPlayer";
+
 	private String mNewServer;
 	private String mPlayerName;
 	private UUID mPlayerUUID;
@@ -16,16 +18,9 @@ public class SendPlayerPacket implements Packet {
 		mPlayerUUID = playerUUID;
 	}
 
-	// TODO - Ugh, this is so annoying
-	// Want to just be able to call SendPlayerPacket.getPacketChannel() without an object
-	// But making that static just causes other problems
-	public static String getStaticPacketChannel() {
-		return "Monumenta.Bungee.SendPlayer";
-	}
-
 	@Override
 	public String getPacketChannel() {
-		return "Monumenta.Bungee.SendPlayer";
+		return StaticPacketChannel;
 	}
 
 	@Override

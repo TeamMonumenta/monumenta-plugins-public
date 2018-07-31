@@ -8,6 +8,8 @@ import pe.project.utils.PacketUtils;
 import pe.project.utils.NetworkUtils;
 
 public class TransferPlayerDataPacket implements Packet {
+	public static final String StaticPacketChannel = "Monumenta.Bungee.Forward.TransferPlayerData";
+
 	private String mNewServer;
 	private String mPlayerName;
 	private UUID mPlayerUUID;
@@ -20,16 +22,9 @@ public class TransferPlayerDataPacket implements Packet {
 		mPlayerContent = playerContent;
 	}
 
-	// TODO - Ugh, this is so annoying
-	// Want to just be able to call TransferPlayerDataPacket.getPacketChannel() without an object
-	// But making that static just causes other problems
-	public static String getStaticPacketChannel() {
-		return "Monumenta.Bungee.Forward.TransferPlayerData";
-	}
-
 	@Override
 	public String getPacketChannel() {
-		return "Monumenta.Bungee.Forward.TransferPlayerData";
+		return StaticPacketChannel;
 	}
 
 	@Override

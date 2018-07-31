@@ -6,22 +6,16 @@ import pe.project.Plugin;
 import pe.project.utils.PacketUtils;
 
 public class BroadcastCommandPacket implements Packet {
+	public static final String StaticPacketChannel = "Monumenta.Bungee.Broadcast.BroadcastCommand";
 	private String mCommand;
 
 	public BroadcastCommandPacket(String command) {
 		mCommand = command;
 	}
 
-	// TODO - Ugh, this is so annoying
-	// Want to just be able to call BroadcastCommandPacket.getPacketChannel() without an object
-	// But making that static just causes other problems
-	public static String getStaticPacketChannel() {
-		return "Monumenta.Bungee.Broadcast.BroadcastCommand";
-	}
-
 	@Override
 	public String getPacketChannel() {
-		return "Monumenta.Bungee.Broadcast.BroadcastCommand";
+		return StaticPacketChannel;
 	}
 
 	@Override
