@@ -3,6 +3,7 @@ package pe.project.utils;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -232,6 +233,53 @@ public class ScoreboardUtils {
 			//  if (currentTeam.getSize() <= 0) {
 			//  	currentTeam.unregister();
 			//  }
+		}
+	}
+
+	public static void transferPlayerScores(String from, String to) throws Exception {
+		List<Player> players = Bukkit.getWorlds().get(0).getPlayers();
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		Set<Objective> objectives = scoreboard.getObjectives();
+
+		boolean fromPlayerExist = scoreboard.getEntries().contains(from);
+		boolean toPlayerExist = scoreboard.getEntries().contains(to);
+
+		if (!fromPlayerExist) {
+			throw new Exception("Old player scoreboard does not exist. Have they ever been on the server or was the name typed incorrectly?");
+		}
+
+		if (!toPlayerExist) {
+			throw new Exception("New player scoreboard does not exist. Have they ever been on the server or was the name typed incorrectly?");
+		}
+
+		//	Additionally to prevent any potential fuck ups by people using this....we want to make sure the from player is offline
+		//	and to too player is online...
+		boolean fromPlayerOffline = true;
+		boolean toPlayerOnline = false;
+
+		for (Player player : players) {
+			if (fromPlayerOffline == true && player.getName().contains(from)) {
+				fromPlayerOffline = false;
+			} else if (toPlayerOnline == false && player.getName().contains(to)) {
+				toPlayerOnline = true;
+			}
+
+			if (fromPlayerOffline == false && toPlayerOnline == true) {
+				break;
+			}
+		}
+
+		if (!fromPlayerOffline || !toPlayerOnline) {
+			throw new Exception("Can only transfer scores from an offline player to an online player. (To prevent accidently breaking people)");
+		}
+
+		//	Transfer Scoreboards from the old name to the new name!
+		for (Objective objective : objectives) {
+			Score toScore = objective.getScore(to);
+			Score fromScore = objective.getScore(from);
+			if (toScore != null && fromScore != null) {
+				toScore.setScore(fromScore.getScore());
+			}
 		}
 	}
 }
