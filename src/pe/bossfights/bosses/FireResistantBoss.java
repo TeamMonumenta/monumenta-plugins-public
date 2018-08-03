@@ -13,7 +13,7 @@ import pe.bossfights.spells.SpellMobEffect;
 
 public class FireResistantBoss extends Boss
 {
-	public static final String identityTag = "boss_fireresistant";
+	public static final String identityTag = "boss_fireresist";
 	public static final int detectionRange = 100;
 
 	LivingEntity mBoss;
