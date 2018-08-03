@@ -66,7 +66,8 @@ public class POIConstants {
 		CursedForest(59, "CursedForest"),
 		Litterbox(60, "Litterbox"),
 		KaulArena(61, null),
-		Total(62, null);
+		MurkyMaze(62, "MurkyMaze"),
+		Total(63, null);
 
 		public int mValue;
 		public String mScoreboard;
