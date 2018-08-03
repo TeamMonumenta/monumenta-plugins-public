@@ -170,6 +170,7 @@ public class POIManager {
 			mPOIs.add(new PointOfInterest(POI.CursedForest, "Cursed Forest", new Point(1103, 100, 54), 100, 110, null));
 
 			mPOIs.add(new PointOfInterest(POI.Litterbox, "Litterbox", new Point(890, 59, 53), 30, 45, null));
+			mPOIs.add(new PointOfInterest(POI.MurkyMaze, "Murky Maze", new Point(-35, 53, 2), 55, 85, null));
 			mPOIs.add(new PointOfInterest(POI.KaulArena, "Kaul Arena", new Point(733, 61, 11), 55, 85, "????? Cenote...what is this place here all about?"));
 		}
 	}
