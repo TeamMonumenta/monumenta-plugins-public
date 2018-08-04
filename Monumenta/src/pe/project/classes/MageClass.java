@@ -164,7 +164,7 @@ public class MageClass extends BaseClass {
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				if ((offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW) || (mainHand.getType() == Material.SHIELD)
+				if (((offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW) || (mainHand.getType() == Material.SHIELD))
 						&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
