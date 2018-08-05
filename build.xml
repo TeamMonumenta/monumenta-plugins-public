@@ -4,7 +4,7 @@
         <mkdir dir="target"></mkdir>
         <jar destfile="../../code/perso/Mc-Serv/plugins/${ant.project.name}.jar">
             <fileset dir="bin"></fileset>
-            <fileset file="plugin.yml"></fileset>
+            <fileset file="src/main/resources/plugin.yml"></fileset>
         </jar>
     </target>
 

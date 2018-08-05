@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ant pmd build jar
+./mvnw clean install
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
 	exit $retcode
