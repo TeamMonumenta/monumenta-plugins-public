@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>fr.rhaz.sockets</groupId>
+  <artifactId>socket4mc</artifactId>
+  <versioning>
+    <release>2.1.3</release>
+    <versions>
+      <version>2.1.3</version>
+    </versions>
+    <lastUpdated>20180805023628</lastUpdated>
+  </versioning>
+</metadata>

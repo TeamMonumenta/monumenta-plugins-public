@@ -1,15 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$SCRIPT_DIR/Monumenta"
-ant pmd build-project jar
-retcode=$?
-if [[ $retcode -ne 0 ]]; then
-	exit $retcode
-fi
-
-cd "$SCRIPT_DIR/BungeeCord"
-ant pmd build-project jar
+./mvnw clean install
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
 	exit $retcode
