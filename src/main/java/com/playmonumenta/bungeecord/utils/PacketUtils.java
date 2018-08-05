@@ -1,4 +1,4 @@
-package bungee.project.utils;
+package com.playmonumenta.bungeecord.utils;
 
 import com.google.gson.Gson;
 

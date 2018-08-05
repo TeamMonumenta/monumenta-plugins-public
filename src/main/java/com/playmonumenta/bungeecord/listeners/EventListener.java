@@ -1,11 +1,11 @@
-package bungee.project.listeners;
+package com.playmonumenta.bungeecord.listeners;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
-import bungee.project.Main;
-import bungee.project.utils.PacketUtils;
+import com.playmonumenta.bungeecord.Main;
+import com.playmonumenta.bungeecord.utils.PacketUtils;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.ChatColor;

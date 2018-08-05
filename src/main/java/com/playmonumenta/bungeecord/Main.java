@@ -1,4 +1,4 @@
-package bungee.project;
+package com.playmonumenta.bungeecord;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
-import bungee.project.listeners.EventListener;
-import bungee.project.reconnect.MonumentaReconnectHandler;
+import com.playmonumenta.bungeecord.listeners.EventListener;
+import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
 
 public class Main extends Plugin {
 	private Configuration mConfig = null;

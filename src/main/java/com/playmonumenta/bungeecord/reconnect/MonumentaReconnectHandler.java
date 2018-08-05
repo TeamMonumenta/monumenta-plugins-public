@@ -1,4 +1,4 @@
-package bungee.project.reconnect;
+package com.playmonumenta.bungeecord.reconnect;
 
 import net.md_5.bungee.api.ReconnectHandler;
 import java.io.File;
