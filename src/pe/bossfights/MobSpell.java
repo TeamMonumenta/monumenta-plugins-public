@@ -12,7 +12,6 @@ import pe.bossfights.spells.SpellAxtalTntThrow;
 import pe.bossfights.spells.SpellAxtalWitherAoe;
 import pe.bossfights.spells.SpellBlockBreak;
 import pe.bossfights.spells.SpellDetectionCircle;
-import pe.bossfights.spells.SpellMaskedEldritchBeam;
 import pe.bossfights.spells.SpellMaskedFrostNova;
 import pe.bossfights.spells.SpellMaskedShadowGlade;
 import pe.bossfights.spells.SpellMaskedSummonBlazes;
@@ -120,11 +119,6 @@ public class MobSpell implements CommandExecutor
 				(new SpellMaskedShadowGlade(plugin,
 				                            Utils.calleeEntity(send).getLocation(),
 				                            Utils.parseInt(args[1], 1, 4))).run();
-				break;
-			case "masked_eldritch_beam":
-				usage = "masked_eldritch_beam";
-				Utils.assertArgCount(args, 0);
-				(new SpellMaskedEldritchBeam(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "masked_frost_nova":
 				usage = "masked_frost_nova <radius> <time>";
