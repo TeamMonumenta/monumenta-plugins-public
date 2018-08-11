@@ -15,7 +15,7 @@ import pe.bossfights.utils.Utils;
 public class BaseLaser implements Spell
 {
 	@FunctionalInterface
-	interface TickAction
+	public interface TickAction
 	{
 		/**
 		 * User function called once every two ticks while laser is running
@@ -28,7 +28,7 @@ public class BaseLaser implements Spell
 	}
 
 	@FunctionalInterface
-	interface ParticleAction
+	public interface ParticleAction
 	{
 		/**
 		 * User function called many times per tick with the location where
@@ -39,7 +39,7 @@ public class BaseLaser implements Spell
 	}
 
 	@FunctionalInterface
-	interface FinishAction
+	public interface FinishAction
 	{
 		/**
 		 * User function called once every two ticks while laser is running

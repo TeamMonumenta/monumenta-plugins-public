@@ -29,6 +29,7 @@ import pe.bossfights.bosses.InvisibleBoss;
 import pe.bossfights.bosses.FireResistantBoss;
 import pe.bossfights.bosses.Masked_1;
 import pe.bossfights.bosses.Masked_2;
+import pe.bossfights.bosses.PulseLaserBoss;
 import pe.bossfights.bosses.Virius;
 import pe.bossfights.bosses.Orangyboi;
 import pe.bossfights.utils.SerializationUtils;
@@ -96,6 +97,9 @@ public class BossManager implements Listener, CommandExecutor
 		case FireResistantBoss.identityTag:
 			boss = new FireResistantBoss(mPlugin, (LivingEntity)targetEntity);
 			break;
+		case PulseLaserBoss.identityTag:
+			boss = new PulseLaserBoss(mPlugin, (LivingEntity)targetEntity);
+			break;
 		case CAxtal.identityTag:
 			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
@@ -115,7 +119,7 @@ public class BossManager implements Listener, CommandExecutor
 			send.sendMessage(ChatColor.RED + "Invalid boss name!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
 			                 InvisibleBoss.identityTag + "," + FireResistantBoss.identityTag + "," + CAxtal.identityTag + "," +
-			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + Virius.identityTag + "," +
+			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + PulseLaserBoss.identityTag + "," + Virius.identityTag + "," +
 							 Orangyboi.identityTag + "]");
 			return false;
 		}
@@ -166,6 +170,8 @@ public class BossManager implements Listener, CommandExecutor
 					boss = Masked_1.deserialize(mPlugin, entity);
 				else if (tags.contains(Masked_2.identityTag))
 					boss = Masked_2.deserialize(mPlugin, entity);
+				else if (tags.contains(PulseLaserBoss.identityTag))
+					boss = PulseLaserBoss.deserialize(mPlugin, entity);
 				else if (tags.contains(Virius.identityTag))
 					boss = Virius.deserialize(mPlugin, entity);
 				else if (tags.contains(Orangyboi.identityTag))
