@@ -5,7 +5,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import pe.bossfights.spells.SpellAxtalDeathRay;
 import pe.bossfights.spells.SpellAxtalMeleeMinions;
 import pe.bossfights.spells.SpellAxtalRangedFlyingMinions;
 import pe.bossfights.spells.SpellAxtalSneakup;
@@ -100,11 +99,6 @@ public class MobSpell implements CommandExecutor
 				(new SpellPushPlayersAway(Utils.calleeEntity(send),
 				                          Utils.parseInt(args[1], 0, 64),
 				                          Utils.parseInt(args[2], 0, 0))).run();
-				break;
-			case "axtal_death_ray":
-				usage = "axtal_death_ray";
-				Utils.assertArgCount(args, 0);
-				(new SpellAxtalDeathRay(plugin, Utils.calleeEntity(send))).run();
 				break;
 			case "detection_circle":
 				usage = "detection_circle <centerx> <centery> <centerz> <radius> <duration> <targetx> <targety> <targetz>";
