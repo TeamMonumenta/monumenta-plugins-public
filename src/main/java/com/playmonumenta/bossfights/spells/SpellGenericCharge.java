@@ -9,7 +9,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
 
-public class SpellGenericCharge extends BaseCharge
+public class SpellGenericCharge extends SpellBaseCharge
 {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage)
 	{

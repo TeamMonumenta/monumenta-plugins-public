@@ -21,7 +21,7 @@ import org.bukkit.Sound;
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.BaseLaser;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBlockBreak;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
@@ -69,7 +69,7 @@ public class Masked_1 extends Boss
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new BaseLaser(plugin, boss, 40, 120, true, false,
+		                                                 new SpellBaseLaser(plugin, boss, 40, 120, true, false,
 		      // Tick action per player
 		      (Player player, int ticks, boolean blocked) ->
 		        {

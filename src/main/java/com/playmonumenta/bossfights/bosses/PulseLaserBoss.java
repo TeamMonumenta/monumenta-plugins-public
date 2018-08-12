@@ -13,7 +13,7 @@ import org.bukkit.Sound;
 
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.BaseLaser;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 
 public class PulseLaserBoss extends Boss
 {
@@ -31,7 +31,7 @@ public class PulseLaserBoss extends Boss
 	{
 		mBoss = boss;
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(new BaseLaser(plugin, boss, detectionRange, 100, false, false,
+		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
 				  // Tick action per player
 				  (Player player, int ticks, boolean blocked) ->
 					{

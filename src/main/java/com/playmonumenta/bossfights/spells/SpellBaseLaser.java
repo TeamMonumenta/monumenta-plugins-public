@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class BaseLaser implements Spell
+public class SpellBaseLaser implements Spell
 {
 	@FunctionalInterface
 	public interface TickAction
@@ -71,7 +71,7 @@ public class BaseLaser implements Spell
 	 * @param particleAction  Called many times per tick to generate particles for laser
 	 * @param finishAction    Called when the spell numTicks have elapsed
 	 */
-	public BaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
+	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
 	                 TickAction tickAction, ParticleAction particleAction, FinishAction finishAction)
 	{
 		mPlugin = plugin;

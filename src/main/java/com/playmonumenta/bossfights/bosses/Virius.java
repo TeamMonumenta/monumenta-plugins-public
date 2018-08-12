@@ -22,7 +22,7 @@ import org.bukkit.Sound;
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.BaseLaser;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.SpellChangeFloor;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -66,7 +66,7 @@ public class Virius extends Boss
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 		                                                 new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA),
-		                                                 new BaseLaser(plugin, boss, detectionRange, 100, false, false,
+		                                                 new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
 				  // Tick action per player
 				  (Player player, int ticks, boolean blocked) ->
 					{

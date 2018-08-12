@@ -23,7 +23,7 @@ import org.bukkit.Sound;
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.BaseLaser;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;
 import com.playmonumenta.bossfights.spells.SpellAxtalSneakup;
@@ -76,7 +76,7 @@ public class CAxtal extends Boss
 		                                                 new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),
 		                                                 new SpellAxtalSneakup(plugin, mBoss),
 		                                                 new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
-		                                                 new BaseLaser(plugin, boss, 60, 140, false, true,
+		                                                 new SpellBaseLaser(plugin, boss, 60, 140, false, true,
 		      // Tick action per player
 		      (Player player, int ticks, boolean blocked) ->
 		        {

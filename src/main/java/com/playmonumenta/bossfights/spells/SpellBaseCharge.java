@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class BaseCharge implements Spell
+public class SpellBaseCharge implements Spell
 {
 	@FunctionalInterface
 	interface WarningAction
@@ -100,7 +100,7 @@ public class BaseCharge implements Spell
 	private ParticleAction mParticleAction;
 	private EndAction mEndAction;
 
-	public BaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
 	                  WarningAction warning, ParticleAction warnParticles,
 	                  StartAction start, HitPlayerAction hitPlayer,
 	                  ParticleAction particle, EndAction end)
