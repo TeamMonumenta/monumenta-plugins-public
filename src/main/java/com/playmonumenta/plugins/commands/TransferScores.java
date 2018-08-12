@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import pe.project.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class TransferScores implements CommandExecutor {
 	@Override
