@@ -26,6 +26,7 @@ import com.playmonumenta.bossfights.bosses.Boss;
 import com.playmonumenta.bossfights.bosses.CAxtal;
 import com.playmonumenta.bossfights.bosses.ChargerBoss;
 import com.playmonumenta.bossfights.bosses.GenericBoss;
+import com.playmonumenta.bossfights.bosses.InfestedBoss;
 import com.playmonumenta.bossfights.bosses.InvisibleBoss;
 import com.playmonumenta.bossfights.bosses.FireResistantBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
@@ -104,6 +105,9 @@ public class BossManager implements Listener, CommandExecutor
 		case ChargerBoss.identityTag:
 			boss = new ChargerBoss(mPlugin, (LivingEntity)targetEntity);
 			break;
+		case InfestedBoss.identityTag:
+			boss = new InfestedBoss(mPlugin, (LivingEntity)targetEntity);
+			break;
 		case CAxtal.identityTag:
 			boss = new CAxtal(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			break;
@@ -123,7 +127,7 @@ public class BossManager implements Listener, CommandExecutor
 			send.sendMessage(ChatColor.RED + "Invalid boss name!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + GenericBoss.identityTag + "," +
 			                 InvisibleBoss.identityTag + "," + FireResistantBoss.identityTag + "," + CAxtal.identityTag + "," +
-			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + ChargerBoss.identityTag + "," + PulseLaserBoss.identityTag + "," + Virius.identityTag + "," +
+			                 Masked_1.identityTag + "," + Masked_2.identityTag + "," + InfestedBoss.identityTag + "," + ChargerBoss.identityTag + "," + PulseLaserBoss.identityTag + "," + Virius.identityTag + "," +
 							 Orangyboi.identityTag + "]");
 			return false;
 		}
@@ -174,6 +178,8 @@ public class BossManager implements Listener, CommandExecutor
 					boss = Masked_1.deserialize(mPlugin, entity);
 				else if (tags.contains(Masked_2.identityTag))
 					boss = Masked_2.deserialize(mPlugin, entity);
+				else if (tags.contains(InfestedBoss.identityTag))
+					boss = InfestedBoss.deserialize(mPlugin, entity);
 				else if (tags.contains(ChargerBoss.identityTag))
 					boss = ChargerBoss.deserialize(mPlugin, entity);
 				else if (tags.contains(PulseLaserBoss.identityTag))

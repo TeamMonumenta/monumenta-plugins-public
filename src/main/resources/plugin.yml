@@ -1,4 +1,4 @@
-main: pe.bossfights.Plugin
+main: com.playmonumenta.bossfights.Plugin
 name: Monumenta_Bossfights
 version: 1.0
 author: rayman520
