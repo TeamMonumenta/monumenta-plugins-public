@@ -56,9 +56,11 @@ public class SpellBaseLaser implements Spell
 	private int mNumTicks;
 	private boolean mStopWhenBlocked;
 	private boolean mSingleTarget;
-	TickAction mTickAction;
-	ParticleAction mParticleAction;
-	FinishAction mFinishAction;
+	private TickAction mTickAction;
+	private ParticleAction mParticleAction;
+	private FinishAction mFinishAction;
+
+	private Random mRandom = new Random();
 
 	/**
 	 * @param plugin          Plugin
@@ -72,7 +74,7 @@ public class SpellBaseLaser implements Spell
 	 * @param finishAction    Called when the spell numTicks have elapsed
 	 */
 	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
-	                 TickAction tickAction, ParticleAction particleAction, FinishAction finishAction)
+	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction)
 	{
 		mPlugin = plugin;
 		mBoss = boss;
@@ -91,7 +93,7 @@ public class SpellBaseLaser implements Spell
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		if (mSingleTarget)
 			// Single target chooses a random player within range
-			launch(players.get((new Random()).nextInt(players.size())));
+			launch(players.get(mRandom.nextInt(players.size())));
 		else
 			// Otherwise target all players within range
 			for (Player player : players)

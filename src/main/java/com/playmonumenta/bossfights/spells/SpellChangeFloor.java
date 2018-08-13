@@ -27,6 +27,8 @@ public class SpellChangeFloor implements Spell
 	private int mRadius;
 	private Material mMaterial;
 
+	private Random mRandom = new Random();
+
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 	                                                   Material.AIR,
 	                                                   Material.COMMAND,
@@ -53,7 +55,7 @@ public class SpellChangeFloor implements Spell
 	public void run()
 	{
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
-		launch(players.get((new Random()).nextInt(players.size())));
+		launch(players.get(mRandom.nextInt(players.size())));
 	}
 
 	public void launch(Player target)
@@ -100,7 +102,7 @@ public class SpellChangeFloor implements Spell
 							for (int dz = -mRadius; dz < mRadius; dz++)
 							{
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
-								if (!mIgnoredMats.contains(state.getType()) && (mRandom.nextInt(16) > 6))
+								if (!mIgnoredMats.contains(state.getType()) && mRandom.nextInt(16) > 6)
 									restoreBlocks.add(state);
 							}
 						}
@@ -118,7 +120,7 @@ public class SpellChangeFloor implements Spell
 					for (BlockState state : restoreBlocks)
 						state.update(true);
 				}
-				else if ((mTicks < PHASE1_TICKS && mBoss.isDead()) || mTicks > PHASE2_TICKS)
+				else if (mTicks < PHASE1_TICKS && mBoss.isDead() || mTicks > PHASE2_TICKS)
 					this.cancel();
 				mTicks++;
 			}

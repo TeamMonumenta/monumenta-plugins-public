@@ -41,7 +41,7 @@ public class SpellAxtalMeleeMinions implements Spell
 	{
 		List<Entity> nearbyEntities = mLauncher.getNearbyEntities(mNearbyRadius, mNearbyRadius, mNearbyRadius);
 
-		return (nearbyEntities.stream().filter(e -> e.getType() == EntityType.SKELETON).count() < mMaxNearby);
+		return nearbyEntities.stream().filter(e -> e.getType() == EntityType.SKELETON).count() < mMaxNearby;
 	}
 
 	@Override
@@ -67,8 +67,8 @@ public class SpellAxtalMeleeMinions implements Spell
 				{
 					if (skelly.getType() == EntityType.SKELETON)
 					{
-						double x = 0.5f * Math.cos(((double)mRand.nextInt(628) / 100));
-						double z = 0.5f * Math.sin(((double)mRand.nextInt(628) / 100));
+						double x = 0.5f * Math.cos((double)mRand.nextInt(628) / 100);
+						double z = 0.5f * Math.sin((double)mRand.nextInt(628) / 100);
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}

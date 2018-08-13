@@ -11,7 +11,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -34,7 +33,7 @@ public class InfestedBoss extends Boss
 		mPlugin = plugin;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellRunAction(plugin, () -> mBoss.getLocation().getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 1, 0.2, 0.2, 0.2, 0))
+			new SpellRunAction(() -> mBoss.getLocation().getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 1, 0.2, 0.2, 0.2, 0))
 		);
 
 		// Boss effectively does nothing

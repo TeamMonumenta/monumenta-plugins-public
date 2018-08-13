@@ -32,7 +32,7 @@ public class MobSpell implements CommandExecutor
 	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
 	{
 		if (args.length < 1)
-			return (false);
+			return false;
 		return spellCall(send, args);
 	}
 

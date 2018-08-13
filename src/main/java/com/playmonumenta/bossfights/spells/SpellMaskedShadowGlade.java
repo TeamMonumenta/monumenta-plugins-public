@@ -90,7 +90,7 @@ public class SpellMaskedShadowGlade implements Spell
 		};
 
 		for (int i = 0; i < 25; i++)
-			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, (i * 4));
+			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 4);
 	}
 
 	public void damage(Location zoneStart)
@@ -109,8 +109,8 @@ public class SpellMaskedShadowGlade implements Spell
 					if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25)
 					{
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, 1f, 0.7f);
-						player.addPotionEffect((new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3)));
-						player.addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1)));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1));
 						player.setFireTicks(20 * 7);
 					}
 				}

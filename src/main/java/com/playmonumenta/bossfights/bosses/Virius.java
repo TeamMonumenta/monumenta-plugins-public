@@ -12,7 +12,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
@@ -70,8 +69,8 @@ public class Virius extends Boss
 				  // Tick action per player
 				  (Player player, int ticks, boolean blocked) ->
 					{
-						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, (0.5f + ((float)ticks / 80f) * 1.5f));
-						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, (0.5f + ((float)ticks / 80f) * 1.5f));
+						player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
+						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
 						if (ticks == 0)
 							boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4), true);
 					},

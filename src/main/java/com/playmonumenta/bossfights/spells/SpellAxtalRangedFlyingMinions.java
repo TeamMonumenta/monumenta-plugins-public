@@ -57,8 +57,8 @@ public class SpellAxtalRangedFlyingMinions implements Spell
 				{
 					if (skelly.getType() == EntityType.SKELETON)
 					{
-						double x = Math.cos(((double)mRand.nextInt(628) / 100));
-						double z = Math.sin(((double)mRand.nextInt(628) / 100));
+						double x = Math.cos((double)mRand.nextInt(628) / 100);
+						double z = Math.sin((double)mRand.nextInt(628) / 100);
 						skelly.setVelocity(new Vector(x, 0f, z));
 						((LivingEntity)skelly).addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, mRand.nextInt(100) + 40, 1));
 					}

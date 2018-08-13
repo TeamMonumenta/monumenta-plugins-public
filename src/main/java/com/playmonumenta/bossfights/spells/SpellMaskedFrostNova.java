@@ -51,7 +51,7 @@ public class SpellMaskedFrostNova implements Spell
 				for (Player player : Utils.playersInRange(mLauncher.getLocation(), mRadius))
 				{
 					player.damage(12.0f);
-					player.addPotionEffect((new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4)));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4));
 				}
 			}
 		};
@@ -69,7 +69,7 @@ public class SpellMaskedFrostNova implements Spell
 			{
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_SNOW_STEP, ((float)mRadius / 7), (float)(0.5 + mRand.nextInt(150) / 100));
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_SNOW_STEP, (float)mRadius / 7, (float)(0.5 + mRand.nextInt(150) / 100));
 				centerLoc.getWorld().spawnParticle(Particle.SNOWBALL, centerLoc, 10, 1, 1, 1, 0.01);
 			}
 		};
@@ -95,9 +95,9 @@ public class SpellMaskedFrostNova implements Spell
 				}
 				if (w == 0)
 				{
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.77F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.5F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.65F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.77F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.5F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.65F);
 				}
 				w++;
 			}

@@ -1,7 +1,5 @@
 package com.playmonumenta.bossfights.spells;
 
-import org.bukkit.plugin.Plugin;
-
 /*
  * Super simple Spell which just runs in-line function
  * code from the caller
@@ -17,12 +15,10 @@ public class SpellRunAction implements Spell
 		void run();
 	}
 
-	private Plugin mPlugin;
 	private Action mAction;
 
-	public SpellRunAction(Plugin plugin, Action action)
+	public SpellRunAction(Action action)
 	{
-		mPlugin = plugin;
 		mAction = action;
 	}
 

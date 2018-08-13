@@ -52,8 +52,8 @@ public class SpellAxtalWitherAoe implements Spell
 				{
 					double distance = player.getLocation().distance(mLauncher.getLocation());
 					int pot_pow = (int)((double)mPower * (((double)mRadius - distance) / (double)mRadius));
-					player.addPotionEffect((new PotionEffect(PotionEffectType.HARM, 1, pot_pow)));
-					player.addPotionEffect((new PotionEffect(PotionEffectType.BLINDNESS, 30, 1)));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));
 				}
 			}
 		};
@@ -73,7 +73,7 @@ public class SpellAxtalWitherAoe implements Spell
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
-				double rad = mRadius * (w < 0 ? ((double)w / 80) : ((double)w / 5));
+				double rad = mRadius * (w < 0 ? (double)w / 80 : (double)w / 5);
 				double angle = 0;
 				for (int j = 0; j < precision; j++)
 				{
@@ -84,12 +84,12 @@ public class SpellAxtalWitherAoe implements Spell
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
 				}
 				if (w < -20 && w % 2 == 0)
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_CAT_HISS, ((float)mRadius / 7), (float)(0.5 + ((float)(w + 60) / 100)));
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_CAT_HISS, (float)mRadius / 7, (float)(0.5 + ((float)(w + 60) / 100)));
 				else if (w == -1)
 				{
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.77F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.5F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, ((float)mRadius / 7), 0.65F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.77F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.5F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.65F);
 				}
 				w++;
 			}

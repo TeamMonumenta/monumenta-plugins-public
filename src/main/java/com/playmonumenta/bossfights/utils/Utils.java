@@ -74,7 +74,7 @@ public class Utils
 
 	public static void assertArgCount(String[] arg, int expectedCount) throws ArgumentException
 	{
-		if ((arg.length - 1) != expectedCount)
+		if (arg.length - 1 != expectedCount)
 			throw new ArgumentException("Expected " + Integer.toString(expectedCount) + " arguments, got " + Integer.toString(arg.length - 1));
 	}
 

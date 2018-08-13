@@ -47,8 +47,8 @@ public class SpellMaskedSummonBlazes implements Spell
 				for (int j = 0; j < count; j++)
 				{
 					Entity blaz = loc.getWorld().spawnEntity(loc, EntityType.BLAZE);
-					double x = 0.5f * Math.cos(((double)mRand.nextInt(628) / 100));
-					double z = 0.5f * Math.sin(((double)mRand.nextInt(628) / 100));
+					double x = 0.5f * Math.cos((double)mRand.nextInt(628) / 100);
+					double z = 0.5f * Math.sin((double)mRand.nextInt(628) / 100);
 					blaz.setVelocity(new Vector(x, 0.3, z));
 				}
 			}
