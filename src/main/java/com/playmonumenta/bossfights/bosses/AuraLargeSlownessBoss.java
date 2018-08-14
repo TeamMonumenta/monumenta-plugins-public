@@ -15,26 +15,26 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class AuraLargeHungerBoss extends Boss
+public class AuraLargeSlownessBoss extends Boss
 {
-	public static final String identityTag = "HungerAura";
+	public static final String identityTag = "SlownessAura";
 	public static final int detectionRange = 100;
 
 	LivingEntity mBoss;
 
 	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
-		return new AuraLargeHungerBoss(plugin, boss);
+		return new AuraLargeSlownessBoss(plugin, boss);
 	}
 
-	public AuraLargeHungerBoss(Plugin plugin, LivingEntity boss)
+	public AuraLargeSlownessBoss(Plugin plugin, LivingEntity boss)
 	{
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBaseAura(mBoss, 35, 20, 35, 50, Particle.FALLING_DUST, new MaterialData(Material.MELON_BLOCK),
+				new SpellBaseAura(mBoss, 35, 20, 35, 50, Particle.FALLING_DUST, new MaterialData(Material.ANVIL),
 					(Player player) -> {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, true, true));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, true, true));
 					})
 		);
 
