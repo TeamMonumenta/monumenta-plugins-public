@@ -23,6 +23,7 @@ public abstract class Boss
 	BossBarManager mBossBar;
 	int mTaskIDpassive = -1;
 	int mTaskIDactive = -1;
+	boolean mUnloaded = false;
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar)
@@ -70,6 +71,7 @@ public abstract class Boss
 					mPlugin.getLogger().log(Level.WARNING,
 					                        "Boss is missing but still registered as an active boss. Unloading...");
 					mPlugin.mBossManager.unload(mBoss);
+					unload();
 					return;
 				}
 
@@ -117,26 +119,31 @@ public abstract class Boss
 	 */
 	public void unload()
 	{
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		if (mTaskIDpassive != -1)
-			scheduler.cancelTask(mTaskIDpassive);
-		if (mTaskIDactive != -1)
-			scheduler.cancelTask(mTaskIDactive);
-		if (mBossBar != null)
-			mBossBar.remove();
+		/* Make sure we don't accidentally unload twice */
+		if (!mUnloaded) {
+			mUnloaded = true;
 
-		if (mBoss.isValid() && mBoss.getHealth() > 0)
-		{
-			String content = serialize();
-			if (content != null && !content.isEmpty())
+			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+			if (mTaskIDpassive != -1)
+				scheduler.cancelTask(mTaskIDpassive);
+			if (mTaskIDactive != -1)
+				scheduler.cancelTask(mTaskIDactive);
+			if (mBossBar != null)
+				mBossBar.remove();
+
+			if (mBoss.isValid() && mBoss.getHealth() > 0)
 			{
-				try
+				String content = serialize();
+				if (content != null && !content.isEmpty())
 				{
-					SerializationUtils.storeDataOnEntity(mBoss, content);
-				}
-				catch (Exception ex)
-				{
-					mPlugin.getLogger().log(Level.SEVERE, "Failed to save data to entity: ", ex);
+					try
+					{
+						SerializationUtils.storeDataOnEntity(mBoss, content);
+					}
+					catch (Exception ex)
+					{
+						mPlugin.getLogger().log(Level.SEVERE, "Failed to save data to entity: ", ex);
+					}
 				}
 			}
 		}
