@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AuraLargeWeaknessBoss extends Boss
 {
 	public static final String identityTag = "WeaknessAura";
-	public static final int detectionRange = 100;
+	public static final int detectionRange = 50;
 
 	LivingEntity mBoss;
 

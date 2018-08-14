@@ -15,26 +15,26 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class AuraLargeFatigueBoss extends Boss
+public class AuraSmallHungerBoss extends Boss
 {
-	public static final String identityTag = "FatigueAura";
-	public static final int detectionRange = 50;
+	public static final String identityTag = "aura_hunger";
+	public static final int detectionRange = 40;
 
 	LivingEntity mBoss;
 
 	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
-		return new AuraLargeFatigueBoss(plugin, boss);
+		return new AuraSmallHungerBoss(plugin, boss);
 	}
 
-	public AuraLargeFatigueBoss(Plugin plugin, LivingEntity boss)
+	public AuraSmallHungerBoss(Plugin plugin, LivingEntity boss)
 	{
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBaseAura(mBoss, 35, 20, 35, 50, Particle.FALLING_DUST, new MaterialData(Material.SAND),
+				new SpellBaseAura(mBoss, 12, 7, 12, 20, Particle.FALLING_DUST, new MaterialData(Material.MELON_BLOCK),
 					(Player player) -> {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, true));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 1, true, true));
 					})
 		);
 

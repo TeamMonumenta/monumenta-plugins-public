@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AuraLargeHungerBoss extends Boss
 {
 	public static final String identityTag = "HungerAura";
-	public static final int detectionRange = 100;
+	public static final int detectionRange = 50;
 
 	LivingEntity mBoss;
 

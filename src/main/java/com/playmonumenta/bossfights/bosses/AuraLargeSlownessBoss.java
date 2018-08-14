@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AuraLargeSlownessBoss extends Boss
 {
 	public static final String identityTag = "SlownessAura";
-	public static final int detectionRange = 100;
+	public static final int detectionRange = 50;
 
 	LivingEntity mBoss;
 

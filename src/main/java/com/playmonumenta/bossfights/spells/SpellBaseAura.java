@@ -70,9 +70,9 @@ public class SpellBaseAura implements Spell
 		// Generate particles immediately around boss
 		bossLoc.getWorld().spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 5, 1, 1, 1, mColor);
 
-		// Apply effects every four iterations
+		// Apply effects every other pulse (2 Hz)
 		mIter++;
-		if (mIter >= 4 && mAuraEffect != null)
+		if (mIter >= 2 && mAuraEffect != null)
 		{
 			mIter = 0;
 
