@@ -63,6 +63,7 @@ static
 	mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
 	mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
 	mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
+	mStatelessBosses.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeHungerBoss(p, e));
 
 	/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 	mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -80,6 +81,7 @@ static
 	mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
 	mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));
 	mBossDeserializers.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> InfestedBoss.deserialize(p, e));
+	mBossDeserializers.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeHungerBoss.deserialize(p, e));
 	mBossDeserializers.put(CAxtal.identityTag, (Plugin p, LivingEntity e) -> CAxtal.deserialize(p, e));
 	mBossDeserializers.put(Masked_1.identityTag, (Plugin p, LivingEntity e) -> Masked_1.deserialize(p, e));
 	mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
