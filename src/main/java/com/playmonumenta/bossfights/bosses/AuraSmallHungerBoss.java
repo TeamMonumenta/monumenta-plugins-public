@@ -15,14 +15,14 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class AuraSmallHungerBoss extends Boss
+public class AuraSmallHungerBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "aura_hunger";
 	public static final int detectionRange = 40;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new AuraSmallHungerBoss(plugin, boss);
 	}

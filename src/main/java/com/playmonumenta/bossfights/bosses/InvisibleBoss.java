@@ -11,14 +11,14 @@ import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellMobEffect;
 
-public class InvisibleBoss extends Boss
+public class InvisibleBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_invisible";
 	public static final int detectionRange = 100;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new InvisibleBoss(plugin, boss);
 	}

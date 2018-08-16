@@ -30,83 +30,83 @@ import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 public class BossManager implements Listener, CommandExecutor
 {
 	Plugin mPlugin;
-	Map<UUID, Boss> mBosses;
+	Map<UUID, BossAbilityGroup> mBosses;
 
-@FunctionalInterface
-public interface StatelessBossConstructor
-{
-	Boss construct(Plugin plugin, LivingEntity entity);
-}
+	@FunctionalInterface
+	public interface StatelessBossConstructor
+	{
+		BossAbilityGroup construct(Plugin plugin, LivingEntity entity);
+	}
 
-@FunctionalInterface
-public interface StatefulBossConstructor
-{
-	Boss construct(Plugin plugin, LivingEntity entity, Location spawnLoc, Location endLoc);
-}
+	@FunctionalInterface
+	public interface StatefulBossConstructor
+	{
+		BossAbilityGroup construct(Plugin plugin, LivingEntity entity, Location spawnLoc, Location endLoc);
+	}
 
-@FunctionalInterface
-public interface BossDeserializer
-{
-	Boss deserialize(Plugin plugin, LivingEntity entity) throws Exception;
-}
+	@FunctionalInterface
+	public interface BossDeserializer
+	{
+		BossAbilityGroup deserialize(Plugin plugin, LivingEntity entity) throws Exception;
+	}
 
-static Map<String, StatelessBossConstructor> mStatelessBosses;
-static Map<String, StatefulBossConstructor> mStatefulBosses;
-static Map<String, BossDeserializer> mBossDeserializers;
-static
-{
-	/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
-	mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
-	mStatelessBosses.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericBoss(p, e));
-	mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
-	mStatelessBosses.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> new FireResistantBoss(p, e));
-	mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
-	mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
-	mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
-	mStatelessBosses.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeFatigueBoss(p, e));
-	mStatelessBosses.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeHungerBoss(p, e));
-	mStatelessBosses.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeSlownessBoss(p, e));
-	mStatelessBosses.put(AuraLargeWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeWeaknessBoss(p, e));
-	mStatelessBosses.put(AuraSmallFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallFatigueBoss(p, e));
-	mStatelessBosses.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallHungerBoss(p, e));
-	mStatelessBosses.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallSlownessBoss(p, e));
-	mStatelessBosses.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallWeaknessBoss(p, e));
+	static Map<String, StatelessBossConstructor> mStatelessBosses;
+	static Map<String, StatefulBossConstructor> mStatefulBosses;
+	static Map<String, BossDeserializer> mBossDeserializers;
+	static
+	{
+		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
+		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
+		mStatelessBosses.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericBoss(p, e));
+		mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
+		mStatelessBosses.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> new FireResistantBoss(p, e));
+		mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
+		mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
+		mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
+		mStatelessBosses.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeFatigueBoss(p, e));
+		mStatelessBosses.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeHungerBoss(p, e));
+		mStatelessBosses.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeSlownessBoss(p, e));
+		mStatelessBosses.put(AuraLargeWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeWeaknessBoss(p, e));
+		mStatelessBosses.put(AuraSmallFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallFatigueBoss(p, e));
+		mStatelessBosses.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallHungerBoss(p, e));
+		mStatelessBosses.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallSlownessBoss(p, e));
+		mStatelessBosses.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallWeaknessBoss(p, e));
 
-	/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
-	mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
-	mStatefulBosses.put(CAxtal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CAxtal(p, e, s, l));
-	mStatefulBosses.put(Masked_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_1(p, e, s, l));
-	mStatefulBosses.put(Masked_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_2(p, e, s, l));
-	mStatefulBosses.put(Virius.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Virius(p, e, s, l));
-	mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
+		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
+		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
+		mStatefulBosses.put(CAxtal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CAxtal(p, e, s, l));
+		mStatefulBosses.put(Masked_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_1(p, e, s, l));
+		mStatefulBosses.put(Masked_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_2(p, e, s, l));
+		mStatefulBosses.put(Virius.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Virius(p, e, s, l));
+		mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
 
-	/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
-	mBossDeserializers = new HashMap<String, BossDeserializer>();
-	mBossDeserializers.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> GenericBoss.deserialize(p, e));
-	mBossDeserializers.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> InvisibleBoss.deserialize(p, e));
-	mBossDeserializers.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> FireResistantBoss.deserialize(p, e));
-	mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
-	mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));
-	mBossDeserializers.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> InfestedBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeFatigueBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeHungerBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeSlownessBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraLargeWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeWeaknessBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraSmallFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallFatigueBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallHungerBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallSlownessBoss.deserialize(p, e));
-	mBossDeserializers.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallWeaknessBoss.deserialize(p, e));
-	mBossDeserializers.put(CAxtal.identityTag, (Plugin p, LivingEntity e) -> CAxtal.deserialize(p, e));
-	mBossDeserializers.put(Masked_1.identityTag, (Plugin p, LivingEntity e) -> Masked_1.deserialize(p, e));
-	mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
-	mBossDeserializers.put(Virius.identityTag, (Plugin p, LivingEntity e) -> Virius.deserialize(p, e));
-	mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
-}
+		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
+		mBossDeserializers = new HashMap<String, BossDeserializer>();
+		mBossDeserializers.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> GenericBoss.deserialize(p, e));
+		mBossDeserializers.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> InvisibleBoss.deserialize(p, e));
+		mBossDeserializers.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> FireResistantBoss.deserialize(p, e));
+		mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
+		mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));
+		mBossDeserializers.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> InfestedBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeFatigueBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeHungerBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeSlownessBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraLargeWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeWeaknessBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraSmallFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallFatigueBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraSmallHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallHungerBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallSlownessBoss.deserialize(p, e));
+		mBossDeserializers.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallWeaknessBoss.deserialize(p, e));
+		mBossDeserializers.put(CAxtal.identityTag, (Plugin p, LivingEntity e) -> CAxtal.deserialize(p, e));
+		mBossDeserializers.put(Masked_1.identityTag, (Plugin p, LivingEntity e) -> Masked_1.deserialize(p, e));
+		mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
+		mBossDeserializers.put(Virius.identityTag, (Plugin p, LivingEntity e) -> Virius.deserialize(p, e));
+		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
+	}
 
 	public BossManager(Plugin plugin)
 	{
 		mPlugin = plugin;
-		mBosses = new HashMap<UUID, Boss>();
+		mBosses = new HashMap<UUID, BossAbilityGroup>();
 
 		/* When starting up, look for bosses in all current world entities */
 		for (Entity entity : Bukkit.getWorlds().get(0).getEntities())
@@ -147,28 +147,28 @@ static
 			return false;
 		}
 
-		Boss boss = null;
+		BossAbilityGroup ability = null;
 		String requestedTag = args[0];
 
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
-			boss = stateless.construct(mPlugin, (LivingEntity)targetEntity);
+			ability = stateless.construct(mPlugin, (LivingEntity)targetEntity);
 		} else {
 			StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
 			if (stateful != null) {
-				boss = stateful.construct(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
+				ability = stateful.construct(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
 			}
 		}
 
-		if (boss == null) {
-			send.sendMessage(ChatColor.RED + "Invalid boss name!");
+		if (ability == null) {
+			send.sendMessage(ChatColor.RED + "Invalid boss tag!");
 			send.sendMessage(ChatColor.RED + "Valid options are: [" + String.join(",", mBossDeserializers.keySet()) + "]");
 			return false;
 		}
 
 		/* Set up boss health / armor / etc */
-		mBosses.put(targetEntity.getUniqueId(), boss);
-		boss.init();
+		mBosses.put(targetEntity.getUniqueId(), ability);
+		ability.init();
 
 		return true;
 	}
@@ -197,13 +197,12 @@ static
 		Set<String> tags = entity.getScoreboardTags();
 		if (tags != null && !tags.isEmpty())
 		{
-			Boss boss = null;
 			try
 			{
 				for (String tag : tags) {
 					BossDeserializer deserializer = mBossDeserializers.get(tag);
 					if (deserializer != null) {
-						boss = deserializer.deserialize(mPlugin, entity);
+						BossAbilityGroup ability = deserializer.deserialize(mPlugin, entity);
 						/* TODO
 						 *
 						 * Currently each boss can only have one boss ability. This is a fairly substantial limitation -
@@ -212,7 +211,7 @@ static
 						 * Fixing this will require rethinking how the boss is tracked (map of a list of Boss?) and
 						 * also figuring out it works if one of the Boss types has nonempty serialization data
 						 */
-						mBosses.put(entity.getUniqueId(), boss);
+						mBosses.put(entity.getUniqueId(), ability);
 						break;
 					}
 				}
@@ -238,7 +237,7 @@ static
 
 	public void unload(LivingEntity entity)
 	{
-		Boss boss = mBosses.get(entity.getUniqueId());
+		BossAbilityGroup boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
 			boss.unload();
@@ -267,7 +266,7 @@ static
 		if (!(entity instanceof LivingEntity))
 			return;
 
-		Boss boss = mBosses.get(entity.getUniqueId());
+		BossAbilityGroup boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
 			boss.death();
@@ -283,7 +282,7 @@ static
 
 	public void unloadAll()
 	{
-		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet())
+		for (Map.Entry<UUID, BossAbilityGroup> entry : mBosses.entrySet())
 			entry.getValue().unload();
 		mBosses.clear();
 	}

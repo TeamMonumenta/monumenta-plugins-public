@@ -7,14 +7,14 @@ import org.bukkit.entity.LivingEntity;
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.Plugin;
 
-public class GenericBoss extends Boss
+public class GenericBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_generic";
 	public static final int detectionRange = 40;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new GenericBoss(plugin, boss);
 	}

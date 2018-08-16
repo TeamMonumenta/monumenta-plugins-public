@@ -26,7 +26,7 @@ import com.playmonumenta.bossfights.spells.SpellMaskedSummonBlazes;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class Masked_2 extends Boss
+public class Masked_2 extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_masked_2";
 	public static final int detectionRange = 50;
@@ -35,7 +35,7 @@ public class Masked_2 extends Boss
 	Location mSpawnLoc;
 	Location mEndLoc;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		String content = SerializationUtils.retrieveDataFromEntity(boss);
 

@@ -34,7 +34,7 @@ import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class CAxtal extends Boss
+public class CAxtal extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_caxtal";
 	public static final int detectionRange = 110;
@@ -43,7 +43,7 @@ public class CAxtal extends Boss
 	Location mSpawnLoc;
 	Location mEndLoc;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		String content = SerializationUtils.retrieveDataFromEntity(boss);
 

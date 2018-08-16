@@ -16,7 +16,7 @@ import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public abstract class Boss
+public abstract class BossAbilityGroup
 {
 	Plugin mPlugin;
 	LivingEntity mBoss;

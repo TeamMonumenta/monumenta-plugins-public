@@ -14,14 +14,14 @@ import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 
-public class PulseLaserBoss extends Boss
+public class PulseLaserBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_pulselaser";
 	public static final int detectionRange = 30;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new PulseLaserBoss(plugin, boss);
 	}

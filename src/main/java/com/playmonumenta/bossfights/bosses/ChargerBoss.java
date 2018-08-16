@@ -8,14 +8,14 @@ import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellGenericCharge;
 
-public class ChargerBoss extends Boss
+public class ChargerBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_charger";
 	public static final int detectionRange = 20;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new ChargerBoss(plugin, boss);
 	}

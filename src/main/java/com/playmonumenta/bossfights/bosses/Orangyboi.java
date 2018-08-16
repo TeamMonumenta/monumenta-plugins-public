@@ -20,7 +20,7 @@ import com.playmonumenta.bossfights.spells.SpellGenericCharge;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class Orangyboi extends Boss
+public class Orangyboi extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_orangyboi";
 	public static final int detectionRange = 35;
@@ -29,7 +29,7 @@ public class Orangyboi extends Boss
 	Location mSpawnLoc;
 	Location mEndLoc;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		String content = SerializationUtils.retrieveDataFromEntity(boss);
 

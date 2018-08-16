@@ -15,14 +15,14 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class AuraLargeWeaknessBoss extends Boss
+public class AuraLargeWeaknessBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "WeaknessAura";
 	public static final int detectionRange = 50;
 
 	LivingEntity mBoss;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new AuraLargeWeaknessBoss(plugin, boss);
 	}

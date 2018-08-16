@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class InfestedBoss extends Boss
+public class InfestedBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "boss_infested";
 	public static final int detectionRange = 30;
@@ -22,7 +22,7 @@ public class InfestedBoss extends Boss
 	LivingEntity mBoss;
 	Plugin mPlugin;
 
-	public static Boss deserialize(Plugin plugin, LivingEntity boss) throws Exception
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
 	{
 		return new InfestedBoss(plugin, boss);
 	}
