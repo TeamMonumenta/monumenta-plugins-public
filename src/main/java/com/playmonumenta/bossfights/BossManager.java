@@ -30,7 +30,7 @@ import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 public class BossManager implements Listener, CommandExecutor
 {
 	Plugin mPlugin;
-	Map<UUID, BossAbilityGroup> mBosses;
+	Map<UUID, Boss> mBosses;
 
 	@FunctionalInterface
 	public interface StatelessBossConstructor
@@ -106,7 +106,7 @@ public class BossManager implements Listener, CommandExecutor
 	public BossManager(Plugin plugin)
 	{
 		mPlugin = plugin;
-		mBosses = new HashMap<UUID, BossAbilityGroup>();
+		mBosses = new HashMap<UUID, Boss>();
 
 		/* When starting up, look for bosses in all current world entities */
 		for (Entity entity : Bukkit.getWorlds().get(0).getEntities())
@@ -167,8 +167,16 @@ public class BossManager implements Listener, CommandExecutor
 		}
 
 		/* Set up boss health / armor / etc */
-		mBosses.put(targetEntity.getUniqueId(), ability);
 		ability.init();
+
+		Boss boss = mBosses.get(targetEntity.getUniqueId());
+		if (boss == null) {
+			boss = new Boss(ability);
+		} else {
+			boss.add(ability);
+		}
+
+		mBosses.put(targetEntity.getUniqueId(), boss);
 
 		return true;
 	}
@@ -199,19 +207,19 @@ public class BossManager implements Listener, CommandExecutor
 		{
 			try
 			{
+				Boss boss = null;
 				for (String tag : tags) {
 					BossDeserializer deserializer = mBossDeserializers.get(tag);
 					if (deserializer != null) {
 						BossAbilityGroup ability = deserializer.deserialize(mPlugin, entity);
-						/* TODO
-						 *
-						 * Currently each boss can only have one boss ability. This is a fairly substantial limitation -
-						 * For example having a boss bar AND a charge attack isn't currently possible.
-						 *
-						 * Fixing this will require rethinking how the boss is tracked (map of a list of Boss?) and
-						 * also figuring out it works if one of the Boss types has nonempty serialization data
-						 */
-						mBosses.put(entity.getUniqueId(), ability);
+
+						if (boss == null) {
+							boss = new Boss(ability);
+							mBosses.put(entity.getUniqueId(), boss);
+						} else {
+							boss.add(ability);
+						}
+
 						break;
 					}
 				}
@@ -237,7 +245,7 @@ public class BossManager implements Listener, CommandExecutor
 
 	public void unload(LivingEntity entity)
 	{
-		BossAbilityGroup boss = mBosses.get(entity.getUniqueId());
+		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
 			boss.unload();
@@ -266,7 +274,7 @@ public class BossManager implements Listener, CommandExecutor
 		if (!(entity instanceof LivingEntity))
 			return;
 
-		BossAbilityGroup boss = mBosses.get(entity.getUniqueId());
+		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null)
 		{
 			boss.death();
@@ -282,7 +290,7 @@ public class BossManager implements Listener, CommandExecutor
 
 	public void unloadAll()
 	{
-		for (Map.Entry<UUID, BossAbilityGroup> entry : mBosses.entrySet())
+		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet())
 			entry.getValue().unload();
 		mBosses.clear();
 	}
