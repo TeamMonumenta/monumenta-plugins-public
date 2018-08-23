@@ -150,47 +150,46 @@ public class WarriorClass extends BaseClass {
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 
-		//	BRUTE FORCE!!!
-		{
-			int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
-			if (bruteForce > 0) {
-				if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
-					if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand)) {
+		// The extra damage that will be applied to the hit damagee at the end of this function
+		double extraDamage = 0;
 
-						Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
-						ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
-						ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
-						List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
-						entities.add(damagee);
-						for(int i = 0; i < entities.size(); i++) {
-							Entity e = entities.get(i);
-							if(EntityUtils.isHostileMob(e)) {
-								LivingEntity mob = (LivingEntity)e;
+		// BRUTE FORCE
+		int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
+		if (bruteForce > 0 && PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE &&
+			(InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand))) {
 
-								Integer extraDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
-								EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
+			double bruteForceDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
+			extraDamage += bruteForceDamage;
 
-								MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
-							}
-						}
-					}
+			Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
+			ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
+			ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
+
+			// Get list of nearby hostile mobs (not including the hit mob!)
+			List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
+
+			// Damage those non-hit nearby entities and knock them away
+			for(Entity e : entities) {
+				if(e instanceof LivingEntity && EntityUtils.isHostileMob(e) && e != damagee) {
+					EntityUtils.damageEntity(mPlugin, (LivingEntity)e, bruteForceDamage, player);
+					MovementUtils.KnockAway(player, (LivingEntity)e, BRUTE_FORCE_KNOCKBACK_SPEED);
 				}
 			}
+
+			// Knock away just the hit entity
+			MovementUtils.KnockAway(player, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
 		}
 
-		if (InventoryUtils.isAxeItem(mainHand)) {
-			int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
-			if (weaponMastery > 0) {
-				int axeDamage = (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
-				EntityUtils.damageEntity(mPlugin, damagee, axeDamage, player);
-			}
+		// WEAPON MASTERY
+		int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
+		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
+			extraDamage += (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
+		} else if (InventoryUtils.isSwordItem(mainHand) && weaponMastery >= 2) {
+			extraDamage += WEAPON_MASTERY_SWORD_2_DAMAGE;
 		}
 
-		if (InventoryUtils.isSwordItem(mainHand)) {
-			int weaponMastery = ScoreboardUtils.getScoreboardValue(player, "WeaponMastery");
-			if (weaponMastery > 1) {
-				EntityUtils.damageEntity(mPlugin, damagee, WEAPON_MASTERY_SWORD_2_DAMAGE, player);
-			}
+		if (extraDamage > 0) {
+			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
 		}
 
 		return false;
