@@ -1,30 +1,38 @@
-package com.playmonumenta.plugins.commands;
+package com.playmonumenta.plugins.command.commands;
 
+import com.playmonumenta.plugins.command.AbstractCommand;
+import com.playmonumenta.plugins.command.CommandContext;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-public class UpdateApartments implements CommandExecutor {
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
-		if (arg3.length != 0) {
-			sender.sendMessage(ChatColor.RED + "Invalid number of parameters!");
-			return false;
-		}
+public class UpdateApartments extends AbstractCommand {
 
+    public UpdateApartments(Plugin plugin) {
+        super(
+            "updateApartments",
+            "Updates player apartment scores",
+            plugin
+        );
+    }
+
+    @Override
+    protected void configure(ArgumentParser parser) {
+    }
+
+    @Override
+    protected boolean run(CommandContext context) {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Objective aptObjective = scoreboard.getObjective("Apartment");
 		Objective aptIdleObjective = scoreboard.getObjective("AptIdle");
 
 		if (aptObjective == null) {
-			sender.sendMessage(ChatColor.RED + "Scoreboard 'Apartment' does not exist!");
+            sendErrorMessage(context,"Scoreboard 'Apartment' does not exist!");
 			return false;
 		} else if (aptIdleObjective == null) {
-			sender.sendMessage(ChatColor.RED + "Scoreboard 'AptIdle' does not exist!");
+            sendErrorMessage(context,"Scoreboard 'AptIdle' does not exist!");
 			return false;
 		}
 

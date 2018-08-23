@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.playmonumenta.plugins.command.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,27 +25,6 @@ import com.playmonumenta.plugins.classes.RogueClass;
 import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
-import com.playmonumenta.plugins.commands.Back;
-import com.playmonumenta.plugins.commands.BroadcastCommand;
-import com.playmonumenta.plugins.commands.CheckEmptyInventory;
-import com.playmonumenta.plugins.commands.ClearEffects;
-import com.playmonumenta.plugins.commands.DeathMsg;
-import com.playmonumenta.plugins.commands.DebugInfo;
-import com.playmonumenta.plugins.commands.Forward;
-import com.playmonumenta.plugins.commands.GetScore;
-import com.playmonumenta.plugins.commands.GiveSoulbound;
-import com.playmonumenta.plugins.commands.HopeifyHeldItem;
-import com.playmonumenta.plugins.commands.IncrementDaily;
-import com.playmonumenta.plugins.commands.MinusExp;
-import com.playmonumenta.plugins.commands.PlayTimeStats;
-import com.playmonumenta.plugins.commands.RefreshClassEffects;
-import com.playmonumenta.plugins.commands.RefreshPOITimerCommand;
-import com.playmonumenta.plugins.commands.RemoveTags;
-import com.playmonumenta.plugins.commands.TestNoScore;
-import com.playmonumenta.plugins.commands.TrackedEffect;
-import com.playmonumenta.plugins.commands.TransferScores;
-import com.playmonumenta.plugins.commands.TransferServer;
-import com.playmonumenta.plugins.commands.UpdateApartments;
 import com.playmonumenta.plugins.items.ItemOverrides;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.MobListener;
@@ -145,6 +125,16 @@ public class Plugin extends JavaPlugin {
 		mWorld = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
 
+        mPotionManager = new PotionManager(this);
+        mTrackingManager = new TrackingManager(this, mWorld);
+        mPOIManager = new POIManager(this);
+        mZoneManager = new ZoneManager(this);
+
+        //	Load info.
+        _loadConfig();
+        mPOIManager.loadAllPOIs();
+        mServerProperties.load(this);
+
 		//	TODO: Move this out of here and into it's own ClassManager class.
 		//	Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
@@ -173,45 +163,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
-		//	TODO: Move this out of here and into it's own CommandManager class.
-		//	Add some slash commands
-		if (Constants.COMMANDS_SERVER_ENABLED) {
-			getCommand("playTimeStats").setExecutor(new PlayTimeStats(mWorld));
-			getCommand("transferScores").setExecutor(new TransferScores());
-			getCommand("getScore").setExecutor(new GetScore());
-			getCommand("transferServer").setExecutor(new TransferServer(this));
-			getCommand("broadcastCommand").setExecutor(new BroadcastCommand(this));
-			getCommand("giveSoulbound").setExecutor(new GiveSoulbound(this));
-			getCommand("hopeifyHeldItem").setExecutor(new HopeifyHeldItem(this));
-			getCommand("checkEmptyInventory").setExecutor(new CheckEmptyInventory(this));
-			getCommand("debugInfo").setExecutor(new DebugInfo(this));
-			getCommand("clearEffects").setExecutor(new ClearEffects(this));
-			getCommand("removeTags").setExecutor(new RemoveTags(this));
-			getCommand("trackedEffect").setExecutor(new TrackedEffect(this));
-			getCommand("incrementDaily").setExecutor(new IncrementDaily(this));
-			getCommand("back").setExecutor(new Back(this));
-			getCommand("forward").setExecutor(new Forward(this));
-			getCommand("minusexp").setExecutor(new MinusExp(this));
-			getCommand("deathMsg").setExecutor(new DeathMsg(this));
-			getCommand("testNoScore").setExecutor(new TestNoScore());
-			getCommand("updateApartments").setExecutor(new UpdateApartments());
-		}
-		if (Constants.CLASSES_ENABLED) {
-			getCommand("refreshClassEffects").setExecutor(new RefreshClassEffects(this));
-		}
-		if (Constants.POIS_ENABLED) {
-			getCommand("refreshPOITimer").setExecutor(new RefreshPOITimerCommand(this));
-		}
-
-		mPotionManager = new PotionManager(this);
-		mTrackingManager = new TrackingManager(this, mWorld);
-		mPOIManager = new POIManager(this);
-		mZoneManager = new ZoneManager(this);
-
-		//	Load info.
-		_loadConfig();
-		mPOIManager.loadAllPOIs();
-		mServerProperties.load(this);
+        CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager, mPOIManager);
 
 		//	Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {

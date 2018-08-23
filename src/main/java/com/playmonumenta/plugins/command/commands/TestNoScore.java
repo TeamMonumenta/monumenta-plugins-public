@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.commands;
+package com.playmonumenta.plugins.command.commands;
 
 import java.util.HashMap;
 import java.util.Set;

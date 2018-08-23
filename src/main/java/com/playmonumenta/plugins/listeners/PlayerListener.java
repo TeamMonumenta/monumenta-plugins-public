@@ -388,7 +388,7 @@ public class PlayerListener implements Listener {
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
-		if (ScoreboardUtils.getScoreboardValue(player, "DeathMessage") != 0) {
+		if (ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE) != 0) {
 			player.sendMessage(event.getDeathMessage());
 			player.sendMessage(ChatColor.AQUA + "Only you saw this message. Change this with /deathmsg");
 			event.setDeathMessage("");
