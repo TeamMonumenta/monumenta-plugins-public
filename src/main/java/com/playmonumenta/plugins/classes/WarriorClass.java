@@ -54,9 +54,9 @@ public class WarriorClass extends BaseClass {
 	private static final double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	private static final Integer DEFENSIVE_LINE_DURATION = 10 * 20;
+	private static final Integer DEFENSIVE_LINE_DURATION = 14 * 20;
 	private static final float DEFENSIVE_LINE_RADIUS = 8.0f;
-	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 60 * 20;
+	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 50 * 20;
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
@@ -67,8 +67,8 @@ public class WarriorClass extends BaseClass {
 	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
 	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
-	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
-	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
+	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 5;
+	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 1.5;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);

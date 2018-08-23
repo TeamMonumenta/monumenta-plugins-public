@@ -77,7 +77,7 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
 	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 18 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 12 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
 	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
@@ -94,7 +94,7 @@ public class MageClass extends BaseClass {
 	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
 	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
-	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
+	private static final double ELEMENTAL_ARROWS_RADIUS = 4.0;
 
 	private static double PASSIVE_DAMAGE = 1.5;
 
@@ -164,7 +164,7 @@ public class MageClass extends BaseClass {
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				if (((offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW) || (mainHand.getType() == Material.SHIELD))
+				if (((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand)) || (mainHand.getType() == Material.SHIELD))
 						&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
@@ -337,6 +337,9 @@ public class MageClass extends BaseClass {
 							if (EntityUtils.isHostileMob(entity)) {
 								LivingEntity mob = (LivingEntity)entity;
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
+								if ((entity instanceof Blaze) && (entity != damagee)) {
+									EntityUtils.damageEntity(mPlugin, mob, 8, player);
+								}
 							}
 						}
 					}
