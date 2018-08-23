@@ -88,31 +88,31 @@ public class PlayerData {
 
 		JsonObject root = new JsonObject();
 
-		//	Add basic player information.
+		//  Add basic player information.
 		root.addProperty("saturation", player.getSaturation());
 		root.addProperty("food_level", player.getFoodLevel());
 		root.addProperty("level", player.getLevel());
 		root.addProperty("xp", player.getExp());
 
-		//	Save Player Potion Data
+		//  Save Player Potion Data
 		JsonObject potions = plugin.mPotionManager.getAsJsonObject(player);
 		if (potions != null) {
 			root.add("potion_info", potions);
 		}
 
-		//	Add Armor
+		//  Add Armor
 		root.addProperty("armor", InventoryUtils.itemStackArrayToBase64(player.getInventory().getArmorContents()));
 
-		//	Add Inventory.
+		//  Add Inventory.
 		root.addProperty("inventory", InventoryUtils.itemStackArrayToBase64(player.getInventory().getContents()));
 
-		//	Add Ender Chest.
+		//  Add Ender Chest.
 		root.addProperty("ender_chest", InventoryUtils.itemStackArrayToBase64(player.getEnderChest().getContents()));
 
-		//	Add Scoreboards and Tags for this player.
+		//  Add Scoreboards and Tags for this player.
 		root.add("scoreboards", ScoreboardUtils.getAsJsonObject(player));
 
-		//	Save the file.
+		//  Save the file.
 		String content = gson.toJson(root);
 
 		if (content == null || content.isEmpty()) {
@@ -220,46 +220,46 @@ public class PlayerData {
 
 		Gson gson = new Gson();
 
-		//	Load the file, if it exist than let's start parsing it.
+		//  Load the file, if it exist than let's start parsing it.
 		JsonObject object = gson.fromJson(content, JsonObject.class);
 
-		//	Set health to max
+		//  Set health to max
 		player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
-		//	Load Saturation.
+		//  Load Saturation.
 		JsonElement saturation = object.get("saturation");
 		if (saturation != null) {
 			player.setSaturation(saturation.getAsFloat());
 		}
 
-		//	Load Exhaustion.
+		//  Load Exhaustion.
 		JsonElement foodLevel = object.get("food_level");
 		if (foodLevel != null) {
 			player.setFoodLevel(foodLevel.getAsInt());
 		}
 
-		//	Load Level.
+		//  Load Level.
 		JsonElement level = object.get("level");
 		if (level != null) {
 			player.setLevel(level.getAsInt());
 		}
 
-		//	Load Experience.
+		//  Load Experience.
 		JsonElement xp = object.get("xp");
 		if (xp != null) {
 			player.setExp(xp.getAsFloat());
 		}
 
-		//	Load Player Potion Data.
+		//  Load Player Potion Data.
 		plugin.mPotionManager.loadFromJsonObject(player, object);
 
-		//	Load Armor.
+		//  Load Armor.
 		JsonElement armor = object.get("armor");
 		if (armor != null) {
 			player.getInventory().setArmorContents(InventoryUtils.itemStackArrayFromBase64(armor.getAsString()));
 		}
 
-		//	Load Inventory.
+		//  Load Inventory.
 		JsonElement inventory = object.get("inventory");
 		if (inventory != null) {
 			ItemStack[] inv = InventoryUtils.itemStackArrayFromBase64(inventory.getAsString());
@@ -268,7 +268,7 @@ public class PlayerData {
 			}
 		}
 
-		//	Load Ender Chest.
+		//  Load Ender Chest.
 		JsonElement ender = object.get("ender_chest");
 		if (ender != null) {
 			ItemStack[] inv = InventoryUtils.itemStackArrayFromBase64(ender.getAsString());
@@ -277,7 +277,7 @@ public class PlayerData {
 			}
 		}
 
-		//	Load Scoreboards and Tags
+		//  Load Scoreboards and Tags
 		ScoreboardUtils.loadFromJsonObject(player, object.getAsJsonObject("scoreboards"));
 	}
 }

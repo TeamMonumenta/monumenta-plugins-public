@@ -35,15 +35,15 @@ public class AreaBounds {
 	}
 
 	public boolean within(Point point) {
-		return	point.mX >= mLowerCorner.mX && point.mX <= mUpperCorner.mX &&
-				point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
-				point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
+		return  point.mX >= mLowerCorner.mX && point.mX <= mUpperCorner.mX &&
+		        point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
+		        point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
 	}
 
 	public boolean within(Location loc) {
-		return	loc.getX() >= mLowerCorner.mX && loc.getX() <= mUpperCorner.mX &&
-				loc.getY() >= mLowerCorner.mY && loc.getY() <= mUpperCorner.mY &&
-				loc.getZ() >= mLowerCorner.mZ && loc.getZ() <= mUpperCorner.mZ;
+		return  loc.getX() >= mLowerCorner.mX && loc.getX() <= mUpperCorner.mX &&
+		        loc.getY() >= mLowerCorner.mY && loc.getY() <= mUpperCorner.mY &&
+		        loc.getZ() >= mLowerCorner.mZ && loc.getZ() <= mUpperCorner.mZ;
 	}
 
 	public String getName() {
@@ -57,6 +57,6 @@ public class AreaBounds {
 	@Override
 	public String toString() {
 		return "{" + mName + ", " + mType.toString() + ", " +
-			mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";
+		       mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";
 	}
 }

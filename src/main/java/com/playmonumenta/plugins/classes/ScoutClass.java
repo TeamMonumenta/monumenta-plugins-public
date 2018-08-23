@@ -65,7 +65,7 @@ public class ScoutClass extends BaseClass {
 
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
-	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;	//Was 30
+	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;  //Was 30
 	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; //20%
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; //35%
 	private static final int EAGLE_EYE_RADIUS = 20;
@@ -134,7 +134,7 @@ public class ScoutClass extends BaseClass {
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
 		List<Projectile> projectiles;
 
-	// PASSIVE : 25% chance of not consuming an arrow
+		// PASSIVE : 25% chance of not consuming an arrow
 		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -259,7 +259,7 @@ public class ScoutClass extends BaseClass {
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.STANDARD_BEARER, STANDARD_BEARER_COOLDOWN);
 
 					Location L = player.getLocation();
-					while(L.getBlock().getType() != Material.AIR){
+					while (L.getBlock().getType() != Material.AIR) {
 						L.add(0, 0.25, 0);
 					}
 

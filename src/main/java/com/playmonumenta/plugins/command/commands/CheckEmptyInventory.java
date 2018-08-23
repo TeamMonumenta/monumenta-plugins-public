@@ -10,27 +10,29 @@ import org.bukkit.plugin.Plugin;
 
 public class CheckEmptyInventory extends AbstractPlayerCommand {
 
-    public CheckEmptyInventory(Plugin plugin) {
-        super(
-            "checkEmptyInventory",
-            "Return success if the player's inventory is empty, fails otherwise",
-            plugin
-        );
-    }
+	public CheckEmptyInventory(Plugin plugin) {
+		super(
+		    "checkEmptyInventory",
+		    "Return success if the player's inventory is empty, fails otherwise",
+		    plugin
+		);
+	}
 
-    @Override
-    protected void configure(final ArgumentParser parser) {
-    }
+	@Override
+	protected void configure(final ArgumentParser parser) {
+	}
 
-    @Override
-    protected boolean run(final CommandContext context) {
-        //noinspection OptionalGetWithoutIsPresent - checked before being called
-        final Player player = context.getPlayer().get();
+	@Override
+	protected boolean run(final CommandContext context) {
+		//noinspection OptionalGetWithoutIsPresent - checked before being called
+		final Player player = context.getPlayer().get();
 
-        for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null) return false;
-        }
+		for (ItemStack item : player.getInventory().getContents()) {
+			if (item != null) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

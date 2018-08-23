@@ -32,13 +32,13 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 
 /*
-	CounterStrike
-	Frenzy
-	Riposte				[formerly Obliteration]
-	DefensiveLine
-	BruteForce
-	Toughness
-	WeaponMastery
+    CounterStrike
+    Frenzy
+    Riposte             [formerly Obliteration]
+    DefensiveLine
+    BruteForce
+    Toughness
+    WeaponMastery
 */
 
 public class WarriorClass extends BaseClass {
@@ -51,7 +51,7 @@ public class WarriorClass extends BaseClass {
 	private static final int RIPOSTE_SWORD_DURATION = 5 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
 	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
-	private static final double RIPOSTE_SQRADIUS = 6.25;	//radius = 2.5, this is it squared
+	private static final double RIPOSTE_SQRADIUS = 6.25;    //radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
 	private static final Integer DEFENSIVE_LINE_DURATION = 14 * 20;
@@ -84,9 +84,9 @@ public class WarriorClass extends BaseClass {
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
 		if (!(damager instanceof Player)) {
-			//	ABILITY: Counter Strike
+			//  ABILITY: Counter Strike
 			{
-				//	If we're not going to succeed in our Random we probably don't want to attempt to grab the scoreboard value anyways.
+				//  If we're not going to succeed in our Random we probably don't want to attempt to grab the scoreboard value anyways.
 				if (mRandom.nextFloat() < 0.15f) {
 					int counterStrike = ScoreboardUtils.getScoreboardValue(player, "CounterStrike");
 					if (counterStrike > 0) {
@@ -97,9 +97,9 @@ public class WarriorClass extends BaseClass {
 						double csDamage = counterStrike == 1 ? 12D : 24D;
 
 						List<Entity> entities = player.getNearbyEntities(COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS);
-						for(int i = 0; i < entities.size(); i++) {
+						for (int i = 0; i < entities.size(); i++) {
 							Entity e = entities.get(i);
-							if(EntityUtils.isHostileMob(e)) {
+							if (EntityUtils.isHostileMob(e)) {
 								EntityUtils.damageEntity(mPlugin, (LivingEntity)e, csDamage, player);
 							}
 						}
@@ -124,8 +124,7 @@ public class WarriorClass extends BaseClass {
 									if (riposte > 1) {
 										if (InventoryUtils.isSwordItem(mainHand)) {
 											player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
-										}
-										else if (InventoryUtils.isAxeItem(mainHand)) {
+										} else if (InventoryUtils.isAxeItem(mainHand)) {
 											damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
 										}
 									}
@@ -156,7 +155,7 @@ public class WarriorClass extends BaseClass {
 		// BRUTE FORCE
 		int bruteForce = ScoreboardUtils.getScoreboardValue(player, "BruteForce");
 		if (bruteForce > 0 && PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE &&
-			(InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand))) {
+		    (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand))) {
 
 			double bruteForceDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
 			extraDamage += bruteForceDamage;
@@ -169,8 +168,8 @@ public class WarriorClass extends BaseClass {
 			List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
 
 			// Damage those non-hit nearby entities and knock them away
-			for(Entity e : entities) {
-				if(e instanceof LivingEntity && EntityUtils.isHostileMob(e) && e != damagee) {
+			for (Entity e : entities) {
+				if (e instanceof LivingEntity && EntityUtils.isHostileMob(e) && e != damagee) {
 					EntityUtils.damageEntity(mPlugin, (LivingEntity)e, bruteForceDamage, player);
 					MovementUtils.KnockAway(player, (LivingEntity)e, BRUTE_FORCE_KNOCKBACK_SPEED);
 				}
@@ -232,9 +231,9 @@ public class WarriorClass extends BaseClass {
 
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		//	Defensive Line
+		//  Defensive Line
 		{
-			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
+			//  If we're sneaking and we block with a shield we can attempt to trigger the ability.
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -274,7 +273,7 @@ public class WarriorClass extends BaseClass {
 		if (weaponMastery > 0) {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
-			//	Player has an sword in their mainHand.
+			//  Player has an sword in their mainHand.
 			if (InventoryUtils.isSwordItem(mainHand)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 			}

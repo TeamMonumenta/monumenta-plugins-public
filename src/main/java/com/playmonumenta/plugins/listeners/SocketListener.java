@@ -20,7 +20,7 @@ public class SocketListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onConnect(BukkitSocketHandshakeEvent e){
+	public void onConnect(BukkitSocketHandshakeEvent e) {
 		mPlugin.mSocketClient = e.getClient();
 
 		/* This deferred task helps work around a bug in Socket4MC/SocketAPI
@@ -51,7 +51,7 @@ public class SocketListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onMessage(BukkitSocketJSONEvent e){
+	public void onMessage(BukkitSocketJSONEvent e) {
 		String channel = e.getChannel();
 		String data = e.getData();
 

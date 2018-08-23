@@ -9,31 +9,31 @@ import org.bukkit.plugin.Plugin;
 public class MinusExp extends AbstractPlayerCommand {
 
 	public MinusExp(Plugin plugin) {
-        super(
-            "minusexp",
-            "Subtracts an equivalent amount of levels worth of experience",
-            plugin
-        );
+		super(
+		    "minusexp",
+		    "Subtracts an equivalent amount of levels worth of experience",
+		    plugin
+		);
 	}
 
-    /**
-     * /minusexp <levels>
-     *
-     * @param parser the {@link ArgumentParser} specific to the command
-     */
-    @Override
-    protected void configure(ArgumentParser parser) {
-        parser.addArgument("levels")
-            .help("number of levels to subtract")
-            .type(Integer.class)
-            .nargs("?");
-    }
+	/**
+	 * /minusexp <levels>
+	 *
+	 * @param parser the {@link ArgumentParser} specific to the command
+	 */
+	@Override
+	protected void configure(ArgumentParser parser) {
+		parser.addArgument("levels")
+		.help("number of levels to subtract")
+		.type(Integer.class)
+		.nargs("?");
+	}
 
-    @Override
-    protected boolean run(CommandContext context) {
-        //noinspection OptionalGetWithoutIsPresent - checked before being called
-        final Player player = context.getPlayer().get();
-        final Integer levels = context.getNamespace().getInt("levels");
+	@Override
+	protected boolean run(CommandContext context) {
+		//noinspection OptionalGetWithoutIsPresent - checked before being called
+		final Player player = context.getPlayer().get();
+		final Integer levels = context.getNamespace().getInt("levels");
 
 		_setTotalExp(player, _getTotalExp(player) - _levelToExp(levels));
 

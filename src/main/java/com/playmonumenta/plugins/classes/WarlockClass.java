@@ -30,13 +30,13 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
-	AmplifyingHex
-	Blasphemy
-	CursedWound
-	GraspingClaws
-	SoulRend
-	VersatileMagic
-	ConsumingFlame
+    AmplifyingHex
+    Blasphemy
+    CursedWound
+    GraspingClaws
+    SoulRend
+    VersatileMagic
+    ConsumingFlame
 */
 
 public class WarlockClass extends BaseClass {
@@ -49,13 +49,13 @@ public class WarlockClass extends BaseClass {
 	private static final float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
 
 	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
-			PotionEffectType.WITHER,
-			PotionEffectType.SLOW,
-	        PotionEffectType.WEAKNESS,
-	        PotionEffectType.SLOW_DIGGING,
-	        PotionEffectType.POISON,
-	        PotionEffectType.UNLUCK
-	);
+	                                                          PotionEffectType.WITHER,
+	                                                          PotionEffectType.SLOW,
+	                                                          PotionEffectType.WEAKNESS,
+	                                                          PotionEffectType.SLOW_DIGGING,
+	                                                          PotionEffectType.POISON,
+	                                                          PotionEffectType.UNLUCK
+	                                                      );
 
 	private static final int BLASPHEMY_RADIUS = 3;
 	private static final float BLASPHEMY_KNOCKBACK_SPEED = 0.3f;
@@ -312,8 +312,8 @@ public class WarlockClass extends BaseClass {
 									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 									if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
 										int debuffCount = (int)DEBUFFS.stream()
-												.filter(effect -> (mob.getPotionEffect(effect) != null))
-												.count();
+										                  .filter(effect -> (mob.getPotionEffect(effect) != null))
+										                  .count();
 										int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
 										if (consumingFlames > 1 && mob.getFireTicks() > 0) {
 											debuffCount++;

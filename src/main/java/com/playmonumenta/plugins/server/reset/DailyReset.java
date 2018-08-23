@@ -10,10 +10,10 @@ public class DailyReset {
 	public static void handle(Plugin plugin, Player player) {
 		if (plugin.mServerProperties.getDailyResetEnabled()) {
 			if (player != null) {
-				//	Test to see if the player's Daily version is different than the servers.
+				//  Test to see if the player's Daily version is different than the servers.
 				int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion");
 				if (dailyVersion != plugin.mDailyQuestVersion) {
-					//	If so reset some scoreboards and message the player.
+					//  If so reset some scoreboards and message the player.
 					ScoreboardUtils.setScoreboardValue(player, "DailyVersion", plugin.mDailyQuestVersion);
 
 					ScoreboardUtils.setScoreboardValue(player, "DailyQuest", 0);

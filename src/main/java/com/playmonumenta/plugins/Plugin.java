@@ -54,7 +54,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Plugin extends JavaPlugin {
-	//	TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?
+	//  TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?
 	public enum Classes {
 		NONE(0),
 		MAGE(1),
@@ -65,11 +65,15 @@ public class Plugin extends JavaPlugin {
 		SCOUT(6),
 		WARLOCK(7),
 
-		COUNT (7);	//	Please update when new classes are added!
+		COUNT(7);   //  Please update when new classes are added!
 
 		private int value;
-		private Classes(int value)	{	this.value = value;	}
-		public int getValue()		{	return this.value;	}
+		private Classes(int value)  {
+			this.value = value;
+		}
+		public int getValue()       {
+			return this.value;
+		}
 	}
 
 	public enum Times {
@@ -80,8 +84,12 @@ public class Plugin extends JavaPlugin {
 		ONE_TWENTY(120);
 
 		private int value;
-		private Times(int value)	{	this.value = value;	}
-		public int getValue()		{	return this.value;	}
+		private Times(int value)    {
+			this.value = value;
+		}
+		public int getValue()       {
+			return this.value;
+		}
 	}
 
 	public HashMap<Integer, BaseClass> mClassMap = new HashMap<Integer, BaseClass>();
@@ -109,14 +117,14 @@ public class Plugin extends JavaPlugin {
 
 	public World mWorld;
 
-	//	Logic that is performed upon enabling the plugin.
+	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
 		PluginManager manager = getServer().getPluginManager();
 
 		mItemOverrides = new ItemOverrides();
 
-		//	Initialize Variables.
+		//  Initialize Variables.
 		mRandom = new Random();
 		mTimers = new CooldownTimers(this);
 		mPulseEffectTimers = new PulseEffectTimers(this);
@@ -125,18 +133,18 @@ public class Plugin extends JavaPlugin {
 		mWorld = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
 
-        mPotionManager = new PotionManager(this);
-        mTrackingManager = new TrackingManager(this, mWorld);
-        mPOIManager = new POIManager(this);
-        mZoneManager = new ZoneManager(this);
+		mPotionManager = new PotionManager(this);
+		mTrackingManager = new TrackingManager(this, mWorld);
+		mPOIManager = new POIManager(this);
+		mZoneManager = new ZoneManager(this);
 
-        //	Load info.
-        _loadConfig();
-        mPOIManager.loadAllPOIs();
-        mServerProperties.load(this);
+		//  Load info.
+		_loadConfig();
+		mPOIManager.loadAllPOIs();
+		mServerProperties.load(this);
 
-		//	TODO: Move this out of here and into it's own ClassManager class.
-		//	Initialize Classes.
+		//  TODO: Move this out of here and into it's own ClassManager class.
+		//  Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom));
 		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom));
@@ -155,7 +163,7 @@ public class Plugin extends JavaPlugin {
 		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom));
 		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom));
 
-		//	TODO: Move this out of here and into it's own EventManager class.
+		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
@@ -163,9 +171,9 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
-        CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager, mPOIManager);
+		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager, mPOIManager);
 
-		//	Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
+		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int ticks = 0;
 
@@ -179,10 +187,10 @@ public class Plugin extends JavaPlugin {
 				// FREQUENCY ANARCHY HAPPENING UP IN HERE
 
 				if (twoHertz) {
-					//	Update cooldowns.
+					//  Update cooldowns.
 					mTimers.UpdateCooldowns(Constants.HALF_TICKS_PER_SECOND);
 
-					//	Update periodic timers.
+					//  Update periodic timers.
 					mPeriodicTimer++;
 
 					final boolean one = (ticks % 20 == 0); //(mPeriodicTimer % Times.ONE.getValue()) == 0;
@@ -190,7 +198,7 @@ public class Plugin extends JavaPlugin {
 					final boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
-					for(Player player : mTrackingManager.mPlayers.getPlayers()) {
+					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						BaseClass pClass = Plugin.this.getClass(player);
 						pClass.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 					}
@@ -198,7 +206,7 @@ public class Plugin extends JavaPlugin {
 					mPeriodicTimer %= Times.ONE_TWENTY.getValue();
 				}
 
-				//	4 times a second.
+				//  4 times a second.
 				if (fourHertz) {
 					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
@@ -206,9 +214,9 @@ public class Plugin extends JavaPlugin {
 					mPulseEffectTimers.Update(Constants.QUARTER_TICKS_PER_SECOND);
 				}
 
-				//	Every tick.
+				//  Every tick.
 				if (twentyHertz) {
-					//	Update cooldowns.
+					//  Update cooldowns.
 					mProjectileEffectTimers.update();
 				}
 
@@ -217,14 +225,14 @@ public class Plugin extends JavaPlugin {
 		}, 0L, 1L);
 	}
 
-	//	Logic that is performed upon disabling the plugin.
+	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
 
 		mTrackingManager.unloadTrackedEntities();
 
-		//	Save info.
+		//  Save info.
 		mPOIManager.saveAllPOIs();
 
 		MetadataUtils.removeAllMetadata(this);
@@ -234,7 +242,7 @@ public class Plugin extends JavaPlugin {
 		return getServer().getPlayer(playerID);
 	}
 
-	//	TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
+	//  TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
 	public BaseClass getClass(Player player) {
 		if (Constants.CLASSES_ENABLED) {
 			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
@@ -243,7 +251,7 @@ public class Plugin extends JavaPlugin {
 			}
 		}
 
-		//	We Seem to be missing a class.
+		//  We Seem to be missing a class.
 		return mClassMap.get(Classes.NONE.getValue());
 	}
 
@@ -255,7 +263,7 @@ public class Plugin extends JavaPlugin {
 			}
 		}
 
-		//	We Seem to be missing a class.
+		//  We Seem to be missing a class.
 		return mSpecializationMap.get(0);
 	}
 

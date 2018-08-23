@@ -88,6 +88,6 @@ public class Point {
 
 	public String toString() {
 		return "(" + Double.toString(mX) + ", " +
-			Double.toString(mY) + ", " + Double.toString(mZ) + ")";
+		       Double.toString(mY) + ", " + Double.toString(mZ) + ")";
 	}
 }

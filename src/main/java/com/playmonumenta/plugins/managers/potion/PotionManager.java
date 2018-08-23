@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
 	Plugin mPlugin = null;
-	//	Player ID / Player Potion Info
+	//  Player ID / Player Potion Info
 	public HashMap<UUID, PlayerPotionInfo> mPotionManager;
 
 	public enum PotionID {
@@ -32,9 +32,16 @@ public class PotionManager {
 
 		private int value;
 		private String name;
-		private PotionID(int value, String name)	{	this.value = value;	this.name = name;	}
-		public int getValue()		{	return value;	}
-		public String getName()		{	return name;	}
+		private PotionID(int value, String name)    {
+			this.value = value;
+			this.name = name;
+		}
+		public int getValue()       {
+			return value;
+		}
+		public String getName()     {
+			return name;
+		}
 
 		public static PotionID getFromString(String name) {
 			if (name.equals(PotionID.APPLIED_POTION.getName())) {
@@ -71,7 +78,7 @@ public class PotionManager {
 
 	public void addPotion(Player player, PotionID id, PotionEffect effect, double intensity) {
 		addPotion(player, id, new PotionInfo(effect.getType(), (int)(((double)effect.getDuration()) * intensity),
-											 effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()));
+		                                     effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()));
 	}
 
 	public void addPotion(Player player, PotionID id, PotionEffect effect) {
@@ -81,8 +88,8 @@ public class PotionManager {
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
 		// Instant potions do not need to be tracked
 		if (Constants.POTION_MANAGER_ENABLED
-			&& !info.type.equals(PotionEffectType.HARM)
-			&& !info.type.equals(PotionEffectType.HEAL)) {
+		    && !info.type.equals(PotionEffectType.HARM)
+		    && !info.type.equals(PotionEffectType.HEAL)) {
 
 			UUID uuid = player.getUniqueId();
 			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
@@ -134,15 +141,15 @@ public class PotionManager {
 	}
 
 	public void refreshClassEffects(Player player) {
-		//	We can just get rid of the ABILITY_SELF, it's useless to us as it's possibly unreliable and we want
-		//	to refresh the timers on those that should be applied anyways.
+		//  We can just get rid of the ABILITY_SELF, it's useless to us as it's possibly unreliable and we want
+		//  to refresh the timers on those that should be applied anyways.
 		clearPotionIDType(player, PotionID.ABILITY_SELF);
 
-		//	Next we want to get this players class and call into an initialization function to make sure they have the correct potion
-		//	effect types applied.
+		//  Next we want to get this players class and call into an initialization function to make sure they have the correct potion
+		//  effect types applied.
 		mPlugin.getClass(player).setupClassPotionEffects(player);
 
-		//	Once all the potion stuff is setup apply the best effects.
+		//  Once all the potion stuff is setup apply the best effects.
 		applyBestPotionEffect(player);
 	}
 

@@ -264,7 +264,7 @@ public class RogueClass extends BaseClass {
 									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
 									                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
 									int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
-					                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
+									                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
 
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, slownessLevel, false, true));
@@ -274,7 +274,7 @@ public class RogueClass extends BaseClass {
 
 						Location loc = player.getLocation();
 						World world = player.getWorld();
-						ParticleEffect.SMOKE_LARGE.display(2.5f, 0.8f, 2.5f, 0.05f, 300, loc.clone().add(0,1,0), 40);
+						ParticleEffect.SMOKE_LARGE.display(2.5f, 0.8f, 2.5f, 0.05f, 300, loc.clone().add(0, 1, 0), 40);
 						ParticleEffect.SMOKE_NORMAL.display(2.5f, 0.2f, 2.5f, 0.1f, 600, loc, 40);
 						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
 
@@ -465,7 +465,7 @@ public class RogueClass extends BaseClass {
 			if (EntityUtils.isElite(killedEntity)) {
 				mPlugin.mTimers.removeAllCooldowns(player.getUniqueId());
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,	new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
 				if (viciousCombos > 1) {
 					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE);
@@ -482,8 +482,7 @@ public class RogueClass extends BaseClass {
 				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
 				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-			}
-			else if (EntityUtils.isHostileMob(killedEntity)) {
+			} else if (EntityUtils.isHostileMob(killedEntity)) {
 				int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 				mPlugin.mTimers.UpdateCooldowns(timeReduction);
 
@@ -507,7 +506,7 @@ public class RogueClass extends BaseClass {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-			//  This test if the damagee is an instance of a Elite.
+				//  This test if the damagee is an instance of a Elite.
 				if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {
 					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
 				} else if (damagee instanceof LivingEntity && EntityUtils.isBoss(event.getEntity())) {

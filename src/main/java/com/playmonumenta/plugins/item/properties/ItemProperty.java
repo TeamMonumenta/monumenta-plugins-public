@@ -24,7 +24,7 @@ public interface ItemProperty {
 	/*
 	 * Describes which slots this property is valid in
 	 */
-	default public EnumSet<ItemSlot> validSlots() {
+default public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.noneOf(ItemSlot.class);
 	}
 
@@ -32,7 +32,7 @@ public interface ItemProperty {
 	 * Computes what level the given item is for this particular ItemProperty.
 	 * If the item does not have this property, it should return 0
 	 */
-	default public int getLevelFromItem(ItemStack item) {
+default public int getLevelFromItem(ItemStack item) {
 		return InventoryUtils.getCustomEnchantLevel(item, getProperty());
 	}
 
@@ -40,7 +40,7 @@ public interface ItemProperty {
 	 * applyProperty will be called every time the player changes their inventory
 	 * and the player matches this ItemProperty
 	 */
-	default public void applyProperty(Plugin plugin, Player player, int level) { }
+default public void applyProperty(Plugin plugin, Player player, int level) { }
 
 	/*
 	 * removeProperty will be called every time the player changes their inventory
@@ -50,21 +50,21 @@ public interface ItemProperty {
 	 * TODO: Modify this so it is only called when the item effect should actually
 	 * be removed
 	 */
-	default public void removeProperty(Plugin plugin, Player player) { }
+default public void removeProperty(Plugin plugin, Player player) { }
 
 
 	/* This method will be called once per second */
-	default public void tick(Plugin plugin, World world, Player player, int level) { }
+default public void tick(Plugin plugin, World world, Player player, int level) { }
 
 	/*
 	 * The onAttack() method will be called whenever the player damages something while
 	 * they have any levels of this property
 	 */
-	default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
 		return damage;
 	}
 
-	default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
+default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
 		return event.getDamage();
 	}
 
@@ -73,10 +73,10 @@ public interface ItemProperty {
 	 *
 	 * IMPORTANT - To use this, you must also override hasOnSpawn() to return true
 	 */
-	default public boolean hasOnSpawn() {
+default public boolean hasOnSpawn() {
 		return false;
 	}
-	default public void onSpawn(Plugin plugin, Item item, int level) { }
+default public void onSpawn(Plugin plugin, Item item, int level) { }
 
 	/*
 	 * TODO: Add an onRightClick() method so you can make items that cast spells

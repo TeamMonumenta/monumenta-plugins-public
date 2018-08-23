@@ -31,10 +31,10 @@ public class BroadcastCommandPacket implements Packet {
 		}
 
 		if (plugin.mServerProperties.getBroadcastCommandEnabled() == true
-			|| rcvStrings[0].startsWith("say")
-			|| rcvStrings[0].startsWith("msg")
-			|| rcvStrings[0].startsWith("tell")
-			|| rcvStrings[0].startsWith("tellraw")) {
+		    || rcvStrings[0].startsWith("say")
+		    || rcvStrings[0].startsWith("msg")
+		    || rcvStrings[0].startsWith("tell")
+		    || rcvStrings[0].startsWith("tellraw")) {
 
 			plugin.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]);

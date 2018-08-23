@@ -19,8 +19,8 @@ public class NetworkUtils {
 
 	public static void sendPlayer(Plugin plugin, String playerName, UUID playerUUID, String server) throws Exception {
 		PacketUtils.SendPacket(plugin, new SendPlayerPacket(server,
-															playerName,
-															playerUUID));
+		                                                    playerName,
+		                                                    playerUUID));
 
 		// Success, print transfer message request to log
 		plugin.getLogger().info("Requested bungeecord transfer " + playerName + " to " + server);
@@ -28,9 +28,9 @@ public class NetworkUtils {
 
 	public static void transferPlayerData(Plugin plugin, Player player, String server) throws Exception {
 		PacketUtils.SendPacket(plugin, new TransferPlayerDataPacket(server,
-																    player.getName(),
-																    player.getUniqueId(),
-																    PlayerData.convertToString(plugin, player)));
+		                                                            player.getName(),
+		                                                            player.getUniqueId(),
+		                                                            PlayerData.convertToString(plugin, player)));
 	}
 
 	public static void getServerList(Plugin plugin, Player player) throws Exception {

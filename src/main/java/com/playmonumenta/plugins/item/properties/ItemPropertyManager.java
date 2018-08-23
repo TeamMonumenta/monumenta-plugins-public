@@ -34,7 +34,7 @@ public class ItemPropertyManager {
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
 	private static Map<ItemSlot, List<ItemProperty>> mProperties
-		= new EnumMap<ItemSlot, List<ItemProperty>>(ItemSlot.class);
+	    = new EnumMap<ItemSlot, List<ItemProperty>>(ItemSlot.class);
 	private static List<ItemProperty> mSpawnedProperties = new ArrayList<ItemProperty>();
 
 	//  Static list of Item Properties.

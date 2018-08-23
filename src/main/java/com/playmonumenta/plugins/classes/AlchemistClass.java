@@ -101,7 +101,7 @@ public class AlchemistClass extends BaseClass {
 	private static final int POWER_INJECTION_DURATION = 20 * 20;
 	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
 
-	//	[Rock]: This is bad and could work incorrectly if there are multiple alchemist playing at the same time. :( Please fix me!
+	//  [Rock]: This is bad and could work incorrectly if there are multiple alchemist playing at the same time. :( Please fix me!
 	Arrow mBlinkArrow = null;
 	Arrow mUnstableArrow = null;
 
@@ -196,8 +196,8 @@ public class AlchemistClass extends BaseClass {
 		meta.setColor(Color.WHITE);
 		meta.setDisplayName(ChatColor.AQUA + "Alchemist's Potion");
 		List<String> lore = Arrays.asList(new String[] {
-			ChatColor.GRAY + "A unique potion for Alchemists",
-		});
+		                                      ChatColor.GRAY + "A unique potion for Alchemists",
+		                                  });
 		meta.setLore(lore);
 		stack.setItemMeta(meta);
 		return stack;
@@ -286,7 +286,7 @@ public class AlchemistClass extends BaseClass {
 	}
 
 
-	//	IRON TINCTURE
+	//  IRON TINCTURE
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (player.isSneaking()) {
@@ -295,9 +295,9 @@ public class AlchemistClass extends BaseClass {
 				if (ironTincture > 0) {
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (mainHand == null ||
-							(!InventoryUtils.isBowItem(mainHand)
-							 && mainHand.getType() != Material.SPLASH_POTION
-							 && mainHand.getType() != Material.LINGERING_POTION)) {
+					    (!InventoryUtils.isBowItem(mainHand)
+					     && mainHand.getType() != Material.SPLASH_POTION
+					     && mainHand.getType() != Material.LINGERING_POTION)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
 							Location loc = player.getLocation().add(0, 1.8, 0);
 							ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);

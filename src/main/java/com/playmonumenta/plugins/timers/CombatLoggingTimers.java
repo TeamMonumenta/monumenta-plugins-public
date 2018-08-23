@@ -17,32 +17,32 @@ import java.util.UUID;
 //	timers for players in the future with this.
 public class CombatLoggingTimers {
 	public HashMap<UUID, Integer> mTimers = null;
-	
+
 	public CombatLoggingTimers() {
 		mTimers = new HashMap<UUID, Integer>();
 	}
-	
+
 	public void addTimer(UUID entityUUID, int time) {
 		mTimers.put(entityUUID, time);
 	}
-	
+
 	public Integer getTimer(UUID entityUUID) {
 		if (mTimers.containsKey(entityUUID)) {
 			return mTimers.get(entityUUID);
 		}
-		
+
 		return -1;
 	}
-	
+
 	public void removeTimer(UUID entityUUID) {
 		mTimers.remove(entityUUID);
 	}
-	
+
 	public void update(World world, Integer ticks) {
 		Iterator<Entry<UUID, Integer>> iter = mTimers.entrySet().iterator();
 		while (iter.hasNext()) {
 			Entry<UUID, Integer> entityEntry = iter.next();
-			
+
 			int oldTimer = entityEntry.getValue();
 			if (oldTimer > 0) {
 				int newTimer = oldTimer - ticks;
@@ -53,12 +53,12 @@ public class CombatLoggingTimers {
 					if (entity != null) {
 						if (entity instanceof Monster) {
 							Monster mob = (Monster)entity;
-							
+
 							Set<String> tags = mob.getScoreboardTags();
 							if (!tags.contains("Elite") && !tags.contains("Boss")) {
 								mob.setRemoveWhenFarAway(true);
 							}
-							
+
 							iter.remove();
 						}
 					} else {

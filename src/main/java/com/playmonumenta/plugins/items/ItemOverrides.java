@@ -23,27 +23,27 @@ public class ItemOverrides {
 	 * players in survival even if they have lore text
 	 */
 	public static EnumSet<Material> ALLOW_LORE_MATS = EnumSet.of(
-		Material.ANVIL,
-		Material.CHEST,
-		Material.BANNER,
-		Material.ENDER_CHEST,
-		Material.PACKED_ICE,
-		Material.WOOL,
+	                                                      Material.ANVIL,
+	                                                      Material.CHEST,
+	                                                      Material.BANNER,
+	                                                      Material.ENDER_CHEST,
+	                                                      Material.PACKED_ICE,
+	                                                      Material.WOOL,
 
-		Material.WOOD_HOE,
-		Material.STONE_HOE,
-		Material.GOLD_HOE,
-		Material.IRON_HOE,
-		Material.DIAMOND_HOE,
+	                                                      Material.WOOD_HOE,
+	                                                      Material.STONE_HOE,
+	                                                      Material.GOLD_HOE,
+	                                                      Material.IRON_HOE,
+	                                                      Material.DIAMOND_HOE,
 
-		Material.WOOD_SPADE,
-		Material.STONE_SPADE,
-		Material.GOLD_SPADE,
-		Material.IRON_SPADE,
-		Material.DIAMOND_SPADE,
+	                                                      Material.WOOD_SPADE,
+	                                                      Material.STONE_SPADE,
+	                                                      Material.GOLD_SPADE,
+	                                                      Material.IRON_SPADE,
+	                                                      Material.DIAMOND_SPADE,
 
-		Material.FLINT_AND_STEEL
-	);
+	                                                      Material.FLINT_AND_STEEL
+	                                                  );
 
 	public ItemOverrides() {
 		registerOverrides();

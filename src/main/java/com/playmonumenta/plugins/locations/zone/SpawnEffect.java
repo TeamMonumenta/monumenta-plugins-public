@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 public class SpawnEffect {
-	public enum SpawnEffectType{
+	public enum SpawnEffectType {
 		Health,
 		Potion,
 		Armor,
@@ -49,12 +49,16 @@ public class SpawnEffect {
 	}
 
 	public double getValue() {
-		if (mType != SpawnEffectType.Health) {return 0;}
+		if (mType != SpawnEffectType.Health) {
+			return 0;
+		}
 		return mValue;
 	}
 
 	public List<PotionEffect> getPotionEffects() {
-		if (mType != SpawnEffectType.Potion) {return null;}
+		if (mType != SpawnEffectType.Potion) {
+			return null;
+		}
 		return mPotionList;
 	}
 }

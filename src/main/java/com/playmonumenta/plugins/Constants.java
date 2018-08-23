@@ -23,7 +23,7 @@ public class Constants {
 	public static final PotionEffect CITY_JUMP_MASK_EFFECT = new PotionEffect(PotionEffectType.JUMP, TICKS_PER_SECOND, 1000, true, false);
 	public static final PotionEffect CITY_SPEED_MASK_EFFECT = new PotionEffect(PotionEffectType.SPEED, TICKS_PER_SECOND, 1000, true, false);
 
-	//	USED FOR DEBUGGING PURPOSES WHEN COMPILING A JAR FOR OTHERS. (sadly it'll still contain the code in the jar, however it won't run)
+	//  USED FOR DEBUGGING PURPOSES WHEN COMPILING A JAR FOR OTHERS. (sadly it'll still contain the code in the jar, however it won't run)
 	public static final boolean CLASSES_ENABLED = true;
 	public static final boolean SPECIALIZATIONS_ENABLED = true;
 	public static final boolean POIS_ENABLED = true;

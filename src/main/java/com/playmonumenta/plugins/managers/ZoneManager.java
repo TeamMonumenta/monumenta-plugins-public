@@ -48,8 +48,7 @@ public class ZoneManager {
 
 									att.setBaseValue(maxHealth + addHealth);
 									creature.setHealth(maxHealth + addHealth);
-								}
-								else if (type == SpawnEffectType.Potion) {
+								} else if (type == SpawnEffectType.Potion) {
 									List<PotionEffect> potionList = effect.getPotionEffects();
 									if (potionList.size() > 0) {
 										for (PotionEffect currentPot : potionList) {
@@ -67,22 +66,22 @@ public class ZoneManager {
 
 	private void _initPOIs() {
 
-	// Test Case - Zombies on Sudowoodo Island get Slowness & 5 HP
-	// Removed for now as I don't have the properties in yet.
+		// Test Case - Zombies on Sudowoodo Island get Slowness & 5 HP
+		// Removed for now as I don't have the properties in yet.
 
-	/*	List<SpawnEffect> seL0 = new ArrayList<SpawnEffect>();
-		List<PotionEffect> potL0 = new ArrayList<PotionEffect>();
+		/*  List<SpawnEffect> seL0 = new ArrayList<SpawnEffect>();
+		    List<PotionEffect> potL0 = new ArrayList<PotionEffect>();
 
-		potL0.add(new PotionEffect(PotionEffectType.GLOWING, Constants.THREE_HOURS, 0));
-		seL0.add(new SpawnEffect(EntityType.ZOMBIE, "DEFAULT", SpawnEffectType.Potion, potL0));
-		seL0.add(new SpawnEffect(EntityType.SKELETON, "A", SpawnEffectType.Potion, potL0));
+		    potL0.add(new PotionEffect(PotionEffectType.GLOWING, Constants.THREE_HOURS, 0));
+		    seL0.add(new SpawnEffect(EntityType.ZOMBIE, "DEFAULT", SpawnEffectType.Potion, potL0));
+		    seL0.add(new SpawnEffect(EntityType.SKELETON, "A", SpawnEffectType.Potion, potL0));
 
-		seL0.add(new SpawnEffect(EntityType.ZOMBIE, "DEFAULT", SpawnEffectType.Health, 5.0));
+		    seL0.add(new SpawnEffect(EntityType.ZOMBIE, "DEFAULT", SpawnEffectType.Health, 5.0));
 
-		mZones.add(new Zone("Test", 99, new Point(-50, 1,-50), new Point(50, 255, 50), seL0));
-	*/
+		    mZones.add(new Zone("Test", 99, new Point(-50, 1,-50), new Point(50, 255, 50), seL0));
+		*/
 
-	// Swamp Nerfs
+		// Swamp Nerfs
 		List<SpawnEffect> seL1 = new ArrayList<SpawnEffect>();
 		List<PotionEffect> slownessEffect = new ArrayList<PotionEffect>();
 		slownessEffect.add(new PotionEffect(PotionEffectType.SLOW, Constants.THREE_HOURS, 0));
@@ -93,6 +92,6 @@ public class ZoneManager {
 		seL1.add(new SpawnEffect(EntityType.SKELETON, "DEFAULT", SpawnEffectType.Health, -8.0));
 		seL1.add(new SpawnEffect(EntityType.SKELETON, "DEFAULT", SpawnEffectType.Potion, slownessEffect));
 
-		mZones.add(new Zone("TSwamp", 1, new Point(-950,1,-650), new Point(-90,255,650), seL1));
+		mZones.add(new Zone("TSwamp", 1, new Point(-950, 1, -650), new Point(-90, 255, 650), seL1));
 	}
 }

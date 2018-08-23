@@ -215,18 +215,18 @@ public class EntityListener implements Listener {
 	}
 
 	public static EnumSet<DamageCause> damageCausesIgnoredInTowns = EnumSet.of(
-		DamageCause.FALL,
-		DamageCause.FALLING_BLOCK,
-		DamageCause.FIRE,
-		DamageCause.FIRE_TICK,
-		DamageCause.FLY_INTO_WALL,
-		DamageCause.MAGIC,
-		DamageCause.POISON,
-		DamageCause.PROJECTILE,
-		DamageCause.STARVATION,
-		DamageCause.THORNS,
-		DamageCause.WITHER
-	);
+	            DamageCause.FALL,
+	            DamageCause.FALLING_BLOCK,
+	            DamageCause.FIRE,
+	            DamageCause.FIRE_TICK,
+	            DamageCause.FLY_INTO_WALL,
+	            DamageCause.MAGIC,
+	            DamageCause.POISON,
+	            DamageCause.PROJECTILE,
+	            DamageCause.STARVATION,
+	            DamageCause.THORNS,
+	            DamageCause.WITHER
+	        );
 
 	// Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -292,8 +292,8 @@ public class EntityListener implements Listener {
 		Material material = event.getBlock().getType();
 
 		if (material == Material.TRIPWIRE || material == Material.TRIPWIRE_HOOK
-			|| material == Material.WOOD_PLATE || material == Material.STONE_PLATE
-			|| material == Material.GOLD_PLATE || material == Material.IRON_PLATE) {
+		    || material == Material.WOOD_PLATE || material == Material.STONE_PLATE
+		    || material == Material.GOLD_PLATE || material == Material.IRON_PLATE) {
 			Entity entity = event.getEntity();
 
 			// Only items and players can activate tripwires
@@ -371,11 +371,11 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 
 					if (((itemInMainHand.getType().equals(Material.SNOW_BALL)) &&
-						 (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
-						 (InventoryUtils.isSoulboundToPlayer(itemInMainHand, player))) ||
-						((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
-						 (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
-						 (InventoryUtils.isSoulboundToPlayer(itemInOffHand, player)))) {
+					     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
+					     (InventoryUtils.isSoulboundToPlayer(itemInMainHand, player))) ||
+					    ((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
+					     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
+					     (InventoryUtils.isSoulboundToPlayer(itemInOffHand, player)))) {
 
 						Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
@@ -513,7 +513,7 @@ public class EntityListener implements Listener {
 
 			// If this block is "unbreakable" than we want to remove it from the list.
 			if (mPlugin.mServerProperties.mUnbreakableBlocks.contains(block.getType()) ||
-					!mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
+			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}
 		}
@@ -582,9 +582,9 @@ public class EntityListener implements Listener {
 		mPlugin.mProjectileEffectTimers.removeEntity(event.getEntity());
 
 		if ((type == EntityType.SNOWBALL)
-			&& (event.getHitEntity() instanceof LivingEntity)
-			&& (!(event.getHitEntity() instanceof Player))
-			&& (!event.getHitEntity().isInvulnerable())) {
+		    && (event.getHitEntity() instanceof LivingEntity)
+		    && (!(event.getHitEntity() instanceof Player))
+		    && (!event.getHitEntity().isInvulnerable())) {
 
 			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 300, 0, false);
 			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);

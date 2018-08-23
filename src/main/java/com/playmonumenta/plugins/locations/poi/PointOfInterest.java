@@ -93,7 +93,7 @@ public class PointOfInterest {
 			Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 			Set<Score> scores = scoreboard.getScores(mPOI.mScoreboard);
 
-			for(Score score : scores) {
+			for (Score score : scores) {
 				if (score.getObjective().getDisplayName().contains("POITimers")) {
 					mTimer = score.getScore();
 					break;
@@ -104,10 +104,10 @@ public class PointOfInterest {
 
 	public double _distance(Point point) {
 		return Math.sqrt(
-			((point.mX - mCenter.mX) * (point.mX - mCenter.mX)) +
-			((point.mY - mCenter.mY) * (point.mY - mCenter.mY)) +
-			((point.mZ - mCenter.mZ) * (point.mZ - mCenter.mZ))
-		);
+		           ((point.mX - mCenter.mX) * (point.mX - mCenter.mX)) +
+		           ((point.mY - mCenter.mY) * (point.mY - mCenter.mY)) +
+		           ((point.mZ - mCenter.mZ) * (point.mZ - mCenter.mZ))
+		       );
 	}
 
 	private void _messageNearbyPlayers(Plugin plugin, String suffix) {

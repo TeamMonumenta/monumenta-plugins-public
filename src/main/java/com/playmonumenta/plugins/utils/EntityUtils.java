@@ -39,8 +39,8 @@ public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {
 		EntityType type = mob.getType();
 		return type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER || type == EntityType.PIG_ZOMBIE || type == EntityType.HUSK ||
-				type == EntityType.SKELETON || type == EntityType.WITHER_SKELETON || type == EntityType.STRAY ||
-				type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE;
+		       type == EntityType.SKELETON || type == EntityType.WITHER_SKELETON || type == EntityType.STRAY ||
+		       type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE;
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -62,7 +62,7 @@ public class EntityUtils {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 		} else if (entity instanceof PolarBear) {
 			LivingEntity target = ((PolarBear)entity).getTarget();
-			return target != null && target instanceof Player;	//	If a player is the target of a Polar Bear it's hostile.
+			return target != null && target instanceof Player;  //  If a player is the target of a Polar Bear it's hostile.
 		}
 
 		return false;
@@ -107,7 +107,7 @@ public class EntityUtils {
 	 * @return The Entity in the crosshair of the player
 	 */
 	public static LivingEntity getCrosshairTarget(Player player, int range, boolean targetPlayers,
-												  boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
+	                                              boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
 		Location loc = player.getEyeLocation();
 		Vector dir = loc.getDirection();
 
@@ -143,52 +143,53 @@ public class EntityUtils {
 	public static LivingEntity GetEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
 		ArrayList<LivingEntity> entities = new ArrayList<LivingEntity>();
-		for( Entity e : en ) {
-			//	Make sure to only get living entities.
-			if( e instanceof LivingEntity ) {
-				//	Make sure we should be targeting this entity.
-				if( (targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player))) ) {
+		for (Entity e : en) {
+			//  Make sure to only get living entities.
+			if (e instanceof LivingEntity) {
+				//  Make sure we should be targeting this entity.
+				if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
 					entities.add((LivingEntity)e);
 				}
 			}
 		}
 
-		//	If there's no living entities nearby then we should just leave as there's no reason to continue.
-		if( entities.size() == 0 ) {
+		//  If there's no living entities nearby then we should just leave as there's no reason to continue.
+		if (entities.size() == 0) {
 			return null;
 		}
 
 		BlockIterator bi;
 		try {
 			bi = new BlockIterator(player, range);
+		} catch (IllegalStateException e) {
+			return null;
 		}
-		catch(IllegalStateException e) { return null; }
 
 		int bx, by, bz;
 
-		while( bi.hasNext() ) {
+		while (bi.hasNext()) {
 			Block b = bi.next();
 			bx = b.getX();
 			by = b.getY();
 			bz = b.getZ();
 
-			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
+			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
 			if (checkLos && LocationUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
 
-			//	Loop through the entities and see if we hit one.
-			for(LivingEntity e : entities) {
+			//  Loop through the entities and see if we hit one.
+			for (LivingEntity e : entities) {
 				Location loc = e.getLocation();
 				double ex = loc.getX();
 				double ey = loc.getY();
 				double ez = loc.getZ();
 
-				if( (bx - 0.75D <= ex) && (ex <= bx + 1.75D)
-						&& (bz - 0.75D <= ez) && (ez <= bz + 1.75D)
-						&& (by - 1.0D <= ey) && (ey <= by + 2.5D) ) {
+				if ((bx - 0.75D <= ex) && (ex <= bx + 1.75D)
+				    && (bz - 0.75D <= ez) && (ez <= bz + 1.75D)
+				    && (by - 1.0D <= ey) && (ey <= by + 2.5D)) {
 
-					//	We got our target.
+					//  We got our target.
 					return e;
 				}
 			}
@@ -201,8 +202,9 @@ public class EntityUtils {
 		BlockIterator bi;
 		try {
 			bi = new BlockIterator(world, fromLocation.toVector(), direction, 0, range);
+		} catch (IllegalStateException e) {
+			return false;
 		}
-		catch(IllegalStateException e) { return false; }
 
 		int bx, by, bz;
 		int dist = 0;
@@ -211,13 +213,13 @@ public class EntityUtils {
 		int ty = toLocation.getBlockY();
 		int tz = toLocation.getBlockZ();
 
-		while( bi.hasNext() ) {
+		while (bi.hasNext()) {
 			Block b = bi.next();
 			bx = b.getX();
 			by = b.getY();
 			bz = b.getZ();
 
-			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
+			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
 			if (LocationUtils.isLosBlockingBlock(b.getType())) {
 				break;
 			}
@@ -238,8 +240,9 @@ public class EntityUtils {
 		BlockIterator bi;
 		try {
 			bi = new BlockIterator(world, fromLocation.toVector(), direction, 0, range);
+		} catch (IllegalStateException e) {
+			return false;
 		}
-		catch(IllegalStateException e) { return false; }
 
 		int bx, by, bz;
 		int dist = 0;
@@ -248,13 +251,13 @@ public class EntityUtils {
 		int ty = toLocation.getBlockY();
 		int tz = toLocation.getBlockZ();
 
-		while( bi.hasNext() ) {
+		while (bi.hasNext()) {
 			Block b = bi.next();
 			bx = b.getX();
 			by = b.getY();
 			bz = b.getZ();
 
-			//	If we want to check Line of sight we want to make sure the the blocks are transparent.
+			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
 			if (LocationUtils.isPathBlockingBlock(b.getType())) {
 				break;
 			}
@@ -271,13 +274,13 @@ public class EntityUtils {
 		return false;
 	}
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
-		loc.setPitch(loc.getPitch()+(float)rotation.getX());
-		loc.setYaw(loc.getYaw()+(float)rotation.getY());
-		Vector vel = new Vector(loc.getDirection().getX()*speed.getX(), loc.getDirection().getY()*speed.getY(), loc.getDirection().getZ()*speed.getZ());
+		loc.setPitch(loc.getPitch() + (float)rotation.getX());
+		loc.setYaw(loc.getYaw() + (float)rotation.getY());
+		Vector vel = new Vector(loc.getDirection().getX() * speed.getX(), loc.getDirection().getY() * speed.getY(), loc.getDirection().getZ() * speed.getZ());
 
 		World world = player.getWorld();
 		Arrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, arrowClass);
@@ -288,13 +291,13 @@ public class EntityUtils {
 		return arrow;
 	}
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
 
-		for (double yaw = -spacing * (numProjectiles/2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
+		for (double yaw = -spacing * (numProjectiles / 2); yaw < spacing * ((numProjectiles / 2) + 1); yaw += spacing) {
 			Projectile proj = spawnArrow(plugin, player, new Vector(0, yaw, 0), new Vector(0, 0, 0), speed, arrowClass);
 			if (proj != null) {
 				projectiles.add(proj);

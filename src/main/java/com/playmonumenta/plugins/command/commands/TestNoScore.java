@@ -25,8 +25,8 @@ public class TestNoScore implements CommandExecutor {
 	 * mScoreCache stores the set of values, and mScoreTicks stores the tick
 	 * that mScoreCache was last updated on.
 	 */
-	HashMap<String,Set<Integer>> mScoreCache = new HashMap<String,Set<Integer>>();
-	HashMap<String,Long> mScoreTicks = new HashMap<String,Long>();
+	HashMap<String, Set<Integer>> mScoreCache = new HashMap<String, Set<Integer>>();
+	HashMap<String, Long> mScoreTicks = new HashMap<String, Long>();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) {
@@ -56,7 +56,7 @@ public class TestNoScore implements CommandExecutor {
 		 * a command block (expected behavior), the block underneath it is set to redstone
 		 * on success.
 		 */
-		if(sender instanceof BlockCommandSender) {
+		if (sender instanceof BlockCommandSender) {
 			((BlockCommandSender)sender).getBlock().getLocation().add(0, -1, 0).getBlock().setType(Material.REDSTONE_BLOCK);
 		}
 

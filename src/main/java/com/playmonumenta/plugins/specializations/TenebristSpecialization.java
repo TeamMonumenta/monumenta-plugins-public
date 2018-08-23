@@ -63,12 +63,12 @@ public class TenebristSpecialization extends BaseSpecialization {
 									for (double i = 0; i < 64; i++) {
 										rotation += 5;
 										double cRadian = Math.toRadians(rotation);
-										loc.add(Math.cos(cRadian)*radius, 0, Math.sin(cRadian)*radius);
+										loc.add(Math.cos(cRadian) * radius, 0, Math.sin(cRadian) * radius);
 										ParticleEffect.SPELL_WITCH.display(0, 0, 0, 0, 1, loc, 40);
 										if (rotation % 90 == 0) {
 											ParticleEffect.SPELL_WITCH.display(0, 0, 0, 1, 12, loc, 40);
 										}
-										loc.subtract(Math.cos(cRadian)*radius, 0, Math.sin(cRadian)*radius);
+										loc.subtract(Math.cos(cRadian) * radius, 0, Math.sin(cRadian) * radius);
 									}
 
 									for (Entity e : loc.getWorld().getNearbyEntities(loc, 5, 5, 5)) {

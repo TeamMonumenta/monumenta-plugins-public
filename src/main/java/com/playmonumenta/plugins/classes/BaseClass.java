@@ -78,13 +78,21 @@ public class BaseClass {
 
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) { return true; }
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
+		return true;
+	}
 
-	public boolean PlayerDamagedEvent(Player player, DamageCause cause, double damage) { return true; }
+	public boolean PlayerDamagedEvent(Player player, DamageCause cause, double damage) {
+		return true;
+	}
 
-	public boolean PlayerCombustByEntityEvent(Player player, Entity damager) { return true; }
+	public boolean PlayerCombustByEntityEvent(Player player, Entity damager) {
+		return true;
+	}
 
-	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) { return true; }
+	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) {
+		return true;
+	}
 
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		return true;
@@ -110,7 +118,7 @@ public class BaseClass {
 
 	// Called when a player throws a splash potion
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-										   ThrownPotion potion, PotionSplashEvent event) {
+	                                       ThrownPotion potion, PotionSplashEvent event) {
 		//  All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player) {
@@ -122,7 +130,7 @@ public class BaseClass {
 				}
 
 				mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
-												 event.getIntensity(entity));
+				                                 event.getIntensity(entity));
 			}
 		}
 

@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class PlayerPotionInfo {
-	//	Effect Type / Potion List
+	//  Effect Type / Potion List
 	public HashMap<PotionEffectType, PotionMap> mPotionInfo;
 
 	public PlayerPotionInfo() {

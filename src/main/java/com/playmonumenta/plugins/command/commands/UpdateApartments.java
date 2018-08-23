@@ -10,29 +10,29 @@ import org.bukkit.scoreboard.Scoreboard;
 
 public class UpdateApartments extends AbstractCommand {
 
-    public UpdateApartments(Plugin plugin) {
-        super(
-            "updateApartments",
-            "Updates player apartment scores",
-            plugin
-        );
-    }
+	public UpdateApartments(Plugin plugin) {
+		super(
+		    "updateApartments",
+		    "Updates player apartment scores",
+		    plugin
+		);
+	}
 
-    @Override
-    protected void configure(ArgumentParser parser) {
-    }
+	@Override
+	protected void configure(ArgumentParser parser) {
+	}
 
-    @Override
-    protected boolean run(CommandContext context) {
+	@Override
+	protected boolean run(CommandContext context) {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Objective aptObjective = scoreboard.getObjective("Apartment");
 		Objective aptIdleObjective = scoreboard.getObjective("AptIdle");
 
 		if (aptObjective == null) {
-            sendErrorMessage(context,"Scoreboard 'Apartment' does not exist!");
+			sendErrorMessage(context, "Scoreboard 'Apartment' does not exist!");
 			return false;
 		} else if (aptIdleObjective == null) {
-            sendErrorMessage(context,"Scoreboard 'AptIdle' does not exist!");
+			sendErrorMessage(context, "Scoreboard 'AptIdle' does not exist!");
 			return false;
 		}
 

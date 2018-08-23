@@ -41,14 +41,14 @@ import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 /*
-	ManaLance
-	FrostNova
-	Prismatic
-	Magma
-	ArcaneStrike
-	ArcaneStrikeHits
-	Elemental
-	Intellect
+    ManaLance
+    FrostNova
+    Prismatic
+    Magma
+    ArcaneStrike
+    ArcaneStrikeHits
+    Elemental
+    Intellect
 */
 
 public class MageClass extends BaseClass {
@@ -60,7 +60,7 @@ public class MageClass extends BaseClass {
 	private static final int MANA_LANCE_R = 91;
 	private static final int MANA_LANCE_G = 187;
 	private static final int MANA_LANCE_B = 255;
-	private static final int MANA_LANCE_STAGGER_DURATION = (int) (0.95 * 20);
+	private static final int MANA_LANCE_STAGGER_DURATION = (int)(0.95 * 20);
 
 	private static final float FROST_NOVA_RADIUS = 6.0f;
 	private static final int FROST_NOVA_1_DAMAGE = 3;
@@ -106,7 +106,7 @@ public class MageClass extends BaseClass {
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 
-		//	Arcane Strike
+		//  Arcane Strike
 		{
 			if (InventoryUtils.isWandItem(mainHand)) {
 				int arcaneStrike = ScoreboardUtils.getScoreboardValue(player, "ArcaneStrike");
@@ -117,8 +117,8 @@ public class MageClass extends BaseClass {
 
 							List<Entity> entities = damagee.getNearbyEntities(ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS);
 							entities.add(damagee);
-							for(Entity e : entities) {
-								if(EntityUtils.isHostileMob(e)) {
+							for (Entity e : entities) {
+								if (EntityUtils.isHostileMob(e)) {
 									LivingEntity mob = (LivingEntity)e;
 									int dmg = extraDamage;
 
@@ -158,22 +158,22 @@ public class MageClass extends BaseClass {
 
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		//	Magma Shield
+		//  Magma Shield
 		{
-			//	If we're sneaking and we block with a shield we can attempt to trigger the ability.
+			//  If we're sneaking and we block with a shield we can attempt to trigger the ability.
 			if (player.isSneaking()) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				if (((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand)) || (mainHand.getType() == Material.SHIELD))
-						&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
+				    && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
 					if (magmaShield > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD)) {
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 							List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
-							for(Entity e : entities) {
-								if(EntityUtils.isHostileMob(e)) {
+							for (Entity e : entities) {
+								if (EntityUtils.isHostileMob(e)) {
 									LivingEntity mob = (LivingEntity)e;
 
 									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
@@ -254,7 +254,7 @@ public class MageClass extends BaseClass {
 			}
 		}
 
-		//	Frost Nova
+		//  Frost Nova
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			if (player.isSneaking()) {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -264,7 +264,7 @@ public class MageClass extends BaseClass {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FROST_NOVA)) {
 							List<Entity> entities = player.getNearbyEntities(FROST_NOVA_RADIUS, FROST_NOVA_RADIUS, FROST_NOVA_RADIUS);
 							entities.add(player);
-							for(int i = 0; i < entities.size(); i++) {
+							for (int i = 0; i < entities.size(); i++) {
 								Entity e = entities.get(i);
 								if (EntityUtils.isHostileMob(e)) {
 									LivingEntity mob = (LivingEntity)(e);
@@ -303,7 +303,7 @@ public class MageClass extends BaseClass {
 
 	@Override
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		//	Elemental Arrows
+		//  Elemental Arrows
 		{
 			int elementalArrows = ScoreboardUtils.getScoreboardValue(player, "Elemental");
 			if (elementalArrows > 0) {
@@ -323,8 +323,7 @@ public class MageClass extends BaseClass {
 							}
 						}
 					}
-				}
-				else if (arrow.hasMetadata("IceArrow")) {
+				} else if (arrow.hasMetadata("IceArrow")) {
 					if (damagee instanceof Blaze) {
 						event.setDamage(event.getDamage() + 8);
 					}
@@ -350,17 +349,17 @@ public class MageClass extends BaseClass {
 
 	@Override
 	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
-		//	Elemental Arrows
+		//  Elemental Arrows
 		{
 			int elementalArrows = ScoreboardUtils.getScoreboardValue(player, "Elemental");
 			if (elementalArrows > 0) {
-				//	If sneaking, Ice Arrow
+				//  If sneaking, Ice Arrow
 				if (player.isSneaking()) {
 					arrow.setFireTicks(0);
 					arrow.setMetadata("IceArrow", new FixedMetadataValue(mPlugin, 0));
 					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
 				}
-				//	else Fire Arrow
+				//  else Fire Arrow
 				else {
 					arrow.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 					arrow.setMetadata("FireArrow", new FixedMetadataValue(mPlugin, 0));

@@ -29,9 +29,9 @@ public class MobSpawnerOverride extends OverrideItem {
 	private boolean _breakable(Block block) {
 		Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
 		if (blockUnder != null && (
-			blockUnder.getType() == Material.BEDROCK ||
-			blockUnder.getType() == Material.BARRIER
-		)) {
+		        blockUnder.getType() == Material.BEDROCK ||
+		        blockUnder.getType() == Material.BARRIER
+		    )) {
 			return false;
 		}
 

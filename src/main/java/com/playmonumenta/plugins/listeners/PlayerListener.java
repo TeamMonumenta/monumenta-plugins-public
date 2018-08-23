@@ -207,8 +207,8 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-				&& player.getGameMode() != GameMode.CREATIVE)) {
+		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -235,8 +235,8 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-				&& player.getGameMode() != GameMode.CREATIVE)) {
+		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -276,8 +276,8 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-				&& player.getGameMode() != GameMode.CREATIVE)) {
+		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -292,8 +292,8 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-				&& player.getGameMode() != GameMode.CREATIVE)) {
+		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -325,9 +325,9 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-					&& player.getGameMode() != GameMode.CREATIVE
-					&& player.getGameMode() != GameMode.SPECTATOR)) {
+			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			        && player.getGameMode() != GameMode.CREATIVE
+			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -359,9 +359,9 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-					&& player.getGameMode() != GameMode.CREATIVE
-					&& player.getGameMode() != GameMode.SPECTATOR)) {
+			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			        && player.getGameMode() != GameMode.CREATIVE
+			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -473,8 +473,8 @@ public class PlayerListener implements Listener {
 					// Kill the player if they drink a potion with instant damage 10+
 					for (PotionEffect effect : effects) {
 						if (effect.getType() != null &&
-								effect.getType().equals(PotionEffectType.HARM) &&
-								effect.getAmplifier() >= 9) {
+						    effect.getType().equals(PotionEffectType.HARM) &&
+						    effect.getAmplifier() >= 9) {
 
 							player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 								@Override
@@ -541,10 +541,10 @@ public class PlayerListener implements Listener {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-			|| cause.equals(TeleportCause.ENDER_PEARL)
-			|| cause.equals(TeleportCause.END_GATEWAY)
-			|| cause.equals(TeleportCause.END_PORTAL)
-			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
+		    || cause.equals(TeleportCause.ENDER_PEARL)
+		    || cause.equals(TeleportCause.END_GATEWAY)
+		    || cause.equals(TeleportCause.END_PORTAL)
+		    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -600,7 +600,7 @@ public class PlayerListener implements Listener {
 			BlockState state = testblock.getState();
 
 			if (testblock.getType().equals(Material.COMMAND)
-				&& state instanceof CommandBlock) {
+			    && state instanceof CommandBlock) {
 
 				String str = ((CommandBlock)state).getCommand();
 

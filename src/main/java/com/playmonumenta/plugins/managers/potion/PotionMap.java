@@ -52,9 +52,9 @@ public class PotionMap {
 
 			// If the current "best" negative effect is less than this new one, track it
 			if (bestEffect == null
-				|| bestEffect.amplifier < newPotionInfo.amplifier
-				|| (bestEffect.amplifier == newPotionInfo.amplifier)
-					&& (bestEffect.duration < newPotionInfo.duration)) {
+			    || bestEffect.amplifier < newPotionInfo.amplifier
+			    || (bestEffect.amplifier == newPotionInfo.amplifier)
+			    && (bestEffect.duration < newPotionInfo.duration)) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 
@@ -93,7 +93,7 @@ public class PotionMap {
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
-		//	First update the timers of all our tracked potion timers.
+		//  First update the timers of all our tracked potion timers.
 		boolean effectWoreOff = false;
 
 		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionIter = mPotionMap.entrySet().iterator();
@@ -118,7 +118,7 @@ public class PotionMap {
 			}
 		}
 
-		//	If a timer wears out, run another check to make sure the best potion effect is applied.
+		//  If a timer wears out, run another check to make sure the best potion effect is applied.
 		if (effectWoreOff) {
 			applyBestPotionEffect(player);
 		}
@@ -139,7 +139,7 @@ public class PotionMap {
 				} else if (info.amplifier > bestEffect.amplifier) {
 					bestEffect = info;
 				} else if (info.amplifier == bestEffect.amplifier &&
-					info.duration > bestEffect.duration) {
+				           info.duration > bestEffect.duration) {
 					bestEffect = info;
 				}
 			}

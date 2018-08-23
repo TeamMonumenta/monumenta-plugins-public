@@ -71,7 +71,7 @@ public class FileUtils {
 	}
 
 	public static void moveFile(String fromFile, String toFile) throws Exception,
-	FileNotFoundException {
+		FileNotFoundException {
 		if (fromFile == null || fromFile.isEmpty()) {
 			throw new Exception("fromFile is null or empty");
 		}
@@ -98,7 +98,7 @@ public class FileUtils {
 	 * AND end with the specified string
 	 */
 	public static ArrayList<File> getFilesInDirectory(String folderPath,
-			String endsWith) throws IOException {
+	                                                  String endsWith) throws IOException {
 		ArrayList<File> matchedFiles = new ArrayList<File>();
 
 		Files.walk(Paths.get(folderPath), 100, FileVisitOption.FOLLOW_LINKS).forEach(path -> {

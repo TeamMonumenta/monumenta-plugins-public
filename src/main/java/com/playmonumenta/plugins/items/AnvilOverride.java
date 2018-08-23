@@ -30,7 +30,7 @@ public class AnvilOverride extends OverrideItem {
 		    && item.getType() != Material.SKULL_ITEM
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
 		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
-			&& block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
+		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 
 			item.setDurability((short)0);
 			plugin.mWorld.playSound(player.getLocation(), "block.anvil.use", 1.0f, 1.0f);

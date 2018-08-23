@@ -37,21 +37,35 @@ public class BaseSpecialization {
 
 	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { return true; }
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean PlayerDamagedEvent(Player player, EntityDamageEvent event) { return true; }
+	public boolean PlayerDamagedEvent(Player player, EntityDamageEvent event) {
+		return true;
+	}
 
-	public boolean PlayerCombustByEntityEvent(Player player, Entity damager) { return true; }
+	public boolean PlayerCombustByEntityEvent(Player player, Entity damager) {
+		return true;
+	}
 
-	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) { return true; }
+	public boolean PlayerDamagedByProjectileEvent(Player player, Projectile damager) {
+		return true;
+	}
 
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { return true; }
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean PlayerDamagedByPlayerEvent (Player player, Player damagee) { return false; }
+	public boolean PlayerDamagedByPlayerEvent(Player player, Player damagee) {
+		return false;
+	}
 
 	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {}
 
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) { return true; }
+	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
+		return true;
+	}
 
 	public void PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {}
 

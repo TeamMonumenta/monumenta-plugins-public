@@ -17,7 +17,7 @@ public class CompassOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (plugin.mServerProperties.getQuestCompassEnabled()) {
-			//	Show current POI respawn timer.
+			//  Show current POI respawn timer.
 			if (player.isSneaking()) {
 				List<PointOfInterest> pois = plugin.mPOIManager.getAllNearbyPOI(new Point(player.getLocation()));
 				if (pois != null && pois.size() > 0) {
@@ -28,16 +28,16 @@ public class CompassOverride extends OverrideItem {
 							int ticks = poi.getTimer();
 							String message;
 
-							//	Seems there's plenty of time before we respawn.
+							//  Seems there's plenty of time before we respawn.
 							if (ticks >= 20) {
 								message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is respawning in " + StringUtils.ticksToTime(ticks);
 							}
-							//	Because we need to handle the case where the player clicks within sub one second and we still
-							//	Want to be able to tell them the POI is about to respawn while still having the [within] tag.
+							//  Because we need to handle the case where the player clicks within sub one second and we still
+							//  Want to be able to tell them the POI is about to respawn while still having the [within] tag.
 							else if (ticks > 0) {
 								message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is nearly ready to respawn!";
 							}
-							//	We're nearby, but not within the POI
+							//  We're nearby, but not within the POI
 							else {
 								message = ChatColor.GREEN + "" + ChatColor.BOLD +  poi.getName() + " is ready to respawn!";
 							}

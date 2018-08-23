@@ -31,7 +31,7 @@ public class LocationUtils {
 		}
 	}
 
-	public static final AreaBounds OLDLABS = new AreaBounds("oldLabs", LocationType.None, new Point(-416.0, 48.0, -976.0), new Point(574.0, 200.0,-750.0));
+	public static final AreaBounds OLDLABS = new AreaBounds("oldLabs", LocationType.None, new Point(-416.0, 48.0, -976.0), new Point(574.0, 200.0, -750.0));
 
 	public static LocationType getLocationType(Plugin plugin, Entity entity) {
 		return getLocationType(plugin, entity.getLocation());
@@ -68,41 +68,41 @@ public class LocationUtils {
 
 	public static boolean isLosBlockingBlock(Material mat) {
 		if (mat.equals(Material.AIR) ||
-				mat.equals(Material.GLASS) ||
-				mat.equals(Material.STAINED_GLASS) ||
-				mat.equals(Material.VINE) ||
-				mat.equals(Material.DOUBLE_PLANT) ||
-				mat.equals(Material.LONG_GRASS) ||
-				mat.equals(Material.YELLOW_FLOWER) ||
-				mat.equals(Material.RED_ROSE) ||
-				mat.equals(Material.WEB) ||
-				mat.equals(Material.WATER) ||
-				mat.equals(Material.STATIONARY_WATER) ||
-				mat.equals(Material.LAVA) ||
-				mat.equals(Material.STATIONARY_LAVA) ||
-				mat.equals(Material.CARPET) ||
-				ItemUtils.isDoor(mat)) {
-				return false;
-			}
+		    mat.equals(Material.GLASS) ||
+		    mat.equals(Material.STAINED_GLASS) ||
+		    mat.equals(Material.VINE) ||
+		    mat.equals(Material.DOUBLE_PLANT) ||
+		    mat.equals(Material.LONG_GRASS) ||
+		    mat.equals(Material.YELLOW_FLOWER) ||
+		    mat.equals(Material.RED_ROSE) ||
+		    mat.equals(Material.WEB) ||
+		    mat.equals(Material.WATER) ||
+		    mat.equals(Material.STATIONARY_WATER) ||
+		    mat.equals(Material.LAVA) ||
+		    mat.equals(Material.STATIONARY_LAVA) ||
+		    mat.equals(Material.CARPET) ||
+		    ItemUtils.isDoor(mat)) {
+			return false;
+		}
 
-			return true;
+		return true;
 	}
 
 	public static boolean isPathBlockingBlock(Material mat) {
 		if (mat.equals(Material.AIR) ||
-				mat.equals(Material.VINE) ||
-				mat.equals(Material.DOUBLE_PLANT) ||
-				mat.equals(Material.LONG_GRASS) ||
-				mat.equals(Material.YELLOW_FLOWER) ||
-				mat.equals(Material.RED_ROSE) ||
-				mat.equals(Material.WEB) ||
-				mat.equals(Material.WATER) ||
-				mat.equals(Material.STATIONARY_WATER) ||
-				mat.equals(Material.CARPET) ||
-				ItemUtils.isDoor(mat)) {
-				return false;
-			}
+		    mat.equals(Material.VINE) ||
+		    mat.equals(Material.DOUBLE_PLANT) ||
+		    mat.equals(Material.LONG_GRASS) ||
+		    mat.equals(Material.YELLOW_FLOWER) ||
+		    mat.equals(Material.RED_ROSE) ||
+		    mat.equals(Material.WEB) ||
+		    mat.equals(Material.WATER) ||
+		    mat.equals(Material.STATIONARY_WATER) ||
+		    mat.equals(Material.CARPET) ||
+		    ItemUtils.isDoor(mat)) {
+			return false;
+		}
 
-			return true;
+		return true;
 	}
 }

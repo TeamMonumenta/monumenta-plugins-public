@@ -108,7 +108,7 @@ public class ServerProperties {
 					mQuestCompassEnabled       = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
 					mIsSleepingEnabled         = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 
-					mShardZoneID			   = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
+					mShardZoneID               = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mLocationBounds            = _getPropertyValueLocationList(plugin, object, "locationBounds");
 

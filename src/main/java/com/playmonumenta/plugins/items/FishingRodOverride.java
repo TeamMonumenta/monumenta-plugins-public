@@ -19,7 +19,7 @@ public class FishingRodOverride extends OverrideItem {
 		Material blockType = block.getType();
 
 		if (action == Action.RIGHT_CLICK_BLOCK) {
-			//	If this is an interactable block it means they didn't really want to be fishing! :D
+			//  If this is an interactable block it means they didn't really want to be fishing! :D
 			if (ItemUtils.isInteractable(blockType)) {
 				if (plugin.mTrackingManager.mFishingHook.containsEntity(player)) {
 					plugin.mTrackingManager.mFishingHook.removeEntity(player);

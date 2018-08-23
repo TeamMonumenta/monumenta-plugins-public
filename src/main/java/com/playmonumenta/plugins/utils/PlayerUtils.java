@@ -21,16 +21,16 @@ import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 public class PlayerUtils {
 	public static boolean isCritical(Player player) {
 		return player.getFallDistance() > 0.0F &&
-        !player.isOnGround() &&
-        !player.isInsideVehicle() &&
-        !player.hasPotionEffect(PotionEffectType.BLINDNESS) &&
-        player.getLocation().getBlock().getType() != Material.LADDER &&
-        player.getLocation().getBlock().getType() != Material.VINE;
+		       !player.isOnGround() &&
+		       !player.isInsideVehicle() &&
+		       !player.hasPotionEffect(PotionEffectType.BLINDNESS) &&
+		       player.getLocation().getBlock().getType() != Material.LADDER &&
+		       player.getLocation().getBlock().getType() != Material.VINE;
 	}
 
 	public static boolean hasLineOfSight(Player player, LivingEntity mob) {
-		//	We want to check against two things since the players view isn't square,
-		//	first we'll test against the X (Yaw).
+		//  We want to check against two things since the players view isn't square,
+		//  first we'll test against the X (Yaw).
 		final double xDotMax = 0.65;
 
 		Vector forwardX = player.getEyeLocation().getDirection().setY(0).normalize();
@@ -39,7 +39,7 @@ public class PlayerUtils {
 		double xz = toMobX.dot(forwardX);
 		boolean yawLos = xz > xDotMax;
 
-		//	Then we'll test against the Y (Pitch)
+		//  Then we'll test against the Y (Pitch)
 		final double yDotMax = 0.70;
 		final double yDotMin = -0.55;
 

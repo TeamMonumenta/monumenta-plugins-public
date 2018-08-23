@@ -31,7 +31,7 @@ public class PulseEffectTimers {
 			mRadius = radius;
 			mTargetPlayers = targetPlayers;
 
-			while(mLocation.getBlock().getType() != Material.AIR){
+			while (mLocation.getBlock().getType() != Material.AIR) {
 				mLocation.add(0, 0.25, 0);
 			}
 
@@ -143,10 +143,10 @@ public class PulseEffectTimers {
 		for (int i = 0; i < size; i++) {
 			EffectInfo info = mPulseEffects.get(i);
 
-			//	Loop through and remove the effects from previously effected players.
+			//  Loop through and remove the effects from previously effected players.
 			info.Cleanup();
 
-			//	Loop through and apply the effects to the new people within range.
+			//  Loop through and apply the effects to the new people within range.
 			boolean remove = info.Update(tickPerUpdate);
 			if (remove) {
 				info.Cleanup();

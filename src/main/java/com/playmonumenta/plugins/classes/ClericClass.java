@@ -36,13 +36,13 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
-	Sanctified
-	Rejuvenation
-	HeavenlyBoon
-	Cleansing
-	DivineJustice
-	Celestial
-	Healing
+    Sanctified
+    Rejuvenation
+    HeavenlyBoon
+    Cleansing
+    DivineJustice
+    Celestial
+    Healing
 */
 
 public class ClericClass extends BaseClass {
@@ -55,13 +55,13 @@ public class ClericClass extends BaseClass {
 	private static final int REJUVENATION_RADIUS = 12;
 	private static final int REJUVENATION_HEAL_AMOUNT = 1;
 
-	//	HEAVENLY_BOON
+	//  HEAVENLY_BOON
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.06;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.1;
 	private static final double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 
-	//	CLEANSING
+	//  CLEANSING
 	private static final int CLEANSING_DURATION = 15 * 20;
 	private static final int CLEANSING_RESIST_LEVEL = 0;
 	private static final int CLEANSING_STRENGTH_LEVEL = 0;
@@ -114,7 +114,7 @@ public class ClericClass extends BaseClass {
 
 	@Override
 	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
-		//	Don't trigger this if dead!
+		//  Don't trigger this if dead!
 		if (!player.isDead()) {
 			boolean threeSeconds = ((originalTime % 3) == 0);
 
@@ -128,11 +128,11 @@ public class ClericClass extends BaseClass {
 					}
 				}
 
-				// 	Rejuvenation
+				//  Rejuvenation
 				int rejuvenation = ScoreboardUtils.getScoreboardValue(player, "Rejuvenation");
 				if (rejuvenation > 0) {
 					for (Player p : PlayerUtils.getNearbyPlayers(player, REJUVENATION_RADIUS, true)) {
-						//	If this is us or we're allowing anyone to get it.
+						//  If this is us or we're allowing anyone to get it.
 						if (p == player || rejuvenation > 1) {
 							double oldHealth = p.getHealth();
 							PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
@@ -172,7 +172,7 @@ public class ClericClass extends BaseClass {
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, LivingEntity damager, double damage) {
-		//	Sanctified
+		//  Sanctified
 		if (EntityUtils.isUndead(damager)) {
 			if (damager instanceof Skeleton) {
 				Skeleton skelly = (Skeleton)damager;
@@ -202,7 +202,7 @@ public class ClericClass extends BaseClass {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
-		//	DivineJustice
+		//  DivineJustice
 		{
 			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 				if (EntityUtils.isUndead(damagee)) {
@@ -227,7 +227,7 @@ public class ClericClass extends BaseClass {
 
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
-		//	DivineJustice
+		//  DivineJustice
 		{
 			if (PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE) {
 				if (EntityUtils.isUndead(killedEntity)) {
@@ -245,7 +245,7 @@ public class ClericClass extends BaseClass {
 			}
 		}
 
-		//	HeavenlyBoon
+		//  HeavenlyBoon
 		if (shouldGenDrops) {
 			if (EntityUtils.isUndead(killedEntity)) {
 				int heavenlyBoon = ScoreboardUtils.getScoreboardValue(player, "HeavenlyBoon");
@@ -282,7 +282,7 @@ public class ClericClass extends BaseClass {
 						ItemUtils.addPotionEffect(potions, PotionInfo.HEALING);
 
 						World world = Bukkit.getWorld(player.getWorld().getName());
-						Location pos = (player.getLocation()).add(0,2,0);
+						Location pos = (player.getLocation()).add(0, 2, 0);
 						//EntityUtils.spawnCustomSplashPotion(world, player, healPot, pos);
 						EntityUtils.spawnCustomSplashPotion(world, player, potions, pos);
 					}
@@ -293,7 +293,7 @@ public class ClericClass extends BaseClass {
 
 	@Override
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-										   ThrownPotion potion, PotionSplashEvent event) {
+	                                       ThrownPotion potion, PotionSplashEvent event) {
 		// Call the base class to make sure effects are correctly applied to other players
 		super.PlayerSplashPotionEvent(player, affectedEntities, potion, event);
 

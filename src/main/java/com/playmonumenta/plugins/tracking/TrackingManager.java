@@ -69,7 +69,7 @@ public class TrackingManager {
 			// Check whether this entity should be pushable
 			if (!(entity instanceof Monster)) {
 				if ((entity instanceof Villager && (!entity.getScoreboardTags().contains(PUSHABLE_TAG))) ||
-					entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
+				    entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
 
 					// This entity should not be pushable - join to the unpushable team
 					mUnpushableTeam.addEntry(entity.getUniqueId().toString());

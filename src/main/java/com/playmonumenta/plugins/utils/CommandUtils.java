@@ -69,14 +69,14 @@ public class CommandUtils {
 	public static int parseIntFromString(CommandSender sender, String str) throws Exception {
 		int value = 0;
 
-		try{
+		try {
 			value = Integer.parseInt(str);
-    	} catch (NumberFormatException e) {
-    		if (sender != null) {
+		} catch (NumberFormatException e) {
+			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
 			}
-    		throw new Exception(e);
-    	}
+			throw new Exception(e);
+		}
 
 		return value;
 	}
@@ -90,7 +90,7 @@ public class CommandUtils {
 			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
 			}
-    		throw new Exception(e);
+			throw new Exception(e);
 		}
 
 		return value;

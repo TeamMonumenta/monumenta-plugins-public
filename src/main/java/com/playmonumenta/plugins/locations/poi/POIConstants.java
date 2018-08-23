@@ -71,7 +71,7 @@ public class POIConstants {
 
 		public int mValue;
 		public String mScoreboard;
-		private POI(int value, String scoreboard)	{
+		private POI(int value, String scoreboard)   {
 			mValue = value;
 			mScoreboard = scoreboard;
 		}

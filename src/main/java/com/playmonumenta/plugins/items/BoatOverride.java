@@ -11,6 +11,6 @@ import com.playmonumenta.plugins.Plugin;
 public class BoatOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return (player == null || player.getGameMode() != GameMode.ADVENTURE);	//	Prevent placing boats in adventure mode.
+		return (player == null || player.getGameMode() != GameMode.ADVENTURE);  //  Prevent placing boats in adventure mode.
 	}
 }

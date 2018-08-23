@@ -36,7 +36,7 @@ public class ProjectileEffectTimers {
 
 			int numParticles = 3;
 
-			//	Because some particles are big
+			//  Because some particles are big
 			if (particle == Particle.CLOUD) {
 				numParticles = 1;
 			}

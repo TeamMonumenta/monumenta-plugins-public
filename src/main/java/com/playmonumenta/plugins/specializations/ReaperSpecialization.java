@@ -166,7 +166,7 @@ public class ReaperSpecialization extends BaseSpecialization {
 									this.cancel();
 								}
 							}
-						} .runTaskTimer(mPlugin, 0, 1);
+						}.runTaskTimer(mPlugin, 0, 1);
 						int cooldown = petrifyingGlare == 1 ? 20 * 40 : 20 * 30;
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PETRIFYING_GLARE, cooldown);
@@ -249,7 +249,7 @@ public class ReaperSpecialization extends BaseSpecialization {
 
 								}
 
-							} .runTaskTimer(mPlugin, 0, 1);
+							}.runTaskTimer(mPlugin, 0, 1);
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SOULREAPING, 20 * 10);
 						}
 					}
