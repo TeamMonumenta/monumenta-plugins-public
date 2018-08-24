@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.command;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.command.commands.*;
-import com.playmonumenta.plugins.managers.POIManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.World;
@@ -17,9 +16,8 @@ public class CommandFactory {
 	 * @param properties    the plugin configuration
 	 * @param world         the default world
 	 * @param potionManager the potion manager
-	 * @param poiManager    the POI manager
 	 */
-	public static void createCommands(JavaPlugin plugin, ServerProperties properties, World world, PotionManager potionManager, POIManager poiManager) {
+	public static void createCommands(JavaPlugin plugin, ServerProperties properties, World world, PotionManager potionManager) {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			createCommand(plugin, new Back(plugin));
 			createCommand(plugin, new BroadcastCommand(plugin, properties.getBroadcastCommandEnabled()));
@@ -46,10 +44,6 @@ public class CommandFactory {
 
 		if (Constants.CLASSES_ENABLED) {
 			createCommand(plugin, new RefreshClassEffects(plugin, potionManager));
-		}
-
-		if (Constants.POIS_ENABLED) {
-			createCommand(plugin, new RefreshPOITimer(plugin, poiManager));
 		}
 	}
 

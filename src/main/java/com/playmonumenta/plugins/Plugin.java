@@ -32,7 +32,6 @@ import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.managers.POIManager;
 import com.playmonumenta.plugins.managers.ZoneManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -107,7 +106,6 @@ public class Plugin extends JavaPlugin {
 	public int mDailyQuestVersion = 0;
 
 	public TrackingManager mTrackingManager;
-	public POIManager mPOIManager;
 	public PotionManager mPotionManager;
 	public ZoneManager mZoneManager;
 
@@ -135,12 +133,10 @@ public class Plugin extends JavaPlugin {
 
 		mPotionManager = new PotionManager(this);
 		mTrackingManager = new TrackingManager(this, mWorld);
-		mPOIManager = new POIManager(this);
 		mZoneManager = new ZoneManager(this);
 
 		//  Load info.
 		_loadConfig();
-		mPOIManager.loadAllPOIs();
 		mServerProperties.load(this);
 
 		//  TODO: Move this out of here and into it's own ClassManager class.
@@ -171,7 +167,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
-		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager, mPOIManager);
+		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -209,7 +205,6 @@ public class Plugin extends JavaPlugin {
 				//  4 times a second.
 				if (fourHertz) {
 					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
-					mPOIManager.updatePOIs(Constants.QUARTER_TICKS_PER_SECOND);
 					mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					mPulseEffectTimers.Update(Constants.QUARTER_TICKS_PER_SECOND);
 				}
@@ -231,9 +226,6 @@ public class Plugin extends JavaPlugin {
 		getServer().getScheduler().cancelTasks(this);
 
 		mTrackingManager.unloadTrackedEntities();
-
-		//  Save info.
-		mPOIManager.saveAllPOIs();
 
 		MetadataUtils.removeAllMetadata(this);
 	}

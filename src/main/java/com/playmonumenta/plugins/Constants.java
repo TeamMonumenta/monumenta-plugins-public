@@ -26,7 +26,6 @@ public class Constants {
 	//  USED FOR DEBUGGING PURPOSES WHEN COMPILING A JAR FOR OTHERS. (sadly it'll still contain the code in the jar, however it won't run)
 	public static final boolean CLASSES_ENABLED = true;
 	public static final boolean SPECIALIZATIONS_ENABLED = true;
-	public static final boolean POIS_ENABLED = true;
 	public static final boolean TRACKING_MANAGER_ENABLED = true;
 	public static final boolean POTION_MANAGER_ENABLED = true;
 	public static final boolean COMMANDS_SERVER_ENABLED = true;
