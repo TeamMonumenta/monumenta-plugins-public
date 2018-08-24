@@ -67,8 +67,8 @@ public class WarriorClass extends BaseClass {
 	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
 	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
-	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 5;
-	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 1.5;
+	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
+	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
 
 	public WarriorClass(Plugin plugin, Random random) {
 		super(plugin, random);

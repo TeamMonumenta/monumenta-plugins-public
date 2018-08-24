@@ -76,7 +76,6 @@ public class AlchemistClass extends BaseClass {
 
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
-	private static final int IRON_TINCTURE_DURATION = 40 * 20;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	private static final int BOMB_ARROW_COOLDOWN = 16 * 20;
@@ -329,12 +328,12 @@ public class AlchemistClass extends BaseClass {
 										tincture.remove();
 
 										int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
-										p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_DURATION, ironTincture));
+										p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
 
 										World zaWarudo = player.getWorld();
 
 										if (p != player) {
-											player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_DURATION, ironTincture));
+											player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
 											ParticleUtils.playParticlesInWorld(zaWarudo, Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
 											zaWarudo.playSound(player.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
 										}
