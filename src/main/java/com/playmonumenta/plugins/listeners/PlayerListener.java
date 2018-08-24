@@ -158,7 +158,11 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		Material mat = (event.getClickedBlock() != null) ? event.getClickedBlock().getType() : Material.AIR;
+		if (event.isCancelled()) {
+			return;
+		}
+
+		Material mat = (block != null) ? block.getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
 		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
 

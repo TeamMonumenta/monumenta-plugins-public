@@ -53,7 +53,6 @@ public class ItemOverrides {
 
 	public void registerOverrides() {
 		mItems.put(Material.MONSTER_EGG, new MonsterEggOverride());
-		mItems.put(Material.COMPASS, new CompassOverride());
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
 		mItems.put(Material.ANVIL, new AnvilOverride());
 		mItems.put(Material.ENCHANTMENT_TABLE, new EnchantmentTableOverride());
