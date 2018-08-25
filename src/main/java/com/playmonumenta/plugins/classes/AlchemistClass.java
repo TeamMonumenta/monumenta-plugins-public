@@ -62,7 +62,7 @@ public class AlchemistClass extends BaseClass {
 	private static final int GRUESOME_ALCHEMY_SLOW = 2;
 
 	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 3;
-	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 5;
+	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 6;
 	private static final int BRUTAL_ALCHEMY_WITHER_1_DURATION = 4 * 20;
 	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 6 * 20;
 
@@ -75,7 +75,8 @@ public class AlchemistClass extends BaseClass {
 	private static final int ENFEEBLING_RADIUS = 3;
 
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
-	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
+	private static final int IRON_TINCTURE_USE_COOLDOWN = 40 * 20;
+	private static final int IRON_TINCTURE_DURATION = 40 * 20;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	private static final int BOMB_ARROW_COOLDOWN = 16 * 20;
@@ -86,7 +87,7 @@ public class AlchemistClass extends BaseClass {
 	private static final float BOMB_ARROW_KNOCKBACK_SPEED = 0.55f;
 	private static final int BOMB_ARROW_1_DAMAGE = 15;
 	private static final int BOMB_ARROW_2_DAMAGE = 24;
-	private static final int BOMB_ARROW_RADIUS = 4;
+	private static final int BOMB_ARROW_RADIUS = 3;
 
 	private static final int BASILISK_POISON_1_EFFECT_LVL = 1;
 	private static final int BASILISK_POISON_2_EFFECT_LVL = 2;

@@ -77,7 +77,7 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
 	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 12 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 18 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
 	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
@@ -94,7 +94,7 @@ public class MageClass extends BaseClass {
 	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
 	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
-	private static final double ELEMENTAL_ARROWS_RADIUS = 4.0;
+	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
 	private static double PASSIVE_DAMAGE = 1.5;
 

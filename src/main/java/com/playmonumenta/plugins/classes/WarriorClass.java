@@ -54,9 +54,9 @@ public class WarriorClass extends BaseClass {
 	private static final double RIPOSTE_SQRADIUS = 6.25;    //radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	private static final Integer DEFENSIVE_LINE_DURATION = 14 * 20;
+	private static final Integer DEFENSIVE_LINE_DURATION = 10 * 20;
 	private static final float DEFENSIVE_LINE_RADIUS = 8.0f;
-	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 50 * 20;
+	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 60 * 20;
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
