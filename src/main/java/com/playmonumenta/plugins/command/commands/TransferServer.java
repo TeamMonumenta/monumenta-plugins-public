@@ -35,7 +35,7 @@ public class TransferServer extends AbstractPlayerCommand {
 		.help("if true and enabled, sends player data")
 		.type(Boolean.class)
 		.nargs("?")
-		.setDefault();
+		.setDefault(true);
 	}
 
 	@Override
