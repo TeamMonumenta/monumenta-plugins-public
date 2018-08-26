@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.command.commands;
 
+import java.util.List;
+
 import com.playmonumenta.plugins.command.AbstractPlayerCommand;
 import com.playmonumenta.plugins.command.CommandContext;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -31,7 +33,8 @@ public class GiveSoulbound extends AbstractPlayerCommand {
 		parser.addArgument("data")
 		.help("the item data");
 		parser.addArgument("datatag")
-		.help("the data tag");
+		.help("the data tag")
+		.nargs("+");
 	}
 
 	@Override
@@ -41,7 +44,7 @@ public class GiveSoulbound extends AbstractPlayerCommand {
 		String consoleCommandString = context.getNamespace().getString("item") + " " +
 		                              context.getNamespace().getString("amount") + " " +
 		                              context.getNamespace().getString("data") + " " +
-		                              context.getNamespace().getString("datatag");
+		                              String.join(" ", (List<String>) context.getNamespace().get("datatag"));
 
 		if (!consoleCommandString.contains("Lore:[")) {
 			sendErrorMessage(context, "This command can only be used to give items that already have at least one line of lore text");
