@@ -53,7 +53,7 @@ public class BroadcastCommand extends AbstractCommand {
 		.help("command to broadcast");
 		parser.addArgument("arguments")
 		.help("arguments for the command")
-		.nargs("*");
+		.nargs("+");
 	}
 
 	@Override
