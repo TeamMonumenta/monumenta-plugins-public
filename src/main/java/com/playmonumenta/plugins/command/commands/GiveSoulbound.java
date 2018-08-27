@@ -37,6 +37,7 @@ public class GiveSoulbound extends AbstractPlayerCommand {
 		.nargs("+");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean run(CommandContext context) {
 		//noinspection OptionalGetWithoutIsPresent - checked before being called

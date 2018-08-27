@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+
 import java.util.Random;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
 public class ChestUtils {
 
@@ -45,9 +46,14 @@ public class ChestUtils {
 				                                3, luckLevel, true, false));
 			}
 
-			int chestDebug = ScoreboardUtils.getScoreboardValue(player, "DEBUGChestLuck");
-			if (chestDebug >= 0) {
-				MessagingUtils.sendActionBarMessage(plugin, player, playerCount + " players in range!");
+			if (player.getEquipment() != null &&
+			    player.getEquipment().getItemInMainHand() != null &&
+			    player.getEquipment().getItemInMainHand().getType() == Material.COMPASS) {
+				if (playerCount == 1) {
+					MessagingUtils.sendActionBarMessage(plugin, player, playerCount + " player in range!");
+				} else {
+					MessagingUtils.sendActionBarMessage(plugin, player, playerCount + " players in range!");
+				}
 			}
 		}
 	}
