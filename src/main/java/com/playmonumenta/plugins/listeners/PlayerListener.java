@@ -1,5 +1,21 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -7,32 +23,28 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
@@ -50,17 +62,19 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionData;
@@ -68,23 +82,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.World;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -285,20 +285,22 @@ public class PlayerListener implements Listener {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 	}
 
-	// The player picked up an item.
+	// An entity picked up an item
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerPickupItemEvent(PlayerPickupItemEvent event) {
-		Player player = event.getPlayer();
+	public void EntityPickupItemEvent(EntityPickupItemEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player)event.getEntity();
 
-		/* Don't let the player do this when transferring or if in a restricted zone */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-		        && player.getGameMode() != GameMode.CREATIVE)) {
-			event.setCancelled(true);
-			return;
+			/* Don't let the player do this when transferring or if in a restricted zone */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
+				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+					&& player.getGameMode() != GameMode.CREATIVE)) {
+				event.setCancelled(true);
+				return;
+			}
+
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 		}
-
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 	}
 
 	// An item on the player breaks.
