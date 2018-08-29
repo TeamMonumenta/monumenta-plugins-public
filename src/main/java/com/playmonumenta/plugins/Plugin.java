@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.classes.RogueClass;
 import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
+import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.MobListener;
@@ -218,6 +219,11 @@ public class Plugin extends JavaPlugin {
 				ticks = (ticks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
+
+		// Provide placeholder API replacements if it is present
+		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+			new PlaceholderAPIIntegration(this).register();
+		}
 	}
 
 	//  Logic that is performed upon disabling the plugin.
