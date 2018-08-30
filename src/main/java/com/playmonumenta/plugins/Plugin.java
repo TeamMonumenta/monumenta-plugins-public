@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
+import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.MobListener;
@@ -223,6 +224,11 @@ public class Plugin extends JavaPlugin {
 		// Provide placeholder API replacements if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
 			new PlaceholderAPIIntegration(this).register();
+		}
+
+		// Get voting events if Votifier is present
+		if (Bukkit.getPluginManager().isPluginEnabled("Votifier")) {
+			manager.registerEvents(new VotifierIntegration(this), this);
 		}
 	}
 

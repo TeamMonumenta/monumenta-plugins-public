@@ -37,6 +37,11 @@
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>parallelblock-public</id>
+            <name>ParallelBlock Public Repository</name>
+            <url>https://repo.parallelblock.com/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -79,6 +84,12 @@
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.8.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vexsoftware</groupId>
+            <artifactId>nuvotifier-universal</artifactId>
+            <version>2.3.7</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

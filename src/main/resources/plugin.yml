@@ -1,7 +1,7 @@
 name: Monumenta-Plugins
 main: com.playmonumenta.plugins.Plugin
 version: 1.0
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI,Votifier]
 commands:
   playTimeStats:
     description: "Get the current playtime stats of everyone online"
