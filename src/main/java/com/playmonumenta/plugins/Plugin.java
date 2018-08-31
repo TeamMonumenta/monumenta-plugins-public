@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.Iterator;
 
 import com.playmonumenta.plugins.command.*;
 import org.bukkit.Bukkit;
@@ -144,7 +145,7 @@ public class Plugin extends JavaPlugin {
 		//  TODO: Move this out of here and into it's own ClassManager class.
 		//  Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom));
+		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom, mWorld));
 		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom));
 		mClassMap.put(Classes.CLERIC.getValue(), new ClericClass(this, mRandom));
 		mClassMap.put(Classes.ROGUE.getValue(), new RogueClass(this, mRandom));

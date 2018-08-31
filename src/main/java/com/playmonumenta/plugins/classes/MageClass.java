@@ -1,16 +1,28 @@
 package com.playmonumenta.plugins.classes;
 
-import java.util.List;
-import java.util.Random;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
@@ -20,25 +32,18 @@ import org.bukkit.entity.Stray;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
+import org.bukkit.World;
 
 /*
     ManaLance
@@ -48,10 +53,22 @@ import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
     ArcaneStrike
     ArcaneStrikeHits
     Elemental
+    SpellShock
     Intellect
 */
 
 public class MageClass extends BaseClass {
+	public class SpellShockedMob {
+		public LivingEntity mob;
+		public int ticksLeft;
+		public Player initiator;
+
+		public SpellShockedMob(LivingEntity inMob, int ticks, Player inInitiator) {
+			mob = inMob;
+			ticksLeft = ticks;
+			initiator = inInitiator;
+		}
+	}
 
 	private static final int MANA_LANCE_1_DAMAGE = 8;
 	private static final int MANA_LANCE_2_DAMAGE = 10;
@@ -96,10 +113,94 @@ public class MageClass extends BaseClass {
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 4.0;
 
+	private static final int SPELL_SHOCK_DURATION = 6 * 20;
+	private static final int SPELL_SHOCK_TEST_PERIOD = 2;
+	private static final int SPELL_SHOCK_DEATH_RADIUS = 2;
+	private static final int SPELL_SHOCK_DEATH_DAMAGE = 3;
+	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
+	private static final int SPELL_SHOCK_SPELL_DAMAGE = 3;
+
 	private static double PASSIVE_DAMAGE = 1.5;
 
-	public MageClass(Plugin plugin, Random random) {
+	private static Map<UUID, SpellShockedMob>mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
+
+	private World mWorld;
+
+	public MageClass(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+
+		mWorld = world;
+
+		// SpellShock task to process tagged mobs
+		// pri
+		new BukkitRunnable() {
+			int tick = 0;
+
+			@Override
+			public void run() {
+				Iterator<Map.Entry<UUID, SpellShockedMob>>it = mSpellShockedMobs.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry<UUID, SpellShockedMob> entry = it.next();
+					SpellShockedMob shocked = entry.getValue();
+
+					Location loc = shocked.mob.getLocation().add(0, 1, 0);
+					ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc, 1, 0.01, 0.1, 0.01, 0.001);
+
+					if (shocked.mob.isDead() || shocked.mob.getHealth() <= 0) {
+						// Mob has died - trigger effects
+						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
+						world.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
+						for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_DEATH_RADIUS,
+						                                                      SPELL_SHOCK_DEATH_RADIUS,
+																			  SPELL_SHOCK_DEATH_RADIUS)) {
+							if (EntityUtils.isHostileMob(nearbyMob)) {
+								EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
+							}
+						}
+
+						it.remove();
+						continue;
+					}
+
+					shocked.ticksLeft -= SPELL_SHOCK_TEST_PERIOD;
+					if (shocked.ticksLeft <= 0) {
+						it.remove();
+						continue;
+					}
+				}
+			}
+
+		}.runTaskTimer(plugin, 1, SPELL_SHOCK_TEST_PERIOD);
+	}
+
+	// Spell Shock
+	private void SpellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player) {
+		SpellShockedMob shocked = mSpellShockedMobs.get(mob.getUniqueId());
+		if (shocked != null) {
+			// Hit a shocked mob with a real spell - extra damage
+
+			// Consume the "charge"
+			mSpellShockedMobs.remove(mob.getUniqueId());
+
+			Location loc = shocked.mob.getLocation().add(0, 1, 0);
+			ParticleUtils.playParticlesInWorld(mWorld, Particle.SPELL_WITCH, loc, 100, 2, 2, 2, 0.001);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.5f);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 1.5f);
+			for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_SPELL_RADIUS,
+																  SPELL_SHOCK_SPELL_RADIUS,
+																  SPELL_SHOCK_SPELL_RADIUS)) {
+				// Only damage hostile mobs and specifically not the mob originally hit
+				if (EntityUtils.isHostileMob(nearbyMob) && nearbyMob != mob) {
+					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player);
+				}
+			}
+
+			dmg += SPELL_SHOCK_SPELL_DAMAGE;
+		}
+
+		// Apply damage to the hit mob all in one shot
+		EntityUtils.damageEntity(mPlugin, mob, dmg, player);
 	}
 
 	@Override
@@ -134,17 +235,25 @@ public class MageClass extends BaseClass {
 								}
 							}
 
-							World world = Bukkit.getWorld(player.getWorld().getName());
 							Location loc = damagee.getLocation();
-							ParticleUtils.playParticlesInWorld(world, Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
-							ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
+							ParticleUtils.playParticlesInWorld(mWorld, Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
+							ParticleUtils.playParticlesInWorld(mWorld, Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
 
-							world.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
+							mWorld.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
 						}
 					}
 				}
+			}
+		}
+
+		// Spell Shock (add static to mobs here)
+		if (InventoryUtils.isWandItem(mainHand) && cause.equals(DamageCause.ENTITY_ATTACK)) {
+			int spellShock = ScoreboardUtils.getScoreboardValue(player, "SpellShock");
+			if (spellShock > 0) {
+				mSpellShockedMobs.put(damagee.getUniqueId(),
+				                      new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, player));
 			}
 		}
 
@@ -182,16 +291,15 @@ public class MageClass extends BaseClass {
 										mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
 										int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-										EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
+										SpellDamageMob(mPlugin, mob, extraDamage, player);
 									}
 								}
 							}
 
 							ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA, 0.25f, MAGMA_SHIELD_DOT_ANGLE);
 
-							World world = Bukkit.getWorld(player.getWorld().getName());
-							world.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
-							world.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
+							mWorld.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
+							mWorld.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
 
 							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
 							int cooldown = intellectBonus ? (MAGMA_SHIELD_COOLDOWN / 3) * 2 : MAGMA_SHIELD_COOLDOWN;
@@ -238,9 +346,9 @@ public class MageClass extends BaseClass {
 									}
 									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
 										if (EntityUtils.isHostileMob(e)) {
-											LivingEntity le = (LivingEntity) e;
-											EntityUtils.damageEntity(mPlugin, le, extraDamage, player);
-											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+											LivingEntity mob = (LivingEntity) e;
+											SpellDamageMob(mPlugin, mob, extraDamage, player);
+											mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 										}
 									}
 								}
@@ -270,7 +378,7 @@ public class MageClass extends BaseClass {
 									LivingEntity mob = (LivingEntity)(e);
 
 									int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-									EntityUtils.damageEntity(mPlugin, mob, extraDamage, player);
+									SpellDamageMob(mPlugin, mob, extraDamage, player);
 
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
 									if (frostNova > 1) {
@@ -288,12 +396,11 @@ public class MageClass extends BaseClass {
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, cooldown);
 
-							World world = Bukkit.getWorld(player.getWorld().getName());
 							Location loc = player.getLocation();
-							ParticleUtils.playParticlesInWorld(world, Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
-							ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
+							ParticleUtils.playParticlesInWorld(mWorld, Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
+							ParticleUtils.playParticlesInWorld(mWorld, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
 
-							world.playSound(loc, "block.glass.break", 0.5f, 1.0f);
+							mWorld.playSound(loc, "block.glass.break", 0.5f, 1.0f);
 						}
 					}
 				}
