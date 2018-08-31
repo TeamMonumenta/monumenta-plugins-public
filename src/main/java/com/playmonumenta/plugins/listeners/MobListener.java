@@ -180,8 +180,8 @@ public class MobListener implements Listener {
 				for (Player p : PlayerUtils.getNearbyPlayers(player, ALCH_PASSIVE_RADIUS, false)) {
 					int classNumber = ScoreboardUtils.getScoreboardValue(p, "Class");
 					if (classNumber == 5) {
-						int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
-						int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
+						int brutalAlchemy = ScoreboardUtils.getScoreboardValue(p, "BrutalAlchemy");
+						int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(p, "GruesomeAlchemy");
 
 						if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
 							int newPot = 0;
