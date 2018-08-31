@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.command;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.helper.HelpScreenException;
-import net.sourceforge.argparse4j.helper.MessageLocalization;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.*;
 import net.sourceforge.argparse4j.internal.ArgumentParserImpl;
@@ -144,12 +143,7 @@ public abstract class AbstractCommand implements CommandExecutor {
 
 		// Add custom help argument
 		parser.addArgument("-h", "--help")
-		.help(
-		    MessageLocalization.localize(
-		        ResourceBundle.getBundle(ArgumentParserImpl.class.getName(), Locale.getDefault()),
-		        "help"
-		    )
-		)
+		.help("show this help message and exit")
 		.action(new ArgumentAction() {
 			@Override
 			public void run(ArgumentParser parser, Argument arg, Map<String, Object> attrs, String flag, Object value) throws ArgumentParserException {
