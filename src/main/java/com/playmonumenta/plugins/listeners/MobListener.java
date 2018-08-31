@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
@@ -18,25 +24,36 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.AlchemistClass;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
+	static final int ALCH_PASSIVE_RADIUS = 12;
+	Random mRandom = new Random();
 
 	Plugin mPlugin = null;
 
 	public MobListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
-
 	@EventHandler(priority = EventPriority.HIGH)
 	void CreatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
@@ -159,6 +176,23 @@ public class MobListener implements Listener {
 				                                          entity.getLastDamageCause().getCause(),
 				                                          shouldGenDrops);
 				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
+
+				for (Player p : PlayerUtils.getNearbyPlayers(player, ALCH_PASSIVE_RADIUS, false)) {
+					int classNumber = ScoreboardUtils.getScoreboardValue(p, "Class");
+					if (classNumber == 5) {
+						int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
+						int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(player, "GruesomeAlchemy");
+
+						if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
+							int newPot = 0;
+							if (mRandom.nextDouble() < .50) {
+								newPot++;
+							}
+
+							AlchemistClass.addAlchemistPotions(p, newPot);
+						}
+					}
+				}
 			}
 		}
 	}

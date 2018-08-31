@@ -86,15 +86,18 @@ public class MageClass extends BaseClass {
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 8 * 20;
 
+	private static final float PRISMATIC_SHIELD_RADIUS = 4.0f;
 	private static final int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
 	private static final int PRISMATIC_SHIELD_EFFECT_LVL_1 = 1;
 	private static final int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
-	private static final int PRISMATIC_SHIELD_1_DURATION = 10 * 20;
-	private static final int PRISMATIC_SHIELD_2_DURATION = 10 * 20;
-	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 3 * 60 * 20;
+	private static final int PRISMATIC_SHIELD_1_DURATION = 12 * 20;
+	private static final int PRISMATIC_SHIELD_2_DURATION = 12 * 20;
+	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 80 * 20;
 	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
+	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
+	private static final int PRISMATIC_SHIELD_DAMAGE = 5;
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 12 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 14 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
 	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
@@ -105,7 +108,8 @@ public class MageClass extends BaseClass {
 	private static final float ARCANE_STRIKE_RADIUS = 4.0f;
 	private static final int ARCANE_STRIKE_1_DAMAGE = 5;
 	private static final int ARCANE_STRIKE_2_DAMAGE = 8;
-	private static final int ARCANE_STRIKE_BURN_DAMAGE = 4;
+	private static final int ARCANE_STRIKE_BURN_DAMAGE_LVL_1 = 2;
+	private static final int ARCANE_STRIKE_BURN_DAMAGE_LVL_2 = 4;
 	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
 
 	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
@@ -152,7 +156,7 @@ public class MageClass extends BaseClass {
 						world.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
 						for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_DEATH_RADIUS,
 						                                                      SPELL_SHOCK_DEATH_RADIUS,
-																			  SPELL_SHOCK_DEATH_RADIUS)) {
+						                                                      SPELL_SHOCK_DEATH_RADIUS)) {
 							if (EntityUtils.isHostileMob(nearbyMob)) {
 								EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
 							}
@@ -188,8 +192,8 @@ public class MageClass extends BaseClass {
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 1.5f);
 			for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_SPELL_RADIUS,
-																  SPELL_SHOCK_SPELL_RADIUS,
-																  SPELL_SHOCK_SPELL_RADIUS)) {
+			                                                      SPELL_SHOCK_SPELL_RADIUS,
+			                                                      SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (EntityUtils.isHostileMob(nearbyMob) && nearbyMob != mob) {
 					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player);
@@ -223,12 +227,14 @@ public class MageClass extends BaseClass {
 									LivingEntity mob = (LivingEntity)e;
 									int dmg = extraDamage;
 
-									// Arcane strike fire damage for level 2.
-									// First check if the mob is burning
-									// If burning, must either not have the metadata value or it must not match this player doing damage
-									if (arcaneStrike > 1 && mob.getFireTicks() > 0
-									    && MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) {
-										dmg += ARCANE_STRIKE_BURN_DAMAGE;
+									// Arcane strike extra fire damage
+									// Check if (the mob is burning AND was not set on fire this tick) OR the mob has slowness
+									//
+
+									if (arcaneStrike > 0 && ((mob.getFireTicks() > 0 &&
+									                          MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) ||
+									                         mob.hasPotionEffect(PotionEffectType.SLOW))) {
+										dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
 									}
 
 									EntityUtils.damageEntity(mPlugin, mob, dmg, player);
@@ -486,6 +492,15 @@ public class MageClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD)) {
 						int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 						int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
+
+						List<Entity> entities = player.getNearbyEntities(PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS);
+
+						for (Entity e : entities) {
+							if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
+								EntityUtils.damageEntity(mPlugin, (LivingEntity)e, PRISMATIC_SHIELD_DAMAGE, player);
+								MovementUtils.KnockAway(player, (LivingEntity)e, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
+							}
+						}
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, false));
 						ParticleEffect.FIREWORKS_SPARK.display(0.2f, 0.35f, 0.2f, 0.5f, 150, player.getLocation().add(0, 1.15, 0), 40);

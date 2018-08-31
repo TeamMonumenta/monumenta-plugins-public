@@ -187,7 +187,7 @@ public class AlchemistClass extends BaseClass {
 		}
 	}
 
-	private ItemStack getAlchemistPotion() {
+	private static ItemStack getAlchemistPotion() {
 		ItemStack stack = new ItemStack(Material.SPLASH_POTION, 1);
 
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();
@@ -202,6 +202,35 @@ public class AlchemistClass extends BaseClass {
 		return stack;
 	}
 
+	public static void addAlchemistPotions(Player player, int numAddedPotions) {
+		if (numAddedPotions == 0) {
+			return;
+		}
+
+		Inventory inv = player.getInventory();
+		ItemStack firstFoundPotStack = null;
+		int potCount = 0;
+
+		for (ItemStack item : inv.getContents()) {
+			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+				if (firstFoundPotStack == null) {
+					firstFoundPotStack = item;
+				}
+				potCount += item.getAmount();
+			}
+		}
+
+		if (potCount < 32) {
+			if (firstFoundPotStack != null) {
+				firstFoundPotStack.setAmount(firstFoundPotStack.getAmount() + numAddedPotions);
+			} else {
+				ItemStack newPotions = getAlchemistPotion();
+				newPotions.setAmount(numAddedPotions);
+				inv.addItem(newPotions);
+			}
+		}
+	}
+
 	@Override
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int brutalAlchemy = ScoreboardUtils.getScoreboardValue(player, "BrutalAlchemy");
@@ -209,36 +238,11 @@ public class AlchemistClass extends BaseClass {
 
 		if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
 			int newPot = 1;
-			double r = (brutalAlchemy + gruesomeAlchemy - 1) * 0.334;
-
-			if (mRandom.nextDouble() < r) {
+			if (mRandom.nextDouble() < 0.30) {
 				newPot++;
 			}
 
-			for (int a = 0; a < newPot; a++) {
-				boolean added = false;
-				Inventory inv = player.getInventory();
-				int potCount = 0;
-				for (ItemStack item : inv.getContents()) {
-					if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-						int amount = item.getAmount();
-						potCount += amount;
-					}
-				}
-
-				if (potCount > 0 && potCount < 32) {
-					for (ItemStack item : inv.getContents()) {
-						if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-							int amount = item.getAmount();
-							item.setAmount(amount + 1);
-							added = true;
-							break;
-						}
-					}
-				} else if (!added && potCount == 0) {
-					inv.addItem(getAlchemistPotion());
-				}
-			}
+			addAlchemistPotions(player, newPot);
 		}
 	}
 
