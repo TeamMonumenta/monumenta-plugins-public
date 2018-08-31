@@ -29,8 +29,7 @@ public class VotifierIntegration implements Listener {
 		//TODO: Probably want to make this less annoying...
 		if (ScoreboardUtils.getScoreboardValue(player, "VoteRaffle") > 0) {
 			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have won the weekly vote raffle! Congratulations!");
-			// TODO: Replace placeholder
-			player.sendMessage(ChatColor.GOLD + "See the PLACEHOLDER NPC in Sierhaven for a special reward");
+			player.sendMessage(ChatColor.GOLD + "See Pollmaster Tennenbaum in Sierhaven for a special reward");
 		}
 	}
 
