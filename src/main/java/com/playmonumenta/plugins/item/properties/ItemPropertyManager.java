@@ -115,7 +115,7 @@ public class ItemPropertyManager {
 						 * If this particular property applies levels,
 						 * add them to the running count
 						 */
-						int level = property.getLevelFromItem(item);
+						int level = property.getLevelFromItem(item, player);
 						if (level > 0) {
 							Integer currentLevel = propertyMap.get(property);
 							if (currentLevel != null) {
