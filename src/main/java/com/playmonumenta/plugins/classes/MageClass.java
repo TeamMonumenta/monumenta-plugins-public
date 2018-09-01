@@ -93,9 +93,10 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_2_DURATION = 12 * 20;
 	private static final int PRISMATIC_SHIELD_COOLDOWN = 80 * 20;
 	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
-	private static final int PRISMATIC_SHIELD_DAMAGE = 5;
+	private static final int PRISMATIC_SHIELD_1_DAMAGE = 3;
+	private static final int PRISMATIC_SHIELD_2_DAMAGE = 6;
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 14 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 13 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
 	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
@@ -125,6 +126,8 @@ public class MageClass extends BaseClass {
 	private static final int SPELL_SHOCK_REGEN_AMPLIFIER = 1;
 	private static final int SPELL_SHOCK_SPEED_DURATION = 120;
 	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
+	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
+	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
 
 	private static double PASSIVE_DAMAGE = 1.5;
 
@@ -189,12 +192,12 @@ public class MageClass extends BaseClass {
 			if (spellShock > 1) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
 				                                 new PotionEffect(PotionEffectType.REGENERATION,
-									                              SPELL_SHOCK_REGEN_DURATION,
-																  SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
+				                                                  SPELL_SHOCK_REGEN_DURATION,
+				                                                  SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
 				                                 new PotionEffect(PotionEffectType.SPEED,
-									                              SPELL_SHOCK_SPEED_DURATION,
-																  SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
+				                                                  SPELL_SHOCK_SPEED_DURATION,
+				                                                  SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
 			}
 
 			// Consume the "charge"
@@ -274,6 +277,8 @@ public class MageClass extends BaseClass {
 			if (spellShock > 0) {
 				mSpellShockedMobs.put(damagee.getUniqueId(),
 				                      new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, player));
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+				                                         SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 			}
 		}
 
@@ -500,12 +505,12 @@ public class MageClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD)) {
 						int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 						int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
+						float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
 						List<Entity> entities = player.getNearbyEntities(PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS);
-
 						for (Entity e : entities) {
 							if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
-								EntityUtils.damageEntity(mPlugin, (LivingEntity)e, PRISMATIC_SHIELD_DAMAGE, player);
+								SpellDamageMob(mPlugin, (LivingEntity)e, prisDamage, player);
 								MovementUtils.KnockAway(player, (LivingEntity)e, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 							}
 						}
