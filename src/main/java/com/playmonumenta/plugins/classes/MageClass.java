@@ -218,8 +218,12 @@ public class MageClass extends BaseClass {
 
 		// Apply damage to the hit mob all in one shot
 		EntityUtils.damageEntity(mPlugin, mob, dmg, player);
-		mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-		                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+
+		// Make sure to apply vulnerability after damage
+		if (shocked != null) {
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+												 SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+		}
 	}
 
 	@Override
