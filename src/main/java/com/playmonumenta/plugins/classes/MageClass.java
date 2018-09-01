@@ -164,6 +164,8 @@ public class MageClass extends BaseClass {
 						                                                      SPELL_SHOCK_DEATH_RADIUS)) {
 							if (EntityUtils.isHostileMob(nearbyMob)) {
 								EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
+								((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+								                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 							}
 						}
 
@@ -214,6 +216,8 @@ public class MageClass extends BaseClass {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (EntityUtils.isHostileMob(nearbyMob) && nearbyMob != mob) {
 					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player);
+					((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}
 
@@ -222,6 +226,8 @@ public class MageClass extends BaseClass {
 
 		// Apply damage to the hit mob all in one shot
 		EntityUtils.damageEntity(mPlugin, mob, dmg, player);
+		mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+		                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 	}
 
 	@Override
@@ -277,8 +283,6 @@ public class MageClass extends BaseClass {
 			if (spellShock > 0) {
 				mSpellShockedMobs.put(damagee.getUniqueId(),
 				                      new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, player));
-				damagee.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-				                                         SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 			}
 		}
 
