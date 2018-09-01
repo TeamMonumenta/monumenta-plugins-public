@@ -314,6 +314,8 @@ public class AlchemistClass extends BaseClass {
 							tincture.setVelocity(vel);
 							tincture.setGlowing(true);
 
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_THROW_COOLDOWN);
+
 							new BukkitRunnable() {
 								int tinctureDecay = 10 * 10;
 
@@ -354,6 +356,11 @@ public class AlchemistClass extends BaseClass {
 										break;
 									}
 
+									// TODO: Someone should clean this awful thing up at some point...
+									if (tincture.getTicksLived() < 12) {
+										return;
+									}
+
 									tinctureDecay--;
 									if (tinctureDecay <= 0) {
 										tincture.remove();
@@ -361,8 +368,6 @@ public class AlchemistClass extends BaseClass {
 								}
 
 							}.runTaskTimer(mPlugin, 0, 2);
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_THROW_COOLDOWN);
 						}
 					}
 				}
