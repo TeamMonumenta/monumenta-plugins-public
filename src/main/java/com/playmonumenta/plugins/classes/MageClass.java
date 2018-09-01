@@ -121,6 +121,10 @@ public class MageClass extends BaseClass {
 	private static final int SPELL_SHOCK_DEATH_DAMAGE = 3;
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
 	private static final int SPELL_SHOCK_SPELL_DAMAGE = 3;
+	private static final int SPELL_SHOCK_REGEN_DURATION = 51;
+	private static final int SPELL_SHOCK_REGEN_AMPLIFIER = 1;
+	private static final int SPELL_SHOCK_SPEED_DURATION = 120;
+	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
 
 	private static double PASSIVE_DAMAGE = 1.5;
 
@@ -180,6 +184,18 @@ public class MageClass extends BaseClass {
 		SpellShockedMob shocked = mSpellShockedMobs.get(mob.getUniqueId());
 		if (shocked != null) {
 			// Hit a shocked mob with a real spell - extra damage
+
+			int spellShock = ScoreboardUtils.getScoreboardValue(player, "SpellShock");
+			if (spellShock > 1) {
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+				                                 new PotionEffect(PotionEffectType.REGENERATION,
+									                              SPELL_SHOCK_REGEN_DURATION,
+																  SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+				                                 new PotionEffect(PotionEffectType.SPEED,
+									                              SPELL_SHOCK_SPEED_DURATION,
+																  SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
+			}
 
 			// Consume the "charge"
 			mSpellShockedMobs.remove(mob.getUniqueId());
@@ -494,7 +510,7 @@ public class MageClass extends BaseClass {
 							}
 						}
 
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, false));
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
 						ParticleEffect.FIREWORKS_SPARK.display(0.2f, 0.35f, 0.2f, 0.5f, 150, player.getLocation().add(0, 1.15, 0), 40);
 						ParticleEffect.SPELL_INSTANT.display(0.2f, 0.35f, 0.2f, 1, 100, player.getLocation().add(0, 1.15, 0), 40);
 						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
