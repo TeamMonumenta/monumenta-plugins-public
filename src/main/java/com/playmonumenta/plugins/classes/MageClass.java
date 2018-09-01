@@ -54,7 +54,6 @@ import org.bukkit.World;
     ArcaneStrikeHits
     Elemental
     SpellShock
-    Intellect
 */
 
 public class MageClass extends BaseClass {
@@ -92,8 +91,7 @@ public class MageClass extends BaseClass {
 	private static final int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
 	private static final int PRISMATIC_SHIELD_1_DURATION = 12 * 20;
 	private static final int PRISMATIC_SHIELD_2_DURATION = 12 * 20;
-	private static final int PRISMATIC_SHIELD_BASE_COOLDOWN = 80 * 20;
-	private static final int PRISMATIC_SHIELD_INTELLECT_COOLDOWN = 2 * 60 * 20;
+	private static final int PRISMATIC_SHIELD_COOLDOWN = 80 * 20;
 	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
 	private static final int PRISMATIC_SHIELD_DAMAGE = 5;
 
@@ -307,10 +305,7 @@ public class MageClass extends BaseClass {
 							mWorld.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
 							mWorld.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
 
-							boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-							int cooldown = intellectBonus ? (MAGMA_SHIELD_COOLDOWN / 3) * 2 : MAGMA_SHIELD_COOLDOWN;
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, MAGMA_SHIELD_COOLDOWN);
 						}
 					}
 				}
@@ -397,10 +392,7 @@ public class MageClass extends BaseClass {
 								}
 							}
 
-							int intellect = ScoreboardUtils.getScoreboardValue(player, "Intellect");
-							int cooldown = intellect < 2 ? FROST_NOVA_COOLDOWN : (FROST_NOVA_COOLDOWN / 3) * 2;
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, cooldown);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
 
 							Location loc = player.getLocation();
 							ParticleUtils.playParticlesInWorld(mWorld, Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
@@ -508,9 +500,7 @@ public class MageClass extends BaseClass {
 						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 						MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
 
-						boolean intellectBonus = ScoreboardUtils.getScoreboardValue(player, "Intellect") == 2;
-						int cooldown = intellectBonus ? PRISMATIC_SHIELD_INTELLECT_COOLDOWN : PRISMATIC_SHIELD_BASE_COOLDOWN;
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, cooldown);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, PRISMATIC_SHIELD_COOLDOWN);
 					}
 				}
 			}
