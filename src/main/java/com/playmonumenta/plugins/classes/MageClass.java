@@ -17,12 +17,10 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
@@ -159,14 +157,10 @@ public class MageClass extends BaseClass {
 						// Mob has died - trigger effects
 						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
 						world.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
-						for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_DEATH_RADIUS,
-						                                                      SPELL_SHOCK_DEATH_RADIUS,
-						                                                      SPELL_SHOCK_DEATH_RADIUS)) {
-							if (EntityUtils.isHostileMob(nearbyMob)) {
-								EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
-								((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-								                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
-							}
+						for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
+							EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
+							nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+							                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 						}
 
 						it.remove();
@@ -210,11 +204,9 @@ public class MageClass extends BaseClass {
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.5f);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 1.5f);
-			for (Entity nearbyMob : shocked.mob.getNearbyEntities(SPELL_SHOCK_SPELL_RADIUS,
-			                                                      SPELL_SHOCK_SPELL_RADIUS,
-			                                                      SPELL_SHOCK_SPELL_RADIUS)) {
+			for (Entity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
-				if (EntityUtils.isHostileMob(nearbyMob) && nearbyMob != mob) {
+				if (nearbyMob != mob) {
 					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player);
 					((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
@@ -243,25 +235,20 @@ public class MageClass extends BaseClass {
 						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
 							int extraDamage = arcaneStrike == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 
-							List<Entity> entities = damagee.getNearbyEntities(ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS, ARCANE_STRIKE_RADIUS);
-							entities.add(damagee);
-							for (Entity e : entities) {
-								if (EntityUtils.isHostileMob(e)) {
-									LivingEntity mob = (LivingEntity)e;
-									int dmg = extraDamage;
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS)) {
+								int dmg = extraDamage;
 
-									// Arcane strike extra fire damage
-									// Check if (the mob is burning AND was not set on fire this tick) OR the mob has slowness
-									//
+								// Arcane strike extra fire damage
+								// Check if (the mob is burning AND was not set on fire this tick) OR the mob has slowness
+								//
 
-									if (arcaneStrike > 0 && ((mob.getFireTicks() > 0 &&
-									                          MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) ||
-									                         mob.hasPotionEffect(PotionEffectType.SLOW))) {
-										dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
-									}
-
-									EntityUtils.damageEntity(mPlugin, mob, dmg, player);
+								if (arcaneStrike > 0 && ((mob.getFireTicks() > 0 &&
+								                          MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) ||
+								                         mob.hasPotionEffect(PotionEffectType.SLOW))) {
+									dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
 								}
+
+								EntityUtils.damageEntity(mPlugin, mob, dmg, player);
 							}
 
 							Location loc = damagee.getLocation();
@@ -309,19 +296,14 @@ public class MageClass extends BaseClass {
 					if (magmaShield > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD)) {
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-							List<Entity> entities = player.getNearbyEntities(MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS, MAGMA_SHIELD_RADIUS);
-							for (Entity e : entities) {
-								if (EntityUtils.isHostileMob(e)) {
-									LivingEntity mob = (LivingEntity)e;
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), MAGMA_SHIELD_RADIUS)) {
+								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+								if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
+									MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
+									mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
-									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-									if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
-										MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
-										mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
-
-										int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-										SpellDamageMob(mPlugin, mob, extraDamage, player);
-									}
+									int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
+									SpellDamageMob(mPlugin, mob, extraDamage, player);
 								}
 							}
 
@@ -370,12 +352,9 @@ public class MageClass extends BaseClass {
 										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
 										break;
 									}
-									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
-										if (EntityUtils.isHostileMob(e)) {
-											LivingEntity mob = (LivingEntity) e;
-											SpellDamageMob(mPlugin, mob, extraDamage, player);
-											mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
-										}
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
+										SpellDamageMob(mPlugin, mob, extraDamage, player);
+										mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 									}
 								}
 
@@ -396,25 +375,17 @@ public class MageClass extends BaseClass {
 					int frostNova = ScoreboardUtils.getScoreboardValue(player, "FrostNova");
 					if (frostNova > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FROST_NOVA)) {
-							List<Entity> entities = player.getNearbyEntities(FROST_NOVA_RADIUS, FROST_NOVA_RADIUS, FROST_NOVA_RADIUS);
-							entities.add(player);
-							for (int i = 0; i < entities.size(); i++) {
-								Entity e = entities.get(i);
-								if (EntityUtils.isHostileMob(e)) {
-									LivingEntity mob = (LivingEntity)(e);
+							player.setFireTicks(0);
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), FROST_NOVA_RADIUS)) {
+								int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
+								SpellDamageMob(mPlugin, mob, extraDamage, player);
 
-									int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-									SpellDamageMob(mPlugin, mob, extraDamage, player);
-
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
-									if (frostNova > 1) {
-										EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
-									}
-
-									mob.setFireTicks(0);
-								} else if (e instanceof Player) {
-									e.setFireTicks(0);
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
+								if (frostNova > 1) {
+									EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
 								}
+
+								mob.setFireTicks(0);
 							}
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
@@ -445,12 +416,8 @@ public class MageClass extends BaseClass {
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 
 					if (elementalArrows == 2) {
-						List<Entity> entities = damagee.getNearbyEntities(ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS);
-						for (Entity entity : entities) {
-							if (EntityUtils.isHostileMob(entity)) {
-								LivingEntity mob = (LivingEntity)entity;
-								mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-							}
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
+							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 						}
 					}
 				} else if (arrow.hasMetadata("IceArrow")) {
@@ -461,14 +428,10 @@ public class MageClass extends BaseClass {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
 
 					if (elementalArrows == 2) {
-						List<Entity> entities = damagee.getNearbyEntities(ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS, ELEMENTAL_ARROWS_RADIUS);
-						for (Entity entity : entities) {
-							if (EntityUtils.isHostileMob(entity)) {
-								LivingEntity mob = (LivingEntity)entity;
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-								if ((entity instanceof Blaze) && (entity != damagee)) {
-									EntityUtils.damageEntity(mPlugin, mob, 8, player);
-								}
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
+							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
+							if ((mob instanceof Blaze) && (mob != damagee)) {
+								EntityUtils.damageEntity(mPlugin, mob, 8, player);
 							}
 						}
 					}
@@ -511,12 +474,9 @@ public class MageClass extends BaseClass {
 						int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 						float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
-						List<Entity> entities = player.getNearbyEntities(PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS, PRISMATIC_SHIELD_RADIUS);
-						for (Entity e : entities) {
-							if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
-								SpellDamageMob(mPlugin, (LivingEntity)e, prisDamage, player);
-								MovementUtils.KnockAway(player, (LivingEntity)e, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
-							}
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
+							SpellDamageMob(mPlugin, mob, prisDamage, player);
+							MovementUtils.KnockAway(player, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 						}
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));

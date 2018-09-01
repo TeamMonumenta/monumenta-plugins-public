@@ -339,6 +339,22 @@ public class EntityUtils {
 		return false;
 	}
 
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius) {
+		return getNearbyMobs(loc, radius, radius, radius);
+	}
+
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
+		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
+		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
+		for (Entity entity : entities) {
+			if ((entity instanceof LivingEntity) && isHostileMob(entity)) {
+				mobs.add((LivingEntity)entity);
+			}
+		}
+
+		return mobs;
+	}
+
 	public static Entity getEntity(World world, UUID entityUUID) {
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
