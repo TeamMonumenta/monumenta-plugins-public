@@ -157,15 +157,11 @@ public class RogueClass extends BaseClass {
 										ParticleEffect.REDSTONE.display(new OrdinaryColor(64, 64, 64), pLoc, 10);
 									}
 
-									for (Entity e : mLoc.getWorld().getNearbyEntities(mLoc, 1, 1, 1)) {
-										if (EntityUtils.isHostileMob(e) && !hit) {
-											LivingEntity le = (LivingEntity) e;
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1)) {
+										EntityUtils.damageEntity(mPlugin, mob, damage, player);
+										mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
 
-											EntityUtils.damageEntity(mPlugin, le, damage, player);
-											le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
-
-											hit = true;
-										}
+										hit = true;
 									}
 
 									if (mLoc.getBlock().getType().isSolid() || hit) {
@@ -231,11 +227,8 @@ public class RogueClass extends BaseClass {
 								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION, ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
 
 								if (advancingShadows > 1) {
-									List<Entity> entities = entity.getNearbyEntities(ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
-									for (Entity mob : entities) {
-										if (mob != player && mob != entity && EntityUtils.isHostileMob(mob)) {
-											MovementUtils.KnockAway(entity, (LivingEntity)mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
-										}
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE)) {
+										MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 									}
 								}
 
@@ -255,20 +248,14 @@ public class RogueClass extends BaseClass {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SMOKESCREEN)) {
 						ItemStack mainHand = player.getInventory().getItemInMainHand();
 						if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
-							List<Entity> entities = player.getNearbyEntities(SMOKESCREEN_RANGE, SMOKESCREEN_RANGE,
-							                                                 SMOKESCREEN_RANGE);
-							for (Entity entity : entities) {
-								if (EntityUtils.isHostileMob(entity)) {
-									LivingEntity mob = (LivingEntity)entity;
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), SMOKESCREEN_RANGE)) {
+								int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
+													SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
+								int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
+													SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
 
-									int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
-									                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
-									int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
-									                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
-
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, slownessLevel, false, true));
-								}
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, slownessLevel, false, true));
 							}
 						}
 
@@ -397,16 +384,11 @@ public class RogueClass extends BaseClass {
 			int escapeDeath = ScoreboardUtils.getScoreboardValue(player, "EscapeDeath");
 			if (escapeDeath > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ESCAPE_DEATH)) {
-					List<Entity> entities = player.getNearbyEntities(ESCAPE_DEATH_RANGE, ESCAPE_DEATH_RANGE,
-					                                                 ESCAPE_DEATH_RANGE);
-					for (Entity entity : entities) {
-						if (EntityUtils.isHostileMob(entity)) {
-							LivingEntity mob = (LivingEntity)entity;
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-							                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-							                                     ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
-						}
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), ESCAPE_DEATH_RANGE)) {
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
+															 ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
+															 ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
 					}
 
 					if (escapeDeath > 1) {
@@ -468,12 +450,8 @@ public class RogueClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
 				if (viciousCombos > 1) {
-					List<Entity> entities = player.getNearbyEntities(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE);
-					for (Entity entity : entities) {
-						if (EntityUtils.isHostileMob(entity)) {
-							LivingEntity mob = (LivingEntity)entity;
-							_damageMob(player, mob, VICIOUS_COMBOS_DAMAGE);
-						}
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), VICIOUS_COMBOS_RANGE)) {
+						_damageMob(player, mob, VICIOUS_COMBOS_DAMAGE);
 					}
 				}
 

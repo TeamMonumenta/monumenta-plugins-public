@@ -333,22 +333,17 @@ public class ScoutClass extends BaseClass {
 						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 						World world = player.getWorld();
 
-						List<Entity> entities = player.getNearbyEntities(EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS, EAGLE_EYE_RADIUS);
-						for (Entity e : entities) {
-							if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
-								LivingEntity mob = (LivingEntity)e;
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS)) {
+							Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+							if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 
-								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-								if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+								int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
-									int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
-
-									ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
-									                                   10, 0.7, 0.7, 0.7, 0.001);
-									world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
-								}
+								ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
+																   10, 0.7, 0.7, 0.7, 0.001);
+								world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
 							}
 						}
 

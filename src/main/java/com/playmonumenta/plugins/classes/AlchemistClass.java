@@ -376,14 +376,9 @@ public class AlchemistClass extends BaseClass {
 					float kbSpeed = (enfeeblingElixir == 1) ? ENFEEBLING_KNOCKBACK_1_SPEED : ENFEEBLING_KNOCKBACK_2_SPEED;
 					int weaknessLevel = enfeeblingElixir;
 
-					List<Entity> entities = damagee.getNearbyEntities(ENFEEBLING_RADIUS, ENFEEBLING_RADIUS, ENFEEBLING_RADIUS);
-					for (Entity e : entities) {
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity mob = (LivingEntity)e;
-
-							MovementUtils.KnockAway(damagee, mob, kbSpeed);
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
-						}
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS)) {
+						MovementUtils.KnockAway(damagee, mob, kbSpeed);
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
 					}
 
 					MovementUtils.KnockAway(player, damagee, kbSpeed);
@@ -430,17 +425,12 @@ public class AlchemistClass extends BaseClass {
 				owner.getWorld().playSound(loc, "entity.generic.explode", 0.9f, 1.0f);
 
 				ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
-				List<Entity> entities = marker.getNearbyEntities(BOMB_ARROW_RADIUS, BOMB_ARROW_RADIUS, BOMB_ARROW_RADIUS);
 
 				int baseDamage = (bombArrow == 1) ? BOMB_ARROW_1_DAMAGE : BOMB_ARROW_2_DAMAGE;
 
-				for (int i = 0; i < entities.size(); i++) {
-					Entity e = entities.get(i);
-					if (EntityUtils.isHostileMob(e)) {
-						LivingEntity mob = (LivingEntity)e;
-						EntityUtils.damageEntity(mPlugin, mob, baseDamage, owner);
-						MovementUtils.KnockAway((LivingEntity)marker, mob, BOMB_ARROW_KNOCKBACK_SPEED);
-					}
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(marker.getLocation(), BOMB_ARROW_RADIUS)) {
+					EntityUtils.damageEntity(mPlugin, mob, baseDamage, owner);
+					MovementUtils.KnockAway((LivingEntity)marker, mob, BOMB_ARROW_KNOCKBACK_SPEED);
 				}
 			}
 		}

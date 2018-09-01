@@ -129,16 +129,9 @@ public class WarlockClass extends BaseClass {
 				ParticleUtils.playParticlesInWorld(world, Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
 				world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
 
-				List<Entity> entities = player.getNearbyEntities(BLASPHEMY_RADIUS, BLASPHEMY_RADIUS, BLASPHEMY_RADIUS);
 				MovementUtils.KnockAway(player, damager, BLASPHEMY_KNOCKBACK_SPEED);
-				for (int i = 0; i < entities.size(); i++) {
-					Entity e = entities.get(i);
-					if (EntityUtils.isHostileMob(e)) {
-						LivingEntity mob = (LivingEntity)e;
-						int vulnLevel = (blasphemy == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
-					}
-				}
+				int vulnLevel = (blasphemy == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
+				damager.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
 			}
 		}
 		return true;
@@ -161,13 +154,8 @@ public class WarlockClass extends BaseClass {
 				}
 
 				if (cursedWound > 1 && PlayerUtils.isCritical(player)) {
-					List<Entity> entities = damagee.getNearbyEntities(CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS, CURSED_WOUND_RADIUS);
-					for (int i = 0; i < entities.size(); i++) {
-						Entity e = entities.get(i);
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity mob = (LivingEntity)e;
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
-						}
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS)) {
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 					}
 				}
 			}
@@ -192,16 +180,10 @@ public class WarlockClass extends BaseClass {
 						world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
 						world.playSound(loc, "entity.player.attack.crit", 1.0f, 1.2f);
 
-						List<Entity> entities = player.getNearbyEntities(SOUL_REND_RADIUS, SOUL_REND_RADIUS, SOUL_REND_RADIUS);
-						entities.add(player);
-						for (Entity entity : entities) {
-							if (entity instanceof Player) {
-								Player p = (Player)entity;
-
-								// If this is us or we're allowing anyone to get it.
-								if (p == player || soulRend > 1) {
-									PlayerUtils.healPlayer(p, soulHealValue);
-								}
+						for (Player p : PlayerUtils.getNearbyPlayers(player, SOUL_REND_RADIUS, true)) {
+							// If this is us or we're allowing anyone to get it.
+							if (p == player || soulRend > 1) {
+								PlayerUtils.healPlayer(p, soulHealValue);
 							}
 						}
 
@@ -233,15 +215,11 @@ public class WarlockClass extends BaseClass {
 
 					int damage = (graspingClaws == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 
-					List<Entity> entities = arrow.getNearbyEntities(GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS, GRASPING_CLAWS_RADIUS);
-					for (Entity entity : entities) {
-						if (EntityUtils.isHostileMob(entity)) {
-							LivingEntity mob = (LivingEntity)entity;
-							EntityUtils.damageEntity(mPlugin, mob, damage, player);
-							MovementUtils.PullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
-							EntityUtils.damageEntity(mPlugin, mob, damage, player);
-						}
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS)) {
+						EntityUtils.damageEntity(mPlugin, mob, damage, player);
+						MovementUtils.PullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
+						EntityUtils.damageEntity(mPlugin, mob, damage, player);
 					}
 
 					// Put Grasping Claws on cooldown
@@ -270,16 +248,12 @@ public class WarlockClass extends BaseClass {
 
 							boolean effect = false;
 							int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
-							List<Entity> entities = player.getNearbyEntities(radius, radius, radius);
-							for (Entity entity : entities) {
-								if (EntityUtils.isHostileMob(entity)) {
-									LivingEntity mob = (LivingEntity)entity;
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
-									mob.setFireTicks(CONSUMING_FLAMES_DURATION);
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius)) {
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
+								mob.setFireTicks(CONSUMING_FLAMES_DURATION);
 
-									EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);
-									effect = true;
-								}
+								EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);
+								effect = true;
 							}
 
 							if (consumingFlames > 1 && effect) {
@@ -304,24 +278,19 @@ public class WarlockClass extends BaseClass {
 							player.getWorld().playSound(player.getLocation(), "entity.polar_bear.warning", 1.0f, 1.6f);
 
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-							List<Entity> entities = player.getNearbyEntities(AMPLIFYING_RADIUS, AMPLIFYING_RADIUS, AMPLIFYING_RADIUS);
-							for (Entity e : entities) {
-								if (EntityUtils.isHostileMob(e)) {
-									LivingEntity mob = (LivingEntity)e;
-
-									Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
-									if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
-										int debuffCount = (int)DEBUFFS.stream()
-										                  .filter(effect -> (mob.getPotionEffect(effect) != null))
-										                  .count();
-										int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
-										if (consumingFlames > 1 && mob.getFireTicks() > 0) {
-											debuffCount++;
-										}
-										if (debuffCount > 0) {
-											EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
-											MovementUtils.KnockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
-										}
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), AMPLIFYING_RADIUS)) {
+								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+								if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
+									int debuffCount = (int)DEBUFFS.stream()
+													  .filter(effect -> (mob.getPotionEffect(effect) != null))
+													  .count();
+									int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
+									if (consumingFlames > 1 && mob.getFireTicks() > 0) {
+										debuffCount++;
+									}
+									if (debuffCount > 0) {
+										EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
+										MovementUtils.KnockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
 									}
 								}
 							}

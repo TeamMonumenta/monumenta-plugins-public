@@ -96,12 +96,8 @@ public class WarriorClass extends BaseClass {
 
 						double csDamage = counterStrike == 1 ? 12D : 24D;
 
-						List<Entity> entities = player.getNearbyEntities(COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS, COUNTER_STRIKE_RADIUS);
-						for (int i = 0; i < entities.size(); i++) {
-							Entity e = entities.get(i);
-							if (EntityUtils.isHostileMob(e)) {
-								EntityUtils.damageEntity(mPlugin, (LivingEntity)e, csDamage, player);
-							}
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), COUNTER_STRIKE_RADIUS)) {
+							EntityUtils.damageEntity(mPlugin, mob, csDamage, player);
 						}
 					}
 				}
@@ -164,14 +160,11 @@ public class WarriorClass extends BaseClass {
 			ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
 			ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
 
-			// Get list of nearby hostile mobs (not including the hit mob!)
-			List<Entity> entities = damagee.getNearbyEntities(BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS, BRUTE_FORCE_RADIUS);
-
 			// Damage those non-hit nearby entities and knock them away
-			for (Entity e : entities) {
-				if (e instanceof LivingEntity && EntityUtils.isHostileMob(e) && e != damagee) {
-					EntityUtils.damageEntity(mPlugin, (LivingEntity)e, bruteForceDamage, player);
-					MovementUtils.KnockAway(player, (LivingEntity)e, BRUTE_FORCE_KNOCKBACK_SPEED);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS)) {
+				if (mob != damagee) {
+					EntityUtils.damageEntity(mPlugin, mob, bruteForceDamage, player);
+					MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
 				}
 			}
 

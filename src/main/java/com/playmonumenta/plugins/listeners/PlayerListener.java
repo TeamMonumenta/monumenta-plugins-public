@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -31,6 +32,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -133,15 +135,9 @@ public class PlayerListener implements Listener {
 		mPlugin.mTrackingManager.removeEntity(player);
 
 		// If the player is opped don't apply anti-combat logging technology!
-		List<Entity> nearbyEntities = player.getNearbyEntities(20, 20, 20);
-		if (nearbyEntities.size() > 0) {
-			for (Entity entity : nearbyEntities) {
-				if (entity instanceof Monster) {
-					Monster mob = (Monster)entity;
-					mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
-					mob.setRemoveWhenFarAway(false);
-				}
-			}
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 20)) {
+			mPlugin.mCombatLoggingTimers.addTimer(mob.getUniqueId(), Constants.TEN_MINUTES);
+			mob.setRemoveWhenFarAway(false);
 		}
 	}
 
