@@ -131,7 +131,10 @@ public class WarlockClass extends BaseClass {
 
 				MovementUtils.KnockAway(player, damager, BLASPHEMY_KNOCKBACK_SPEED);
 				int vulnLevel = (blasphemy == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
-				damager.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
+
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), BLASPHEMY_RADIUS)) {
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
+				}
 			}
 		}
 		return true;
