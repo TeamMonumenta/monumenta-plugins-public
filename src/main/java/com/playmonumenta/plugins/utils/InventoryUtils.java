@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Plugin;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
@@ -17,11 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Material;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import com.playmonumenta.plugins.Plugin;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 public class InventoryUtils {
 	private static int OFFHAND_SLOT = 40;
@@ -29,32 +31,6 @@ public class InventoryUtils {
 	private static int CHESTPLATE_SLOT = 38;
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
-
-	enum ItemLevels {
-		/*
-		 * The space is important here to make sure that
-		 * we don't accidentaly match "IV" as "V" using endsWith()
-		 */
-		LEVEL_1(1, " I"),
-		LEVEL_2(2, " II"),
-		LEVEL_3(3, " III"),
-		LEVEL_4(4, " IV"),
-		LEVEL_5(5, " V");
-
-		private final int level;
-		private final String name;
-
-		ItemLevels(int level, String name) {
-			this.level = level;
-			this.name = name;
-		}
-		public int getLevel() {
-			return level;
-		}
-		public String getName() {
-			return name;
-		}
-	}
 
 	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player) {
 		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -130,10 +106,16 @@ public class InventoryUtils {
 
 					//  If it exists, loop through the different "level" matchers and return the index of it if it exists.
 					if (loreEntry != null) {
-						for (ItemLevels level : ItemLevels.values()) {
-							if (loreEntry.endsWith(level.getName())) {
-								return level.getLevel();
-							}
+						if (loreEntry.endsWith(" I")) {
+							return 1;
+						} else if (loreEntry.endsWith(" II")) {
+							return 2;
+						} else if (loreEntry.endsWith(" III")) {
+							return 3;
+						} else if (loreEntry.endsWith(" IV")) {
+							return 4;
+						} else if (loreEntry.endsWith(" V")) {
+							return 5;
 						}
 
 						// Default level is 1
