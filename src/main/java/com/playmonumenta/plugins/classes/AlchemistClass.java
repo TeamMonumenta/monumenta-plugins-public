@@ -323,10 +323,13 @@ public class AlchemistClass extends BaseClass {
 										this.cancel();
 									}
 									ParticleEffect.SPELL.display(0, 0, 0, 0.1f, 3, tincture.getLocation(), 40);
-									if (tincture.getTicksLived() < 12) {
-										return;
-									}
+
 									for (Player p : PlayerUtils.getNearbyPlayers(tincture.getLocation(), 1)) {
+										// Prevent players from picking up their own tincture instantly
+										if (p == player && tincture.getTicksLived() < 12) {
+											continue;
+										}
+
 										tincture.getWorld().playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
 										ParticleEffect.BLOCK_DUST.display(new BlockData(Material.GLASS, (byte) 0), 0.1f, 0.1f, 0.1f, 0.1f, 250, tincture.getLocation(), 40);
 										tincture.remove();
@@ -341,12 +344,14 @@ public class AlchemistClass extends BaseClass {
 											ParticleUtils.playParticlesInWorld(zaWarudo, Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
 											zaWarudo.playSound(player.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
 										}
-										this.cancel();
 										mPlugin.mTimers.removeCooldown(player.getUniqueId(), Spells.IRON_TINCTURE);
 										mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_USE_COOLDOWN);
 
 										ParticleUtils.playParticlesInWorld(zaWarudo, Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
 										zaWarudo.playSound(p.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
+
+										this.cancel();
+										break;
 									}
 
 									tinctureDecay--;
