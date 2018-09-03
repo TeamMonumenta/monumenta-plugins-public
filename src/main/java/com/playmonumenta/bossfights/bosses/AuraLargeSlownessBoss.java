@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 public class AuraLargeSlownessBoss extends BossAbilityGroup
 {
 	public static final String identityTag = "SlownessAura";
-	public static final int detectionRange = 50;
+	public static final int detectionRange = 45;
 
 	LivingEntity mBoss;
 
@@ -32,7 +32,7 @@ public class AuraLargeSlownessBoss extends BossAbilityGroup
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBaseAura(mBoss, 35, 20, 35, 50, Particle.FALLING_DUST, new MaterialData(Material.ANVIL),
+				new SpellBaseAura(mBoss, 35, 20, 35, 10, Particle.FALLING_DUST, new MaterialData(Material.ANVIL),
 					(Player player) -> {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, true, true));
 					})
