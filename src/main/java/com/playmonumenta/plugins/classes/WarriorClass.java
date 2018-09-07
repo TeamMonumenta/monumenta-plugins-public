@@ -238,8 +238,10 @@ public class WarriorClass extends BaseClass {
 								Location loc = target.getLocation();
 
 								target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
-								boolean self = (target == player);
-								mPlugin.mPotionManager.addPotion(target, self ? PotionID.ABILITY_SELF : PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DEFENSIVE_LINE_DURATION, 1, true, true));
+								mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
+								                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
+								                                                  DEFENSIVE_LINE_DURATION,
+								                                                  1, true, true));
 							}
 
 							ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
