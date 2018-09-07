@@ -343,15 +343,25 @@ public class ClericClass extends BaseClass {
 					}
 				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
+
+				// Cleansing Rain
+				boolean cleansingAttempted = false;
+				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
+				if (cleansing > 0 &&
+						player.getLocation().getPitch() < -CLEANSING_ANGLE &&
+						(mainHand == null || mainHand.getType() != Material.BOW) &&
+						(offHand == null || offHand.getType() != Material.BOW) &&
+						cleansing > 0) {
+					cleansingAttempted = true;
+					activateCleansing(player, cleansing);
+				}
+
+				// Hand of Light
 				if ((offHand != null && offHand.getType() == Material.SHIELD) || (mainHand != null && mainHand.getType() == Material.SHIELD)) {
-					int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-					if (cleansing > 0 && (player.getLocation()).getPitch() < -CLEANSING_ANGLE) {
-						activateCleansing(player, cleansing);
-					} else if (healing > 0) {
+					if (healing > 0 && !cleansingAttempted) {
 						activateHealing(player, healing);
 					}
 				}
