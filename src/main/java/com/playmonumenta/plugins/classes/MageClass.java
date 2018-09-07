@@ -116,7 +116,7 @@ public class MageClass extends BaseClass {
 
 	private static final int SPELL_SHOCK_DURATION = 6 * 20;
 	private static final int SPELL_SHOCK_TEST_PERIOD = 2;
-	private static final int SPELL_SHOCK_DEATH_RADIUS = 2;
+	private static final int SPELL_SHOCK_DEATH_RADIUS = 3;
 	private static final int SPELL_SHOCK_DEATH_DAMAGE = 3;
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
 	private static final int SPELL_SHOCK_SPELL_DAMAGE = 3;
@@ -126,6 +126,7 @@ public class MageClass extends BaseClass {
 	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
+	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
 
 	private static double PASSIVE_DAMAGE = 1.5;
 
@@ -207,6 +208,7 @@ public class MageClass extends BaseClass {
 			for (Entity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SPELL_SHOCK_STAGGER_DURATION, 10, true, false));
 					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player);
 					((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
@@ -217,7 +219,9 @@ public class MageClass extends BaseClass {
 		}
 
 		// Apply damage to the hit mob all in one shot
-		EntityUtils.damageEntity(mPlugin, mob, dmg, player);
+		if (dmg > 0) {
+			EntityUtils.damageEntity(mPlugin, mob, dmg, player);
+		}
 
 		// Make sure to apply vulnerability after damage
 		if (shocked != null) {
@@ -417,11 +421,17 @@ public class MageClass extends BaseClass {
 						event.setDamage(event.getDamage() + 8);
 					}
 
+					// Trigger spellshock if mob is shocked
+					SpellDamageMob(mPlugin, damagee, 0, player);
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 
 					if (elementalArrows == 2) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
-							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
+							if (mob != damagee) {
+								// Trigger spellshock if mob is shocked
+								SpellDamageMob(mPlugin, mob, 0, player);
+								mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
+							}
 						}
 					}
 				} else if (arrow.hasMetadata("IceArrow")) {
@@ -429,13 +439,19 @@ public class MageClass extends BaseClass {
 						event.setDamage(event.getDamage() + 8);
 					}
 
+					// Trigger spellshock if mob is shocked
+					SpellDamageMob(mPlugin, damagee, 0, player);
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
 
 					if (elementalArrows == 2) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-							if ((mob instanceof Blaze) && (mob != damagee)) {
-								EntityUtils.damageEntity(mPlugin, mob, 8, player);
+							if (mob != damagee) {
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
+								// Trigger spellshock if mob is shocked
+								SpellDamageMob(mPlugin, mob, 0, player);
+								if (mob instanceof Blaze) {
+									EntityUtils.damageEntity(mPlugin, mob, 8, player);
+								}
 							}
 						}
 					}
