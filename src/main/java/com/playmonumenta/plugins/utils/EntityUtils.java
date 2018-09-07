@@ -68,6 +68,18 @@ public class EntityUtils {
 		return false;
 	}
 
+	public static boolean isStillLoaded(Entity entity) {
+		Location loc = entity.getLocation();
+
+		for (Entity ne : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
+			if (ne.getUniqueId().equals(entity.getUniqueId())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public static void applyFreeze(Plugin plugin, int ticks, LivingEntity mob) {
 		if (!mob.hasAI() || isBoss(mob)) {
 			return;

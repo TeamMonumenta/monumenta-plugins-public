@@ -45,6 +45,7 @@ public class ItemPropertyManager {
 		init.add(new Darksight());
 		init.add(new Radiant());
 		init.add(new Gills());
+		init.add(new Gilded());
 		init.add(new Stylish());
 		init.add(new Hope());
 		init.add(new Frost());

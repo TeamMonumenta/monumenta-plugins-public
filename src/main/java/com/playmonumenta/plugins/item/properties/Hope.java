@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.item.properties;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+
 import java.lang.reflect.Field;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 
 public class Hope implements ItemProperty {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
@@ -54,11 +55,22 @@ public class Hope implements ItemProperty {
 		}
 
 		new BukkitRunnable() {
+			int numTicks = 0;
+
 			@Override
 			public void run() {
 				ParticleEffect.SPELL_INSTANT.display(0.2f, 0.2f, 0.2f, 0, 3, item.getLocation(), 40);
 				if (item == null || item.isDead()) {
 					this.cancel();
+				}
+
+				// Very infrequently check if the item is still actually there
+				numTicks++;
+				if (numTicks > 200) {
+					numTicks = 0;
+					if (!EntityUtils.isStillLoaded(item)) {
+						this.cancel();
+					}
 				}
 			}
 		}.runTaskTimer(plugin, 10, tickPeriod);
