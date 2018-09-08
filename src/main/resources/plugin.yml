@@ -32,6 +32,9 @@ commands:
   hopeifyHeldItem:
     permission: monumenta.command.hopeifyHeldItem
     description: Adds the hope enchant and the player's name to their held item
+  gildifyHeldItem:
+    permission: monumenta.command.gildifyHeldItem
+    description: Adds the Gilded enchant and the player's name to their held item
   checkEmptyInventory:
     permission: monumenta.command.checkEmptyInventory
     description: Return success if the player's inventory is empty, fails otherwise

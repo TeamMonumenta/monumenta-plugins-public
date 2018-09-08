@@ -27,6 +27,7 @@ public class CommandFactory {
 			createCommand(plugin, new DebugInfo(plugin, potionManager));
 			createCommand(plugin, new Forward(plugin));
 			createCommand(plugin, new GetScore(plugin));
+			createCommand(plugin, new GildifyHeldItem(plugin));
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new HopeifyHeldItem(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
