@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 
 public class ScoreboardUtils {
 	public static final String[] NOT_TRANSFERRED_OBJECTIVES_VALS =
-	    new String[] {"Apartment", "AptIdle", "DailyQuest", "DailyVersion", "VotesWeekly", "VotesTotal", "VoteRewards", "VoteRaffle"};
+	    new String[] {"Apartment", "AptIdle", "DailyQuest", "DailyVersion", "VotesWeekly", "VotesTotal", "VoteRewards", "VoteRaffle", "VoteCache"};
 	public static final Set<String> NOT_TRANSFERRED_OBJECTIVES =
 	    new HashSet<>(Arrays.asList(NOT_TRANSFERRED_OBJECTIVES_VALS));
 
@@ -56,6 +56,14 @@ public class ScoreboardUtils {
 		}
 
 		return scoreValue;
+	}
+
+	public static void setScoreboardValue(String playerName, String scoreboardValue, int value) {
+		Objective objective = Bukkit.getScoreboardManager().getMainScoreboard().getObjective(scoreboardValue);
+		if (objective != null) {
+			Score score = objective.getScore(playerName);
+			score.setScore(value);
+		}
 	}
 
 	public static void setScoreboardValue(Player player, String scoreboardValue, int value) {

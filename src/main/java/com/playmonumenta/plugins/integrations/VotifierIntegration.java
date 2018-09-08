@@ -26,39 +26,63 @@ public class VotifierIntegration implements Listener {
 	public void PlayerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
-		//TODO: Probably want to make this less annoying...
 		if (ScoreboardUtils.getScoreboardValue(player, "VoteRaffle") > 0) {
 			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have won the weekly vote raffle! Congratulations!");
-			player.sendMessage(ChatColor.GOLD + "See Pollmaster Tennenbaum in Sierhaven for a special reward");
+			player.sendMessage(ChatColor.GOLD + "See Pollmaster Tennenbaum in Sierhaven for your reward");
+		}
+
+		int offlineVotes = ScoreboardUtils.getScoreboardValue(player, "VoteCache");
+		if (offlineVotes > 0) {
+			int votesWeekly = ScoreboardUtils.getScoreboardValue(player, "VotesWeekly");
+			int votesTotal = ScoreboardUtils.getScoreboardValue(player, "VotesTotal");
+			int voteRewards = ScoreboardUtils.getScoreboardValue(player, "VoteRewards");
+
+			player.sendMessage(ChatColor.GOLD + "Thanks for voting for Monumenta! Your " + offlineVotes +
+			                   " votes while you were away from King's Valley have been recorded.");
+			player.sendMessage(ChatColor.GOLD +
+							   "You have " + Integer.toString(votesWeekly) + " vote" + (votesWeekly == 1 ? "" : "s") +
+							   " this week, " + Integer.toString(votesTotal) + " lifetime vote" + (votesTotal == 1 ? "" : "s") +
+							   " and " + Integer.toString(voteRewards) + " unclaimed reward" + (voteRewards == 1 ? "" : "s"));
+			ScoreboardUtils.setScoreboardValue(player, "VoteCache", 0);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
     public void onVotifierEvent(VotifierEvent event) {
         Vote vote = event.getVote();
+		String playerName = vote.getUsername();
 
-		//TODO: Remove this eventually
 		mPlugin.getLogger().log(Level.FINE, "Got vote: " + vote.toString());
-		//TODO: Forward this message if on the build shard
 
-		//  Loop through all online players and find the matching one
-		//  and send them a message
-		for (Player player : mPlugin.getServer().getOnlinePlayers()) {
-			if (player.getName().equals(vote.getUsername())) {
-				int votesWeekly = ScoreboardUtils.getScoreboardValue(player, "VotesWeekly") + 1;
-				int votesTotal = ScoreboardUtils.getScoreboardValue(player, "VotesTotal") + 1;
-				int voteRewards = ScoreboardUtils.getScoreboardValue(player, "VoteRewards") + 1;
-				ScoreboardUtils.setScoreboardValue(player, "VotesWeekly", votesWeekly);
-				ScoreboardUtils.setScoreboardValue(player, "VotesTotal", votesTotal);
-				ScoreboardUtils.setScoreboardValue(player, "VoteRewards", voteRewards);
+		// Give the player credit for voting
+		int votesWeekly = ScoreboardUtils.getScoreboardValue(playerName, "VotesWeekly").orElse(0) + 1;
+		int votesTotal = ScoreboardUtils.getScoreboardValue(playerName, "VotesTotal").orElse(0) + 1;
+		int voteRewards = ScoreboardUtils.getScoreboardValue(playerName, "VoteRewards").orElse(0) + 1;
+		ScoreboardUtils.setScoreboardValue(playerName, "VotesWeekly", votesWeekly);
+		ScoreboardUtils.setScoreboardValue(playerName, "VotesTotal", votesTotal);
+		ScoreboardUtils.setScoreboardValue(playerName, "VoteRewards", voteRewards);
 
-				player.sendMessage(ChatColor.GOLD + "Thanks for voting at " + vote.getServiceName() + "!");
-				player.sendMessage(ChatColor.GOLD +
-				                   "You have " + Integer.toString(votesWeekly) + " vote" + (votesWeekly == 1 ? "" : "s") +
-				                   " this week, " + Integer.toString(votesTotal) + " lifetime vote" + (votesTotal == 1 ? "" : "s") +
-								   " and " + Integer.toString(voteRewards) + " unclaimed reward" + (voteRewards == 1 ? "" : "s"));
+		Player player = null;
+
+		//  Loop through all online players and see if this player is online
+		for (Player testPlayer : mPlugin.getServer().getOnlinePlayers()) {
+			if (testPlayer.getName().equals(playerName)) {
+				player = testPlayer;
 				break;
 			}
+		}
+
+		if (player != null) {
+			// Player is online
+			player.sendMessage(ChatColor.GOLD + "Thanks for voting at " + vote.getServiceName() + "!");
+			player.sendMessage(ChatColor.GOLD +
+							   "You have " + Integer.toString(votesWeekly) + " vote" + (votesWeekly == 1 ? "" : "s") +
+							   " this week, " + Integer.toString(votesTotal) + " lifetime vote" + (votesTotal == 1 ? "" : "s") +
+							   " and " + Integer.toString(voteRewards) + " unclaimed reward" + (voteRewards == 1 ? "" : "s"));
+		} else {
+			// Player is not online - keep track of how many votes they make while offline
+			int voteCache = ScoreboardUtils.getScoreboardValue(playerName, "VoteCache").orElse(0) + 1;
+			ScoreboardUtils.setScoreboardValue(playerName, "VoteCache", voteCache);
 		}
     }
 }
