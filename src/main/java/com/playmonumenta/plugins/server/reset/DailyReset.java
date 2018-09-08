@@ -10,6 +10,10 @@ public class DailyReset {
 	public static void handle(Plugin plugin, Player player) {
 		if (plugin.mServerProperties.getDailyResetEnabled()) {
 			if (player != null) {
+				if (ScoreboardUtils.getScoreboardValue(player, "VoteRaffle") >= 1) {
+					player.sendMessage(ChatColor.BOLD + "" + ChatColor.GOLD + "You have won the weekly voting raffle! See Pollmaster Tennenbaum for a reward!");
+				}
+
 				//  Test to see if the player's Daily version is different than the servers.
 				int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion");
 				if (dailyVersion != plugin.mDailyQuestVersion) {
