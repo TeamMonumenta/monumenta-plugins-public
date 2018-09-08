@@ -159,7 +159,7 @@ public class MageClass extends BaseClass {
 						// Mob has died - trigger effects
 						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
 						ParticleEffect.CRIT_MAGIC.display(1, 1, 1, 0.25f, 100, loc, 40);
-						world.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
+						world.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
 						for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
 							EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
 							nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
@@ -205,9 +205,9 @@ public class MageClass extends BaseClass {
 			Location loc = shocked.mob.getLocation().add(0, 1, 0);
 			ParticleUtils.playParticlesInWorld(mWorld, Particle.SPELL_WITCH, loc, 100, 2, 2, 2, 0.001);
 			ParticleEffect.CRIT_MAGIC.display(1, 1, 1, 0.25f, 75, loc, 40);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.5f);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 2.0f);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 10.0f, 1.5f);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.5f);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
+			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 1.5f);
 			for (Entity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
