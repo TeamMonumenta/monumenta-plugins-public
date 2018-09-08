@@ -89,6 +89,7 @@ public class HopeifyHeldItem extends AbstractPlayerCommand {
 
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
+		item.setAmount(1);
 		sendMessage(context, "Succesfully added hope to player's held item");
 
 		return true;

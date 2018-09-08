@@ -101,10 +101,12 @@ public class GildifyHeldItem extends AbstractPlayerCommand {
 		if (duplicateItem) {
 			// Give the player a copy of their un-modified item
 			dupe = item.clone();
+			dupe.setAmount(1);
 		}
 
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
+		item.setAmount(1);
 
 		if (duplicateItem) {
 			player.getInventory().addItem(dupe);
