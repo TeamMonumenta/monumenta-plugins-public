@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 import com.playmonumenta.plugins.command.*;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -249,6 +250,12 @@ public class Plugin extends JavaPlugin {
 
 	//  TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
 	public BaseClass getClass(Player player) {
+		// Players in spectator have no class abilities
+		// TODO: Hook vanished here also
+		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+			return mClassMap.get(Classes.NONE.getValue());
+		}
+
 		if (Constants.CLASSES_ENABLED) {
 			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
 			if (playerClass >= 0 && playerClass <= Classes.COUNT.getValue()) {

@@ -1,18 +1,19 @@
 package com.playmonumenta.plugins.player;
 
+import com.playmonumenta.plugins.item.properties.ItemProperty;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
+import com.playmonumenta.plugins.Plugin;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.item.properties.ItemProperty;
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
+import org.bukkit.GameMode;
+import org.bukkit.World;
 
 public class PlayerInventory {
 	/*
@@ -26,6 +27,12 @@ public class PlayerInventory {
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
+		// Players in spectator do not have ticking effects
+		// TODO: Add vanish hook here also
+		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+			return;
+		}
+
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();

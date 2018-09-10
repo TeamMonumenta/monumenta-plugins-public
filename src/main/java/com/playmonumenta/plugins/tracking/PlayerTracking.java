@@ -200,6 +200,11 @@ public class PlayerTracking implements EntityTracking {
 	// TODO: We should move this out of being ticked and into an event based system as well as store all
 	// Patrons in a list so we're not testing against every player 4 times a second.
 	void _updatePatreonEffects(Player player, World world) {
+		// Players in spectator do not have patreon particles
+		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+			return;
+		}
+
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		if (patreon > 0) {
 			int shinyWhite = ScoreboardUtils.getScoreboardValue(player, "ShinyWhite");
