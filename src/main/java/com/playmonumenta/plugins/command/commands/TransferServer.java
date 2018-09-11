@@ -96,6 +96,8 @@ public class TransferServer extends AbstractPlayerCommand {
 			}
 		} catch (Exception e) {
 			sendErrorMessage(context, "Caught exception when transferring players");
+			mPlugin.getLogger().severe("Caught exception when transferring players" + e);
+			e.printStackTrace();
 			return false;
 		}
 
