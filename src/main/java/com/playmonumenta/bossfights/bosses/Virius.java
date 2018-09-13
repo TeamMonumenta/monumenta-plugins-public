@@ -64,7 +64,7 @@ public class Virius extends BossAbilityGroup
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA),
+		                                                 new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA_BLOCK),
 		                                                 new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
 				  // Tick action per player
 				  (Player player, int ticks, boolean blocked) ->
@@ -83,7 +83,7 @@ public class Virius extends BossAbilityGroup
 				  // Damage generated at the end of the attack
 				  (Player player, Location loc, boolean blocked) ->
 					{
-						loc.getWorld().playSound(loc, Sound.ENTITY_ENDERDRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
+						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
 						if (!blocked)
 							player.damage(16f);

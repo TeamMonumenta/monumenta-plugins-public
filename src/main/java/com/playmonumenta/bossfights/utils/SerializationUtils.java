@@ -45,7 +45,7 @@ public class SerializationUtils
 		ItemStack item = equip.getItemInOffHand();
 		if (item == null || item.getType() == Material.AIR)
 		{
-			item = new ItemStack(Material.GREEN_RECORD);
+			item = new ItemStack(Material.MUSIC_DISC_13);
 			placeholderItem = true;
 		}
 

@@ -30,7 +30,7 @@ public class SpellGenericCharge extends SpellBaseCharge
 		      (Player player) ->
 			    {
 		            boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
-		            boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 1.5f);
+		            boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
 				},
 		      // Attack hit a player
 		      (Player player) ->

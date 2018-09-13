@@ -81,7 +81,7 @@ public class SpellMaskedShadowGlade implements Spell
 					for (Player player : pList)
 					{
 						Location pPos = player.getLocation();
-						pPos.getWorld().playSound(pPos, Sound.ENTITY_ENDERDRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
+						pPos.getWorld().playSound(pPos, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
 					}
 					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / mCount) * 10, 4, 0, 4, 0.01);
 				}

@@ -57,10 +57,10 @@ public class SpellAxtalTntThrow implements Spell
 			public void run()
 			{
 				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07);
-				loc.getWorld().playSound(loc, Sound.ENTITY_IRONGOLEM_HURT, 1, 0.77F);
+				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.77F);
 			}
 		};
-		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIG_ANGRY, 1, 0.77F);
+		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIGMAN_ANGRY, 1, 0.77F);
 		for (int i = 0; i < (40 + mCount * mCooldown); i++)
 			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, (long)(i));
 		for (int i = 0; i < mCount; i++)

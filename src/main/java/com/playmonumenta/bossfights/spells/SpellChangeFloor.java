@@ -31,13 +31,13 @@ public class SpellChangeFloor implements Spell
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 	                                                   Material.AIR,
-	                                                   Material.COMMAND,
-	                                                   Material.COMMAND_CHAIN,
-	                                                   Material.COMMAND_REPEATING,
+	                                                   Material.COMMAND_BLOCK,
+	                                                   Material.CHAIN_COMMAND_BLOCK,
+	                                                   Material.REPEATING_COMMAND_BLOCK,
 	                                                   Material.BEDROCK,
 	                                                   Material.OBSIDIAN,
 	                                                   Material.CHEST,
-	                                                   Material.MOB_SPAWNER
+	                                                   Material.SPAWNER
 	                                               );
 
 
@@ -89,8 +89,8 @@ public class SpellChangeFloor implements Spell
 
 				if (mTicks == 0)
 				{
-		            target.playSound(target.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 4f);
-		            mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 5f);
+		            target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
+		            mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
 					mBoss.getLocation().getWorld().spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3), true);
 

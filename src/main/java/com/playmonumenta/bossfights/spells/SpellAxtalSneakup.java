@@ -62,7 +62,7 @@ public class SpellAxtalSneakup implements Spell
 			@Override
 			public void run()
 			{
-				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 3f, 0.7f);
+				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 			}
 		};
 		Runnable particle = new Runnable()
