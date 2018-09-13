@@ -13,9 +13,6 @@ commands:
   transferScores:
     permission: monumenta.command.transferScores
     description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.
-  getScore:
-    permission: monumenta.command.getScore
-    description: Gets a scoreboard value.
   refreshClassEffects:
     permission: monumenta.command.refreshClassEffects
     description: Refreshes class effects for affected player (either sender or target of /execute)
