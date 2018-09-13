@@ -131,7 +131,7 @@ public class InventoryUtils {
 	public static boolean isAxeItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
-			return mat == Material.WOOD_AXE || mat == Material.STONE_AXE || mat == Material.GOLD_AXE
+			return mat == Material.WOODEN_AXE || mat == Material.STONE_AXE || mat == Material.GOLDEN_AXE
 			       || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
 		}
 
@@ -150,7 +150,7 @@ public class InventoryUtils {
 	public static boolean isSwordItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
-			return mat == Material.WOOD_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLD_SWORD
+			return mat == Material.WOODEN_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLDEN_SWORD
 			       || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
 		}
 
@@ -160,7 +160,7 @@ public class InventoryUtils {
 	public static boolean isPickaxeItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
-			return mat == Material.WOOD_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLD_PICKAXE
+			return mat == Material.WOODEN_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLDEN_PICKAXE
 			       || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
 		}
 
@@ -170,7 +170,7 @@ public class InventoryUtils {
 	public static boolean isScytheItem(ItemStack item) {
 		if (item != null) {
 			Material mat = item.getType();
-			return mat == Material.WOOD_HOE || mat == Material.STONE_HOE || mat == Material.GOLD_HOE
+			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
 			       || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
 		}
 

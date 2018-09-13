@@ -27,7 +27,6 @@ public class AnvilOverride extends OverrideItem {
 		}
 
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
-		    && item.getType() != Material.SKULL_ITEM
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
 		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
 		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {

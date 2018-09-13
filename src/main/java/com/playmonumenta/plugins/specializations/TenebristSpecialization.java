@@ -152,7 +152,7 @@ public class TenebristSpecialization extends BaseSpecialization {
 				if (blackClouds > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BLACK_CLOUDS)) {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.65f);
-						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_THUNDER, 1, 0.85f);
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 0.85f);
 
 						double dmg = blackClouds == 1 ? 22 : 28;
 						int duration = blackClouds == 1 ? 15 * 20 : 30 * 20;
@@ -177,7 +177,7 @@ public class TenebristSpecialization extends BaseSpecialization {
 										ParticleEffect.FLAME.display(0, 0, 0, 0.35f, 250, l, 40);
 										ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.25f, 75, l, 40);
 										p.getWorld().playSound(l, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-										p.getWorld().playSound(l, Sound.ENTITY_LIGHTNING_THUNDER, 1, 0.9f);
+										p.getWorld().playSound(l, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 0.9f);
 
 										for (Entity e : p.getNearbyEntities(3, 3, 3)) {
 											if (EntityUtils.isHostileMob(e)) {

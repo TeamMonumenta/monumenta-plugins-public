@@ -94,7 +94,7 @@ public class ReaperSpecialization extends BaseSpecialization {
 								ParticleEffect.BLOCK_CRACK.display(new BlockData(mat, data), 0.25f, 0.25f, 0.25f, 1, 15, loc, 40);
 								ParticleEffect.SPELL_WITCH.display(0.25f, 0.25f, 0.25f, 1, 25, loc, 40);
 								ParticleEffect.SMOKE_NORMAL.display(0.25f, 0.25f, 0.25f, 0.075f, 10, loc, 40);
-								loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_DOOR_WOOD, 0.85f, 0.85f);
+								loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 0.85f);
 
 								for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.85, 0.85, 0.85)) {
 									if (EntityUtils.isHostileMob(e)) {

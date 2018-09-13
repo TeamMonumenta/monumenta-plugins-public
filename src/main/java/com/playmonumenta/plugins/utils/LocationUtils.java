@@ -67,42 +67,10 @@ public class LocationUtils {
 	}
 
 	public static boolean isLosBlockingBlock(Material mat) {
-		if (mat.equals(Material.AIR) ||
-		    mat.equals(Material.GLASS) ||
-		    mat.equals(Material.STAINED_GLASS) ||
-		    mat.equals(Material.VINE) ||
-		    mat.equals(Material.DOUBLE_PLANT) ||
-		    mat.equals(Material.LONG_GRASS) ||
-		    mat.equals(Material.YELLOW_FLOWER) ||
-		    mat.equals(Material.RED_ROSE) ||
-		    mat.equals(Material.WEB) ||
-		    mat.equals(Material.WATER) ||
-		    mat.equals(Material.STATIONARY_WATER) ||
-		    mat.equals(Material.LAVA) ||
-		    mat.equals(Material.STATIONARY_LAVA) ||
-		    mat.equals(Material.CARPET) ||
-		    ItemUtils.isDoor(mat)) {
-			return false;
-		}
-
-		return true;
+		return mat.isOccluding();
 	}
 
 	public static boolean isPathBlockingBlock(Material mat) {
-		if (mat.equals(Material.AIR) ||
-		    mat.equals(Material.VINE) ||
-		    mat.equals(Material.DOUBLE_PLANT) ||
-		    mat.equals(Material.LONG_GRASS) ||
-		    mat.equals(Material.YELLOW_FLOWER) ||
-		    mat.equals(Material.RED_ROSE) ||
-		    mat.equals(Material.WEB) ||
-		    mat.equals(Material.WATER) ||
-		    mat.equals(Material.STATIONARY_WATER) ||
-		    mat.equals(Material.CARPET) ||
-		    ItemUtils.isDoor(mat)) {
-			return false;
-		}
-
-		return true;
+		return mat.isSolid() || mat.equals(Material.LAVA);
 	}
 }

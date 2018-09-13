@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -14,120 +15,50 @@ import org.bukkit.potion.PotionType;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class ItemUtils {
-	public static EnumSet<Material> interactables = EnumSet.of(
-	                                                    Material.ACACIA_DOOR,
-	                                                    Material.ACACIA_FENCE_GATE,
-	                                                    Material.ANVIL,
-	                                                    Material.BEACON,
-	                                                    Material.BED,
-	                                                    Material.BIRCH_DOOR,
-	                                                    Material.BIRCH_FENCE_GATE,
-	                                                    Material.BOAT,
-	                                                    Material.BOAT_ACACIA,
-	                                                    Material.BOAT_BIRCH,
-	                                                    Material.BOAT_DARK_OAK,
-	                                                    Material.BOAT_JUNGLE,
-	                                                    Material.BOAT_SPRUCE,
-	                                                    Material.BREWING_STAND,
-	                                                    Material.COMMAND,
-	                                                    Material.CHEST,
-	                                                    Material.DARK_OAK_DOOR,
-	                                                    Material.DARK_OAK_FENCE_GATE,
-	                                                    Material.DAYLIGHT_DETECTOR,
-	                                                    Material.DAYLIGHT_DETECTOR_INVERTED,
-	                                                    Material.DISPENSER,
-	                                                    Material.DROPPER,
-	                                                    Material.ENCHANTMENT_TABLE,
-	                                                    Material.ENDER_CHEST,
-	                                                    Material.FENCE_GATE,
-	                                                    Material.FURNACE,
-	                                                    Material.HOPPER,
-	                                                    Material.HOPPER_MINECART,
-	                                                    Material.ITEM_FRAME,
-	                                                    Material.JUNGLE_DOOR,
-	                                                    Material.JUNGLE_FENCE_GATE,
-	                                                    Material.LEVER,
-	                                                    Material.MINECART,
-	                                                    Material.NOTE_BLOCK,
-	                                                    Material.POWERED_MINECART,
-	                                                    Material.REDSTONE_COMPARATOR,
-	                                                    Material.REDSTONE_COMPARATOR_OFF,
-	                                                    Material.REDSTONE_COMPARATOR_ON,
-	                                                    Material.SIGN,
-	                                                    Material.SIGN_POST,
-	                                                    Material.STONE_BUTTON,
-	                                                    Material.STORAGE_MINECART,
-	                                                    Material.TRAP_DOOR,
-	                                                    Material.TRAPPED_CHEST,
-	                                                    Material.WALL_SIGN,
-	                                                    Material.WOOD_BUTTON,
-	                                                    Material.WOOD_DOOR,
-	                                                    Material.WORKBENCH,
+	public static final Set<Material> armors = EnumSet.of(
+			Material.LEATHER_BOOTS,
+			Material.LEATHER_CHESTPLATE,
+			Material.LEATHER_HELMET,
+			Material.LEATHER_LEGGINGS,
 
-	                                                    //Shulker Boxes
-	                                                    Material.BLACK_SHULKER_BOX,
-	                                                    Material.BLUE_SHULKER_BOX,
-	                                                    Material.BROWN_SHULKER_BOX,
-	                                                    Material.CYAN_SHULKER_BOX,
-	                                                    Material.GRAY_SHULKER_BOX,
-	                                                    Material.GREEN_SHULKER_BOX,
-	                                                    Material.LIGHT_BLUE_SHULKER_BOX,
-	                                                    Material.LIME_SHULKER_BOX,
-	                                                    Material.MAGENTA_SHULKER_BOX,
-	                                                    Material.ORANGE_SHULKER_BOX,
-	                                                    Material.PINK_SHULKER_BOX,
-	                                                    Material.PURPLE_SHULKER_BOX,
-	                                                    Material.RED_SHULKER_BOX,
-	                                                    Material.SILVER_SHULKER_BOX,
-	                                                    Material.WHITE_SHULKER_BOX,
-	                                                    Material.YELLOW_SHULKER_BOX
-	                                                );
+			Material.CHAINMAIL_BOOTS,
+			Material.CHAINMAIL_CHESTPLATE,
+			Material.CHAINMAIL_HELMET,
+			Material.CHAINMAIL_LEGGINGS,
 
-	public static EnumSet<Material> armors = EnumSet.of(
-	                                             Material.LEATHER_BOOTS,
-	                                             Material.LEATHER_CHESTPLATE,
-	                                             Material.LEATHER_HELMET,
-	                                             Material.LEATHER_LEGGINGS,
+			Material.GOLDEN_BOOTS,
+			Material.GOLDEN_CHESTPLATE,
+			Material.GOLDEN_HELMET,
+			Material.GOLDEN_LEGGINGS,
 
-	                                             Material.CHAINMAIL_BOOTS,
-	                                             Material.CHAINMAIL_CHESTPLATE,
-	                                             Material.CHAINMAIL_HELMET,
-	                                             Material.CHAINMAIL_LEGGINGS,
+			Material.IRON_BOOTS,
+			Material.IRON_CHESTPLATE,
+			Material.IRON_HELMET,
+			Material.IRON_LEGGINGS,
 
-	                                             Material.GOLD_BOOTS,
-	                                             Material.GOLD_CHESTPLATE,
-	                                             Material.GOLD_HELMET,
-	                                             Material.GOLD_LEGGINGS,
-
-	                                             Material.IRON_BOOTS,
-	                                             Material.IRON_CHESTPLATE,
-	                                             Material.IRON_HELMET,
-	                                             Material.IRON_LEGGINGS,
-
-	                                             Material.DIAMOND_BOOTS,
-	                                             Material.DIAMOND_CHESTPLATE,
-	                                             Material.DIAMOND_HELMET,
-	                                             Material.DIAMOND_LEGGINGS
-	                                         );
-
-	public static EnumSet<Material> doors = EnumSet.of(
-	                                            Material.ACACIA_DOOR,
-	                                            Material.BIRCH_DOOR,
-	                                            Material.DARK_OAK_DOOR,
-	                                            Material.IRON_DOOR,
-	                                            Material.JUNGLE_DOOR,
-	                                            Material.SPRUCE_DOOR,
-	                                            Material.WOOD_DOOR
-	                                        );
+			Material.DIAMOND_BOOTS,
+			Material.DIAMOND_CHESTPLATE,
+			Material.DIAMOND_HELMET,
+			Material.DIAMOND_LEGGINGS
+		);
 
 	// List of materials that trees can replace when they grow
-	public static EnumSet<Material> allowedTreeReplaceMaterials = EnumSet.of(
-	            Material.AIR,
-	            Material.LEAVES,
-	            Material.LEAVES_2,
-	            Material.SAPLING,
-	            Material.VINE
-	        );
+	public static final Set<Material> allowedTreeReplaceMaterials = EnumSet.of(
+			Material.AIR,
+			Material.OAK_LEAVES,
+			Material.SPRUCE_LEAVES,
+			Material.BIRCH_LEAVES,
+			Material.JUNGLE_LEAVES,
+			Material.ACACIA_LEAVES,
+			Material.DARK_OAK_LEAVES,
+			Material.OAK_SAPLING,
+			Material.ACACIA_SAPLING,
+			Material.BIRCH_SAPLING,
+			Material.DARK_OAK_SAPLING,
+			Material.JUNGLE_SAPLING,
+			Material.SPRUCE_SAPLING,
+			Material.VINE
+		);
 
 	/**
 	 * Items drop if they have lore that does not contain $$$
@@ -186,16 +117,8 @@ public class ItemUtils {
 		return null;
 	}
 
-	public static boolean isInteractable(Material mat) {
-		return interactables.contains(mat);
-	}
-
 	public static boolean isArmorItem(Material item) {
 		return armors.contains(item);
-	}
-
-	public static boolean isDoor(Material item) {
-		return doors.contains(item);
 	}
 
 	public static boolean isAllowedTreeReplace(Material item) {

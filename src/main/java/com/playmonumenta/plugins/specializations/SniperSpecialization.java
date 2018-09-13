@@ -115,7 +115,7 @@ public class SniperSpecialization extends BaseSpecialization {
 				 */
 
 				if (enchantedArrow > 0) {
-					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1, 1.45f);
+					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
 					player.setMetadata(PLAYER_ENCHANTED_ARROW_METAKEY, new FixedMetadataValue(mPlugin, enchantedArrow));
 					new BukkitRunnable() {
 						int t = 0;
@@ -239,8 +239,8 @@ public class SniperSpecialization extends BaseSpecialization {
 				public void run() {
 					i++;
 					player.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.85f);
-					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_SHOOT, 1, 0.65f);
-					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 0.85f);
+					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0.65f);
+					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 					ParticleEffect.FIREWORKS_SPARK.display(0.1f, 0.1f, 0.1f, 0.2f, 10, loc.clone().add(dir), 40);
 					for (int i = 0; i < 60; i++) {
 						loc.add(dir.clone().multiply(0.5));
@@ -281,7 +281,7 @@ public class SniperSpecialization extends BaseSpecialization {
 						}
 						if (loc.getBlock().getType().isSolid()) {
 							ParticleEffect.FIREWORKS_SPARK.display(0.1f, 0.1f, 0.1f, 0.2f, 150, loc, 40);
-							player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 0.85f);
+							player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 							break;
 						}
 					}

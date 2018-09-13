@@ -41,7 +41,7 @@ public class AssassinSpecialization extends BaseSpecialization {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PERFECT_KILL)) {
 				if (PlayerUtils.isCritical(player) && !EntityUtils.isBoss(e) && !EntityUtils.isElite(e)) {
 					e.setHealth(0);
-					e.getWorld().playSound(e.getLocation(), Sound.ENTITY_IRONGOLEM_DEATH, 1, 1.75f);
+					e.getWorld().playSound(e.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1.75f);
 					ParticleEffect.SPELL_WITCH.display(0.3f, 0.35f, 0.3f, 1, 50, e.getLocation().add(0, 1.15, 0), 40);
 					ParticleEffect.SPELL_MOB.display(0.2f, 0.35f, 0.2f, 0, 50, e.getLocation().add(0, 1.15, 0), 40);
 					ParticleEffect.SMOKE_LARGE.display(0.3f, 0.35f, 0.3f, 0, 5, e.getLocation().add(0, 1.15, 0), 40);

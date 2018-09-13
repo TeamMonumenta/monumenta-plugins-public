@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -65,6 +66,34 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class EntityListener implements Listener {
+	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
+			Material.TRIPWIRE,
+			Material.TRIPWIRE_HOOK,
+			Material.OAK_PRESSURE_PLATE,
+			Material.ACACIA_PRESSURE_PLATE,
+			Material.BIRCH_PRESSURE_PLATE,
+			Material.DARK_OAK_PRESSURE_PLATE,
+			Material.JUNGLE_PRESSURE_PLATE,
+			Material.SPRUCE_PRESSURE_PLATE,
+			Material.STONE_PRESSURE_PLATE,
+			Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
+			Material.HEAVY_WEIGHTED_PRESSURE_PLATE
+		);
+
+	public static final Set<DamageCause> DAMAGE_CAUSES_IGNORED_IN_TOWNS = EnumSet.of(
+			DamageCause.FALL,
+			DamageCause.FALLING_BLOCK,
+			DamageCause.FIRE,
+			DamageCause.FIRE_TICK,
+			DamageCause.FLY_INTO_WALL,
+			DamageCause.MAGIC,
+			DamageCause.POISON,
+			DamageCause.PROJECTILE,
+			DamageCause.STARVATION,
+			DamageCause.THORNS,
+			DamageCause.WITHER
+		);
+
 	Plugin mPlugin;
 	World mWorld;
 
@@ -214,20 +243,6 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	public static EnumSet<DamageCause> damageCausesIgnoredInTowns = EnumSet.of(
-	            DamageCause.FALL,
-	            DamageCause.FALLING_BLOCK,
-	            DamageCause.FIRE,
-	            DamageCause.FIRE_TICK,
-	            DamageCause.FLY_INTO_WALL,
-	            DamageCause.MAGIC,
-	            DamageCause.POISON,
-	            DamageCause.PROJECTILE,
-	            DamageCause.STARVATION,
-	            DamageCause.THORNS,
-	            DamageCause.WITHER
-	        );
-
 	// Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageEvent(EntityDamageEvent event) {
@@ -249,7 +264,7 @@ public class EntityListener implements Listener {
 
 			LocationType locType = LocationUtils.getLocationType(mPlugin, player.getLocation());
 			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
-				if (damageCausesIgnoredInTowns.contains(source)) {
+				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
 					event.setCancelled(true);
 				}
 			}
@@ -291,9 +306,7 @@ public class EntityListener implements Listener {
 	public void EntityInteractEvent(EntityInteractEvent event) {
 		Material material = event.getBlock().getType();
 
-		if (material == Material.TRIPWIRE || material == Material.TRIPWIRE_HOOK
-		    || material == Material.WOOD_PLATE || material == Material.STONE_PLATE
-		    || material == Material.GOLD_PLATE || material == Material.IRON_PLATE) {
+		if (ENTITY_UNINTERACTABLE_MATS.contains(material)) {
 			Entity entity = event.getEntity();
 
 			// Only items and players can activate tripwires
@@ -362,18 +375,18 @@ public class EntityListener implements Listener {
 				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
 				// Check if the player has an infinity snowball in main or off hand
-				if (((itemInMainHand.getType().equals(Material.SNOW_BALL)) &&
+				if (((itemInMainHand.getType().equals(Material.SNOWBALL)) &&
 				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
-				    ((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
+				    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
 				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
 					// If they do, cancel the event. This means players can't throw eachother's
 					// soulbound snowballs
 					event.setCancelled(true);
 
-					if (((itemInMainHand.getType().equals(Material.SNOW_BALL)) &&
+					if (((itemInMainHand.getType().equals(Material.SNOWBALL)) &&
 					     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
 					     (InventoryUtils.isSoulboundToPlayer(itemInMainHand, player))) ||
-					    ((itemInOffHand.getType().equals(Material.SNOW_BALL)) &&
+					    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
 					     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
 					     (InventoryUtils.isSoulboundToPlayer(itemInOffHand, player)))) {
 

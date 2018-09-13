@@ -182,7 +182,7 @@ public class ScoreboardUtils {
 
 			Objective objective = scoreboard.getObjective(name);
 			if (objective == null) {
-				objective = scoreboard.registerNewObjective(name, "dummy");
+				objective = scoreboard.registerNewObjective(name, "dummy", name);
 			}
 
 			Score score = objective.getScore(player.getName());

@@ -264,11 +264,10 @@ public class ScoutClass extends BaseClass {
 					}
 
 					Block block = L.getBlock();
-					block.setType(Material.STANDING_BANNER);
+					block.setType(Material.CYAN_BANNER);
 
 					if (block.getState() instanceof Banner) {
 						Banner banner = (Banner)block.getState();
-						banner.setBaseColor(DyeColor.CYAN);
 
 						banner.addPattern(new Pattern(DyeColor.LIGHT_BLUE, PatternType.STRAIGHT_CROSS));
 						banner.addPattern(new Pattern(DyeColor.BLUE, PatternType.CIRCLE_MIDDLE));

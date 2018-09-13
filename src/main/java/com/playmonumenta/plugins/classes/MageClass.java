@@ -301,7 +301,7 @@ public class MageClass extends BaseClass {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				if (((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand)) || (mainHand.getType() == Material.SHIELD))
-				    && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !ItemUtils.isInteractable(blockClicked)) {
+				    && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && !blockClicked.isInteractable()) {
 
 					int magmaShield = ScoreboardUtils.getScoreboardValue(player, "Magma");
 					if (magmaShield > 0) {
@@ -329,7 +329,7 @@ public class MageClass extends BaseClass {
 				}
 			} else {
 				//Mana Lance
-				if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.isInteractable(blockClicked))) {
+				if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !blockClicked.isInteractable())) {
 					int manaLance = ScoreboardUtils.getScoreboardValue(player, "ManaLance");
 					ItemStack mainHand = player.getInventory().getItemInMainHand();
 					if (InventoryUtils.isWandItem(mainHand)) {
@@ -360,7 +360,7 @@ public class MageClass extends BaseClass {
 									if (loc.getBlock().getType().isSolid()) {
 										loc.subtract(dir.multiply(0.5));
 										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
-										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_BLAST, 1, 1.65f);
+										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 										break;
 									}
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {

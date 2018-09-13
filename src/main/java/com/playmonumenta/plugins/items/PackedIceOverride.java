@@ -21,7 +21,7 @@ public class PackedIceOverride extends OverrideItem {
 		    && item.getItemMeta().hasLore()
 		    && player.getGameMode() == GameMode.SURVIVAL
 		    && LocationUtils.getLocationType(plugin, player) == LocationType.Capital) {
-			event.getBlockPlaced().setType(Material.STATIONARY_WATER);
+			event.getBlockPlaced().setType(Material.WATER);
 		}
 
 		return true;

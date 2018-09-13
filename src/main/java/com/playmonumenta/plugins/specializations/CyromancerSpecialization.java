@@ -41,7 +41,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 				if ((mainHand.getType() != Material.BOW) ||
 				    (offHand.getType() != Material.BOW)
-				    && !ItemUtils.isInteractable(blockClicked)) {
+				    && !blockClicked.isInteractable()) {
 
 					int blizzard = ScoreboardUtils.getScoreboardValue(player, "Blizzard");
 					/*
@@ -54,7 +54,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 							ParticleEffect.EXPLOSION_NORMAL.display(7, 1, 7, 0.2f, 1000, player.getLocation(), 40);
 							ParticleEffect.SNOW_SHOVEL.display(7, 4, 7, 0.35f, 1500, player.getLocation(), 40);
 							ParticleEffect.CLOUD.display(0, 0, 0, 0.5f, 300, player.getLocation(), 40);
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 1, 0.85f);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 							player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 0.85f, 1.15f);
 							double damage = blizzard == 1 ? 15 : 22;
 							for (Entity e : player.getNearbyEntities(7, 4, 7)) {

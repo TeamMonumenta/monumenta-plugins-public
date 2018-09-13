@@ -220,7 +220,7 @@ public class RogueClass extends BaseClass {
 								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
 								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40)
 								;
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 
 								player.teleport(loc);
 
@@ -234,7 +234,7 @@ public class RogueClass extends BaseClass {
 
 								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
 								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40);
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0f, 1.5f);
+								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
 							}
 						}

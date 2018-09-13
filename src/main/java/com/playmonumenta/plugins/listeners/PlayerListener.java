@@ -597,7 +597,7 @@ public class PlayerListener implements Listener {
 			Block testblock = loc.getBlock();
 			BlockState state = testblock.getState();
 
-			if (testblock.getType().equals(Material.COMMAND)
+			if (testblock.getType().equals(Material.COMMAND_BLOCK)
 			    && state instanceof CommandBlock) {
 
 				String str = ((CommandBlock)state).getCommand();
@@ -695,7 +695,7 @@ public class PlayerListener implements Listener {
 			ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 0, 1, loc, 40);
 			ParticleEffect.FLAME.display(0, 0, 0, 0.25f, 100, loc, 40);
 			ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.1f, 50, loc, 40);
-			loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMEN_DEATH, 1, 0);
+			loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_DEATH, 1, 0);
 			loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 			loc.getBlock().setType(Material.AIR);
 			event.setCancelled(true);

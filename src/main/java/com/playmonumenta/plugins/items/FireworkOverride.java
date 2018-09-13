@@ -17,8 +17,7 @@ public class FireworkOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (item != null && block != null) {
-			Material blockType = block.getType();
-			if (!ItemUtils.isInteractable(blockType)) {
+			if (!block.getType().isInteractable()) {
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					if (meta.hasDisplayName() && meta.getDisplayName().contains("Signal Flare")) {
