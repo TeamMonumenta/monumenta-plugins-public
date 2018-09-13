@@ -95,6 +95,7 @@
     </dependencies>
 
     <build>
+        <finalName>Monumenta-Plugins_1.13.1_${project.version}_${maven.build.timestamp}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
