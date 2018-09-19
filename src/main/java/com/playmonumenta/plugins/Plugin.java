@@ -154,14 +154,14 @@ public class Plugin extends JavaPlugin {
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
 
-		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.SWORDSAGE.getId(), new SwordsageSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.ASSASSIN.getId(), new AssassinSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.PYROMANCER.getId(), new PyromancerSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.CYROMANCER.getId(), new CyromancerSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom));
-		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom));
+		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.SWORDSAGE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.ASSASSIN.getId(), new AssassinSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.PYROMANCER.getId(), new PyromancerSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.CYROMANCER.getId(), new CyromancerSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom, mWorld));
 
 		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);

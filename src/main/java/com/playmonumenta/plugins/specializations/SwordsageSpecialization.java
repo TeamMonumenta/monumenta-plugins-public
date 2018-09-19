@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -30,11 +29,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 public class SwordsageSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public SwordsageSpecialization(Plugin plugin, Random random) {
+	public SwordsageSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	public static final String BLADE_DANCE_ACTIVE_METAKEY = "BladeDanceActive";
@@ -67,8 +69,8 @@ public class SwordsageSpecialization extends BaseSpecialization {
 						}
 					}
 
-					ParticleEffect.CRIT.display(12, 12, 12, 0.45f, 2000, entity.getLocation(), 40);
-					ParticleEffect.TOTEM.display(12, 12, 12, 0.1f, 2000, entity.getLocation(), 40);
+					mWorld.spawnParticle(Particle.CRIT, entity.getLocation(), 2000, 12, 12, 12, 0.45);
+					mWorld.spawnParticle(Particle.TOTEM, entity.getLocation(), 2000, 12, 12, 12, 0.1);
 					entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_PARROT_IMITATE_CREEPER, 1.25f, 1);
 					entity.getWorld().playSound(entity.getLocation(), Sound.ITEM_TOTEM_USE, 1.2f, 1);
 
@@ -97,7 +99,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 							int damage = bladeSurge == 1 ? 10 : 14;
 
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.2f);
-							ParticleEffect.CLOUD.display(0.2f, 0.25f, 0.2f, 0.15f, 12, player.getLocation(), 40);
+							mWorld.spawnParticle(Particle.CLOUD, player.getLocation(), 12, 0.2, 0.25, 0.2, 0.15);
 
 							new BukkitRunnable() {
 								Location loc = player.getEyeLocation();
@@ -108,8 +110,8 @@ public class SwordsageSpecialization extends BaseSpecialization {
 									i++;
 									loc.add(dir.clone().multiply(1.4));
 									player.getLocation().getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2);
-									ParticleEffect.SWEEPATTACK.display(0, 0, 0, 0, 1, loc, 40);
-									ParticleEffect.CLOUD.display(0.05f, 0.05f, 0.05f, 0.03F, 3, loc, 40);
+									mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0);
+									mWorld.spawnParticle(Particle.CLOUD, loc, 3, 0.05, 0.05, 0.05, 0.03);
 									player.getWorld().spawnParticle(Particle.REDSTONE, loc, 50, 0.25, 0.25, 0.25, 1, BLADE_SURGE_COLOR);
 
 									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.65, 0.65, 0.65)) {
@@ -121,12 +123,12 @@ public class SwordsageSpecialization extends BaseSpecialization {
 
 									if (loc.getBlock().getType().isSolid()) {
 										this.cancel();
-										ParticleEffect.CLOUD.display(0.05f, 0.05f, 0.05f, 0.2F, 15, loc, 40);
+										mWorld.spawnParticle(Particle.CLOUD, loc, 15, 0.05, 0.05, 0.05, 0.2);
 									}
 
 									if (i >= 14) {
 										this.cancel();
-										ParticleEffect.CLOUD.display(0.05f, 0.05f, 0.05f, 0.2F, 15, loc, 40);
+										mWorld.spawnParticle(Particle.CLOUD, loc, 15, 0.05, 0.05, 0.05, 0.2);
 									}
 
 								}
@@ -138,15 +140,15 @@ public class SwordsageSpecialization extends BaseSpecialization {
 							if (bladeSurge > 1) {
 								Location loc = player.getEyeLocation();
 								loc.add(loc.getDirection());
-								ParticleEffect.SWEEPATTACK.display(1.5f, 0.75f, 1.5f, 1, 10, loc, 40);
+								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 10, 1.5, 0.75, 1.5, 1);
 
 								for (Entity e : loc.getWorld().getNearbyEntities(loc, 2, 1, 2)) {
 									if (EntityUtils.isHostileMob(e)) {
 										LivingEntity le = (LivingEntity) e;
 										EntityUtils.damageEntity(mPlugin, le, 8, player);
 										MovementUtils.KnockAway(player, le, 1.1f);
-										ParticleEffect.CLOUD.display(0, 0, 0, 0.25f, 15, e.getLocation(), 40);
-										ParticleEffect.SWEEPATTACK.display(0, 0, 0, 1, 1, e.getLocation(), 40);
+										mWorld.spawnParticle(Particle.CLOUD, e.getLocation(), 15, 0, 0, 0, 0.25);
+										mWorld.spawnParticle(Particle.SWEEP_ATTACK, e.getLocation(), 1, 0, 0, 0, 1);
 									}
 								}
 							}
@@ -184,7 +186,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 						player.setMetadata(BLADE_DANCE_ACTIVE_METAKEY, new FixedMetadataValue(mPlugin, 0D));
 						double extraDamage = bladeDance == 1 ? 5 : 10;
 						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 2f);
-						ParticleEffect.SWEEPATTACK.display(6, 6, 6, 0, 250, player.getLocation(), 40);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 250, 6, 6, 6, 0);
 						new BukkitRunnable() {
 							int i = 0;
 							float pitch = 0;
@@ -214,9 +216,9 @@ public class SwordsageSpecialization extends BaseSpecialization {
 									public void run() {
 										t++;
 										l1.add(dir.clone().multiply(1.15));
-										ParticleEffect.CRIT_MAGIC.display(0, 0, 0, 0.35f, 4, l1, 40);
-										ParticleEffect.CLOUD.display(0, 0, 0, 0, 1, l1, 40);
-										ParticleEffect.SWEEPATTACK.display(0, 0, 0, 0, 1, l1, 40);
+										mWorld.spawnParticle(Particle.CRIT_MAGIC, l1, 4, 0, 0, 0, 0.35);
+										mWorld.spawnParticle(Particle.CLOUD, l1, 1, 0, 0, 0, 0);
+										mWorld.spawnParticle(Particle.SWEEP_ATTACK, l1, 1, 0, 0, 0, 0);
 										if (t >= 10) {
 											this.cancel();
 										}
@@ -244,7 +246,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 										double dx = dir.getX();
 										double dy = dir.getY();
 										double dz = dir.getZ();
-										ParticleEffect.FLAME.display((float)dx, (float)dy, (float)dz, 0.5f, 0, locclone, 40);
+										mWorld.spawnParticle(Particle.FLAME, locclone, 0, (float)dx, (float)dy, (float)dz, 0.5);
 									}
 
 									for (int i = 0; i < 20; i++) {
@@ -258,7 +260,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 										double dx = dir.getX();
 										double dy = dir.getY();
 										double dz = dir.getZ();
-										ParticleEffect.EXPLOSION_NORMAL.display((float)dx, (float)dy, (float)dz, 0.5f, 0, locclone, 40);
+										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locclone, 0, (float)dx, (float)dy, (float)dz, 0.5);
 									}
 
 									for (Entity e : player.getNearbyEntities(6, 6, 6)) {

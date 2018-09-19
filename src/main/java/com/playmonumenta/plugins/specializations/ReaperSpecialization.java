@@ -1,37 +1,39 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.BlockData;;
+import org.bukkit.World;
 
 public class ReaperSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public ReaperSpecialization(Plugin plugin, Random random) {
+	public ReaperSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -53,8 +55,8 @@ public class ReaperSpecialization extends BaseSpecialization {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DARK_ERUPTION)) {
 
 						if (darkEruption > 1) {
-							ParticleEffect.SPELL_WITCH.display(3, 1, 3, 1, 250, player.getLocation(), 40);
-							ParticleEffect.SMOKE_LARGE.display(3, 1, 3, 0, 100, player.getLocation(), 40);
+							mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation(), 250, 3, 1, 3, 1);
+							mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 100, 3, 1, 3, 0);
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1.3f);
 							for (Entity e : player.getNearbyEntities(3, 2, 3)) {
 								if (EntityUtils.isHostileMob(e)) {
@@ -87,13 +89,12 @@ public class ReaperSpecialization extends BaseSpecialization {
 									}
 								}
 								Material mat = loc.clone().subtract(0, 1, 0).getBlock().getType();
-								byte data = loc.clone().subtract(0, 1, 0).getBlock().getData();
 								if (mat == Material.AIR || mat == Material.BARRIER) {
 									mat = Material.DIRT;
 								}
-								ParticleEffect.BLOCK_CRACK.display(new BlockData(mat, data), 0.25f, 0.25f, 0.25f, 1, 15, loc, 40);
-								ParticleEffect.SPELL_WITCH.display(0.25f, 0.25f, 0.25f, 1, 25, loc, 40);
-								ParticleEffect.SMOKE_NORMAL.display(0.25f, 0.25f, 0.25f, 0.075f, 10, loc, 40);
+								mWorld.spawnParticle(Particle.BLOCK_CRACK, loc, 15, 0.25, 0.25, 0.25, 1, mat.createBlockData());
+								mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 25, 0.25, 0.25, 0.25, 1);
+								mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.25, 0.25, 0.25, 0.075);
 								loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 0.85f);
 
 								for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.85, 0.85, 0.85)) {
@@ -148,8 +149,8 @@ public class ReaperSpecialization extends BaseSpecialization {
 								double z = direction.getZ() * t;
 								player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.9f, 0.15f);
 								loc.add(x, y, z);
-								ParticleEffect.SPELL.display(xoffset, 0.25F, zoffset, 0, 45, loc, 40);
-								ParticleEffect.SPELL_WITCH.display(xoffset, 0.25F, zoffset, 0.05F, 50, loc, 40);
+								mWorld.spawnParticle(Particle.SPELL, loc, 45, xoffset, 0.25, zoffset, 0);
+								mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, xoffset, 0.25, zoffset, 0.05);
 
 								for (Entity e : loc.getWorld().getNearbyEntities(loc, damagerange, 1.25, damagerange)) {
 									if (EntityUtils.isHostileMob(e) && !affected.contains(e)) {
@@ -195,8 +196,8 @@ public class ReaperSpecialization extends BaseSpecialization {
 						double healed = hp * percent;
 						PlayerUtils.healPlayer(damagee, healed);
 						damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1, 0.75f);
-						ParticleEffect.SPELL_WITCH.display(0.25f, 0.35f, 0.25f, 0, 20, damagee.getLocation().add(0, 1.15, 0), 40);
-						ParticleEffect.SPELL_MOB.display(0.25f, 0.35f, 0.25f, 0, 15, damagee.getLocation().add(0, 1.15, 0), 40);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, damagee.getLocation().add(0, 1.15, 0), 20, 0.25, 0.35, 0.25, 0);
+						mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, 1.15, 0), 15, 0.25, 0.35, 0.25, 0);
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SOULREAPING, 20 * 10);
 					}
 				}
@@ -228,16 +229,16 @@ public class ReaperSpecialization extends BaseSpecialization {
 								@Override
 								public void run() {
 									t++;
-									ParticleEffect.SPELL_WITCH.display(0.25f, 0.35f, 0.25f, 0, 1, e.getLocation().add(0, 1.15, 0), 40);
-									ParticleEffect.SPELL_MOB.display(0.25f, 0.35f, 0.25f, 0, 1, e.getLocation().add(0, 1.15, 0), 40);
+									mWorld.spawnParticle(Particle.SPELL_WITCH, e.getLocation().add(0, 1.15, 0), 1, 0.25, 0.35, 0.25, 0);
+									mWorld.spawnParticle(Particle.SPELL_MOB, e.getLocation().add(0, 1.15, 0), 1, 0.25, 0.35, 0.25, 0);
 									if (t >= 20 * 2 || e.isDead()) {
 										this.cancel();
 										List<Entity> entities = e.getNearbyEntities(2, 2, 2);
 										entities.add(e);
-										ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.15f, 15, e.getLocation().add(0, 1.15, 0), 40);
-										ParticleEffect.SPELL_WITCH.display(2f, 0.35f, 2f, 1, 35, e.getLocation().add(0, 1.15, 0), 40);
-										ParticleEffect.SPELL_MOB.display(2f, 0.35f, 2f, 0, 30, e.getLocation().add(0, 1.15, 0), 40);
-										ParticleEffect.SMOKE_LARGE.display(2f, 0.35f, 2f, 0, 8, e.getLocation().add(0, 1.15, 0), 40);
+										mWorld.spawnParticle(Particle.SMOKE_LARGE, e.getLocation().add(0, 1.15, 0), 15, 0, 0, 0, 0.15);
+										mWorld.spawnParticle(Particle.SPELL_WITCH, e.getLocation().add(0, 1.15, 0), 35, 2f, 0.35, 2f, 1);
+										mWorld.spawnParticle(Particle.SPELL_MOB, e.getLocation().add(0, 1.15, 0), 30, 2f, 0.35, 2f, 0);
+										mWorld.spawnParticle(Particle.SMOKE_LARGE, e.getLocation().add(0, 1.15, 0), 8, 2f, 0.35, 2f, 0);
 										e.getWorld().playSound(e.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 0.5f);
 										for (Entity en : entities) {
 											if (EntityUtils.isHostileMob(en)) {
@@ -277,11 +278,11 @@ public class ReaperSpecialization extends BaseSpecialization {
 //				EntityDamageEvent ev = e.getLastDamageCause();
 //				if (ev.getCause() == DamageCause.ENTITY_ATTACK) {
 //					PlayerUtils.healPlayer(player, ev.getFinalDamage() * lifesteal);
-//					ParticleEffect.SPELL_WITCH.display(0.2f, 0.35f, 0.2f, 1, 4, player.getLocation().add(0, 1.15, 0), 40);
+//					mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.15, 0), 4, 0.2, 0.35, 0.2, 1);
 //					if (soulreaping > 1) {
 //						if (EntityUtils.isElite(e)) {
-//							ParticleEffect.SPELL_WITCH.display(5, 5, 5, 1, 500, e.getLocation(), 40);
-//							ParticleEffect.SPELL_MOB.display(5, 5, 5, 0, 500, e.getLocation(), 40);
+//							mWorld.spawnParticle(Particle.SPELL_WITCH, e.getLocation(), 500, 5, 5, 5, 1);
+//							mWorld.spawnParticle(Particle.SPELL_MOB, e.getLocation(), 500, 5, 5, 5, 0);
 //							e.getWorld().playSound(e.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.25f, 0.15f);
 //							for (Entity ne : e.getNearbyEntities(5, 5, 5)) {
 //								if (EntityUtils.isHostileMob(ne)) {

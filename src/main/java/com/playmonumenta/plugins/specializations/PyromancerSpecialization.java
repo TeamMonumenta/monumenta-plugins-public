@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,19 +16,20 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.World;
 
 public class PyromancerSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public PyromancerSpecialization(Plugin plugin, Random random) {
+	public PyromancerSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -43,8 +46,8 @@ public class PyromancerSpecialization extends BaseSpecialization {
 				 */
 				if (inferno > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.INFERNO)) {
-						ParticleEffect.FLAME.display(8, 1, 8, 0.175f, 1000, player.getLocation(), 40);
-						ParticleEffect.LAVA.display(8, 1, 8, 0.175f, 500, player.getLocation(), 40);
+						mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 1000, 8, 1, 8, 0.175);
+						mWorld.spawnParticle(Particle.LAVA, player.getLocation(), 500, 8, 1, 8, 0.175);
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.85f);
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
@@ -121,8 +124,8 @@ public class PyromancerSpecialization extends BaseSpecialization {
 							double z = direction.getZ() * t;
 							player.getLocation().getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
 							loc.add(x, y, z);
-							ParticleEffect.SMOKE_LARGE.display(xoffset, 0.25F, zoffset, 0.075F, 50, loc, 40);
-							ParticleEffect.FLAME.display(xoffset, 0.25F, zoffset, 0.05F, 10, loc, 40);
+							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, xoffset, 0.25, zoffset, 0.075);
+							mWorld.spawnParticle(Particle.FLAME, loc, 10, xoffset, 0.25, zoffset, 0.05);
 
 							for (Entity e : loc.getWorld().getNearbyEntities(loc, damagerange, 1.25, damagerange)) {
 								if (EntityUtils.isHostileMob(e)) {
@@ -166,8 +169,8 @@ public class PyromancerSpecialization extends BaseSpecialization {
 		if (burningWrath > 0) {
 			if (e.getFireTicks() > 0) {
 				if (cause == DamageCause.ENTITY_ATTACK) {
-					ParticleEffect.FLAME.display(3, 1, 3, 0.1f, 125, e.getLocation(), 40);
-					ParticleEffect.LAVA.display(3, 1, 3, 0.1f, 25, e.getLocation(), 40);
+					mWorld.spawnParticle(Particle.FLAME, e.getLocation(), 125, 3, 1, 3, 0.1);
+					mWorld.spawnParticle(Particle.LAVA, e.getLocation(), 25, 3, 1, 3, 0.1);
 					for (Entity ne : e.getNearbyEntities(3, 3, 3)) {
 						if (EntityUtils.isHostileMob(ne)) {
 							LivingEntity le = (LivingEntity) ne;

@@ -1,12 +1,16 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Random;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -15,23 +19,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.World;
 
 public class SniperSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public SniperSpecialization(Plugin plugin, Random random) {
+	public SniperSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	/*
@@ -67,7 +69,7 @@ public class SniperSpecialization extends BaseSpecialization {
 							i++;
 							if (i >= 16) {
 
-								ParticleEffect.CRIT.display(0, 0, 0, 0.25f, 10, player.getLocation(), 40);
+								mWorld.spawnParticle(Particle.CRIT, player.getLocation(), 10, 0, 0, 0, 0.25);
 								if (i == 16 + chargeTime) {
 									MessagingUtils.sendActionBarMessage(mPlugin, player, "Your shot is now " + ChatColor.BOLD + "Overcharged!");
 									player.setMetadata(PLAYER_OVERCHARGED_METAKEY, new FixedMetadataValue(mPlugin, null));
@@ -122,7 +124,7 @@ public class SniperSpecialization extends BaseSpecialization {
 						@Override
 						public void run() {
 							t++;
-							ParticleEffect.SPELL_INSTANT.display(0.25f, 0, 0.25f, 0, 4, player.getLocation(), 40);
+							mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
 							if (!player.hasMetadata(PLAYER_ENCHANTED_ARROW_METAKEY) || t >= 20 * 10) {
 								player.removeMetadata(PLAYER_ENCHANTED_ARROW_METAKEY, mPlugin);
 								this.cancel();
@@ -219,7 +221,7 @@ public class SniperSpecialization extends BaseSpecialization {
 		 */
 		if (bloodhunterArrows > 0) {
 			double velInc = bloodhunterArrows == 1 ? 1.1 : 1.2;
-			ParticleEffect.CRIT.display(0, 0, 0, 0.5f, 8, player.getEyeLocation().add(player.getLocation().getDirection()), 40);
+			mWorld.spawnParticle(Particle.CRIT, player.getEyeLocation().add(player.getLocation().getDirection()), 8, 0, 0, 0, 0.5);
 			arrow.setVelocity(arrow.getVelocity().multiply(velInc));
 			if (arrow.isCritical()) {
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.REDSTONE);
@@ -241,11 +243,11 @@ public class SniperSpecialization extends BaseSpecialization {
 					player.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.85f);
 					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0.65f);
 					player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
-					ParticleEffect.FIREWORKS_SPARK.display(0.1f, 0.1f, 0.1f, 0.2f, 10, loc.clone().add(dir), 40);
+					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
 					for (int i = 0; i < 60; i++) {
 						loc.add(dir.clone().multiply(0.5));
-						ParticleEffect.SPELL_INSTANT.display(0.1f, 0.1f, 0.1f, 0, 3, loc, 40);
-						ParticleEffect.FIREWORKS_SPARK.display(0.1f, 0.1f, 0.1f, 0.1f, 1, loc, 40);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0);
+						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.1, 0.1, 0.1, 0.1);
 
 						boolean gotTar = false;
 						for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.75, 0.75, 0.75)) {
@@ -280,7 +282,7 @@ public class SniperSpecialization extends BaseSpecialization {
 							break;
 						}
 						if (loc.getBlock().getType().isSolid()) {
-							ParticleEffect.FIREWORKS_SPARK.display(0.1f, 0.1f, 0.1f, 0.2f, 150, loc, 40);
+							mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 150, 0.1, 0.1, 0.1, 0.2);
 							player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 							break;
 						}

@@ -1,29 +1,32 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Random;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class AssassinSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public AssassinSpecialization(Plugin plugin, Random random) {
+	public AssassinSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	public static final String SWIFT_COMBOS_ACTIVE_METAKEY = "SwiftCombosStacks";
@@ -42,9 +45,9 @@ public class AssassinSpecialization extends BaseSpecialization {
 				if (PlayerUtils.isCritical(player) && !EntityUtils.isBoss(e) && !EntityUtils.isElite(e)) {
 					e.setHealth(0);
 					e.getWorld().playSound(e.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1.75f);
-					ParticleEffect.SPELL_WITCH.display(0.3f, 0.35f, 0.3f, 1, 50, e.getLocation().add(0, 1.15, 0), 40);
-					ParticleEffect.SPELL_MOB.display(0.2f, 0.35f, 0.2f, 0, 50, e.getLocation().add(0, 1.15, 0), 40);
-					ParticleEffect.SMOKE_LARGE.display(0.3f, 0.35f, 0.3f, 0, 5, e.getLocation().add(0, 1.15, 0), 40);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, e.getLocation().add(0, 1.15, 0), 50, 0.3, 0.35, 0.3, 1);
+					mWorld.spawnParticle(Particle.SPELL_MOB, e.getLocation().add(0, 1.15, 0), 50, 0.2, 0.35, 0.2, 0);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, e.getLocation().add(0, 1.15, 0), 5, 0.3, 0.35, 0.3, 0);
 
 					int cooldown = perfectKill == 1 ? 24 * 20 : 12 * 20;
 

@@ -1,36 +1,39 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.World;
 
 public class CyromancerSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public CyromancerSpecialization(Plugin plugin, Random random) {
+	public CyromancerSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -51,9 +54,9 @@ public class CyromancerSpecialization extends BaseSpecialization {
 					 */
 					if (blizzard > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BLIZZARD)) {
-							ParticleEffect.EXPLOSION_NORMAL.display(7, 1, 7, 0.2f, 1000, player.getLocation(), 40);
-							ParticleEffect.SNOW_SHOVEL.display(7, 4, 7, 0.35f, 1500, player.getLocation(), 40);
-							ParticleEffect.CLOUD.display(0, 0, 0, 0.5f, 300, player.getLocation(), 40);
+							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 1000, 7, 1, 7, 0.2);
+							mWorld.spawnParticle(Particle.SNOW_SHOVEL, player.getLocation(), 1500, 7, 4, 7, 0.35);
+							mWorld.spawnParticle(Particle.CLOUD, player.getLocation(), 300, 0, 0, 0, 0.5);
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 							player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 0.85f, 1.15f);
 							double damage = blizzard == 1 ? 15 : 22;
@@ -111,8 +114,8 @@ public class CyromancerSpecialization extends BaseSpecialization {
 							double z = direction.getZ() * t;
 							player.getLocation().getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1);
 							loc.add(x, y, z);
-							ParticleEffect.CLOUD.display(xoffset, 0.25F, zoffset, 0.075F, 10, loc, 40);
-							ParticleEffect.SNOW_SHOVEL.display(xoffset, 0.25F, zoffset, 0.05F, 50, loc, 40);
+							mWorld.spawnParticle(Particle.CLOUD, loc, 10, xoffset, 0.25, zoffset, 0.075);
+							mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc, 50, xoffset, 0.25, zoffset, 0.05);
 
 							for (Entity e : loc.getWorld().getNearbyEntities(loc, damagerange, 1.25, damagerange)) {
 								if (EntityUtils.isHostileMob(e) && !affected.contains(e)) {
@@ -160,7 +163,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 					if (PlayerUtils.isCritical(player)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FROZEN_HEART)) {
 							e.getWorld().playSound(e.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-							ParticleEffect.SNOW_SHOVEL.display(0.2f, 0.2f, 0.2f, 0.2f, 50, e.getLocation().add(0, e.getHeight() / 2, 0), 40);
+							mWorld.spawnParticle(Particle.SNOW_SHOVEL, e.getLocation().add(0, e.getHeight() / 2, 0), 50, 0.2, 0.2, 0.2, 0.2);
 							if (!EntityUtils.isBoss(e)) {
 								EntityUtils.applyFreeze(mPlugin, 20 * 3, e);
 							} else {

@@ -1,38 +1,41 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import org.bukkit.World;
 
 public class TenebristSpecialization extends BaseSpecialization {
+	private World mWorld;
 
-	public TenebristSpecialization(Plugin plugin, Random random) {
+	public TenebristSpecialization(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -64,9 +67,9 @@ public class TenebristSpecialization extends BaseSpecialization {
 										rotation += 5;
 										double cRadian = Math.toRadians(rotation);
 										loc.add(Math.cos(cRadian) * radius, 0, Math.sin(cRadian) * radius);
-										ParticleEffect.SPELL_WITCH.display(0, 0, 0, 0, 1, loc, 40);
+										mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
 										if (rotation % 90 == 0) {
-											ParticleEffect.SPELL_WITCH.display(0, 0, 0, 1, 12, loc, 40);
+											mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 12, 0, 0, 0, 1);
 										}
 										loc.subtract(Math.cos(cRadian) * radius, 0, Math.sin(cRadian) * radius);
 									}
@@ -167,15 +170,15 @@ public class TenebristSpecialization extends BaseSpecialization {
 							@Override
 							public void run() {
 								i++;
-								ParticleEffect.SMOKE_LARGE.display(12, 0.2f, 12, 0.1f, 75, loc, 40);
-								ParticleEffect.CLOUD.display(12, 0.2f, 12, 0.05f, 10, loc, 40);
+								mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 75, 12, 0.2, 12, 0.1);
+								mWorld.spawnParticle(Particle.CLOUD, loc, 10, 12, 0.2, 12, 0.05);
 
 								for (Player p : PlayerUtils.getNearbyPlayers(loc, 12)) {
 									if (MetadataUtils.happenedThisTick(mPlugin, p, Constants.PLAYER_DAMAGE_NONCE_METAKEY, -1)) {
 										Location l = p.getLocation();
 										p.getWorld().strikeLightningEffect(l);
-										ParticleEffect.FLAME.display(0, 0, 0, 0.35f, 250, l, 40);
-										ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.25f, 75, l, 40);
+										mWorld.spawnParticle(Particle.FLAME, l, 250, 0, 0, 0, 0.35);
+										mWorld.spawnParticle(Particle.SMOKE_LARGE, l, 75, 0, 0, 0, 0.25);
 										p.getWorld().playSound(l, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 										p.getWorld().playSound(l, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 0.9f);
 
@@ -224,22 +227,22 @@ public class TenebristSpecialization extends BaseSpecialization {
 							public void run() {
 								t++;
 								loc.add(dir.clone().multiply(0.15));
-								ParticleEffect.SPELL_WITCH.display(0.35f, 0.35f, 0.35f, 1, 30, loc, 40);
-								ParticleEffect.SPELL_MOB.display(0.35f, 0.35f, 0.35f, 0, 25, loc, 40);
+								mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 30, 0.35, 0.35, 0.35, 1);
+								mWorld.spawnParticle(Particle.SPELL_MOB, loc, 25, 0.35, 0.35, 0.35, 0);
 
 								for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.85, 0.85, 0.85)) {
 									if (EntityUtils.isHostileMob(e)) {
 										EntityUtils.damageEntity(mPlugin, (LivingEntity) e, dmg, player);
-										ParticleEffect.DRAGONBREATH.display(0, 0, 0, 0.25f, 150, loc, 40);
-										ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.2f, 80, loc, 40);
+										mWorld.spawnParticle(Particle.DRAGON_BREATH, loc, 150, 0, 0, 0, 0.25);
+										mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 80, 0, 0, 0, 0.2);
 										loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.8f);
 										this.cancel();
 										break;
 									}
 								}
 								if (loc.getBlock().getType().isSolid()) {
-									ParticleEffect.DRAGONBREATH.display(0, 0, 0, 0.25f, 150, loc, 40);
-									ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.2f, 80, loc, 40);
+									mWorld.spawnParticle(Particle.DRAGON_BREATH, loc, 150, 0, 0, 0, 0.25);
+									mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 80, 0, 0, 0, 0.2);
 									loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.8f);
 									this.cancel();
 								}
