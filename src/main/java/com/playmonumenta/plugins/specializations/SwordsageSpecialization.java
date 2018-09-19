@@ -1,12 +1,19 @@
 package com.playmonumenta.plugins.specializations;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
+
+import org.bukkit.Color;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,21 +21,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 
 public class SwordsageSpecialization extends BaseSpecialization {
 
@@ -37,6 +38,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 	}
 
 	public static final String BLADE_DANCE_ACTIVE_METAKEY = "BladeDanceActive";
+	private static final Particle.DustOptions BLADE_SURGE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
 	@Override
 	public void EntityDeathEvent(Player player, EntityDeathEvent event) {
@@ -94,7 +96,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 
 							int damage = bladeSurge == 1 ? 10 : 14;
 
-							player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.2f);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.2f);
 							ParticleEffect.CLOUD.display(0.2f, 0.25f, 0.2f, 0.15f, 12, player.getLocation(), 40);
 
 							new BukkitRunnable() {
@@ -108,7 +110,7 @@ public class SwordsageSpecialization extends BaseSpecialization {
 									player.getLocation().getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2);
 									ParticleEffect.SWEEPATTACK.display(0, 0, 0, 0, 1, loc, 40);
 									ParticleEffect.CLOUD.display(0.05f, 0.05f, 0.05f, 0.03F, 3, loc, 40);
-									ParticleUtils.playColorEffect(ParticleEffect.REDSTONE, 255, 255, 255, 0.25f, 0.25f, 0.25f, loc, 50);
+									player.getWorld().spawnParticle(Particle.REDSTONE, loc, 50, 0.25, 0.25, 0.25, 1, BLADE_SURGE_COLOR);
 
 									for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.65, 0.65, 0.65)) {
 										if (EntityUtils.isHostileMob(e)) {

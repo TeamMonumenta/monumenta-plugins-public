@@ -9,8 +9,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -21,6 +19,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.Color;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
@@ -71,9 +70,7 @@ public class MageClass extends BaseClass {
 	private static final int MANA_LANCE_2_DAMAGE = 10;
 	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
 	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
-	private static final int MANA_LANCE_R = 91;
-	private static final int MANA_LANCE_G = 187;
-	private static final int MANA_LANCE_B = 255;
+	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 	private static final int MANA_LANCE_STAGGER_DURATION = (int)(0.95 * 20);
 
 	private static final float FROST_NOVA_RADIUS = 6.0f;
@@ -127,6 +124,7 @@ public class MageClass extends BaseClass {
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
 	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
+	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	private static double PASSIVE_DAMAGE = 1.5;
 
@@ -152,13 +150,13 @@ public class MageClass extends BaseClass {
 					SpellShockedMob shocked = entry.getValue();
 
 					Location loc = shocked.mob.getLocation().add(0, 1, 0);
-					ParticleEffect.SPELL_WITCH.display(0.2f, 0.6f, 0.2f, 1, 3, loc, 40);
-					ParticleUtils.playColorEffect(ParticleEffect.REDSTONE, 220, 147, 249, 0.3f, 0.6f, 0.3f, loc, 4);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1);
+					mWorld.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
 
 					if (shocked.mob.isDead() || shocked.mob.getHealth() <= 0) {
 						// Mob has died - trigger effects
-						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
-						ParticleEffect.CRIT_MAGIC.display(1, 1, 1, 0.25f, 100, loc, 40);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
+						mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 100, 1, 1, 1, 0.25);
 						world.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
 						for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
 							EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
@@ -203,8 +201,8 @@ public class MageClass extends BaseClass {
 			mSpellShockedMobs.remove(mob.getUniqueId());
 
 			Location loc = shocked.mob.getLocation().add(0, 1, 0);
-			ParticleUtils.playParticlesInWorld(mWorld, Particle.SPELL_WITCH, loc, 100, 2, 2, 2, 0.001);
-			ParticleEffect.CRIT_MAGIC.display(1, 1, 1, 0.25f, 75, loc, 40);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 100, 1, 1, 1, 0.001);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 75, 1, 1, 1, 0.25);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.5f);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
 			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 1.5f);
@@ -263,9 +261,8 @@ public class MageClass extends BaseClass {
 							}
 
 							Location loc = damagee.getLocation();
-							ParticleUtils.playParticlesInWorld(mWorld, Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
-							ParticleUtils.playParticlesInWorld(mWorld, Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
-
+							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
+							mWorld.spawnParticle(Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
 							mWorld.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
@@ -342,25 +339,18 @@ public class MageClass extends BaseClass {
 								Location loc = player.getEyeLocation();
 								Vector dir = loc.getDirection();
 								loc.add(dir);
-								ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.125f, 10, loc, 40);
-								double pOffset = 0.35;
+								mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
 
 								for (int i = 0; i < 8; i++) {
 									loc.add(dir);
 
-									ParticleEffect.EXPLOSION_NORMAL.display(0.05f, 0.05f, 0.05f, 0.025f, 2, loc, 40);
-									for (int t = 0; t < 18; t++) {
-										Location pLoc = loc.clone();
-										double os1 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										double os2 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										double os3 = ThreadLocalRandom.current().nextDouble(-pOffset, pOffset);
-										pLoc.add(os1, os2, os3);
-										ParticleEffect.REDSTONE.display(new OrdinaryColor(MANA_LANCE_R, MANA_LANCE_G, MANA_LANCE_B), pLoc, 40);
-									}
+									mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05, 0.05, 0.05, 0.025);
+									mWorld.spawnParticle(Particle.REDSTONE, loc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
+
 									if (loc.getBlock().getType().isSolid()) {
 										loc.subtract(dir.multiply(0.5));
-										ParticleEffect.CLOUD.display(0, 0, 0, 0.125f, 30, loc, 40);
-										loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+										mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125);
+										mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 										break;
 									}
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
@@ -370,7 +360,7 @@ public class MageClass extends BaseClass {
 								}
 
 								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MANA_LANCE, cooldown);
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+								mWorld.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 							}
 						}
 					}
@@ -402,9 +392,8 @@ public class MageClass extends BaseClass {
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
 
 							Location loc = player.getLocation();
-							ParticleUtils.playParticlesInWorld(mWorld, Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
-							ParticleUtils.playParticlesInWorld(mWorld, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
-
+							mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
+							mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
 							mWorld.playSound(loc, "block.glass.break", 0.5f, 1.0f);
 						}
 					}
@@ -503,9 +492,9 @@ public class MageClass extends BaseClass {
 						}
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
-						ParticleEffect.FIREWORKS_SPARK.display(0.2f, 0.35f, 0.2f, 0.5f, 150, player.getLocation().add(0, 1.15, 0), 40);
-						ParticleEffect.SPELL_INSTANT.display(0.2f, 0.35f, 0.2f, 1, 100, player.getLocation().add(0, 1.15, 0), 40);
-						player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+						mWorld.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 						MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, PRISMATIC_SHIELD_COOLDOWN);

@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
@@ -79,6 +78,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -692,9 +692,9 @@ public class PlayerListener implements Listener {
 		if (malfunction) {
 			Block block = event.getBlock();
 			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
-			ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 0, 1, loc, 40);
-			ParticleEffect.FLAME.display(0, 0, 0, 0.25f, 100, loc, 40);
-			ParticleEffect.SMOKE_LARGE.display(0, 0, 0, 0.1f, 50, loc, 40);
+			loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+			loc.getWorld().spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.25);
+			loc.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.1);
 			loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_DEATH, 1, 0);
 			loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 			loc.getBlock().setType(Material.AIR);

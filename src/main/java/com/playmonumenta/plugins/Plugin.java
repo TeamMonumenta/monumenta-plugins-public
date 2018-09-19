@@ -147,10 +147,10 @@ public class Plugin extends JavaPlugin {
 		//  Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom, mWorld));
-		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom));
+		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom, mWorld));
 		mClassMap.put(Classes.CLERIC.getValue(), new ClericClass(this, mRandom));
-		mClassMap.put(Classes.ROGUE.getValue(), new RogueClass(this, mRandom));
-		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom));
+		mClassMap.put(Classes.ROGUE.getValue(), new RogueClass(this, mRandom, mWorld));
+		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom, mWorld));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
 

@@ -1,29 +1,19 @@
 package com.playmonumenta.plugins.utils;
 
-import java.util.Random;
+import com.playmonumenta.plugins.Plugin;
+
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
+import org.bukkit.World;
 
 public class ParticleUtils {
-	public static void playParticleInWorld(World world, Particle type, Location loc, int count) {
-		world.spawnParticle(type, loc, count);
-	}
-
-	public static void playParticlesInWorld(World world, Particle type, Location loc, int count, double xOffset, double yOffset, double zOffset, double data) {
-		world.spawnParticle(type, loc, count, xOffset, yOffset, zOffset, data);
-	}
-
 	public static void explodingSphereEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2) {
 		new BukkitRunnable() {
 			double t = Math.PI / 4;
@@ -39,7 +29,7 @@ public class ParticleUtils {
 					loc.add(x, y, z);
 
 					if (rand.nextDouble() < percent1) {
-						playParticleInWorld(world, type1, loc, 1);
+						world.spawnParticle(type1, loc, 1);
 					}
 
 					loc.subtract(x, y, z);
@@ -52,7 +42,7 @@ public class ParticleUtils {
 					loc.add(x, y, z);
 
 					if (rand.nextDouble() < percent2) {
-						playParticleInWorld(world, type2, loc, 1);
+						world.spawnParticle(type2, loc, 1);
 					}
 
 					loc.subtract(x, y, z);
@@ -63,22 +53,6 @@ public class ParticleUtils {
 			}
 
 		}.runTaskTimer(plugin, 0, 1);
-	}
-
-	/**
-	 * Plays Colored particle effects.
-	 *
-	 * Only works for REDSTONE, and SPELL_MOB
-	 */
-	public static void playColorEffect(ParticleEffect effect, int r, int g, int b, double xOffset, double yOffset, double zOffset, Location loc, int amount) {
-		for (int i = 0; i < amount; i++) {
-			double x = ThreadLocalRandom.current().nextDouble(-xOffset, xOffset);
-			double y = ThreadLocalRandom.current().nextDouble(-yOffset, yOffset);
-			double z = ThreadLocalRandom.current().nextDouble(-zOffset, zOffset);
-			Location l = loc.clone();
-			l.add(x, y, z);
-			effect.display(new OrdinaryColor(r, g, b), l, 40);
-		}
 	}
 
 	public static void explodingConeEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
@@ -100,7 +74,7 @@ public class ParticleUtils {
 					Vector toParticle = loc.toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 
 					if (playerDir.dot(toParticle) > dotAngle && rand.nextDouble() < percent1) {
-						playParticleInWorld(world, type1, loc, 1);
+						world.spawnParticle(type1, loc, 1);
 					}
 
 					loc.subtract(x, y, z);
@@ -115,7 +89,7 @@ public class ParticleUtils {
 					toParticle = loc.toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 
 					if (playerDir.dot(toParticle) > dotAngle && rand.nextDouble() < percent2) {
-						playParticleInWorld(world, type2, loc, 1);
+						world.spawnParticle(type2, loc, 1);
 					}
 
 					loc.subtract(x, y, z);

@@ -4,12 +4,11 @@ import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
 
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.Particle;
@@ -17,7 +16,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.World;
 
 public class Gilded implements ItemProperty {
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Gilded";
+	private static final Particle.DustOptions GILDED_1_COLOR = new Particle.DustOptions(Color.fromRGB(191, 166, 51), 1.0f);
+	private static final Particle.DustOptions GILDED_2_COLOR = new Particle.DustOptions(Color.fromRGB(210, 191, 76), 1.0f);
+	private static final Particle.DustOptions GILDED_3_COLOR = new Particle.DustOptions(Color.fromRGB(229, 229, 128), 1.0f);
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Gilded";
 	private static final int tickPeriod = 6;
 
 	@Override
@@ -41,14 +43,14 @@ public class Gilded implements ItemProperty {
 		case 0:
 			break;
 		case 1:
-			ParticleUtils.playColorEffect(ParticleEffect.REDSTONE, 191, 166, 51, 0.3, 0.5, 0.3, player.getLocation().add(0, 0.8, 0), 4);
+			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_1_COLOR);
 			break;
 		case 2:
-			ParticleUtils.playColorEffect(ParticleEffect.REDSTONE, 210, 191, 76, 0.3, 0.5, 0.3, player.getLocation().add(0, 0.8, 0), 5);
+			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_2_COLOR);
 			break;
 		case 3:
 		default:
-			ParticleUtils.playColorEffect(ParticleEffect.REDSTONE, 229, 229, 128, 0.3, 0.5, 0.3, player.getLocation().add(0, 0.8, 0), 7);
+			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_3_COLOR);
 			break;
 		}
 	}
@@ -60,10 +62,11 @@ public class Gilded implements ItemProperty {
 
 			@Override
 			public void run() {
-				ParticleEffect.REDSTONE.display(new OrdinaryColor(191, 165, 51), item.getLocation(), 40);
 				if (item == null || item.isDead()) {
 					this.cancel();
 				}
+
+				item.getWorld().spawnParticle(Particle.REDSTONE, item.getLocation(), 1, 0.1, 0.1, 0.1, GILDED_1_COLOR);
 
 				// Very infrequently check if the item is still actually there
 				numTicks++;

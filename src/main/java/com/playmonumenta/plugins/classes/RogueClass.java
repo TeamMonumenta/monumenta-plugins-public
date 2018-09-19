@@ -1,14 +1,23 @@
 package com.playmonumenta.plugins.classes;
 
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.Color;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -19,27 +28,16 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.OrdinaryColor;
+import org.bukkit.World;
 
 /*
     ByMyBlade
@@ -109,11 +107,15 @@ public class RogueClass extends BaseClass {
 	private static final int DAGGER_THROW_DURATION = 10 * 20;
 	private static final int DAGGER_THROW_1_VULN = 3;
 	private static final int DAGGER_THROW_2_VULN = 7;
+	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
 
-	public RogueClass(Plugin plugin, Random random) {
+	private World mWorld;
+
+	public RogueClass(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -141,6 +143,7 @@ public class RogueClass extends BaseClass {
 							double damage = (daggerThrow == 1) ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 							int vulnLevel = (daggerThrow == 1) ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 
+							// TODO: Upgrade this to raycast code
 							for (int a = -1; a < 2; a++) {
 								double angle = a * 0.463; //25o. Set to 0.524 for 30o or 0.349 for 20o
 								Vector newDir = new Vector(Math.cos(angle) * dir.getX() + Math.sin(angle) * dir.getZ(), dir.getY(), Math.cos(angle) * dir.getZ() - Math.sin(angle) * dir.getX());
@@ -154,7 +157,7 @@ public class RogueClass extends BaseClass {
 
 									for (int t = 0; t < 10; t++) {
 										pLoc.add((newDir.clone()).multiply(0.1));
-										ParticleEffect.REDSTONE.display(new OrdinaryColor(64, 64, 64), pLoc, 10);
+										world.spawnParticle(Particle.REDSTONE, pLoc, 1);
 									}
 
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1)) {
@@ -166,7 +169,7 @@ public class RogueClass extends BaseClass {
 
 									if (mLoc.getBlock().getType().isSolid() || hit) {
 										mLoc.subtract((newDir.clone()).multiply(0.5));
-										ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
+										world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
 
 										if (hit) {
 											world.playSound(loc, "block.anvil.place", 0.4f, 2.5f);
@@ -217,10 +220,9 @@ public class RogueClass extends BaseClass {
 								while (loc.getBlock().getType().isSolid()) {
 									loc.subtract(dir.clone().multiply(1.15));
 								}
-								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
-								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40)
-								;
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+								mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
+								mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
+								mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 
 								player.teleport(loc);
 
@@ -232,9 +234,9 @@ public class RogueClass extends BaseClass {
 									}
 								}
 
-								ParticleEffect.SPELL_WITCH.display(0, 0.5f, 0, 1, 50, player.getLocation().add(0, 1.1, 0), 40);
-								ParticleEffect.SMOKE_LARGE.display(0, 0.5f, 0, 0.05f, 12, player.getLocation().add(0, 1.1, 0), 40);
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+								mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
+								mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
+								mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 								mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ADVANCING_SHADOWS, ADVANCING_SHADOWS_COOLDOWN);
 							}
 						}
@@ -260,10 +262,9 @@ public class RogueClass extends BaseClass {
 						}
 
 						Location loc = player.getLocation();
-						World world = player.getWorld();
-						ParticleEffect.SMOKE_LARGE.display(2.5f, 0.8f, 2.5f, 0.05f, 300, loc.clone().add(0, 1, 0), 40);
-						ParticleEffect.SMOKE_NORMAL.display(2.5f, 0.2f, 2.5f, 0.1f, 600, loc, 40);
-						world.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
+						mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
+						mWorld.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
 					}
@@ -293,17 +294,16 @@ public class RogueClass extends BaseClass {
 						double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 						_damageMob(player, damagee, extraDamage);
 
-						World world = player.getWorld();
 						Location loc = damagee.getLocation();
 						loc.add(0, 1, 0);
 						int count = 15;
-						world.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 						if (byMyBlade > 1) {
-							ParticleEffect.SPELL_WITCH.display(0.2f, 0.65f, 0.2f, 1, 45, loc, 40);
+							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 							count = 30;
 						}
-						ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
-						ParticleUtils.playParticlesInWorld(world, Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
+						mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
+						mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
+						mWorld.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 					}
 				}
 			}
@@ -407,16 +407,13 @@ public class RogueClass extends BaseClass {
 					Location loc = player.getLocation();
 					loc.add(0, 1, 0);
 
-					int val = escapeDeath == 1 ? 1 : ESCAPE_DEATH_RANGE;
-					Vector offset = new Vector(val, val, val);
+					double offset = escapeDeath == 1 ? 1 : ESCAPE_DEATH_RANGE;
 					int particles = escapeDeath == 1 ? 30 : 500;
 
-					ParticleUtils.playParticlesInWorld(world, Particle.SPELL_INSTANT, loc, particles, offset.getX(),
-					                                   offset.getY(), offset.getZ(), 0.001);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, particles, offset, offset, offset, 0.001);
 
 					if (escapeDeath > 1) {
-						ParticleUtils.playParticlesInWorld(world, Particle.CLOUD, loc, particles, offset.getX(),
-						                                   offset.getY(), offset.getZ(), 0.001);
+						mWorld.spawnParticle(Particle.CLOUD, loc, particles, offset, offset, offset, 0.001);
 					}
 
 					world.playSound(loc, "item.totem.use", 0.5f, 0.5f);
@@ -440,7 +437,6 @@ public class RogueClass extends BaseClass {
 	public void EntityDeathEvent(Player player, LivingEntity killedEntity, DamageCause cause, boolean shouldGenDrops) {
 		int viciousCombos = ScoreboardUtils.getScoreboardValue(player, "ViciousCombos");
 		if (viciousCombos > 0) {
-			World world = player.getWorld();
 			Location loc = killedEntity.getLocation();
 			loc = loc.add(0, 0.5, 0);
 
@@ -455,23 +451,21 @@ public class RogueClass extends BaseClass {
 					}
 				}
 
-				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
-				ParticleEffect.CRIT.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
-				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 500, loc, 40);
-				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
+				mWorld.spawnParticle(Particle.CRIT, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+				mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			} else if (EntityUtils.isHostileMob(killedEntity)) {
 				int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 				mPlugin.mTimers.UpdateCooldowns(timeReduction);
 
-				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
-				ParticleEffect.CRIT.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 50, loc, 40);
-				ParticleEffect.CRIT_MAGIC.display(VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25f, 50, loc, 40);
-				ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
+				mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+				mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+				mWorld.spawnParticle(Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			}
-
-
 		}
 	}
 

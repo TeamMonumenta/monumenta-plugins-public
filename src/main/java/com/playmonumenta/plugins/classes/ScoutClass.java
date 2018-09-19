@@ -294,7 +294,7 @@ public class ScoutClass extends BaseClass {
 					double z = loc.getZ();
 					Location newLoc = new Location(loc.getWorld(), x, y, z);
 
-					ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.VILLAGER_HAPPY, newLoc, 5, 0.75,
+					owner.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, newLoc, 5, 0.75,
 					                                   0.75, 0.75, 0.001);
 
 					if (standardBearer > 1) {
@@ -340,7 +340,7 @@ public class ScoutClass extends BaseClass {
 								int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
-								ParticleUtils.playParticlesInWorld(world, Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
+								world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
 																   10, 0.7, 0.7, 0.7, 0.001);
 								world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
 							}

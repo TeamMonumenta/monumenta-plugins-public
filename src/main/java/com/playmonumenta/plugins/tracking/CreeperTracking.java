@@ -32,7 +32,7 @@ public class CreeperTracking implements EntityTracking {
 			if (creeper != null && creeper.isValid()) {
 				Set<String> tags = creeper.getScoreboardTags();
 				if (tags != null && tags.contains("Snuggles")) {
-					ParticleUtils.playParticlesInWorld(world, Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
+					world.spawnParticle(Particle.HEART, creeper.getLocation().add(0, 1, 0), 1, 0.4, 1, 0.4, 0);
 				}
 			} else {
 				creeperIter.remove();

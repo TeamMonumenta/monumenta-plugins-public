@@ -124,7 +124,7 @@ public class ClericClass extends BaseClass {
 				for (Player p : PlayerUtils.getNearbyPlayers(player, PASSIVE_HEAL_RADIUS, false)) {
 					if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
 						PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
-						ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
+						world.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
 					}
 				}
 
@@ -137,7 +137,7 @@ public class ClericClass extends BaseClass {
 							double oldHealth = p.getHealth();
 							PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 							if (p.getHealth() > oldHealth) {
-								ParticleUtils.playParticlesInWorld(world, Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+								world.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 							}
 						}
 					}
@@ -148,8 +148,8 @@ public class ClericClass extends BaseClass {
 				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 				if (cleansing > 0) {
 					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE)) {
-						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
-						ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
+						player.getWorld().spawnParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
+						player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
 
 						for (Player e : PlayerUtils.getNearbyPlayers(player, CLEANSING_RADIUS, true)) {
 							PotionUtils.clearNegatives(mPlugin, e);
@@ -190,7 +190,7 @@ public class ClericClass extends BaseClass {
 				MovementUtils.KnockAway(player, damager, SANCTIFIED_KNOCKBACK_SPEED);
 
 				Location loc = damager.getLocation();
-				ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.END_ROD, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
+				player.getWorld().spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
 
 				if (sanctified > 1) {
 					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
@@ -215,7 +215,7 @@ public class ClericClass extends BaseClass {
 
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.5, 0.5, 0.001);
+						world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.5, 0.5, 0.001);
 						world.playSound(loc, "block.anvil.land", 0.15f, 1.5f);
 					}
 				}
@@ -237,7 +237,7 @@ public class ClericClass extends BaseClass {
 
 						World world = player.getWorld();
 						Location loc = killedEntity.getLocation();
-						ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
+						world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
 						player.getWorld().playSound(loc, "block.enchantment_table.use", 1.5f, 1.5f);
 
 					}
@@ -335,7 +335,7 @@ public class ClericClass extends BaseClass {
 							p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
 
 							Location loc = p.getLocation();
-							ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
+							world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
 							world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
 						}
 
@@ -393,8 +393,8 @@ public class ClericClass extends BaseClass {
 
 					Location loc = p.getLocation();
 
-					ParticleUtils.playParticlesInWorld(world, Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-					ParticleUtils.playParticlesInWorld(world, Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+					world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+					world.spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 					player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
 					player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
 				}

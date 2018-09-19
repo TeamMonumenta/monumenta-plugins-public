@@ -43,8 +43,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect.BlockData;
 
 /*
     BasiliskPoison
@@ -104,8 +102,11 @@ public class AlchemistClass extends BaseClass {
 	Arrow mBlinkArrow = null;
 	Arrow mUnstableArrow = null;
 
-	public AlchemistClass(Plugin plugin, Random random) {
+	private World mWorld;
+
+	public AlchemistClass(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 
@@ -117,7 +118,7 @@ public class AlchemistClass extends BaseClass {
 			int effectLvl = basiliskPoison == 1 ? BASILISK_POISON_1_EFFECT_LVL : BASILISK_POISON_2_EFFECT_LVL;
 			int duration = basiliskPoison == 1 ? BASILISK_POISON_1_DURATION : BASILISK_POISON_2_DURATION;
 			damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
-			ParticleUtils.playParticlesInWorld(damagee.getWorld(), Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
+			mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 		}
 	}
 
@@ -132,11 +133,9 @@ public class AlchemistClass extends BaseClass {
 					if (targetEntity != null && targetEntity instanceof Player) {
 						Player targetPlayer = (Player) targetEntity;
 						if (targetPlayer.getGameMode() != GameMode.SPECTATOR) {
-							World zaWarudo = player.getWorld();
-
-							ParticleUtils.playParticlesInWorld(zaWarudo, Particle.FLAME, targetPlayer.getLocation().add(0, 1, 0), 30, 1.0, 1.0, 1.0, 0.001);
-							zaWarudo.playSound(targetPlayer.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
-							zaWarudo.playSound(player.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
+							mWorld.spawnParticle(Particle.FLAME, targetPlayer.getLocation().add(0, 1, 0), 30, 1.0, 1.0, 1.0, 0.001);
+							mWorld.playSound(targetPlayer.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
+							mWorld.playSound(player.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
 
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 
@@ -304,8 +303,8 @@ public class AlchemistClass extends BaseClass {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
 							Location loc = player.getLocation().add(0, 1.8, 0);
 							ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
-							player.getWorld().playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
-							Item tincture = (player.getWorld()).dropItem(loc, itemTincture);
+							mWorld.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
+							Item tincture = mWorld.dropItem(loc, itemTincture);
 							tincture.setPickupDelay(Integer.MAX_VALUE);
 
 							Vector vel = player.getEyeLocation().getDirection().normalize();
@@ -324,7 +323,7 @@ public class AlchemistClass extends BaseClass {
 									if (tincture.isDead() || tincture == null) {
 										this.cancel();
 									}
-									ParticleEffect.SPELL.display(0, 0, 0, 0.1f, 3, tincture.getLocation(), 40);
+									mWorld.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
 
 									for (Player p : PlayerUtils.getNearbyPlayers(tincture.getLocation(), 1)) {
 										// Prevent players from picking up their own tincture instantly
@@ -332,25 +331,23 @@ public class AlchemistClass extends BaseClass {
 											continue;
 										}
 
-										tincture.getWorld().playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-										ParticleEffect.BLOCK_DUST.display(new BlockData(Material.GLASS, (byte) 0), 0.1f, 0.1f, 0.1f, 0.1f, 250, tincture.getLocation(), 40);
+										mWorld.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
+										mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 250, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
 										tincture.remove();
 
 										int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
 										p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
 
-										World zaWarudo = player.getWorld();
-
 										if (p != player) {
 											player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
-											ParticleUtils.playParticlesInWorld(zaWarudo, Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-											zaWarudo.playSound(player.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
+											mWorld.spawnParticle(Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
+											mWorld.playSound(player.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
 										}
 										mPlugin.mTimers.removeCooldown(player.getUniqueId(), Spells.IRON_TINCTURE);
 										mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_USE_COOLDOWN);
 
-										ParticleUtils.playParticlesInWorld(zaWarudo, Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-										zaWarudo.playSound(p.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
+										mWorld.spawnParticle(Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
+										mWorld.playSound(p.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
 
 										this.cancel();
 										break;
@@ -397,8 +394,8 @@ public class AlchemistClass extends BaseClass {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
 
-					ParticleEffect.SPELL_MOB.display(2, 1.5f, 2, 0, 100, damagee.getLocation(), 40);
-					damagee.getWorld().playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
+					mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation(), 100, 2, 1.5, 2, 0);
+					mWorld.playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR, ENFEEBLING_COOLDOWN);
 				}
 			}
@@ -412,9 +409,9 @@ public class AlchemistClass extends BaseClass {
 		if (abilityID == BOMB_ARROW_ID) {
 			int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
 			if (bombArrow > 0) {
-				ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
-				ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
-				owner.getWorld().playSound(loc, "block.lava.extinguish", 5.0f, 0.25f);
+				mWorld.spawnParticle(Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
+				mWorld.playSound(loc, "block.lava.extinguish", 5.0f, 0.25f);
 			}
 		}
 	}
@@ -431,10 +428,10 @@ public class AlchemistClass extends BaseClass {
 				}
 
 				loc = loc.add(0, 1.2, 0);
-				owner.getWorld().playSound(loc, "entity.generic.explode", 0.7f, 1.0f);
-				owner.getWorld().playSound(loc, "entity.generic.explode", 0.9f, 1.0f);
+				mWorld.playSound(loc, "entity.generic.explode", 0.7f, 1.0f);
+				mWorld.playSound(loc, "entity.generic.explode", 0.9f, 1.0f);
 
-				ParticleUtils.playParticlesInWorld(owner.getWorld(), Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
+				mWorld.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
 
 				int baseDamage = (bombArrow == 1) ? BOMB_ARROW_1_DAMAGE : BOMB_ARROW_2_DAMAGE;
 

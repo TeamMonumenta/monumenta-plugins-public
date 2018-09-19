@@ -29,7 +29,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 
 /*
     CounterStrike
@@ -70,8 +69,11 @@ public class WarriorClass extends BaseClass {
 	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
 	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
 
-	public WarriorClass(Plugin plugin, Random random) {
+	private World mWorld;
+
+	public WarriorClass(Plugin plugin, Random random, World world) {
 		super(plugin, random);
+		mWorld = world;
 	}
 
 	@Override
@@ -115,8 +117,6 @@ public class WarriorClass extends BaseClass {
 								MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
 
 								if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
-									World world = player.getWorld();
-
 									if (riposte > 1) {
 										if (InventoryUtils.isSwordItem(mainHand)) {
 											player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
@@ -125,9 +125,9 @@ public class WarriorClass extends BaseClass {
 										}
 									}
 
-									world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
-									ParticleUtils.playParticlesInWorld(world, Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
-									ParticleUtils.playParticlesInWorld(world, Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
+									mWorld.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+									mWorld.spawnParticle(Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
+									mWorld.spawnParticle(Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
 									mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.RIPOSTE, RIPOSTE_COOLDOWN);
 
 									return false;
@@ -157,8 +157,8 @@ public class WarriorClass extends BaseClass {
 			extraDamage += bruteForceDamage;
 
 			Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
-			ParticleEffect.EXPLOSION_LARGE.display(0, 0, 0, 1, 1, loc, 40);
-			ParticleEffect.EXPLOSION_NORMAL.display(0, 0, 0, 0.135f, 10, loc, 40);
+			mWorld.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135);
 
 			// Damage those non-hit nearby entities and knock them away
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS)) {
@@ -211,9 +211,8 @@ public class WarriorClass extends BaseClass {
 
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
 
-				World world = Bukkit.getWorld(player.getWorld().getName());
 				Location loc = player.getLocation();
-				world.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
+				mWorld.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
 
 				if (frenzy > 1) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));

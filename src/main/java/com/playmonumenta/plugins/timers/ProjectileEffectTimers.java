@@ -41,7 +41,7 @@ public class ProjectileEffectTimers {
 				numParticles = 1;
 			}
 
-			ParticleUtils.playParticlesInWorld(mWorld, particle, entity.getLocation(), numParticles, 0.1, 0.1, 0.1, 0);
+			mWorld.spawnParticle(particle, entity.getLocation(), numParticles, 0.1, 0.1, 0.1, 0);
 		}
 	}
 }

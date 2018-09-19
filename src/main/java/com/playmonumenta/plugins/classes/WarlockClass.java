@@ -125,8 +125,8 @@ public class WarlockClass extends BaseClass {
 				Location loc = player.getLocation();
 				World world = player.getWorld();
 
-				ParticleUtils.playParticlesInWorld(world, Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
+				world.spawnParticle(Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
 				world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
 
 				MovementUtils.KnockAway(player, damager, BLASPHEMY_KNOCKBACK_SPEED);
@@ -150,7 +150,7 @@ public class WarlockClass extends BaseClass {
 			int cursedWound = ScoreboardUtils.getScoreboardValue(player, "CursedWound");
 			if (cursedWound > 0) {
 				if (EntityUtils.isHostileMob(damagee)) {
-					ParticleUtils.playParticlesInWorld(player.getWorld(), Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
+					player.getWorld().spawnParticle(Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
 					int damageMult = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
 					EntityUtils.damageEntity(mPlugin, damagee, damageMult, player);
@@ -175,9 +175,9 @@ public class WarlockClass extends BaseClass {
 						World world = player.getWorld();
 
 						if (soulRend == 1) {
-							ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);
+							world.spawnParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);
 						} else if (soulRend == 2) {
-							ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);
+							world.spawnParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);
 						}
 
 						world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
@@ -213,8 +213,8 @@ public class WarlockClass extends BaseClass {
 					World world = arrow.getWorld();
 
 					world.playSound(loc, "block.enchantment_table.use", 1.0f, 0.8f);
-					ParticleUtils.playParticlesInWorld(world, Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
-					ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, loc, 75, 1, 1, 1, 0.0);
+					world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
+					world.spawnParticle(Particle.DRAGON_BREATH, loc, 75, 1, 1, 1, 0.0);
 
 					int damage = (graspingClaws == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 
@@ -246,7 +246,7 @@ public class WarlockClass extends BaseClass {
 							Location loc = player.getLocation();
 							World world = player.getWorld();
 
-							ParticleUtils.playParticlesInWorld(world, Particle.FLAME, loc.add(0, 1, 0), 60, 1.75, 0.75, 1.75, 0.0);
+							world.spawnParticle(Particle.FLAME, loc.add(0, 1, 0), 60, 1.75, 0.75, 1.75, 0.0);
 							world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
 
 							boolean effect = false;

@@ -209,25 +209,25 @@ public class PlayerTracking implements EntityTracking {
 		if (patreon > 0) {
 			int shinyWhite = ScoreboardUtils.getScoreboardValue(player, "ShinyWhite");
 			if (shinyWhite == 1 && patreon >= 5) {
-				ParticleUtils.playParticlesInWorld(world, Particle.SPELL_INSTANT, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
 
 			int shinyPurple = ScoreboardUtils.getScoreboardValue(player, "ShinyPurple");
 			if (shinyPurple == 1 && patreon >= 10) {
-				ParticleUtils.playParticlesInWorld(world, Particle.DRAGON_BREATH, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.DRAGON_BREATH, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
 
 			int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
 			if (shinyGreen == 1 && patreon >= 20) {
-				ParticleUtils.playParticlesInWorld(world, Particle.VILLAGER_HAPPY, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
 
 			int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
 			if (shinyRed == 1 && patreon >= 30) {
-				ParticleUtils.playParticlesInWorld(world, Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				return;
 			}
 		}

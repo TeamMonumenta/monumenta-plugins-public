@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.item.properties;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.particlelib.ParticleEffect;
 
 import java.lang.reflect.Field;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
+import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Hope implements ItemProperty {
@@ -59,7 +59,7 @@ public class Hope implements ItemProperty {
 
 			@Override
 			public void run() {
-				ParticleEffect.SPELL_INSTANT.display(0.2f, 0.2f, 0.2f, 0, 3, item.getLocation(), 40);
+				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, item.getLocation(), 3, 0.2, 0.2, 0.2, 0);
 				if (item == null || item.isDead()) {
 					this.cancel();
 				}

@@ -33,7 +33,7 @@ public class Chaotic implements ItemProperty {
 		int rand = mRandom.nextInt(2 * level + 1) - level;
 
 		if (rand > 0) {
-			ParticleUtils.playParticlesInWorld(world, Particle.DAMAGE_INDICATOR, target.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
+			world.spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
 		}
 
 		if (cause == DamageCause.ENTITY_SWEEP_ATTACK) {
