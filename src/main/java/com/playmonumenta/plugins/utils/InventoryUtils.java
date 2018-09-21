@@ -98,28 +98,33 @@ public class InventoryUtils {
 			if (meta != null) {
 				List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					//  Filter out the lore text that contain the nameText.
-					List<String> entries = lore.stream().filter(l -> l.startsWith(nameText)).collect(Collectors.toList());
+					for (String loreEntry : lore) {
+						if (loreEntry.startsWith(nameText)) {
+							if (loreEntry.endsWith(" I")) {
+								return 1;
+							} else if (loreEntry.endsWith(" II")) {
+								return 2;
+							} else if (loreEntry.endsWith(" III")) {
+								return 3;
+							} else if (loreEntry.endsWith(" IV")) {
+								return 4;
+							} else if (loreEntry.endsWith(" V")) {
+								return 5;
+							} else if (loreEntry.endsWith(" VI")) {
+								return 6;
+							} else if (loreEntry.endsWith(" VII")) {
+								return 7;
+							} else if (loreEntry.endsWith(" VIII")) {
+								return 8;
+							} else if (loreEntry.endsWith(" IX")) {
+								return 9;
+							} else if (loreEntry.endsWith(" X")) {
+								return 10;
+							}
 
-					//  Make sure there's only a single copy of this lore text.
-					String loreEntry = entries.size() == 1 ? entries.get(0) : null;
-
-					//  If it exists, loop through the different "level" matchers and return the index of it if it exists.
-					if (loreEntry != null) {
-						if (loreEntry.endsWith(" I")) {
+							// Default level is 1
 							return 1;
-						} else if (loreEntry.endsWith(" II")) {
-							return 2;
-						} else if (loreEntry.endsWith(" III")) {
-							return 3;
-						} else if (loreEntry.endsWith(" IV")) {
-							return 4;
-						} else if (loreEntry.endsWith(" V")) {
-							return 5;
 						}
-
-						// Default level is 1
-						return 1;
 					}
 				}
 			}
