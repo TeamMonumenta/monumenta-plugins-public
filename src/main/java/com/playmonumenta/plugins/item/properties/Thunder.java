@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
 import org.bukkit.World;
 
 public class Thunder implements ItemProperty {
@@ -43,7 +44,7 @@ public class Thunder implements ItemProperty {
 				damage = damage + 1.0;
 			}
 
-			world.playSound(player.getLocation(), "entity.lightning.impact", 0.4f, 1.0f);
+			world.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.4f, 1.0f);
 		}
 
 		return damage;

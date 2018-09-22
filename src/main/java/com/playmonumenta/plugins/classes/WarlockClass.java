@@ -1,13 +1,18 @@
 package com.playmonumenta.plugins.classes;
 
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,18 +21,14 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.World;
 
 /*
     AmplifyingHex
@@ -127,7 +128,7 @@ public class WarlockClass extends BaseClass {
 
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
 				world.spawnParticle(Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-				world.playSound(loc, "entity.player.attack.knockback", 0.8f, 0.6f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.8f, 0.6f);
 
 				MovementUtils.KnockAway(player, damager, BLASPHEMY_KNOCKBACK_SPEED);
 				int vulnLevel = (blasphemy == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
@@ -180,8 +181,8 @@ public class WarlockClass extends BaseClass {
 							world.spawnParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);
 						}
 
-						world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
-						world.playSound(loc, "entity.player.attack.crit", 1.0f, 1.2f);
+						world.playSound(loc, Sound.ENTITY_MAGMA_CUBE_SQUISH, 1.0f, 0.66f);
+						world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.2f);
 
 						for (Player p : PlayerUtils.getNearbyPlayers(player, SOUL_REND_RADIUS, true)) {
 							// If this is us or we're allowing anyone to get it.
@@ -212,7 +213,7 @@ public class WarlockClass extends BaseClass {
 					Location loc = arrow.getLocation();
 					World world = arrow.getWorld();
 
-					world.playSound(loc, "block.enchantment_table.use", 1.0f, 0.8f);
+					world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.8f);
 					world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
 					world.spawnParticle(Particle.DRAGON_BREATH, loc, 75, 1, 1, 1, 0.0);
 
@@ -247,7 +248,7 @@ public class WarlockClass extends BaseClass {
 							World world = player.getWorld();
 
 							world.spawnParticle(Particle.FLAME, loc.add(0, 1, 0), 60, 1.75, 0.75, 1.75, 0.0);
-							world.playSound(loc, "entity.magmacube.squish", 1.0f, 0.66f);
+							world.playSound(loc, Sound.ENTITY_MAGMA_CUBE_SQUISH, 1.0f, 0.66f);
 
 							boolean effect = false;
 							int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
@@ -278,7 +279,7 @@ public class WarlockClass extends BaseClass {
 					if (amplifyingHex > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.AMPLIFYING)) {
 							ParticleUtils.explodingConeEffect(mPlugin, player, AMPLIFYING_RADIUS, Particle.DRAGON_BREATH, 0.6f, Particle.SMOKE_NORMAL, 0.4f, AMPLIFYING_DOT_ANGLE);
-							player.getWorld().playSound(player.getLocation(), "entity.polar_bear.warning", 1.0f, 1.6f);
+							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 1.6f);
 
 							Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), AMPLIFYING_RADIUS)) {

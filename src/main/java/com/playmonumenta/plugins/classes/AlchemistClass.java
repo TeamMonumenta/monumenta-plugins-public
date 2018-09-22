@@ -134,8 +134,8 @@ public class AlchemistClass extends BaseClass {
 						Player targetPlayer = (Player) targetEntity;
 						if (targetPlayer.getGameMode() != GameMode.SPECTATOR) {
 							mWorld.spawnParticle(Particle.FLAME, targetPlayer.getLocation().add(0, 1, 0), 30, 1.0, 1.0, 1.0, 0.001);
-							mWorld.playSound(targetPlayer.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
-							mWorld.playSound(player.getLocation(), "entity.illusion_illager.prepare_blindness", 1.2f, 1.0f);
+							mWorld.playSound(targetPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.0f);
+							mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.0f);
 
 							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 
@@ -341,13 +341,13 @@ public class AlchemistClass extends BaseClass {
 										if (p != player) {
 											player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
 											mWorld.spawnParticle(Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-											mWorld.playSound(player.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
+											mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 										}
 										mPlugin.mTimers.removeCooldown(player.getUniqueId(), Spells.IRON_TINCTURE);
 										mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_USE_COOLDOWN);
 
 										mWorld.spawnParticle(Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-										mWorld.playSound(p.getLocation(), "entity.illusion_illager.prepare_mirror", 1.2f, 1.0f);
+										mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 
 										this.cancel();
 										break;
@@ -411,7 +411,7 @@ public class AlchemistClass extends BaseClass {
 			if (bombArrow > 0) {
 				mWorld.spawnParticle(Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
-				mWorld.playSound(loc, "block.lava.extinguish", 5.0f, 0.25f);
+				mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
 			}
 		}
 	}
@@ -428,8 +428,8 @@ public class AlchemistClass extends BaseClass {
 				}
 
 				loc = loc.add(0, 1.2, 0);
-				mWorld.playSound(loc, "entity.generic.explode", 0.7f, 1.0f);
-				mWorld.playSound(loc, "entity.generic.explode", 0.9f, 1.0f);
+				mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.7f, 1.0f);
+				mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.9f, 1.0f);
 
 				mWorld.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
 

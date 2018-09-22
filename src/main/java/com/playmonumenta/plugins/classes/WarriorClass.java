@@ -94,7 +94,7 @@ public class WarriorClass extends BaseClass {
 					if (counterStrike > 0) {
 						Location loc = player.getLocation();
 						player.spawnParticle(Particle.SWEEP_ATTACK, loc.getX(), loc.getY() + 1.5D, loc.getZ(), 20, 1.5D, 1.5D, 1.5D);
-						player.playSound(loc,  Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
+						player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
 
 						double csDamage = counterStrike == 1 ? 12D : 24D;
 
@@ -125,7 +125,7 @@ public class WarriorClass extends BaseClass {
 										}
 									}
 
-									mWorld.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+									mWorld.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 									mWorld.spawnParticle(Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
 									mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.RIPOSTE, RIPOSTE_COOLDOWN);
@@ -212,7 +212,7 @@ public class WarriorClass extends BaseClass {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
 
 				Location loc = player.getLocation();
-				mWorld.playSound(loc, "entity.polar_bear.hurt", 0.1f, 1.0f);
+				mWorld.playSound(loc, Sound.ENTITY_POLAR_BEAR_HURT, 0.1f, 1.0f);
 
 				if (frenzy > 1) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));

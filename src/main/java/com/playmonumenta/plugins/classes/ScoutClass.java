@@ -1,21 +1,23 @@
 package com.playmonumenta.plugins.classes;
 
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.DyeColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Banner;
-import org.bukkit.block.Block;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.block.Block;
+import org.bukkit.DyeColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -25,21 +27,20 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.World;
 
 /*
     Agility
@@ -146,7 +147,7 @@ public class ScoutClass extends BaseClass {
 					int firstArrow = playerInv.first(Material.ARROW);
 					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
 
-					player.getWorld().playSound(player.getLocation(), "entity.arrow.hit_player", 0.3f, 1.0f);
+					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 
 					int arrowSlot = -1;
 					if (firstArrow == -1 && firstTippedArrow > -1) {
@@ -342,7 +343,7 @@ public class ScoutClass extends BaseClass {
 
 								world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
 																   10, 0.7, 0.7, 0.7, 0.001);
-								world.playSound(player.getLocation(), "entity.parrot.imitate.shulker", 0.4f, 1.7f);
+								world.playSound(player.getLocation(), Sound.ENTITY_PARROT_IMITATE_SHULKER, 0.4f, 1.7f);
 							}
 						}
 

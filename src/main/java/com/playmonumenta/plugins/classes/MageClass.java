@@ -157,7 +157,7 @@ public class MageClass extends BaseClass {
 						// Mob has died - trigger effects
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
 						mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 100, 1, 1, 1, 0.25);
-						world.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
+						world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 						for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
 							EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
 							nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
@@ -203,9 +203,9 @@ public class MageClass extends BaseClass {
 			Location loc = shocked.mob.getLocation().add(0, 1, 0);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 100, 1, 1, 1, 0.001);
 			mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 75, 1, 1, 1, 0.25);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.5f);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 2.0f);
-			mWorld.playSound(loc, "entity.player.hurt_on_fire", 1.0f, 1.5f);
+			mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.5f);
+			mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
+			mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 1.5f);
 			for (Entity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
@@ -263,7 +263,7 @@ public class MageClass extends BaseClass {
 							Location loc = damagee.getLocation();
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc.add(0, 1, 0), 50, 2.5, 1, 2.5, 0.001);
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
-							mWorld.playSound(loc, "entity.enderdragon_fireball.explode", 0.5f, 1.5f);
+							mWorld.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.5f, 1.5f);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ARCANE_STRIKE, ARCANE_STRIKE_COOLDOWN);
 						}
@@ -317,8 +317,8 @@ public class MageClass extends BaseClass {
 
 							ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA, 0.25f, MAGMA_SHIELD_DOT_ANGLE);
 
-							mWorld.playSound(player.getLocation(), "entity.firework.large_blast", 0.5f, 1.5f);
-							mWorld.playSound(player.getLocation(), "entity.generic.explode", 0.25f, 1.0f);
+							mWorld.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
+							mWorld.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.MAGMA_SHIELD, MAGMA_SHIELD_COOLDOWN);
 						}
@@ -394,7 +394,7 @@ public class MageClass extends BaseClass {
 							Location loc = player.getLocation();
 							mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
 							mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
-							mWorld.playSound(loc, "block.glass.break", 0.5f, 1.0f);
+							mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
 						}
 					}
 				}

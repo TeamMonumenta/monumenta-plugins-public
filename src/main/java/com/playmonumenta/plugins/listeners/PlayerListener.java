@@ -648,7 +648,7 @@ public class PlayerListener implements Listener {
 							} else if (tick >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc);
 
-								world.playSound(teleLoc, "entity.elder_guardian.death", 1.0f, 1.3f);
+								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
 
 								this.cancel();
 							}

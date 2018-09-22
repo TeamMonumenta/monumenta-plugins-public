@@ -216,7 +216,7 @@ public class ClericClass extends BaseClass {
 						World world = player.getWorld();
 						Location loc = damagee.getLocation();
 						world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.5, 0.5, 0.001);
-						world.playSound(loc, "block.anvil.land", 0.15f, 1.5f);
+						world.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
 					}
 				}
 			}
@@ -238,7 +238,7 @@ public class ClericClass extends BaseClass {
 						World world = player.getWorld();
 						Location loc = killedEntity.getLocation();
 						world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
-						player.getWorld().playSound(loc, "block.enchantment_table.use", 1.5f, 1.5f);
+						player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1.5f);
 
 					}
 				}
@@ -336,7 +336,7 @@ public class ClericClass extends BaseClass {
 
 							Location loc = p.getLocation();
 							world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
-							world.playSound(loc, "entity.player.levelup", 0.4f, 1.5f);
+							world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
 						}
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING, CELESTIAL_COOLDOWN);
@@ -395,13 +395,13 @@ public class ClericClass extends BaseClass {
 
 					world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 					world.spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-					player.getWorld().playSound(loc, "block.enchantment_table.use", 2.0f, 1.6f);
-					player.getWorld().playSound(loc, "entity.player.levelup", 0.05f, 1.0f);
+					player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
+					player.getWorld().playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
 				}
 			}
 
-			player.getWorld().playSound(player.getLocation(), "block.enchantment_table.use", 2.0f, 1.6f);
-			player.getWorld().playSound(player.getLocation(), "entity.player.levelup", 0.05f, 1.0f);
+			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
 
 			ParticleUtils.explodingConeEffect(mPlugin, player, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 

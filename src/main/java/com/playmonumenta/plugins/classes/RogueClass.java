@@ -172,7 +172,7 @@ public class RogueClass extends BaseClass {
 										world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
 
 										if (hit) {
-											world.playSound(loc, "block.anvil.place", 0.4f, 2.5f);
+											world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 										}
 
 										break;
@@ -181,9 +181,9 @@ public class RogueClass extends BaseClass {
 							}
 
 							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DAGGER_THROW, DAGGER_THROW_COOLDOWN);
-							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.5f);
-							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.25f);
-							world.playSound(loc, "entity.player.attack.sweep", 0.9f, 1.0f);
+							world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
+							world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
+							world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
 						}
 					}
 				}
@@ -264,7 +264,7 @@ public class RogueClass extends BaseClass {
 						Location loc = player.getLocation();
 						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
 						mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
-						mWorld.playSound(loc, "entity.blaze.shoot", 1.0f, 0.35f);
+						mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
 					}
@@ -344,10 +344,10 @@ public class RogueClass extends BaseClass {
 						                                                  DODGING_SPEED_EFFECT_DURATION,
 						                                                  DODGING_SPEED_EFFECT_LEVEL,
 						                                                  true, false));
-						world.playSound(player.getLocation(), "entity.firework.launch", 2.0f, 0.5f);
+						world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
 					}
 
-					world.playSound(player.getLocation(), "block.anvil.land", 0.5f, 1.5f);
+					world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 
 					int cooldown = dodging == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DODGING, cooldown);
@@ -416,7 +416,7 @@ public class RogueClass extends BaseClass {
 						mWorld.spawnParticle(Particle.CLOUD, loc, particles, offset, offset, offset, 0.001);
 					}
 
-					world.playSound(loc, "item.totem.use", 0.5f, 0.5f);
+					world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
 
 					MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
 
