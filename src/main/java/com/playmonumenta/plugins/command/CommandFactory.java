@@ -19,13 +19,11 @@ public class CommandFactory {
 	 */
 	public static void createCommands(JavaPlugin plugin, ServerProperties properties, World world, PotionManager potionManager) {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
-			createCommand(plugin, new Back(plugin));
 			createCommand(plugin, new BroadcastCommand(plugin, properties.getBroadcastCommandEnabled()));
 			createCommand(plugin, new CheckEmptyInventory(plugin));
 			createCommand(plugin, new ClearEffects(plugin, potionManager));
 			createCommand(plugin, new DeathMsg(plugin));
 			createCommand(plugin, new DebugInfo(plugin, potionManager));
-			createCommand(plugin, new Forward(plugin));
 			createCommand(plugin, new GildifyHeldItem(plugin));
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new HopeifyHeldItem(plugin));

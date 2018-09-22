@@ -43,10 +43,5 @@ public class Constants {
 	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";
 	public static final String ANVIL_CONFIRMATION_METAKEY = "MonumentaAnvilConfirmation";
 
-	// For /back and /forward
-	public static final String PLAYER_BACK_STACK_METAKEY = "MonumentaBackStack";
-	public static final String PLAYER_FORWARD_STACK_METAKEY = "MonumentaForwardStack";
-	public static final String PLAYER_SKIP_BACK_ADD_METAKEY = "MonumentaSkipAddToBackList";
-
 	public static final String SCOREBOARD_DEATH_MESSAGE = "DeathMessage";
 }

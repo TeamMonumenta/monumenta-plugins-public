@@ -533,7 +533,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	@SuppressWarnings("unchecked")
 	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
 		// Cancel teleports caused by forbidden sources
@@ -545,29 +545,6 @@ public class PlayerListener implements Listener {
 		    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
-		}
-
-		Player player = event.getPlayer();
-
-		// Only add the location to the back stack if the player didn't just use /back or /forward
-		if (player.hasMetadata(Constants.PLAYER_SKIP_BACK_ADD_METAKEY)) {
-			player.removeMetadata(Constants.PLAYER_SKIP_BACK_ADD_METAKEY, mPlugin);
-		} else {
-			// Get the stack of previous teleport locations
-			Stack<Location> backStack = null;
-			if (player.hasMetadata(Constants.PLAYER_BACK_STACK_METAKEY)) {
-				List<MetadataValue> val = player.getMetadata(Constants.PLAYER_BACK_STACK_METAKEY);
-				if (val != null && !val.isEmpty()) {
-					backStack = (Stack<Location>)val.get(0).value();
-				}
-			}
-
-			if (backStack == null) {
-				backStack = new Stack<Location>();
-			}
-
-			backStack.push(event.getFrom());
-			player.setMetadata(Constants.PLAYER_BACK_STACK_METAKEY, new FixedMetadataValue(mPlugin, backStack));
 		}
 	}
 
