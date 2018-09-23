@@ -28,8 +28,8 @@ public class Utils {
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.getLocation().distance(loc) < range &&
-			        player.getGameMode() != GameMode.SPECTATOR &&
-			        player.getHealth() > 0) {
+			    player.getGameMode() != GameMode.SPECTATOR &&
+			    player.getHealth() > 0) {
 				out.add(player);
 			}
 		}
@@ -119,6 +119,18 @@ public class Utils {
 	public static void executeCommandOnNearbyPlayers(Location loc, int radius, String command) {
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
+	}
+
+	public static List<Player> getNearbyPlayers(Location loc, double radius) {
+		List<Player> players = new ArrayList<Player>(Bukkit.getOnlinePlayers().size());
+
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (loc.distance(player.getLocation()) <= radius) {
+				players.add(player);
+			}
+		}
+
+		return players;
 	}
 
 	/*
