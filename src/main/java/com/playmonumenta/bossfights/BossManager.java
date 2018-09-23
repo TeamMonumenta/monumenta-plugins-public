@@ -27,34 +27,29 @@ import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 
-public class BossManager implements Listener, CommandExecutor
-{
+public class BossManager implements Listener, CommandExecutor {
 	Plugin mPlugin;
 	Map<UUID, Boss> mBosses;
 
 	@FunctionalInterface
-	public interface StatelessBossConstructor
-	{
+	public interface StatelessBossConstructor {
 		BossAbilityGroup construct(Plugin plugin, LivingEntity entity);
 	}
 
 	@FunctionalInterface
-	public interface StatefulBossConstructor
-	{
+	public interface StatefulBossConstructor {
 		BossAbilityGroup construct(Plugin plugin, LivingEntity entity, Location spawnLoc, Location endLoc);
 	}
 
 	@FunctionalInterface
-	public interface BossDeserializer
-	{
+	public interface BossDeserializer {
 		BossAbilityGroup deserialize(Plugin plugin, LivingEntity entity) throws Exception;
 	}
 
 	static Map<String, StatelessBossConstructor> mStatelessBosses;
 	static Map<String, StatefulBossConstructor> mStatefulBosses;
 	static Map<String, BossDeserializer> mBossDeserializers;
-	static
-	{
+	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
 		mStatelessBosses.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericBoss(p, e));
@@ -105,26 +100,23 @@ public class BossManager implements Listener, CommandExecutor
 		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
 	}
 
-	public BossManager(Plugin plugin)
-	{
+	public BossManager(Plugin plugin) {
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
 		/* When starting up, look for bosses in all current world entities */
-		for (Entity entity : Bukkit.getWorlds().get(0).getEntities())
-		{
-			if (!(entity instanceof LivingEntity))
+		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {
+			if (!(entity instanceof LivingEntity)) {
 				continue;
+			}
 
 			ProcessEntity((LivingEntity)entity);
 		}
 	}
 
 	@Override
-	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
-	{
-		if (args.length != 4)
-		{
+	public boolean onCommand(CommandSender send, Command command, String label, String[] args) {
+		if (args.length != 4) {
 			send.sendMessage(ChatColor.RED + "This command requires exactly four arguments!");
 			return false;
 		}
@@ -132,19 +124,15 @@ public class BossManager implements Listener, CommandExecutor
 		Location endLoc;
 		Entity targetEntity;
 
-		try
-		{
+		try {
 			targetEntity = Utils.calleeEntity(send);
 			endLoc = Utils.getLocation(targetEntity.getLocation(), args[1], args[2], args[3]);
-		}
-		catch (ArgumentException ex)
-		{
+		} catch (ArgumentException ex) {
 			send.sendMessage(ChatColor.RED + ex.getMessage());
 			return false;
 		}
 
-		if (!(targetEntity instanceof LivingEntity))
-		{
+		if (!(targetEntity instanceof LivingEntity)) {
 			send.sendMessage(ChatColor.RED + "Target entity is not a LivingEntity!");
 			return false;
 		}
@@ -185,30 +173,26 @@ public class BossManager implements Listener, CommandExecutor
 
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntitySpawnEvent(EntitySpawnEvent event)
-	{
+	public void EntitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 
-		if (!(entity instanceof LivingEntity))
+		if (!(entity instanceof LivingEntity)) {
 			return;
+		}
 
 		ProcessEntity((LivingEntity)entity);
 	}
 
-	private void ProcessEntity(LivingEntity entity)
-	{
+	private void ProcessEntity(LivingEntity entity) {
 		/* This should never happen */
-		if (mBosses.get(entity.getUniqueId()) != null)
-		{
+		if (mBosses.get(entity.getUniqueId()) != null) {
 			mPlugin.getLogger().log(Level.WARNING, "ProcessEntity: Attempted to add boss that was already tracked!");
 			return;
 		}
 
 		Set<String> tags = entity.getScoreboardTags();
-		if (tags != null && !tags.isEmpty())
-		{
-			try
-			{
+		if (tags != null && !tags.isEmpty()) {
+			try {
 				Boss boss = null;
 				for (String tag : tags) {
 					BossDeserializer deserializer = mBossDeserializers.get(tag);
@@ -225,60 +209,53 @@ public class BossManager implements Listener, CommandExecutor
 						break;
 					}
 				}
-			}
-			catch (Exception ex)
-			{
+			} catch (Exception ex) {
 				mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
 			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void ChunkLoadEvent(ChunkLoadEvent event)
-	{
-		for (Entity entity : event.getChunk().getEntities())
-		{
-			if (!(entity instanceof LivingEntity))
+	public void ChunkLoadEvent(ChunkLoadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (!(entity instanceof LivingEntity)) {
 				continue;
+			}
 
 			ProcessEntity((LivingEntity)entity);
 		}
 	}
 
-	public void unload(LivingEntity entity)
-	{
+	public void unload(LivingEntity entity) {
 		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null)
-		{
+		if (boss != null) {
 			boss.unload();
 			mBosses.remove(entity.getUniqueId());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void ChunkUnloadEvent(ChunkUnloadEvent event)
-	{
+	public void ChunkUnloadEvent(ChunkUnloadEvent event) {
 		Entity[] entities = event.getChunk().getEntities();
 
-		for (Entity entity : entities)
-		{
-			if (!(entity instanceof LivingEntity))
+		for (Entity entity : entities) {
+			if (!(entity instanceof LivingEntity)) {
 				continue;
+			}
 
 			unload((LivingEntity)entity);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void EntityDeathEvent(EntityDeathEvent event)
-	{
+	public void EntityDeathEvent(EntityDeathEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity))
+		if (!(entity instanceof LivingEntity)) {
 			return;
+		}
 
 		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null)
-		{
+		if (boss != null) {
 			boss.death();
 			boss.unload();
 
@@ -290,10 +267,10 @@ public class BossManager implements Listener, CommandExecutor
 		}
 	}
 
-	public void unloadAll()
-	{
-		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet())
+	public void unloadAll() {
+		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet()) {
 			entry.getValue().unload();
+		}
 		mBosses.clear();
 	}
 }

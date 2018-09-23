@@ -19,8 +19,7 @@ import org.bukkit.Sound;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellChangeFloor implements Spell
-{
+public class SpellChangeFloor implements Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private int mRange;
@@ -30,19 +29,18 @@ public class SpellChangeFloor implements Spell
 	private Random mRandom = new Random();
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-	                                                   Material.AIR,
-	                                                   Material.COMMAND_BLOCK,
-	                                                   Material.CHAIN_COMMAND_BLOCK,
-	                                                   Material.REPEATING_COMMAND_BLOCK,
-	                                                   Material.BEDROCK,
-	                                                   Material.OBSIDIAN,
-	                                                   Material.CHEST,
-	                                                   Material.SPAWNER
-	                                               );
+	            Material.AIR,
+	            Material.COMMAND_BLOCK,
+	            Material.CHAIN_COMMAND_BLOCK,
+	            Material.REPEATING_COMMAND_BLOCK,
+	            Material.BEDROCK,
+	            Material.OBSIDIAN,
+	            Material.CHEST,
+	            Material.SPAWNER
+	        );
 
 
-	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material)
-	{
+	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material) {
 		mPlugin = plugin;
 		mBoss = launcher;
 		mRange = range;
@@ -52,14 +50,12 @@ public class SpellChangeFloor implements Spell
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		launch(players.get(mRandom.nextInt(players.size())));
 	}
 
-	public void launch(Player target)
-	{
+	public void launch(Player target) {
 		/*
 		 * First phase - play sound effect
 		 * Second phase - convert top layer of ground under player to mMaterial, particles
@@ -68,60 +64,51 @@ public class SpellChangeFloor implements Spell
 		final int PHASE1_TICKS = 30;
 		final int PHASE2_TICKS = 800;
 
-		new BukkitRunnable()
-		{
+		new BukkitRunnable() {
 			int mTicks = 0;
 			List<BlockState> restoreBlocks = new LinkedList<BlockState>();
 			Random mRandom = new Random();
 
 			@Override
-			public void run()
-			{
-				if (mTicks > 0 && mTicks < PHASE2_TICKS)
-				{
+			public void run() {
+				if (mTicks > 0 && mTicks < PHASE2_TICKS) {
 					// Particles over the changed blocks
-					for (BlockState state : restoreBlocks)
-					{
+					for (BlockState state : restoreBlocks) {
 						Location loc = state.getLocation().add(0.5f, 1f, 0.5f);
 						loc.getWorld().spawnParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0);
 					}
 				}
 
-				if (mTicks == 0)
-				{
-		            target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
-		            mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
+				if (mTicks == 0) {
+					target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
+					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
 					mBoss.getLocation().getWorld().spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3), true);
 
 					// Get a list of blocks that should be changed
-					for (int dx = -mRadius; dx < mRadius; dx++)
-					{
-						for (int dy = -mRadius; dy < mRadius; dy++)
-						{
-							for (int dz = -mRadius; dz < mRadius; dz++)
-							{
+					for (int dx = -mRadius; dx < mRadius; dx++) {
+						for (int dy = -mRadius; dy < mRadius; dy++) {
+							for (int dz = -mRadius; dz < mRadius; dz++) {
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
-								if (!mIgnoredMats.contains(state.getType()) && mRandom.nextInt(16) > 6)
+								if (!mIgnoredMats.contains(state.getType()) && mRandom.nextInt(16) > 6) {
 									restoreBlocks.add(state);
+								}
 							}
 						}
 					}
-				}
-				else if (mTicks == PHASE1_TICKS)
-				{
+				} else if (mTicks == PHASE1_TICKS) {
 					// Set the blocks to the specified material
-					for (BlockState state : restoreBlocks)
+					for (BlockState state : restoreBlocks) {
 						state.getLocation().getBlock().setType(mMaterial);
-				}
-				else if (mTicks == PHASE2_TICKS)
-				{
+					}
+				} else if (mTicks == PHASE2_TICKS) {
 					// Restore the block states saved earlier
-					for (BlockState state : restoreBlocks)
+					for (BlockState state : restoreBlocks) {
 						state.update(true);
-				}
-				else if (mTicks < PHASE1_TICKS && mBoss.isDead() || mTicks > PHASE2_TICKS)
+					}
+				} else if (mTicks < PHASE1_TICKS && mBoss.isDead() || mTicks > PHASE2_TICKS) {
 					this.cancel();
+				}
 				mTicks++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1);

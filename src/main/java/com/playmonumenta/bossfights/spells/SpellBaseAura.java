@@ -8,11 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.material.MaterialData;
 import org.bukkit.Particle;
 
-public class SpellBaseAura implements Spell
-{
+public class SpellBaseAura implements Spell {
 	@FunctionalInterface
-	public interface ApplyAuraEffect
-	{
+	public interface ApplyAuraEffect {
 		/**
 		 * Runs on users when they are within range of the aura
 		 * @param player The player to affect
@@ -36,8 +34,7 @@ public class SpellBaseAura implements Spell
 	private int mIter; // Number of iterations - rolls around between 1 and 4
 
 	public SpellBaseAura(Entity boss, double dx, double dy, double dz, int numParticles,
-	                     Particle particle, MaterialData color, ApplyAuraEffect auraEffect)
-	{
+	                     Particle particle, MaterialData color, ApplyAuraEffect auraEffect) {
 		mBoss = boss;
 		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
 		mDX = dx;
@@ -61,8 +58,7 @@ public class SpellBaseAura implements Spell
 	 * so only particles run every invocation, effects only one in four
 	 */
 	@Override
-	public void run()
-	{
+	public void run() {
 		Location bossLoc = mBoss.getLocation();
 
 		// Generate particles in area
@@ -72,17 +68,14 @@ public class SpellBaseAura implements Spell
 
 		// Apply effects every other pulse (2 Hz)
 		mIter++;
-		if (mIter >= 2 && mAuraEffect != null)
-		{
+		if (mIter >= 2 && mAuraEffect != null) {
 			mIter = 0;
 
-			for (Player player : Utils.playersInRange(bossLoc, mRadius))
-			{
+			for (Player player : Utils.playersInRange(bossLoc, mRadius)) {
 				Location playerLoc = player.getLocation();
 				if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				    Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				    Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX)
-				{
+				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
+				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
 					// Player is within range
 					mAuraEffect.run(player);
 				}

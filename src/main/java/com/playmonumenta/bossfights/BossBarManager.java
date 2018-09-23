@@ -11,16 +11,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class BossBarManager
-{
+public class BossBarManager {
 	private LivingEntity mBoss;
 	private int mRange;
 	private Map<Integer, String> mEvents;
 	private int mEventCursor;
 	private BossBar mBar;
 
-	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, String>events)
-	{
+	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, String>events) {
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
@@ -30,38 +28,38 @@ public class BossBarManager
 		mBar.setVisible(true);
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers())
-			if (player.getLocation().distance(boss.getLocation()) < range)
+			if (player.getLocation().distance(boss.getLocation()) < range) {
 				mBar.addPlayer(player);
+			}
 	}
 
-	public void update()
-	{
-		if (mBoss.getHealth() <= 0)
+	public void update() {
+		if (mBoss.getHealth() <= 0) {
 			mBar.setVisible(false);
+		}
 
-		for (Player player : Bukkit.getServer().getOnlinePlayers())
-		{
-			if (player.getLocation().distance(mBoss.getLocation()) < mRange)
+		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
 				mBar.addPlayer(player);
-			else
+			} else {
 				mBar.removePlayer(player);
+			}
 		}
 
 		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 
-		while (mEvents != null && mEventCursor > (progress * 100))
-		{
+		while (mEvents != null && mEventCursor > (progress * 100)) {
 			String event = mEvents.get(mEventCursor);
-			if (event != null && !event.isEmpty())
+			if (event != null && !event.isEmpty()) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), event);
+			}
 			mEventCursor--;
 		}
 
 		mBar.setProgress(progress);
 	}
 
-	public void remove()
-	{
+	public void remove() {
 		mBar.setVisible(false);
 	}
 }

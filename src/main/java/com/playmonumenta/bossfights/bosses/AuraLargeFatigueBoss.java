@@ -15,27 +15,24 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class AuraLargeFatigueBoss extends BossAbilityGroup
-{
+public class AuraLargeFatigueBoss extends BossAbilityGroup {
 	public static final String identityTag = "FatigueAura";
 	public static final int detectionRange = 45;
 
 	LivingEntity mBoss;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
-	{
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AuraLargeFatigueBoss(plugin, boss);
 	}
 
-	public AuraLargeFatigueBoss(Plugin plugin, LivingEntity boss)
-	{
+	public AuraLargeFatigueBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBaseAura(mBoss, 35, 20, 35, 10, Particle.FALLING_DUST, new MaterialData(Material.SAND),
-					(Player player) -> {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, true));
-					})
+			new SpellBaseAura(mBoss, 35, 20, 35, 10, Particle.FALLING_DUST, new MaterialData(Material.SAND),
+			                  (Player player) -> {
+			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, true));
+			                  })
 		);
 
 		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);

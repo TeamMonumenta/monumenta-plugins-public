@@ -15,16 +15,14 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellAxtalTntThrow implements Spell
-{
+public class SpellAxtalTntThrow implements Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mCount;
 	private int mCooldown;
 	Random mRand = new Random();
 
-	public SpellAxtalTntThrow(Plugin plugin, Entity launcher, int count, int cooldown)
-	{
+	public SpellAxtalTntThrow(Plugin plugin, Entity launcher, int count, int cooldown) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCount = count;
@@ -32,49 +30,42 @@ public class SpellAxtalTntThrow implements Spell
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		launch();
 		animation();
 	}
 
-	private void animation()
-	{
+	private void animation() {
 		Location loc = mLauncher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable particles1 = new Runnable()
-		{
+		Runnable particles1 = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				mLauncher.teleport(loc);
 				loc.getWorld().spawnParticle(Particle.LAVA, loc, 4, 0, 0, 0, 0.01);
 			}
 		};
-		Runnable particles2 = new Runnable()
-		{
+		Runnable particles2 = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07);
 				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.77F);
 			}
 		};
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIGMAN_ANGRY, 1, 0.77F);
-		for (int i = 0; i < (40 + mCount * mCooldown); i++)
+		for (int i = 0; i < (40 + mCount * mCooldown); i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, (long)(i));
-		for (int i = 0; i < mCount; i++)
+		}
+		for (int i = 0; i < mCount; i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, (long)(40 + i * mCooldown));
+		}
 	}
 
-	private void launch()
-	{
+	private void launch() {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_launch = new Runnable()
-		{
+		Runnable single_launch = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				List<Player> plist = Utils.playersInRange(mLauncher.getLocation(), 100);
 				Player Target = plist.get(mRand.nextInt(plist.size()));
 				Location SLoc = mLauncher.getLocation();
@@ -91,8 +82,9 @@ public class SpellAxtalTntThrow implements Spell
 				tnt.get(1).setVelocity(vect);
 			}
 		};
-		for (int i = 0; i < mCount; i++)
+		for (int i = 0; i < mCount; i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, single_launch, (long)(40 + i * mCooldown));
+		}
 	}
 }
 

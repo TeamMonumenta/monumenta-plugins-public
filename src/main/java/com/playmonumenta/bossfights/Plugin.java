@@ -5,13 +5,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.bossfights.utils.MetadataUtils;
 
-public class Plugin extends JavaPlugin
-{
+public class Plugin extends JavaPlugin {
 	public BossManager mBossManager;
 
 	@Override
-	public void onEnable()
-	{
+	public void onEnable() {
 		Bukkit.getConsoleSender().sendMessage("[Monumenta_bossfights] Plugin enabled!");
 
 		mBossManager = new BossManager(this);
@@ -22,8 +20,7 @@ public class Plugin extends JavaPlugin
 	}
 
 	@Override
-	public void onDisable()
-	{
+	public void onDisable() {
 		mBossManager.unloadAll();
 
 		getServer().getScheduler().cancelTasks(this);

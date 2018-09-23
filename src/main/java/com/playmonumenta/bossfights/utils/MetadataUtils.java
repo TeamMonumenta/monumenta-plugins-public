@@ -27,7 +27,7 @@ public class MetadataUtils {
 	 */
 	public static boolean checkOnceThisTick(Plugin plugin, Entity entity, String metakey) {
 		if (entity.hasMetadata(metakey)
-		    && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived()) {
+		        && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived()) {
 			return false;
 		}
 

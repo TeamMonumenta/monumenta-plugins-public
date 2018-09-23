@@ -15,11 +15,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class SpellFireball implements Spell
-{
+public class SpellFireball implements Spell {
 	@FunctionalInterface
-	public interface LaunchFireballEffect
-	{
+	public interface LaunchFireballEffect {
 		/**
 		 * Runs at location of boss and target when generating a fireball
 		 * @param loc The location of boss and player
@@ -52,8 +50,7 @@ public class SpellFireball implements Spell
 	 */
 	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count,
 	                     float yield, boolean isIncendiary, boolean singleTarget,
-	                     LaunchFireballEffect launchEffect)
-	{
+	                     LaunchFireballEffect launchEffect) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -66,62 +63,52 @@ public class SpellFireball implements Spell
 	}
 
 	@Override
-	public void run()
-	{
-		new BukkitRunnable()
-		{
+	public void run() {
+		new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
 
 			@Override
-			public void run()
-			{
-				if (mTicks >= mDelay)
-				{
+			public void run() {
+				if (mTicks >= mDelay) {
 					mLaunches++;
 					mTicks = 0;
 
 					List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
-					if (mSingleTarget)
-					{
+					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(players);
-						for (Player player : players)
-						{
-							if (Utils.hasLineOfSight(player, mBoss))
-							{
+						for (Player player : players) {
+							if (Utils.hasLineOfSight(player, mBoss)) {
 								launch(player);
 								break;
 							}
 						}
-					}
-					else
-					{
+					} else {
 						// Otherwise target all players within range
-						for (Player player : players)
+						for (Player player : players) {
 							launch(player);
+						}
 					}
 				}
 
-				if (mLaunches >= mCount)
+				if (mLaunches >= mCount) {
 					this.cancel();
+				}
 
 				mTicks += 2;
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
-	private void launch(Player target)
-	{
+	private void launch(Player target) {
 		// Play launch effect
 		mLaunchEffect.run(target.getLocation());
 		mLaunchEffect.run(mBoss.getLocation());
 
-		new BukkitRunnable()
-		{
+		new BukkitRunnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				// Summon a fireball slightly offset from the boss in the direction of the player
 				Location spawnLoc = mBoss.getLocation().add(0, 0.5, 0);
 				Vector direction = target.getLocation().subtract(spawnLoc).toVector().normalize();

@@ -19,32 +19,27 @@ import com.playmonumenta.bossfights.spells.SpellPushPlayersAway;
 import com.playmonumenta.bossfights.utils.Utils;
 import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 
-public class MobSpell implements CommandExecutor
-{
+public class MobSpell implements CommandExecutor {
 	Plugin plugin;
 
-	public MobSpell(Plugin pl)
-	{
+	public MobSpell(Plugin pl) {
 		plugin = pl;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender send, Command command, String label, String[] args)
-	{
-		if (args.length < 1)
+	public boolean onCommand(CommandSender send, Command command, String label, String[] args) {
+		if (args.length < 1) {
 			return false;
+		}
 		return spellCall(send, args);
 	}
 
-	public boolean spellCall(CommandSender send, String[] args)
-	{
+	public boolean spellCall(CommandSender send, String[] args) {
 		String input = args[0].toLowerCase();
 		String usage = null; // Default is just the command name
 
-		try
-		{
-			switch (input)
-			{
+		try {
+			switch (input) {
 			case "axtal_wither_aoe":
 				usage = "axtal_wither_aoe <radius> <power>";
 				Utils.assertArgCount(args, 2);
@@ -131,12 +126,11 @@ public class MobSpell implements CommandExecutor
 			default:
 				send.sendMessage("Unknown spell: '" + args[0] + "'");
 			}
-		}
-		catch (ArgumentException ex)
-		{
+		} catch (ArgumentException ex) {
 			send.sendMessage(ChatColor.RED + ex.getMessage());
-			if (usage != null)
+			if (usage != null) {
 				send.sendMessage(ChatColor.RED + "Usage: " + usage);
+			}
 
 			return false;
 		}

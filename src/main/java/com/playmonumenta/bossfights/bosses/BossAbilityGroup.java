@@ -16,8 +16,7 @@ import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public abstract class BossAbilityGroup
-{
+public abstract class BossAbilityGroup {
 	Plugin mPlugin;
 	LivingEntity mBoss;
 	BossBarManager mBossBar;
@@ -26,8 +25,7 @@ public abstract class BossAbilityGroup
 	boolean mUnloaded = false;
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar)
-	{
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mBossBar = bossBar;
@@ -37,36 +35,36 @@ public abstract class BossAbilityGroup
 		mBoss.addScoreboardTag("Boss");
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable passive = new Runnable()
-		{
+		Runnable passive = new Runnable() {
 			@Override
-			public void run()
-			{
-				if (mBossBar != null)
+			public void run() {
+				if (mBossBar != null) {
 					mBossBar.update();
+				}
 
 				/* Don't run abilities if players aren't present */
-				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
+				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty()) {
 					return;
+				}
 
 				if (passiveSpells != null)
-					for (Spell spell : passiveSpells)
+					for (Spell spell : passiveSpells) {
 						spell.run();
+					}
 			}
 		};
 		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 
-		Runnable active = new Runnable()
-		{
+		Runnable active = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				/* Check if somehow the boss entity is missing even though this is still running */
 				boolean bossCheck = true;
 				Location bossLoc = mBoss.getLocation();
 				for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4))
-					if (entity.getUniqueId().equals(mBoss.getUniqueId()))
+					if (entity.getUniqueId().equals(mBoss.getUniqueId())) {
 						bossCheck = false;
+					}
 				if (bossCheck) {
 					mPlugin.getLogger().log(Level.WARNING,
 					                        "Boss is missing but still registered as an active boss. Unloading...");
@@ -76,11 +74,13 @@ public abstract class BossAbilityGroup
 				}
 
 				/* Don't progress if players aren't present */
-				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty())
+				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty()) {
 					return;
+				}
 
-				if (activeSpells != null)
+				if (activeSpells != null) {
 					activeSpells.runNextSpell();
+				}
 			}
 		};
 		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
@@ -106,8 +106,7 @@ public abstract class BossAbilityGroup
 	 * Needed whenever the boss needs more parameters to instantiate than just
 	 * the boss mob itself (tele to spawn location, end location to set block, etc.)
 	 */
-	public String serialize()
-	{
+	public String serialize() {
 		return null;
 	}
 
@@ -117,31 +116,28 @@ public abstract class BossAbilityGroup
 	 * Probably don't need to override this method, but if you do, call it
 	 * via super.unload()
 	 */
-	public void unload()
-	{
+	public void unload() {
 		/* Make sure we don't accidentally unload twice */
 		if (!mUnloaded) {
 			mUnloaded = true;
 
 			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-			if (mTaskIDpassive != -1)
+			if (mTaskIDpassive != -1) {
 				scheduler.cancelTask(mTaskIDpassive);
-			if (mTaskIDactive != -1)
+			}
+			if (mTaskIDactive != -1) {
 				scheduler.cancelTask(mTaskIDactive);
-			if (mBossBar != null)
+			}
+			if (mBossBar != null) {
 				mBossBar.remove();
+			}
 
-			if (mBoss.isValid() && mBoss.getHealth() > 0)
-			{
+			if (mBoss.isValid() && mBoss.getHealth() > 0) {
 				String content = serialize();
-				if (content != null && !content.isEmpty())
-				{
-					try
-					{
+				if (content != null && !content.isEmpty()) {
+					try {
 						SerializationUtils.storeDataOnEntity(mBoss, content);
-					}
-					catch (Exception ex)
-					{
+					} catch (Exception ex) {
 						mPlugin.getLogger().log(Level.SEVERE, "Failed to save data to entity: ", ex);
 					}
 				}

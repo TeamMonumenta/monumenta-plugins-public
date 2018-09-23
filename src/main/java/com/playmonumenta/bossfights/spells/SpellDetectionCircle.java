@@ -11,8 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-public class SpellDetectionCircle implements Spell
-{
+public class SpellDetectionCircle implements Spell {
 	private Plugin mPlugin;
 	private int mRadius;
 	private int mDuration;
@@ -22,8 +21,7 @@ public class SpellDetectionCircle implements Spell
 	private int runs_left;
 	private int taskID;
 
-	public SpellDetectionCircle(Plugin plugin, Location center, int radius, int duration, Location target)
-	{
+	public SpellDetectionCircle(Plugin plugin, Location center, int radius, int duration, Location target) {
 		mPlugin = plugin;
 		mRadius = radius;
 		mDuration = duration;
@@ -32,23 +30,19 @@ public class SpellDetectionCircle implements Spell
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		runs_left = mDuration;
-		Runnable loop = new Runnable()
-		{
+		Runnable loop = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				int  n = mRand.nextInt(50) + 100;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
 				double rad = mRadius;
 				double angle = 0;
-				for (int j = 0; j < precision; j++)
-				{
+				for (int j = 0; j < precision; j++) {
 					angle = (double)j * increment;
 					particleLoc.setX(mCenter.getX() + (rad * Math.cos(angle)));
 					particleLoc.setZ(mCenter.getZ() + (rad * Math.sin(angle)));
@@ -56,17 +50,16 @@ public class SpellDetectionCircle implements Spell
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
 				}
 
-				for (Player player : Bukkit.getServer().getOnlinePlayers())
-				{
-					if (player.getLocation().distance(mCenter) < mRadius && player.getGameMode() == GameMode.SURVIVAL)
-					{
+				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+					if (player.getLocation().distance(mCenter) < mRadius && player.getGameMode() == GameMode.SURVIVAL) {
 						mTarget.getBlock().setType(Material.REDSTONE_BLOCK);
 						scheduler.cancelTask(taskID);
 						break;
 					}
 				}
-				if (runs_left <= 0)
+				if (runs_left <= 0) {
 					scheduler.cancelTask(taskID);
+				}
 				runs_left -= 5;
 			}
 		};

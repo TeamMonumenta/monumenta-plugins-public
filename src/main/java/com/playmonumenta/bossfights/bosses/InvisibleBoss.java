@@ -11,20 +11,17 @@ import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellMobEffect;
 
-public class InvisibleBoss extends BossAbilityGroup
-{
+public class InvisibleBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_invisible";
 	public static final int detectionRange = 100;
 
 	LivingEntity mBoss;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception
-	{
+	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new InvisibleBoss(plugin, boss);
 	}
 
-	public InvisibleBoss(Plugin plugin, LivingEntity boss)
-	{
+	public InvisibleBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
 
 		// Immediately apply the effect, don't wait

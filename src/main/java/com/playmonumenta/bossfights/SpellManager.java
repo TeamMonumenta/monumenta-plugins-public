@@ -23,34 +23,33 @@ import com.playmonumenta.bossfights.spells.Spell;
  * very next time a spell is invoked. 5-6 spells is a cooldown of 2 (can not be
  * chosen either immediately afterward OR the time after that). Etc.
  */
-public class SpellManager
-{
+public class SpellManager {
 	List<Spell> mReadySpells;
 	Queue<Spell> mCooldownSpells;
 	int mCooldown;
 
-	public SpellManager(List<Spell> spells)
-	{
+	public SpellManager(List<Spell> spells) {
 		/*
 		 * Need a new copy of the list because the passed-in version doesn't
 		 * support removing during iteration... Weird
 		 */
 		mReadySpells = new ArrayList<Spell>();
-		for (Spell spell : spells)
+		for (Spell spell : spells) {
 			mReadySpells.add(spell);
+		}
 
 		mCooldownSpells = new LinkedList<Spell>();
 		mCooldown = (int)Math.floor(((double)mReadySpells.size() - 1.0) / 2.0);
 	}
 
-	public void runNextSpell()
-	{
+	public void runNextSpell() {
 		/*
 		 * If a spell has been on cooldown sufficiently long, remove it from
 		 * the cooldown list and add it to the ready list.
 		 */
-		if (mCooldownSpells.size() > mCooldown)
+		if (mCooldownSpells.size() > mCooldown) {
 			mReadySpells.add(mCooldownSpells.remove());
+		}
 
 
 		/*
@@ -58,11 +57,9 @@ public class SpellManager
 		 */
 		Collections.shuffle(mReadySpells);
 		Iterator<Spell> iterator = mReadySpells.iterator();
-		while (iterator.hasNext())
-		{
+		while (iterator.hasNext()) {
 			Spell spell = iterator.next();
-			if (spell.canRun())
-			{
+			if (spell.canRun()) {
 				spell.run();
 				mCooldownSpells.add(spell);
 				iterator.remove();

@@ -5,23 +5,19 @@ import java.util.List;
 
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
 
-public class Boss
-{
+public class Boss {
 	List<BossAbilityGroup> mAbilities;
 
-	public Boss(BossAbilityGroup ability)
-	{
+	public Boss(BossAbilityGroup ability) {
 		mAbilities = new LinkedList<BossAbilityGroup>();
 		mAbilities.add(ability);
 	}
 
-	public void add(BossAbilityGroup ability)
-	{
+	public void add(BossAbilityGroup ability) {
 		mAbilities.add(ability);
 	}
 
-	public void unload()
-	{
+	public void unload() {
 		/* NOTE
 		 *
 		 * Unload will cause state to be serialized to the mob's equipment. This is fine if
@@ -31,14 +27,15 @@ public class Boss
 		 *
 		 * Overcoming this limitation requires substantial refactoring.
 		 */
-		for (BossAbilityGroup ability : mAbilities)
+		for (BossAbilityGroup ability : mAbilities) {
 			ability.unload();
+		}
 		mAbilities.clear();
 	}
 
-	public void death()
-	{
-		for (BossAbilityGroup ability : mAbilities)
+	public void death() {
+		for (BossAbilityGroup ability : mAbilities) {
 			ability.death();
+		}
 	}
 }

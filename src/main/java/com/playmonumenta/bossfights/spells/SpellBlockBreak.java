@@ -9,44 +9,39 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class SpellBlockBreak implements Spell
-{
+public class SpellBlockBreak implements Spell {
 	private Entity mLauncher;
 
-	public SpellBlockBreak(Entity launcher)
-	{
+	public SpellBlockBreak(Entity launcher) {
 		mLauncher = launcher;
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		Location loc = mLauncher.getLocation();
 
 		/* Get a list of all blocks that impede the boss's movement */
 		List<Location> badBlockList = new ArrayList<Location>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
-		for (int x = -1; x <= 1; x++)
-		{
+		for (int x = -1; x <= 1; x++) {
 			testloc.setX(loc.getX() + (double)x);
-			for (int y = 1; y <= 3; y++)
-			{
+			for (int y = 1; y <= 3; y++) {
 				testloc.setY(loc.getY() + (double)y);
-				for (int z = -1; z <= 1; z++)
-				{
+				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(loc.getZ() + (double)z);
 					Material material = testloc.getBlock().getType();
-					if (testloc.getBlock().getType() != Material.BEDROCK && material.isSolid())
+					if (testloc.getBlock().getType() != Material.BEDROCK && material.isSolid()) {
 						badBlockList.add(testloc.clone());
+					}
 				}
 			}
 		}
 
 		/* If more than two blocks, destroy all blocking blocks */
-		if (badBlockList.size() > 2)
-		{
-			for (Location targetLoc : badBlockList)
+		if (badBlockList.size() > 2) {
+			for (Location targetLoc : badBlockList) {
 				targetLoc.getBlock().setType(Material.AIR);
+			}
 
 			loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 3f, 0.6f);
 			loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 3f, 0.6f);

@@ -12,11 +12,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellBaseLaser implements Spell
-{
+public class SpellBaseLaser implements Spell {
 	@FunctionalInterface
-	public interface TickAction
-	{
+	public interface TickAction {
 		/**
 		 * User function called once every two ticks while laser is running
 		 * @param player  Player being targeted
@@ -28,8 +26,7 @@ public class SpellBaseLaser implements Spell
 	}
 
 	@FunctionalInterface
-	public interface ParticleAction
-	{
+	public interface ParticleAction {
 		/**
 		 * User function called many times per tick with the location where
 		 * a laser particle should be spawned
@@ -39,8 +36,7 @@ public class SpellBaseLaser implements Spell
 	}
 
 	@FunctionalInterface
-	public interface FinishAction
-	{
+	public interface FinishAction {
 		/**
 		 * User function called once every two ticks while laser is running
 		 * @param player  Player being targeted
@@ -74,8 +70,7 @@ public class SpellBaseLaser implements Spell
 	 * @param finishAction    Called when the spell numTicks have elapsed
 	 */
 	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
-	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction)
-	{
+	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -88,27 +83,25 @@ public class SpellBaseLaser implements Spell
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		if (mSingleTarget)
 			// Single target chooses a random player within range
+		{
 			launch(players.get(mRandom.nextInt(players.size())));
-		else
+		} else
 			// Otherwise target all players within range
-			for (Player player : players)
+			for (Player player : players) {
 				launch(player);
+			}
 	}
 
-	private void launch(Player target)
-	{
-		new BukkitRunnable()
-		{
+	private void launch(Player target) {
+		new BukkitRunnable() {
 			private int mTicks = 0;
 
 			@Override
-			public void run()
-			{
+			public void run() {
 				Location launLoc = mBoss.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
 				Location endLoc = launLoc;
@@ -117,37 +110,36 @@ public class SpellBaseLaser implements Spell
 				baseVect = baseVect.normalize().multiply(0.5);
 
 				boolean blocked = false;
-				for (int i = 0; i < 200; i++)
-				{
+				for (int i = 0; i < 200; i++) {
 					endLoc.add(baseVect);
 
-					if (mParticleAction != null)
+					if (mParticleAction != null) {
 						mParticleAction.run(endLoc);
+					}
 
-					if (endLoc.getBlock().getType().isSolid())
-					{
+					if (endLoc.getBlock().getType().isSolid()) {
 						blocked = true;
 						break;
+					} else if (launLoc.distance(endLoc) > launLoc.distance(tarLoc)) {
+						break;
+					} else if (tarLoc.distance(endLoc) < 0.5) {
+						break;
 					}
-					else if (launLoc.distance(endLoc) > launLoc.distance(tarLoc))
-						break;
-					else if (tarLoc.distance(endLoc) < 0.5)
-						break;
 				}
 
-				if (blocked && mStopWhenBlocked)
-				{
+				if (blocked && mStopWhenBlocked) {
 					this.cancel();
 					return;
 				}
 
-				if (mTickAction != null)
+				if (mTickAction != null) {
 					mTickAction.run(target, mTicks, blocked);
+				}
 
-				if (mTicks >= mNumTicks)
-				{
-					if (mFinishAction != null)
+				if (mTicks >= mNumTicks) {
+					if (mFinishAction != null) {
 						mFinishAction.run(target, endLoc, blocked);
+					}
 
 					this.cancel();
 					return;

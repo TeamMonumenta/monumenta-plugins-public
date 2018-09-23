@@ -4,11 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpellDelayedAction implements Spell
-{
+public class SpellDelayedAction implements Spell {
 	@FunctionalInterface
-	public interface StartAction
-	{
+	public interface StartAction {
 		/**
 		 * Action called when first running
 		 *
@@ -18,8 +16,7 @@ public class SpellDelayedAction implements Spell
 	}
 
 	@FunctionalInterface
-	public interface WarningAction
-	{
+	public interface WarningAction {
 		/**
 		 * Action to warn player of pending action
 		 * Called every tick while delaying
@@ -30,8 +27,7 @@ public class SpellDelayedAction implements Spell
 	}
 
 	@FunctionalInterface
-	public interface EndAction
-	{
+	public interface EndAction {
 		/**
 		 * Action to run at the end of the delay
 		 *
@@ -48,8 +44,7 @@ public class SpellDelayedAction implements Spell
 	private EndAction mEndAction;
 
 	public SpellDelayedAction(Plugin plugin, Location loc, int delayTicks,
-	                          StartAction start, WarningAction warning, EndAction end)
-	{
+	                          StartAction start, WarningAction warning, EndAction end) {
 		mPlugin = plugin;
 		mLoc = loc;
 		mDelayTicks = delayTicks;
@@ -59,30 +54,25 @@ public class SpellDelayedAction implements Spell
 	}
 
 	@Override
-	public void run()
-	{
-		new BukkitRunnable()
-		{
+	public void run() {
+		new BukkitRunnable() {
 			private int mTicks = 0;
 			Location targetLoc;
 
 			@Override
-			public void run()
-			{
-				if (mTicks == 0)
-				{
-					if (mStartAction != null)
+			public void run() {
+				if (mTicks == 0) {
+					if (mStartAction != null) {
 						mStartAction.run(mLoc);
-				}
-				else if (mTicks > 0 && mTicks < mDelayTicks)
-				{
-					if (mWarningAction != null)
+					}
+				} else if (mTicks > 0 && mTicks < mDelayTicks) {
+					if (mWarningAction != null) {
 						mWarningAction.run(mLoc);
 					}
-				else if (mTicks >= mDelayTicks)
-				{
-					if (mEndAction != null)
+				} else if (mTicks >= mDelayTicks) {
+					if (mEndAction != null) {
 						mEndAction.run(mLoc);
+					}
 					this.cancel();
 				}
 

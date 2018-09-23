@@ -1,12 +1,11 @@
 package com.playmonumenta.bossfights.spells;
 
-public interface Spell
-{
+public interface Spell {
 	/*
 	 * Used by some spells to indicate if they can be run
 	 * now (true) or not (false)
 	 */
-	default boolean canRun() {
+default boolean canRun() {
 		return true;
 	}
 	void run();

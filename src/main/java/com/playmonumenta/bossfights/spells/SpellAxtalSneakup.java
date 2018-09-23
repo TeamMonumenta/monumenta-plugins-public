@@ -15,35 +15,29 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellAxtalSneakup implements Spell
-{
+public class SpellAxtalSneakup implements Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private Random mRand = new Random();
 
-	public SpellAxtalSneakup(Plugin plugin, Entity launcher)
-	{
+	public SpellAxtalSneakup(Plugin plugin, Entity launcher) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 80);
 		Player target = players.get(mRand.nextInt(players.size()));
 		launch(target);
 		animation(target);
 	}
 
-	private void launch(Player target)
-	{
+	private void launch(Player target) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable()
-		{
+		Runnable teleport = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Location newloc = target.getLocation();
 				Vector vect = newloc.getDirection().multiply(-3.0f);
 				newloc.add(vect).setY(target.getLocation().getY() + 0.1f);
@@ -53,29 +47,25 @@ public class SpellAxtalSneakup implements Spell
 		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 50);
 	}
 
-	private void animation(Player target)
-	{
+	private void animation(Player target) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
-		Runnable teleport = new Runnable()
-		{
+		Runnable teleport = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 			}
 		};
-		Runnable particle = new Runnable()
-		{
+		Runnable particle = new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
 				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
 			}
 		};
 		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 49);
-		for (int i = 0; i < 50; i++)
+		for (int i = 0; i < 50; i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, particle, i);
+		}
 	}
 }
