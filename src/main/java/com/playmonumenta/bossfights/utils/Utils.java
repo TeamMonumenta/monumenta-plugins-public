@@ -109,10 +109,10 @@ public class Utils {
 
 	/* Command should use @s for targeting selector */
 	public static String getExecuteCommandOnNearbyPlayers(Location loc, int radius, String command) {
-		String executeCmd = "execute @a[x=" + (int)loc.getX() +
+		String executeCmd = "execute as @a[x=" + (int)loc.getX() +
 		                    ",y=" + (int)loc.getY() +
 		                    ",z=" + (int)loc.getZ() +
-		                    ",r=" + radius + "] ~ ~ ~ ";
+		                    ",distance=.." + radius + "] at @s run ";
 		return executeCmd + command;
 	}
 
