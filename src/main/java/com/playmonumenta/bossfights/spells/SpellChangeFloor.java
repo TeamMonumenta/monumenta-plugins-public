@@ -124,6 +124,6 @@ public class SpellChangeFloor implements Spell
 					this.cancel();
 				mTicks++;
 			}
-		} .runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }

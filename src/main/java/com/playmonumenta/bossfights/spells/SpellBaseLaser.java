@@ -155,6 +155,6 @@ public class SpellBaseLaser implements Spell
 
 				mTicks += 2;
 			}
-		} .runTaskTimer(mPlugin, 0, 2);
+		}.runTaskTimer(mPlugin, 0, 2);
 	}
 }

@@ -128,7 +128,7 @@ public class SpellBaseCharge implements Spell
 		Collections.shuffle(players);
 		for (Player player : players)
 		{
-			if (doCharge(player, player.getLocation().add(0, 1.0F, 0), players, null, null, null, null, false))
+			if (Utils.hasLineOfSight(player, mBoss))
 			{
 				launch(player, bystanders);
 				break;
@@ -141,6 +141,7 @@ public class SpellBaseCharge implements Spell
 	 * Returns whether the charge hit a player or not
 	 *
 	 * @param target The intended target of the attack
+	 * @param charger The living entity charging the player
 	 * @param validTargets Other players (including the target!) who might be indicentally hit by the charge
 	 * @param start Action to run on boss at start location (may be null)
 	 * @param particle Action to spawn particle at locations along path (may be null)
@@ -148,10 +149,11 @@ public class SpellBaseCharge implements Spell
 	 * @param end Action to run on boss at end location (may be null)
 	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
 	 */
-	private boolean doCharge(Player target, Location targetLoc, List<Player> validTargets, StartAction start, ParticleAction particle,
-	                         HitPlayerAction hitPlayer, EndAction end, boolean teleBoss)
+	public static boolean doCharge(Player target, LivingEntity charger, Location targetLoc, List<Player> validTargets, StartAction start,
+	                                ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss)
 	{
-		Location launLoc = mBoss.getLocation().add(0, 1.0f, 0);
+		Location launLoc = charger.getEyeLocation();
+
 		/* Test locations that are iterated in the loop */
 		Location endLoc = launLoc.clone();
 		Location endLoc1 = launLoc.clone().add(0, 1, 0); // Same as endLoc but one block higher
@@ -198,7 +200,7 @@ public class SpellBaseCharge implements Spell
 		}
 
 		if (teleBoss)
-			mBoss.teleport(endLoc);
+			charger.teleport(endLoc);
 
 		if (end != null)
 			end.run();
@@ -225,12 +227,12 @@ public class SpellBaseCharge implements Spell
 				else if (mTicks > 0 && mTicks < mChargeTicks)
 				{
 					// This runs once every other tick while charging
-					doCharge(target, targetLoc, players, null, mWarnParticleAction, null, null, false);
+					doCharge(target, mBoss, targetLoc, players, null, mWarnParticleAction, null, null, false);
 				}
 				else if (mTicks >= mChargeTicks)
 				{
 					// Do the "real" charge attack
-					doCharge(target, targetLoc, players, mStartAction, mParticleAction, mHitPlayerAction, mEndAction, true);
+					doCharge(target, mBoss, targetLoc, players, mStartAction, mParticleAction, mHitPlayerAction, mEndAction, true);
 					this.cancel();
 				}
 

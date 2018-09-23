@@ -1,12 +1,16 @@
 package com.playmonumenta.bossfights.utils;
 
+import com.playmonumenta.bossfights.spells.SpellBaseCharge;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -124,5 +128,12 @@ public class Utils
 	{
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
+	}
+
+	/*
+	 * Uses the charge mechanic to detect if a player has line of sight to a location (usually boss.getEyeLocation())
+	 */
+	public static boolean hasLineOfSight(Player player, LivingEntity target) {
+		return SpellBaseCharge.doCharge(player, target, player.getEyeLocation(), Arrays.asList(player), null, null, null, null, false);
 	}
 }
