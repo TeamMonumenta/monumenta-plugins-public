@@ -165,6 +165,9 @@ public class EntityListener implements Listener {
 				if (!mPlugin.getSpecialization(player).PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
+				for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
+					mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
+				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
@@ -172,9 +175,17 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			} else {
 				if (damager instanceof Projectile) {
+					Projectile proj = (Projectile) damager;
 					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, (Projectile)damager)) {
 						damager.remove();
 						event.setCancelled(true);
+					}
+
+					if (proj.getShooter() instanceof LivingEntity) {
+						LivingEntity shooter = (LivingEntity) proj.getShooter();
+						for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
+							mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, shooter, event);
+						}
 					}
 				}
 			}

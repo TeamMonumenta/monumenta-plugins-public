@@ -10,8 +10,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.block.Block;
+import org.bukkit.Color;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
@@ -403,5 +405,61 @@ public class EntityUtils {
 		}
 
 		return 1;
+	}
+
+	public static LivingEntity getNearestHostile(Player player, double range) {
+		LivingEntity target = null;
+		double maxDist = range;
+
+		for (Entity e : player.getNearbyEntities(range, range, range)) {
+			if (isHostileMob(e) && !e.isDead()) {
+				LivingEntity le = (LivingEntity) e;
+
+				if (le.getLocation().distance(player.getLocation()) < maxDist) {
+					maxDist = le.getLocation().distance(player.getLocation());
+					target = le;
+				}
+			}
+		}
+		return target;
+	}
+
+	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+
+	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
+		if (isBoss(mob)) {
+			return;
+		}
+
+		mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ticks, 8, false, true));
+		mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, ticks, 8, false, true));
+		new BukkitRunnable() {
+			int t = 0;
+			double rotation = 0;
+			@Override
+			public void run() {
+				t++;
+				rotation += 20;
+
+				double radian1 = Math.toRadians(rotation);
+				Location l = mob.getLocation();
+				l.add(Math.cos(radian1) * 0.5, mob.getHeight(), Math.sin(radian1) * 0.5);
+				for (int i = 0; i < 5; i++) {
+					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 1, 0, 0, 0, STUN_COLOR);
+				}
+				l.subtract(Math.cos(radian1) * 0.5, mob.getHeight(), Math.sin(radian1) * 0.5);
+
+				if (mob instanceof Creature) {
+					Creature c = (Creature) mob;
+					if (c.getTarget() != null) {
+						c.setTarget(null);
+					}
+				}
+				if (t >= ticks) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 1);
 	}
 }

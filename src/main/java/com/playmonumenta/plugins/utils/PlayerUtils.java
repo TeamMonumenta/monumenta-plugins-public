@@ -99,4 +99,10 @@ public class PlayerUtils {
 			player.setHealth(newHealth);
 		}
 	}
+
+	public static Location getRightSide(Location location, double distance) {
+		float angle = location.getYaw() / 60;
+		return location.clone().subtract(new Vector(Math.cos(angle), 0, Math.sin(angle)).normalize().multiply(distance));
+	}
+
 }

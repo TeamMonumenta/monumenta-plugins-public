@@ -44,4 +44,7 @@ public class Constants {
 	public static final String ANVIL_CONFIRMATION_METAKEY = "MonumentaAnvilConfirmation";
 
 	public static final String SCOREBOARD_DEATH_MESSAGE = "DeathMessage";
+
+	// The max distance for spells that detected nearby damaged allies/enemies.
+	public static final double ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS = 15;
 }

@@ -18,6 +18,7 @@ public enum Spells {
 	ASHEN_HEART("Ashen Heart", false, Classes.MAGE),
 
 	//--Cyromancer Spec.
+
 	BLIZZARD("Blizzard", false, Classes.MAGE),
 	COLD_WAVE("Cold Wave", false, Classes.MAGE),
 	FROZEN_HEART("Frozen Heart", false, Classes.MAGE),
@@ -41,12 +42,22 @@ public enum Spells {
 	PERFECT_KILL("Perfect Kill", false, Classes.ROGUE),
 
 	//Cleric
+
+	//--Core Abilities
 	CELESTIAL_BLESSING("Celestial Blessing", false, Classes.CLERIC),
 	CELESTIAL_FAKE_1("Celestial Blessing", true, Classes.CLERIC),
 	CELESTIAL_FAKE_2("Celestial Blessing", true, Classes.CLERIC),
 	CLEANSING("Cleansing Rain", false, Classes.CLERIC),
 	CLEANSING_FAKE("Cleansing Rain", true, Classes.CLERIC),
 	HEALING("Hand of Light", false, Classes.CLERIC),
+
+	//--Pally
+	HOLY_JAVELIN("Holy Javelin", false, Classes.CLERIC),
+	HALLOWED_BEAM("Hallowed Beam", false, Classes.CLERIC),
+	LUMINOUS_INFUSION("Luminous Infusion", false, Classes.CLERIC),
+
+	//--Hierophant
+	CHOIR_BELLS("Choir Bells", false, Classes.CLERIC),
 
 	//Scout
 
@@ -56,8 +67,13 @@ public enum Spells {
 	STANDARD_BEARER_FAKE("Standard Bearer", true, Classes.SCOUT),
 	EAGLE_EYE("Eagle Eye", false, Classes.SCOUT),
 
-	//--Sniper
+	//--Camper/Sniper
 	ENCHANTED_ARROW("Enchanted Arrow", false, Classes.SCOUT),
+
+	//--Ranger
+	QUICKSHOT("Quickshot", false, Classes.SCOUT),
+	DISENGAGE("Disengage", false, Classes.SCOUT),
+	DEADEYE("Deadeye", false, Classes.SCOUT),
 
 	//Warlock
 

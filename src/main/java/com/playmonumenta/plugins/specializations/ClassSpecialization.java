@@ -11,7 +11,11 @@ public enum ClassSpecialization {
 	CYROMANCER(Classes.MAGE, 4),
 	REAPER(Classes.WARLOCK, 5),
 	TENEBRIST(Classes.WARLOCK, 6),
-	SNIPER(Classes.SCOUT, 7);
+	SNIPER(Classes.SCOUT, 7),
+	RANGER(Classes.SCOUT, 8),
+	PALADIN(Classes.CLERIC, 9),
+	HIEROPHANT(Classes.CLERIC, 10),
+	BERSERKER(Classes.WARRIOR, 11);
 
 	private final Classes linkedClass;
 	private final int id;
@@ -21,12 +25,8 @@ public enum ClassSpecialization {
 		this.id = id;
 	}
 
-	public Classes getLinkedClass() {
-		return linkedClass;
-	}
+	public Classes getLinkedClass() { return linkedClass; }
 
-	public int getId() {
-		return id;
-	}
+	public int getId() { return id; }
 
 }

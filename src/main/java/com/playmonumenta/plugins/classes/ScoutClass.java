@@ -296,7 +296,7 @@ public class ScoutClass extends BaseClass {
 					Location newLoc = new Location(loc.getWorld(), x, y, z);
 
 					owner.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, newLoc, 5, 0.75,
-					                                   0.75, 0.75, 0.001);
+					                               0.75, 0.75, 0.001);
 
 					if (standardBearer > 1) {
 						AttributeInstance att = effectedPlayer.getAttribute(Attribute.GENERIC_ARMOR);
@@ -342,7 +342,7 @@ public class ScoutClass extends BaseClass {
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
 								world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0),
-																   10, 0.7, 0.7, 0.7, 0.001);
+								                    10, 0.7, 0.7, 0.7, 0.001);
 								world.playSound(player.getLocation(), Sound.ENTITY_PARROT_IMITATE_SHULKER, 0.4f, 1.7f);
 							}
 						}
@@ -393,5 +393,14 @@ public class ScoutClass extends BaseClass {
 				                                 new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
 			}
 		}
+	}
+
+	public static int getBowMasteryDamage(Player player) {
+		int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
+		if (bowMastery > 0) {
+			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+			return bonusDamage;
+		}
+		return 0;
 	}
 }

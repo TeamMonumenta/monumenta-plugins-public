@@ -39,15 +39,7 @@ import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.managers.ZoneManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.specializations.AssassinSpecialization;
-import com.playmonumenta.plugins.specializations.BaseSpecialization;
-import com.playmonumenta.plugins.specializations.ClassSpecialization;
-import com.playmonumenta.plugins.specializations.CyromancerSpecialization;
-import com.playmonumenta.plugins.specializations.PyromancerSpecialization;
-import com.playmonumenta.plugins.specializations.ReaperSpecialization;
-import com.playmonumenta.plugins.specializations.SniperSpecialization;
-import com.playmonumenta.plugins.specializations.SwordsageSpecialization;
-import com.playmonumenta.plugins.specializations.TenebristSpecialization;
+import com.playmonumenta.plugins.specializations.*;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
@@ -162,6 +154,10 @@ public class Plugin extends JavaPlugin {
 		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.RANGER.getId(), new RangerSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.PALADIN.getId(), new PaladinSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.HIEROPHANT.getId(), new HierophantSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.BERSERKER.getId(), new BerserkerSpecialization(this, mRandom, mWorld));
 
 		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);

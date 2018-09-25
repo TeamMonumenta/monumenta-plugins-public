@@ -80,4 +80,7 @@ public class BaseSpecialization {
 	public void EntityDeathEvent(Player player, EntityDeathEvent event) {}
 
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {}
+
+	public boolean PlayerDamagedByLivingEntityRadiusEvent(Player player, Player caster, LivingEntity damager, EntityDamageByEntityEvent event) { return true; }
+
 }

@@ -85,6 +85,7 @@ public class AssassinSpecialization extends BaseSpecialization {
 		 * and applies the bonus damage to Sweep attack targets.
 		 */
 		if (swiftCombos > 0) {
+			int max = swiftCombos == 1 ? 5 : 8;
 			if (!player.hasMetadata(SWIFT_COMBOS_ACTIVE_METAKEY)) {
 				player.setMetadata(SWIFT_COMBOS_ACTIVE_METAKEY, new FixedMetadataValue(mPlugin, 1));
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "You have begun to stack Swift Combos");
@@ -97,6 +98,9 @@ public class AssassinSpecialization extends BaseSpecialization {
 						if (stacks != player.getMetadata(SWIFT_COMBOS_ACTIVE_METAKEY).get(0).asInt()) {
 							t = 0;
 							stacks = player.getMetadata(SWIFT_COMBOS_ACTIVE_METAKEY).get(0).asInt();
+						} else if (stacks > max) {
+							t = 0;
+							player.setMetadata(SWIFT_COMBOS_ACTIVE_METAKEY, new FixedMetadataValue(mPlugin, stacks - 1));
 						}
 
 						if (t >= 20 * 3) {
