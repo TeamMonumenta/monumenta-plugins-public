@@ -53,11 +53,12 @@ public enum Spells {
 
 	//--Pally
 	HOLY_JAVELIN("Holy Javelin", false, Classes.CLERIC),
-	HALLOWED_BEAM("Hallowed Beam", false, Classes.CLERIC),
+	CHOIR_BELLS("Choir Bells", false, Classes.CLERIC),
 	LUMINOUS_INFUSION("Luminous Infusion", false, Classes.CLERIC),
 
 	//--Hierophant
-	CHOIR_BELLS("Choir Bells", false, Classes.CLERIC),
+	HALLOWED_BEAM("Hallowed Beam", false, Classes.CLERIC),
+	INCENSED_THURIBLE("Incensed Thurible", false, Classes.CLERIC),
 
 	//Scout
 

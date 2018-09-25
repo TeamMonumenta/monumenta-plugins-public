@@ -6,8 +6,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 
 import java.util.Random;
 
@@ -15,6 +17,7 @@ import org.bukkit.Color;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -32,7 +35,7 @@ import org.bukkit.World;
 
 public class PaladinSpecialization extends BaseSpecialization {
 	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 150), 1.0f);
-	private static final Particle.DustOptions HALLOWED_BEAM_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 150), 1.0f);
+	
 	private World mWorld;
 
 	public PaladinSpecialization(Plugin plugin, Random random, World world) {
@@ -55,7 +58,9 @@ public class PaladinSpecialization extends BaseSpecialization {
 				 * is increased to 10, cooldown is reduced to 8s.
 				 */
 				if (holyJavelin > 0) {
-					int damage = holyJavelin == 1 ? 10 : 20;
+					int damage = holyJavelin == 1 ? 10 : 15;
+					int damage2 = holyJavelin == 1 ? 5 : 10;
+							
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HOLY_JAVELIN)) {
 
 						Location loc = player.getEyeLocation();
@@ -64,7 +69,7 @@ public class PaladinSpecialization extends BaseSpecialization {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 0.9f);
 
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc.clone().add(dir), 10, 0, 0, 0, 0.125f);
-						for (int i = 0; i < 15; i++) {
+						for (int i = 0; i < 12; i++) {
 							loc.add(dir);
 							mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
@@ -74,8 +79,10 @@ public class PaladinSpecialization extends BaseSpecialization {
 									LivingEntity le = (LivingEntity) e;
 									if (EntityUtils.isUndead(le)) {
 										EntityUtils.damageEntity(mPlugin, le, damage, player);
+										if (holyJavelin > 1) {
+											MovementUtils.PullTowards(player, le, 0.1f);
 									} else {
-										EntityUtils.damageEntity(mPlugin, le, damage / 2, player);
+										EntityUtils.damageEntity(mPlugin, le, damage2, player);
 									}
 									le.setFireTicks(20 * 5);
 								}
@@ -135,8 +142,46 @@ public class PaladinSpecialization extends BaseSpecialization {
 					}
 				}
 			}
+			else if (player.isSprinting()) {
+				int choirBells = ScoreboardUtils.getScoreboardValue(player, "ChoirBells");
+				/*
+				 * Choir Bells: Right-Clicking while sprinting causes the Cleric to
+				 * become the target of any undead within a cone area in front of them.
+				 * Affected Undead are stricken with slowness II (level 1) and 30%
+				 * Vulnerability (level 2). Cooldown 30/20s
+				 */
+
+				if (choirBells > 0) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CHOIR_BELLS)) {
+						int cooldown = choirBells == 1 ? 30 * 20 : 20 * 20;
+						ParticleUtils.explodingConeEffect(mPlugin, player, 8, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
+						Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+						for (Entity e : player.getNearbyEntities(8, 8, 8)) {
+							if (e instanceof LivingEntity) {
+								LivingEntity le = (LivingEntity) e;
+								if (EntityUtils.isUndead(le)) {
+									Vector toMobVector = le.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
+									if (playerDir.dot(toMobVector) > 0.33) {
+										((Monster) le).setTarget(player);
+										if (choirBells > 0) {
+											le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1, true, false));
+										}
+										if (choirBells > 1) {
+											le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, 5, true, false));
+										}
+									}
+								}
+							}
+						}
+
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CHOIR_BELLS, cooldown);
+					}
+				}
+			}
 		}
 	}
+}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
@@ -160,63 +205,6 @@ public class PaladinSpecialization extends BaseSpecialization {
 		return true;
 	}
 
-	@Override
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
-		if (arrow.isCritical()) {
-			int hallowedBeam = ScoreboardUtils.getScoreboardValue(player, "HallowedBeam");
-			/*
-			 * Hallowed Beam: Level 1 - Firing a fully-drawn bow while sneaking,
-			 * if pointed directly at a non-boss undead, will instantly deal 40
-			 * damage to the undead instead of consuming the arrow.  Cooldown:
-			 * 20s.
-			 * Level 2 - The targeted undead explodes, dealing 20 damage
-			 * to undead within a 5-block radius, and giving slowness 4 all enemies
-			 * for 5s.
-
-			 */
-			if (hallowedBeam > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.HALLOWED_BEAM)) {
-					LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
-					if (e != null && EntityUtils.isUndead(e)) {
-						player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
-						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-						Location loc = player.getEyeLocation();
-						Vector dir = LocationUtils.getDirectionTo(e.getEyeLocation(), loc);
-						for (int i = 0; i < 30; i++) {
-							loc.add(dir);
-							mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.35, 0.35, 0.35, HALLOWED_BEAM_COLOR);
-							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-							if (loc.distance(e.getEyeLocation()) < 1.25) {
-								loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.35f);
-								loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-								break;
-							}
-						}
-						EntityUtils.damageEntity(mPlugin, e, 40, player);
-						Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
-						mWorld.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
-						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
-						if (hallowedBeam > 1) {
-							mWorld.spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 500, 5, 0.15f, 5, 1);
-							for (Entity ne : e.getNearbyEntities(5, 5, 5)) {
-								if (ne instanceof LivingEntity) {
-									LivingEntity le = (LivingEntity) ne;
-									if (EntityUtils.isUndead(le)) {
-										EntityUtils.damageEntity(mPlugin, le, 20, player);
-										le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
-									}
-								}
-							}
-						}
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.HALLOWED_BEAM, 20 * 20);
-						return false;
-					}
-				} else {
-					return true;
-				}
-			}
-		}
-		return true;
-	}
+	
 
 }
