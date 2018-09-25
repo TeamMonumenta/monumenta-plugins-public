@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.block.Block;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
@@ -29,6 +32,7 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -87,27 +91,11 @@ public class EntityUtils {
 			return;
 		}
 
-		mob.setAI(false);
-		new BukkitRunnable() {
-			int i = 0;
-			@Override
-			public void run() {
-
-				if (i % 5 == 0) {
-					plugin.mWorld.spawnParticle(Particle.SNOWBALL, mob.getLocation(), 15, 0.25, (float)(mob.getHeight() / 2), 0.25, 0);
-				}
-
-				i++;
-				if (i >= ticks || mob.isDead() || mob.hasAI()) {
-					this.cancel();
-					mob.setAI(true);
-				}
-			}
-		}.runTaskTimer(plugin, 0, 1);
+		new FreezeObject(plugin, ticks, mob);
 	}
 
 	public static boolean isFrozen(LivingEntity mob) {
-		return !mob.hasAI();
+		return FreezeObject.getHandle(mob) != null;
 	}
 
 	/**
@@ -384,11 +372,27 @@ public class EntityUtils {
 
 		damage = damage * vulnerabilityMult(target);
 
+		CustomDamageEvent event = new CustomDamageEvent(damager, target, damage);
+		Bukkit.getPluginManager().callEvent(event);
 		if (damager != null) {
 			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
-			target.damage(damage, damager);
+			target.damage(event.getDamage(), damager);
 		} else {
-			target.damage(damage);
+			target.damage(event.getDamage());
+		}
+	}
+
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType) {
+
+		damage = damage * vulnerabilityMult(target);
+
+		CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
+		Bukkit.getPluginManager().callEvent(event);
+		if (damager != null) {
+			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
+			target.damage(event.getDamage(), damager);
+		} else {
+			target.damage(event.getDamage());
 		}
 	}
 
@@ -460,6 +464,63 @@ public class EntityUtils {
 				}
 			}
 
-		}.runTaskTimer(plugin, 0, 1);
+		} .runTaskTimer(plugin, 0, 1);
+	}
+	public static class FreezeObject {
+		private static final String FREEZE_METAKEY = "MonumentaFreezeMetakey";
+		private int mNumTicks;
+		private int mTicksSoFar;
+
+		public FreezeObject(Plugin plugin, int ticks, LivingEntity mob) {
+			mNumTicks = ticks;
+			mTicksSoFar = 0;
+
+			mob.setMetadata(FREEZE_METAKEY, new FixedMetadataValue(plugin, this));
+
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mob.setAI(false);
+
+					if (mNumTicks % 5 == 0) {
+						plugin.mWorld.spawnParticle(Particle.SNOWBALL, mob.getLocation(), 15, 0.25, (float)(mob.getHeight() / 2), 0.25, 0);
+					}
+
+					mNumTicks++;
+					if (mNumTicks >= mNumTicks || mob.isDead() || mob.hasAI()) {
+						this.cancel();
+						mob.setAI(true);
+						mob.removeMetadata(FREEZE_METAKEY, plugin);
+					}
+				}
+			} .runTaskTimer(plugin, 0, 1);
+		}
+
+		public int getTotalDuration() {
+			return mNumTicks;
+		}
+
+		public int getRemainingDuration() {
+			return mNumTicks - mTicksSoFar;
+		}
+
+		public void setRemainingDuration(int ticks) {
+			mNumTicks = mTicksSoFar + ticks;
+		}
+
+		public void setTotalDuration(int ticks) {
+			mNumTicks = ticks;
+		}
+
+		public void addDuration(int ticks) {
+			mNumTicks += ticks;
+		}
+
+		public static FreezeObject getHandle(LivingEntity mob) {
+			if (mob.hasMetadata(FREEZE_METAKEY)) {
+				return (FreezeObject)mob.getMetadata(FREEZE_METAKEY).get(0);
+			}
+			return null;
+		}
 	}
 }

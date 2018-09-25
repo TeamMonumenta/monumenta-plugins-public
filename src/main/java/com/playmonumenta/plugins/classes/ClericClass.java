@@ -350,10 +350,10 @@ public class ClericClass extends BaseClass {
 				boolean cleansingAttempted = false;
 				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
 				if (cleansing > 0 &&
-						player.getLocation().getPitch() < -CLEANSING_ANGLE &&
-						(mainHand == null || mainHand.getType() != Material.BOW) &&
-						(offHand == null || offHand.getType() != Material.BOW) &&
-						cleansing > 0) {
+				    player.getLocation().getPitch() < -CLEANSING_ANGLE &&
+				    (mainHand == null || mainHand.getType() != Material.BOW) &&
+				    (offHand == null || offHand.getType() != Material.BOW) &&
+				    cleansing > 0) {
 					cleansingAttempted = true;
 					activateCleansing(player, cleansing);
 				}

@@ -194,8 +194,8 @@ public class AlchemistClass extends BaseClass {
 		meta.setColor(Color.WHITE);
 		meta.setDisplayName(ChatColor.AQUA + "Alchemist's Potion");
 		List<String> lore = Arrays.asList(new String[] {
-		                                      ChatColor.GRAY + "A unique potion for Alchemists",
-		                                  });
+			ChatColor.GRAY + "A unique potion for Alchemists",
+		});
 		meta.setLore(lore);
 		stack.setItemMeta(meta);
 		return stack;

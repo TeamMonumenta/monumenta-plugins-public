@@ -1,15 +1,16 @@
 package com.playmonumenta.plugins.timers;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class CooldownTimers {
 	public HashMap<UUID, HashMap<Spells, Integer>> mTimers = null;
@@ -116,7 +117,46 @@ public class CooldownTimers {
 		}
 	}
 
+	/**
+	 * Reduces the players ticks on all of their cooldowns.
+	 * @param player The player whose cooldown ticks will be updated
+	 * @param ticks The cooldown reduction in ticks
+	 */
+	public void UpdateCooldowns(Player player, Integer ticks) {
+		HashMap<Spells, Integer> cds = mTimers.get(player.getUniqueId());
+
+		Iterator<Spells> it = cds.keySet().iterator();
+		while (it.hasNext()) {
+			Spells spell = it.next();
+			int cd = cds.get(spell);
+			cd -= ticks;
+			if (cd <= 0) {
+				if (!spell.isFake()) {
+					MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
+				} else {
+					mPlugin.getClass(player).FakeAbilityOffCooldown(player, spell);
+				}
+				cds.remove(spell);
+			} else {
+				cds.put(spell, cd);
+			}
+		}
+
+		if (mTimers.keySet().size() <= 0) {
+			mTimers.remove(player.getUniqueId());
+		}
+	}
+
 	public void removeAllCooldowns(UUID playerID) {
 		mTimers.remove(playerID);
+	}
+
+	public Set<Spells> getCooldowns(UUID playerID) {
+		HashMap<Spells, Integer> player = mTimers.get(playerID);
+		if (player != null) {
+			return player.keySet();
+		} else {
+			return null;
+		}
 	}
 }

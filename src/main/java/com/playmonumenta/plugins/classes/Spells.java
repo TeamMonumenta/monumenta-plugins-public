@@ -23,6 +23,15 @@ public enum Spells {
 	COLD_WAVE("Cold Wave", false, Classes.MAGE),
 	FROZEN_HEART("Frozen Heart", false, Classes.MAGE),
 
+	//--Elementalist Spec.
+
+	METEOR_STRIKE("Meteor Strike", false, Classes.MAGE),
+	ELEMENTAL_SPIRIT("Elemental Spirit", false, Classes.MAGE),
+	GLACIAL_RIFT("Glacial Rift", false, Classes.MAGE),
+
+	//--Arcanist Spec.
+	FSWORD("Flash Sword", false, Classes.MAGE),
+
 	//Rogue
 
 	//--Core Abilities
@@ -75,6 +84,7 @@ public enum Spells {
 	QUICKSHOT("Quickshot", false, Classes.SCOUT),
 	DISENGAGE("Disengage", false, Classes.SCOUT),
 	DEADEYE("Deadeye", false, Classes.SCOUT),
+	PRECISION_STRIKE("Precision Strike", false, Classes.SCOUT),
 
 	//Warlock
 

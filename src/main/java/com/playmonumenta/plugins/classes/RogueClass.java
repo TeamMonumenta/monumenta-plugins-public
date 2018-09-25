@@ -252,9 +252,9 @@ public class RogueClass extends BaseClass {
 						if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), SMOKESCREEN_RANGE)) {
 								int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
-													SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
+								                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
 								int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
-													SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
+								                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
 
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION, weaknessLevel, false, true));
 								mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION, slownessLevel, false, true));
@@ -386,9 +386,9 @@ public class RogueClass extends BaseClass {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ESCAPE_DEATH)) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), ESCAPE_DEATH_RANGE)) {
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-															 ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
+						                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-															 ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
+						                                     ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
 					}
 
 					if (escapeDeath > 1) {
@@ -458,7 +458,7 @@ public class RogueClass extends BaseClass {
 				mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			} else if (EntityUtils.isHostileMob(killedEntity)) {
 				int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
-				mPlugin.mTimers.UpdateCooldowns(timeReduction);
+				mPlugin.mTimers.UpdateCooldowns(player, timeReduction);
 
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
 				mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);

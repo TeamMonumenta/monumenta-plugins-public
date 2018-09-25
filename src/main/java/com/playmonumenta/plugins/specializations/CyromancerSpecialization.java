@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -55,7 +54,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 					if (blizzard > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BLIZZARD)) {
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 1000, 7, 1, 7, 0.2);
-							mWorld.spawnParticle(Particle.SNOW_SHOVEL, player.getLocation(), 1500, 7, 4, 7, 0.35);
+							mWorld.spawnParticle(Particle.SNOWBALL, player.getLocation(), 1500, 7, 4, 7, 0.35);
 							mWorld.spawnParticle(Particle.CLOUD, player.getLocation(), 300, 0, 0, 0, 0.5);
 							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 							player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_BREAK, 0.85f, 1.15f);
@@ -115,7 +114,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 							player.getLocation().getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1);
 							loc.add(x, y, z);
 							mWorld.spawnParticle(Particle.CLOUD, loc, 10, xoffset, 0.25, zoffset, 0.075);
-							mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc, 50, xoffset, 0.25, zoffset, 0.05);
+							mWorld.spawnParticle(Particle.SNOWBALL, loc, 50, xoffset, 0.25, zoffset, 0.05);
 
 							for (Entity e : loc.getWorld().getNearbyEntities(loc, damagerange, 1.25, damagerange)) {
 								if (EntityUtils.isHostileMob(e) && !affected.contains(e)) {
@@ -163,7 +162,7 @@ public class CyromancerSpecialization extends BaseSpecialization {
 					if (PlayerUtils.isCritical(player)) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FROZEN_HEART)) {
 							e.getWorld().playSound(e.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-							mWorld.spawnParticle(Particle.SNOW_SHOVEL, e.getLocation().add(0, e.getHeight() / 2, 0), 50, 0.2, 0.2, 0.2, 0.2);
+							mWorld.spawnParticle(Particle.SNOWBALL, e.getLocation().add(0, e.getHeight() / 2, 0), 50, 0.2, 0.2, 0.2, 0.2);
 							if (!EntityUtils.isBoss(e)) {
 								EntityUtils.applyFreeze(mPlugin, 20 * 3, e);
 							} else {

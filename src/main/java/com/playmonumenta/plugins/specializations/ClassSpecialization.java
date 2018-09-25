@@ -15,7 +15,9 @@ public enum ClassSpecialization {
 	RANGER(Classes.SCOUT, 8),
 	PALADIN(Classes.CLERIC, 9),
 	HIEROPHANT(Classes.CLERIC, 10),
-	BERSERKER(Classes.WARRIOR, 11);
+	BERSERKER(Classes.WARRIOR, 11),
+	ELEMENTALIST(Classes.MAGE, 12),
+	ARCANIST(Classes.MAGE, 13);
 
 	private final Classes linkedClass;
 	private final int id;
@@ -25,8 +27,12 @@ public enum ClassSpecialization {
 		this.id = id;
 	}
 
-	public Classes getLinkedClass() { return linkedClass; }
+	public Classes getLinkedClass() {
+		return linkedClass;
+	}
 
-	public int getId() { return id; }
+	public int getId() {
+		return id;
+	}
 
 }

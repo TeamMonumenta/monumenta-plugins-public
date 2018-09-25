@@ -1,8 +1,14 @@
 package com.playmonumenta.plugins.specializations;
 
+import com.playmonumenta.plugins.classes.BaseClass;
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.timers.CooldownTimers;
+
 import java.util.Random;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -14,10 +20,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.BaseClass;
-import com.playmonumenta.plugins.timers.CooldownTimers;
+import org.bukkit.Material;
 
 public class BaseSpecialization {
 
@@ -81,6 +84,13 @@ public class BaseSpecialization {
 
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {}
 
-	public boolean PlayerDamagedByLivingEntityRadiusEvent(Player player, Player caster, LivingEntity damager, EntityDamageByEntityEvent event) { return true; }
+	public boolean PlayerDamagedByLivingEntityRadiusEvent(Player player, Player caster, LivingEntity damager, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
+	public boolean EntityCustomDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, MagicType type, CustomDamageEvent event) {
+		return true;
+	}
+
+	public void AbilityCastEvent(Player player, AbilityCastEvent event) {}
 }

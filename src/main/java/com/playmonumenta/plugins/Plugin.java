@@ -1,24 +1,5 @@
 package com.playmonumenta.plugins;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.Iterator;
-
-import com.playmonumenta.plugins.command.*;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.ClericClass;
@@ -27,6 +8,7 @@ import com.playmonumenta.plugins.classes.RogueClass;
 import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
+import com.playmonumenta.plugins.command.*;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
@@ -36,8 +18,8 @@ import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.managers.ZoneManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
+import com.playmonumenta.plugins.managers.ZoneManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.specializations.*;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
@@ -47,6 +29,25 @@ import com.playmonumenta.plugins.timers.PulseEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.Random;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.World;
 
 public class Plugin extends JavaPlugin {
 	//  TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?
@@ -111,9 +112,16 @@ public class Plugin extends JavaPlugin {
 
 	public World mWorld;
 
+	private static Plugin plugin;
+
+	public static Plugin getInstance() {
+		return plugin;
+	}
+
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
+		plugin = this;
 		PluginManager manager = getServer().getPluginManager();
 
 		mItemOverrides = new ItemOverrides();
@@ -158,6 +166,8 @@ public class Plugin extends JavaPlugin {
 		mSpecializationMap.put(ClassSpecialization.PALADIN.getId(), new PaladinSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.HIEROPHANT.getId(), new HierophantSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.BERSERKER.getId(), new BerserkerSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.ELEMENTALIST.getId(), new ElementalistSpecialization(this, mRandom, mWorld));
+		mSpecializationMap.put(ClassSpecialization.ARCANIST.getId(), new ArcanistSpecialization(this, mRandom, mWorld));
 
 		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
@@ -197,6 +207,9 @@ public class Plugin extends JavaPlugin {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						BaseClass pClass = Plugin.this.getClass(player);
 						pClass.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+
+						BaseSpecialization pSpec = getSpecialization(player);
+						pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 					}
 
 					mPeriodicTimer %= Times.ONE_TWENTY.getValue();

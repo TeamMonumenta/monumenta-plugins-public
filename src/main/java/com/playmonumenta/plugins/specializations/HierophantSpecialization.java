@@ -163,7 +163,7 @@ public class HierophantSpecialization extends BaseSpecialization {
 				}
 			}
 
-			
+
 		}
 	}
 	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {

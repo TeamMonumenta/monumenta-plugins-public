@@ -65,6 +65,10 @@ public class LocationUtils {
 		Vector vTo = to.toVector();
 		return vTo.subtract(vFrom).normalize();
 	}
+	
+	public static Location getEntityCenter(Entity e) {
+		return e.getLocation().add(0, e.getHeight() / 2, 0);
+	}
 
 	public static boolean isLosBlockingBlock(Material mat) {
 		return mat.isOccluding();

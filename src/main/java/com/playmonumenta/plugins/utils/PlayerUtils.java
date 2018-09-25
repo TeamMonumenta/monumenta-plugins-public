@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,9 +20,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-
 public class PlayerUtils {
 	public static boolean isCritical(Player player) {
 		return player.getFallDistance() > 0.0F &&
@@ -26,6 +28,11 @@ public class PlayerUtils {
 		       !player.hasPotionEffect(PotionEffectType.BLINDNESS) &&
 		       player.getLocation().getBlock().getType() != Material.LADDER &&
 		       player.getLocation().getBlock().getType() != Material.VINE;
+	}
+
+	public static void callAbilityCastEvent(Player player, Spells spell) {
+		AbilityCastEvent event = new AbilityCastEvent(player, spell);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	public static boolean hasLineOfSight(Player player, LivingEntity mob) {

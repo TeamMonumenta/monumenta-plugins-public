@@ -286,8 +286,8 @@ public class WarlockClass extends BaseClass {
 								Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 								if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
 									int debuffCount = (int)DEBUFFS.stream()
-													  .filter(effect -> (mob.getPotionEffect(effect) != null))
-													  .count();
+									                  .filter(effect -> (mob.getPotionEffect(effect) != null))
+									                  .count();
 									int damageMult = (amplifyingHex == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
 									if (consumingFlames > 1 && mob.getFireTicks() > 0) {
 										debuffCount++;

@@ -1,13 +1,9 @@
 package com.playmonumenta.plugins.specializations;
 
-import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import java.util.Random;
@@ -17,7 +13,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -47,11 +42,12 @@ public class RangerSpecialization extends BaseSpecialization {
 			if (InventoryUtils.isBowItem(itemInHand)) {
 				int quickshot = ScoreboardUtils.getScoreboardValue(player, "Quickshot");
 				/*
-				 * Quickdraw: Left Clicking with a bow instantly fires an arrow
-				 *  that deals 6 damage (+ any other bonuses from skills) and
-				 *  inflicts Slowness 3 for 2 seconds (Cooldown: 12 seconds).
-				 *  Level 2 decreases the cooldown to 10 seconds and increases
-				 *  the arrow damage to 9 + effects.
+				 * Quickdraw: Left Clicking with a bow instantly
+				 * fires an arrow that deals 9 damage (+ any other
+				 * bonuses from skills) and inflicts Slowness 3
+				 * for 2 seconds (Cooldown: 12 seconds). Level 2
+				 * decreases the cooldown to 10 seconds and increases
+				 * the arrow damage to 12 + effects.
 				 */
 				if (quickshot > 0) {
 					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.QUICKSHOT)) {
@@ -67,52 +63,6 @@ public class RangerSpecialization extends BaseSpecialization {
 						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.QUICKSHOT, cooldown);
 					}
 				}
-			} else {
-				if (player.isSprinting()) {
-					int deadeye = ScoreboardUtils.getScoreboardValue(player, "Deadeye");
-					/*
-					 * Deadeye: Sprint Attack to prime Deadeye, canceling any forward
-					 * movement and taking a 3 block leap backwards. All charged shots
-					 * made in the next 4/5 seconds, instead of shooting an arrow, deal
-					 * 8/12 damage (plus any other bonuses from skills), inflict Glowing,
-					 * and inflict Vulnerability 20% to the nearest enemy in front of you
-					 * (within 15 blocks). At Level 2, you also gain Speed 2 duration the
-					 * duration of Deadeye. (Cooldown: 20 Seconds from the end of ability
-					 * duration) (Use beam/smoke particles from the player to the target
-					 * pls if you can)
-					 */
-					if (deadeye > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DEADEYE)) {
-							player.setMetadata(PLAYER_DEADEYE_METAKEY, new FixedMetadataValue(mPlugin, null));
-							player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 2);
-							player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.5f);
-							int duration = deadeye == 1 ? 20 * 4 : 20 * 5;
-							if (deadeye > 1) {
-								mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, duration, 1, true, false));
-							}
-							Location loc = player.getLocation();
-							Vector dir = loc.getDirection();
-							double z = dir.getZ() * 0.65;
-							double x = dir.getX() * 0.65;
-							player.setVelocity(new Vector(-x, 0.35, -z));
-							new BukkitRunnable() {
-								int t = 0;
-								@Override
-								public void run() {
-									t++;
-									mWorld.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 7, 0.25f, 0.1f, 0.25f, 0);
-
-									if (t >= duration) {
-										this.cancel();
-										player.removeMetadata(PLAYER_DEADEYE_METAKEY, mPlugin);
-									}
-								}
-
-							}.runTaskTimer(mPlugin, 0, 1);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DEADEYE, (20 * 20) + duration);
-						}
-					}
-				}
 			}
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			if (player.isSneaking()) {
@@ -123,11 +73,11 @@ public class RangerSpecialization extends BaseSpecialization {
 				    && !blockClicked.isInteractable()) {
 					int disengage = ScoreboardUtils.getScoreboardValue(player, "Disengage");
 					/*
-					 * Disengage: Sneak Block with a shield to leap backwards 6'ish
-					 * blocks from your position, with a bit of vertical velocity
-					 * as well. Enemies within melee range of you previous position
-					 * are stunned for 3 seconds. (Cooldown: 15 seconds) At Level 2,
-					 * you receive 7 seconds of Speed II on landing.
+					 * Disengage: Sneak right click (without a bow) to leap backwards
+					 * 6 ish blocks from your position, with a bit of vertical velocity
+					 *  as well. Enemies within melee range of you previous position
+					 *  are stunned for 2 seconds(does not work on ebm,lites and bosses).
+					 *  (Cooldown: 12 seconds) At Level 2, you deal 8 damage
 					 */
 					if (disengage > 0) {
 						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.DISENGAGE)) {
@@ -135,9 +85,13 @@ public class RangerSpecialization extends BaseSpecialization {
 								if (EntityUtils.isHostileMob(e)) {
 									LivingEntity le = (LivingEntity) e;
 									EntityUtils.applyStun(mPlugin, 20 * 3, le);
+									if (disengage > 1) {
+										EntityUtils.damageEntity(mPlugin, le, 8, player);
+									}
 								}
 							}
 							player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+							player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
 							Location loc = player.getLocation();
 							Vector dir = loc.getDirection();
 							double z = dir.getZ() * 1.65;
@@ -145,80 +99,53 @@ public class RangerSpecialization extends BaseSpecialization {
 							player.setVelocity(new Vector(-x, 0.65, -z));
 							mWorld.spawnParticle(Particle.CLOUD, loc, 15, 0.1f, 0, 0.1f, 0.125f);
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0.1f, 0, 0.1f, 0.15f);
-							if (disengage > 1) {
-								new BukkitRunnable() {
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DISENGAGE, 20 * 12);
+						}
+					}
+				}
+			} else if (player.isSprinting()) {
+				int precisionStrike = ScoreboardUtils.getScoreboardValue(player, "PrecisionStrike");
+				/*
+				 * Precision Strike: A fast dash that stops at the first
+				 * enemy hit, dealing 6 damage and applying 20% vulnerability
+				 * for 2 seconds, this also stuns the enemy hit for 1 second.
+				 * At level 2 the damage increases to 10 and the vulnerability
+				 * increases to 30%. (CD: 6 seconds)
+				 */
+				if (precisionStrike > 0) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PRECISION_STRIKE)) {
+						Location loc = player.getLocation();
+						Vector dir = loc.getDirection();
+						dir.setY(dir.getY() * 0.5);
+						dir.add(new Vector(0, 0.35, 0));
+						int level = precisionStrike == 1 ? 3 : 5;
+						int dmg = precisionStrike == 1 ? 6 : 10;
+						player.setVelocity(dir);
+						mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 63, 0.25, 0.1, 0.25, 0.2);
+						mWorld.spawnParticle(Particle.CLOUD, loc, 20, 0.25, 0.1, 0.25, 0.125);
+						mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+						mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
+						new BukkitRunnable() {
 
-									@Override
-									public void run() {
-										if (player.isOnGround() || player.getLocation().getBlock().isLiquid()) {
-											this.cancel();
-											mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 20 * 7, 1, true, false));
-											player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
-											mWorld.spawnParticle(Particle.CLOUD, player.getLocation(), 10, 0, 0, 0, 0.175f);
-										}
-									}
-
-								}.runTaskTimer(mPlugin, 5, 1);
+							@Override
+							public void run() {
+								for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.75)) {
+									EntityUtils.damageEntity(mPlugin, e, dmg, player);
+									e.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, level, false, true));
+									EntityUtils.applyStun(mPlugin, 20, e);
+									break;
+								}
+								if (player.isOnGround()) {
+									this.cancel();
+								}
 							}
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DISENGAGE, 20 * 15);
-						}
+
+						}.runTaskTimer(mPlugin, 1, 1);
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRECISION_STRIKE, 20 * 6);
 					}
 				}
 			}
 		}
 	}
 
-	@Override
-	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (arrow.hasMetadata(ARROW_QUICKSHOT_METAKEY)) {
-			event.setCancelled(true);
-			double damage = arrow.getMetadata(ARROW_QUICKSHOT_METAKEY).get(0).asDouble();
-			EntityUtils.damageEntity(mPlugin, damagee, damage, player);
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 2, false, true));
-		}
-	}
-
-	@Override
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
-		if (player.hasMetadata(PLAYER_DEADEYE_METAKEY)) {
-			LivingEntity entity = EntityUtils.getNearestHostile(player, 15);
-			if (entity != null && arrow.isCritical()) {
-				int deadeye = ScoreboardUtils.getScoreboardValue(player, "Deadeye");
-				Vector dir = LocationUtils.getDirectionTo(entity.getEyeLocation(), player.getEyeLocation());
-				Location loc = player.getEyeLocation();
-				int extraDam = ScoutClass.getBowMasteryDamage(player);
-				int dam = deadeye == 1 ? 8 : 12;
-
-				player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
-				mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(dir), 10, 0, 0, 0, 0.15f);
-				boolean hit = false;
-				for (int i = 0; i < 20; i++) {
-					loc.add(dir);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 15, 0.3f, 0.3f, 0.3f, 0.075f);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.2f, 0.2f, 0.2f, 0);
-					for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity le = (LivingEntity) e;
-							EntityUtils.damageEntity(mPlugin, le, dam + extraDam, player);
-							le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 3, 3, false, true));
-							le.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, false, true));
-							hit = true;
-						}
-					}
-					if (hit) {
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.175f);
-						mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 150, 0, 0, 0, 0.3f);
-						loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.65f);
-						break;
-					}
-				}
-
-				return false;
-			} else {
-				return true;
-			}
-		}
-		return true;
-	}
 }

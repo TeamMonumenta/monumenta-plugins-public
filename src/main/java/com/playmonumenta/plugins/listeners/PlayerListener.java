@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
@@ -21,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -77,7 +77,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -707,5 +706,11 @@ public class PlayerListener implements Listener {
 				mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
 			}
 		}
+	}
+
+	@EventHandler
+	public void AbilityCastEvent(AbilityCastEvent event) {
+		Player player = event.getCaster();
+		mPlugin.getSpecialization(player).AbilityCastEvent(player, event);
 	}
 }
