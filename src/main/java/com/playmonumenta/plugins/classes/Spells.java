@@ -106,8 +106,13 @@ public enum Spells {
 	BLACK_CLOUDS("Black Clouds", false, Classes.WARLOCK),
 
 	//Warrior
+
+	//--Core Abilites
 	RIPOSTE("Riposte", false, Classes.WARRIOR),
 	DEFENSIVE_LINE("Defensive Line", false, Classes.WARRIOR),
+
+	//--Berserker
+	RECKLESS_SWING("Reckless Swing", false, Classes.WARRIOR),
 
 	//Alchemist
 	POWER_INJECTION("Power Injection", false, Classes.ALCHEMIST),

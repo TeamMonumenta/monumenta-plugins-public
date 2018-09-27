@@ -88,6 +88,10 @@ public class BaseSpecialization {
 		return true;
 	}
 
+	public boolean PlayerExtendedSneakEvent(Player player) {
+		return true;
+	}
+
 	public boolean EntityCustomDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, MagicType type, CustomDamageEvent event) {
 		return true;
 	}

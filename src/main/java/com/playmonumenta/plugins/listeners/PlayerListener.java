@@ -68,6 +68,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
@@ -288,8 +289,8 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-				|| (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
-					&& player.getGameMode() != GameMode.CREATIVE)) {
+			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			        && player.getGameMode() != GameMode.CREATIVE)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -706,6 +707,26 @@ public class PlayerListener implements Listener {
 				mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event, Player player) {
+		new BukkitRunnable() {
+			Integer mTicks = 0;
+			@Override
+			public void run() {
+				if (player.isSneaking()) {
+					mTicks += 2;
+					if (mTicks >= 40) {
+						mPlugin.getSpecialization(player).PlayerExtendedSneakEvent(player);
+						this.cancel();
+					}
+
+				} else {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
 	@EventHandler
