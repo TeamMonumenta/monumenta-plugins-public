@@ -96,6 +96,11 @@ public class SpellBaseLaser implements Spell {
 			}
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void launch(Player target) {
 		new BukkitRunnable() {
 			private int mTicks = 0;

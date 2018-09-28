@@ -37,6 +37,11 @@ public class SpellMaskedFrostNova implements Spell {
 		deal_damage();
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void deal_damage() {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable dealer = new Runnable() {

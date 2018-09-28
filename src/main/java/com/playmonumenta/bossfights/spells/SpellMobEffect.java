@@ -16,4 +16,9 @@ public class SpellMobEffect implements Spell {
 	public void run() {
 		mLauncher.addPotionEffect(mPotion, true);
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

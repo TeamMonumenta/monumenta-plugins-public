@@ -80,4 +80,9 @@ public class SpellDelayedAction implements Spell {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
+
+	@Override
+	public int duration() {
+		return mDelayTicks;
+	}
 }

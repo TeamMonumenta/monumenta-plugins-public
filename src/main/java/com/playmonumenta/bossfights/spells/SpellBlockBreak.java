@@ -50,4 +50,9 @@ public class SpellBlockBreak implements Spell {
 			particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, particleLoc, 10, 1, 1, 1, 0.03);
 		}
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

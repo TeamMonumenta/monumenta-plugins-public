@@ -35,6 +35,11 @@ public class SpellAxtalTntThrow implements Spell {
 		animation();
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void animation() {
 		Location loc = mLauncher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

@@ -23,4 +23,9 @@ public class SpellConditionalTeleport implements Spell {
 			mLauncher.teleport(mDest);
 		}
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

@@ -42,7 +42,7 @@ public class SpellManager {
 		mCooldown = (int)Math.floor(((double)mReadySpells.size() - 1.0) / 2.0);
 	}
 
-	public void runNextSpell() {
+	public int runNextSpell() {
 		/*
 		 * If a spell has been on cooldown sufficiently long, remove it from
 		 * the cooldown list and add it to the ready list.
@@ -63,9 +63,14 @@ public class SpellManager {
 				spell.run();
 				mCooldownSpells.add(spell);
 				iterator.remove();
-				break;
+
+				/* Return how much time the spell takes */
+				return spell.duration();
 			}
 		}
+
+		/* None of these spells can run - wait a second before trying again */
+		return 20;
 	}
 }
 

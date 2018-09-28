@@ -33,6 +33,11 @@ public class SpellMaskedSummonBlazes implements Spell {
 		spawn(lLoc, count, 2);
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void spawn(Location loc, int count, int repeats) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable single_spawn = new Runnable() {

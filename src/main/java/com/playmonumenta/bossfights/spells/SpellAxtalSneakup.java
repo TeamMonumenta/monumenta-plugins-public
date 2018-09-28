@@ -33,6 +33,11 @@ public class SpellAxtalSneakup implements Spell {
 		animation(target);
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void launch(Player target) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable teleport = new Runnable() {

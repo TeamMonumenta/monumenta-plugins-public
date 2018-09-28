@@ -47,4 +47,9 @@ public class SpellPushPlayersAway implements Spell {
 			playerNearTime.put(player.getUniqueId(), nearTime);
 		}
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

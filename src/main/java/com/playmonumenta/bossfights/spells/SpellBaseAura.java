@@ -82,4 +82,9 @@ public class SpellBaseAura implements Spell {
 			}
 		}
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

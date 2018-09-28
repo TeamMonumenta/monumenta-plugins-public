@@ -47,6 +47,11 @@ public class SpellAxtalMeleeMinions implements Spell {
 		spawn();
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	public void spawn() {
 		Location loc = mLauncher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

@@ -25,4 +25,9 @@ public class SpellRunAction implements Spell {
 			mAction.run();
 		}
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }

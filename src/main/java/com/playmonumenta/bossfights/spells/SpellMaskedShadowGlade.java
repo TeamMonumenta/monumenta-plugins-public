@@ -52,6 +52,11 @@ public class SpellMaskedShadowGlade implements Spell {
 		}
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	public void animation(Location zoneStart) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		List<Player> pList = Utils.playersInRange(zoneStart, 40);

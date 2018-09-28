@@ -55,6 +55,11 @@ public class SpellChangeFloor implements Spell {
 		launch(players.get(mRandom.nextInt(players.size())));
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	public void launch(Player target) {
 		/*
 		 * First phase - play sound effect

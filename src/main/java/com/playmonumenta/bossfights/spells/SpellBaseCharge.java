@@ -125,6 +125,11 @@ public class SpellBaseCharge implements Spell {
 		}
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	/**
 	 * Does a charge attack - which may not do anything, depending on parameters passed
 	 * Returns whether the charge hit a player or not

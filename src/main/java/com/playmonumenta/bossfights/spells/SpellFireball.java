@@ -101,6 +101,11 @@ public class SpellFireball implements Spell {
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
+	@Override
+	public int duration() {
+		return 160; // 8 seconds
+	}
+
 	private void launch(Player target) {
 		// Play launch effect
 		mLaunchEffect.run(target.getLocation());

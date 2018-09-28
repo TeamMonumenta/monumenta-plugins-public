@@ -47,17 +47,27 @@ public abstract class BossAbilityGroup {
 					return;
 				}
 
-				if (passiveSpells != null)
+				if (passiveSpells != null) {
 					for (Spell spell : passiveSpells) {
 						spell.run();
 					}
+				}
 			}
 		};
 		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 
 		Runnable active = new Runnable() {
+			Integer mNextActiveTimer = 0;
+
 			@Override
 			public void run() {
+				mNextActiveTimer -= 2;
+
+				if (mNextActiveTimer > 0) {
+					// Still waiting for the current spell to finish
+					return;
+				}
+
 				/* Check if somehow the boss entity is missing even though this is still running */
 				boolean bossCheck = true;
 				Location bossLoc = mBoss.getLocation();
@@ -79,11 +89,12 @@ public abstract class BossAbilityGroup {
 				}
 
 				if (activeSpells != null) {
-					activeSpells.runNextSpell();
+					// Run the next spell and store how long before the next spell can run
+					mNextActiveTimer = activeSpells.runNextSpell();
 				}
 			}
 		};
-		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 160L);
+		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 2L);
 	}
 
 	/*

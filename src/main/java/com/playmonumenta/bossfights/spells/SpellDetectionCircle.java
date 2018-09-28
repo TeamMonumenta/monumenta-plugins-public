@@ -65,4 +65,9 @@ public class SpellDetectionCircle implements Spell {
 		};
 		taskID = scheduler.scheduleSyncRepeatingTask(mPlugin, loop, 1L, 5L);
 	}
+
+	@Override
+	public int duration() {
+		return 1;
+	}
 }
