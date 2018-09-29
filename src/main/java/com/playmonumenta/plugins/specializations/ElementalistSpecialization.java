@@ -103,20 +103,21 @@ public class ElementalistSpecialization extends BaseSpecialization {
 							Location loc = player.getLocation();
 							Vector dir = loc.getDirection().normalize();
 							dir.multiply(1.2);
-							dir.add(new Vector(0, 0.5, 0));
+							dir.add(new Vector(0, 0.45, 0));
 							player.setVelocity(dir);
 							player.setInvulnerable(true);
 							mWorld.spawnParticle(Particle.CLOUD, loc, 15, 0, 0, 0, 0.15);
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 12, 0, 0, 0, 0.15);
 							loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
 							loc.getWorld().playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1, 0.5f);
+							double dmg = glacialRift == 1 ? 8 : 16;
 							new BukkitRunnable() {
 
 								@Override
 								public void run() {
 									Block block = null;
 									Location loc = player.getLocation();
-									for (double i = 0; i < 8; i += 0.25) {
+									for (double i = 0; i < 10; i += 1) {
 										loc.subtract(0, 0.25, 0);
 										if (loc.getBlock().getType().isSolid()) {
 											block = loc.getBlock();
@@ -131,13 +132,13 @@ public class ElementalistSpecialization extends BaseSpecialization {
 											@Override
 											public void run() {
 												t++;
-												mWorld.spawnParticle(Particle.CLOUD, bLoc, 2, 0.5, 0, 0.5, 0.05);
-												mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.5, 0, 0.5, 0.05);
+												mWorld.spawnParticle(Particle.CLOUD, bLoc, 1, 0.5, 0, 0.5, 0.05);
+												mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 1, 0.5, 0, 0.5, 0.05);
 												for (LivingEntity e : EntityUtils.getNearbyMobs(bLoc, 0.65)) {
 													if (!affect.contains(e)) {
 														affect.add(e);
-														EntityUtils.applyFreeze(mPlugin, 4, e);
-														EntityUtils.damageEntity(mPlugin, e, 8, player);
+														EntityUtils.applyFreeze(mPlugin, 20 * 4, e);
+														EntityUtils.damageEntity(mPlugin, e, dmg, player, MagicType.ICE);
 													}
 												}
 												if (t >= 16 || player.isDead()) {
@@ -154,6 +155,7 @@ public class ElementalistSpecialization extends BaseSpecialization {
 								}
 
 							}.runTaskTimer(mPlugin, 0, 1);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GLACIAL_RIFT, 20 * 16);
 						}
 					}
 				}

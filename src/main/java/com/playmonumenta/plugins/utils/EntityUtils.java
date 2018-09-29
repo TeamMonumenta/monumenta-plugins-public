@@ -464,7 +464,7 @@ public class EntityUtils {
 				}
 			}
 
-		} .runTaskTimer(plugin, 0, 1);
+		}.runTaskTimer(plugin, 0, 1);
 	}
 	public static class FreezeObject {
 		private static final String FREEZE_METAKEY = "MonumentaFreezeMetakey";
@@ -493,7 +493,7 @@ public class EntityUtils {
 						mob.removeMetadata(FREEZE_METAKEY, plugin);
 					}
 				}
-			} .runTaskTimer(plugin, 0, 1);
+			}.runTaskTimer(plugin, 0, 1);
 		}
 
 		public int getTotalDuration() {

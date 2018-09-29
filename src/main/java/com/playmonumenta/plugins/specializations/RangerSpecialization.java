@@ -117,7 +117,7 @@ public class RangerSpecialization extends BaseSpecialization {
 						Location loc = player.getLocation();
 						Vector dir = loc.getDirection();
 						dir.setY(dir.getY() * 0.5);
-						dir.add(new Vector(0, 0.35, 0));
+						dir.add(new Vector(0, 0.4, 0));
 						int level = precisionStrike == 1 ? 3 : 5;
 						int dmg = precisionStrike == 1 ? 6 : 10;
 						player.setVelocity(dir);
@@ -129,10 +129,12 @@ public class RangerSpecialization extends BaseSpecialization {
 
 							@Override
 							public void run() {
-								for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.75)) {
+								mWorld.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
+								for (LivingEntity e : EntityUtils.getNearbyMobs(player.getLocation(), 1)) {
 									EntityUtils.damageEntity(mPlugin, e, dmg, player);
 									e.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, level, false, true));
 									EntityUtils.applyStun(mPlugin, 20, e);
+									this.cancel();
 									break;
 								}
 								if (player.isOnGround()) {

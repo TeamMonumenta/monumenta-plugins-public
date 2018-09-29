@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -30,12 +31,12 @@ import org.bukkit.util.Vector;
 import org.bukkit.World;
 
 public class ArcanistSpecialization extends BaseSpecialization {
-	private static final int ARCANIST_INSIGHT = (int)(0.5 * 20);
+	private static final int ARCANIST_INSIGHT = (int)(1 * 20);
 	private static final int FSWORD_1_DAMAGE = 3;
-	private static final int FSWORD_2_DAMAGE = 4;
-	private static final int FSWORD_1_SWIPE = 2;
+	private static final int FSWORD_2_DAMAGE = 5;
+	private static final int FSWORD_1_SWIPE = 3;
 	private static final int FSWORD_2_SWIPE = 3;
-	private static final int FSWORD_RADIUS = 4;
+	private static final int FSWORD_RADIUS = 5;
 	private static final int FSWORD_COOLDOWN = 8;
 	private static final float FSWORD_KNOCKBACK_SPEED = 0.12f;
 	private static final double FSWORD_DOT_ANGLE = 0.33;
@@ -83,109 +84,109 @@ public class ArcanistSpecialization extends BaseSpecialization {
 		 * seconds)
 		 */
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			if (player.isSneaking()) {
+			if (player.isSprinting()) {
 				if (InventoryUtils.isWandItem(mainHand)) {
-					if (flashSword > 0)
-						;
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FSWORD)) {
-						int swings = flashSword == 1 ? 2 : 3;
-						new BukkitRunnable() {
-							int t = 0;
-							float pitch = 1.2f;
-							int sw = 0;
-							@Override
-							public void run() {
-								t++;
-								sw++;
-								Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-								for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(),
-								                                                  FSWORD_RADIUS)) {
-									Vector toMobVector = mob.getLocation().toVector()
-									                     .subtract(player.getLocation().toVector()).setY(0).normalize();
-									if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
-										int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
-										EntityUtils.damageEntity(mPlugin, mob, damageMult, player);
-										if (t >= swings) {
-											MovementUtils.KnockAway(player, mob, 1);
+					if (flashSword > 0) {
+						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.FSWORD)) {
+							int swings = flashSword == 1 ? 2 : 3;
+							new BukkitRunnable() {
+								int t = 0;
+								float pitch = 1.2f;
+								int sw = 0;
+								@Override
+								public void run() {
+									t++;
+									sw++;
+									Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
+									for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(),
+									                                                  FSWORD_RADIUS)) {
+										Vector toMobVector = mob.getLocation().toVector()
+										                     .subtract(player.getLocation().toVector()).setY(0).normalize();
+										if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
+											int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
+											mob.setNoDamageTicks(0);
+											EntityUtils.damageEntity(mPlugin, mob, damageMult, player);
+											if (t >= swings) {
+												MovementUtils.KnockAway(player, mob, 0.4f);
+											}
 										}
 									}
-								}
 
-								if (t >= swings) {
-									pitch = 1.45f;
-								}
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP,
-								                            1.0f, 0.8f);
-								player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT,
-								                            1.0f, pitch);
-								Location loc = player.getLocation();
-								new BukkitRunnable() {
-									final int i = sw;
-									double roll;
-									double d = 45;
-									boolean init = false;
-									@Override
-									public void run() {
-										if (!init) {
+									if (t >= swings) {
+										pitch = 1.45f;
+									}
+									player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP,
+									                            1.0f, 0.8f);
+									player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT,
+									                            1.0f, pitch);
+									Location loc = player.getLocation();
+									new BukkitRunnable() {
+										final int i = sw;
+										double roll;
+										double d = 45;
+										boolean init = false;
+										@Override
+										public void run() {
+											if (!init) {
+												if (i % 2 == 0) {
+													roll = -8;
+													d = 45;
+												} else {
+													roll = 8;
+													d = 135;
+												}
+												init = true;
+											}
 											if (i % 2 == 0) {
-												roll = -8;
-												d = 45;
+												Vector vec;
+												for (double r = 1; r < 5; r += 0.5) {
+													for (double degree = d; degree < d + 30; degree += 5) {
+														double radian1 = Math.toRadians(degree);
+														vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+														vec = VectorUtils.rotateZAxis(vec, roll);
+														vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
+														vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+														Location l = loc.clone().add(0, 1.25, 0).add(vec);
+														mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
+														mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+													}
+												}
+
+												d += 30;
 											} else {
-												roll = 8;
-												d = 135;
-											}
-											init = true;
-										}
-										if (i % 2 == 0) {
-											Vector vec;
-											for (double r = 1; r < 4; r += 0.5) {
-												for (double degree = d; degree < d + 30; degree += 5) {
-													double radian1 = Math.toRadians(degree);
-													vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-													vec = VectorUtils.rotateZAxis(vec, roll);
-													vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-													vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+												Vector vec;
+												for (double r = 1; r < 5; r += 0.5) {
+													for (double degree = d; degree > d - 30; degree -= 5) {
+														double radian1 = Math.toRadians(degree);
+														vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+														vec = VectorUtils.rotateZAxis(vec, roll);
+														vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
+														vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-													Location l = loc.clone().add(0, 1.25, 0).add(vec);
-
-													mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-													mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+														Location l = loc.clone().add(0, 1.25, 0).add(vec);
+														mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
+														mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
+													}
 												}
+												d -= 30;
 											}
 
-											d += 30;
-										} else {
-											Vector vec;
-											for (double r = 1; r < 4; r += 0.5) {
-												for (double degree = d; degree > d - 30; degree -= 5) {
-													double radian1 = Math.toRadians(degree);
-													vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-													vec = VectorUtils.rotateZAxis(vec, roll);
-													vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-													vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-
-													Location l = loc.clone().add(0, 1.25, 0).add(vec);
-													mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
-													mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
-												}
+											if ((d >= 135 && i % 2 == 0) || (d <= 45 && i % 2 > 0)) {
+												this.cancel();
 											}
-											d -= 30;
 										}
 
-										if ((d >= 135 && i % 2 == 0) || (d <= 45 && i % 2 > 0)) {
-											this.cancel();
-										}
+									}.runTaskTimer(mPlugin, 0, 1);
+									if (t >= swings) {
+										this.cancel();
 									}
-
-								}.runTaskTimer(mPlugin, 0, 1);
-								if (t >= swings) {
-									this.cancel();
 								}
-							}
 
-						}.runTaskTimer(mPlugin, 0, 7);
-						PlayerUtils.callAbilityCastEvent(player, Spells.FSWORD);
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FSWORD, 20 * 8);
+							}.runTaskTimer(mPlugin, 0, 7);
+							PlayerUtils.callAbilityCastEvent(player, Spells.FSWORD);
+							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FSWORD, 20 * 8);
+						}
 					}
 				}
 			}

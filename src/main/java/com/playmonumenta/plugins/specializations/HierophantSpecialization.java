@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -16,7 +15,6 @@ import org.bukkit.Color;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -151,8 +149,12 @@ public class HierophantSpecialization extends BaseSpecialization {
 									}
 								}
 							}
-							if (t >= 2) {
-								if (player.isDead() || (!player.isHandRaised() && !player.isBlocking())) {
+							if (t >= 1) {
+								if (player.isDead()) {
+									this.cancel();
+									player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
+								}
+								if ((!player.isHandRaised() && !player.isBlocking())) {
 									this.cancel();
 									player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
 								}
