@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.ClericClass;
@@ -34,6 +35,7 @@ import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -69,6 +71,16 @@ public class Plugin extends JavaPlugin {
 		}
 		public int getValue()       {
 			return this.value;
+		}
+
+		public static Classes getClassById(int id) {
+			for (Classes cl : Classes.values()) {
+				if (cl != Classes.COUNT) {
+					if (cl.getValue() == id)
+						return cl;
+				}
+			}
+			return NONE;
 		}
 	}
 
@@ -176,6 +188,13 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new EntityListener(this, mWorld), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
+
+		//Register all existing Abilities
+		try {
+			new Ability().putAbilities(mWorld, this, mRandom);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 
 		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
 

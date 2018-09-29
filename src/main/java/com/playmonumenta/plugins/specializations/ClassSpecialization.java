@@ -35,4 +35,13 @@ public enum ClassSpecialization {
 		return id;
 	}
 
+	public static ClassSpecialization getSpecById(int id) {
+		for (ClassSpecialization spec : ClassSpecialization.values()) {
+			if (spec.getId() == id) {
+				return spec;
+			}
+		}
+		return NONE;
+	}
+
 }
