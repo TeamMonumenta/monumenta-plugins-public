@@ -14,14 +14,20 @@ import com.playmonumenta.plugins.specializations.ClassSpecialization;
 public class AbilityInfo {
 
 	private final Ability ability;
-
-	public String name = null;
+	
+	//If the ability does not require a scoreboardID andj ust a classId, leave this as null.
 	public String scoreboardId = null;
+	
 	public Spells linkedSpell = null;
 	public AbilityTrigger trigger = null;
+	
+	//This is in ticks
 	public int cooldown = 0;
+	
 	public int classId = 0;
-	public int specId = 0;
+	
+	//If the ability does not require a spec, input a negative number.
+	public int specId = -1;
 
 	public AbilityInfo(Ability ability) {
 		this.ability = ability;

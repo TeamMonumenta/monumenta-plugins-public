@@ -75,8 +75,9 @@ public class AbilityCollection {
 					if (info.scoreboardId != null) {
 						int score = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId);
 						if (score > 0)
-							addAbility(abil);
-					}
+							addAbility(abil.getInstance());
+					} else
+						addAbility(abil.getInstance());
 				}
 			}
 		}

@@ -12,9 +12,9 @@ import java.util.jar.JarFile;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.player.data.PIManager;
 import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -39,8 +39,9 @@ public class Ability {
 	 * This is used when the ability is casted manually when its
 	 * AbilityTrigger (Right Click/Left Click), along with whatever
 	 * runCheck() may contain, is correct.
+	 * @return if the player managed to cast the spell successfully.
 	 */
-	public void cast() { }
+	public boolean cast(Player player) { return true; }
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
@@ -54,6 +55,40 @@ public class Ability {
 	 * @return true or false
 	 */
 	public boolean runCheck(Player player) { return true; }
+	
+	public boolean isOnCooldown(Player player) {
+		if (getInfo() != null) {
+			AbilityInfo info = getInfo();
+			if (info.linkedSpell != null) {
+				if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	public void putOnCooldown(Player player) {
+		if (getInfo() != null) {
+			AbilityInfo info = getInfo();
+			if (info.linkedSpell != null) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell))
+					mPlugin.mTimers.AddCooldown(player.getUniqueId(), info.linkedSpell, info.cooldown);
+			}
+		}
+	}
+	
+	/**
+	 * A combination of both runCheck and isOnCooldown.
+	 * @param player
+	 * @return
+	 */
+	public boolean canCast(Player player) {
+		if (runCheck(player) && !isOnCooldown(player)) {
+			putOnCooldown(player);
+			return true;
+		}
+		return false;
+	}
 
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
@@ -62,6 +97,8 @@ public class Ability {
 
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { return true; }
 
+	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) { return true; }
+	
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean canUse(Player player, PlayerInfo info) {
@@ -69,8 +106,12 @@ public class Ability {
 		if (info != null) {
 			AbilityInfo aInfo = ability.getInfo();
 			if (aInfo != null) {
-				if (info.classId == aInfo.classId && info.specId == aInfo.specId)
-					return true;
+				if (info.classId == aInfo.classId) { 
+					if (aInfo.specId < 0)
+						return true;
+					else if (aInfo.specId == info.classId)
+						return true;
+				}
 			}
 		}
 		return false;
@@ -87,6 +128,8 @@ public class Ability {
 
 	/**
 	 * Utilizes reflection to grab all ability classes and put them in a list.
+	 * If you wish to change this because it's too complex or not preferred, feel free to do so.
+	 * This is just how I like it.
 	 * @author Someone else
 	 * @throws URISyntaxException
 	 */
@@ -128,4 +171,14 @@ public class Ability {
 	}
 
 	public static List<Ability> getAbilities() { return abilities; }
+	
+	public Ability getInstance() {
+		try {
+			return getClass().newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
