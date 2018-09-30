@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Random;
 
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,6 +33,7 @@ public class BerserkerSpecialization extends BaseSpecialization {
 	private static final double METEOR_SLAM_2_DAMAGE = 3;
 	private static final double METEOR_SLAM_1_RADIUS = 3.0;
 	private static final double METEOR_SLAM_2_RADIUS = 5.0;
+	private static final double METEOR_SLAM_ANGLE = 70;
 	private static final int METEOR_SLAM_1_EFFECT_LVL = 2;
 	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
 	private static final int METEOR_SLAM_DURATION = 2 * 20;
@@ -46,6 +48,14 @@ public class BerserkerSpecialization extends BaseSpecialization {
 	private static final int RECKLESS_SWING_COOLDOWN = 12 * 20;
 	private static final float RECKLESS_SWING_KNOCKBACK_SPEED = 0.3f;
 
+	private static final double PSYCHOSIS_TRIGGER_HEALTH_PERCENT = 0.5;
+	private static final double PSYCHOSIS_TRIGGER_HEALTH = 6;
+	private static final double PSYCHOSIS_1_KNOCKBACK_RESISTANCE = 0.15;
+	private static final double PSYCHOSIS_2_KNOCKBACK_RESISTANCE = 0.25;
+	private static final double PSYCHOSIS_1_DAMAGE = 2;
+	private static final double PSYCHOSIS_2_DAMAGE = 4;
+	private static final double PSYCHOSIS_ARMOR = 3;
+	private static final double PSYCHOSIS_ATTACK_SPEED = 0.2;
 
 
 	private World mWorld;
@@ -57,6 +67,9 @@ public class BerserkerSpecialization extends BaseSpecialization {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+		double extraDamage = 0;
+		LivingEntity damagee = (LivingEntity) event.getEntity();
+		
 		if (player.getFallDistance() >= 1) {
 			int fall = Math.round(player.getFallDistance());
 			int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
@@ -70,13 +83,12 @@ public class BerserkerSpecialization extends BaseSpecialization {
 				ItemStack item = player.getInventory().getItemInMainHand();
 				if (InventoryUtils.isAxeItem(item) || InventoryUtils.isSwordItem(item)) {
 					player.setFallDistance(0);
-					LivingEntity entity = (LivingEntity) event.getEntity();
-					Location loc = entity.getLocation();
+					Location loc = damagee.getLocation();
 					double radius = meteorSlam == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
 					double dmgMult = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE : METEOR_SLAM_2_DAMAGE;
-
+					extraDamage += fall * dmgMult;
 					for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
-						if (EntityUtils.isHostileMob(e)) {
+						if (EntityUtils.isHostileMob(e) && e != damagee) {
 							LivingEntity le = (LivingEntity) e;
 							EntityUtils.damageEntity(mPlugin, le, fall * dmgMult, player);
 						}
@@ -85,13 +97,26 @@ public class BerserkerSpecialization extends BaseSpecialization {
 					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
 					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
 					mWorld.spawnParticle(Particle.FLAME, loc, 175, 0F, 0F, 0F, 0.175F);
-					//mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0F, 0F, 0F, 0.3F);
 					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0F, 0F, 0F, 0.3F);
 					mWorld.spawnParticle(Particle.LAVA, loc, 100, radius, 0.25f, radius, 0);
 
 				}
 			}
 		}
+		
+		if (player.getHealth() <= PSYCHOSIS_TRIGGER_HEALTH_PERCENT * player.getMaxHealth()) {
+			int psychosis = ScoreboardUtils.getScoreboardValue(player, "Psychosis");
+			/* Psychosis: While below 50% health, gain +2/+4 Attack Damage
+			 */
+			if (psychosis > 0) {
+				extraDamage += psychosis == 1 ? PSYCHOSIS_1_DAMAGE : PSYCHOSIS_2_DAMAGE;
+			}
+		}
+		
+		if (extraDamage > 0) {
+			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
+		}
+		
 		return true;
 	}
 
@@ -132,7 +157,18 @@ public class BerserkerSpecialization extends BaseSpecialization {
 
 	@Override
 	public boolean PlayerExtendedSneakEvent(Player player) {
-
+		int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
+		/* Meteor Slam: Holding shift and looking directly down for 2s 
+		 * grants you 2s of Jump Boost 3/5. (cooldown 7/5s)
+		 */
+		if(meteorSlam > 0 && player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.METEOR_SLAM)) {
+				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
+				int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
+				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
+				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.METEOR_SLAM, cooldown);
+			}
+		}
 		return true;
 	}
 }

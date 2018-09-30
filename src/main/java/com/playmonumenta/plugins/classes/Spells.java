@@ -113,6 +113,7 @@ public enum Spells {
 
 	//--Berserker
 	RECKLESS_SWING("Reckless Swing", false, Classes.WARRIOR),
+	METEOR_SLAM("Meteor Slam", false, Classes.WARRIOR),
 
 	//Alchemist
 	POWER_INJECTION("Power Injection", false, Classes.ALCHEMIST),

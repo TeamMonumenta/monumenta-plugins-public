@@ -16,8 +16,8 @@ public class PlayerInfo {
 	private final Player player;
 
 	public AbilityCollection abilities = null;
-	public Classes clazz = Classes.NONE;
-	public ClassSpecialization spec = ClassSpecialization.NONE;
+	public int classId = 0;
+	public int specId = 0;
 
 	public PlayerInfo(Player player) {
 		this.player = player;

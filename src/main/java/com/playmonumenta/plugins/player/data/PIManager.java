@@ -42,16 +42,13 @@ public class PIManager {
 		}
 
 		if (pInfo != null) {
-			int classId = ScoreboardUtils.getScoreboardValue(player, "Class");
-			pInfo.clazz = Classes.getClassById(classId);
-
-			int specId = ScoreboardUtils.getScoreboardValue(player, "Specialization");
-			pInfo.spec = ClassSpecialization.getSpecById(specId);
+			pInfo.classId = ScoreboardUtils.getScoreboardValue(player, "Class");;
+			pInfo.specId = ScoreboardUtils.getScoreboardValue(player, "Specialization");
 
 			/*
 			 * Checks if the player currently has an ability collection.
 			 * If not, get all abilities and check their scores.
-			 * Add abilities depending on scores
+			 * Add abilities depending on scores and class & spec ids.
 			 */
 			AbilityCollection collection;
 			if (pInfo.abilities == null) {

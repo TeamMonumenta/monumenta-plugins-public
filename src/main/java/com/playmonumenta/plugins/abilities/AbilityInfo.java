@@ -20,8 +20,8 @@ public class AbilityInfo {
 	public Spells linkedSpell = null;
 	public AbilityTrigger trigger = null;
 	public int cooldown = 0;
-	public Classes clazz = Classes.NONE;
-	public ClassSpecialization spec = ClassSpecialization.NONE;
+	public int classId = 0;
+	public int specId = 0;
 
 	public AbilityInfo(Ability ability) {
 		this.ability = ability;

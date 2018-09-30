@@ -69,7 +69,7 @@ public class Ability {
 		if (info != null) {
 			AbilityInfo aInfo = ability.getInfo();
 			if (aInfo != null) {
-				if (info.clazz == aInfo.clazz && info.spec == aInfo.spec)
+				if (info.classId == aInfo.classId && info.specId == aInfo.specId)
 					return true;
 			}
 		}
