@@ -198,6 +198,20 @@ public class EntityListener implements Listener {
 						damager.remove();
 						event.setCancelled(true);
 					}
+					
+					boolean cancelled = false;
+					PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+					for (Ability abil : pInf.abilities.getAbilities()) {
+						if (abil.canCast(player)) {
+							if (!abil.PlayerDamagedByProjectileEvent(player, event)) {
+								if (!cancelled) {
+									cancelled = true;
+									damager.remove();
+									event.setCancelled(true);
+								}
+							}
+						}
+					}
 
 					if (proj.getShooter() instanceof LivingEntity) {
 						LivingEntity shooter = (LivingEntity) proj.getShooter();

@@ -11,6 +11,7 @@ import java.util.jar.JarFile;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -25,6 +26,8 @@ public class Ability {
 	protected World mWorld;
 	protected Plugin mPlugin;
 	protected Random mRandom;
+	
+	public Player player = null;
 
 	public Ability() { }
 
@@ -98,6 +101,8 @@ public class Ability {
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { return true; }
 
 	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) { return true; }
+	
+	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) { return true; }
 	
 	//---------------------------------------------------------------------------------------------------------------
 

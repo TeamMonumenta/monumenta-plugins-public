@@ -28,11 +28,16 @@ public class AbilityCollection {
 	 * @param abil The ability that will be removed, if it exists
 	 */
 	public void removeAbility(Ability abil) {
-		if (abilities.contains(abil))
+		if (abilities.contains(abil)) {
+			abil.player = null;
 			abilities.remove(abil);
+		}
 	}
 
-	public void addAbility(Ability abil) { abilities.add(abil); }
+	public void addAbility(Ability abil) { 
+		abil.player = player;
+		abilities.add(abil); 
+	}
 
 	public Ability getAbility(String scoreboardId) {
 		for (Ability abil : abilities) {
