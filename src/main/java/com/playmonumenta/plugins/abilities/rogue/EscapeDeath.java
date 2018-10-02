@@ -32,12 +32,13 @@ public class EscapeDeath extends Ability {
 	private static final int ESCAPE_DEATH_SLOWNESS_EFFECT_LVL = 4;
 	private static final int ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL = 2;
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
-	
+
 	/*
 	 * Should we also make this escape death from general mob damage? (Includes projectile, mob spells, mob melee)
+	 * TODO: Yes, probably want a generic player damage event instead
 	 */
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		int escapeDeath = getAbilityScore(player);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), ESCAPE_DEATH_RANGE)) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
@@ -74,26 +75,26 @@ public class EscapeDeath extends Ability {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
 
 		MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
-		return true; 
+		return true;
 	}
-	
+
 	@Override
-	public AbilityInfo getInfo() { 
+	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
 		info.classId = 4;
 		info.specId = -1;
 		info.linkedSpell = Spells.ESCAPE_DEATH;
 		info.scoreboardId = "EscapeDeath";
 		info.cooldown = ESCAPE_DEATH_COOLDOWN;
-		return info; 
+		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		EntityDamageEvent lastDamage = player.getLastDamageCause();
 		if (lastDamage.getCause() == DamageCause.ENTITY_ATTACK) {
 			double correctHealth = player.getHealth() - lastDamage.getFinalDamage();
-			if (correctHealth > 0 && correctHealth < ESCAPE_DEATH_HEALTH_TRIGGER)
+			if (!player.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER)
 				return true;
 		}
 		return false;
