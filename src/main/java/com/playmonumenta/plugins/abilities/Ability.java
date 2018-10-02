@@ -1,23 +1,27 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.playmonumenta.plugins.player.data.PlayerInfo;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.io.File;
+
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.List;
+import java.util.Random;
 
-import org.bukkit.World;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.World;
 
 public class Ability {
 
@@ -26,7 +30,7 @@ public class Ability {
 	protected World mWorld;
 	protected Plugin mPlugin;
 	protected Random mRandom;
-	
+
 	public Player player = null;
 
 	public Ability() { }
@@ -58,7 +62,7 @@ public class Ability {
 	 * @return true or false
 	 */
 	public boolean runCheck(Player player) { return true; }
-	
+
 	public boolean isOnCooldown(Player player) {
 		if (getInfo() != null) {
 			AbilityInfo info = getInfo();
@@ -69,7 +73,7 @@ public class Ability {
 		}
 		return false;
 	}
-	
+
 	public void putOnCooldown(Player player) {
 		if (getInfo() != null) {
 			AbilityInfo info = getInfo();
@@ -79,7 +83,7 @@ public class Ability {
 			}
 		}
 	}
-	
+
 	/**
 	 * A combination of both runCheck and isOnCooldown.
 	 * @param player
@@ -101,9 +105,13 @@ public class Ability {
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { return true; }
 
 	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) { return true; }
-	
+
 	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) { return true; }
-	
+
+	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) { return true; }
+
+	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) { return true; }
+
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean canUse(Player player, PlayerInfo info) {
@@ -111,7 +119,7 @@ public class Ability {
 		if (info != null) {
 			AbilityInfo aInfo = ability.getInfo();
 			if (aInfo != null) {
-				if (info.classId == aInfo.classId) { 
+				if (info.classId == aInfo.classId) {
 					if (aInfo.specId < 0)
 						return true;
 					else if (aInfo.specId == info.classId)
@@ -176,7 +184,7 @@ public class Ability {
 	}
 
 	public static List<Ability> getAbilities() { return abilities; }
-	
+
 	public Ability getInstance() {
 		try {
 			return getClass().newInstance();

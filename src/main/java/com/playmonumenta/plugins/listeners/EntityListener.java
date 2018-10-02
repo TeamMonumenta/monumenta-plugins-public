@@ -198,7 +198,7 @@ public class EntityListener implements Listener {
 						damager.remove();
 						event.setCancelled(true);
 					}
-					
+
 					boolean cancelled = false;
 					PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
 					for (Ability abil : pInf.abilities.getAbilities()) {
@@ -251,7 +251,7 @@ public class EntityListener implements Listener {
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
 
 						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
-						
+
 						PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
 						for (Ability abil : pInf.abilities.getAbilities()) {
 							if (abil.canCast(player))
@@ -274,6 +274,20 @@ public class EntityListener implements Listener {
 					_class.ModifyDamage(player, _class, event);
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
+
+					boolean cancelled = false;
+					PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+					for (Ability abil : pInf.abilities.getAbilities()) {
+						if (abil.canCast(player)) {
+							if (!abil.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+								if (!cancelled) {
+									cancelled = true;
+									damager.remove();
+									event.setCancelled(true);
+								}
+							}
+						}
+					}
 
 					double damage = mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, arrow, event);
 					event.setDamage(Math.max(damage, 0));
@@ -456,6 +470,21 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				}
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
+
+				boolean cancelled = false;
+				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+				for (Ability abil : pInf.abilities.getAbilities()) {
+					if (abil.canCast(player)) {
+						if (!abil.PlayerShotArrowEvent(player, arrow)) {
+							if (!cancelled) {
+								cancelled = true;
+								arrow.remove();
+								event.setCancelled(true);
+							}
+						}
+					}
+				}
+
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
 			}
 		} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
