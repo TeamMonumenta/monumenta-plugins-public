@@ -12,6 +12,7 @@ public enum Spells {
 	PRISMATIC_SHIELD("Prismatic Shield", false, Classes.MAGE),
 	MAGMA_SHIELD("Magma Shield", false, Classes.MAGE),
 	ARCANE_STRIKE("Arcane Strike", false, Classes.MAGE),
+	ELEMENTAL_ARROWS("Elemental Arrows", false, Classes.MAGE),
 
 	//--Pyromancer Spec
 	INFERNO("Inferno", false, Classes.MAGE),
