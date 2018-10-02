@@ -4,8 +4,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.ClericClass;
-import com.playmonumenta.plugins.classes.MageClass;
-import com.playmonumenta.plugins.classes.RogueClass;
 import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
@@ -158,10 +156,10 @@ public class Plugin extends JavaPlugin {
 		//  TODO: Move this out of here and into it's own ClassManager class.
 		//  Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.MAGE.getValue(), new MageClass(this, mRandom, mWorld));
+		mClassMap.put(Classes.MAGE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom, mWorld));
 		mClassMap.put(Classes.CLERIC.getValue(), new ClericClass(this, mRandom));
-		mClassMap.put(Classes.ROGUE.getValue(), new RogueClass(this, mRandom, mWorld));
+		mClassMap.put(Classes.ROGUE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom, mWorld));
 		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
 		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
