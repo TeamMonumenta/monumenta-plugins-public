@@ -25,7 +25,7 @@ public class MagePassive extends Ability {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			if (InventoryUtils.isWandItem(mainHand)) {
 				if (damagee instanceof LivingEntity) {
-					EntityUtils.damageEntity(mPlugin, (LivingEntity)damagee, PASSIVE_DAMAGE, player);
+					event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
 				}
 			}
 			Bukkit.broadcastMessage("DEBUG: mage passive success.");

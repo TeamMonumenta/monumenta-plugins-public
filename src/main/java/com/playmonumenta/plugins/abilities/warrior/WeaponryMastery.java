@@ -14,19 +14,19 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class WeaponryMastery extends Ability {
-	
+
 	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
 	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
 	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
-	
+
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		int weaponMastery = getAbilityScore(player);
 		// The extra damage that will be applied to the hit damagee at the end of this function
 		double extraDamage = 0;
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		LivingEntity damagee = (LivingEntity) event.getEntity();
-		
+
 		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
 			extraDamage += (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
 		} else if (InventoryUtils.isSwordItem(mainHand) && weaponMastery >= 2) {
@@ -34,12 +34,12 @@ public class WeaponryMastery extends Ability {
 		}
 
 		if (extraDamage > 0)
-			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
-		return true; 
+			event.setDamage(event.getDamage() + extraDamage);
+		return true;
 	}
-	
+
 	@Override
-	public void setupClassPotionEffects(Player player) { 
+	public void setupClassPotionEffects(Player player) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
@@ -47,7 +47,7 @@ public class WeaponryMastery extends Ability {
 		if (InventoryUtils.isSwordItem(mainHand))
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 	}
-	
+
 	@Override
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
@@ -56,7 +56,7 @@ public class WeaponryMastery extends Ability {
 		if (InventoryUtils.isSwordItem(mainHand))
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -65,5 +65,5 @@ public class WeaponryMastery extends Ability {
 		info.scoreboardId = "WeaponMastery";
 		return info;
 	}
-	
+
 }

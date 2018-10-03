@@ -21,22 +21,19 @@ public class BruteForce extends Ability {
 	private static final Integer BRUTE_FORCE_1_DAMAGE = 2;
 	private static final Integer BRUTE_FORCE_2_DAMAGE = 4;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
-	
+
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		int bruteForce = getAbilityScore(player);
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		DamageCause cause = event.getCause();
 		LivingEntity damagee = (LivingEntity) event.getEntity();
 
-		// The extra damage that will be applied to the hit damagee at the end of this function
-		double extraDamage = 0;
-
 		if (bruteForce > 0 && PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE &&
 		    (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand))) {
 
 			double bruteForceDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
-			extraDamage += bruteForceDamage;
+			event.setDamage(event.getDamage() + bruteForceDamage);
 
 			Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 			mWorld.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
@@ -54,9 +51,7 @@ public class BruteForce extends Ability {
 			MovementUtils.KnockAway(player, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
 		}
 
-		if (extraDamage > 0)
-			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
-		return true; 
+		return true;
 	}
 	@Override
 	public AbilityInfo getInfo() {
@@ -66,5 +61,5 @@ public class BruteForce extends Ability {
 		info.scoreboardId = "BruteForce";
 		return info;
 	}
-	
+
 }
