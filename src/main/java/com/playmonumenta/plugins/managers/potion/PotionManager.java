@@ -12,9 +12,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.player.data.PIManager;
+import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
@@ -148,7 +150,10 @@ public class PotionManager {
 		//  Next we want to get this players class and call into an initialization function to make sure they have the correct potion
 		//  effect types applied.
 		mPlugin.getClass(player).setupClassPotionEffects(player);
-
+		PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+		for (Ability abil : pInf.abilities.getAbilities()) {
+			abil.setupClassPotionEffects(player);
+		}
 		//  Once all the potion stuff is setup apply the best effects.
 		applyBestPotionEffect(player);
 	}

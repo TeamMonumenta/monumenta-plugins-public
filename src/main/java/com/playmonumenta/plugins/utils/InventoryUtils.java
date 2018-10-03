@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.player.data.PIManager;
+import com.playmonumenta.plugins.player.data.PlayerInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +43,11 @@ public class InventoryUtils {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				plugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+				for (Ability abil : pInf.abilities.getAbilities()) {
+					if (abil.canCast(player))
+						abil.PlayerItemHeldEvent(player, mainHand, offHand);
+				}
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 			}
 		}, 0);

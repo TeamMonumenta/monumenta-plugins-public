@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.World;
 
 public class Ability {
@@ -112,6 +113,17 @@ public class Ability {
 
 	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) { return true; }
 
+	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) { }
+
+	public void PlayerRespawnEvent(Player player) { }
+	
+	//---------------------------------------------------------------------------------------------------------------
+	
+	//Other
+	//---------------------------------------------------------------------------------------------------------------
+	
+	public void setupClassPotionEffects(Player player) { }
+	
 	//---------------------------------------------------------------------------------------------------------------
 
 	public boolean canUse(Player player, PlayerInfo info) {

@@ -369,6 +369,11 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+			PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+			for (Ability abil : pInf.abilities.getAbilities()) {
+				if (abil.canCast(player))
+					abil.PlayerItemHeldEvent(player, mainHand, offHand);
+			}
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 		}
 	}
@@ -440,6 +445,11 @@ public class PlayerListener implements Listener {
 				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
+				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
+				for (Ability abil : pInf.abilities.getAbilities()) {
+					if (abil.canCast(player))
+						abil.PlayerRespawnEvent(player);
+				}
 			}
 		}, 0);
 	}
