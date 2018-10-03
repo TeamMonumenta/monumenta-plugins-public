@@ -15,7 +15,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-		          boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 4), true);
+		          boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 1.5f);
 		      },
 		      // Warning particles
