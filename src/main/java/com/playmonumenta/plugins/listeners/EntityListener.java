@@ -54,12 +54,12 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.player.data.PIManager;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -200,8 +200,8 @@ public class EntityListener implements Listener {
 					}
 
 					boolean cancelled = false;
-					PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-					for (Ability abil : pInf.abilities.getAbilities()) {
+					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+					for (Ability abil : aColl.getAbilities()) {
 						if (abil.canCast(player)) {
 							if (!abil.PlayerDamagedByProjectileEvent(player, event)) {
 								if (!cancelled) {
@@ -252,8 +252,8 @@ public class EntityListener implements Listener {
 
 						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
 
-						PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-						for (Ability abil : pInf.abilities.getAbilities()) {
+						AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+						for (Ability abil : aColl.getAbilities()) {
 							if (abil.canCast(player))
 								abil.LivingEntityDamagedByPlayerEvent(player, event);
 						}
@@ -276,8 +276,8 @@ public class EntityListener implements Listener {
 					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 
 					boolean cancelled = false;
-					PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-					for (Ability abil : pInf.abilities.getAbilities()) {
+					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+					for (Ability abil : aColl.getAbilities()) {
 						if (abil.canCast(player)) {
 							if (!abil.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 								if (!cancelled) {
@@ -472,8 +472,8 @@ public class EntityListener implements Listener {
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
 
 				boolean cancelled = false;
-				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-				for (Ability abil : pInf.abilities.getAbilities()) {
+				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+				for (Ability abil : aColl.getAbilities()) {
 					if (abil.canCast(player)) {
 						if (!abil.PlayerShotArrowEvent(player, arrow)) {
 							if (!cancelled) {

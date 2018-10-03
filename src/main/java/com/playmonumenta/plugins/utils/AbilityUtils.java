@@ -12,17 +12,16 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.player.data.PIManager;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 
 public class AbilityUtils {
 
 	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
-	
+
 	public static void rogueDamageMob(Plugin mPlugin, Player player, LivingEntity damagee, double damage) {
 		double correctDamage = damage;
 		if (EntityUtils.isElite(damagee)) {
@@ -32,7 +31,7 @@ public class AbilityUtils {
 		}
 		EntityUtils.damageEntity(mPlugin, damagee, correctDamage, player);
 	}
-	
+
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
 	private static final int SPELL_SHOCK_SPELL_DAMAGE = 3;
 	private static final int SPELL_SHOCK_REGEN_DURATION = 51;
@@ -42,10 +41,9 @@ public class AbilityUtils {
 	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
-	
+
 	public static void mageSpellshock(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type) {
-		PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-		AbilityCollection aColl = pInf.abilities;
+		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 		boolean shocked = false;
 		if (aColl.getAbility("SpellShock") != null) {
 			Spellshock ss = (Spellshock) aColl.getAbility("SpellShock");
@@ -88,15 +86,15 @@ public class AbilityUtils {
 				dmg += SPELL_SHOCK_SPELL_DAMAGE;
 			}
 		}
-		
+
 		// Apply damage to the hit mob all in one shot
 		if (dmg > 0) {
 			EntityUtils.damageEntity(plugin, mob, dmg, player, type);
 		}
-		
+
 		if (shocked)
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 	}
-	
+
 }

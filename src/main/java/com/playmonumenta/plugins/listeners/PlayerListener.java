@@ -74,12 +74,12 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.player.data.PIManager;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -162,9 +162,10 @@ public class PlayerListener implements Listener {
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
 		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
-		
-		PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-		for (Ability abil : pInf.abilities.getAbilities()) {
+
+
+		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+		for (Ability abil : aColl.getAbilities()) {
 			AbilityInfo info = abil.getInfo();
 			if (info.trigger != null) {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
@@ -369,8 +370,8 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
-			PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-			for (Ability abil : pInf.abilities.getAbilities()) {
+			AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+			for (Ability abil : aColl.getAbilities()) {
 				if (abil.canCast(player))
 					abil.PlayerItemHeldEvent(player, mainHand, offHand);
 			}
@@ -445,8 +446,8 @@ public class PlayerListener implements Listener {
 				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
-				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-				for (Ability abil : pInf.abilities.getAbilities()) {
+				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+				for (Ability abil : aColl.getAbilities()) {
 					if (abil.canCast(player))
 						abil.PlayerRespawnEvent(player);
 				}

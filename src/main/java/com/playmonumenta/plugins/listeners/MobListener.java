@@ -26,9 +26,9 @@ import org.bukkit.metadata.MetadataValue;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.AlchemistClass;
-import com.playmonumenta.plugins.player.data.PIManager;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
@@ -167,9 +167,9 @@ public class MobListener implements Listener {
 				                                          entity.getLastDamageCause().getCause(),
 				                                          shouldGenDrops);
 				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
-				
-				PlayerInfo pInf = PIManager.getManager().getPlayerInfo(player);
-				for (Ability abil : pInf.abilities.getAbilities()) {
+
+				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
+				for (Ability abil : aColl.getAbilities()) {
 					if (abil.canCast(player))
 						abil.EntityDeathEvent(player, event, shouldGenDrops);
 				}

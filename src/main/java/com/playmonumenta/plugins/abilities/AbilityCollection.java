@@ -6,20 +6,21 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AbilityCollection {
 
-	private List<Ability> abilities;
-	private Player player;
+	private List<Ability> mAbilities;
+	private Player mPlayer;
 
 	public AbilityCollection(Player player) {
-		abilities = new ArrayList<Ability>();
-		this.player = player;
+		mAbilities = new ArrayList<Ability>();
+		mPlayer = player;
 	}
 
-	public List<Ability> getAbilities() { return abilities; }
+	public List<Ability> getAbilities() {
+		return mAbilities;
+	}
 
 	/**
 	 * Removes the ability that is specified in the parameters.
@@ -28,19 +29,19 @@ public class AbilityCollection {
 	 * @param abil The ability that will be removed, if it exists
 	 */
 	public void removeAbility(Ability abil) {
-		if (abilities.contains(abil)) {
+		if (mAbilities.contains(abil)) {
 			abil.player = null;
-			abilities.remove(abil);
+			mAbilities.remove(abil);
 		}
 	}
 
-	public void addAbility(Ability abil) { 
-		abil.player = player;
-		abilities.add(abil); 
+	public void addAbility(Ability abil) {
+		abil.player = mPlayer;
+		mAbilities.add(abil);
 	}
 
 	public Ability getAbility(String scoreboardId) {
-		for (Ability abil : abilities) {
+		for (Ability abil : mAbilities) {
 			if (abil.getInfo() != null) {
 				AbilityInfo info = abil.getInfo();
 				if (info.scoreboardId != null) {
@@ -54,7 +55,7 @@ public class AbilityCollection {
 	}
 
 	public Ability getAbility(Spells spell) {
-		for (Ability abil : abilities) {
+		for (Ability abil : mAbilities) {
 			if (abil.getInfo() != null) {
 				AbilityInfo info = abil.getInfo();
 				if (info.linkedSpell != null) {
@@ -69,23 +70,23 @@ public class AbilityCollection {
 
 	/**
 	 * Refreshes the player's ability collection.
-	 * @param pInfo The PlayerInfo object of a player
 	 */
-	public void refreshAbilities(PlayerInfo pInfo) {
-		abilities.clear();
+	public void refreshAbilities() {
+		mAbilities.clear();
 		for (Ability abil : Ability.getAbilities()) {
 			if (abil.getInfo() != null) {
 				AbilityInfo info = abil.getInfo();
-				if (abil.canUse(player, pInfo)) {
+				if (abil.canUse(mPlayer)) {
 					if (info.scoreboardId != null) {
-						int score = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId);
-						if (score > 0)
+						int score = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
+						if (score > 0) {
 							addAbility(abil.getInstance());
-					} else
+						}
+					} else {
 						addAbility(abil.getInstance());
+					}
 				}
 			}
 		}
 	}
-
 }

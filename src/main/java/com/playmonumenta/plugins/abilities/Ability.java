@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.playmonumenta.plugins.player.data.PlayerInfo;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -116,27 +115,23 @@ public class Ability {
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) { }
 
 	public void PlayerRespawnEvent(Player player) { }
-	
-	//---------------------------------------------------------------------------------------------------------------
-	
-	//Other
-	//---------------------------------------------------------------------------------------------------------------
-	
-	public void setupClassPotionEffects(Player player) { }
-	
+
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean canUse(Player player, PlayerInfo info) {
-		Ability ability = this;
-		if (info != null) {
-			AbilityInfo aInfo = ability.getInfo();
-			if (aInfo != null) {
-				if (info.classId == aInfo.classId) {
-					if (aInfo.specId < 0)
-						return true;
-					else if (aInfo.specId == info.classId)
-						return true;
-				}
+	//Other
+	//---------------------------------------------------------------------------------------------------------------
+
+	public void setupClassPotionEffects(Player player) { }
+
+	//---------------------------------------------------------------------------------------------------------------
+	public boolean canUse(Player player) {
+		AbilityInfo aInfo = getInfo();
+		if (aInfo != null) {
+			if (aInfo.classId == ScoreboardUtils.getScoreboardValue(player, "Class")) {
+				if (aInfo.specId < 0)
+					return true;
+				else if (aInfo.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization"))
+					return true;
 			}
 		}
 		return false;
