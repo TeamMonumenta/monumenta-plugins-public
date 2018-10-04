@@ -170,14 +170,18 @@ public class PlayerListener implements Listener {
 			if (info.trigger != null) {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-						if (abil.canCast(player))
-							abil.cast(player);
+						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
+							if (abil.cast(player))
+								abil.putOnCooldown(player);
+						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
 					if (event.getAction() == Action.RIGHT_CLICK_AIR
 							|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && block.getType().isInteractable())) {
-						if (abil.canCast(player))
-							abil.cast(player);
+						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
+							if (abil.cast(player))
+								abil.putOnCooldown(player);
+						}
 					}
 				}
 			}
