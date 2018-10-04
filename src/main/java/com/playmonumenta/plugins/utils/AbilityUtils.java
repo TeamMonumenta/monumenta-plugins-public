@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
@@ -95,6 +96,18 @@ public class AbilityUtils {
 		if (shocked)
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+	}
+	
+	private static final int BOW_MASTER_1_DAMAGE = 3;
+	private static final int BOW_MASTER_2_DAMAGE = 6;
+	
+	public static int getBowMasteryDamage(Player player) {
+		int bowMastery = new BowMastery().getAbilityScore(player);
+		if (bowMastery > 0) {
+			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+			return bonusDamage;
+		}
+		return 0;
 	}
 
 }
