@@ -1,13 +1,9 @@
-main: com.playmonumenta.bossfights.Plugin
 name: Monumenta_Bossfights
-version: 1.0
+main: com.playmonumenta.bossfights.Plugin
+depend: [CommandAPI]
+version: dev
 api-version: 1.13
 commands:
-  bossfight:
-    description: bossfight
-    usage: "usage: /bossfight <boss_name> <x> <y> <z>"
-    permission: BossFight.bossfight
-    permission-message: You don't have the permission to use this command.
   mobspell:
     description: Used to launch spells
     usage: "usage: /mobspell <spell> [arguments]"

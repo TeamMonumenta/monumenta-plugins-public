@@ -27,7 +27,7 @@ import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 
-public class BossManager implements Listener, CommandExecutor {
+public class BossManager implements Listener {
 	Plugin mPlugin;
 	Map<UUID, Boss> mBosses;
 
@@ -114,48 +114,23 @@ public class BossManager implements Listener, CommandExecutor {
 		}
 	}
 
-	@Override
-	public boolean onCommand(CommandSender send, Command command, String label, String[] args) {
-		if (args.length != 4) {
-			send.sendMessage(ChatColor.RED + "This command requires exactly four arguments!");
-			return false;
-		}
-
-		Location endLoc;
-		Entity targetEntity;
-
-		try {
-			targetEntity = Utils.calleeEntity(send);
-			endLoc = Utils.getLocation(targetEntity.getLocation(), args[1], args[2], args[3]);
-		} catch (ArgumentException ex) {
-			send.sendMessage(ChatColor.RED + ex.getMessage());
-			return false;
-		}
-
-		if (!(targetEntity instanceof LivingEntity)) {
-			send.sendMessage(ChatColor.RED + "Target entity is not a LivingEntity!");
-			return false;
-		}
-
-		BossAbilityGroup ability = null;
-		String requestedTag = args[0];
-
+	public void createBoss(LivingEntity targetEntity, String requestedTag) {
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
-			ability = stateless.construct(mPlugin, (LivingEntity)targetEntity);
+			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
+		}
+	}
+
+	public void createBoss(LivingEntity targetEntity, String requestedTag, Location endLoc) {
+		StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
+		if (stateful != null) {
+			createBossInternal(targetEntity, stateful.construct(mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
 		} else {
-			StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
-			if (stateful != null) {
-				ability = stateful.construct(mPlugin, (LivingEntity)targetEntity, targetEntity.getLocation(), endLoc);
-			}
+			createBoss(targetEntity, requestedTag);
 		}
+	}
 
-		if (ability == null) {
-			send.sendMessage(ChatColor.RED + "Invalid boss tag!");
-			send.sendMessage(ChatColor.RED + "Valid options are: [" + String.join(",", mBossDeserializers.keySet()) + "]");
-			return false;
-		}
-
+	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) {
 		/* Set up boss health / armor / etc */
 		ability.init();
 
@@ -167,10 +142,7 @@ public class BossManager implements Listener, CommandExecutor {
 		}
 
 		mBosses.put(targetEntity.getUniqueId(), boss);
-
-		return true;
 	}
-
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntitySpawnEvent(EntitySpawnEvent event) {

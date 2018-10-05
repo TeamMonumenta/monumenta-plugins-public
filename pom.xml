@@ -19,6 +19,17 @@
 
     <repositories>
         <repository>
+            <id>repo</id>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>file://${project.baseUri}/repo</url>
+        </repository>
+        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -29,6 +40,13 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>${minecraft.server.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+		<dependency>
+            <groupId>io.github.jorelali</groupId>
+            <artifactId>commandapi</artifactId>
+            <version>1.2</version>
             <scope>provided</scope>
         </dependency>
 
