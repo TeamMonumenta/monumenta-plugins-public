@@ -16,9 +16,6 @@ commands:
   refreshClassEffects:
     permission: monumenta.command.refreshClassEffects
     description: Refreshes class effects for affected player (either sender or target of /execute)
-  transferServer:
-    permission: monumenta.command.transferServer
-    description: Transfers players with or without inventory between bungee shards.
   broadcastCommand:
     permission: monumenta.command.broadcastCommand
     description: Broadcasts a command to run on all Monumenta servers

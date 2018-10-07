@@ -32,7 +32,6 @@ public class CommandFactory {
 			createCommand(plugin, new RemoveTags(plugin));
 			createCommand(plugin, new TrackedEffect(plugin, potionManager));
 			createCommand(plugin, new TransferScores(plugin));
-			createCommand(plugin, new TransferServer(plugin, properties));
 			createCommand(plugin, new UpdateApartments(plugin));
 
 			// Streamlined command for performance
