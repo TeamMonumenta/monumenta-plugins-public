@@ -25,21 +25,12 @@ commands:
   checkEmptyInventory:
     permission: monumenta.command.checkEmptyInventory
     description: Return success if the player's inventory is empty, fails otherwise
-  debugInfo:
-    permission: monumenta.command.debugInfo
-    description: Tells the sender information about the target
-  cleareffects:
-    permission: monumenta.command.cleareffects
-    description: Clears all status effects from the player
   trackedeffect:
     permission: monumenta.command.trackedeffect
     description: Like /effect but use potion manager to track effect
   incrementDaily:
     permission: monumenta.command.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
-  removetags:
-    permission: monumenta.command.removetags
-    description: Removes all of the target entity's scoreboard tags
   testnoscore:
     permission: monumenta.command.testnoscore
     description: Succeeds if no entry exists with a particular score on a scoreboard

@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.rawcommands;
 
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,15 +9,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class HopeifyHeldItem extends GenericPlayerCommand {
-	public static void register(Plugin plugin) {
+public class HopeifyHeldItem extends GenericCommand {
+	public static void register() {
 		registerPlayerCommand("hopeifyhelditem", "monumenta.command.hopeifyhelditem",
 		                      (sender, player) -> {
-		                          run(plugin, sender, player);
+		                          run(sender, player);
 		                      });
 	}
 
-	private static void run(Plugin plugin, CommandSender sender, Player player) {
+	private static void run(CommandSender sender, Player player) {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
 			error(sender, "Player must have a King's Valley item in their main hand!");

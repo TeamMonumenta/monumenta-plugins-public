@@ -21,12 +21,9 @@ public class CommandFactory {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			createCommand(plugin, new BroadcastCommand(plugin, properties.getBroadcastCommandEnabled()));
 			createCommand(plugin, new CheckEmptyInventory(plugin));
-			createCommand(plugin, new ClearEffects(plugin, potionManager));
 			createCommand(plugin, new DeathMsg(plugin));
-			createCommand(plugin, new DebugInfo(plugin, potionManager));
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
-			createCommand(plugin, new RemoveTags(plugin));
 			createCommand(plugin, new TrackedEffect(plugin, potionManager));
 			createCommand(plugin, new TransferScores(plugin));
 			createCommand(plugin, new UpdateApartments(plugin));

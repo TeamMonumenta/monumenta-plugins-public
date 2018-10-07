@@ -8,9 +8,6 @@ import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.classes.WarriorClass;
 import com.playmonumenta.plugins.command.*;
-import com.playmonumenta.plugins.rawcommands.TransferServer;
-import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
-import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
@@ -22,6 +19,12 @@ import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.managers.ZoneManager;
+import com.playmonumenta.plugins.rawcommands.ClearEffects;
+import com.playmonumenta.plugins.rawcommands.DebugInfo;
+import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
+import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
+import com.playmonumenta.plugins.rawcommands.RemoveTags;
+import com.playmonumenta.plugins.rawcommands.TransferServer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.specializations.*;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
@@ -194,9 +197,14 @@ public class Plugin extends JavaPlugin {
 		Ability.getBadInstance().putAbilities(mWorld, this, mRandom);
 
 		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
+
+		// Register raw commands
 		TransferServer.register(this);
-		HopeifyHeldItem.register(this);
-		GildifyHeldItem.register(this);
+		HopeifyHeldItem.register();
+		GildifyHeldItem.register();
+		DebugInfo.register(mPotionManager);
+		ClearEffects.register(mPotionManager);
+		RemoveTags.register();
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {

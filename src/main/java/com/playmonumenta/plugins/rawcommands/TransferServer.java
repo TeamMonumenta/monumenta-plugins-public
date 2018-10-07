@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class TransferServer {
+public class TransferServer extends GenericCommand {
 	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		String command = "transferserver";
@@ -80,10 +80,6 @@ public class TransferServer {
 		                                                 (String)args[1], (Boolean)args[2]);
 		                                  }
 		);
-	}
-
-	private static void error(CommandSender sender, String msg) {
-		sender.sendMessage(ChatColor.RED + msg);
 	}
 
 	private static void getServerList(Plugin plugin, CommandSender sender, Player player) {
