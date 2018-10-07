@@ -24,9 +24,7 @@ public class CommandFactory {
 			createCommand(plugin, new ClearEffects(plugin, potionManager));
 			createCommand(plugin, new DeathMsg(plugin));
 			createCommand(plugin, new DebugInfo(plugin, potionManager));
-			createCommand(plugin, new GildifyHeldItem(plugin));
 			createCommand(plugin, new GiveSoulbound(plugin));
-			createCommand(plugin, new HopeifyHeldItem(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
 			createCommand(plugin, new RemoveTags(plugin));
 			createCommand(plugin, new TrackedEffect(plugin, potionManager));

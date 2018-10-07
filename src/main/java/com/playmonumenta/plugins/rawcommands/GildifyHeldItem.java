@@ -1,54 +1,41 @@
-package com.playmonumenta.plugins.command.commands;
+package com.playmonumenta.plugins.rawcommands;
+
+import com.playmonumenta.plugins.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.playmonumenta.plugins.command.AbstractPlayerCommand;
-import com.playmonumenta.plugins.command.CommandContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 
-public class GildifyHeldItem extends AbstractPlayerCommand {
-
-	public GildifyHeldItem(Plugin plugin) {
-		super(
-		    "gildifyHeldItem",
-		    "Adds the Gilded enchant and the player's name to their held item",
-		    plugin
-		);
+public class GildifyHeldItem extends GenericPlayerCommand {
+	public static void register(Plugin plugin) {
+		registerPlayerCommand("gildifyhelditem", "monumenta.command.gildifyhelditem",
+		                      (sender, player) -> {
+		                          run(plugin, sender, player);
+		                      });
 	}
 
-	@Override
-	protected void configure(ArgumentParser parser) {
-	}
-
-	@Override
-	protected boolean run(CommandContext context) {
-		//noinspection OptionalGetWithoutIsPresent - checked before being called
-		final Player player = context.getPlayer().get();
-
-		// TODO consider refactoring
-
+	private static void run(Plugin plugin, CommandSender sender, Player player) {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
-			sendErrorMessage(context, "Player must have a King's Valley item in their main hand!");
-			return false;
+			error(sender, "Player must have a King's Valley item in their main hand!");
+			return;
 		}
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
-			sendErrorMessage(context, "Player must have a King's Valley item in their main hand!");
-			return false;
+			error(sender, "Player must have a King's Valley item in their main hand!");
+			return;
 		}
 
 		List<String> lore = meta.getLore();
 		if (lore == null || lore.isEmpty()) {
-			sendErrorMessage(context, "Player must have a King's Valley item in their main hand!");
-			return false;
+			error(sender, "Player must have a King's Valley item in their main hand!");
+			return;
 		}
 
 		List<String> newLore = new ArrayList<>();
@@ -58,8 +45,8 @@ public class GildifyHeldItem extends AbstractPlayerCommand {
 		boolean duplicateItem = true;
 		for (String loreEntry : lore) {
 			if (loreEntry.contains(ChatColor.GRAY + "Gilded")) {
-				sendErrorMessage(context, "Player's item already gilded");
-				return false;
+				error(sender, "Player's item already gilded");
+				return;
 			}
 
 			if (loreEntry.contains("King's Valley")) {
@@ -93,8 +80,8 @@ public class GildifyHeldItem extends AbstractPlayerCommand {
 		}
 
 		if (!kingsValleyFound) {
-			sendErrorMessage(context, "Player must have a King's Valley item in their main hand!");
-			return false;
+			error(sender, "Player must have a King's Valley item in their main hand!");
+			return;
 		}
 
 		ItemStack dupe = null;
@@ -112,8 +99,6 @@ public class GildifyHeldItem extends AbstractPlayerCommand {
 			player.getInventory().addItem(dupe);
 		}
 
-		sendMessage(context, "Succesfully added Gilded to player's held item");
-
-		return true;
+		sender.sendMessage("Succesfully added Gilded to player's held item");
 	}
 }
