@@ -43,9 +43,6 @@ commands:
   incrementDaily:
     permission: monumenta.command.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.
-  minusexp:
-    permission: monumenta.command.minusexp
-    description: Subtracts an equivalent amount of levels worth of experience
   removetags:
     permission: monumenta.command.removetags
     description: Removes all of the target entity's scoreboard tags

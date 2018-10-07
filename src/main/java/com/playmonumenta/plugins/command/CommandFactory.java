@@ -28,7 +28,6 @@ public class CommandFactory {
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new HopeifyHeldItem(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
-			createCommand(plugin, new MinusExp(plugin));
 			createCommand(plugin, new RemoveTags(plugin));
 			createCommand(plugin, new TrackedEffect(plugin, potionManager));
 			createCommand(plugin, new TransferScores(plugin));
