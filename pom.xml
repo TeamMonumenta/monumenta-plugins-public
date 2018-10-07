@@ -51,13 +51,12 @@
             <version>${minecraft.server.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${minecraft.server.version}</version>
+		<dependency>
+            <groupId>io.github.jorelali</groupId>
+            <artifactId>commandapi</artifactId>
+            <version>1.2-19-g7edc7d8</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -68,7 +67,6 @@
             <artifactId>argparse4j</artifactId>
             <version>0.8.1</version>
         </dependency>
-
         <dependency>
             <groupId>fr.rhaz.sockets</groupId>
             <artifactId>socket4mc</artifactId>
