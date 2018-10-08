@@ -188,11 +188,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
 		//Register all existing Abilities
-		try {
-			new Ability().putAbilities(mWorld, this, mRandom);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		Ability.getBadInstance().putAbilities(mWorld, this, mRandom);
 
 		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
 

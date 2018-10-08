@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -56,6 +57,7 @@ public class ArcaneStrike extends Ability {
 		mWorld.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.5f, 1.5f);
 
 		PlayerUtils.callAbilityCastEvent(player, Spells.ARCANE_STRIKE);
+		putOnCooldown(player);
 		return true;
 	}
 	
@@ -74,6 +76,7 @@ public class ArcaneStrike extends Ability {
 	public boolean runCheck(Player player) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)) {
+			Bukkit.broadcastMessage("rc1");
 			if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) 
 				return true;
 		}

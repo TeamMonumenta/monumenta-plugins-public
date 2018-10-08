@@ -34,34 +34,31 @@ public class PrismaticShield extends Ability {
 	private static final int PRISMATIC_SHIELD_2_DAMAGE = 6;
 
 	/*
-	 * Should we also make this prismatic shield work from general mob damage? (Includes projectile, mob spells, mob melee)
-	 * TODO: Yes, probably want a generic player damage event instead
+	 * Should we also make this prismatic shield work from general mob damage?
+	 * (Includes projectile, mob spells, mob melee) TODO: Yes, probably want a
+	 * generic player damage event instead
 	 */
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		int prismatic = getAbilityScore(player);
-		if (prismatic > 0) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD)) {
-				int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
-				int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
-				float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
+		int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
+		int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
+		float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
-					AbilityUtils.mageSpellshock(mPlugin, mob, prisDamage, player, MagicType.ARCANE);
-					MovementUtils.KnockAway(player, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
-				}
-
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
-				mWorld.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
-				MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
-
-				PlayerUtils.callAbilityCastEvent(player, Spells.PRISMATIC_SHIELD);
-				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.PRISMATIC_SHIELD, PRISMATIC_SHIELD_COOLDOWN);
-			}
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
+			AbilityUtils.mageSpellshock(mPlugin, mob, prisDamage, player, MagicType.ARCANE);
+			MovementUtils.KnockAway(player, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 
+		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+				new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
+		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+		mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+		mWorld.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+		MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
+
+		PlayerUtils.callAbilityCastEvent(player, Spells.PRISMATIC_SHIELD);
+		putOnCooldown(player);
 		return true;
 	}
 

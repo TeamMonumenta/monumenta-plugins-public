@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 public class AdvancingShadows extends Ability {
 
 	private String owner = "none";
-	private int id = mRandom.nextInt(10);
+	private int id = new Random().nextInt(10);
 	private LivingEntity target = null;
 
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
@@ -85,6 +86,7 @@ public class AdvancingShadows extends Ability {
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
 			mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 			target = null;
+			putOnCooldown(player);
 			return true;
 		}
 		return false;

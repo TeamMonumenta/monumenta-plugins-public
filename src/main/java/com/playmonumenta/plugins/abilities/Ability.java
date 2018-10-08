@@ -1,27 +1,48 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import java.io.File;
-
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.abilities.mage.FrostNova;
+import com.playmonumenta.plugins.abilities.mage.MagePassive;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
+import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
+import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
+import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dodging;
+import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
+import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
+import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
+import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
+import com.playmonumenta.plugins.abilities.scout.Agility;
+import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.warrior.BruteForce;
+import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
+import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Frenzy;
+import com.playmonumenta.plugins.abilities.warrior.Riposte;
+import com.playmonumenta.plugins.abilities.warrior.Toughness;
+import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
+import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Ability {
 
@@ -33,13 +54,18 @@ public class Ability {
 
 	public Player player = null;
 
+	private static Ability abil = new Ability();
+	
 	public Ability() { }
 
+	public static Ability getBadInstance() { return abil; }
 
-	private void initialize(World mWorld, Plugin mPlugin, Random mRandom) {
+	public void initialize(World mWorld, Plugin mPlugin, Random mRandom) {
 		this.mWorld = mWorld;
 		this.mPlugin = mPlugin;
 		this.mRandom = mRandom;
+		System.out.println("" + (mPlugin == null) + " " + (mWorld == null) + " " + (mRandom == null));
+		System.out.println("" + (this.mPlugin == null) + " " + (this.mWorld == null) + " " + (this.mRandom == null));
 	}
 
 	/**
@@ -65,10 +91,14 @@ public class Ability {
 
 	public boolean isOnCooldown(Player player) {
 		if (getInfo() != null) {
+			Bukkit.broadcastMessage("is1");
 			AbilityInfo info = getInfo();
 			if (info.linkedSpell != null) {
-				if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell))
+				Bukkit.broadcastMessage("is2 " + (mPlugin == null) + " " + (player == null) + " " + (info == null));
+				if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell)) {
+					Bukkit.broadcastMessage("is3");
 					return true;
+				}
 			}
 		}
 		return false;
@@ -90,8 +120,9 @@ public class Ability {
 	 * @return
 	 */
 	public boolean canCast(Player player) {
+		Bukkit.broadcastMessage("c1");
 		if (runCheck(player) && !isOnCooldown(player)) {
-			putOnCooldown(player);
+			Bukkit.broadcastMessage("c2");
 			return true;
 		}
 		return false;
@@ -153,48 +184,87 @@ public class Ability {
 	 * @author Someone else
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "unchecked" })
-	public void putAbilities(World mWorld, Plugin mPlugin, Random mRandom) throws URISyntaxException {
-		File file = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-		try {
-			@SuppressWarnings("resource")
-			JarFile jar = new JarFile(file);
-
-			for (Enumeration<JarEntry> entry = jar.entries(); entry.hasMoreElements();) {
-				JarEntry e = entry.nextElement();
-				String name = e.getName().replace("/", ".");
-
-				if (name.endsWith(".class")) {
-					name = name.split(".class")[0];
-					try {
-						Class<?> c = Class.forName(name);
-						if (c.getSuperclass() != null && c.getSuperclass() == Ability.class) {
-							try {
-								Class<? extends Ability> mc = (Class<? extends Ability>) c;
-								Ability sp = mc.newInstance();
-								initialize(mWorld, mPlugin, mRandom);
-								abilities.add(sp);
-							} catch (InstantiationException ie) {
-								ie.printStackTrace();
-							} catch (IllegalAccessException ie) {
-								ie.printStackTrace();
-							}
-						}
-					} catch (ExceptionInInitializerError ie) {
-						ie.printStackTrace();
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void putAbilities(World mWorld, Plugin mPlugin, Random mRandom) {
+		
+		abilities.add(new ArcaneStrike());
+		abilities.add(new ElementalArrows());
+		abilities.add(new FrostNova());
+		abilities.add(new MagePassive());
+		abilities.add(new MagmaShield());
+		abilities.add(new ManaLance());
+		abilities.add(new PrismaticShield());
+		abilities.add(new Spellshock());
+		
+		abilities.add(new AdvancingShadows());
+		abilities.add(new ByMyBlade());
+		abilities.add(new DaggerThrow());
+		abilities.add(new Dodging());
+		abilities.add(new EscapeDeath());
+		abilities.add(new RoguePassive());
+		abilities.add(new Smokescreen());
+		abilities.add(new ViciousCombos());
+		
+		abilities.add(new Agility());
+		abilities.add(new BowMastery());
+		abilities.add(new Volley());
+		
+		abilities.add(new BruteForce());
+		abilities.add(new CounterStrike());
+		abilities.add(new DefensiveLine());
+		abilities.add(new Frenzy());
+		abilities.add(new Riposte());
+		abilities.add(new Toughness());
+		abilities.add(new WarriorPassive());
+		abilities.add(new WeaponryMastery());
+		System.out.println("" + (mPlugin == null) + " " + (mWorld == null) + " " + (mRandom == null));
+		for (Ability abil : abilities) {
+			abil.initialize(mWorld, mPlugin, mRandom);
 		}
+		
+//		File file = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+//		try {
+//			@SuppressWarnings("resource")
+//			JarFile jar = new JarFile(file);
+//
+//			for (Enumeration<JarEntry> entry = jar.entries(); entry.hasMoreElements();) {
+//				JarEntry e = entry.nextElement();
+//				String name = e.getName().replace("/", ".");
+//
+//				if (name.endsWith(".class")) {
+//					name = name.split(".class")[0];
+//					try {
+//						Class<?> c = Class.forName(name);
+//						if (c.getSuperclass() != null && c.getSuperclass() == Ability.class) {
+//							try {
+//								Class<? extends Ability> mc = (Class<? extends Ability>) c;
+//								Ability sp = mc.newInstance();
+//								initialize(mWorld, mPlugin, mRandom);
+//								abilities.add(sp);
+//							} catch (InstantiationException ie) {
+//								ie.printStackTrace();
+//							} catch (IllegalAccessException ie) {
+//								ie.printStackTrace();
+//							}
+//						}
+//					} catch (ExceptionInInitializerError ie) {
+//						ie.printStackTrace();
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public static List<Ability> getAbilities() { return abilities; }
 
 	public Ability getInstance() {
 		try {
-			return getClass().newInstance();
+			Ability newInstance = getClass().newInstance();
+			newInstance.mPlugin = this.mPlugin;
+			newInstance.mWorld = this.mWorld;
+			newInstance.mRandom = this.mRandom;
+			return newInstance;
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

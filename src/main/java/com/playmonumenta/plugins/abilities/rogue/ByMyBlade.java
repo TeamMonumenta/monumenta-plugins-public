@@ -53,6 +53,7 @@ public class ByMyBlade extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 			mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
 			mWorld.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+			putOnCooldown(player);
 		}
 		return true; 
 	}

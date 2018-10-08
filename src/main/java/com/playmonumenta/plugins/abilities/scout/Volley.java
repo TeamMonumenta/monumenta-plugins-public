@@ -104,6 +104,7 @@ public class Volley extends Ability {
 				}
 			}
 		}
+		putOnCooldown(player);
 		return true;
 	}
 	

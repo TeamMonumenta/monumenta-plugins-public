@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DefensiveLine extends Ability {
 	
@@ -37,6 +38,7 @@ public class DefensiveLine extends Ability {
 		}
 
 		ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
+		putOnCooldown(player);
 		return true;
 	}
 	
@@ -47,7 +49,7 @@ public class DefensiveLine extends Ability {
 		info.specId = -1;
 		info.linkedSpell = Spells.DEFENSIVE_LINE;
 		info.scoreboardId = "DefensiveLine";
-		int cd = getAbilityScore(player) == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
 		info.cooldown = cd;
 		info.trigger = AbilityTrigger.RIGHT_CLICK;
 		return info;

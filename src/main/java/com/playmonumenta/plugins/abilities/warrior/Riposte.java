@@ -45,7 +45,7 @@ public class Riposte extends Ability {
 				mWorld.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 				mWorld.spawnParticle(Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
 				mWorld.spawnParticle(Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
-				
+				putOnCooldown(player);
 				return false;
 			}
 		}

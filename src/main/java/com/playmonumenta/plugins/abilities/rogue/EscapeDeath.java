@@ -75,6 +75,7 @@ public class EscapeDeath extends Ability {
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
 
 		MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
+		putOnCooldown(player);
 		return true;
 	}
 

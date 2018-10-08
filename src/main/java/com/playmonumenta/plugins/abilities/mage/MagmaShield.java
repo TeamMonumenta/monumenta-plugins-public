@@ -53,6 +53,7 @@ public class MagmaShield extends Ability {
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
 
 		PlayerUtils.callAbilityCastEvent(player, Spells.MAGMA_SHIELD);
+		putOnCooldown(player);
 		return true;
 	}
 

@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Dodging extends Ability {
 
@@ -69,6 +70,7 @@ public class Dodging extends Ability {
 		// Set metadata indicating this event happened this tick
 		MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY);
 		event.setCancelled(true);
+		putOnCooldown(player);
 		return false; 
 	}
 	
@@ -79,7 +81,7 @@ public class Dodging extends Ability {
 		info.specId = -1;
 		info.linkedSpell = Spells.DODGING;
 		info.scoreboardId = "Dodging";
-		int cd = getAbilityScore(player) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		info.cooldown = cd;
 		return info; 
 	}

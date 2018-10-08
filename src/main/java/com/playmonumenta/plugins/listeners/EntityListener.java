@@ -254,8 +254,9 @@ public class EntityListener implements Listener {
 
 						AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 						for (Ability abil : aColl.getAbilities()) {
-							if (abil.canCast(player))
+							if (abil.canCast(player)) {
 								abil.LivingEntityDamagedByPlayerEvent(player, event);
+							}
 						}
 					}
 					if (damagee instanceof Player) {

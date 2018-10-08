@@ -122,7 +122,7 @@ public class PlayerListener implements Listener {
 
 					mPlugin.mTrackingManager.addEntity(player);
 					DailyReset.handle(mPlugin, player);
-
+					AbilityManager.getManager().updatePlayerAbilities(player);
 					this.cancel();
 				}
 			}
@@ -176,11 +176,13 @@ public class PlayerListener implements Listener {
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
+					Bukkit.broadcastMessage("1");
 					if (event.getAction() == Action.RIGHT_CLICK_AIR
-							|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && block.getType().isInteractable())) {
+							|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
+						Bukkit.broadcastMessage("2");
 						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
-							if (abil.cast(player))
-								abil.putOnCooldown(player);
+							Bukkit.broadcastMessage("3");
+							abil.cast(player);
 						}
 					}
 				}

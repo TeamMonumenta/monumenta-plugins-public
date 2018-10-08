@@ -44,6 +44,7 @@ public class DaggerThrow extends Ability {
 		// TODO: Upgrade this to raycast code
 		for (int a = -1; a < 2; a++) {
 			double angle = a * 0.463; //25o. Set to 0.524 for 30o or 0.349 for 20o
+			// ^ I'm sure you can just do Math.toRadians(degrees) to make it easier
 			Vector newDir = new Vector(Math.cos(angle) * dir.getX() + Math.sin(angle) * dir.getZ(), dir.getY(), Math.cos(angle) * dir.getZ() - Math.sin(angle) * dir.getX());
 			newDir.normalize();
 
@@ -81,6 +82,7 @@ public class DaggerThrow extends Ability {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
+		putOnCooldown(player);
 		return true;
 	}
 	
