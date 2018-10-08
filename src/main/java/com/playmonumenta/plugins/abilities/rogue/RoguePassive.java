@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -33,7 +32,6 @@ public class RoguePassive extends Ability {
 					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
 				}
 			}
-			Bukkit.broadcastMessage("rogue passive success.");
 		}
 		return true;
 	}

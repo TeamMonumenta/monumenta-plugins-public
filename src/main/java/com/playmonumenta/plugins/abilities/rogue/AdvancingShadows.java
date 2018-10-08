@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +43,6 @@ public class AdvancingShadows extends Ability {
 	@Override
 	public boolean cast(Player player) {
 		owner = player.getName();
-		Bukkit.broadcastMessage("ability belongs to " + owner + " with abilityid " + id);
 
 		LivingEntity entity = target;
 		if (entity != null) {

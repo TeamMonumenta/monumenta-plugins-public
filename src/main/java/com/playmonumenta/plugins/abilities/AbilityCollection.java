@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class AbilityCollection {
@@ -38,9 +37,6 @@ public class AbilityCollection {
 
 	public void addAbility(Ability abil) {
 		abil.player = mPlayer;
-//		abil.mPlugin = Plugin.getInstance();
-//		abil.mWorld = abil.mPlugin.mWorld;
-//		abil.mRandom = abil.mPlugin.mRandom;
 		mAbilities.add(abil);
 	}
 
@@ -82,12 +78,10 @@ public class AbilityCollection {
 			abil.player = mPlayer;
 			if (abil.getInfo() != null) {
 				AbilityInfo info = abil.getInfo();
-				Bukkit.broadcastMessage(info.scoreboardId);
 				if (abil.canUse(mPlayer)) {
 					if (info.scoreboardId != null) {
 						int score = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
 						if (score > 0) {
-							Bukkit.broadcastMessage("add " + info.scoreboardId);
 							addAbility(abil);
 						}
 					} else {

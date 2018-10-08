@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -76,7 +75,6 @@ public class ArcaneStrike extends Ability {
 	public boolean runCheck(Player player) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)) {
-			Bukkit.broadcastMessage("rc1");
 			if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
 				return true;
 			}

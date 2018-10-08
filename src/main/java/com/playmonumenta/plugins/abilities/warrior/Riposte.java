@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -36,7 +37,9 @@ public class Riposte extends Ability {
 			if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
 				if (riposte > 1) {
 					if (InventoryUtils.isSwordItem(mainHand)) {
-						player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION, RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
+						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
+						                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
+						                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
 					} else if (InventoryUtils.isAxeItem(mainHand)) {
 						damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
 					}

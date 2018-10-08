@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,8 +66,6 @@ public class Ability {
 		this.mWorld = mWorld;
 		this.mPlugin = mPlugin;
 		this.mRandom = mRandom;
-		System.out.println("" + (mPlugin == null) + " " + (mWorld == null) + " " + (mRandom == null));
-		System.out.println("" + (this.mPlugin == null) + " " + (this.mWorld == null) + " " + (this.mRandom == null));
 	}
 
 	/**
@@ -100,12 +97,9 @@ public class Ability {
 
 	public boolean isOnCooldown(Player player) {
 		if (getInfo() != null) {
-			Bukkit.broadcastMessage("is1");
 			AbilityInfo info = getInfo();
 			if (info.linkedSpell != null) {
-				Bukkit.broadcastMessage("is2 " + (mPlugin == null) + " " + (player == null) + " " + (info == null));
 				if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell)) {
-					Bukkit.broadcastMessage("is3");
 					return true;
 				}
 			}
@@ -130,9 +124,7 @@ public class Ability {
 	 * @return
 	 */
 	public boolean canCast(Player player) {
-		Bukkit.broadcastMessage("c1");
 		if (runCheck(player) && !isOnCooldown(player)) {
-			Bukkit.broadcastMessage("c2");
 			return true;
 		}
 		return false;
@@ -240,44 +232,9 @@ public class Ability {
 		abilities.add(new Toughness());
 		abilities.add(new WarriorPassive());
 		abilities.add(new WeaponryMastery());
-		System.out.println("" + (mPlugin == null) + " " + (mWorld == null) + " " + (mRandom == null));
 		for (Ability abil : abilities) {
 			abil.initialize(mWorld, mPlugin, mRandom);
 		}
-
-//		File file = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-//		try {
-//			@SuppressWarnings("resource")
-//			JarFile jar = new JarFile(file);
-//
-//			for (Enumeration<JarEntry> entry = jar.entries(); entry.hasMoreElements();) {
-//				JarEntry e = entry.nextElement();
-//				String name = e.getName().replace("/", ".");
-//
-//				if (name.endsWith(".class")) {
-//					name = name.split(".class")[0];
-//					try {
-//						Class<?> c = Class.forName(name);
-//						if (c.getSuperclass() != null && c.getSuperclass() == Ability.class) {
-//							try {
-//								Class<? extends Ability> mc = (Class<? extends Ability>) c;
-//								Ability sp = mc.newInstance();
-//								initialize(mWorld, mPlugin, mRandom);
-//								abilities.add(sp);
-//							} catch (InstantiationException ie) {
-//								ie.printStackTrace();
-//							} catch (IllegalAccessException ie) {
-//								ie.printStackTrace();
-//							}
-//						}
-//					} catch (ExceptionInInitializerError ie) {
-//						ie.printStackTrace();
-//					}
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	public static List<Ability> getAbilities() {

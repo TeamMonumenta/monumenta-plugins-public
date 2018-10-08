@@ -177,12 +177,9 @@ public class PlayerListener implements Listener {
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
-					Bukkit.broadcastMessage("1");
 					if (event.getAction() == Action.RIGHT_CLICK_AIR
 					    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
-						Bukkit.broadcastMessage("2");
 						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
-							Bukkit.broadcastMessage("3");
 							abil.cast(player);
 						}
 					}
