@@ -1,24 +1,24 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public class MagmaShield extends Ability {
 
@@ -36,7 +36,7 @@ public class MagmaShield extends Ability {
 		Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), MAGMA_SHIELD_RADIUS)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0)
-					.normalize();
+			                     .normalize();
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
 				MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
 				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
@@ -47,7 +47,7 @@ public class MagmaShield extends Ability {
 		}
 
 		ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA,
-				0.25f, MAGMA_SHIELD_DOT_ANGLE);
+		                                  0.25f, MAGMA_SHIELD_DOT_ANGLE);
 
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
@@ -74,8 +74,9 @@ public class MagmaShield extends Ability {
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if ((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand))
-				|| (mainHand.getType() == Material.SHIELD))
+		    || (mainHand.getType() == Material.SHIELD)) {
 			return player.isSneaking();
+		}
 		return false;
 	}
 

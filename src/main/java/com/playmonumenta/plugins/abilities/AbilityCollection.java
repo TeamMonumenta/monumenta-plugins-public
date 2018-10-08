@@ -1,14 +1,13 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AbilityCollection {
 

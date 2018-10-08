@@ -1,19 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -25,6 +11,20 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+
+import java.util.List;
+import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public class AdvancingShadows extends Ability {
 
@@ -45,7 +45,7 @@ public class AdvancingShadows extends Ability {
 	public boolean cast(Player player) {
 		owner = player.getName();
 		Bukkit.broadcastMessage("ability belongs to " + owner + " with abilityid " + id);
-		
+
 		LivingEntity entity = target;
 		if (entity != null) {
 			int advancingShadows = getAbilityScore(player);
@@ -72,12 +72,12 @@ public class AdvancingShadows extends Ability {
 			player.teleport(loc);
 
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-					new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION,
-							ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
+			                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION,
+			                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
 
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-						ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE)) {
+				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE)) {
 					MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 				}
 			}
@@ -124,8 +124,9 @@ public class AdvancingShadows extends Ability {
 				List<LivingEntity> rayEntities = data.getEntities();
 				if (rayEntities != null && !rayEntities.isEmpty()) {
 					target = rayEntities.get(0);
-					if (target != null && !target.isDead() && EntityUtils.isHostileMob(target))
+					if (target != null && !target.isDead() && EntityUtils.isHostileMob(target)) {
 						return true;
+					}
 				}
 			}
 		}

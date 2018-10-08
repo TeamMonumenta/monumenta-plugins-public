@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.Plugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,10 +11,8 @@ import java.io.IOException;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
@@ -45,8 +43,9 @@ public class InventoryUtils {
 				plugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player))
+					if (abil.canCast(player)) {
 						abil.PlayerItemHeldEvent(player, mainHand, offHand);
+					}
 				}
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 			}

@@ -1,20 +1,5 @@
 package com.playmonumenta.plugins.abilities;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -42,7 +27,23 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import java.net.URISyntaxException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.World;
 
 public class Ability {
 
@@ -55,10 +56,12 @@ public class Ability {
 	public Player player = null;
 
 	private static Ability abil = new Ability();
-	
+
 	public Ability() { }
 
-	public static Ability getBadInstance() { return abil; }
+	public static Ability getBadInstance() {
+		return abil;
+	}
 
 	public void initialize(World mWorld, Plugin mPlugin, Random mRandom) {
 		this.mWorld = mWorld;
@@ -74,20 +77,26 @@ public class Ability {
 	 * runCheck() may contain, is correct.
 	 * @return if the player managed to cast the spell successfully.
 	 */
-	public boolean cast(Player player) { return true; }
+	public boolean cast(Player player) {
+		return true;
+	}
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
 	 * @return the AbilityInfo object, if one exists. If not, it returns null.
 	 */
-	public AbilityInfo getInfo() { return null; }
+	public AbilityInfo getInfo() {
+		return null;
+	}
 
 	/**
 	 * A custom check if additional checks are needed. For example, if you need to check if a player is looking up or down.
 	 * @param player
 	 * @return true or false
 	 */
-	public boolean runCheck(Player player) { return true; }
+	public boolean runCheck(Player player) {
+		return true;
+	}
 
 	public boolean isOnCooldown(Player player) {
 		if (getInfo() != null) {
@@ -108,8 +117,9 @@ public class Ability {
 		if (getInfo() != null) {
 			AbilityInfo info = getInfo();
 			if (info.linkedSpell != null) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell))
+				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell)) {
 					mPlugin.mTimers.AddCooldown(player.getUniqueId(), info.linkedSpell, info.cooldown);
+				}
 			}
 		}
 	}
@@ -131,17 +141,29 @@ public class Ability {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { return true; }
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) { return true; }
+	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) { return true; }
+	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+		return true;
+	}
 
-	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) { return true; }
+	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) { return true; }
+	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		return true;
+	}
 
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) { return true; }
+	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
+		return true;
+	}
 
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) { }
 
@@ -159,10 +181,11 @@ public class Ability {
 		AbilityInfo aInfo = getInfo();
 		if (aInfo != null) {
 			if (aInfo.classId == ScoreboardUtils.getScoreboardValue(player, "Class")) {
-				if (aInfo.specId < 0)
+				if (aInfo.specId < 0) {
 					return true;
-				else if (aInfo.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization"))
+				} else if (aInfo.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization")) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -171,8 +194,9 @@ public class Ability {
 	public int getAbilityScore(Player player) {
 		if (getInfo() != null) {
 			AbilityInfo info = getInfo();
-			if (info.scoreboardId != null)
+			if (info.scoreboardId != null) {
 				return ScoreboardUtils.getScoreboardValue(player, info.scoreboardId);
+			}
 		}
 		return 0;
 	}
@@ -185,7 +209,7 @@ public class Ability {
 	 * @throws URISyntaxException
 	 */
 	public void putAbilities(World mWorld, Plugin mPlugin, Random mRandom) {
-		
+
 		abilities.add(new ArcaneStrike());
 		abilities.add(new ElementalArrows());
 		abilities.add(new FrostNova());
@@ -194,7 +218,7 @@ public class Ability {
 		abilities.add(new ManaLance());
 		abilities.add(new PrismaticShield());
 		abilities.add(new Spellshock());
-		
+
 		abilities.add(new AdvancingShadows());
 		abilities.add(new ByMyBlade());
 		abilities.add(new DaggerThrow());
@@ -203,11 +227,11 @@ public class Ability {
 		abilities.add(new RoguePassive());
 		abilities.add(new Smokescreen());
 		abilities.add(new ViciousCombos());
-		
+
 		abilities.add(new Agility());
 		abilities.add(new BowMastery());
 		abilities.add(new Volley());
-		
+
 		abilities.add(new BruteForce());
 		abilities.add(new CounterStrike());
 		abilities.add(new DefensiveLine());
@@ -220,7 +244,7 @@ public class Ability {
 		for (Ability abil : abilities) {
 			abil.initialize(mWorld, mPlugin, mRandom);
 		}
-		
+
 //		File file = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 //		try {
 //			@SuppressWarnings("resource")
@@ -256,7 +280,9 @@ public class Ability {
 //		}
 	}
 
-	public static List<Ability> getAbilities() { return abilities; }
+	public static List<Ability> getAbilities() {
+		return abilities;
+	}
 
 	public Ability getInstance() {
 		try {

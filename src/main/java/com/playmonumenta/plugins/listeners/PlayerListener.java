@@ -1,40 +1,56 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
@@ -58,40 +74,24 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.server.reset.DailyReset;
-import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.World;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -171,14 +171,15 @@ public class PlayerListener implements Listener {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
-							if (abil.cast(player))
+							if (abil.cast(player)) {
 								abil.putOnCooldown(player);
+							}
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
 					Bukkit.broadcastMessage("1");
 					if (event.getAction() == Action.RIGHT_CLICK_AIR
-							|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
+					    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
 						Bukkit.broadcastMessage("2");
 						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
 							Bukkit.broadcastMessage("3");
@@ -378,8 +379,9 @@ public class PlayerListener implements Listener {
 			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 			AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 			for (Ability abil : aColl.getAbilities()) {
-				if (abil.canCast(player))
+				if (abil.canCast(player)) {
 					abil.PlayerItemHeldEvent(player, mainHand, offHand);
+				}
 			}
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 		}
@@ -454,8 +456,9 @@ public class PlayerListener implements Listener {
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player))
+					if (abil.canCast(player)) {
 						abil.PlayerRespawnEvent(player);
+					}
 				}
 			}
 		}, 0);

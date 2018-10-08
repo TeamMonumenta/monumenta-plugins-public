@@ -1,26 +1,26 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TippedArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TippedArrow;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.Location;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 public class Volley extends Ability {
 
@@ -29,7 +29,7 @@ public class Volley extends Ability {
 	private static final int VOLLEY_2_ARROW_COUNT = 10;
 	private static final double VOLLEY_1_DAMAGE_INCREASE = 0.75;
 	private static final double VOLLEY_2_DAMAGE_INCREASE = 1.5;
-	
+
 	@Override
 	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
 		List<Projectile> projectiles;
@@ -96,7 +96,7 @@ public class Volley extends Ability {
 			projectiles = new ArrayList<Projectile>();
 			projectiles.add(arrow);
 		}
-		
+
 		if (AbilityUtils.getBowMasteryDamage(player) > 0) {
 			if (arrow.isCritical()) {
 				for (Projectile proj : projectiles) {
@@ -107,7 +107,7 @@ public class Volley extends Ability {
 		putOnCooldown(player);
 		return true;
 	}
-	
+
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (arrow.hasMetadata("Volley")) {
@@ -119,7 +119,7 @@ public class Volley extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -130,5 +130,5 @@ public class Volley extends Ability {
 		info.cooldown = VOLLEY_COOLDOWN;
 		return info;
 	}
-	
+
 }

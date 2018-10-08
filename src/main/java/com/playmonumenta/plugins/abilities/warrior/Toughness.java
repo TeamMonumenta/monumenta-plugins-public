@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Toughness extends Ability {
 
@@ -16,17 +16,17 @@ public class Toughness extends Ability {
 		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.HEALTH_BOOST, 1000000, healthBoost, true, false));
 		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 100, 4, true, false));
 	}
-	
+
 	@Override
-	public void setupClassPotionEffects(Player player) { 
+	public void setupClassPotionEffects(Player player) {
 		toughness(player);
 	}
-	
+
 	@Override
-	public void PlayerRespawnEvent(Player player) { 
+	public void PlayerRespawnEvent(Player player) {
 		toughness(player);
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -35,5 +35,5 @@ public class Toughness extends Ability {
 		info.scoreboardId = "Toughness";
 		return info;
 	}
-	
+
 }

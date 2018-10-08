@@ -1,16 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
@@ -19,17 +8,28 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
+
 public class ByMyBlade extends Ability {
-	
+
 	private static final int BY_MY_BLADE_HASTE_1_LVL = 1;
 	private static final int BY_MY_BLADE_HASTE_2_LVL = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
 	private static final double BY_MY_BLADE_DAMAGE_1 = 12;
 	private static final double BY_MY_BLADE_DAMAGE_2 = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
-	
+
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		if (event.getCause() != DamageCause.PROJECTILE) {
 			int byMyBlade = getAbilityScore(player);
 			LivingEntity damagee = (LivingEntity) event.getEntity();
@@ -55,29 +55,30 @@ public class ByMyBlade extends Ability {
 			mWorld.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 			putOnCooldown(player);
 		}
-		return true; 
+		return true;
 	}
-	
+
 	@Override
-	public AbilityInfo getInfo() { 
+	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
 		info.classId = 4;
 		info.specId = -1;
 		info.linkedSpell = Spells.BY_MY_BLADE;
 		info.scoreboardId = "ByMyBlade";
 		info.cooldown = BY_MY_BLADE_COOLDOWN;
-		return info; 
+		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		if (PlayerUtils.isCritical(player)) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
-			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand))
+			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				return true;
+			}
 		}
-		return false; 
+		return false;
 	}
 
 }

@@ -51,7 +51,7 @@ public class PrismaticShield extends Ability {
 		}
 
 		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
+		                                 new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
 		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
 		mWorld.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);

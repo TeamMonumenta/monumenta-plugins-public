@@ -1,39 +1,39 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.AlchemistClass;
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.ListIterator;
 import java.util.Random;
 
-import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.AlchemistClass;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -170,8 +170,9 @@ public class MobListener implements Listener {
 
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player))
+					if (abil.canCast(player)) {
 						abil.EntityDeathEvent(player, event, shouldGenDrops);
+					}
 				}
 
 				for (Player p : PlayerUtils.getNearbyPlayers(player, ALCH_PASSIVE_RADIUS, false)) {

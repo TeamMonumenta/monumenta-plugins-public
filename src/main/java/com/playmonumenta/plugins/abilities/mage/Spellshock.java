@@ -1,24 +1,24 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Color;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 
 public class Spellshock extends Ability {
 
@@ -36,11 +36,11 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
 	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
-	
+
 	public List<LivingEntity> shocked = new ArrayList<LivingEntity>();
-	
+
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity hit = (LivingEntity) event.getEntity();
 			if (!shocked.contains(hit)) {
@@ -67,19 +67,19 @@ public class Spellshock extends Ability {
 
 							shocked.remove(hit);
 						}
-						
-						if (t >= SPELL_SHOCK_DURATION){
+
+						if (t >= SPELL_SHOCK_DURATION) {
 							this.cancel();
 							shocked.remove(hit);
 						}
 					}
-					
+
 				}.runTaskTimer(mPlugin, 0, SPELL_SHOCK_TEST_PERIOD);
 			}
 		}
-		return true; 
+		return true;
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -88,10 +88,10 @@ public class Spellshock extends Ability {
 		info.scoreboardId = "SpellShock";
 		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		return InventoryUtils.isWandItem(player.getInventory().getItemInMainHand());
 	}
-	
+
 }

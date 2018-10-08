@@ -1,9 +1,14 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Iterator;
 
-import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -14,13 +19,8 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class Dodging extends Ability {
 
@@ -29,7 +29,7 @@ public class Dodging extends Ability {
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
-	
+
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
 		EntityType type = event.getDamager().getType();
@@ -71,11 +71,11 @@ public class Dodging extends Ability {
 		MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY);
 		event.setCancelled(true);
 		putOnCooldown(player);
-		return false; 
+		return false;
 	}
-	
+
 	@Override
-	public AbilityInfo getInfo() { 
+	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
 		info.classId = 4;
 		info.specId = -1;
@@ -83,9 +83,9 @@ public class Dodging extends Ability {
 		info.scoreboardId = "Dodging";
 		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		info.cooldown = cd;
-		return info; 
+		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		return player.getLastDamageCause().getCause() == DamageCause.PROJECTILE;

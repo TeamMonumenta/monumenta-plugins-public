@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
 
 public class FrostNova extends Ability {
 
@@ -27,7 +27,7 @@ public class FrostNova extends Ability {
 	private static final int FROST_NOVA_EFFECT_LVL = 2;
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 8 * 20;
-	
+
 	@Override
 	public boolean cast(Player player) {
 		int frostNova = getAbilityScore(player);
@@ -53,7 +53,7 @@ public class FrostNova extends Ability {
 		putOnCooldown(player);
 		return true;
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -65,7 +65,7 @@ public class FrostNova extends Ability {
 		info.trigger = AbilityTrigger.LEFT_CLICK;
 		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		if (player.isSneaking()) {
@@ -74,5 +74,5 @@ public class FrostNova extends Ability {
 		}
 		return false;
 	}
-	
+
 }

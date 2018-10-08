@@ -6,13 +6,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import java.util.Random;
 
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -69,7 +66,7 @@ public class BerserkerSpecialization extends BaseSpecialization {
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		double extraDamage = 0;
 		LivingEntity damagee = (LivingEntity) event.getEntity();
-		
+
 		if (player.getFallDistance() >= 1) {
 			int fall = Math.round(player.getFallDistance());
 			int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
@@ -103,7 +100,7 @@ public class BerserkerSpecialization extends BaseSpecialization {
 				}
 			}
 		}
-		
+
 		if (player.getHealth() <= PSYCHOSIS_TRIGGER_HEALTH_PERCENT * player.getMaxHealth()) {
 			int psychosis = ScoreboardUtils.getScoreboardValue(player, "Psychosis");
 			/* Psychosis: While below 50% health, gain +2/+4 Attack Damage
@@ -112,11 +109,11 @@ public class BerserkerSpecialization extends BaseSpecialization {
 				extraDamage += psychosis == 1 ? PSYCHOSIS_1_DAMAGE : PSYCHOSIS_2_DAMAGE;
 			}
 		}
-		
+
 		if (extraDamage > 0) {
 			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, player);
 		}
-		
+
 		return true;
 	}
 
@@ -158,10 +155,10 @@ public class BerserkerSpecialization extends BaseSpecialization {
 	@Override
 	public boolean PlayerExtendedSneakEvent(Player player) {
 		int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
-		/* Meteor Slam: Holding shift and looking directly down for 2s 
+		/* Meteor Slam: Holding shift and looking directly down for 2s
 		 * grants you 2s of Jump Boost 3/5. (cooldown 7/5s)
 		 */
-		if(meteorSlam > 0 && player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
+		if (meteorSlam > 0 && player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.METEOR_SLAM)) {
 				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
 				int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;

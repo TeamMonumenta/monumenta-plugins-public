@@ -1,19 +1,19 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
 
 public class Riposte extends Ability {
 
@@ -24,7 +24,7 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
 	private static final double RIPOSTE_SQRADIUS = 6.25;    //radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
-	
+
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getEntity();
@@ -51,7 +51,7 @@ public class Riposte extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -62,5 +62,5 @@ public class Riposte extends Ability {
 		info.cooldown = RIPOSTE_COOLDOWN;
 		return info;
 	}
-	
+
 }

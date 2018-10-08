@@ -33,7 +33,6 @@ import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -74,8 +73,9 @@ public class Plugin extends JavaPlugin {
 		public static Classes getClassById(int id) {
 			for (Classes cl : Classes.values()) {
 				if (cl != Classes.COUNT) {
-					if (cl.getValue() == id)
+					if (cl.getValue() == id) {
 						return cl;
+					}
 				}
 			}
 			return NONE;

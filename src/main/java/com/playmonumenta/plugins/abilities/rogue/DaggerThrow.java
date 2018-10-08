@@ -1,17 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
@@ -19,8 +7,20 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
+import org.bukkit.Color;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
+import org.bukkit.util.Vector;
+import org.bukkit.World;
+
 public class DaggerThrow extends Ability {
-	
+
 	private static final int DAGGER_THROW_COOLDOWN = 12 * 20;
 	private static final int DAGGER_THROW_RANGE = 8;
 	private static final int DAGGER_THROW_1_DAMAGE = 6;
@@ -29,7 +29,7 @@ public class DaggerThrow extends Ability {
 	private static final int DAGGER_THROW_1_VULN = 3;
 	private static final int DAGGER_THROW_2_VULN = 7;
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
-	
+
 	@Override
 	public boolean cast(Player player) {
 		int daggerThrow = getAbilityScore(player);
@@ -85,7 +85,7 @@ public class DaggerThrow extends Ability {
 		putOnCooldown(player);
 		return true;
 	}
-	
+
 	@Override
 	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
@@ -97,15 +97,16 @@ public class DaggerThrow extends Ability {
 		info.trigger = AbilityTrigger.RIGHT_CLICK;
 		return info;
 	}
-	
+
 	@Override
 	public boolean runCheck(Player player) {
 		if (player.isSneaking()) {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) 
+			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				return true;
+			}
 		}
 		return false;
 	}

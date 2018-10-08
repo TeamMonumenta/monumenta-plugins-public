@@ -1,22 +1,22 @@
 package com.playmonumenta.plugins.utils;
 
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class AbilityUtils {
 
@@ -56,13 +56,13 @@ public class AbilityUtils {
 				int spellShock = ScoreboardUtils.getScoreboardValue(player, "SpellShock");
 				if (spellShock > 1) {
 					plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-					                                 new PotionEffect(PotionEffectType.REGENERATION,
-					                                                  SPELL_SHOCK_REGEN_DURATION,
-					                                                  SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
+					                                new PotionEffect(PotionEffectType.REGENERATION,
+					                                                 SPELL_SHOCK_REGEN_DURATION,
+					                                                 SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
 					plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-					                                 new PotionEffect(PotionEffectType.SPEED,
-					                                                  SPELL_SHOCK_SPEED_DURATION,
-					                                                  SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
+					                                new PotionEffect(PotionEffectType.SPEED,
+					                                                 SPELL_SHOCK_SPEED_DURATION,
+					                                                 SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
 				}
 
 				// Consume the "charge"
@@ -97,10 +97,10 @@ public class AbilityUtils {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 	}
-	
+
 	private static final int BOW_MASTER_1_DAMAGE = 3;
 	private static final int BOW_MASTER_2_DAMAGE = 6;
-	
+
 	public static int getBowMasteryDamage(Player player) {
 		int bowMastery = new BowMastery().getAbilityScore(player);
 		if (bowMastery > 0) {

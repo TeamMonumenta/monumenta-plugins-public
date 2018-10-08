@@ -13,7 +13,9 @@ public class AbilityManager {
 
 	private static AbilityManager manager = new AbilityManager();
 
-	public static AbilityManager getManager() { return manager; }
+	public static AbilityManager getManager() {
+		return manager;
+	}
 
 	public void updatePlayerAbilities(Player player) {
 		AbilityCollection collection = mAbilities.get(player.getUniqueId());

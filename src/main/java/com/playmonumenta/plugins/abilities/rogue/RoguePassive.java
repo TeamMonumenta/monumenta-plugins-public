@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -7,18 +12,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 public class RoguePassive extends Ability {
-	
+
 	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
-	
+
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) { 
+	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		//  Make sure only players trigger this.
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
@@ -35,15 +35,15 @@ public class RoguePassive extends Ability {
 			}
 			Bukkit.broadcastMessage("rogue passive success.");
 		}
-		return true; 
+		return true;
 	}
-	
+
 	@Override
-	public AbilityInfo getInfo() { 
+	public AbilityInfo getInfo() {
 		AbilityInfo info = new AbilityInfo(this);
 		info.classId = 4;
 		info.specId = -1;
-		return info; 
+		return info;
 	}
 
 }

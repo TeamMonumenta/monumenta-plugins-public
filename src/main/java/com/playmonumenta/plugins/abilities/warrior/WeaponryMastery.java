@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class WeaponryMastery extends Ability {
 
@@ -33,8 +32,9 @@ public class WeaponryMastery extends Ability {
 			extraDamage += WEAPON_MASTERY_SWORD_2_DAMAGE;
 		}
 
-		if (extraDamage > 0)
+		if (extraDamage > 0) {
 			event.setDamage(event.getDamage() + extraDamage);
+		}
 		return true;
 	}
 
@@ -44,8 +44,9 @@ public class WeaponryMastery extends Ability {
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
 		//  Player has an sword in their mainHand.
-		if (InventoryUtils.isSwordItem(mainHand))
+		if (InventoryUtils.isSwordItem(mainHand)) {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+		}
 	}
 
 	@Override
@@ -53,8 +54,9 @@ public class WeaponryMastery extends Ability {
 		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
 		//  Player has an sword in their mainHand.
-		if (InventoryUtils.isSwordItem(mainHand))
+		if (InventoryUtils.isSwordItem(mainHand)) {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+		}
 	}
 
 	@Override
