@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class Smokescreen extends Ability {
 
@@ -26,6 +29,16 @@ public class Smokescreen extends Ability {
 	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 = 1;
 	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2 = 2;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
+
+	public Smokescreen(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.SMOKESCREEN;
+		mInfo.scoreboardId = "SmokeScreen";
+		mInfo.cooldown = SMOKESCREEN_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -48,18 +61,6 @@ public class Smokescreen extends Ability {
 		}
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.SMOKESCREEN;
-		info.scoreboardId = "SmokeScreen";
-		info.cooldown = SMOKESCREEN_COOLDOWN;
-		info.trigger = AbilityTrigger.LEFT_CLICK;
-		return info;
 	}
 
 	@Override

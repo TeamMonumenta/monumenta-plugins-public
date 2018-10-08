@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -12,11 +14,18 @@ import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class Frenzy extends Ability {
 
 	private static final int FRENZY_DURATION = 5 * 20;
 
+	public Frenzy(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 2;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "Frenzy";
+	}
 
 	@Override
 	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
@@ -53,14 +62,4 @@ public class Frenzy extends Ability {
 			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 		}
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 2;
-		info.specId = -1;
-		info.scoreboardId = "Frenzy";
-		return info;
-	}
-
 }

@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -21,6 +22,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.bukkit.World;
 
 public class Volley extends Ability {
 
@@ -29,6 +31,15 @@ public class Volley extends Ability {
 	private static final int VOLLEY_2_ARROW_COUNT = 10;
 	private static final double VOLLEY_1_DAMAGE_INCREASE = 0.75;
 	private static final double VOLLEY_2_DAMAGE_INCREASE = 1.5;
+
+	public Volley(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 6;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.VOLLEY;
+		mInfo.scoreboardId = "Volley";
+		mInfo.cooldown = VOLLEY_COOLDOWN;
+	}
 
 	@Override
 	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
@@ -119,16 +130,4 @@ public class Volley extends Ability {
 		}
 		return true;
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 6;
-		info.specId = -1;
-		info.linkedSpell = Spells.VOLLEY;
-		info.scoreboardId = "Volley";
-		info.cooldown = VOLLEY_COOLDOWN;
-		return info;
-	}
-
 }

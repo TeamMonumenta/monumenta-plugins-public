@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class ByMyBlade extends Ability {
 
@@ -27,6 +30,15 @@ public class ByMyBlade extends Ability {
 	private static final double BY_MY_BLADE_DAMAGE_1 = 12;
 	private static final double BY_MY_BLADE_DAMAGE_2 = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
+
+	public ByMyBlade(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.BY_MY_BLADE;
+		mInfo.scoreboardId = "ByMyBlade";
+		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;
+	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
@@ -56,17 +68,6 @@ public class ByMyBlade extends Ability {
 			putOnCooldown(player);
 		}
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.BY_MY_BLADE;
-		info.scoreboardId = "ByMyBlade";
-		info.cooldown = BY_MY_BLADE_COOLDOWN;
-		return info;
 	}
 
 	@Override

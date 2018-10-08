@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class ViciousCombos extends Ability {
 
@@ -24,6 +27,13 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 	private static final int VICIOUS_COMBOS_COOL_1 = 1 * 20;
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
+
+	public ViciousCombos(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "ViciousCombos";
+	}
 
 	@Override
 	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
@@ -61,14 +71,4 @@ public class ViciousCombos extends Ability {
 		}
 		return true;
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.scoreboardId = "ViciousCombos";
-		return info;
-	}
-
 }

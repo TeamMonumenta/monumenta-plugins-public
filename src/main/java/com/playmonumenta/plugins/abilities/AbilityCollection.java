@@ -13,31 +13,13 @@ public class AbilityCollection {
 	private List<Ability> mAbilities;
 	private Player mPlayer;
 
-	public AbilityCollection(Player player) {
-		mAbilities = new ArrayList<Ability>();
+	public AbilityCollection(Player player, List<Ability> abilities) {
+		mAbilities = abilities;
 		mPlayer = player;
 	}
 
 	public List<Ability> getAbilities() {
 		return mAbilities;
-	}
-
-	/**
-	 * Removes the ability that is specified in the parameters.
-	 * You can use the getAbility() methods in order to get the
-	 * ability that needs to be removed.
-	 * @param abil The ability that will be removed, if it exists
-	 */
-	public void removeAbility(Ability abil) {
-		if (mAbilities.contains(abil)) {
-			abil.player = null;
-			mAbilities.remove(abil);
-		}
-	}
-
-	public void addAbility(Ability abil) {
-		abil.player = mPlayer;
-		mAbilities.add(abil);
 	}
 
 	public Ability getAbility(String scoreboardId) {
@@ -66,29 +48,5 @@ public class AbilityCollection {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Refreshes the player's ability collection.
-	 */
-	public void refreshAbilities() {
-		mAbilities.clear();
-		for (Ability ab : Ability.getAbilities()) {
-			Ability abil = ab.getInstance();
-			abil.player = mPlayer;
-			if (abil.getInfo() != null) {
-				AbilityInfo info = abil.getInfo();
-				if (abil.canUse(mPlayer)) {
-					if (info.scoreboardId != null) {
-						int score = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
-						if (score > 0) {
-							addAbility(abil);
-						}
-					} else {
-						addAbility(abil);
-					}
-				}
-			}
-		}
 	}
 }

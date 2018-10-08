@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,6 +34,15 @@ public class EscapeDeath extends Ability {
 	private static final int ESCAPE_DEATH_SLOWNESS_EFFECT_LVL = 4;
 	private static final int ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL = 2;
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
+
+	public EscapeDeath(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
+		mInfo.scoreboardId = "EscapeDeath";
+		mInfo.cooldown = ESCAPE_DEATH_COOLDOWN;
+	}
 
 	/*
 	 * Should we also make this escape death from general mob damage? (Includes projectile, mob spells, mob melee)
@@ -77,17 +88,6 @@ public class EscapeDeath extends Ability {
 		MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.ESCAPE_DEATH;
-		info.scoreboardId = "EscapeDeath";
-		info.cooldown = ESCAPE_DEATH_COOLDOWN;
-		return info;
 	}
 
 	@Override

@@ -1,16 +1,18 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 public class MagmaShield extends Ability {
 
@@ -29,6 +32,16 @@ public class MagmaShield extends Ability {
 	private static final int MAGMA_SHIELD_2_DAMAGE = 12;
 	private static final float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
 	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
+
+	public MagmaShield(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
+		mInfo.scoreboardId = "MagmaShield";
+		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -55,18 +68,6 @@ public class MagmaShield extends Ability {
 		PlayerUtils.callAbilityCastEvent(player, Spells.MAGMA_SHIELD);
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.MAGMA_SHIELD;
-		info.scoreboardId = "MagmaShield";
-		info.cooldown = MAGMA_SHIELD_COOLDOWN;
-		info.trigger = AbilityTrigger.RIGHT_CLICK;
-		return info;
 	}
 
 	@Override

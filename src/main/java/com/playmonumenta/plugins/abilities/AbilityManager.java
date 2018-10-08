@@ -1,29 +1,127 @@
 package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.abilities.mage.FrostNova;
+import com.playmonumenta.plugins.abilities.mage.MagePassive;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
+import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
+import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
+import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
+import com.playmonumenta.plugins.abilities.rogue.Dodging;
+import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
+import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
+import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
+import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
+import com.playmonumenta.plugins.abilities.scout.Agility;
+import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.warrior.BruteForce;
+import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
+import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Frenzy;
+import com.playmonumenta.plugins.abilities.warrior.Riposte;
+import com.playmonumenta.plugins.abilities.warrior.Toughness;
+import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
+import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.Plugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+import org.bukkit.World;
 
 public class AbilityManager {
+	private static AbilityManager mManager = null;
+
+	private Plugin mPlugin;
+	private World mWorld;
+	private Random mRandom;
+	private List<Ability> mReferenceAbilities;
 	private Map<UUID, AbilityCollection> mAbilities = new HashMap<UUID, AbilityCollection>();
 
-	private static AbilityManager manager = new AbilityManager();
+	public AbilityManager(Plugin plugin, World world, Random random) {
+		mPlugin = plugin;
+		mWorld = world;
+		mRandom = random;
+		mManager = this;
+
+		mReferenceAbilities = Arrays.asList(
+		                          // MAGE
+		                          new ArcaneStrike(mPlugin, mWorld, mRandom, null),
+		                          new ElementalArrows(mPlugin, mWorld, mRandom, null),
+		                          new FrostNova(mPlugin, mWorld, mRandom, null),
+		                          new MagePassive(mPlugin, mWorld, mRandom, null),
+		                          new MagmaShield(mPlugin, mWorld, mRandom, null),
+		                          new ManaLance(mPlugin, mWorld, mRandom, null),
+		                          new PrismaticShield(mPlugin, mWorld, mRandom, null),
+		                          new Spellshock(mPlugin, mWorld, mRandom, null),
+
+		                          // ROGUE
+		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
+		                          new ByMyBlade(mPlugin, mWorld, mRandom, null),
+		                          new DaggerThrow(mPlugin, mWorld, mRandom, null),
+		                          new Dodging(mPlugin, mWorld, mRandom, null),
+		                          new EscapeDeath(mPlugin, mWorld, mRandom, null),
+		                          new RoguePassive(mPlugin, mWorld, mRandom, null),
+		                          new Smokescreen(mPlugin, mWorld, mRandom, null),
+		                          new ViciousCombos(mPlugin, mWorld, mRandom, null),
+
+		                          // SCOUT
+		                          new Agility(mPlugin, mWorld, mRandom, null),
+		                          new BowMastery(mPlugin, mWorld, mRandom, null),
+		                          new Volley(mPlugin, mWorld, mRandom, null),
+
+		                          // WARRIOR
+		                          new BruteForce(mPlugin, mWorld, mRandom, null),
+		                          new CounterStrike(mPlugin, mWorld, mRandom, null),
+		                          new DefensiveLine(mPlugin, mWorld, mRandom, null),
+		                          new Frenzy(mPlugin, mWorld, mRandom, null),
+		                          new Riposte(mPlugin, mWorld, mRandom, null),
+		                          new Toughness(mPlugin, mWorld, mRandom, null),
+		                          new WarriorPassive(mPlugin, mWorld, mRandom, null),
+		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null)
+		                      );
+	}
 
 	public static AbilityManager getManager() {
-		return manager;
+		return mManager;
 	}
 
 	public void updatePlayerAbilities(Player player) {
-		AbilityCollection collection = mAbilities.get(player.getUniqueId());
-		if (collection == null) {
-			collection = new AbilityCollection(player);
-			mAbilities.put(player.getUniqueId(), collection);
+		mAbilities.put(player.getUniqueId(), getCurrentAbilities(player));
+	}
+
+	private AbilityCollection getCurrentAbilities(Player player) {
+		List<Ability> abilities = new ArrayList<Ability>();
+		try {
+			for (Ability ab : mReferenceAbilities) {
+				if (ab.canUse(player)) {
+					Class[] constructorTypes = new Class[4];
+					constructorTypes[0] = Plugin.class;
+					constructorTypes[1] = World.class;
+					constructorTypes[2] = Random.class;
+					constructorTypes[3] = Player.class;
+
+					Ability newAbility = ab.getClass().getDeclaredConstructor(constructorTypes).newInstance(mPlugin, mWorld, mRandom, player);
+					abilities.add(newAbility);
+				}
+			}
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		collection.refreshAbilities();
+		return new AbilityCollection(player, abilities);
 	}
 
 	/*

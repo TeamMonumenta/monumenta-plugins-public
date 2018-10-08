@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class DefensiveLine extends Ability {
 
@@ -24,6 +26,17 @@ public class DefensiveLine extends Ability {
 	private static final float DEFENSIVE_LINE_RADIUS = 8.0f;
 	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 50 * 20;
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
+
+	public DefensiveLine(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
+		mInfo.scoreboardId = "DefensiveLine";
+		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
+		mInfo.cooldown = getAbilityScore(player) == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -40,19 +53,6 @@ public class DefensiveLine extends Ability {
 		ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.DEFENSIVE_LINE;
-		info.scoreboardId = "DefensiveLine";
-		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
-		info.cooldown = cd;
-		info.trigger = AbilityTrigger.RIGHT_CLICK;
-		return info;
 	}
 
 	@Override

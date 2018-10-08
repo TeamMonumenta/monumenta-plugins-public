@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
@@ -24,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 public class AdvancingShadows extends Ability {
 
@@ -39,6 +41,16 @@ public class AdvancingShadows extends Ability {
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+
+	public AdvancingShadows(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.ADVANCING_SHADOWS;
+		mInfo.scoreboardId = "AdvancingShadows";
+		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -88,18 +100,6 @@ public class AdvancingShadows extends Ability {
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.ADVANCING_SHADOWS;
-		info.scoreboardId = "AdvancingShadows";
-		info.cooldown = ADVANCING_SHADOWS_COOLDOWN;
-		info.trigger = AbilityTrigger.RIGHT_CLICK;
-		return info;
 	}
 
 	@Override

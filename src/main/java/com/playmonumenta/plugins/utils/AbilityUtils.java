@@ -102,7 +102,7 @@ public class AbilityUtils {
 	private static final int BOW_MASTER_2_DAMAGE = 6;
 
 	public static int getBowMasteryDamage(Player player) {
-		int bowMastery = new BowMastery().getAbilityScore(player);
+		int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
 		if (bowMastery > 0) {
 			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
 			return bonusDamage;

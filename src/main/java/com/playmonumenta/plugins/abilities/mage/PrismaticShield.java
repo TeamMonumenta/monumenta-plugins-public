@@ -1,15 +1,17 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class PrismaticShield extends Ability {
 
@@ -32,6 +35,15 @@ public class PrismaticShield extends Ability {
 	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
 	private static final int PRISMATIC_SHIELD_1_DAMAGE = 3;
 	private static final int PRISMATIC_SHIELD_2_DAMAGE = 6;
+
+	public PrismaticShield(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
+		mInfo.scoreboardId = "Prismatic";
+		mInfo.cooldown = PRISMATIC_SHIELD_COOLDOWN;
+	}
 
 	/*
 	 * Should we also make this prismatic shield work from general mob damage?
@@ -60,17 +72,6 @@ public class PrismaticShield extends Ability {
 		PlayerUtils.callAbilityCastEvent(player, Spells.PRISMATIC_SHIELD);
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.PRISMATIC_SHIELD;
-		info.scoreboardId = "Prismatic";
-		info.cooldown = PRISMATIC_SHIELD_COOLDOWN;
-		return info;
 	}
 
 	@Override

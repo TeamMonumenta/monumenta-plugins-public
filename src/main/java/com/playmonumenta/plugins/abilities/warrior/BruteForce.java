@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 
 public class BruteForce extends Ability {
 
@@ -21,6 +24,13 @@ public class BruteForce extends Ability {
 	private static final Integer BRUTE_FORCE_1_DAMAGE = 2;
 	private static final Integer BRUTE_FORCE_2_DAMAGE = 4;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
+
+	public BruteForce(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 2;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "BruteForce";
+	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
@@ -53,13 +63,4 @@ public class BruteForce extends Ability {
 
 		return true;
 	}
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 2;
-		info.specId = -1;
-		info.scoreboardId = "BruteForce";
-		return info;
-	}
-
 }

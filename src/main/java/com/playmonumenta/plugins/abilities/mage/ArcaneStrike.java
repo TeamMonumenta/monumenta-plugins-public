@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class ArcaneStrike extends Ability {
 
@@ -27,6 +30,15 @@ public class ArcaneStrike extends Ability {
 	private static final int ARCANE_STRIKE_BURN_DAMAGE_LVL_1 = 2;
 	private static final int ARCANE_STRIKE_BURN_DAMAGE_LVL_2 = 4;
 	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
+
+	public ArcaneStrike(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
+		mInfo.scoreboardId = "ArcaneStrike";
+		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;
+	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
@@ -61,17 +73,6 @@ public class ArcaneStrike extends Ability {
 	}
 
 	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.ARCANE_STRIKE;
-		info.scoreboardId = "ArcaneStrike";
-		info.cooldown = ARCANE_STRIKE_COOLDOWN;
-		return info;
-	}
-
-	@Override
 	public boolean runCheck(Player player) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)) {
@@ -81,5 +82,4 @@ public class ArcaneStrike extends Ability {
 		}
 		return false;
 	}
-
 }

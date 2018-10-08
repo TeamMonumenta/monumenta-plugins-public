@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
@@ -17,12 +19,21 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.World;
 
 public class ElementalArrows extends Ability {
 	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
 	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
 	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 4.0;
+
+	public ElementalArrows(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.ELEMENTAL_ARROWS;
+		mInfo.scoreboardId = "Elemental";
+	}
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
@@ -74,15 +85,5 @@ public class ElementalArrows extends Ability {
 		}
 
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.ELEMENTAL_ARROWS;
-		info.scoreboardId = "Elemental";
-		return info;
 	}
 }

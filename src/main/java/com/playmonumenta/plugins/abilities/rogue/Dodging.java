@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -29,6 +29,16 @@ public class Dodging extends Ability {
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
 	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
+
+	public Dodging(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.DODGING;
+		mInfo.scoreboardId = "Dodging";
+		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
+		mInfo.cooldown = getAbilityScore(player) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+	}
 
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
@@ -72,18 +82,6 @@ public class Dodging extends Ability {
 		event.setCancelled(true);
 		putOnCooldown(player);
 		return false;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.DODGING;
-		info.scoreboardId = "Dodging";
-		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
-		info.cooldown = cd;
-		return info;
 	}
 
 	@Override

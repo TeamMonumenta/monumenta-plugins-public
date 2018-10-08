@@ -10,9 +10,6 @@ import com.playmonumenta.plugins.classes.Spells;
  *
  */
 public class AbilityInfo {
-
-	private final Ability ability;
-
 	//If the ability does not require a scoreboardID andj ust a classId, leave this as null.
 	public String scoreboardId = null;
 
@@ -26,13 +23,4 @@ public class AbilityInfo {
 
 	//If the ability does not require a spec, input a negative number.
 	public int specId = -1;
-
-	public AbilityInfo(Ability ability) {
-		this.ability = ability;
-	}
-
-	public Ability getAbility() {
-		return ability;
-	}
-
 }

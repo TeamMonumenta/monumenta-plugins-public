@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins;
 
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.ClericClass;
@@ -121,6 +121,7 @@ public class Plugin extends JavaPlugin {
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
 	public ZoneManager mZoneManager;
+	public AbilityManager mAbilityManager;
 
 	public SocketClient mSocketClient;
 
@@ -154,6 +155,7 @@ public class Plugin extends JavaPlugin {
 		mPotionManager = new PotionManager(this);
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new ZoneManager(this);
+		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
 
 		//  Load info.
 		_loadConfig();
@@ -192,9 +194,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new EntityListener(this, mWorld), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
-
-		//Register all existing Abilities
-		Ability.getBadInstance().putAbilities(mWorld, this, mRandom);
 
 		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
 

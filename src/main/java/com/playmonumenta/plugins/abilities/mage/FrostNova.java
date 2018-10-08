@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class FrostNova extends Ability {
 
@@ -27,6 +30,16 @@ public class FrostNova extends Ability {
 	private static final int FROST_NOVA_EFFECT_LVL = 2;
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 8 * 20;
+
+	public FrostNova(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.FROST_NOVA;
+		mInfo.scoreboardId = "FrostNova";
+		mInfo.cooldown = FROST_NOVA_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -52,18 +65,6 @@ public class FrostNova extends Ability {
 		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.FROST_NOVA;
-		info.scoreboardId = "FrostNova";
-		info.cooldown = FROST_NOVA_COOLDOWN;
-		info.trigger = AbilityTrigger.LEFT_CLICK;
-		return info;
 	}
 
 	@Override

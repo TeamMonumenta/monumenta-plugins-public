@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -10,10 +12,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class CounterStrike extends Ability {
 
 	private static final float COUNTER_STRIKE_RADIUS = 5.0f;
+
+	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "CounterStrike";
+	}
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
@@ -34,14 +44,4 @@ public class CounterStrike extends Ability {
 		}
 		return true;
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.scoreboardId = "CounterStrike";
-		return info;
-	}
-
 }

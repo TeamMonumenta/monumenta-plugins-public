@@ -1,15 +1,16 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.entity.LivingEntity;
@@ -22,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 public class ManaLance extends Ability {
 
@@ -29,9 +31,19 @@ public class ManaLance extends Ability {
 	private static final int MANA_LANCE_2_DAMAGE = 10;
 	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
 	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
-	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255),
-	        1.0f);
+	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 	private static final int MANA_LANCE_STAGGER_DURATION = (int)(0.95 * 20);
+
+	public ManaLance(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 1;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.MANA_LANCE;
+		mInfo.scoreboardId = "ManaLance";
+		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
+		mInfo.cooldown = getAbilityScore(player) == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -67,20 +79,6 @@ public class ManaLance extends Ability {
 		putOnCooldown(player);
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 1;
-		info.specId = -1;
-		info.linkedSpell = Spells.MANA_LANCE;
-		info.scoreboardId = "ManaLance";
-		int cd = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) == 1 ? MANA_LANCE_1_COOLDOWN
-		         : MANA_LANCE_2_COOLDOWN;
-		info.cooldown = cd;
-		info.trigger = AbilityTrigger.RIGHT_CLICK;
-		return info;
 	}
 
 	@Override

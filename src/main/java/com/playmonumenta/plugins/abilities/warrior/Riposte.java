@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class Riposte extends Ability {
 
@@ -25,6 +28,15 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
 	private static final double RIPOSTE_SQRADIUS = 6.25;    //radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
+
+	public Riposte(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 2;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.RIPOSTE;
+		mInfo.scoreboardId = "Obliteration";
+		mInfo.cooldown = RIPOSTE_COOLDOWN;
+	}
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
@@ -54,16 +66,4 @@ public class Riposte extends Ability {
 		}
 		return true;
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 2;
-		info.specId = -1;
-		info.linkedSpell = Spells.RIPOSTE;
-		info.scoreboardId = "Obliteration";
-		info.cooldown = RIPOSTE_COOLDOWN;
-		return info;
-	}
-
 }

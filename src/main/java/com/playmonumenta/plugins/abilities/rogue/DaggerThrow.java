@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+
+import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.entity.LivingEntity;
@@ -29,6 +31,16 @@ public class DaggerThrow extends Ability {
 	private static final int DAGGER_THROW_1_VULN = 3;
 	private static final int DAGGER_THROW_2_VULN = 7;
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
+
+	public DaggerThrow(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 4;
+		mInfo.specId = -1;
+		mInfo.linkedSpell = Spells.DAGGER_THROW;
+		mInfo.scoreboardId = "DaggerThrow";
+		mInfo.cooldown = DAGGER_THROW_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+	}
 
 	@Override
 	public boolean cast(Player player) {
@@ -84,18 +96,6 @@ public class DaggerThrow extends Ability {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
 		putOnCooldown(player);
 		return true;
-	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 4;
-		info.specId = -1;
-		info.linkedSpell = Spells.DAGGER_THROW;
-		info.scoreboardId = "DaggerThrow";
-		info.cooldown = DAGGER_THROW_COOLDOWN;
-		info.trigger = AbilityTrigger.RIGHT_CLICK;
-		return info;
 	}
 
 	@Override

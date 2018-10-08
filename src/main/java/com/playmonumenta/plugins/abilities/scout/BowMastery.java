@@ -1,18 +1,28 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.World;
 
 public class BowMastery extends Ability {
 
 	private static final int BOW_MASTER_1_DAMAGE = 3;
 	private static final int BOW_MASTER_2_DAMAGE = 6;
+
+	public BowMastery(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 6;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "BowMastery";
+	}
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
@@ -23,14 +33,4 @@ public class BowMastery extends Ability {
 		}
 		return true;
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 6;
-		info.specId = -1;
-		info.scoreboardId = "BowMastery";
-		return info;
-	}
-
 }

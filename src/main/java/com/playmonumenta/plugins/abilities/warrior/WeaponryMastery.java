@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+
+import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -11,12 +13,20 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.World;
 
 public class WeaponryMastery extends Ability {
 
 	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
 	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
 	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
+
+	public WeaponryMastery(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 2;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "WeaponMastery";
+	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
@@ -58,14 +68,4 @@ public class WeaponryMastery extends Ability {
 			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 		}
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 2;
-		info.specId = -1;
-		info.scoreboardId = "WeaponMastery";
-		return info;
-	}
-
 }

@@ -1,14 +1,24 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+
+import java.util.Random;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.World;
 
 public class Toughness extends Ability {
+
+	public Toughness(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.classId = 2;
+		mInfo.specId = -1;
+		mInfo.scoreboardId = "Toughness";
+	}
 
 	private void toughness(Player player) {
 		int toughness = getAbilityScore(player);
@@ -26,14 +36,4 @@ public class Toughness extends Ability {
 	public void PlayerRespawnEvent(Player player) {
 		toughness(player);
 	}
-
-	@Override
-	public AbilityInfo getInfo() {
-		AbilityInfo info = new AbilityInfo(this);
-		info.classId = 2;
-		info.specId = -1;
-		info.scoreboardId = "Toughness";
-		return info;
-	}
-
 }
