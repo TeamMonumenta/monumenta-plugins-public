@@ -145,9 +145,9 @@ public abstract class Ability {
 	 */
 	protected int getAbilityScore() {
 		AbilityInfo info = getInfo();
-		if (info.scoreboardId != null) {
+		if (mPlayer != null && info.scoreboardId != null) {
 			if (mScore == null) {
-				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
+				mScore = new Integer(ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId));
 			}
 			return mScore;
 		}

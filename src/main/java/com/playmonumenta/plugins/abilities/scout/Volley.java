@@ -46,7 +46,7 @@ public class Volley extends Ability {
 		List<Projectile> projectiles;
 		//  Volley
 		if (mPlayer.isSneaking()) {
-			int volley = ScoreboardUtils.getScoreboardValue(mPlayer, "Volley");
+			int volley = getAbilityScore();
 			if (volley > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.VOLLEY)) {
 					boolean isCritical = arrow.isCritical();
