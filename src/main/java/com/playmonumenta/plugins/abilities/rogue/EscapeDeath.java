@@ -49,9 +49,9 @@ public class EscapeDeath extends Ability {
 	 * TODO: Yes, probably want a generic player damage event instead
 	 */
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
-		int escapeDeath = getAbilityScore(player);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), ESCAPE_DEATH_RANGE)) {
+	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+		int escapeDeath = getAbilityScore();
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ESCAPE_DEATH_RANGE)) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
 			                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
@@ -59,19 +59,18 @@ public class EscapeDeath extends Ability {
 		}
 
 		if (escapeDeath > 1) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION,
 			                                                  ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, false));
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER,
 			                                                  ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER,
 			                                                  ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
 		}
 
-		World world = player.getWorld();
-		Location loc = player.getLocation();
+		Location loc = mPlayer.getLocation();
 		loc.add(0, 1, 0);
 
 		double offset = escapeDeath == 1 ? 1 : ESCAPE_DEATH_RANGE;
@@ -83,19 +82,19 @@ public class EscapeDeath extends Ability {
 			mWorld.spawnParticle(Particle.CLOUD, loc, particles, offset, offset, offset, 0.001);
 		}
 
-		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
+		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
 
-		MessagingUtils.sendActionBarMessage(mPlugin, player, "Escape Death has been activated");
-		putOnCooldown(player);
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		EntityDamageEvent lastDamage = player.getLastDamageCause();
+	public boolean runCheck() {
+		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
 		if (lastDamage.getCause() == DamageCause.ENTITY_ATTACK) {
-			double correctHealth = player.getHealth() - lastDamage.getFinalDamage();
-			if (!player.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER) {
+			double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
+			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER) {
 				return true;
 			}
 		}

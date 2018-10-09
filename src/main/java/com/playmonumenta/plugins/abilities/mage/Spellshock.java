@@ -49,7 +49,7 @@ public class Spellshock extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity hit = (LivingEntity) event.getEntity();
 			if (!shocked.contains(hit)) {
@@ -69,7 +69,7 @@ public class Spellshock extends Ability {
 							mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 100, 1, 1, 1, 0.25);
 							mWorld.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 							for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(hit.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
-								EntityUtils.damageEntity(mPlugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, player);
+								EntityUtils.damageEntity(mPlugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, mPlayer);
 								nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 								                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 							}
@@ -90,8 +90,7 @@ public class Spellshock extends Ability {
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		return InventoryUtils.isWandItem(player.getInventory().getItemInMainHand());
+	public boolean runCheck() {
+		return InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand());
 	}
-
 }

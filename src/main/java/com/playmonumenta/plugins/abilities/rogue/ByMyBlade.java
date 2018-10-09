@@ -41,19 +41,19 @@ public class ByMyBlade extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() != DamageCause.PROJECTILE) {
-			int byMyBlade = getAbilityScore(player);
+			int byMyBlade = getAbilityScore();
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.FAST_DIGGING,
 			                                                  BY_MY_BLADE_HASTE_DURATION,
 			                                                  effectLevel, false, true));
 
 
 			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
-			AbilityUtils.rogueDamageMob(mPlugin, player, damagee, extraDamage);
+			AbilityUtils.rogueDamageMob(mPlugin, mPlayer, damagee, extraDamage);
 
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);
@@ -65,16 +65,16 @@ public class ByMyBlade extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 			mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);
 			mWorld.playSound(loc, Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
-			putOnCooldown(player);
+			putOnCooldown();
 		}
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		if (PlayerUtils.isCritical(player)) {
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			ItemStack offHand = player.getInventory().getItemInOffHand();
+	public boolean runCheck() {
+		if (PlayerUtils.isCritical(mPlayer)) {
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				return true;
 			}

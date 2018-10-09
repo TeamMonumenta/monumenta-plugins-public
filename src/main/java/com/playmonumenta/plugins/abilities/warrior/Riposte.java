@@ -39,17 +39,17 @@ public class Riposte extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getEntity();
-		if ((player.getLocation()).distanceSquared(damager.getLocation()) < RIPOSTE_SQRADIUS) {
-			int riposte = getAbilityScore(player);
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			MovementUtils.KnockAway(player, damager, RIPOSTE_KNOCKBACK_SPEED);
+		if ((mPlayer.getLocation()).distanceSquared(damager.getLocation()) < RIPOSTE_SQRADIUS) {
+			int riposte = getAbilityScore();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			MovementUtils.KnockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
 			if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
 				if (riposte > 1) {
 					if (InventoryUtils.isSwordItem(mainHand)) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
+						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.APPLIED_POTION,
 						                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
 						                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
 					} else if (InventoryUtils.isAxeItem(mainHand)) {
@@ -57,10 +57,10 @@ public class Riposte extends Ability {
 					}
 				}
 
-				mWorld.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
-				mWorld.spawnParticle(Particle.SWEEP_ATTACK, (player.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
-				mWorld.spawnParticle(Particle.CRIT_MAGIC, (player.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
-				putOnCooldown(player);
+				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, (mPlayer.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
+				mWorld.spawnParticle(Particle.CRIT_MAGIC, (mPlayer.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
+				putOnCooldown();
 				return false;
 			}
 		}

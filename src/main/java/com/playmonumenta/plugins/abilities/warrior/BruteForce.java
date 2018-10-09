@@ -33,13 +33,13 @@ public class BruteForce extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
-		int bruteForce = getAbilityScore(player);
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		int bruteForce = getAbilityScore();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		DamageCause cause = event.getCause();
 		LivingEntity damagee = (LivingEntity) event.getEntity();
 
-		if (bruteForce > 0 && PlayerUtils.isCritical(player) && cause != DamageCause.PROJECTILE &&
+		if (bruteForce > 0 && PlayerUtils.isCritical(mPlayer) && cause != DamageCause.PROJECTILE &&
 		    (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isScytheItem(mainHand))) {
 
 			double bruteForceDamage = bruteForce == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
@@ -52,13 +52,13 @@ public class BruteForce extends Ability {
 			// Damage those non-hit nearby entities and knock them away
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS)) {
 				if (mob != damagee) {
-					EntityUtils.damageEntity(mPlugin, mob, bruteForceDamage, player);
-					MovementUtils.KnockAway(player, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+					EntityUtils.damageEntity(mPlugin, mob, bruteForceDamage, mPlayer);
+					MovementUtils.KnockAway(mPlayer, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
 				}
 			}
 
 			// Knock away just the hit entity
-			MovementUtils.KnockAway(player, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
+			MovementUtils.KnockAway(mPlayer, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
 		}
 
 		return true;

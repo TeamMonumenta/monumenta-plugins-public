@@ -36,21 +36,21 @@ public class ViciousCombos extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = (LivingEntity) event.getEntity();
-		int viciousCombos = getAbilityScore(player);
+		int viciousCombos = getAbilityScore();
 
 		Location loc = killedEntity.getLocation();
 		loc = loc.add(0, 0.5, 0);
 
 		if (EntityUtils.isElite(killedEntity)) {
-			mPlugin.mTimers.removeAllCooldowns(player.getUniqueId());
-			MessagingUtils.sendActionBarMessage(mPlugin, player, "All your cooldowns have been reset");
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
+			mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
 			if (viciousCombos > 1) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), VICIOUS_COMBOS_RANGE)) {
-					AbilityUtils.rogueDamageMob(mPlugin, player, mob, VICIOUS_COMBOS_DAMAGE);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), VICIOUS_COMBOS_RANGE)) {
+					AbilityUtils.rogueDamageMob(mPlugin, mPlayer, mob, VICIOUS_COMBOS_DAMAGE);
 				}
 			}
 
@@ -61,7 +61,7 @@ public class ViciousCombos extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 		} else if (EntityUtils.isHostileMob(killedEntity)) {
 			int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
-			mPlugin.mTimers.UpdateCooldowns(player, timeReduction);
+			mPlugin.mTimers.UpdateCooldowns(mPlayer, timeReduction);
 
 			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
 			mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);

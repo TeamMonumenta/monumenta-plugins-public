@@ -21,8 +21,8 @@ public class WarriorPassive extends Ability {
 	}
 
 	@Override
-	public void PlayerRespawnEvent(Player player) {
-		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+	public void PlayerRespawnEvent() {
+		AttributeInstance att = mPlayer.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 		att.setBaseValue(0);
 		att.setBaseValue(PASSIVE_KNOCKBACK_RESISTANCE);
 	}

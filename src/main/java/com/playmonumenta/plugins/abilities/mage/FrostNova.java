@@ -42,12 +42,12 @@ public class FrostNova extends Ability {
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		int frostNova = getAbilityScore(player);
-		player.setFireTicks(0);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), FROST_NOVA_RADIUS)) {
+	public boolean cast() {
+		int frostNova = getAbilityScore();
+		mPlayer.setFireTicks(0);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-			AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, player, MagicType.ICE);
+			AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
 
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
 			if (frostNova > 1) {
@@ -56,21 +56,21 @@ public class FrostNova extends Ability {
 
 			mob.setFireTicks(0);
 		}
-		PlayerUtils.callAbilityCastEvent(player, Spells.FROST_NOVA);
-		mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
+		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.FROST_NOVA);
+		mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
 
-		Location loc = player.getLocation();
+		Location loc = mPlayer.getLocation();
 		mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
 		mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
 		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
-		putOnCooldown(player);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		if (player.isSneaking()) {
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean runCheck() {
+		if (mPlayer.isSneaking()) {
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			return InventoryUtils.isWandItem(mainHand);
 		}
 		return false;

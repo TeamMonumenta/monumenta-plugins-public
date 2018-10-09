@@ -53,14 +53,14 @@ public class AdvancingShadows extends Ability {
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		owner = player.getName();
+	public boolean cast() {
+		owner = mPlayer.getName();
 
 		LivingEntity entity = target;
 		if (entity != null) {
-			int advancingShadows = getAbilityScore(player);
-			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), player.getLocation());
-			Location loc = player.getLocation();
+			int advancingShadows = getAbilityScore();
+			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
+			Location loc = mPlayer.getLocation();
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 				loc.add(dir);
 				if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
@@ -75,13 +75,13 @@ public class AdvancingShadows extends Ability {
 			while (loc.getBlock().getType().isSolid()) {
 				loc.subtract(dir.clone().multiply(1.15));
 			}
-			mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
-			mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 
-			player.teleport(loc);
+			mPlayer.teleport(loc);
 
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION,
 			                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, false));
 
@@ -92,28 +92,28 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 
-			mWorld.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
-			mWorld.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 			target = null;
-			putOnCooldown(player);
+			putOnCooldown();
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		ItemStack offHand = player.getInventory().getItemInOffHand();
+	public boolean runCheck() {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-			if (!player.isSneaking()) {
-				int advancingShadows = getAbilityScore(player);
+			if (!mPlayer.isSneaking()) {
+				int advancingShadows = getAbilityScore();
 				int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
 
 				// Basically makes sure if the target is in LoS and if there is
 				// a path.
-				Location eyeLoc = player.getEyeLocation();
+				Location eyeLoc = mPlayer.getEyeLocation();
 				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
 				ray.throughBlocks = false;
 				ray.throughNonOccluding = false;

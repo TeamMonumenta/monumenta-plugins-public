@@ -22,12 +22,14 @@ public abstract class Ability {
 	protected final World mWorld;
 	protected final Random mRandom;
 	protected final AbilityInfo mInfo;
+	protected final Player mPlayer;
 	private Integer mScore = null;
 
 	public Ability(Plugin plugin, World world, Random random, Player player) {
 		mPlugin = plugin;
 		mWorld = world;
 		mRandom = random;
+		mPlayer = player;
 		mInfo = new AbilityInfo();
 	}
 
@@ -37,7 +39,7 @@ public abstract class Ability {
 	 * runCheck() may contain, is correct.
 	 * @return if the player managed to cast the spell successfully.
 	 */
-	public boolean cast(Player player) {
+	public boolean cast() {
 		return true;
 	}
 
@@ -54,25 +56,25 @@ public abstract class Ability {
 	 * @param player
 	 * @return true or false
 	 */
-	public boolean runCheck(Player player) {
+	public boolean runCheck() {
 		return true;
 	}
 
-	public boolean isOnCooldown(Player player) {
+	public boolean isOnCooldown() {
 		AbilityInfo info = getInfo();
 		if (info.linkedSpell != null) {
-			if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell)) {
+			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public void putOnCooldown(Player player) {
+	public void putOnCooldown() {
 		AbilityInfo info = getInfo();
 		if (info.linkedSpell != null) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), info.linkedSpell)) {
-				mPlugin.mTimers.AddCooldown(player.getUniqueId(), info.linkedSpell, info.cooldown);
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
+				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), info.linkedSpell, info.cooldown);
 			}
 		}
 	}
@@ -82,8 +84,8 @@ public abstract class Ability {
 	 * @param player
 	 * @return
 	 */
-	public boolean canCast(Player player) {
-		if (runCheck(player) && !isOnCooldown(player)) {
+	public boolean canCast() {
+		if (runCheck() && !isOnCooldown()) {
 			return true;
 		}
 		return false;
@@ -92,40 +94,40 @@ public abstract class Ability {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		return true;
 	}
 
-	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
+	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		return true;
 	}
 
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) { }
+	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
-	public void PlayerRespawnEvent(Player player) { }
+	public void PlayerRespawnEvent() { }
 
 	//---------------------------------------------------------------------------------------------------------------
 
 	//Other
 	//---------------------------------------------------------------------------------------------------------------
 
-	public void setupClassPotionEffects(Player player) { }
+	public void setupClassPotionEffects() { }
 
 	//---------------------------------------------------------------------------------------------------------------
 	public boolean canUse(Player player) {
@@ -141,11 +143,11 @@ public abstract class Ability {
 	/*
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
-	protected int getAbilityScore(Player player) {
+	protected int getAbilityScore() {
 		AbilityInfo info = getInfo();
 		if (info.scoreboardId != null) {
 			if (mScore == null) {
-				mScore = ScoreboardUtils.getScoreboardValue(player, info.scoreboardId);
+				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
 			}
 			return mScore;
 		}

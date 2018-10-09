@@ -41,18 +41,18 @@ public class ManaLance extends Ability {
 		mInfo.linkedSpell = Spells.MANA_LANCE;
 		mInfo.scoreboardId = "ManaLance";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore(player) == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		int manaLance = getAbilityScore(player);
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean cast() {
+		int manaLance = getAbilityScore();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
 		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 
-		Location loc = player.getEyeLocation();
+		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
 		loc.add(dir);
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
@@ -70,22 +70,22 @@ public class ManaLance extends Ability {
 				break;
 			}
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
-				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, player, MagicType.ARCANE);
+				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 				mob.addPotionEffect(
 				    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 			}
 		}
-		PlayerUtils.callAbilityCastEvent(player, Spells.MANA_LANCE);
-		putOnCooldown(player);
-		mWorld.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MANA_LANCE);
+		putOnCooldown();
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		return !player.isSneaking() && InventoryUtils.isWandItem(mainHand)
-		       && player.getGameMode() != GameMode.SPECTATOR;
+	public boolean runCheck() {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand)
+		       && mPlayer.getGameMode() != GameMode.SPECTATOR;
 	}
 
 }

@@ -170,17 +170,17 @@ public class PlayerListener implements Listener {
 			if (info.trigger != null) {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
-							if (abil.cast(player)) {
-								abil.putOnCooldown(player);
+						if (abil.runCheck() && !abil.isOnCooldown()) {
+							if (abil.cast()) {
+								abil.putOnCooldown();
 							}
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
 					if (event.getAction() == Action.RIGHT_CLICK_AIR
 					    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
-						if (abil.runCheck(player) && !abil.isOnCooldown(player)) {
-							abil.cast(player);
+						if (abil.runCheck() && !abil.isOnCooldown()) {
+							abil.cast();
 						}
 					}
 				}
@@ -376,8 +376,8 @@ public class PlayerListener implements Listener {
 			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 			AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 			for (Ability abil : aColl.getAbilities()) {
-				if (abil.canCast(player)) {
-					abil.PlayerItemHeldEvent(player, mainHand, offHand);
+				if (abil.canCast()) {
+					abil.PlayerItemHeldEvent(mainHand, offHand);
 				}
 			}
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
@@ -453,8 +453,8 @@ public class PlayerListener implements Listener {
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player)) {
-						abil.PlayerRespawnEvent(player);
+					if (abil.canCast()) {
+						abil.PlayerRespawnEvent();
 					}
 				}
 			}

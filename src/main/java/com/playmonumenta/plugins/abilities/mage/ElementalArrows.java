@@ -36,29 +36,29 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		int elementalArrows = getAbilityScore(player);
+	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		int elementalArrows = getAbilityScore();
 		if (elementalArrows > 0) {
 			if (arrow.hasMetadata("FireArrow")) {
 				if (elementalArrows == 1) {
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-					AbilityUtils.mageSpellshock(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 0, player, MagicType.FIRE);
+					AbilityUtils.mageSpellshock(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 0, mPlayer, MagicType.FIRE);
 				} else if (elementalArrows == 2) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
 						if (mob != damagee) {
 							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-							AbilityUtils.mageSpellshock(mPlugin, mob, 0, player, MagicType.FIRE);
+							AbilityUtils.mageSpellshock(mPlugin, mob, 0, mPlayer, MagicType.FIRE);
 						}
 					}
 				}
 			} else if (arrow.hasMetadata("IceArrow")) {
 				if (elementalArrows == 1) {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-					AbilityUtils.mageSpellshock(mPlugin, damagee, 0, player, MagicType.ICE);
+					AbilityUtils.mageSpellshock(mPlugin, damagee, 0, mPlayer, MagicType.ICE);
 				} else if (elementalArrows == 2) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-						AbilityUtils.mageSpellshock(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 0, player, MagicType.ICE);
+						AbilityUtils.mageSpellshock(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 0, mPlayer, MagicType.ICE);
 					}
 				}
 			}
@@ -68,10 +68,10 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
-		int elementalArrows = getAbilityScore(player);
+	public boolean PlayerShotArrowEvent(Arrow arrow) {
+		int elementalArrows = getAbilityScore();
 		if (elementalArrows > 0) {
-			if (player.isSneaking()) {
+			if (mPlayer.isSneaking()) {
 				//  If sneaking, Ice Arrow
 				arrow.setFireTicks(0);
 				arrow.setMetadata("IceArrow", new FixedMetadataValue(mPlugin, 0));

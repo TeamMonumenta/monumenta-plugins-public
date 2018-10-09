@@ -34,13 +34,13 @@ public class DefensiveLine extends Ability {
 		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.scoreboardId = "DefensiveLine";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore(player) == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		for (Player target : PlayerUtils.getNearbyPlayers(player, DEFENSIVE_LINE_RADIUS, true)) {
+	public boolean cast() {
+		for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
 			Location loc = target.getLocation();
 
 			target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
@@ -50,17 +50,17 @@ public class DefensiveLine extends Ability {
 			                                                  1, true, true));
 		}
 
-		ParticleUtils.explodingSphereEffect(mPlugin, player, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
-		putOnCooldown(player);
+		ParticleUtils.explodingSphereEffect(mPlugin, mPlayer, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
+	public boolean runCheck() {
 		//  If we're sneaking and we block with a shield we can attempt to trigger the ability.
-		if (player.isSneaking()) {
-			ItemStack offHand = player.getInventory().getItemInOffHand();
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
+		if (mPlayer.isSneaking()) {
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) {
 				return true;
 			}

@@ -51,34 +51,34 @@ public class PrismaticShield extends Ability {
 	 * generic player damage event instead
 	 */
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
-		int prismatic = getAbilityScore(player);
+	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+		int prismatic = getAbilityScore();
 		int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 		int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 		float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
-			AbilityUtils.mageSpellshock(mPlugin, mob, prisDamage, player, MagicType.ARCANE);
-			MovementUtils.KnockAway(player, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
+			AbilityUtils.mageSpellshock(mPlugin, mob, prisDamage, mPlayer, MagicType.ARCANE);
+			MovementUtils.KnockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 
-		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.ABSORPTION, duration, effectLevel, true, true));
-		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
-		mWorld.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
-		MessagingUtils.sendActionBarMessage(mPlugin, player, "Prismatic Shield has been activated");
+		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5);
+		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
 
-		PlayerUtils.callAbilityCastEvent(player, Spells.PRISMATIC_SHIELD);
-		putOnCooldown(player);
+		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.PRISMATIC_SHIELD);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		EntityDamageEvent lastDamage = player.getLastDamageCause();
-		double correctHealth = player.getHealth() - lastDamage.getFinalDamage();
-		if (!player.isDead() && correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
+	public boolean runCheck() {
+		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
+		double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
+		if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
 			return true;
 		}
 		return false;

@@ -43,11 +43,10 @@ public class DaggerThrow extends Ability {
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		int daggerThrow = getAbilityScore(player);
-		World world = player.getWorld();
+	public boolean cast() {
+		int daggerThrow = getAbilityScore();
 
-		Location loc = player.getEyeLocation();
+		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
 
 		double damage = (daggerThrow == 1) ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
@@ -68,11 +67,11 @@ public class DaggerThrow extends Ability {
 
 				for (int t = 0; t < 10; t++) {
 					pLoc.add((newDir.clone()).multiply(0.1));
-					world.spawnParticle(Particle.REDSTONE, pLoc, 1);
+					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1);
 				}
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, player);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
 
 					hit = true;
@@ -80,10 +79,10 @@ public class DaggerThrow extends Ability {
 
 				if (mLoc.getBlock().getType().isSolid() || hit) {
 					mLoc.subtract((newDir.clone()).multiply(0.5));
-					world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
+					mWorld.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 3, 0.3, 0.3, 0.3, 0.1);
 
 					if (hit) {
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
+						mWorld.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 					}
 
 					break;
@@ -91,18 +90,18 @@ public class DaggerThrow extends Ability {
 			}
 		}
 
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
-		putOnCooldown(player);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.5f);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		if (player.isSneaking()) {
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			ItemStack offHand = player.getInventory().getItemInOffHand();
+	public boolean runCheck() {
+		if (mPlayer.isSneaking()) {
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				return true;

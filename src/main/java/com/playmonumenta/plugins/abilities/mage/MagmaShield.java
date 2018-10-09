@@ -44,39 +44,39 @@ public class MagmaShield extends Ability {
 	}
 
 	@Override
-	public boolean cast(Player player) {
-		int magmaShield = getAbilityScore(player);
-		Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), MAGMA_SHIELD_RADIUS)) {
-			Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0)
+	public boolean cast() {
+		int magmaShield = getAbilityScore();
+		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS)) {
+			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0)
 			                     .normalize();
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
-				MovementUtils.KnockAway(player, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
+				MovementUtils.KnockAway(mPlayer, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
 				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
 				int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, player, MagicType.FIRE);
+				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
 			}
 		}
 
-		ParticleUtils.explodingConeEffect(mPlugin, player, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA,
+		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA,
 		                                  0.25f, MAGMA_SHIELD_DOT_ANGLE);
 
-		mWorld.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
-		mWorld.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
 
-		PlayerUtils.callAbilityCastEvent(player, Spells.MAGMA_SHIELD);
-		putOnCooldown(player);
+		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MAGMA_SHIELD);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		ItemStack offHand = player.getInventory().getItemInOffHand();
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean runCheck() {
+		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if ((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand))
 		    || (mainHand.getType() == Material.SHIELD)) {
-			return player.isSneaking();
+			return mPlayer.isSneaking();
 		}
 		return false;
 	}

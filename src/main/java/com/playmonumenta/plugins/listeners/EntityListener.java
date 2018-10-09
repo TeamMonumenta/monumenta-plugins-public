@@ -202,8 +202,8 @@ public class EntityListener implements Listener {
 					boolean cancelled = false;
 					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 					for (Ability abil : aColl.getAbilities()) {
-						if (abil.canCast(player)) {
-							if (!abil.PlayerDamagedByProjectileEvent(player, event)) {
+						if (abil.canCast()) {
+							if (!abil.PlayerDamagedByProjectileEvent(event)) {
 								if (!cancelled) {
 									cancelled = true;
 									damager.remove();
@@ -254,8 +254,8 @@ public class EntityListener implements Listener {
 
 						AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 						for (Ability abil : aColl.getAbilities()) {
-							if (abil.canCast(player)) {
-								abil.LivingEntityDamagedByPlayerEvent(player, event);
+							if (abil.canCast()) {
+								abil.LivingEntityDamagedByPlayerEvent(event);
 							}
 						}
 					}
@@ -279,8 +279,8 @@ public class EntityListener implements Listener {
 					boolean cancelled = false;
 					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 					for (Ability abil : aColl.getAbilities()) {
-						if (abil.canCast(player)) {
-							if (!abil.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+						if (abil.canCast()) {
+							if (!abil.LivingEntityShotByPlayerEvent(arrow, (LivingEntity)damagee, event)) {
 								if (!cancelled) {
 									cancelled = true;
 									damager.remove();
@@ -475,8 +475,8 @@ public class EntityListener implements Listener {
 				boolean cancelled = false;
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player)) {
-						if (!abil.PlayerShotArrowEvent(player, arrow)) {
+					if (abil.canCast()) {
+						if (!abil.PlayerShotArrowEvent(arrow)) {
 							if (!cancelled) {
 								cancelled = true;
 								arrow.remove();

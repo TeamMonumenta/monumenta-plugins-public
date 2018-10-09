@@ -153,7 +153,7 @@ public class PotionManager {
 		mPlugin.getClass(player).setupClassPotionEffects(player);
 		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 		for (Ability abil : aColl.getAbilities()) {
-			abil.setupClassPotionEffects(player);
+			abil.setupClassPotionEffects();
 		}
 		//  Once all the potion stuff is setup apply the best effects.
 		applyBestPotionEffect(player);

@@ -27,25 +27,25 @@ public class Agility extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
-		int extraDamage = (getAbilityScore(player) == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		int extraDamage = (getAbilityScore() == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
 		event.setDamage(event.getDamage() + extraDamage);
 		return true;
 	}
 
 	@Override
-	public void setupClassPotionEffects(Player player) {
-		testForAgility(player);
+	public void setupClassPotionEffects() {
+		testForAgility();
 	}
 
 	@Override
-	public void PlayerRespawnEvent(Player player) {
-		testForAgility(player);
+	public void PlayerRespawnEvent() {
+		testForAgility();
 	}
 
-	public void testForAgility(Player player) {
-		int effectLevel = getAbilityScore(player) == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
-		mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+	public void testForAgility() {
+		int effectLevel = getAbilityScore() == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));
 	}
 }

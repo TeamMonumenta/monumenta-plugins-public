@@ -28,38 +28,38 @@ public class Frenzy extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		int frenzy = getAbilityScore(player);
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		int frenzy = getAbilityScore();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!InventoryUtils.isPickaxeItem(mainHand)) {
 			int hasteAmp = frenzy == 1 ? 2 : 3;
 
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, FRENZY_DURATION, hasteAmp, true, true));
 
-			Location loc = player.getLocation();
+			Location loc = mPlayer.getLocation();
 			mWorld.playSound(loc, Sound.ENTITY_POLAR_BEAR_HURT, 0.1f, 1.0f);
 
 			if (frenzy > 1) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, FRENZY_DURATION, 0, true, true));
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public void setupClassPotionEffects(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public void setupClassPotionEffects() {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isPickaxeItem(mainHand)) {
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 		}
 	}
 
 	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
 		if (InventoryUtils.isPickaxeItem(mainHand)) {
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
-			mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 		}
 	}
 }

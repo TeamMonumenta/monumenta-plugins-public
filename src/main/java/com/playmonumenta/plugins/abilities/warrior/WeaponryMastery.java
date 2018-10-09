@@ -29,11 +29,11 @@ public class WeaponryMastery extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
-		int weaponMastery = getAbilityScore(player);
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		int weaponMastery = getAbilityScore();
 		// The extra damage that will be applied to the hit damagee at the end of this function
 		double extraDamage = 0;
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		LivingEntity damagee = (LivingEntity) event.getEntity();
 
 		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
@@ -49,23 +49,23 @@ public class WeaponryMastery extends Ability {
 	}
 
 	@Override
-	public void setupClassPotionEffects(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+	public void setupClassPotionEffects() {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
 		//  Player has an sword in their mainHand.
 		if (InventoryUtils.isSwordItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 		}
 	}
 
 	@Override
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		mPlugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
+	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
+		mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 
 		//  Player has an sword in their mainHand.
 		if (InventoryUtils.isSwordItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
 		}
 	}
 }

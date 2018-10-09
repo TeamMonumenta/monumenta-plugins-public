@@ -170,8 +170,8 @@ public class MobListener implements Listener {
 
 				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
 				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast(player)) {
-						abil.EntityDeathEvent(player, event, shouldGenDrops);
+					if (abil.canCast()) {
+						abil.EntityDeathEvent(event, shouldGenDrops);
 					}
 				}
 

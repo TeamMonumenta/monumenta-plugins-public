@@ -26,13 +26,13 @@ public class RoguePassive extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		//  Make sure only players trigger this.
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
 
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			ItemStack offHand = player.getInventory().getItemInOffHand();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				//  This test if the damagee is an instance of a Elite.
 				if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {

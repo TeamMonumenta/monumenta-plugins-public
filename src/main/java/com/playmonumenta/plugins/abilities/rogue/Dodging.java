@@ -37,28 +37,27 @@ public class Dodging extends Ability {
 		mInfo.linkedSpell = Spells.DODGING;
 		mInfo.scoreboardId = "Dodging";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore(player) == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		mInfo.cooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 	}
 
 	@Override
-	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		EntityType type = event.getDamager().getType();
 		Projectile damager = (Projectile) event.getDamager();
-		int dodging = getAbilityScore(player);
-		World world = player.getWorld();
+		int dodging = getAbilityScore();
 		if (dodging > 1) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.SPEED,
 			                                                  DODGING_SPEED_EFFECT_DURATION,
 			                                                  DODGING_SPEED_EFFECT_LEVEL,
 			                                                  true, false));
-			world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
 		}
 
-		world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 
 		int cooldown = dodging == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
-		mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.DODGING, cooldown);
+		mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.DODGING, cooldown);
 
 		// Remove effects from tipped arrows
 		// TODO: This is the same code as for removing from shields, should probably be
@@ -78,14 +77,14 @@ public class Dodging extends Ability {
 		}
 
 		// Set metadata indicating this event happened this tick
-		MetadataUtils.checkOnceThisTick(mPlugin, player, ROGUE_DODGING_NONCE_METAKEY);
+		MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, ROGUE_DODGING_NONCE_METAKEY);
 		event.setCancelled(true);
-		putOnCooldown(player);
+		putOnCooldown();
 		return false;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		return player.getLastDamageCause().getCause() == DamageCause.PROJECTILE;
+	public boolean runCheck() {
+		return mPlayer.getLastDamageCause().getCause() == DamageCause.PROJECTILE;
 	}
 }

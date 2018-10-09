@@ -42,13 +42,13 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
+	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		List<Projectile> projectiles;
 		//  Volley
-		if (player.isSneaking()) {
-			int volley = ScoreboardUtils.getScoreboardValue(player, "Volley");
+		if (mPlayer.isSneaking()) {
+			int volley = ScoreboardUtils.getScoreboardValue(mPlayer, "Volley");
 			if (volley > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.VOLLEY)) {
+				if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.VOLLEY)) {
 					boolean isCritical = arrow.isCritical();
 					int fireTicks = arrow.getFireTicks();
 					int knockbackStrength = arrow.getKnockbackStrength();
@@ -67,9 +67,9 @@ public class Volley extends Ability {
 					}
 
 					if (tArrowData == null) {
-						projectiles = EntityUtils.spawnArrowVolley(mPlugin, player, numArrows, 1.5, 5, Arrow.class);
+						projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, Arrow.class);
 					} else {
-						projectiles = EntityUtils.spawnArrowVolley(mPlugin, player, numArrows, 1.5, 5, TippedArrow.class);
+						projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, TippedArrow.class);
 					}
 
 					for (Projectile proj : projectiles) {
@@ -90,11 +90,11 @@ public class Volley extends Ability {
 					}
 
 					//  I hate this so much, you don't even know... [Rock]
-					Location jankWorkAround = player.getLocation();
+					Location jankWorkAround = mPlayer.getLocation();
 					jankWorkAround.setY(-15);
 					arrow.teleport(jankWorkAround);
 
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.VOLLEY, VOLLEY_COOLDOWN);
+					mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.VOLLEY, VOLLEY_COOLDOWN);
 				} else {
 					projectiles = new ArrayList<Projectile>();
 					projectiles.add(arrow);
@@ -108,21 +108,21 @@ public class Volley extends Ability {
 			projectiles.add(arrow);
 		}
 
-		if (AbilityUtils.getBowMasteryDamage(player) > 0) {
+		if (AbilityUtils.getBowMasteryDamage(mPlayer) > 0) {
 			if (arrow.isCritical()) {
 				for (Projectile proj : projectiles) {
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.CLOUD);
 				}
 			}
 		}
-		putOnCooldown(player);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (arrow.hasMetadata("Volley")) {
-			double damageMultiplier = getAbilityScore(player) == 1 ? VOLLEY_1_DAMAGE_INCREASE : VOLLEY_2_DAMAGE_INCREASE;
+			double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_INCREASE : VOLLEY_2_DAMAGE_INCREASE;
 			double oldDamage = event.getDamage();
 
 			double newDamage = oldDamage + (oldDamage * damageMultiplier);

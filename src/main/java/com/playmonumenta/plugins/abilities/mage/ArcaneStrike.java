@@ -41,8 +41,8 @@ public class ArcaneStrike extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
-		int arcaneStrike = getAbilityScore(player);
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		int arcaneStrike = getAbilityScore();
 		LivingEntity damagee = (LivingEntity) event.getEntity();
 		int extraDamage = arcaneStrike == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 
@@ -59,7 +59,7 @@ public class ArcaneStrike extends Ability {
 				dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
 			}
 
-			EntityUtils.damageEntity(mPlugin, mob, dmg, player, MagicType.ARCANE);
+			EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
 		}
 
 		Location loc = damagee.getLocation();
@@ -67,16 +67,16 @@ public class ArcaneStrike extends Ability {
 		mWorld.spawnParticle(Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
 		mWorld.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.5f, 1.5f);
 
-		PlayerUtils.callAbilityCastEvent(player, Spells.ARCANE_STRIKE);
-		putOnCooldown(player);
+		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.ARCANE_STRIKE);
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
-	public boolean runCheck(Player player) {
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
+	public boolean runCheck() {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)) {
-			if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
+			if (!MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
 				return true;
 			}
 		}

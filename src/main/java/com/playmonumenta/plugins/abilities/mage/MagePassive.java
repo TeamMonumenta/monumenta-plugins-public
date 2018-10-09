@@ -24,12 +24,12 @@ public class MagePassive extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		//  Make sure only players trigger this.
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getEntity();
 
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isWandItem(mainHand)) {
 				if (damagee instanceof LivingEntity) {
 					event.setDamage(event.getDamage() + PASSIVE_DAMAGE);

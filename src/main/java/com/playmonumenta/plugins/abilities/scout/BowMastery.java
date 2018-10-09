@@ -25,11 +25,11 @@ public class BowMastery extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		int bowMastery = getAbilityScore(player);
+	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		int bowMastery = getAbilityScore();
 		if (arrow.isCritical()) {
 			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-			EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, player);
+			EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, mPlayer);
 		}
 		return true;
 	}
