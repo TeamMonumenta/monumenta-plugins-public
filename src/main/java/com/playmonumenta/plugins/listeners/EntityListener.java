@@ -175,12 +175,13 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
-				if (!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager,
-				        event.getFinalDamage()))  {
+				if (!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager, event.getFinalDamage()))  {
 					event.setCancelled(true);
 				}
-
 				if (!mPlugin.getSpecialization(player).PlayerDamagedByLivingEntityEvent(player, event)) {
+					event.setCancelled(true);
+				}
+				if (!AbilityManager.getManager().PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
 				for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
@@ -199,18 +200,9 @@ public class EntityListener implements Listener {
 						event.setCancelled(true);
 					}
 
-					boolean cancelled = false;
-					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-					for (Ability abil : aColl.getAbilities()) {
-						if (abil.canCast()) {
-							if (!abil.PlayerDamagedByProjectileEvent(event)) {
-								if (!cancelled) {
-									cancelled = true;
-									damager.remove();
-									event.setCancelled(true);
-								}
-							}
-						}
+					if (!AbilityManager.getManager().PlayerDamagedByProjectileEvent(player, event)) {
+						damager.remove();
+						event.setCancelled(true);
 					}
 
 					if (proj.getShooter() instanceof LivingEntity) {
@@ -252,11 +244,8 @@ public class EntityListener implements Listener {
 
 						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
 
-						AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-						for (Ability abil : aColl.getAbilities()) {
-							if (abil.canCast()) {
-								abil.LivingEntityDamagedByPlayerEvent(event);
-							}
+						if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
+							event.setCancelled(true);
 						}
 					}
 					if (damagee instanceof Player) {
@@ -276,18 +265,9 @@ public class EntityListener implements Listener {
 					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 
-					boolean cancelled = false;
-					AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-					for (Ability abil : aColl.getAbilities()) {
-						if (abil.canCast()) {
-							if (!abil.LivingEntityShotByPlayerEvent(arrow, (LivingEntity)damagee, event)) {
-								if (!cancelled) {
-									cancelled = true;
-									damager.remove();
-									event.setCancelled(true);
-								}
-							}
-						}
+					if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+						damager.remove();
+						event.setCancelled(true);
 					}
 
 					double damage = mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, arrow, event);
@@ -472,18 +452,9 @@ public class EntityListener implements Listener {
 				}
 				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
 
-				boolean cancelled = false;
-				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast()) {
-						if (!abil.PlayerShotArrowEvent(arrow)) {
-							if (!cancelled) {
-								cancelled = true;
-								arrow.remove();
-								event.setCancelled(true);
-							}
-						}
-					}
+				if (!AbilityManager.getManager().PlayerShotArrowEvent(player, arrow)) {
+					arrow.remove();
+					event.setCancelled(true);
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);

@@ -41,12 +41,7 @@ public class InventoryUtils {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				plugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
-				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast()) {
-						abil.PlayerItemHeldEvent(mainHand, offHand);
-					}
-				}
+				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 			}
 		}, 0);

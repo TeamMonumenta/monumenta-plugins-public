@@ -162,30 +162,7 @@ public class PlayerListener implements Listener {
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
 		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
-
-
-		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-		for (Ability abil : aColl.getAbilities()) {
-			AbilityInfo info = abil.getInfo();
-			if (info.trigger != null) {
-				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
-					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							if (abil.cast()) {
-								abil.putOnCooldown();
-							}
-						}
-					}
-				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
-					if (event.getAction() == Action.RIGHT_CLICK_AIR
-					    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && !block.getType().isInteractable())) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast();
-						}
-					}
-				}
-			}
-		}
+		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
 
 		// Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -374,12 +351,7 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
-			AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-			for (Ability abil : aColl.getAbilities()) {
-				if (abil.canCast()) {
-					abil.PlayerItemHeldEvent(mainHand, offHand);
-				}
-			}
+			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 		}
 	}
@@ -448,15 +420,11 @@ public class PlayerListener implements Listener {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
+				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 
 				mPlugin.getClass(player).PlayerRespawnEvent(player);
-				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast()) {
-						abil.PlayerRespawnEvent();
-					}
-				}
+				AbilityManager.getManager().PlayerRespawnEvent(player);
 			}
 		}, 0);
 	}

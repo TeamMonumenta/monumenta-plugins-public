@@ -168,12 +168,7 @@ public class MobListener implements Listener {
 				                                          shouldGenDrops);
 				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
 
-				AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-				for (Ability abil : aColl.getAbilities()) {
-					if (abil.canCast()) {
-						abil.EntityDeathEvent(event, shouldGenDrops);
-					}
-				}
+				AbilityManager.getManager().EntityDeathEvent(player, event, shouldGenDrops);
 
 				for (Player p : PlayerUtils.getNearbyPlayers(player, ALCH_PASSIVE_RADIUS, false)) {
 					int classNumber = ScoreboardUtils.getScoreboardValue(p, "Class");

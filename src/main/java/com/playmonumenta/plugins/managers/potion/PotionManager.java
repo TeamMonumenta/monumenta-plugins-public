@@ -151,10 +151,8 @@ public class PotionManager {
 		//  Next we want to get this players class and call into an initialization function to make sure they have the correct potion
 		//  effect types applied.
 		mPlugin.getClass(player).setupClassPotionEffects(player);
-		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-		for (Ability abil : aColl.getAbilities()) {
-			abil.setupClassPotionEffects();
-		}
+		AbilityManager.getManager().setupClassPotionEffects(player);
+
 		//  Once all the potion stuff is setup apply the best effects.
 		applyBestPotionEffect(player);
 	}
