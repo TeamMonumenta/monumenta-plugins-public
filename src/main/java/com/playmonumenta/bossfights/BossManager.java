@@ -76,6 +76,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(Masked_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_2(p, e, s, l));
 		mStatefulBosses.put(Virius.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Virius(p, e, s, l));
 		mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
+		mStatefulBosses.put(Azacor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Azacor(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -99,6 +100,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
 		mBossDeserializers.put(Virius.identityTag, (Plugin p, LivingEntity e) -> Virius.deserialize(p, e));
 		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
+		mBossDeserializers.put(Azacor.identityTag, (Plugin p, LivingEntity e) -> Azacor.deserialize(p, e));
 	}
 
 	public BossManager(Plugin plugin) {

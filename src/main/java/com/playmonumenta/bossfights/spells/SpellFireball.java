@@ -11,7 +11,11 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -70,6 +74,9 @@ public class SpellFireball implements Spell {
 
 			@Override
 			public void run() {
+				mBoss.setAI(false);
+				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
+				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
 				if (mTicks >= mDelay) {
 					mLaunches++;
 					mTicks = 0;
@@ -94,6 +101,7 @@ public class SpellFireball implements Spell {
 
 				if (mLaunches >= mCount) {
 					this.cancel();
+					mBoss.setAI(true);
 				}
 
 				mTicks += 2;
