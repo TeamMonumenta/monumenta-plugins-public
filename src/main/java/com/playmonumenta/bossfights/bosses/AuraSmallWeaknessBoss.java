@@ -10,7 +10,6 @@ import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Material;
-import org.bukkit.material.MaterialData;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +28,7 @@ public class AuraSmallWeaknessBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST, new MaterialData(Material.REDSTONE_BLOCK),
+			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST, Material.REDSTONE_BLOCK.createBlockData(),
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 1, true, true));
 			                  })

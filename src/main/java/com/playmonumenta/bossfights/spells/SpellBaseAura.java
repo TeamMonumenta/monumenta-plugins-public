@@ -2,10 +2,12 @@ package com.playmonumenta.bossfights.spells;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import org.bukkit.material.MaterialData;
 import org.bukkit.Particle;
 
 public class SpellBaseAura implements Spell {
@@ -18,23 +20,25 @@ public class SpellBaseAura implements Spell {
 		void run(Player player);
 	}
 
-	private Entity mBoss;
-	private double mDX;
-	private double mDY;
-	private double mDZ;
-	private double mParticleDX;
-	private double mParticleDY;
-	private double mParticleDZ;
-	private int mNumParticles;
-	private Particle mParticle;
-	private MaterialData mColor;
-	private ApplyAuraEffect mAuraEffect;
+	private final Entity mBoss;
+	private final double mDX;
+	private final double mDY;
+	private final double mDZ;
+	private final double mParticleDX;
+	private final double mParticleDY;
+	private final double mParticleDZ;
+	private final int mNumParticles;
+	private final Particle mParticle;
+	private final Object mParticleArg;
+	private final ApplyAuraEffect mAuraEffect;
 
-	private int mRadius; // Computed maximum of mDX, mDY, mDZ
-	private int mIter; // Number of iterations - rolls around between 1 and 4
+	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
+	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
+	private int mParticleIter; // Number of particle iterations - rolls around between 0 and 20
+	private final List<Player> mParticlePlayers; // Players who have opted to get particles
 
 	public SpellBaseAura(Entity boss, double dx, double dy, double dz, int numParticles,
-	                     Particle particle, MaterialData color, ApplyAuraEffect auraEffect) {
+	                     Particle particle, Object particleArg, ApplyAuraEffect auraEffect) {
 		mBoss = boss;
 		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
 		mDX = dx;
@@ -45,11 +49,12 @@ public class SpellBaseAura implements Spell {
 		mParticleDZ = dz / 2 - 1;
 		mNumParticles = numParticles;
 		mParticle = particle;
-		mColor = color;
+		mParticleArg = particleArg;
 		mAuraEffect = auraEffect;
+		mParticlePlayers = new ArrayList<Player>();
 
 		mRadius = (int)Math.max(mDX, Math.max(mDY, mDZ));
-		mIter = 0;
+		mEffectIter = 0;
 	}
 
 	/*
@@ -61,15 +66,24 @@ public class SpellBaseAura implements Spell {
 	public void run() {
 		Location bossLoc = mBoss.getLocation();
 
-		// Generate particles in area
-		bossLoc.getWorld().spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mColor);
-		// Generate particles immediately around boss
-		bossLoc.getWorld().spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mColor);
+		for (Player player : mParticlePlayers) {
+			if (mParticleArg != null) {
+				// Generate particles in area
+				player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg);
+				// Generate particles immediately around boss
+				player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg);
+			} else {
+				// Generate particles in area
+				player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ);
+				// Generate particles immediately around boss
+				player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1);
+			}
+		}
 
 		// Apply effects every other pulse (2 Hz)
-		mIter++;
-		if (mIter >= 2 && mAuraEffect != null) {
-			mIter = 0;
+		mEffectIter++;
+		if (mEffectIter >= 2 && mAuraEffect != null) {
+			mEffectIter = 0;
 
 			for (Player player : Utils.playersInRange(bossLoc, mRadius)) {
 				Location playerLoc = player.getLocation();
@@ -78,6 +92,28 @@ public class SpellBaseAura implements Spell {
 				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
 					// Player is within range
 					mAuraEffect.run(player);
+				}
+			}
+		}
+
+		// Update the group of nearby players who can see the particles every 5s
+		mParticleIter++;
+		if (mParticleIter >= 20) {
+			mParticleIter = 0;
+
+			// Loop through all nearby players and put the ones that don't have
+			// the noAuraParticles tag on a list to send particles to them
+			mParticlePlayers.clear();
+			for (Player player : Utils.playersInRange(bossLoc, 80)) {
+				boolean particlesOk = true;
+				for (String tag : player.getScoreboardTags()) {
+					if (tag.equals("noAuraParticles")) {
+						particlesOk = false;
+						break;
+					}
+				}
+				if (particlesOk) {
+					mParticlePlayers.add(player);
 				}
 			}
 		}
