@@ -1,6 +1,24 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.playmonumenta.plugins.abilities.AbilityCollection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -19,6 +37,7 @@ import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
@@ -29,25 +48,6 @@ import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.Plugin;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
-import org.bukkit.World;
 
 public class AbilityManager {
 	private static AbilityManager mManager = null;
@@ -92,6 +92,7 @@ public class AbilityManager {
 		                          new Agility(mPlugin, mWorld, mRandom, null),
 		                          new BowMastery(mPlugin, mWorld, mRandom, null),
 		                          new Volley(mPlugin, mWorld, mRandom, null),
+		                          new Swiftness(mPlugin, mWorld, mRandom, null),
 
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
