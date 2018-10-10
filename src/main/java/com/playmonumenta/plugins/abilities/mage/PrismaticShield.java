@@ -77,9 +77,11 @@ public class PrismaticShield extends Ability {
 	@Override
 	public boolean runCheck() {
 		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
-		double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
-		if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
-			return true;
+		if (lastDamage != null && !lastDamage.isCancelled()) {
+			double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
+			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
+				return true;
+			}
 		}
 		return false;
 	}
