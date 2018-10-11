@@ -4,9 +4,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.ClericClass;
-import com.playmonumenta.plugins.classes.ScoutClass;
 import com.playmonumenta.plugins.classes.WarlockClass;
-import com.playmonumenta.plugins.classes.WarriorClass;
 import com.playmonumenta.plugins.command.*;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
@@ -165,11 +163,11 @@ public class Plugin extends JavaPlugin {
 		//  Initialize Classes.
 		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.MAGE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.WARRIOR.getValue(), new WarriorClass(this, mRandom, mWorld));
+		mClassMap.put(Classes.WARRIOR.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.CLERIC.getValue(), new ClericClass(this, mRandom));
 		mClassMap.put(Classes.ROGUE.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom, mWorld));
-		mClassMap.put(Classes.SCOUT.getValue(), new ScoutClass(this, mRandom));
+		mClassMap.put(Classes.SCOUT.getValue(), new BaseClass(this, mRandom));
 		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
 
 		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
