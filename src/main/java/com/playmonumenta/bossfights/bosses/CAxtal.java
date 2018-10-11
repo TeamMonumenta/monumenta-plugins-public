@@ -70,6 +70,8 @@ public class CAxtal extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.addScoreboardTag("Boss");
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellAxtalWitherAoe(plugin, mBoss, 13, 4),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),

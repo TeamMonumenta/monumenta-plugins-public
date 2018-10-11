@@ -62,6 +62,8 @@ public class Virius extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.addScoreboardTag("Boss");
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA_BLOCK),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,

@@ -32,7 +32,6 @@ public abstract class BossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
-		mBoss.addScoreboardTag("Boss");
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable passive = new Runnable() {

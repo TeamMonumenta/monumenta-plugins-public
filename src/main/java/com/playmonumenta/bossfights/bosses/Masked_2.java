@@ -62,6 +62,8 @@ public class Masked_2 extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.addScoreboardTag("Boss");
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellMaskedFrostNova(plugin, mBoss, 9, 70),
 			new SpellMaskedShadowGlade(plugin, spawnLoc, 2),

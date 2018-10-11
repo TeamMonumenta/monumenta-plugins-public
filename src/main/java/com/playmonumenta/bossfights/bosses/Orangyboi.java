@@ -56,6 +56,8 @@ public class Orangyboi extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.addScoreboardTag("Boss");
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellGenericCharge(plugin, mBoss, detectionRange, 15.0F)
 		));

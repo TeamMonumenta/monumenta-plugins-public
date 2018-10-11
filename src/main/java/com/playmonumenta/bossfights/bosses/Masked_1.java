@@ -66,6 +66,8 @@ public class Masked_1 extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.addScoreboardTag("Boss");
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseLaser(plugin, boss, 40, 120, true, false,
 		                       // Tick action per player
