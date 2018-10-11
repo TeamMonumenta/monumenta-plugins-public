@@ -1,5 +1,11 @@
 package com.playmonumenta.bossfights;
 
+import com.playmonumenta.bossfights.bosses.*;
+import com.playmonumenta.bossfights.utils.SerializationUtils;
+import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.Map;
@@ -21,11 +27,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.Location;
-
-import com.playmonumenta.bossfights.bosses.*;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
-import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 
 public class BossManager implements Listener {
 	Plugin mPlugin;
@@ -164,25 +165,29 @@ public class BossManager implements Listener {
 
 		Set<String> tags = entity.getScoreboardTags();
 		if (tags != null && !tags.isEmpty()) {
-			try {
-				Boss boss = null;
-				for (String tag : tags) {
-					BossDeserializer deserializer = mBossDeserializers.get(tag);
-					if (deserializer != null) {
-						BossAbilityGroup ability = deserializer.deserialize(mPlugin, entity);
+			Boss boss = null;
+			/*
+			 * Note - it is important to make a copy here to avoid concurrent modification exception
+			 * which happens while iterating and the boss constructor changes the tags on the mob
+			 */
+			for (String tag : new ArrayList<String>(tags)) {
+				BossDeserializer deserializer = mBossDeserializers.get(tag);
+				if (deserializer != null) {
+					BossAbilityGroup ability;
+					try {
+						ability = deserializer.deserialize(mPlugin, entity);
+					} catch (Exception ex) {
+						mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
+						continue;
+					}
 
-						if (boss == null) {
-							boss = new Boss(ability);
-							mBosses.put(entity.getUniqueId(), boss);
-						} else {
-							boss.add(ability);
-						}
-
-						break;
+					if (boss == null) {
+						boss = new Boss(ability);
+						mBosses.put(entity.getUniqueId(), boss);
+					} else {
+						boss.add(ability);
 					}
 				}
-			} catch (Exception ex) {
-				mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
 			}
 		}
 	}
