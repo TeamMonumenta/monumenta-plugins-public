@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -47,7 +46,7 @@ public class FrostNova extends Ability {
 		mPlayer.setFireTicks(0);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-			AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
+			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
 
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
 			if (frostNova > 1) {

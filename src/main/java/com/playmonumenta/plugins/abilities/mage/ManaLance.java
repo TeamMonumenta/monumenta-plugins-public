@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -70,7 +69,7 @@ public class ManaLance extends Ability {
 				break;
 			}
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
-				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
+				Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 				mob.addPotionEffect(
 				    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 			}

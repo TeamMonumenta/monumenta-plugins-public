@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 import java.util.Random;
@@ -42,23 +41,23 @@ public class ElementalArrows extends Ability {
 			if (arrow.hasMetadata("FireArrow")) {
 				if (elementalArrows == 1) {
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-					AbilityUtils.mageSpellshock(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 0, mPlayer, MagicType.FIRE);
+					Spellshock.spellDamageMob(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 0, mPlayer, MagicType.FIRE);
 				} else if (elementalArrows == 2) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
 						if (mob != damagee) {
 							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-							AbilityUtils.mageSpellshock(mPlugin, mob, 0, mPlayer, MagicType.FIRE);
+							Spellshock.spellDamageMob(mPlugin, mob, 0, mPlayer, MagicType.FIRE);
 						}
 					}
 				}
 			} else if (arrow.hasMetadata("IceArrow")) {
 				if (elementalArrows == 1) {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-					AbilityUtils.mageSpellshock(mPlugin, damagee, 0, mPlayer, MagicType.ICE);
+					Spellshock.spellDamageMob(mPlugin, damagee, 0, mPlayer, MagicType.ICE);
 				} else if (elementalArrows == 2) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-						AbilityUtils.mageSpellshock(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 0, mPlayer, MagicType.ICE);
+						Spellshock.spellDamageMob(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 0, mPlayer, MagicType.ICE);
 					}
 				}
 			}

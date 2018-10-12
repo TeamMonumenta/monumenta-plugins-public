@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -55,7 +54,7 @@ public class MagmaShield extends Ability {
 				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
 				int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
-				AbilityUtils.mageSpellshock(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
+				Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
 			}
 		}
 
