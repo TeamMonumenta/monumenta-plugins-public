@@ -1,10 +1,6 @@
 package com.playmonumenta.plugins;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.AlchemistClass;
-import com.playmonumenta.plugins.classes.BaseClass;
-import com.playmonumenta.plugins.classes.ClericClass;
-import com.playmonumenta.plugins.classes.WarlockClass;
 import com.playmonumenta.plugins.command.*;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
@@ -102,7 +98,6 @@ public class Plugin extends JavaPlugin {
 		}
 	}
 
-	public HashMap<Integer, BaseClass> mClassMap = new HashMap<Integer, BaseClass>();
 	public HashMap<Integer, BaseSpecialization> mSpecializationMap = new HashMap<Integer, BaseSpecialization>();
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
@@ -159,17 +154,7 @@ public class Plugin extends JavaPlugin {
 		_loadConfig();
 		mServerProperties.load(this);
 
-		//  TODO: Move this out of here and into it's own ClassManager class.
-		//  Initialize Classes.
-		mClassMap.put(Classes.NONE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.MAGE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.WARRIOR.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.CLERIC.getValue(), new ClericClass(this, mRandom));
-		mClassMap.put(Classes.ROGUE.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.ALCHEMIST.getValue(), new AlchemistClass(this, mRandom, mWorld));
-		mClassMap.put(Classes.SCOUT.getValue(), new BaseClass(this, mRandom));
-		mClassMap.put(Classes.WARLOCK.getValue(), new WarlockClass(this, mRandom));
-
+		//  Initialize Specializations
 		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.SWORDSAGE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.ASSASSIN.getId(), new AssassinSpecialization(this, mRandom, mWorld));
@@ -229,9 +214,6 @@ public class Plugin extends JavaPlugin {
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
-						BaseClass pClass = Plugin.this.getClass(player);
-						pClass.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
-
 						BaseSpecialization pSpec = getSpecialization(player);
 						pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 
@@ -281,25 +263,6 @@ public class Plugin extends JavaPlugin {
 
 	public Player getPlayer(UUID playerID) {
 		return getServer().getPlayer(playerID);
-	}
-
-	//  TODO: Hmmm. I feel we may be able to transition all class related activites to static functions, investigate.
-	public BaseClass getClass(Player player) {
-		// Players in spectator have no class abilities
-		// TODO: Hook vanished here also
-		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-			return mClassMap.get(Classes.NONE.getValue());
-		}
-
-		if (Constants.CLASSES_ENABLED) {
-			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Class");
-			if (playerClass >= 0 && playerClass <= Classes.COUNT.getValue()) {
-				return mClassMap.get(playerClass);
-			}
-		}
-
-		//  We Seem to be missing a class.
-		return mClassMap.get(Classes.NONE.getValue());
 	}
 
 	public BaseSpecialization getSpecialization(Player player) {

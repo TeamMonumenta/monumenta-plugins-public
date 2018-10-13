@@ -40,7 +40,6 @@ public class InventoryUtils {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				plugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 			}

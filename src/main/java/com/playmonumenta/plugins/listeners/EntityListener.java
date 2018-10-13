@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
@@ -135,10 +134,6 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-
-			if (!mPlugin.getClass(player).PlayerCombustByEntityEvent(player, combuster)) {
-				event.setCancelled(true);
-			}
 		}
 	}
 
@@ -173,9 +168,6 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
-				if (!mPlugin.getClass(player).PlayerDamagedByLivingEntityEvent((Player)damagee, (LivingEntity)damager, event.getFinalDamage()))  {
-					event.setCancelled(true);
-				}
 				if (!mPlugin.getSpecialization(player).PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
@@ -193,10 +185,6 @@ public class EntityListener implements Listener {
 			} else {
 				if (damager instanceof Projectile) {
 					Projectile proj = (Projectile) damager;
-					if (!mPlugin.getClass(player).PlayerDamagedByProjectileEvent((Player)damagee, (Projectile)damager)) {
-						damager.remove();
-						event.setCancelled(true);
-					}
 
 					if (!AbilityManager.getManager().PlayerDamagedByProjectileEvent(player, event)) {
 						damager.remove();
@@ -237,9 +225,6 @@ public class EntityListener implements Listener {
 						event.setDamage(Math.max(damage, 0));
 
 						AbilityManager.getManager().modifyDamage(player, event);
-						BaseClass _class = mPlugin.getClass(player);
-						_class.ModifyDamage(player, _class, event);
-						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
 
 						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
 
@@ -259,9 +244,6 @@ public class EntityListener implements Listener {
 				if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					Player player = (Player)arrow.getShooter();
 
-					BaseClass _class = mPlugin.getClass(player);
-					_class.ModifyDamage(player, _class, event);
-					_class.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 
 					if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
@@ -299,10 +281,6 @@ public class EntityListener implements Listener {
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 				event.setCancelled(true);
 				return;
-			}
-
-			if (!mPlugin.getClass(player).PlayerDamagedEvent(player, source, event.getDamage())) {
-				event.setCancelled(true);
 			}
 
 			LocationType locType = LocationUtils.getLocationType(mPlugin, player.getLocation());
@@ -449,7 +427,6 @@ public class EntityListener implements Listener {
 				if (!mPlugin.getSpecialization(player).PlayerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
-				mPlugin.getClass(player).PlayerShotArrowEvent(player, arrow);
 
 				if (!AbilityManager.getManager().PlayerShotArrowEvent(player, arrow)) {
 					arrow.remove();
@@ -462,7 +439,7 @@ public class EntityListener implements Listener {
 			SplashPotion potion = (SplashPotion)event.getEntity();
 			if (potion.getShooter() instanceof Player) {
 				Player player = (Player)potion.getShooter();
-				mPlugin.getClass(player).PlayerThrewSplashPotionEvent(player, potion);
+				//mPlugin.getClass(player).PlayerThrewSplashPotionEvent(player, potion);
 			}
 		}
 	}
@@ -491,8 +468,7 @@ public class EntityListener implements Listener {
 			// If thrown by a player, that player's class determines how entities are affected
 			Player player = (Player)source;
 
-			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion, event) ||
-			    AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
+			if (AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -532,7 +508,7 @@ public class EntityListener implements Listener {
 		if (source instanceof Player) {
 			Player player = (Player)source;
 
-			mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
+			//mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
 		}
 
 		PotionData data = cloud.getBasePotionData();
@@ -597,9 +573,6 @@ public class EntityListener implements Listener {
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player)entity;
 
-			// Give classes a chance to modify the projectile first
-			mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
-
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 
@@ -638,7 +611,6 @@ public class EntityListener implements Listener {
 			if (source instanceof Player) {
 				Player player = (Player)source;
 				AbilityManager.getManager().ProjectileHitEvent(player, event, arrow);
-				mPlugin.getClass(player).ProjectileHitEvent(player, arrow);
 			}
 		}
 

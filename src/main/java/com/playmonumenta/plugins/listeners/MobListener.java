@@ -163,9 +163,6 @@ public class MobListener implements Listener {
 			Player player = livingEntity.getKiller();
 			if (player != null) {
 				//  Player kills a mob
-				mPlugin.getClass(player).EntityDeathEvent(player, livingEntity,
-				                                          entity.getLastDamageCause().getCause(),
-				                                          shouldGenDrops);
 				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
 
 				AbilityManager.getManager().EntityDeathEvent(player, event, shouldGenDrops);

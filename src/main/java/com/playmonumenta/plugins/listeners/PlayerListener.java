@@ -160,7 +160,6 @@ public class PlayerListener implements Listener {
 		}
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
-		mPlugin.getClass(player).PlayerInteractEvent(player, event.getAction(), item, mat);
 		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
 		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
 
@@ -350,7 +349,6 @@ public class PlayerListener implements Listener {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-			mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 		}
@@ -419,11 +417,9 @@ public class PlayerListener implements Listener {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				mPlugin.getClass(player).PlayerItemHeldEvent(player, mainHand, offHand);
 				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
 
-				mPlugin.getClass(player).PlayerRespawnEvent(player);
 				AbilityManager.getManager().PlayerRespawnEvent(player);
 			}
 		}, 0);
