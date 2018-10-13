@@ -36,14 +36,6 @@ public class BaseClass {
 		mCooldowns = new CooldownTimers(plugin);
 	}
 
-	public void FakeAbilityOffCooldown(Player player, Spells ability) {
-		/*
-		if (ability == Spells.STANDARD_BEARER_FAKE) {
-			player.removeMetadata(ScoutClass.STANDARD_BEARER_TAG_NAME, mPlugin);
-		}
-		*/
-	}
-
 	public void setupClassPotionEffects(Player player) {}
 
 	public void AbilityOffCooldown(Player player, Spells spell) {}

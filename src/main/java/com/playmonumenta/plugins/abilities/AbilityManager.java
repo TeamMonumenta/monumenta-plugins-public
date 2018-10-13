@@ -109,7 +109,6 @@ public class AbilityManager {
 		                          new Swiftness(mPlugin, mWorld, mRandom, null),
 		                          new EagleEye(mPlugin, mWorld, mRandom, null),
 		                          new ScoutPassive(mPlugin, mWorld, mRandom, null),
-//		                          new StandardBearer(mPlugin, mWorld, mRandom, null),
 
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),

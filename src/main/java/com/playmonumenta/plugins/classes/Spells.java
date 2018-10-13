@@ -71,7 +71,6 @@ public enum Spells {
 
 	//-- Core Abilities
 	VOLLEY("Volley", Classes.SCOUT),
-	STANDARD_BEARER("Standard Bearer", Classes.SCOUT),
 	EAGLE_EYE("Eagle Eye", Classes.SCOUT),
 
 	//--Camper/Sniper
