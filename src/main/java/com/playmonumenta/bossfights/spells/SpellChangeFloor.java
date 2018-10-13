@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,14 +19,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
 
-import com.playmonumenta.bossfights.utils.Utils;
-
 public class SpellChangeFloor implements Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private int mRange;
 	private int mRadius;
 	private Material mMaterial;
+	private int mDuration;
+	private int mFloorDuration;
 
 	private Random mRandom = new Random();
 
@@ -40,13 +42,14 @@ public class SpellChangeFloor implements Spell {
 	        );
 
 
-	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material) {
+	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material, int floorduration) {
 		mPlugin = plugin;
 		mBoss = launcher;
 		mRange = range;
 		mRadius = radius;
 		mMaterial = material;
 		mIgnoredMats.add(material);
+		mFloorDuration = floorduration;
 	}
 
 	@Override
@@ -67,7 +70,7 @@ public class SpellChangeFloor implements Spell {
 		 * Third phase - cleanup converted blocks
 		 */
 		final int PHASE1_TICKS = 30;
-		final int PHASE2_TICKS = 800;
+		final int PHASE2_TICKS = mFloorDuration;
 
 		new BukkitRunnable() {
 			int mTicks = 0;

@@ -4,6 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import com.playmonumenta.bossfights.BossBarManager;
+import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
+import com.playmonumenta.bossfights.spells.SpellChangeFloor;
+import com.playmonumenta.bossfights.utils.SerializationUtils;
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.Arrays;
 
 import org.bukkit.attribute.Attribute;
@@ -17,14 +25,6 @@ import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Sound;
-
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.spells.SpellChangeFloor;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
 
 public class Virius extends BossAbilityGroup {
 	public static final String identityTag = "boss_virius";
@@ -65,7 +65,7 @@ public class Virius extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA_BLOCK),
+			new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA_BLOCK, 800),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {

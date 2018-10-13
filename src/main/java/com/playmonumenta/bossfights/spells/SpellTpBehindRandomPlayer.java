@@ -1,10 +1,13 @@
 package com.playmonumenta.bossfights.spells;
 
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,16 +16,16 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.utils.Utils;
-
-public class SpellAxtalSneakup implements Spell {
+public class SpellTpBehindRandomPlayer implements Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
+	private int mDuration;
 	private Random mRand = new Random();
 
-	public SpellAxtalSneakup(Plugin plugin, Entity launcher) {
+	public SpellTpBehindRandomPlayer(Plugin plugin, Entity launcher, int duration) {
 		mPlugin = plugin;
 		mLauncher = launcher;
+		mDuration = duration;
 	}
 
 	@Override
@@ -35,7 +38,7 @@ public class SpellAxtalSneakup implements Spell {
 
 	@Override
 	public int duration() {
-		return 160; // 8 seconds
+		return mDuration;
 	}
 
 	private void launch(Player target) {
@@ -47,6 +50,9 @@ public class SpellAxtalSneakup implements Spell {
 				Vector vect = newloc.getDirection().multiply(-3.0f);
 				newloc.add(vect).setY(target.getLocation().getY() + 0.1f);
 				mLauncher.teleport(newloc);
+				if (mLauncher instanceof Mob) {
+					((Mob)mLauncher).setTarget(target);
+				}
 			}
 		};
 		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 50);

@@ -4,6 +4,20 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import com.playmonumenta.bossfights.BossBarManager;
+import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;
+import com.playmonumenta.bossfights.spells.SpellAxtalTntThrow;
+import com.playmonumenta.bossfights.spells.SpellAxtalWitherAoe;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
+import com.playmonumenta.bossfights.spells.SpellBlockBreak;
+import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
+import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
+import com.playmonumenta.bossfights.utils.SerializationUtils;
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,20 +33,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;
-import com.playmonumenta.bossfights.spells.SpellAxtalSneakup;
-import com.playmonumenta.bossfights.spells.SpellAxtalTntThrow;
-import com.playmonumenta.bossfights.spells.SpellAxtalWitherAoe;
-import com.playmonumenta.bossfights.spells.SpellBlockBreak;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
 
 public class CAxtal extends BossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";
@@ -75,7 +75,7 @@ public class CAxtal extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellAxtalWitherAoe(plugin, mBoss, 13, 4),
 			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),
-			new SpellAxtalSneakup(plugin, mBoss),
+			new SpellTpBehindRandomPlayer(plugin, mBoss, 160),
 			new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
 			new SpellBaseLaser(plugin, boss, 60, 140, false, true,
 			                   // Tick action per player

@@ -1,13 +1,7 @@
 package com.playmonumenta.bossfights;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
 import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;
 import com.playmonumenta.bossfights.spells.SpellAxtalRangedFlyingMinions;
-import com.playmonumenta.bossfights.spells.SpellAxtalSneakup;
 import com.playmonumenta.bossfights.spells.SpellAxtalTntThrow;
 import com.playmonumenta.bossfights.spells.SpellAxtalWitherAoe;
 import com.playmonumenta.bossfights.spells.SpellBlockBreak;
@@ -16,8 +10,14 @@ import com.playmonumenta.bossfights.spells.SpellMaskedFrostNova;
 import com.playmonumenta.bossfights.spells.SpellMaskedShadowGlade;
 import com.playmonumenta.bossfights.spells.SpellMaskedSummonBlazes;
 import com.playmonumenta.bossfights.spells.SpellPushPlayersAway;
+import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
 import com.playmonumenta.bossfights.utils.Utils;
 import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class MobSpell implements CommandExecutor {
 	Plugin plugin;
@@ -76,10 +76,12 @@ public class MobSpell implements CommandExecutor {
 				                        Utils.parseInt(args[1], 0, 64),
 				                        Utils.parseInt(args[2], 0, 60))).run();
 				break;
-			case "axtal_sneakup":
-				usage = "axtal_sneakup";
+			case "tp_behind":
+				usage = "tp_behind";
 				Utils.assertArgCount(args, 0);
-				(new SpellAxtalSneakup(plugin, Utils.calleeEntity(send))).run();
+				(new SpellTpBehindRandomPlayer(plugin,
+											   Utils.calleeEntity(send),
+											   Utils.parseInt(args[1], 0, 1000))).run();
 				break;
 			case "axtal_block_break":
 			case "block_break":
