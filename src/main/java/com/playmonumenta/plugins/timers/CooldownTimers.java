@@ -97,11 +97,7 @@ public class CooldownTimers {
 					if (time <= 0) {
 						Spells spell = cooldown.getKey();
 
-						if (!spell.isFake()) {
-							MessagingUtils.sendActionBarMessage(mPlugin, _player, spell.getName() + " is now off cooldown!");
-						} else {
-							//mPlugin.getClass(_player).FakeAbilityOffCooldown(_player, spell);
-						}
+						MessagingUtils.sendActionBarMessage(mPlugin, _player, spell.getName() + " is now off cooldown!");
 
 						abilityIter.remove();
 					} else {
@@ -131,11 +127,7 @@ public class CooldownTimers {
 			int cd = cds.get(spell);
 			cd -= ticks;
 			if (cd <= 0) {
-				if (!spell.isFake()) {
-					MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
-				} else {
-					//mPlugin.getClass(player).FakeAbilityOffCooldown(player, spell);
-				}
+				MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
 				cds.remove(spell);
 			} else {
 				cds.put(spell, cd);

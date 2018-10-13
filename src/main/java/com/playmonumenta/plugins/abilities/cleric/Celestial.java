@@ -6,25 +6,26 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.Location;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.Particle;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
 import org.bukkit.World;
 
 public class Celestial extends Ability {
 
-	public static final int CELESTIAL_1_FAKE_ID = 100361;
-	public static final int CELESTIAL_2_FAKE_ID = 100362;
 	private static final int CELESTIAL_COOLDOWN = 40 * 20;
 	private static final int CELESTIAL_1_DURATION = 10 * 20;
 	private static final int CELESTIAL_2_DURATION = 12 * 20;
 	private static final double CELESTIAL_RADIUS = 12;
-	public static final String CELESTIAL_1_TAGNAME = "Celestial_1";
-	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
+	private static final String CELESTIAL_1_TAGNAME = "Celestial_1";
+	private static final String CELESTIAL_2_TAGNAME = "Celestial_2";
 	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
@@ -43,18 +44,29 @@ public class Celestial extends Ability {
 		int celestial = getAbilityScore();
 
 		World world = mPlayer.getWorld();
-		Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
 		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
+		String tagName = celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME;
 
-		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, CELESTIAL_RADIUS, true)) {
-			mPlugin.mTimers.AddCooldown(p.getUniqueId(), fakeID, duration);
+		List<Player> affectedPlayers = PlayerUtils.getNearbyPlayers(mPlayer, CELESTIAL_RADIUS, true);
 
-			p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
+		// Give these players the metadata tag that boosts their damage
+		for (Player p : affectedPlayers) {
+			p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
 
 			Location loc = p.getLocation();
 			world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
 			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
 		}
+
+		// Run a task later to remove the metadata tag after time has elapsed
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (Player p : affectedPlayers) {
+					p.removeMetadata(tagName, mPlugin);
+				}
+			}
+		}.runTaskLater(mPlugin, duration);
 
 		return true;
 	}
@@ -64,4 +76,15 @@ public class Celestial extends Ability {
 		return mPlayer.isSneaking();
 	}
 
+	/**
+	 * A static method that is run every time a player does damage (regardless of class) to
+	 * check for this ability.
+	 */
+	public static void modifyDamage(Player player, EntityDamageByEntityEvent event) {
+		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {
+			event.setDamage(event.getDamage() * CELESTIAL_1_DAMAGE_MULTIPLIER);
+		} else if (player.hasMetadata(CELESTIAL_2_TAGNAME)) {
+			event.setDamage(event.getDamage() * CELESTIAL_2_DAMAGE_MULTIPLIER);
+		}
+	}
 }

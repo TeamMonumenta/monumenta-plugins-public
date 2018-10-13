@@ -37,13 +37,11 @@ public class BaseClass {
 	}
 
 	public void FakeAbilityOffCooldown(Player player, Spells ability) {
-		if (ability == Spells.CELESTIAL_FAKE_1) {
-			player.removeMetadata(ClericClass.CELESTIAL_1_TAGNAME, mPlugin);
-		} else if (ability == Spells.CELESTIAL_FAKE_2) {
-			player.removeMetadata(ClericClass.CELESTIAL_2_TAGNAME, mPlugin);
-		} else if (ability == Spells.STANDARD_BEARER_FAKE) {
+		/*
+		if (ability == Spells.STANDARD_BEARER_FAKE) {
 			player.removeMetadata(ScoutClass.STANDARD_BEARER_TAG_NAME, mPlugin);
 		}
+		*/
 	}
 
 	public void setupClassPotionEffects(Player player) {}

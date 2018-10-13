@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
@@ -121,6 +122,7 @@ public class AbilityManager {
 		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
 
 		                          // CLERIC
+		                          new Celestial(mPlugin, mWorld, mRandom, null),
 		                          new CleansingRain(mPlugin, mWorld, mRandom, null),
 		                          new HandOfLight(mPlugin, mWorld, mRandom, null),
 		                          new ClericPassive(mPlugin, mWorld, mRandom, null),
@@ -147,21 +149,13 @@ public class AbilityManager {
 		return getPlayerAbilities(player).getAbility(spell);
 	}
 
-	public static final String CELESTIAL_1_TAGNAME = "Celestial_1";
-	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
-	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
-	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
-
+	/**
+	 * Called whenever a player deals damage.
+	 *
+	 * All classes that modify player damage should register in this function
+	 */
 	public void modifyDamage(Player player, EntityDamageByEntityEvent event) {
-		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {
-			double damage = event.getDamage();
-			damage *= CELESTIAL_1_DAMAGE_MULTIPLIER;
-			event.setDamage(damage);
-		} else if (player.hasMetadata(CELESTIAL_2_TAGNAME)) {
-			double damage = event.getDamage();
-			damage *= CELESTIAL_2_DAMAGE_MULTIPLIER;
-			event.setDamage(damage);
-		}
+		Celestial.modifyDamage(player, event);
 	}
 
 	//Events

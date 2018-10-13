@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.attribute.Attribute;
@@ -89,7 +89,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> getNearbyPlayers(Location loc, double radius) {
-		List<Player> players = new LinkedList<Player>();
+		List<Player> players = new ArrayList<Player>();
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (loc.distance(player.getLocation()) <= radius && player.getGameMode() != GameMode.SPECTATOR) {

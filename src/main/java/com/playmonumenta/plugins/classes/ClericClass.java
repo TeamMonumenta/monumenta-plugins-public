@@ -39,7 +39,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
     Sanctified
     Rejuvenation
     HeavenlyBoon
-    Cleansing
     DivineJustice
     Celestial
     Healing
@@ -61,30 +60,9 @@ public class ClericClass extends BaseClass {
 	private static final double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 
-	//  CLEANSING
-	private static final int CLEANSING_DURATION = 15 * 20;
-	private static final int CLEANSING_RESIST_LEVEL = 0;
-	private static final int CLEANSING_STRENGTH_LEVEL = 0;
-	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
-	private static final int CLEANSING_RADIUS = 4;
-	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
-	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
-	private static final double CLEANSING_ANGLE = 50.0;
-
 	private static final int DIVINE_JUSTICE_DAMAGE = 5;
 	private static final int DIVINE_JUSTICE_HEAL = 4;
 	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
-
-	public static final int CELESTIAL_1_FAKE_ID = 100361;
-	public static final int CELESTIAL_2_FAKE_ID = 100362;
-	private static final int CELESTIAL_COOLDOWN = 40 * 20;
-	private static final int CELESTIAL_1_DURATION = 10 * 20;
-	private static final int CELESTIAL_2_DURATION = 12 * 20;
-	private static final double CELESTIAL_RADIUS = 12;
-	public static final String CELESTIAL_1_TAGNAME = "Celestial_1";
-	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
-	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
-	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
 	private static final int HEALING_RADIUS = 12;
 	private static final int HEALING_1_HEAL = 10;
@@ -138,30 +116,6 @@ public class ClericClass extends BaseClass {
 							PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
 							if (p.getHealth() > oldHealth) {
 								world.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
-							}
-						}
-					}
-				}
-			}
-
-			if (twoHertz) {
-				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
-				if (cleansing > 0) {
-					if (mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE)) {
-						player.getWorld().spawnParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
-						player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
-
-						for (Player e : PlayerUtils.getNearbyPlayers(player, CLEANSING_RADIUS, true)) {
-							PotionUtils.clearNegatives(mPlugin, e);
-
-							if (e.getFireTicks() > 1) {
-								e.setFireTicks(1);
-							}
-
-							// TODO: This should use the potion manager!
-							e.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, true));
-							if (cleansing > 1) {
-								e.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, true));
 							}
 						}
 					}
@@ -322,59 +276,18 @@ public class ClericClass extends BaseClass {
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (player.isSneaking()) {
 			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-				int celestial = ScoreboardUtils.getScoreboardValue(player, "Celestial");
-				if (celestial > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING)) {
-						World world = player.getWorld();
-						Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
-						int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
-
-						for (Player p : PlayerUtils.getNearbyPlayers(player, CELESTIAL_RADIUS, true)) {
-							mPlugin.mTimers.AddCooldown(p.getUniqueId(), fakeID, duration);
-
-							p.setMetadata(celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME, new FixedMetadataValue(mPlugin, 0));
-
-							Location loc = p.getLocation();
-							world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
-							world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
-						}
-
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CELESTIAL_BLESSING, CELESTIAL_COOLDOWN);
-					}
-				}
 			} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 
-				// Cleansing Rain
-				boolean cleansingAttempted = false;
-				int cleansing = ScoreboardUtils.getScoreboardValue(player, "Cleansing");
-				if (cleansing > 0 &&
-				    player.getLocation().getPitch() < -CLEANSING_ANGLE &&
-				    (mainHand == null || mainHand.getType() != Material.BOW) &&
-				    (offHand == null || offHand.getType() != Material.BOW) &&
-				    cleansing > 0) {
-					cleansingAttempted = true;
-					activateCleansing(player, cleansing);
-				}
-
 				// Hand of Light
 				if ((offHand != null && offHand.getType() == Material.SHIELD) || (mainHand != null && mainHand.getType() == Material.SHIELD)) {
 					int healing = ScoreboardUtils.getScoreboardValue(player, "Healing");
-					if (healing > 0 && !cleansingAttempted) {
+					if (healing > 0) {
 						activateHealing(player, healing);
 					}
 				}
 			}
-		}
-	}
-
-	private void activateCleansing(Player player, int cleansing) {
-		if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.CLEANSING)) {
-			int cooldown = (cleansing == 1) ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
-			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING, cooldown);
-			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.CLEANSING_FAKE, CLEANSING_DURATION);
 		}
 	}
 
@@ -407,19 +320,6 @@ public class ClericClass extends BaseClass {
 
 			int cooldown = healing == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 			mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.HEALING, cooldown);
-		}
-	}
-
-	@Override
-	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {
-		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {
-			double damage = event.getDamage();
-			damage *= CELESTIAL_1_DAMAGE_MULTIPLIER;
-			event.setDamage(damage);
-		} else if (player.hasMetadata(CELESTIAL_2_TAGNAME)) {
-			double damage = event.getDamage();
-			damage *= CELESTIAL_2_DAMAGE_MULTIPLIER;
-			event.setDamage(damage);
 		}
 	}
 }
