@@ -65,7 +65,7 @@ public class ArcanistSpecialization extends BaseSpecialization {
 				if (cds.size() > 0) {
 					int mult = cds.size();
 					double dmg = overload == 1 ? 1.5 : 3;
-					event.setDamage(dmg * mult);
+					event.setDamage(event.getDamage() + (dmg * mult));
 				}
 			}
 		}

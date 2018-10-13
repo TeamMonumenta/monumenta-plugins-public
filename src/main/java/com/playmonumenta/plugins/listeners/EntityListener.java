@@ -238,6 +238,7 @@ public class EntityListener implements Listener {
 
 						event.setDamage(Math.max(damage, 0));
 
+						AbilityManager.getManager().modifyDamage(player, event);
 						BaseClass _class = mPlugin.getClass(player);
 						_class.ModifyDamage(player, _class, event);
 						_class.LivingEntityDamagedByPlayerEvent(player, (LivingEntity)damagee, event.getDamage(), event.getCause());
@@ -492,7 +493,8 @@ public class EntityListener implements Listener {
 			// If thrown by a player, that player's class determines how entities are affected
 			Player player = (Player)source;
 
-			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
+			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion, event) ||
+					AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -599,7 +601,7 @@ public class EntityListener implements Listener {
 
 			// Give classes a chance to modify the projectile first
 			mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
-
+			
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 
@@ -637,7 +639,7 @@ public class EntityListener implements Listener {
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
-
+				AbilityManager.getManager().ProjectileHitEvent(player, event, arrow);
 				mPlugin.getClass(player).ProjectileHitEvent(player, arrow);
 			}
 		}

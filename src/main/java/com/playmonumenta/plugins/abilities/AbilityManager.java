@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +14,22 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
+import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
+import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
+import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
+import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
+import com.playmonumenta.plugins.abilities.cleric.Sanctified;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -37,6 +48,8 @@ import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
@@ -93,7 +106,10 @@ public class AbilityManager {
 		                          new BowMastery(mPlugin, mWorld, mRandom, null),
 		                          new Volley(mPlugin, mWorld, mRandom, null),
 		                          new Swiftness(mPlugin, mWorld, mRandom, null),
-
+		                          new EagleEye(mPlugin, mWorld, mRandom, null),
+		                          new ScoutPassive(mPlugin, mWorld, mRandom, null),
+//		                          new StandardBearer(mPlugin, mWorld, mRandom, null),
+		                          
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
 		                          new CounterStrike(mPlugin, mWorld, mRandom, null),
@@ -102,7 +118,16 @@ public class AbilityManager {
 		                          new Riposte(mPlugin, mWorld, mRandom, null),
 		                          new Toughness(mPlugin, mWorld, mRandom, null),
 		                          new WarriorPassive(mPlugin, mWorld, mRandom, null),
-		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null)
+		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
+		                          
+		                          // CLERIC
+		                          new CleansingRain(mPlugin, mWorld, mRandom, null),
+		                          new HandOfLight(mPlugin, mWorld, mRandom, null),
+		                          new ClericPassive(mPlugin, mWorld, mRandom, null),
+		                          new DivineJustice(mPlugin, mWorld, mRandom, null),
+		                          new HeavenlyBoon(mPlugin, mWorld, mRandom, null),
+		                          new Rejuvenation(mPlugin, mWorld, mRandom, null),
+		                          new Sanctified(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
@@ -120,6 +145,23 @@ public class AbilityManager {
 
 	public Ability getPlayerAbility(Player player, Spells spell) {
 		return getPlayerAbilities(player).getAbility(spell);
+	}
+	
+	public static final String CELESTIAL_1_TAGNAME = "Celestial_1";
+	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
+	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
+	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
+	
+	public void modifyDamage(Player player, EntityDamageByEntityEvent event) {
+		if (player.hasMetadata(CELESTIAL_1_TAGNAME)) {
+			double damage = event.getDamage();
+			damage *= CELESTIAL_1_DAMAGE_MULTIPLIER;
+			event.setDamage(damage);
+		} else if (player.hasMetadata(CELESTIAL_2_TAGNAME)) {
+			double damage = event.getDamage();
+			damage *= CELESTIAL_2_DAMAGE_MULTIPLIER;
+			event.setDamage(damage);
+		}
 	}
 
 	//Events
@@ -201,6 +243,33 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.PlayerRespawnEvent();
+			}
+		}
+	}
+	
+	public void ProjectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.ProjectileHitEvent(event, arrow);
+			}
+		}
+	}
+	
+	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+            ThrownPotion potion, PotionSplashEvent event) {
+		boolean re = true;
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerSplashPotionEvent(affectedEntities, potion, event)) re = false;
+			}
+		}
+		return re;
+	}
+	
+	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PeriodicTrigger(twoHertz, oneSecond, twoSeconds, fourtySeconds, sixtySeconds, originalTime);
 			}
 		}
 	}

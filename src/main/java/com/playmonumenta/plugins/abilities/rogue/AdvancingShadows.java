@@ -29,8 +29,6 @@ import org.bukkit.World;
 
 public class AdvancingShadows extends Ability {
 
-	private String owner = "none";
-	private int id = new Random().nextInt(10);
 	private LivingEntity target = null;
 
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
@@ -54,7 +52,6 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public boolean cast() {
-		owner = mPlayer.getName();
 
 		LivingEntity entity = target;
 		if (entity != null) {

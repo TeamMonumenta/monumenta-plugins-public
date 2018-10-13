@@ -1,21 +1,23 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import java.net.URISyntaxException;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -117,7 +119,32 @@ public abstract class Ability {
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		return true;
 	}
+	
+	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { return true; }
 
+	// Called when a player throws a splash potion
+	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
+	                                       ThrownPotion potion, PotionSplashEvent event) {
+		if (mPlayer != null) {
+			//  All affected players need to have the effect added to their potion manager.
+			for (LivingEntity entity : affectedEntities) {
+				if (entity instanceof Player) {
+					// Thrown by a player - negative effects are not allowed for other players
+					// Don't remove negative effects if it was the same player that threw the potion
+					if ((!entity.equals(mPlayer)) && PotionUtils.hasNegativeEffects(potion.getEffects())) {
+						// If a thrown potion contains any negative effects, don't apply *any* effects to other players
+						event.setIntensity(entity, 0);
+					}
+
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
+					                                 event.getIntensity(entity));
+				}
+			}
+
+		}
+		return true;
+	}
+	
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
 	public void PlayerRespawnEvent() { }
@@ -128,6 +155,24 @@ public abstract class Ability {
 	//---------------------------------------------------------------------------------------------------------------
 
 	public void setupClassPotionEffects() { }
+	
+	public boolean has1SecondTrigger() {
+		return false;
+	}
+
+	public boolean has2SecondTrigger() {
+		return false;
+	}
+
+	public boolean has40SecondTrigger() {
+		return false;
+	}
+
+	public boolean has60SecondTrigger() {
+		return false;
+	}
+
+	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
 
 	//---------------------------------------------------------------------------------------------------------------
 	public boolean canUse(Player player) {
