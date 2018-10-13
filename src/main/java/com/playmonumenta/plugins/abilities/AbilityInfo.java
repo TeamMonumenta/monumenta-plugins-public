@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.gson.JsonObject;
+
 import com.playmonumenta.plugins.classes.Spells;
 
 /**
@@ -23,4 +25,22 @@ public class AbilityInfo {
 
 	//If the ability does not require a spec, input a negative number.
 	public int specId = -1;
+
+	public JsonObject getAsJsonObject() {
+		JsonObject info = new JsonObject();
+		if (scoreboardId != null) {
+			info.addProperty("scoreboardId", scoreboardId);
+		}
+		if (linkedSpell != null) {
+			info.addProperty("name", linkedSpell.getName());
+		}
+		if (trigger != null) {
+			info.addProperty("trigger", trigger.toString());
+		}
+		info.addProperty("cooldown", cooldown);
+		info.addProperty("classId", classId);
+		info.addProperty("specId", specId);
+
+		return info;
+	}
 }

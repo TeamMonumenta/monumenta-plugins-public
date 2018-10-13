@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.gson.JsonObject;
+
 import com.playmonumenta.plugins.classes.Spells;
 
 import java.util.List;
@@ -42,5 +44,15 @@ public class AbilityCollection {
 			}
 		}
 		return null;
+	}
+
+	public JsonObject getAsJsonObject() {
+		JsonObject playerAbilities = new JsonObject();
+
+		for (Ability ability : mAbilities) {
+			playerAbilities.add(ability.getClass().getName(), ability.getAsJsonObject());
+		}
+
+		return playerAbilities;
 	}
 }

@@ -181,7 +181,7 @@ public class Plugin extends JavaPlugin {
 		TransferServer.register(this);
 		HopeifyHeldItem.register();
 		GildifyHeldItem.register();
-		DebugInfo.register(mPotionManager);
+		DebugInfo.register(mPotionManager, mAbilityManager);
 		ClearEffects.register(mPotionManager);
 		RemoveTags.register();
 

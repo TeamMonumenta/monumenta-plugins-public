@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.gson.JsonObject;
+
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -197,5 +199,11 @@ public abstract class Ability {
 			return mScore;
 		}
 		return 0;
+	}
+
+	public JsonObject getAsJsonObject() {
+		JsonObject obj = mInfo.getAsJsonObject();
+		obj.addProperty("score", getAbilityScore());
+		return obj;
 	}
 }

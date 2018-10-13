@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
@@ -150,6 +154,12 @@ public class AbilityManager {
 
 	public Ability getPlayerAbility(Player player, Spells spell) {
 		return getPlayerAbilities(player).getAbility(spell);
+	}
+
+	public String printInfo(Player player) {
+		JsonObject object = getPlayerAbilities(player).getAsJsonObject();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(object);
 	}
 
 	/**
