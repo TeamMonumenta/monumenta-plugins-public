@@ -40,14 +40,6 @@ public class BaseClass {
 
 	public void AbilityOffCooldown(Player player, Spells spell) {}
 
-	public void PulseEffectApplyEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
-	public void PulseEffectApplyEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {}
-
-	public void PulseEffectRemoveEffect(Player owner, Location loc, Player effectedPlayer, int abilityID) {}
-	public void PulseEffectRemoveEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {}
-
-	public void PulseEffectComplete(Player owner, Location loc, Entity markerEntity, int abilityID) {}
-
 	public boolean has1SecondTrigger() {
 		return false;
 	}

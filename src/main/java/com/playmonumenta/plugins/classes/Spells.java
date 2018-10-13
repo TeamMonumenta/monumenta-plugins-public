@@ -118,7 +118,7 @@ public enum Spells {
 	CAUSTIC_BLADE("Caustic Blade", Classes.ALCHEMIST),
 	IRON_TINCTURE("Iron Tincture", Classes.ALCHEMIST),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir", Classes.ALCHEMIST),
-	BOMB_ARROW("Unstable Arrows", Classes.ALCHEMIST);
+	UNSTABLE_ARROWS("Unstable Arrows", Classes.ALCHEMIST);
 
 	private final String name;
 	private final Classes classes;

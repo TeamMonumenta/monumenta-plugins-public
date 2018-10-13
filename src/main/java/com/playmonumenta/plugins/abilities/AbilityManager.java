@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
@@ -128,7 +129,10 @@ public class AbilityManager {
 		                          new DivineJustice(mPlugin, mWorld, mRandom, null),
 		                          new HeavenlyBoon(mPlugin, mWorld, mRandom, null),
 		                          new Rejuvenation(mPlugin, mWorld, mRandom, null),
-		                          new Sanctified(mPlugin, mWorld, mRandom, null)
+		                          new Sanctified(mPlugin, mWorld, mRandom, null),
+
+								  // ALCHEMIST
+								  new UnstableArrows(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 

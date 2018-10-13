@@ -120,9 +120,7 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		return true;
-	}
+	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
 
 	// Called when a player throws a splash potion
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,

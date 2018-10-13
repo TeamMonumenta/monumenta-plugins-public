@@ -24,7 +24,6 @@ import com.playmonumenta.plugins.specializations.*;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
-import com.playmonumenta.plugins.timers.PulseEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -101,7 +100,6 @@ public class Plugin extends JavaPlugin {
 	public HashMap<Integer, BaseSpecialization> mSpecializationMap = new HashMap<Integer, BaseSpecialization>();
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
-	public PulseEffectTimers mPulseEffectTimers = null;
 	public CombatLoggingTimers mCombatLoggingTimers = null;
 	public Random mRandom = null;
 	int mPeriodicTimer = -1;
@@ -139,7 +137,6 @@ public class Plugin extends JavaPlugin {
 		//  Initialize Variables.
 		mRandom = new Random();
 		mTimers = new CooldownTimers(this);
-		mPulseEffectTimers = new PulseEffectTimers(this);
 		mCombatLoggingTimers = new CombatLoggingTimers();
 
 		mWorld = Bukkit.getWorlds().get(0);
@@ -227,7 +224,6 @@ public class Plugin extends JavaPlugin {
 				if (fourHertz) {
 					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
 					mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
-					mPulseEffectTimers.Update(Constants.QUARTER_TICKS_PER_SECOND);
 				}
 
 				//  Every tick.

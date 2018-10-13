@@ -76,16 +76,6 @@ public class AlchemistClass extends BaseClass {
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
-	private static final int BOMB_ARROW_COOLDOWN = 16 * 20;
-	private static final int BOMB_ARROW_TRIGGER_RANGE = 32;
-	private static final int BOMB_ARROW_ID = 67;
-	public static final String BOMB_ARROW_TAG_NAME = "TagBearer";
-	private static final int BOMB_ARROW_DURATION = 3 * 20;
-	private static final float BOMB_ARROW_KNOCKBACK_SPEED = 0.55f;
-	private static final int BOMB_ARROW_1_DAMAGE = 15;
-	private static final int BOMB_ARROW_2_DAMAGE = 24;
-	private static final int BOMB_ARROW_RADIUS = 4;
-
 	private static final int BASILISK_POISON_1_EFFECT_LVL = 1;
 	private static final int BASILISK_POISON_2_EFFECT_LVL = 2;
 	private static final int BASILISK_POISON_1_DURATION = 7 * 20;
@@ -97,10 +87,6 @@ public class AlchemistClass extends BaseClass {
 	private static final int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
 	private static final int POWER_INJECTION_DURATION = 20 * 20;
 	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
-
-	//  [Rock]: This is bad and could work incorrectly if there are multiple alchemist playing at the same time. :( Please fix me!
-	Arrow mBlinkArrow = null;
-	Arrow mUnstableArrow = null;
 
 	private World mWorld;
 
@@ -154,35 +140,10 @@ public class AlchemistClass extends BaseClass {
 			}
 		}
 
-		if (player.isSneaking()) {
-			int bombArrow = ScoreboardUtils.getScoreboardValue(player, "BombArrow");
-			if (bombArrow > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.BOMB_ARROW)) {
-					mUnstableArrow = arrow;
-				}
-			}
-		}
-
 		//  BasiliskPoison
 		int basiliskPoison = ScoreboardUtils.getScoreboardValue(player, "BasiliskPoison");
 		if (basiliskPoison > 0) {
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.TOTEM);
-		}
-	}
-
-	@Override
-	public void ProjectileHitEvent(Player player, Arrow arrow) {
-		if (arrow == mUnstableArrow && mUnstableArrow != null) {
-			double range = arrow.getLocation().distance(player.getLocation());
-			if (range <= BOMB_ARROW_TRIGGER_RANGE) {
-				mPlugin.mPulseEffectTimers.AddPulseEffect(player, this, BOMB_ARROW_ID, BOMB_ARROW_TAG_NAME, BOMB_ARROW_DURATION, 20, arrow.getLocation(), 0, false);
-
-				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.BOMB_ARROW, BOMB_ARROW_COOLDOWN);
-				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-				mBlinkArrow = arrow;
-			}
-
-			mUnstableArrow = null;
 		}
 	}
 
@@ -402,44 +363,5 @@ public class AlchemistClass extends BaseClass {
 		}
 
 		return true;
-	}
-
-	@Override
-	public void PulseEffectApplyEffect(Player owner, Location loc, Entity effectedEntity, int abilityID) {
-		if (abilityID == BOMB_ARROW_ID) {
-			int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
-			if (bombArrow > 0) {
-				mWorld.spawnParticle(Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
-				mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
-			}
-		}
-	}
-
-	@Override
-	public void PulseEffectComplete(Player owner, Location loc, Entity marker, int abilityID) {
-		if (abilityID == BOMB_ARROW_ID) {
-			int bombArrow = ScoreboardUtils.getScoreboardValue(owner, "BombArrow");
-			if (bombArrow > 0) {
-				if (mBlinkArrow != null) {
-					loc = mBlinkArrow.getLocation();
-					mBlinkArrow.remove();
-					mBlinkArrow = null;
-				}
-
-				loc = loc.add(0, 1.2, 0);
-				mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.7f, 1.0f);
-				mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.9f, 1.0f);
-
-				mWorld.spawnParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.02, 0.02, 0.02, 0.001);
-
-				int baseDamage = (bombArrow == 1) ? BOMB_ARROW_1_DAMAGE : BOMB_ARROW_2_DAMAGE;
-
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(marker.getLocation(), BOMB_ARROW_RADIUS)) {
-					EntityUtils.damageEntity(mPlugin, mob, baseDamage, owner);
-					MovementUtils.KnockAway((LivingEntity)marker, mob, BOMB_ARROW_KNOCKBACK_SPEED);
-				}
-			}
-		}
 	}
 }
