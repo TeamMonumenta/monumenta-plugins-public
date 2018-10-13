@@ -234,7 +234,7 @@ public class Plugin extends JavaPlugin {
 
 						BaseSpecialization pSpec = getSpecialization(player);
 						pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
-						
+
 						AbilityManager.getManager().PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 					}
 

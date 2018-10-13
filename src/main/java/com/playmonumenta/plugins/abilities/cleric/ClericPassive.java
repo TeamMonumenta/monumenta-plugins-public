@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.Random;
 
+import org.bukkit.entity.Player;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ClericPassive extends Ability {
 
 	private static final int PASSIVE_HEAL_AMOUNT = 1;
 	private static final int PASSIVE_HEAL_RADIUS = 5;
 	private static final double PASSIVE_HP_THRESHOLD = 10.0;
-	
+
 	public ClericPassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 3;
@@ -39,5 +39,5 @@ public class ClericPassive extends Ability {
 			}
 		}
 	}
-	
+
 }

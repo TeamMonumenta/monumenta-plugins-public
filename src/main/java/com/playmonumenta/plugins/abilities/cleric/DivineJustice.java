@@ -1,28 +1,28 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.Random;
 
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineJustice extends Ability {
 
 	private static final int DIVINE_JUSTICE_DAMAGE = 5;
 	private static final int DIVINE_JUSTICE_HEAL = 4;
 	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
-	
+
 	public DivineJustice(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 3;
@@ -46,10 +46,10 @@ public class DivineJustice extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		
+
 		LivingEntity killedEntity = event.getEntity();
 		DamageCause cause = killedEntity.getLastDamageCause().getCause();
 		if (cause != DamageCause.PROJECTILE && EntityUtils.isUndead(killedEntity)) {
@@ -64,8 +64,10 @@ public class DivineJustice extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
-	public boolean runCheck() { return PlayerUtils.isCritical(mPlayer); }
-	
+	public boolean runCheck() {
+		return PlayerUtils.isCritical(mPlayer);
+	}
+
 }

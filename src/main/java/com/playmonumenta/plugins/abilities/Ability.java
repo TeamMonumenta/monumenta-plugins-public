@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.abilities;
 
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.Collection;
 import java.util.Random;
 
-import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,11 +17,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.World;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -119,8 +119,10 @@ public abstract class Ability {
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		return true;
 	}
-	
-	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { return true; }
+
+	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
+		return true;
+	}
 
 	// Called when a player throws a splash potion
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
@@ -144,7 +146,7 @@ public abstract class Ability {
 		}
 		return true;
 	}
-	
+
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
 	public void PlayerRespawnEvent() { }
@@ -155,7 +157,7 @@ public abstract class Ability {
 	//---------------------------------------------------------------------------------------------------------------
 
 	public void setupClassPotionEffects() { }
-	
+
 	public boolean has1SecondTrigger() {
 		return false;
 	}
@@ -178,8 +180,8 @@ public abstract class Ability {
 	public boolean canUse(Player player) {
 		AbilityInfo info = getInfo();
 		if (info.classId == ScoreboardUtils.getScoreboardValue(player, "Class")
-			&& (info.specId < 0 || info.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization"))
-			&& (info.scoreboardId == null || ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) > 0)) {
+		    && (info.specId < 0 || info.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization"))
+		    && (info.scoreboardId == null || ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) > 0)) {
 			return true;
 		}
 		return false;

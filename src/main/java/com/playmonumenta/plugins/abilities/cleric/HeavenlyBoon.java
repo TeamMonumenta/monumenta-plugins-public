@@ -1,31 +1,29 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import org.bukkit.World;
 
 public class HeavenlyBoon extends Ability {
 
@@ -56,31 +54,31 @@ public class HeavenlyBoon extends Ability {
 						int rand = mRandom.nextInt(4);
 						if (rand == 0 || rand == 1) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 20 * 20, 0,
-									"Splash Potion of Regeneration");
+							                                         "Splash Potion of Regeneration");
 						} else if (rand == 2) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 20 * 20, 0,
-									"Splash Potion of Absorption");
+							                                         "Splash Potion of Absorption");
 						} else {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 20 * 20, 0,
-									"Splash Potion of Speed");
+							                                         "Splash Potion of Speed");
 						}
 					} else {
 						int rand = mRandom.nextInt(5);
 						if (rand == 0) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 50 * 20, 0,
-									"Splash Potion of Regeneration");
+							                                         "Splash Potion of Regeneration");
 						} else if (rand == 1) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.ABSORPTION, 1, 50 * 20, 0,
-									"Splash Potion of Absorption");
+							                                         "Splash Potion of Absorption");
 						} else if (rand == 2) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.SPEED, 1, 50 * 20, 0,
-									"Splash Potion of Speed");
+							                                         "Splash Potion of Speed");
 						} else if (rand == 3) {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.INCREASE_DAMAGE, 1, 50 * 20, 0,
-									"Splash Potion of Strength");
+							                                         "Splash Potion of Strength");
 						} else {
 							potions = ItemUtils.createStackedPotions(PotionEffectType.DAMAGE_RESISTANCE, 1, 50 * 20, 0,
-									"Splash Potion of Resistance");
+							                                         "Splash Potion of Resistance");
 						}
 					}
 
@@ -97,7 +95,7 @@ public class HeavenlyBoon extends Ability {
 
 	@Override
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
-			PotionSplashEvent event) {
+	                                       PotionSplashEvent event) {
 		// Call the base class to make sure effects are correctly applied to
 		// other players
 		super.PlayerSplashPotionEvent(affectedEntities, potion, event);

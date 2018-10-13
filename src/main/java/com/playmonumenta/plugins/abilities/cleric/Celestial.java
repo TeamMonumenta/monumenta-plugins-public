@@ -1,19 +1,19 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
-
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
+import java.util.Random;
+
+import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 
 public class Celestial extends Ability {
 
@@ -27,7 +27,7 @@ public class Celestial extends Ability {
 	public static final String CELESTIAL_2_TAGNAME = "Celestial_2";
 	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
-	
+
 	public Celestial(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 3;
@@ -37,11 +37,11 @@ public class Celestial extends Ability {
 		mInfo.cooldown = CELESTIAL_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		int celestial = getAbilityScore();
-		
+
 		World world = mPlayer.getWorld();
 		Spells fakeID = celestial == 1 ? Spells.CELESTIAL_FAKE_1 : Spells.CELESTIAL_FAKE_2;
 		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
@@ -55,10 +55,10 @@ public class Celestial extends Ability {
 			world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
 			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		return mPlayer.isSneaking();

@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import org.bukkit.World;
 
 public class Sanctified extends Ability {
 
@@ -26,14 +26,14 @@ public class Sanctified extends Ability {
 	private static final int SANCTIFIED_EFFECT_LEVEL = 0;
 	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
-	
+
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 3;
 		mInfo.specId = -1;
 		mInfo.scoreboardId = "Sanctified";
 	}
-	
+
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getDamager();

@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.Plugin;
+
 import java.util.Random;
 
+import org.bukkit.block.Banner;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
+import org.bukkit.block.Block;
 import org.bukkit.DyeColor;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Banner;
-import org.bukkit.block.Block;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.ProjectileHitEvent;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
 
 public class StandardBearer extends Ability {
 
@@ -30,13 +30,13 @@ public class StandardBearer extends Ability {
 	private static final int STANDARD_BEARER_DURATION = 30 * 20;
 	private static final int STANDARD_BEARER_TRIGGER_RADIUS = 12;
 	private static final double STANDARD_BEARER_DAMAGE_MULTIPLIER = 1.25;
-	
+
 	public StandardBearer(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
-	
+
 	@Override
-	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { 
+	public boolean ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		double range = arrow.getLocation().distance(mPlayer.getLocation());
 		if (range <= STANDARD_BEARER_TRIGGER_RANGE) {
 //			mPlugin.mPulseEffectTimers.AddPulseEffect(mPlayer, this, STANDARD_BEARER_ID,
@@ -65,10 +65,12 @@ public class StandardBearer extends Ability {
 				banner.update();
 			}
 		}
-		return true; 
+		return true;
 	}
-	
+
 	@Override
-	public boolean runCheck() { return mPlayer.getGameMode() != GameMode.ADVENTURE; }
+	public boolean runCheck() {
+		return mPlayer.getGameMode() != GameMode.ADVENTURE;
+	}
 
 }

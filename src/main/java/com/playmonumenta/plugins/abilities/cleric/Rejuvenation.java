@@ -1,27 +1,27 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
 import java.util.Random;
 
+import org.bukkit.entity.Player;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Rejuvenation extends Ability {
 
 	private static final int REJUVENATION_RADIUS = 12;
 	private static final int REJUVENATION_HEAL_AMOUNT = 1;
-	
+
 	public Rejuvenation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 3;
 		mInfo.specId = -1;
 		mInfo.scoreboardId = "Rejuvenation";
 	}
-	
+
 	@Override
 	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		//  Don't trigger this if dead!

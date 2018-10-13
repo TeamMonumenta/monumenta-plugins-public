@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
@@ -494,7 +492,7 @@ public class EntityListener implements Listener {
 			Player player = (Player)source;
 
 			if (!mPlugin.getClass(player).PlayerSplashPotionEvent(player, affectedEntities, potion, event) ||
-					AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
+			    AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -601,7 +599,7 @@ public class EntityListener implements Listener {
 
 			// Give classes a chance to modify the projectile first
 			mPlugin.getClass(player).ProjectileHitPlayerEvent(player, event.getEntity());
-			
+
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 
