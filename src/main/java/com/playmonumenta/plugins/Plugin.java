@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.rawcommands.ClearEffects;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
 import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
+import com.playmonumenta.plugins.rawcommands.RefreshClass;
 import com.playmonumenta.plugins.rawcommands.RemoveTags;
 import com.playmonumenta.plugins.rawcommands.TransferServer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -182,6 +183,7 @@ public class Plugin extends JavaPlugin {
 		HopeifyHeldItem.register();
 		GildifyHeldItem.register();
 		DebugInfo.register(mPotionManager, mAbilityManager);
+		RefreshClass.register(mPotionManager, mAbilityManager);
 		ClearEffects.register(mPotionManager);
 		RemoveTags.register();
 

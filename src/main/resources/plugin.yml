@@ -7,15 +7,9 @@ commands:
   deathMsg:
     permission: monumenta.command.deathmsg
     description: Toggles death messages on and off
-  refreshPOITimer:
-    permission: monumenta.command.refreshpoitimer
-    description: refresh an internal score from the scoreboard value.
   transferScores:
     permission: monumenta.command.transferScores
     description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.
-  refreshClassEffects:
-    permission: monumenta.command.refreshClassEffects
-    description: Refreshes class effects for affected player (either sender or target of /execute)
   broadcastCommand:
     permission: monumenta.command.broadcastCommand
     description: Broadcasts a command to run on all Monumenta servers

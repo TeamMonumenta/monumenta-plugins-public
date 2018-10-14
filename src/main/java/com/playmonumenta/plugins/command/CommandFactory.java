@@ -31,10 +31,6 @@ public class CommandFactory {
 			// Streamlined command for performance
 			plugin.getCommand("testNoScore").setExecutor(new TestNoScore());
 		}
-
-		if (Constants.CLASSES_ENABLED) {
-			createCommand(plugin, new RefreshClassEffects(plugin, potionManager));
-		}
 	}
 
 	/**
