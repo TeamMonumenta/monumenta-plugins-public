@@ -36,6 +36,7 @@ public class UnstableArrows extends Ability {
 		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
+		mInfo.cooldown = UNSTABLE_ARROWS_COOLDOWN;
 	}
 
 	@Override
@@ -52,12 +53,14 @@ public class UnstableArrows extends Ability {
 				int mTicks = 0;
 				@Override
 				public void run() {
-					mWorld.spawnParticle(Particle.FLAME, loc, 8, 0.3, 0.3, 0.3, 0.001);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.5, 0.5, 0.5, 0.001);
-					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.5f, ((UNSTABLE_ARROWS_DURATION / 2.0f) + mTicks) / (2.0f * UNSTABLE_ARROWS_DURATION));
+					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.3, 0.3, 0.3, 0.001);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.5, 0.5, 0.5, 0.001);
+					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.5f,
+					                 ((UNSTABLE_ARROWS_DURATION / 2.0f) + mTicks) / (2.0f * UNSTABLE_ARROWS_DURATION));
 
 					mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
 					if (mTicks > UNSTABLE_ARROWS_DURATION) {
+						arrow.remove();
 						Location explodeLoc = loc.add(0, 1.2, 0);
 						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.7f, 1.0f);
 						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.9f, 1.0f);
@@ -79,14 +82,12 @@ public class UnstableArrows extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
-		mUnstableArrow = arrow;
+		// Can't use runCheck for this because player doesn't need to be sneaking when arrow lands
+		if (mPlayer.isSneaking()) {
+			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
+			mUnstableArrow = arrow;
+		}
 
 		return true;
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking();
 	}
 }
