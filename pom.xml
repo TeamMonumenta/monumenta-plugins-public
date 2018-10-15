@@ -51,11 +51,10 @@
             <version>${minecraft.server.version}</version>
             <scope>provided</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>io.github.jorelali</groupId>
             <artifactId>commandapi</artifactId>
-            <version>1.2-19-g7edc7d8</version>
-            <scope>provided</scope>
+            <version>v1.5</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
