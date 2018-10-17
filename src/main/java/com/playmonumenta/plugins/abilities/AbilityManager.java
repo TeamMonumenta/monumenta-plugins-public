@@ -35,6 +35,13 @@ import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
+import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
+import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
+import com.playmonumenta.plugins.abilities.warlock.CursedWound;
+import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.SoulRend;
+import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
@@ -135,8 +142,18 @@ public class AbilityManager {
 		                          new Rejuvenation(mPlugin, mWorld, mRandom, null),
 		                          new Sanctified(mPlugin, mWorld, mRandom, null),
 
-								  // ALCHEMIST
-								  new UnstableArrows(mPlugin, mWorld, mRandom, null)
+		                          //WARLOCK
+
+		                          new AmplifyingHex(mPlugin, mWorld, mRandom, null),
+		                          new BlasphemousAura(mPlugin, mWorld, mRandom, null),
+		                          new ConsumingFlames(mPlugin, mWorld, mRandom, null),
+		                          new CursedWound(mPlugin, mWorld, mRandom, null),
+		                          new GraspingClaws(mPlugin, mWorld, mRandom, null),
+		                          new SoulRend(mPlugin, mWorld, mRandom, null),
+		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
+
+		                          // ALCHEMIST
+		                          new UnstableArrows(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
