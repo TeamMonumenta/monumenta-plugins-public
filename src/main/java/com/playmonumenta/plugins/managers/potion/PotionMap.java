@@ -79,7 +79,6 @@ public class PotionMap {
 		applyBestPotionEffect(player);
 	}
 
-	// If amplifier is negative, remove all levels of that effect
 	public void removePotionMap(Player player, PotionID id) {
 		if (id == PotionID.ALL) {
 			// Clear all effects from all sources

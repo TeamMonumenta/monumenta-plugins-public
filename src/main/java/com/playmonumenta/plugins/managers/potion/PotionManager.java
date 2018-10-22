@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
@@ -117,7 +118,8 @@ public class PotionManager {
 	public void clearAllPotions(Player player) {
 		mPotionManager.remove(player.getUniqueId());
 
-		for (PotionEffect type : player.getActivePotionEffects()) {
+		// Make a copy of the list to prevent ConcurrentModificationException's
+		for (PotionEffect type : new ArrayList<PotionEffect>(player.getActivePotionEffects())) {
 			player.removePotionEffect(type.getType());
 		}
 	}
@@ -127,6 +129,14 @@ public class PotionManager {
 		if (potionInfo != null) {
 			potionInfo.clearPotionIDType(player, id);
 		}
+	}
+
+	public void clearPotionEffectType(Player player, PotionEffectType type) {
+		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
+		if (potionInfo != null) {
+			potionInfo.clearPotionEffectType(player, type);
+		}
+		player.removePotionEffect(type);
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {

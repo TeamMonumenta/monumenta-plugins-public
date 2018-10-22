@@ -24,7 +24,6 @@ public class CommandFactory {
 			createCommand(plugin, new DeathMsg(plugin));
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
-			createCommand(plugin, new TrackedEffect(plugin, potionManager));
 			createCommand(plugin, new TransferScores(plugin));
 			createCommand(plugin, new UpdateApartments(plugin));
 

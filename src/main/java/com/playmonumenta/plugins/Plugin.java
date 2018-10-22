@@ -13,8 +13,8 @@ import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.managers.ZoneManager;
-import com.playmonumenta.plugins.rawcommands.ClearEffects;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
+import com.playmonumenta.plugins.rawcommands.Effect;
 import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.RefreshClass;
@@ -184,7 +184,7 @@ public class Plugin extends JavaPlugin {
 		GildifyHeldItem.register();
 		DebugInfo.register(mPotionManager, mAbilityManager);
 		RefreshClass.register(mPotionManager, mAbilityManager);
-		ClearEffects.register(mPotionManager);
+		Effect.register(mPotionManager);
 		RemoveTags.register();
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
