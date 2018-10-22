@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.managers.ZoneManager;
+import com.playmonumenta.plugins.rawcommands.BroadcastCommand;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
 import com.playmonumenta.plugins.rawcommands.Effect;
 import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
@@ -186,6 +187,9 @@ public class Plugin extends JavaPlugin {
 		RefreshClass.register(mPotionManager, mAbilityManager);
 		Effect.register(mPotionManager);
 		RemoveTags.register();
+		if (mServerProperties.getBroadcastCommandEnabled()) {
+			BroadcastCommand.register(this);
+		}
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {

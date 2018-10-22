@@ -114,19 +114,15 @@ public class PlayerListener implements Listener {
 		event.getPlayer().setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(mPlugin, true));
 
 		new BukkitRunnable() {
-			Integer tick = 0;
 			@Override
 			public void run() {
-				if (++tick == 20) {
-					Player player = event.getPlayer();
+				Player player = event.getPlayer();
 
-					mPlugin.mTrackingManager.addEntity(player);
-					DailyReset.handle(mPlugin, player);
-					AbilityManager.getManager().updatePlayerAbilities(player);
-					this.cancel();
-				}
+				mPlugin.mTrackingManager.addEntity(player);
+				DailyReset.handle(mPlugin, player);
+				AbilityManager.getManager().updatePlayerAbilities(player);
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskLater(mPlugin, 20);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
