@@ -37,7 +37,9 @@ public class BroadcastCommandPacket implements Packet {
 		    || rcvStrings[0].startsWith("tellraw")) {
 
 			plugin.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]);
+
+			/* Call this on the main thread */
+			Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]));
 		}
 	}
 }

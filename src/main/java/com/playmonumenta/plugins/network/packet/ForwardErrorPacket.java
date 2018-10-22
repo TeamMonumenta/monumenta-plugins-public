@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.network.packet;
 
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PacketUtils;
+
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class ForwardErrorPacket implements Packet {
 	public static final String StaticPacketChannel = "Monumenta.Bungee.Error.Forward";
@@ -39,8 +40,14 @@ public class ForwardErrorPacket implements Packet {
 			if (player != null) {
 				player.sendMessage(ChatColor.RED + "Bungee reports server '" + server + "' is not available!");
 
+				/* Call this on the main thread */
 				// Remove the metadata that prevents player from interacting with things (if present)
-				player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, plugin);
+				Bukkit.getScheduler().callSyncMethod(plugin,
+				                                     () -> {
+				                                         player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, plugin);
+				                                         return true; //Does nothing - conforms to functional interface
+				                                     }
+				);
 			}
 		}
 	}
