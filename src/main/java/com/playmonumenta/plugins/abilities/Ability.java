@@ -102,6 +102,10 @@ public abstract class Ability {
 		return true;
 	}
 
+	public boolean PlayerDamagedEvent(EntityDamageByEntityEvent event) {
+		return true;
+	}
+
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
@@ -150,6 +154,10 @@ public abstract class Ability {
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
 	public void PlayerRespawnEvent() { }
+
+	public boolean PlayerExtendedSneakEvent(Player player) {
+		return true;
+	}
 
 	//---------------------------------------------------------------------------------------------------------------
 

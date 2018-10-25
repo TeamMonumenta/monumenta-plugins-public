@@ -4,52 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
-import com.playmonumenta.plugins.abilities.cleric.Celestial;
-import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
-import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
-import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
-import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
-import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
-import com.playmonumenta.plugins.abilities.cleric.Sanctified;
-import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
-import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.abilities.mage.FrostNova;
-import com.playmonumenta.plugins.abilities.mage.MagePassive;
-import com.playmonumenta.plugins.abilities.mage.MagmaShield;
-import com.playmonumenta.plugins.abilities.mage.ManaLance;
-import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
-import com.playmonumenta.plugins.abilities.mage.Spellshock;
-import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
-import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
-import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
-import com.playmonumenta.plugins.abilities.rogue.Dodging;
-import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
-import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
-import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
-import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
-import com.playmonumenta.plugins.abilities.scout.Agility;
-import com.playmonumenta.plugins.abilities.scout.BowMastery;
-import com.playmonumenta.plugins.abilities.scout.EagleEye;
-import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
-import com.playmonumenta.plugins.abilities.scout.Swiftness;
-import com.playmonumenta.plugins.abilities.scout.Volley;
-import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
-import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
-import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
-import com.playmonumenta.plugins.abilities.warlock.CursedWound;
-import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
-import com.playmonumenta.plugins.abilities.warlock.SoulRend;
-import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
-import com.playmonumenta.plugins.abilities.warrior.BruteForce;
-import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
-import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
-import com.playmonumenta.plugins.abilities.warrior.Frenzy;
-import com.playmonumenta.plugins.abilities.warrior.Riposte;
-import com.playmonumenta.plugins.abilities.warrior.Toughness;
-import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
-import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
+import com.playmonumenta.plugins.abilities.alchemist.*;
+import com.playmonumenta.plugins.abilities.cleric.*;
+import com.playmonumenta.plugins.abilities.mage.*;
+import com.playmonumenta.plugins.abilities.rogue.*;
+import com.playmonumenta.plugins.abilities.scout.*;
+import com.playmonumenta.plugins.abilities.warlock.*;
+import com.playmonumenta.plugins.abilities.warrior.*;
+import com.playmonumenta.plugins.abilities.warrior.berserker.*;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
 
@@ -131,6 +93,10 @@ public class AbilityManager {
 		                          new Toughness(mPlugin, mWorld, mRandom, null),
 		                          new WarriorPassive(mPlugin, mWorld, mRandom, null),
 		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
+		                          // BERSERKER
+		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
+		                          new Psychosis(mPlugin, mWorld, mRandom, null),
+		                          new RecklessSwing(mPlugin, mWorld, mRandom, null),
 
 		                          // CLERIC
 		                          new Celestial(mPlugin, mWorld, mRandom, null),
