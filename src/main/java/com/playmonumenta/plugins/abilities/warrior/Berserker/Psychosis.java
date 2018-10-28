@@ -39,7 +39,7 @@ public class Psychosis extends Ability {
 	}
 
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer.getHealth() <= PSYCHOSIS_TRIGGER_HEALTH_PERCENT * mPlayer.getMaxHealth()) {
+		if (mPlayer.getHealth() <= PSYCHOSIS_TRIGGER_HEALTH_PERCENT * mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) {
 			int psychosis = getAbilityScore();
 			if (psychosis > 0) {
 				double psychosisDamage = psychosis == 1 ? PSYCHOSIS_1_DAMAGE : PSYCHOSIS_2_DAMAGE;
@@ -53,7 +53,7 @@ public class Psychosis extends Ability {
 	public boolean PlayerDamagedEvent(EntityDamageByEntityEvent event) {
 		if (!mPlayer.isDead()) {
 			double correctHealth = mPlayer.getHealth() - event.getDamage();
-			double maxHealth = mPlayer.getMaxHealth();
+			double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 			int psychosis = getAbilityScore();
 			if (psychosis > 0) {
 				double knockbackRes = psychosis == 1 ? PSYCHOSIS_1_KNOCKBACK_RESISTANCE : PSYCHOSIS_2_KNOCKBACK_RESISTANCE;

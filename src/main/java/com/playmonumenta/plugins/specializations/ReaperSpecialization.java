@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -191,7 +192,7 @@ public class ReaperSpecialization extends BaseSpecialization {
 			if (soulreaping > 0) {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.SOULREAPING)) {
 					if (PlayerUtils.isCritical(player)) {
-						double hp = damagee.getMaxHealth() - damagee.getHealth();
+						double hp = damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - damagee.getHealth();
 						double percent = soulreaping == 1 ? 0.4 : 0.5;
 						double healed = hp * percent;
 						PlayerUtils.healPlayer(damagee, healed);
