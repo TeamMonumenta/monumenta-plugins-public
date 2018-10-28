@@ -59,28 +59,26 @@ public class MeteorSlam extends Ability {
 		if (mPlayer.getFallDistance() >= 1) {
 			int fall = Math.round(mPlayer.getFallDistance());
 			int meteorSlam = getAbilityScore();
-			if (meteorSlam > 0) {
-				ItemStack item = mPlayer.getInventory().getItemInMainHand();
-				if (InventoryUtils.isAxeItem(item) || InventoryUtils.isSwordItem(item)) {
-					mPlayer.setFallDistance(0);
-					Location loc = damagee.getLocation();
-					double radius = meteorSlam == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
-					double dmgMult = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE : METEOR_SLAM_2_DAMAGE;
-					double meteorSlamDamage = fall * dmgMult;
-					event.setDamage(event.getDamage() + meteorSlamDamage);
-					for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
-						if (EntityUtils.isHostileMob(e) && e != damagee) {
-							LivingEntity le = (LivingEntity) e;
-							EntityUtils.damageEntity(mPlugin, le, meteorSlamDamage, mPlayer);
-						}
+			ItemStack item = mPlayer.getInventory().getItemInMainHand();
+			if (InventoryUtils.isAxeItem(item) || InventoryUtils.isSwordItem(item)) {
+				mPlayer.setFallDistance(0);
+				Location loc = damagee.getLocation();
+				double radius = meteorSlam == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
+				double dmgMult = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE : METEOR_SLAM_2_DAMAGE;
+				double meteorSlamDamage = fall * dmgMult;
+				event.setDamage(event.getDamage() + meteorSlamDamage);
+				for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
+					if (EntityUtils.isHostileMob(e) && e != damagee) {
+						LivingEntity le = (LivingEntity) e;
+						EntityUtils.damageEntity(mPlugin, le, meteorSlamDamage, mPlayer);
 					}
-
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
-					mWorld.spawnParticle(Particle.FLAME, loc, 175, 0F, 0F, 0F, 0.175F);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0F, 0F, 0F, 0.3F);
-					mWorld.spawnParticle(Particle.LAVA, loc, 100, radius, 0.25f, radius, 0);
 				}
+
+				loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
+				loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
+				mWorld.spawnParticle(Particle.FLAME, loc, 175, 0F, 0F, 0F, 0.175F);
+				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0F, 0F, 0F, 0.3F);
+				mWorld.spawnParticle(Particle.LAVA, loc, 100, radius, 0.25f, radius, 0);
 			}
 		}
 		return true;
@@ -89,7 +87,7 @@ public class MeteorSlam extends Ability {
 	@Override
 	public boolean PlayerExtendedSneakEvent(Player player) { //bugged
 		int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
-		if (meteorSlam > 0 && player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
+		if (player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.METEOR_SLAM)) {
 				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
 				int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;

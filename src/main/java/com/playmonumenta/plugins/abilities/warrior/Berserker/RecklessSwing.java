@@ -48,21 +48,19 @@ public class RecklessSwing extends Ability {
 	@Override
 	public boolean cast() {
 		int recklessSwing = getAbilityScore();
-		if (recklessSwing > 0) {
-			int damage = recklessSwing == 1 ? RECKLESS_SWING_1_DAMAGE : RECKLESS_SWING_2_DAMAGE;
-			double radius = RECKLESS_SWING_RADIUS;
-			Location loc = mPlayer.getLocation();
-			for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
-				if (EntityUtils.isHostileMob(e)) {
-					LivingEntity le = (LivingEntity) e;
-					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-					MovementUtils.KnockAway(mPlayer, le, RECKLESS_SWING_KNOCKBACK_SPEED);
-				}
+		int damage = recklessSwing == 1 ? RECKLESS_SWING_1_DAMAGE : RECKLESS_SWING_2_DAMAGE;
+		double radius = RECKLESS_SWING_RADIUS;
+		Location loc = mPlayer.getLocation();
+		for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
+			if (EntityUtils.isHostileMob(e)) {
+				LivingEntity le = (LivingEntity) e;
+				EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+				MovementUtils.KnockAway(mPlayer, le, RECKLESS_SWING_KNOCKBACK_SPEED);
 			}
-			int selfDamage = recklessSwing == 1 ? RECKLESS_SWING_1_DAMAGE_TAKEN : RECKLESS_SWING_2_DAMAGE_TAKEN;
-			mPlayer.damage(selfDamage);
-			putOnCooldown();
 		}
+		int selfDamage = recklessSwing == 1 ? RECKLESS_SWING_1_DAMAGE_TAKEN : RECKLESS_SWING_2_DAMAGE_TAKEN;
+		mPlayer.damage(selfDamage);
+		putOnCooldown();
 		return true;
 	}
 
