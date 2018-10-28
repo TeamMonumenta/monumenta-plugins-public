@@ -85,16 +85,15 @@ public class MeteorSlam extends Ability {
 	}
 
 	@Override
-	public boolean PlayerExtendedSneakEvent(Player player) { //bugged
-		int meteorSlam = ScoreboardUtils.getScoreboardValue(player, "MeteorSlam");
-		if (player.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.METEOR_SLAM)) {
+	public void PlayerExtendedSneakEvent() {
+		int meteorSlam = ScoreboardUtils.getScoreboardValue(mPlayer, "MeteorSlam");
+		if (mPlayer.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) {
 				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
 				int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
-				mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.METEOR_SLAM, cooldown);
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
+				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM, cooldown);
 			}
 		}
-		return true;
 	}
 }

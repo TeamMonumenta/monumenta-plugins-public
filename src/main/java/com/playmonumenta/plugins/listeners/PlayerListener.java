@@ -712,22 +712,34 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event, Player player) {
-		new BukkitRunnable() {
-			Integer mTicks = 0;
-			@Override
-			public void run() {
-				if (player.isSneaking()) {
-					mTicks += 2;
-					if (mTicks >= 40) {
-						mPlugin.getSpecialization(player).PlayerExtendedSneakEvent(player);
-						this.cancel();
-					}
+		if (event.isSneaking()) {
+			/*
+			 * Player started sneaking
+			 *
+			 * Create a task that will fire in 2s and attach that taskId to the player via metadata
+			 *
+			 * If that task fires, trigger the extended sneak event and remove the metadata
+			 */
+			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
+				() -> {
+					AbilityManager.getManager().PlayerExtendedSneakEvent(player);
+					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+				}, 40);
 
-				} else {
-					this.cancel();
-				}
+			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
+		} else {
+			/*
+			 * Player stopped sneaking
+			 *
+			 * Check if they still have the metadata (they haven't been sneaking for 2s)
+			 * If so, remove it and cancel the task
+			 */
+			if (player.hasMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY)) {
+				int taskId = player.getMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY).get(0).asInt();
+				Bukkit.getScheduler().cancelTask(taskId);
+				player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		}
 	}
 
 	@EventHandler

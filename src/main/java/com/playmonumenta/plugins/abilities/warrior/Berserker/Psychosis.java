@@ -9,6 +9,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.World;
 
 /* Psychosis: While below 50% health, gain +2/+4 Attack
@@ -47,7 +48,7 @@ public class Psychosis extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedEvent(EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
 		if (!mPlayer.isDead()) {
 			double correctHealth = mPlayer.getHealth() - event.getDamage();
 			double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();

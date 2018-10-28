@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -102,7 +103,7 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean PlayerDamagedEvent(EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
 		return true;
 	}
 
@@ -155,9 +156,7 @@ public abstract class Ability {
 
 	public void PlayerRespawnEvent() { }
 
-	public boolean PlayerExtendedSneakEvent(Player player) {
-		return true;
-	}
+	public void PlayerExtendedSneakEvent() { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

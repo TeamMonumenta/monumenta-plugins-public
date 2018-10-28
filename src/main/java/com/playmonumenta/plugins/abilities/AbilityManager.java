@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -168,6 +169,17 @@ public class AbilityManager {
 		return true;
 	}
 
+	public boolean PlayerDamagedEvent(Player player, EntityDamageEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerDamagedEvent(event)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
@@ -241,6 +253,14 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.ProjectileHitEvent(event, arrow);
+			}
+		}
+	}
+
+	public void PlayerExtendedSneakEvent(Player player) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PlayerExtendedSneakEvent();
 			}
 		}
 	}

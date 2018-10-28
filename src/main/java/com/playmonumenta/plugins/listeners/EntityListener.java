@@ -287,7 +287,12 @@ public class EntityListener implements Listener {
 			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
 				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
 					event.setCancelled(true);
+					return;
 				}
+			}
+
+			if (!AbilityManager.getManager().PlayerDamagedEvent(player, event)) {
+				event.setCancelled(true);
 			}
 
 			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {

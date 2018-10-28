@@ -45,12 +45,10 @@ public class PrismaticShield extends Ability {
 	}
 
 	/*
-	 * Should we also make this prismatic shield work from general mob damage?
-	 * (Includes projectile, mob spells, mob melee) TODO: Yes, probably want a
-	 * generic player damage event instead
+	 * Works against all types of damage
 	 */
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
 		int prismatic = getAbilityScore();
 		int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 		int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;

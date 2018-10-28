@@ -45,8 +45,7 @@ public class EscapeDeath extends Ability {
 	}
 
 	/*
-	 * Should we also make this escape death from general mob damage? (Includes projectile, mob spells, mob melee)
-	 * TODO: Yes, probably want a generic player damage event instead
+	 * Only activates when taking damage from mobs
 	 */
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
