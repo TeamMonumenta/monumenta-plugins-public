@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import com.playmonumenta.bossfights.BossBarManager;
+import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
@@ -108,11 +109,19 @@ public class CAxtal extends BossAbilityGroup {
 			                                                   b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
-		Map<Integer, String> events = new HashMap<Integer, String>();
-		events.put(100, Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
-		events.put(50,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
-		events.put(25,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
-		events.put(10,  Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
+		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		events.put(100, mBoss -> {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]"));
+        });
+		events.put(50, (mBoss) -> {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PLEASE. KILL ME. KAUL HOLDS ONTO MY MIND, BUT I YEARN FOR FREEDOM.\",\"color\":\"dark_red\"}]"));
+        });
+		events.put(25, (mBoss) -> {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE CLOSE. END THIS. END THE REVERIE!\",\"color\":\"dark_red\"}]"));
+        });
+		events.put(10, (mBoss) -> {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"My servant is nearly dead. You dare to impose your will on the jungle?\",\"color\":\"dark_green\"}]"));
+        });
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);

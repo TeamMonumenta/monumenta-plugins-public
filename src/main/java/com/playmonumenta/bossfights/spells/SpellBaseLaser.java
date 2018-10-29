@@ -108,7 +108,7 @@ public class SpellBaseLaser implements Spell {
 			@Override
 			public void run() {
 				Location launLoc = mBoss.getLocation().add(0, 1.6f, 0);
-				Location tarLoc = target.getLocation().add(0, 0.6f, 0);
+				Location tarLoc = target.getEyeLocation();
 				Location endLoc = launLoc;
 
 				Vector baseVect = new Vector(tarLoc.getX() - launLoc.getX(), tarLoc.getY() - launLoc.getY(), tarLoc.getZ() - launLoc.getZ());

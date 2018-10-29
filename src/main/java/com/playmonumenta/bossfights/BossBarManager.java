@@ -8,17 +8,22 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class BossBarManager {
+	@FunctionalInterface
+	public interface BossHealthAction {
+		void run(LivingEntity boss);
+	}
 	private LivingEntity mBoss;
 	private int mRange;
-	private Map<Integer, String> mEvents;
+	private Map<Integer, BossHealthAction> mEvents;
 	private int mEventCursor;
 	private BossBar mBar;
 
-	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, String>events) {
+	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction>events) {
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
@@ -49,9 +54,9 @@ public class BossBarManager {
 		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 
 		while (mEvents != null && mEventCursor > (progress * 100)) {
-			String event = mEvents.get(mEventCursor);
-			if (event != null && !event.isEmpty()) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), event);
+			BossHealthAction event = mEvents.get(mEventCursor);
+			if (event != null) {
+				event.run(mBoss);
 			}
 			mEventCursor--;
 		}

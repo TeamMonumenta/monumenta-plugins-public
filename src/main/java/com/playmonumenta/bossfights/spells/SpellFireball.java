@@ -77,6 +77,10 @@ public class SpellFireball implements Spell {
 				mBoss.setAI(false);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
+				List<Player> players1 = Utils.playersInRange(mBoss.getLocation(), mRange);
+				for(Player player : players1) {
+					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
+				}
 				if (mTicks >= mDelay) {
 					mLaunches++;
 					mTicks = 0;
