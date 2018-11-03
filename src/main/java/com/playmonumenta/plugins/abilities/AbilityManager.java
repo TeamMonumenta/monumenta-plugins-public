@@ -110,7 +110,6 @@ public class AbilityManager {
 		                          new Sanctified(mPlugin, mWorld, mRandom, null),
 
 		                          //WARLOCK
-
 		                          new AmplifyingHex(mPlugin, mWorld, mRandom, null),
 		                          new BlasphemousAura(mPlugin, mWorld, mRandom, null),
 		                          new ConsumingFlames(mPlugin, mWorld, mRandom, null),
@@ -120,7 +119,13 @@ public class AbilityManager {
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
 
 		                          // ALCHEMIST
-		                          new UnstableArrows(mPlugin, mWorld, mRandom, null)
+		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),
+								  new UnstableArrows(mPlugin, mWorld, mRandom, null),
+								  new PowerInjection(mPlugin, mWorld, mRandom, null),
+								  new IronTincture(mPlugin, mWorld, mRandom, null),
+								  new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
+								  new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
+								  new EnfeeblingElixir(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 

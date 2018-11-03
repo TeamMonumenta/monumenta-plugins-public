@@ -45,13 +45,13 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
-    BasiliskPoison
-    Unstable Arrows
-    PowerInjection
-    IronTincture
+    BasiliskPoison - refactored
+    Unstable Arrows - refactored
+    PowerInjection - refactored
+    IronTincture - refactored
     Gruesome Alchemy
     Brutal Alchemy
-    Enfeebling Elixir
+    Enfeebling Elixir - refactored
 */
 
 public class AlchemistClass extends BaseClass {
@@ -64,87 +64,11 @@ public class AlchemistClass extends BaseClass {
 	private static final int BRUTAL_ALCHEMY_WITHER_1_DURATION = 4 * 20;
 	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 6 * 20;
 
-	private static final int ENFEEBLING_COOLDOWN = 20 * 20;
-	private static final int ENFEEBLING_DURATION_1 = 6 * 20;
-	private static final int ENFEEBLING_DURATION_2 = 9 * 20;
-	private static final float ENFEEBLING_KNOCKBACK_1_SPEED = 0.35f;
-	private static final float ENFEEBLING_KNOCKBACK_2_SPEED = 0.5f;
-	private static final int ENFEEBLING_JUMP_LEVEL = 1;
-	private static final int ENFEEBLING_RADIUS = 3;
-
-	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
-	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
-	private static final double IRON_TINCTURE_VELOCITY = 0.7;
-
-	private static final int BASILISK_POISON_1_EFFECT_LVL = 1;
-	private static final int BASILISK_POISON_2_EFFECT_LVL = 2;
-	private static final int BASILISK_POISON_1_DURATION = 7 * 20;
-	private static final int BASILISK_POISON_2_DURATION = 6 * 20;
-
-	private static final int POWER_INJECTION_RANGE = 16;
-	private static final int POWER_INJECTION_1_STRENGTH_EFFECT_LVL = 1;
-	private static final int POWER_INJECTION_2_STRENGTH_EFFECT_LVL = 2;
-	private static final int POWER_INJECTION_SPEED_EFFECT_LVL = 0;
-	private static final int POWER_INJECTION_DURATION = 20 * 20;
-	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
-
 	private World mWorld;
 
 	public AlchemistClass(Plugin plugin, Random random, World world) {
 		super(plugin, random);
 		mWorld = world;
-	}
-
-
-	@Override
-	public void LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		//  BasiliskPoison
-		int basiliskPoison = ScoreboardUtils.getScoreboardValue(player, "BasiliskPoison");
-		if (basiliskPoison > 0) {
-			int effectLvl = basiliskPoison == 1 ? BASILISK_POISON_1_EFFECT_LVL : BASILISK_POISON_2_EFFECT_LVL;
-			int duration = basiliskPoison == 1 ? BASILISK_POISON_1_DURATION : BASILISK_POISON_2_DURATION;
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
-			mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
-		}
-	}
-
-	@Override
-	public void PlayerShotArrowEvent(Player player, Arrow arrow) {
-		//  PowerInjection
-		if (arrow.isCritical() && (player.isSneaking())) {
-			int powerInjection = ScoreboardUtils.getScoreboardValue(player, "PowerInjection");
-			if (powerInjection > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.POWER_INJECTION)) {
-					LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(player, POWER_INJECTION_RANGE, true, true, true);
-					if (targetEntity != null && targetEntity instanceof Player) {
-						Player targetPlayer = (Player) targetEntity;
-						if (targetPlayer.getGameMode() != GameMode.SPECTATOR) {
-							mWorld.spawnParticle(Particle.FLAME, targetPlayer.getLocation().add(0, 1, 0), 30, 1.0, 1.0, 1.0, 0.001);
-							mWorld.playSound(targetPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.0f);
-							mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.2f, 1.0f);
-
-							int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
-
-							mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
-							if (powerInjection > 1) {
-								mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
-							}
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.POWER_INJECTION, POWER_INJECTION_COOLDOWN);
-
-							arrow.remove();
-							return;
-						}
-					}
-				}
-			}
-		}
-
-		//  BasiliskPoison
-		int basiliskPoison = ScoreboardUtils.getScoreboardValue(player, "BasiliskPoison");
-		if (basiliskPoison > 0) {
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.TOTEM);
-		}
 	}
 
 	private static ItemStack getAlchemistPotion() {
@@ -245,123 +169,6 @@ public class AlchemistClass extends BaseClass {
 				}
 			}
 		}
-		return true;
-	}
-
-
-	//  IRON TINCTURE
-	@Override
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		if (player.isSneaking()) {
-			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-				int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
-				if (ironTincture > 0) {
-					ItemStack mainHand = player.getInventory().getItemInMainHand();
-					if (mainHand == null ||
-					    (!InventoryUtils.isBowItem(mainHand)
-					     && mainHand.getType() != Material.SPLASH_POTION
-					     && mainHand.getType() != Material.LINGERING_POTION)) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.IRON_TINCTURE)) {
-							Location loc = player.getLocation().add(0, 1.8, 0);
-							ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
-							mWorld.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
-							Item tincture = mWorld.dropItem(loc, itemTincture);
-							tincture.setPickupDelay(Integer.MAX_VALUE);
-
-							Vector vel = player.getEyeLocation().getDirection().normalize();
-							vel.multiply(IRON_TINCTURE_VELOCITY);
-
-							tincture.setVelocity(vel);
-							tincture.setGlowing(true);
-
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_THROW_COOLDOWN);
-
-							new BukkitRunnable() {
-								int tinctureDecay = 10 * 10;
-
-								@Override
-								public void run() {
-									if (tincture.isDead() || tincture == null) {
-										this.cancel();
-									}
-									mWorld.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
-
-									for (Player p : PlayerUtils.getNearbyPlayers(tincture.getLocation(), 1)) {
-										// Prevent players from picking up their own tincture instantly
-										if (p == player && tincture.getTicksLived() < 12) {
-											continue;
-										}
-
-										mWorld.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-										mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 250, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
-										tincture.remove();
-
-										int ironTincture = ScoreboardUtils.getScoreboardValue(player, "IronTincture");
-										p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
-
-										if (p != player) {
-											player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
-											mWorld.spawnParticle(Particle.LAVA, player.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-											mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-										}
-										mPlugin.mTimers.removeCooldown(player.getUniqueId(), Spells.IRON_TINCTURE);
-										mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.IRON_TINCTURE, IRON_TINCTURE_USE_COOLDOWN);
-
-										mWorld.spawnParticle(Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
-										mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-
-										this.cancel();
-										break;
-									}
-
-									// TODO: Someone should clean this awful thing up at some point...
-									if (tincture.getTicksLived() < 12) {
-										return;
-									}
-
-									tinctureDecay--;
-									if (tinctureDecay <= 0) {
-										tincture.remove();
-									}
-								}
-
-							}.runTaskTimer(mPlugin, 0, 2);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, LivingEntity damagee, double damage, DamageCause cause) {
-		int enfeeblingElixir = ScoreboardUtils.getScoreboardValue(player, "EnfeeblingElixir");
-		if (enfeeblingElixir > 0 && EntityUtils.isHostileMob(damagee)) {
-			if (player.isSneaking()) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR)) {
-					int duration = (enfeeblingElixir == 1) ? ENFEEBLING_DURATION_1 : ENFEEBLING_DURATION_2;
-
-					float kbSpeed = (enfeeblingElixir == 1) ? ENFEEBLING_KNOCKBACK_1_SPEED : ENFEEBLING_KNOCKBACK_2_SPEED;
-					int weaknessLevel = enfeeblingElixir;
-
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS)) {
-						MovementUtils.KnockAway(damagee, mob, kbSpeed);
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
-					}
-
-					MovementUtils.KnockAway(player, damagee, kbSpeed);
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
-
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
-
-					mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation(), 100, 2, 1.5, 2, 0);
-					mWorld.playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
-					mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.ENFEEBLING_ELIXIR, ENFEEBLING_COOLDOWN);
-				}
-			}
-		}
-
 		return true;
 	}
 }
