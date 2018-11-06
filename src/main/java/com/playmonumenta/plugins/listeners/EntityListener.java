@@ -473,16 +473,22 @@ public class EntityListener implements Listener {
 		/* Don't let the player interact with the world when transferring */
 		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
-		if (source instanceof Player) {
-			// If thrown by a player, that player's class determines how entities are affected
-			Player player = (Player)source;
+		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
+		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getEffects())) {
+			//TODO: Alchemist? Should they be able to splash themselves with negatives like everyone else?
+			affectedEntities.removeIf(entity -> (entity instanceof Player && entity != source));
+		}
 
-			if (AbilityManager.getManager().PlayerSplashPotionEvent(player, affectedEntities, potion, event)) {
+		/* If a player threw this potion, trigger applicable abilities (potentially cancelling the event) */
+		if (source instanceof Player) {
+			if (!AbilityManager.getManager().PlayerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
-		} else {
-			// If not thrown by a player, add tracked effects to the potion manager
+		}
+
+		// If event was not cancelled, track all player potion effects with the potion manager
+		if (!event.isCancelled()) {
 			for (LivingEntity entity : affectedEntities) {
 				if (entity instanceof Player) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),

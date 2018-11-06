@@ -128,32 +128,15 @@ public abstract class Ability {
 		return true;
 	}
 
-	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
-
-	// Called when a player throws a splash potion
+	// Called when entities are hit by a potion a player threw
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {
-		if (mPlayer != null) {
-			//  All affected players need to have the effect added to their potion manager.
-			for (LivingEntity entity : affectedEntities) {
-				if (entity instanceof Player) {
-					// Thrown by a player - negative effects are not allowed for other players
-					// Don't remove negative effects if it was the same player that threw the potion
-					if ((!entity.equals(mPlayer)) && PotionUtils.hasNegativeEffects(potion.getEffects())) {
-						// If a thrown potion contains any negative effects, don't apply *any* effects to other players
-						event.setIntensity(entity, 0);
-					}
-
-					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
-					                                 event.getIntensity(entity));
-				}
-			}
-
-		}
 		return true;
 	}
 
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+
+	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
 
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
