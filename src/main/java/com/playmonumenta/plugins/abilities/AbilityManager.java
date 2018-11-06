@@ -27,6 +27,7 @@ import java.util.UUID;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -125,7 +126,9 @@ public class AbilityManager {
 		                          new IronTincture(mPlugin, mWorld, mRandom, null),
 		                          new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
-		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null)
+		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
+		                          new AlchemistPassive(mPlugin, mWorld, mRandom, null),
+		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
@@ -196,15 +199,6 @@ public class AbilityManager {
 		return true;
 	}
 
-	public void EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		AbilityCollection aColl = AbilityManager.getManager().getPlayerAbilities(player);
-		for (Ability abil : aColl.getAbilities()) {
-			if (abil.canCast()) {
-				abil.EntityDeathEvent(event, shouldGenDrops);
-			}
-		}
-	}
-
 	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
@@ -236,6 +230,25 @@ public class AbilityManager {
 			}
 		}
 		return true;
+	}
+
+	public boolean PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerThrewSplashPotionEvent(potion)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public void EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.EntityDeathEvent(event, shouldGenDrops);
+			}
+		}
 	}
 
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {

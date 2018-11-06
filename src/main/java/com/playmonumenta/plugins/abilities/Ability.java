@@ -13,6 +13,7 @@ import java.util.Random;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -111,10 +112,6 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		return true;
-	}
-
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
@@ -124,6 +121,10 @@ public abstract class Ability {
 	}
 
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
+		return true;
+	}
+
+	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
 		return true;
 	}
 
@@ -151,6 +152,8 @@ public abstract class Ability {
 		}
 		return true;
 	}
+
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
 
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 

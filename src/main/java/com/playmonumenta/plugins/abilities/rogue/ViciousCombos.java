@@ -36,7 +36,7 @@ public class ViciousCombos extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = (LivingEntity) event.getEntity();
 		int viciousCombos = getAbilityScore();
 
@@ -69,6 +69,5 @@ public class ViciousCombos extends Ability {
 			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 		}
-		return true;
 	}
 }

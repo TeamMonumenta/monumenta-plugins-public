@@ -1,16 +1,11 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.AlchemistClass;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import java.util.ListIterator;
 import java.util.Random;
@@ -166,23 +161,6 @@ public class MobListener implements Listener {
 				mPlugin.getSpecialization(player).EntityDeathEvent(player, event);
 
 				AbilityManager.getManager().EntityDeathEvent(player, event, shouldGenDrops);
-
-				for (Player p : PlayerUtils.getNearbyPlayers(player, ALCH_PASSIVE_RADIUS, false)) {
-					int classNumber = ScoreboardUtils.getScoreboardValue(p, "Class");
-					if (classNumber == 5) {
-						int brutalAlchemy = ScoreboardUtils.getScoreboardValue(p, "BrutalAlchemy");
-						int gruesomeAlchemy = ScoreboardUtils.getScoreboardValue(p, "GruesomeAlchemy");
-
-						if (brutalAlchemy > 0 || gruesomeAlchemy > 0) {
-							int newPot = 0;
-							if (mRandom.nextDouble() < .50) {
-								newPot++;
-							}
-
-							AlchemistClass.addAlchemistPotions(p, newPot);
-						}
-					}
-				}
 			}
 		}
 	}

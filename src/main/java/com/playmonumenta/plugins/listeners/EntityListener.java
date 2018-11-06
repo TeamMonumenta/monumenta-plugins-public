@@ -444,7 +444,11 @@ public class EntityListener implements Listener {
 			SplashPotion potion = (SplashPotion)event.getEntity();
 			if (potion.getShooter() instanceof Player) {
 				Player player = (Player)potion.getShooter();
-				//mPlugin.getClass(player).PlayerThrewSplashPotionEvent(player, potion);
+
+				if (!AbilityManager.getManager().PlayerThrewSplashPotionEvent(player, potion)) {
+					potion.remove();
+					event.setCancelled(true);
+				}
 			}
 		}
 	}

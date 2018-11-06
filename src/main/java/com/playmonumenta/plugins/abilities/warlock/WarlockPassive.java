@@ -27,7 +27,7 @@ public class WarlockPassive extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		if (EntityUtils.isHostileMob(killedEntity)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
@@ -37,7 +37,6 @@ public class WarlockPassive extends Ability {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, false, true));
 			}
 		}
-		return true;
 	}
 
 }

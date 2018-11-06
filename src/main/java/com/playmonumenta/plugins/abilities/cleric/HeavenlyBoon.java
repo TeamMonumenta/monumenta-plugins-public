@@ -40,7 +40,7 @@ public class HeavenlyBoon extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		int heavenlyBoon = getAbilityScore();
 		if (shouldGenDrops) {
@@ -90,7 +90,6 @@ public class HeavenlyBoon extends Ability {
 				}
 			}
 		}
-		return true;
 	}
 
 	@Override

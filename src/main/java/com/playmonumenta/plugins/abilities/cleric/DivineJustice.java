@@ -48,8 +48,7 @@ public class DivineJustice extends Ability {
 	}
 
 	@Override
-	public boolean EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		DamageCause cause = killedEntity.getLastDamageCause().getCause();
 		if (cause != DamageCause.PROJECTILE && EntityUtils.isUndead(killedEntity)) {
@@ -62,7 +61,6 @@ public class DivineJustice extends Ability {
 				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1.5f);
 			}
 		}
-		return true;
 	}
 
 	@Override
