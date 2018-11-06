@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.specializations;
 
-import com.playmonumenta.plugins.classes.BaseClass;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -37,8 +36,6 @@ public class BaseSpecialization {
 	}
 
 	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
-
-	public void ModifyDamage(Player player, BaseClass owner, EntityDamageByEntityEvent event) {}
 
 	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		return true;
