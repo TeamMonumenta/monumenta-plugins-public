@@ -39,21 +39,21 @@ public class IronTincture extends Ability {
 		mInfo.cooldown = IRON_TINCTURE_THROW_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
-	
+
 	@Override
-	public boolean runCheck(){
+	public boolean runCheck() {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand == null ||
-				(!InventoryUtils.isBowItem(mainHand)
-				 && mainHand.getType() != Material.SPLASH_POTION
-				 && mainHand.getType() != Material.LINGERING_POTION)) {
+			    (!InventoryUtils.isBowItem(mainHand)
+			     && mainHand.getType() != Material.SPLASH_POTION
+			     && mainHand.getType() != Material.LINGERING_POTION)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		int ironTincture = getAbilityScore();

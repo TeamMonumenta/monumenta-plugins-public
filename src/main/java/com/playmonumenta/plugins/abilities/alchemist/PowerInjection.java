@@ -37,7 +37,7 @@ public class PowerInjection extends Ability {
 		mInfo.scoreboardId = "PowerInjection";
 		mInfo.cooldown = POWER_INJECTION_COOLDOWN;
 	}
-	
+
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (arrow.isCritical() && (mPlayer.isSneaking())) {

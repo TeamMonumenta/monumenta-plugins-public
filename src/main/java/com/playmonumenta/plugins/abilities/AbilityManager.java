@@ -120,12 +120,12 @@ public class AbilityManager {
 
 		                          // ALCHEMIST
 		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),
-								  new UnstableArrows(mPlugin, mWorld, mRandom, null),
-								  new PowerInjection(mPlugin, mWorld, mRandom, null),
-								  new IronTincture(mPlugin, mWorld, mRandom, null),
-								  new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
-								  new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
-								  new EnfeeblingElixir(mPlugin, mWorld, mRandom, null)
+		                          new UnstableArrows(mPlugin, mWorld, mRandom, null),
+		                          new PowerInjection(mPlugin, mWorld, mRandom, null),
+		                          new IronTincture(mPlugin, mWorld, mRandom, null),
+		                          new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
+		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
+		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 

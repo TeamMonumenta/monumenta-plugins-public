@@ -30,7 +30,7 @@ public class BasiliskPoison extends Ability {
 		mInfo.specId = -1;
 		mInfo.scoreboardId = "BasiliskPoison";
 	}
-	
+
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		int basiliskPoison = getAbilityScore();
@@ -40,7 +40,7 @@ public class BasiliskPoison extends Ability {
 		mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 		return true;
 	}
-	
+
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.TOTEM);

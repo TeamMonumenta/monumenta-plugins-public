@@ -38,7 +38,7 @@ public class EnfeeblingElixir extends Ability {
 		mInfo.scoreboardId = "EnfeeblingElixir";
 		mInfo.cooldown = ENFEEBLING_COOLDOWN;
 	}
-	
+
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		int enfeeblingElixir = getAbilityScore();
