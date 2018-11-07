@@ -204,7 +204,7 @@ public class PotionUtils {
 	}
 
 	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
-		if (effect.getType().getName() == PotionEffectType.HEAL.getName()) {
+		if (effect.getType().equals(PotionEffectType.HEAL)) {
 			double health = player.getHealth();
 			double healthToAdd = 4 * (effect.getAmplifier() + 1);
 

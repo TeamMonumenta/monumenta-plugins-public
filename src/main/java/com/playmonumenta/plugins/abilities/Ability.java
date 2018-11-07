@@ -128,6 +128,11 @@ public abstract class Ability {
 		return true;
 	}
 
+	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
+	                                           ThrownPotion potion, PotionSplashEvent event) {
+		return true;
+	}
+
 	// Called when entities are hit by a potion a player threw
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -479,11 +480,25 @@ public class EntityListener implements Listener {
 			affectedEntities.removeIf(entity -> (entity instanceof Player && entity != source));
 		}
 
-		/* If a player threw this potion, trigger applicable abilities (potentially cancelling the event) */
+		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
 		if (source instanceof Player) {
 			if (!AbilityManager.getManager().PlayerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
+			}
+		}
+
+		/*
+		 * If a player was hit by this potion, trigger applicable abilities (potentially cancelling or modifying the event!)
+		 *
+		 * Since the ability might modify the affectedEntities list while iterating, need to make a copy of it
+		 */
+		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
+			if (entity instanceof Player) {
+				if (!AbilityManager.getManager().PlayerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
+					event.setCancelled(true);
+					return;
+				}
 			}
 		}
 

@@ -29,8 +29,8 @@ public class HeavenlyBoon extends Ability {
 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.06;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.1;
-	private static final double HEAVENLY_BOON_TRIGGER_RANGE = 2.0;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
+	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.3;
 
 	public HeavenlyBoon(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -92,25 +92,31 @@ public class HeavenlyBoon extends Ability {
 		}
 	}
 
+	/*
+	 * When a cleric is hit by a splash potion, distribute full durations of any positive effects to all
+	 * nearby players. If a player gets a full-duration effect in this way, they are removed from the
+	 * affectedEntities list so they don't get potion effects applied to them twice
+	 */
 	@Override
-	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
-	                                       PotionSplashEvent event) {
-		// Call the base class to make sure effects are correctly applied to
-		// other players
-		super.PlayerSplashPotionEvent(affectedEntities, potion, event);
+	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
+	                                           PotionSplashEvent event) {
+		if (PotionUtils.hasNegativeEffects(potion.getEffects())) {
+			// This potion is bad - don't do anything with it
+			return true;
+		}
 
-		double range = potion.getLocation().distance(mPlayer.getLocation());
-		if (range <= HEAVENLY_BOON_TRIGGER_RANGE) {
-			PotionMeta meta = (PotionMeta) potion.getItem().getItemMeta();
-			List<PotionEffect> effectList = PotionUtils.getEffects(meta);
+		if (event.getIntensity(mPlayer) >= HEAVENLY_BOON_TRIGGER_INTENSITY) {
+			/* If within range, apply full strength of all potion effects to all nearby players */
 
 			for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEAVENLY_BOON_RADIUS, true)) {
-				for (PotionEffect effect : effectList) {
+				/* Apply full-strength effects to players within range */
+				for (PotionEffect effect : potion.getEffects()) {
 					PotionUtils.applyPotion(mPlugin, p, effect);
 				}
-			}
 
-			return false;
+				/* Remove this player from the "usual" application of potion effects */
+				affectedEntities.remove(p);
+			}
 		}
 
 		return true;

@@ -296,6 +296,19 @@ public class AbilityManager {
 		return re;
 	}
 
+	public boolean PlayerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+	                                           ThrownPotion potion, PotionSplashEvent event) {
+		boolean re = true;
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerSplashedByPotionEvent(affectedEntities, potion, event)) {
+					re = false;
+				}
+			}
+		}
+		return re;
+	}
+
 	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
