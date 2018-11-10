@@ -47,6 +47,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.GameMode;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.World;
 
 public class Plugin extends JavaPlugin {
@@ -250,6 +251,23 @@ public class Plugin extends JavaPlugin {
 		if (Bukkit.getPluginManager().isPluginEnabled("Votifier")) {
 			manager.registerEvents(new VotifierIntegration(this), this);
 		}
+
+		// TODO
+		// ***
+		// TODO
+		// ***
+		// TODO
+		//
+		// Janky workaround!
+		//
+		// Reload functions and loot tables two minutes after this plugin loads
+		//
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
+			}
+		}.runTaskLater(this, 2 * 60 * Constants.TICKS_PER_SECOND);
 	}
 
 	//  Logic that is performed upon disabling the plugin.
