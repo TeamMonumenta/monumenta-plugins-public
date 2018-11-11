@@ -85,6 +85,11 @@ public class Dodging extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.getLastDamageCause().getCause() == DamageCause.PROJECTILE;
+		if (mPlayer != null &&
+		    mPlayer.getLastDamageCause() != null &&
+		    mPlayer.getLastDamageCause().getCause() != null) {
+			return mPlayer.getLastDamageCause().getCause() == DamageCause.PROJECTILE;
+		}
+		return false;
 	}
 }
