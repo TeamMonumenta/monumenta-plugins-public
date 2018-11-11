@@ -72,7 +72,7 @@ public class AbilityManager {
 		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
 		                          new ByMyBlade(mPlugin, mWorld, mRandom, null),
 		                          new DaggerThrow(mPlugin, mWorld, mRandom, null),
-		                          new Dodging(mPlugin, mWorld, mRandom, null),
+		                          //new Dodging(mPlugin, mWorld, mRandom, null),
 		                          new EscapeDeath(mPlugin, mWorld, mRandom, null),
 		                          new RoguePassive(mPlugin, mWorld, mRandom, null),
 		                          new Smokescreen(mPlugin, mWorld, mRandom, null),
