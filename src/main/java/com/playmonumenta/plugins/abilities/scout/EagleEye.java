@@ -26,13 +26,13 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; //35%
 	private static final int EAGLE_EYE_RADIUS = 20;
 	private static final double EAGLE_EYE_DOT_ANGLE = 0.33;
-	
+
 	public EagleEye(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 6;
 		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
-		mInfo.scoreboardId = "Volley";
+		mInfo.scoreboardId = "Tinkering";
 		mInfo.cooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
@@ -59,10 +59,10 @@ public class EagleEye extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		return mPlayer.isSneaking();
 	}
-	
+
 }
