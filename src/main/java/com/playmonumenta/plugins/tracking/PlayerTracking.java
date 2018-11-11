@@ -170,11 +170,24 @@ public class PlayerTracking implements EntityTracking {
 				}
 			}
 
-			// Extra Effects.
-			inventory.tick(mPlugin, world, player);
-			_updatePatreonEffects(player, world);
+			// Extra Effects
+			try {
+				inventory.tick(mPlugin, world, player);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-			mPlugin.mPotionManager.updatePotionStatus(player, ticks);
+			try {
+				_updatePatreonEffects(player, world);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			try {
+				mPlugin.mPotionManager.updatePotionStatus(player, ticks);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -101,9 +101,28 @@ public class TrackingManager {
 	}
 
 	public void update(World world, int ticks) {
-		mPlayers.update(world, ticks);
-		mCreepers.update(world, ticks);
-		mBoats.update(world, ticks);
-		mSilverfish.update(world, ticks);
+		try {
+			mPlayers.update(world, ticks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			mCreepers.update(world, ticks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			mBoats.update(world, ticks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			mSilverfish.update(world, ticks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

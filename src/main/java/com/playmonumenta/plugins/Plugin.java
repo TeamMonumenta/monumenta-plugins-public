@@ -206,7 +206,11 @@ public class Plugin extends JavaPlugin {
 
 				if (twoHertz) {
 					//  Update cooldowns.
-					mTimers.UpdateCooldowns(Constants.HALF_TICKS_PER_SECOND);
+					try {
+						mTimers.UpdateCooldowns(Constants.HALF_TICKS_PER_SECOND);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 
 					//  Update periodic timers.
 					mPeriodicTimer++;
@@ -217,10 +221,18 @@ public class Plugin extends JavaPlugin {
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
-						BaseSpecialization pSpec = getSpecialization(player);
-						pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+						try {
+							BaseSpecialization pSpec = getSpecialization(player);
+							pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 
-						AbilityManager.getManager().PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+						try {
+							AbilityManager.getManager().PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 
 					mPeriodicTimer %= Times.ONE_TWENTY.getValue();
@@ -228,14 +240,27 @@ public class Plugin extends JavaPlugin {
 
 				//  4 times a second.
 				if (fourHertz) {
-					mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
-					mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
+					try {
+						mTrackingManager.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					try {
+						mCombatLoggingTimers.update(mWorld, Constants.QUARTER_TICKS_PER_SECOND);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				//  Every tick.
 				if (twentyHertz) {
 					//  Update cooldowns.
-					mProjectileEffectTimers.update();
+					try {
+						mProjectileEffectTimers.update();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				ticks = (ticks + 1) % Constants.TICKS_PER_SECOND;
