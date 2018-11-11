@@ -1,16 +1,24 @@
 package com.playmonumenta.plugins.tracking;
 
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.player.PlayerInventory;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.point.Point;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.Color;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -18,18 +26,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.player.PlayerInventory;
-import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 
 public class PlayerTracking implements EntityTracking {
 	Plugin mPlugin = null;
@@ -210,8 +211,11 @@ public class PlayerTracking implements EntityTracking {
 		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
+	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
+
 	// TODO: We should move this out of being ticked and into an event based system as well as store all
 	// Patrons in a list so we're not testing against every player 4 times a second.
+	// New Ability system would be great for this
 	void _updatePatreonEffects(Player player, World world) {
 		// Players in spectator do not have patreon particles
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
@@ -240,7 +244,7 @@ public class PlayerTracking implements EntityTracking {
 
 			int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
 			if (shinyRed == 1 && patreon >= 30) {
-				world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, RED_PARTICLE_COLOR);
 				return;
 			}
 		}
