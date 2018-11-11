@@ -37,7 +37,7 @@ public class MagmaShield extends Ability {
 		mInfo.classId = 1;
 		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
-		mInfo.scoreboardId = "MagmaShield";
+		mInfo.scoreboardId = "Magma";
 		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

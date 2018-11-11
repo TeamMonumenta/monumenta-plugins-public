@@ -29,7 +29,7 @@ public class DefensiveLine extends Ability {
 
 	public DefensiveLine(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
+		mInfo.classId = 2;
 		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.scoreboardId = "DefensiveLine";
