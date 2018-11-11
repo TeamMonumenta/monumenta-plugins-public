@@ -3,11 +3,8 @@ package com.playmonumenta.plugins.abilities.scout;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -43,78 +40,56 @@ public class Volley extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
+		if (!mPlayer.isSneaking()) {
+			return true;
+		}
+
 		List<Projectile> projectiles;
-		//  Volley
-		if (mPlayer.isSneaking()) {
-			int volley = getAbilityScore();
-			if (volley > 0) {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.VOLLEY)) {
-					boolean isCritical = arrow.isCritical();
-					int fireTicks = arrow.getFireTicks();
-					int knockbackStrength = arrow.getKnockbackStrength();
-					int numArrows = (volley == 1) ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
+		int volley = getAbilityScore();
+		int numArrows = (volley == 1) ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
 
-					// Store PotionData from the original arrow only if it is weakness or slowness
-					PotionData tArrowData = null;
-					if (arrow instanceof TippedArrow) {
-						TippedArrow tArrow = (TippedArrow)arrow;
+		// Store PotionData from the original arrow only if it is weakness or slowness
+		PotionData tArrowData = null;
+		if (arrow instanceof TippedArrow) {
+			TippedArrow tArrow = (TippedArrow)arrow;
 
-						tArrowData = tArrow.getBasePotionData();
-						if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
-							// This arrow isn't weakness or slowness - don't store the potion data
-							tArrowData = null;
-						}
-					}
-
-					if (tArrowData == null) {
-						projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, Arrow.class);
-					} else {
-						projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, TippedArrow.class);
-					}
-
-					for (Projectile proj : projectiles) {
-						Arrow _arrow = (Arrow)proj;
-
-						proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
-
-						// If the base arrow's potion data is still stored, apply it to the new arrows
-						if (tArrowData != null && _arrow instanceof TippedArrow) {
-							((TippedArrow)_arrow).setBasePotionData(tArrowData);
-						}
-
-						_arrow.setCritical(isCritical);
-						_arrow.setFireTicks(fireTicks);
-						_arrow.setKnockbackStrength(knockbackStrength);
-
-						mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
-					}
-
-					//  I hate this so much, you don't even know... [Rock]
-					Location jankWorkAround = mPlayer.getLocation();
-					jankWorkAround.setY(-15);
-					arrow.teleport(jankWorkAround);
-
-					mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.VOLLEY, VOLLEY_COOLDOWN);
-				} else {
-					projectiles = new ArrayList<Projectile>();
-					projectiles.add(arrow);
-				}
-			} else {
-				projectiles = new ArrayList<Projectile>();
-				projectiles.add(arrow);
+			tArrowData = tArrow.getBasePotionData();
+			if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
+				// This arrow isn't weakness or slowness - don't store the potion data
+				tArrowData = null;
 			}
+		}
+
+		if (tArrowData == null) {
+			projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, Arrow.class);
 		} else {
-			projectiles = new ArrayList<Projectile>();
-			projectiles.add(arrow);
+			projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.5, 5, TippedArrow.class);
 		}
 
-		if (AbilityUtils.getBowMasteryDamage(mPlayer) > 0) {
-			if (arrow.isCritical()) {
-				for (Projectile proj : projectiles) {
-					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.CLOUD);
-				}
+		for (Projectile proj : projectiles) {
+			Arrow _arrow = (Arrow)proj;
+
+			proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
+
+			// If the base arrow's potion data is still stored, apply it to the new arrows
+			if (tArrowData != null && _arrow instanceof TippedArrow) {
+				((TippedArrow)_arrow).setBasePotionData(tArrowData);
 			}
+
+			_arrow.setCritical(arrow.isCritical());
+			_arrow.setFireTicks(arrow.getFireTicks());
+			_arrow.setKnockbackStrength(arrow.getKnockbackStrength());
+
+			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
+
+			//TODO: Call PlayerShotArrowEvent with all these new arrows
 		}
+
+		//  I hate this so much, you don't even know... [Rock]
+		Location jankWorkAround = mPlayer.getLocation();
+		jankWorkAround.setY(-15);
+		arrow.teleport(jankWorkAround);
+
 		putOnCooldown();
 		return true;
 	}

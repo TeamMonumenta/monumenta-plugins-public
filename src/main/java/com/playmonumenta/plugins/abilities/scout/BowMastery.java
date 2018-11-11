@@ -10,6 +10,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.Particle;
 import org.bukkit.World;
 
 public class BowMastery extends Ability {
@@ -31,6 +32,12 @@ public class BowMastery extends Ability {
 			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
 			EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, mPlayer);
 		}
+		return true;
+	}
+
+	@Override
+	public boolean PlayerShotArrowEvent(Arrow arrow) {
+		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
 		return true;
 	}
 }
