@@ -67,7 +67,7 @@ public class DaggerThrow extends Ability {
 
 				for (int t = 0; t < 10; t++) {
 					pLoc.add((newDir.clone()).multiply(0.1));
-					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1);
+					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1)) {
