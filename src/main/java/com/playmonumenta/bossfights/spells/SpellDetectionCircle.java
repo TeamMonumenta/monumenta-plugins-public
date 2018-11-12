@@ -21,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellDetectionCircle implements Spell {
 	private Plugin mPlugin;
-	private int mRadius;
+	private double mRadius;
 	private int mDuration;
 	private Location mCenter;
 	private Location mTarget;
@@ -61,16 +61,15 @@ public class SpellDetectionCircle implements Spell {
 
 			@Override
 			public void run() {
-				int  n = mRand.nextInt(40) + 50;
+				int n = mRand.nextInt(40) + 50 + (int)mRadius * 4;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
-				double rad = mRadius;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
 					angle = (double)j * increment;
-					particleLoc.setX(mCenter.getX() + (rad * Math.cos(angle)));
-					particleLoc.setZ(mCenter.getZ() + (rad * Math.sin(angle)));
+					particleLoc.setX(mCenter.getX() + (mRadius * Math.cos(angle)));
+					particleLoc.setZ(mCenter.getZ() + (mRadius * Math.sin(angle)));
 					particleLoc.setY(mCenter.getY() + 5 * (double)(mRand.nextInt(120) - 60) / (60));
 					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
 				}
