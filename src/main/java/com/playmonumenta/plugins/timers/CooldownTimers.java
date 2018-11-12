@@ -121,21 +121,23 @@ public class CooldownTimers {
 	public void UpdateCooldowns(Player player, Integer ticks) {
 		HashMap<Spells, Integer> cds = mTimers.get(player.getUniqueId());
 
-		Iterator<Spells> it = cds.keySet().iterator();
-		while (it.hasNext()) {
-			Spells spell = it.next();
-			int cd = cds.get(spell);
-			cd -= ticks;
-			if (cd <= 0) {
-				MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
-				cds.remove(spell);
-			} else {
-				cds.put(spell, cd);
+		if (cds != null) {
+			Iterator<Spells> it = cds.keySet().iterator();
+			while (it.hasNext()) {
+				Spells spell = it.next();
+				int cd = cds.get(spell);
+				cd -= ticks;
+				if (cd <= 0) {
+					MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
+					cds.remove(spell);
+				} else {
+					cds.put(spell, cd);
+				}
 			}
-		}
 
-		if (mTimers.keySet().size() <= 0) {
-			mTimers.remove(player.getUniqueId());
+			if (mTimers.keySet().size() <= 0) {
+				mTimers.remove(player.getUniqueId());
+			}
 		}
 	}
 
