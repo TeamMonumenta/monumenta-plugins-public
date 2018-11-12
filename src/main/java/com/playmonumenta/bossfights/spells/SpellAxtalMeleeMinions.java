@@ -60,7 +60,7 @@ public class SpellAxtalMeleeMinions implements Spell {
 			public void run() {
 				int nb_to_spawn = mCount + (mRand.nextInt(2 * mScope) - mScope);
 				for (int j = 0; j < nb_to_spawn; j++) {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"Soul\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skull\",Count:1b}],ArmorDropChances:[0.085F,0.085F,-327.67F,-327.67F],Attributes:[{Name:generic.maxHealth,Base:10},{Name:generic.attackDamage,Base:6}],Health:10.0f,DeathLootTable:\"empty\",ActiveEffects:[{Id:14,Amplifier:0,Duration:222220,ShowParticles:0b}],Team:\"Tlax\"}");
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"\\\"Soul\\\"\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skeleton_skull\",Count:1b}],Attributes:[{Name:generic.maxHealth,Base:11},{Name:generic.attackDamage,Base:6}],Health:11.0f,DeathLootTable:\"minecraft:empty\",Team:\"Tlax\",ActiveEffects:[{Id:14b,Amplifier:1b,Duration:999999},{Id:20b,Amplifier:0b,Duration:999999}],Silent:1b}");
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (skelly.getType() == EntityType.SKELETON) {

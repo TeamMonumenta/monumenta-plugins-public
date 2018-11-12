@@ -64,7 +64,7 @@ public class SpellAxtalWitherAoe implements Spell {
 			@Override
 			public void run() {
 				Location lloc = mLauncher.getLocation();
-				int  n = mRand.nextInt(50) + 100;
+				int n = mRand.nextInt(40) + 50;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
