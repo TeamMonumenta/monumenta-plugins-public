@@ -43,7 +43,6 @@ public class FrostNova extends Ability {
 	@Override
 	public boolean cast() {
 		int frostNova = getAbilityScore();
-		mPlayer.setFireTicks(0);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
@@ -53,8 +52,18 @@ public class FrostNova extends Ability {
 				EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
 			}
 
-			mob.setFireTicks(0);
+			if (mob.getFireTicks() > 1) {
+				mob.setFireTicks(1);
+			}
 		}
+
+		// Extinguish fire on all nearby players
+		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
+			if (player.getFireTicks() > 1) {
+				player.setFireTicks(1);
+			}
+		}
+
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.FROST_NOVA);
 		mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
 
