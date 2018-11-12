@@ -1,5 +1,13 @@
 package com.playmonumenta.bossfights.spells;
 
+import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
+import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
+import io.github.jorelali.commandapi.api.arguments.LocationArgument;
+import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.CommandPermission;
+
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -9,7 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellDetectionCircle implements Spell {
 	private Plugin mPlugin;
@@ -17,9 +25,25 @@ public class SpellDetectionCircle implements Spell {
 	private int mDuration;
 	private Location mCenter;
 	private Location mTarget;
-	private Random mRand = new Random();
-	private int runs_left;
-	private int taskID;
+
+	public static void registerCommand(Plugin plugin) {
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+
+		arguments.put("detection_circle", new LiteralArgument("detection_circle"));
+		arguments.put("center_pos", new LocationArgument());
+		arguments.put("radius", new IntegerArgument(1, 2000));
+		arguments.put("duration", new IntegerArgument(1, Integer.MAX_VALUE));
+		arguments.put("redstone_pos", new LocationArgument());
+
+		CommandAPI.getInstance().register("mobspell",
+		                                  new CommandPermission("mobspell.detectioncircle"),
+		                                  arguments,
+		                                  (sender, args) -> {
+		                                      new SpellDetectionCircle(plugin, (Location)args[0], (Integer)args[1],
+		                                                               (Integer)args[2], (Location)args[3]).run();
+		                                  }
+		);
+	}
 
 	public SpellDetectionCircle(Plugin plugin, Location center, int radius, int duration, Location target) {
 		mPlugin = plugin;
@@ -31,12 +55,13 @@ public class SpellDetectionCircle implements Spell {
 
 	@Override
 	public void run() {
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		runs_left = mDuration;
-		Runnable loop = new Runnable() {
+		new BukkitRunnable() {
+			private int runs_left = mDuration;
+			private Random mRand = new Random();
+
 			@Override
 			public void run() {
-				int  n = mRand.nextInt(50) + 100;
+				int  n = mRand.nextInt(40) + 50;
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
@@ -51,19 +76,19 @@ public class SpellDetectionCircle implements Spell {
 				}
 
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-					if (player.getLocation().distance(mCenter) < mRadius && player.getGameMode() == GameMode.SURVIVAL) {
+					if (player.getLocation().distance(mCenter) < mRadius &&
+						(player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
 						mTarget.getBlock().setType(Material.REDSTONE_BLOCK);
-						scheduler.cancelTask(taskID);
+						this.cancel();
 						break;
 					}
 				}
 				if (runs_left <= 0) {
-					scheduler.cancelTask(taskID);
+					this.cancel();
 				}
 				runs_left -= 5;
 			}
-		};
-		taskID = scheduler.scheduleSyncRepeatingTask(mPlugin, loop, 1L, 5L);
+		}.runTaskTimer(mPlugin, 1, 5);
 	}
 
 	@Override

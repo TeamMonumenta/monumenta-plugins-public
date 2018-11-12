@@ -1,6 +1,7 @@
 package com.playmonumenta.bossfights;
 
 import com.playmonumenta.bossfights.commands.BossFight;
+import com.playmonumenta.bossfights.spells.SpellDetectionCircle;
 import com.playmonumenta.bossfights.utils.MetadataUtils;
 
 import org.bukkit.Bukkit;
@@ -16,9 +17,13 @@ public class Plugin extends JavaPlugin {
 		mBossManager = new BossManager(this);
 		getServer().getPluginManager().registerEvents(mBossManager, this);
 
-		getCommand("mobspell").setExecutor(new MobSpell(this));
-
 		BossFight.register(mBossManager);
+
+		/*
+		 * Register spells that can be run by themselves
+		 * By convention, these are always like: /mobspell <spell_label> <args>
+		 */
+		SpellDetectionCircle.registerCommand(this);
 	}
 
 	@Override
