@@ -460,11 +460,6 @@ public class EntityListener implements Listener {
 		ProjectileSource source = potion.getShooter();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
-		// If we are in any type of safezone don't apply splash effects to non-players
-		if (LocationUtils.getLocationType(mPlugin, potion.getLocation()) != LocationType.None) {
-			affectedEntities.removeIf(entity -> (!(entity instanceof Player)));
-		}
-
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
 
@@ -519,11 +514,6 @@ public class EntityListener implements Listener {
 		AreaEffectCloud cloud = event.getEntity();
 		ProjectileSource source = cloud.getSource();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
-
-		// If we are in any type of safezone don't apply splash effects to non-players
-		if (LocationUtils.getLocationType(mPlugin, cloud.getLocation()) != LocationType.None) {
-			affectedEntities.removeIf(entity -> (!(entity instanceof Player)));
-		}
 
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
