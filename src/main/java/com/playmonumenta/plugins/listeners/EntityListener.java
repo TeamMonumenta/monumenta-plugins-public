@@ -201,6 +201,15 @@ public class EntityListener implements Listener {
 				}
 			}
 		} else {
+			//  Don't hurt Villagers!
+			if (damagee instanceof Villager) {
+				event.setCancelled(true);
+			}
+			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
+			if (event.isCancelled()) {
+				return;
+			}
+
 			if (damager instanceof Player) {
 				Player player = (Player)damager;
 
@@ -261,11 +270,6 @@ public class EntityListener implements Listener {
 				LivingEntity mob = (LivingEntity) damagee;
 				event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
 			}
-		}
-
-		//  Don't hurt Villagers!
-		if (damagee instanceof Villager) {
-			event.setCancelled(true);
 		}
 	}
 
