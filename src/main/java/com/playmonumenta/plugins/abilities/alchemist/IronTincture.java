@@ -28,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
+	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	public IronTincture(Plugin plugin, World world, Random random, Player player) {
@@ -36,7 +37,7 @@ public class IronTincture extends Ability {
 		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
-		mInfo.cooldown = IRON_TINCTURE_THROW_COOLDOWN;
+		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
@@ -69,10 +70,11 @@ public class IronTincture extends Ability {
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
+		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
 		new BukkitRunnable() {
-			int tinctureDecay = 10 * 10;
+			int tinctureDecay = 0;
 
 			@Override
 			public void run() {
@@ -91,10 +93,10 @@ public class IronTincture extends Ability {
 					mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 250, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
 					tincture.remove();
 
-					p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
+					p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
 
 					if (p != mPlayer) {
-						mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, ironTincture));
+						mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
 						mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 					}
@@ -108,18 +110,17 @@ public class IronTincture extends Ability {
 					break;
 				}
 
-				// TODO: Someone should clean this awful thing up at some point...
-				if (tincture.getTicksLived() < 12) {
-					return;
-				}
-
-				tinctureDecay--;
-				if (tinctureDecay <= 0) {
+				tinctureDecay += IRON_TINCTURE_TICK_PERIOD;
+				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN) {
 					tincture.remove();
+					this.cancel();
+
+					// Take the skill off cooldown (by setting to 0)
+					mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 0);
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 2);
+		}.runTaskTimer(mPlugin, 0, IRON_TINCTURE_TICK_PERIOD);
 		return true;
 	}
 }

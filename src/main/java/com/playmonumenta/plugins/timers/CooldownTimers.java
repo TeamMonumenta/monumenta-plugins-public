@@ -45,30 +45,20 @@ public class CooldownTimers {
 		return true;
 	}
 
-	public boolean AddCooldown(UUID playerID, Spells spell, Integer cooldownTime) {
-		//  First let's investigate whether this player already has existing cooldowns.
+	public void AddCooldown(UUID playerID, Spells spell, Integer cooldownTime) {
+		// First let's investigate whether this player already has existing cooldowns.
 		HashMap<Spells, Integer> player = mTimers.get(playerID);
-		//  Is there a player already storing cooldowns?
+		// Is there a player already storing cooldowns?
 		if (player != null) {
-			//  Next check to see if this abilityID already exist in this HashMap, if not than we're
-			//  not on cooldown and we should put it on cooldown.
-			Integer ability = player.get(spell);
-			if (ability == null) {
-				player.put(spell, cooldownTime);
-				return true;
-			}
-		}
-		//  Else add a new player entry with it's info.
-		else {
+			// Set the cooldown, even if it already exists
+			player.put(spell, cooldownTime);
+		} else {
+			// Else add a new player entry with it's info.
 			HashMap<Spells, Integer> cooldownHash = new HashMap<Spells, Integer>();
 
 			cooldownHash.put(spell, cooldownTime);
 			mTimers.put(playerID, cooldownHash);
-
-			return true;
 		}
-
-		return false;
 	}
 
 	public void removeCooldown(UUID playerID, Spells spell) {
