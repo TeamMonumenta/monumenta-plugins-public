@@ -98,7 +98,9 @@ public class SpellChangeFloor implements Spell {
 						for (int dy = -mRadius; dy < mRadius; dy++) {
 							for (int dz = -mRadius; dz < mRadius; dz++) {
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
-								if (!mIgnoredMats.contains(state.getType()) && mRandom.nextInt(16) > 6) {
+								if (!mIgnoredMats.contains(state.getType()) &&
+								    !state.getType().isInteractable() &&
+									mRandom.nextInt(16) > 6) {
 									restoreBlocks.add(state);
 								}
 							}
