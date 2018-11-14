@@ -11,12 +11,11 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public class SpellFireball implements Spell {
@@ -78,7 +77,7 @@ public class SpellFireball implements Spell {
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
 				List<Player> players1 = Utils.playersInRange(mBoss.getLocation(), mRange);
-				for(Player player : players1) {
+				for (Player player : players1) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
 				}
 				if (mTicks >= mDelay) {

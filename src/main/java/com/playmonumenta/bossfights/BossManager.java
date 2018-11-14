@@ -2,8 +2,6 @@ package com.playmonumenta.bossfights;
 
 import com.playmonumenta.bossfights.bosses.*;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
-import com.playmonumenta.bossfights.utils.Utils.ArgumentException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;

@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -8,12 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
-
-import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellFlameNova implements Spell {
 	private Plugin mPlugin;

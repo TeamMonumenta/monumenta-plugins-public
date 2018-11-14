@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.List;
 import java.util.Random;
 
@@ -9,8 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellBaseLaser implements Spell {
 	@FunctionalInterface

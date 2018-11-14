@@ -1,9 +1,10 @@
 package com.playmonumenta.bossfights.spells;
 
+import com.playmonumenta.bossfights.utils.Utils;
+
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -12,10 +13,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.Vector;
 import org.bukkit.Sound;
-
-import com.playmonumenta.bossfights.utils.Utils;
+import org.bukkit.util.Vector;
 
 public class SpellKnockAway implements Spell {
 	private Plugin mPlugin;
@@ -55,10 +54,10 @@ public class SpellKnockAway implements Spell {
 					player.damage(10.0f);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1), true);
-					
+
 					Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
 					dir.setY(0.5f);
-					
+
 					player.setVelocity(dir);
 				}
 			}
