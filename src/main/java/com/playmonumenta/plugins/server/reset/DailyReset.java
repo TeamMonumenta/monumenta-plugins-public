@@ -22,6 +22,9 @@ public class DailyReset {
 						player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The king's bounty has changed! Perhaps you should seek out the Herald...");
 					}
 
+					// Remove the tag that prevents players from beating Azacor more than once per day
+					player.removeScoreboardTag("am_antiartifact");
+
 					/* Reset the player's access to the Patreon shrine (if applicable) */
 					int Patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 					int ShrinePower = (Patreon >= 20) ? 2 : ((Patreon >= 10) ? 1 : 0);
