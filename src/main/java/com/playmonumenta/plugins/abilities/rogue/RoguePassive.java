@@ -17,7 +17,6 @@ import org.bukkit.World;
 public class RoguePassive extends Ability {
 
 	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
 
 	public RoguePassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -37,8 +36,6 @@ public class RoguePassive extends Ability {
 				//  This test if the damagee is an instance of a Elite.
 				if (damagee instanceof LivingEntity && EntityUtils.isElite(event.getEntity())) {
 					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
-				} else if (damagee instanceof LivingEntity && EntityUtils.isBoss(event.getEntity())) {
-					event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
 				}
 			}
 		}
