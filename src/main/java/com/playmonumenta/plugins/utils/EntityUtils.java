@@ -46,7 +46,8 @@ public class EntityUtils {
 		EntityType type = mob.getType();
 		return type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER || type == EntityType.PIG_ZOMBIE || type == EntityType.HUSK ||
 		       type == EntityType.SKELETON || type == EntityType.WITHER_SKELETON || type == EntityType.STRAY ||
-		       type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE;
+		       type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE ||
+			   type == EntityType.PHANTOM || type == EntityType.DROWNED;
 	}
 
 	public static boolean isElite(Entity entity) {
