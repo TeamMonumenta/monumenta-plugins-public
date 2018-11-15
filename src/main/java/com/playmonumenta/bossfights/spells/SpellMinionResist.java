@@ -14,22 +14,37 @@ public class SpellMinionResist implements Spell {
 	private LivingEntity mLauncher;
 	private PotionEffect mPotion;
 	private int mRange;
+	private int mApplyPeriod;
+	private Scoreboard mScoreboard;
+	private Team mTeam;
+	private int mTicks;
 
-	public SpellMinionResist(LivingEntity launcher, PotionEffect potion, int range) {
+	/*
+	 * Applies potion effect to launcher whenever other members of his team are within range
+	 *
+	 * Because this is expected to be called often (passive effect), this only actually does the check
+	 * every applyPeriod invocations
+	 */
+	public SpellMinionResist(LivingEntity launcher, PotionEffect potion, int range, int applyPeriod) {
+		mScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		mTeam = mScoreboard.getEntryTeam(launcher.getUniqueId().toString());
 		mLauncher = launcher;
 		mPotion = potion;
 		mRange = range;
+		mApplyPeriod = applyPeriod;
+		mTicks = mApplyPeriod;
 	}
 
 	@Override
 	public void run() {
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Team team = scoreboard.getEntryTeam(mLauncher.getUniqueId().toString());
-		List<Entity> en = mLauncher.getNearbyEntities(mRange, mRange, mRange);
-		for (Entity e : en) {
-			Team team2 = scoreboard.getEntryTeam(e.getUniqueId().toString());
-			if (team == team2) {
-				mLauncher.addPotionEffect(mPotion, true);
+		mTicks++;
+		if (mTicks >= mApplyPeriod) {
+			mTicks = 0;
+
+			for (Entity e : mLauncher.getNearbyEntities(mRange, mRange, mRange)) {
+				if (mTeam.equals(mScoreboard.getEntryTeam(e.getUniqueId().toString()))) {
+					mLauncher.addPotionEffect(mPotion, true);
+				}
 			}
 		}
 	}

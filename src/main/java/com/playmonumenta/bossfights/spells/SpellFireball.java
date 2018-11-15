@@ -70,21 +70,21 @@ public class SpellFireball implements Spell {
 		new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
+			private List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 
 			@Override
 			public void run() {
 				mBoss.setAI(false);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
-				List<Player> players1 = Utils.playersInRange(mBoss.getLocation(), mRange);
-				for (Player player : players1) {
+				for (Player player : players) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
 				}
 				if (mTicks >= mDelay) {
 					mLaunches++;
 					mTicks = 0;
 
-					List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+					players = Utils.playersInRange(mBoss.getLocation(), mRange);
 					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(players);
