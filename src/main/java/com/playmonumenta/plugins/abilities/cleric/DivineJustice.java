@@ -33,8 +33,9 @@ public class DivineJustice extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damagee = (LivingEntity) event.getEntity();
-		DamageCause cause = damagee.getLastDamageCause().getCause();
-		if (cause != DamageCause.PROJECTILE && EntityUtils.isUndead(damagee)) {
+		if (damagee.getLastDamageCause() != null
+				&& damagee.getLastDamageCause().getCause() != DamageCause.PROJECTILE
+				&& EntityUtils.isUndead(damagee)) {
 			EntityUtils.damageEntity(mPlugin, damagee, DIVINE_JUSTICE_DAMAGE, mPlayer);
 
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_CRIT_HEAL);
@@ -50,16 +51,16 @@ public class DivineJustice extends Ability {
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
-		DamageCause cause = killedEntity.getLastDamageCause().getCause();
-		if (cause != DamageCause.PROJECTILE && EntityUtils.isUndead(killedEntity)) {
-			if (getAbilityScore() > 1) {
-				PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_HEAL);
+		if (getAbilityScore() > 1
+				&& killedEntity.getLastDamageCause() != null
+				&& killedEntity.getLastDamageCause().getCause() != DamageCause.PROJECTILE
+				&& EntityUtils.isUndead(killedEntity)) {
+			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_HEAL);
 
-				World world = mPlayer.getWorld();
-				Location loc = killedEntity.getLocation();
-				world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
-				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1.5f);
-			}
+			World world = mPlayer.getWorld();
+			Location loc = killedEntity.getLocation();
+			world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
+			mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1.5f);
 		}
 	}
 
