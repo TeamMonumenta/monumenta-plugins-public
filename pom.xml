@@ -24,7 +24,7 @@
         </repository>
 		<repository>
 			<id>jorelali</id>
-			<url>https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/</url>
+			<url>https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/</url>
 		</repository>
     </repositories>
 
