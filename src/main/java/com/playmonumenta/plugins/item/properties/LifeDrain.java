@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.Particle;
 import org.bukkit.World;
 
 public class LifeDrain implements ItemProperty {
@@ -28,7 +29,10 @@ public class LifeDrain implements ItemProperty {
 
 	@Override
 	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
-		PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL);
+		if (PlayerUtils.isCritical(player)) {
+			PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL);
+			world.spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
+		}
 
 		return damage;
 	}
