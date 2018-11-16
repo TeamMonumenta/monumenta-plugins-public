@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
@@ -64,6 +65,15 @@ public class PlayerInventory {
 		}
 
 		return damage;
+	}
+
+	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onExpChange(plugin, player, event, level);
+		}
 	}
 
 	public double onShootAttack(Plugin plugin, Player player, Projectile proj, EntityDamageByEntityEvent event) {

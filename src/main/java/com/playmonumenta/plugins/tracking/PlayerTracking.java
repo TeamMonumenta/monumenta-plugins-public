@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -96,6 +97,13 @@ public class PlayerTracking implements EntityTracking {
 		}
 
 		return damage;
+	}
+
+	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onExpChange(plugin, player, event);
+		}
 	}
 
 	@Override

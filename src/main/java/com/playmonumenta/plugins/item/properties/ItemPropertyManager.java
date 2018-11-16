@@ -50,6 +50,7 @@ public class ItemPropertyManager {
 		init.add(new Stylish());
 		init.add(new Hope());
 		init.add(new Frost());
+		init.add(new Intuition());
 
 		init.add(new CurseOfCorruption());
 

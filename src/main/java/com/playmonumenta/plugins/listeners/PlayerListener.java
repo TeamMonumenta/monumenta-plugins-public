@@ -532,6 +532,8 @@ public class PlayerListener implements Listener {
 			xp = xp / 3;
 			event.setAmount(xp);
 		}
+
+		mPlugin.mTrackingManager.mPlayers.onExpChange(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

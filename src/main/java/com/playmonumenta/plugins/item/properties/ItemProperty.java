@@ -1,19 +1,20 @@
 package com.playmonumenta.plugins.item.properties;
 
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+
 import java.util.EnumSet;
 
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import org.bukkit.World;
 
 public interface ItemProperty {
 	/*
@@ -77,6 +78,8 @@ public interface ItemProperty {
 	default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
 		return event.getDamage();
 	}
+
+	default public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
 
 	/*
 	 * Triggers when an item entity spawns in the world (possibly a player dropped item)
