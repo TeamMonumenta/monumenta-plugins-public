@@ -77,7 +77,7 @@ public class Azacor extends BossAbilityGroup {
 		mEndLoc = endLoc;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.LAVA, 400),
+			new SpellChangeFloor(plugin, mBoss, spawnLoc, 24, 3, Material.LAVA, 400),
 			new SpellFireball(plugin, boss, detectionRange, 40, 1, 2.0f, true, false,
 			                  // Launch effect
 			                  (Location loc) -> {

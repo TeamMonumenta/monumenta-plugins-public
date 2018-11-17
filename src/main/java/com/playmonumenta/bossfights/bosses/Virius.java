@@ -65,7 +65,7 @@ public class Virius extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellChangeFloor(plugin, mBoss, detectionRange, 3, Material.MAGMA_BLOCK, 800),
+			new SpellChangeFloor(plugin, mBoss, mSpawnLoc, detectionRange, 3, Material.MAGMA_BLOCK, 800),
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {

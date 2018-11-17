@@ -22,6 +22,7 @@ import org.bukkit.Sound;
 public class SpellChangeFloor implements Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private Location mCenterLoc;
 	private int mRange;
 	private int mRadius;
 	private Material mMaterial;
@@ -42,9 +43,10 @@ public class SpellChangeFloor implements Spell {
 	        );
 
 
-	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, int range, int radius, Material material, int floorduration) {
+	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, Location centerLoc, int range, int radius, Material material, int floorduration) {
 		mPlugin = plugin;
 		mBoss = launcher;
+		mCenterLoc = centerLoc;
 		mRange = range;
 		mRadius = radius;
 		mMaterial = material;
@@ -54,7 +56,7 @@ public class SpellChangeFloor implements Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = Utils.playersInRange(mCenterLoc, mRange);
 		launch(players.get(mRandom.nextInt(players.size())));
 	}
 
