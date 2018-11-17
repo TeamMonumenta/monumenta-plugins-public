@@ -51,6 +51,7 @@ public class ItemPropertyManager {
 		init.add(new Hope());
 		init.add(new Frost());
 		init.add(new Intuition());
+		init.add(new LifeDrain());
 
 		init.add(new CurseOfCorruption());
 
