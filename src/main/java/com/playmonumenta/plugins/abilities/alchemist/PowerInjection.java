@@ -60,6 +60,9 @@ public class PowerInjection extends Ability {
 					putOnCooldown();
 
 					arrow.remove();
+
+					// In case this was particle spamming from basilisk arrows
+					mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 				}
 			}
 		}
