@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 import java.util.Random;
@@ -68,7 +69,7 @@ public class SoulRend extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return PlayerUtils.isCritical(mPlayer);
+		return PlayerUtils.isCritical(mPlayer) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 }
