@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class IceAspect implements ItemProperty {
+	private static final int ICE_ASPECT_DURATION = 20 * 5;
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
 
 	@Override
@@ -31,8 +32,7 @@ public class IceAspect implements ItemProperty {
 
 	@Override
 	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
-		int duration = 20 * 5;
-		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level - 1, false, true));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ICE_ASPECT_DURATION, level - 1, false, true));
 		world.spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {
