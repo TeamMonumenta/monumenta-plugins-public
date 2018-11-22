@@ -3,7 +3,7 @@ package com.playmonumenta.bossfights.spells;
 import com.playmonumenta.bossfights.utils.Utils;
 
 import java.util.List;
-import java.util.Random;
+import java.util.SplittableRandom;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -46,17 +46,16 @@ public class SpellBaseLaser implements Spell {
 		void run(Player player, Location loc, boolean blocked);
 	}
 
-	private Plugin mPlugin;
-	private Entity mBoss;
-	private int mRange;
-	private int mNumTicks;
-	private boolean mStopWhenBlocked;
-	private boolean mSingleTarget;
-	private TickAction mTickAction;
-	private ParticleAction mParticleAction;
-	private FinishAction mFinishAction;
-
-	private Random mRandom = new Random();
+	private final Plugin mPlugin;
+	private final Entity mBoss;
+	private final int mRange;
+	private final int mNumTicks;
+	private final boolean mStopWhenBlocked;
+	private final boolean mSingleTarget;
+	private final TickAction mTickAction;
+	private final ParticleAction mParticleAction;
+	private final FinishAction mFinishAction;
+	private final SplittableRandom mRandom = new SplittableRandom();
 
 	/**
 	 * @param plugin          Plugin
@@ -118,7 +117,7 @@ public class SpellBaseLaser implements Spell {
 				for (int i = 0; i < 200; i++) {
 					endLoc.add(baseVect);
 
-					if (mParticleAction != null) {
+					if (mParticleAction != null && mRandom.nextInt(3) == 0) {
 						mParticleAction.run(endLoc);
 					}
 
