@@ -37,7 +37,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -436,7 +435,7 @@ public class PlayerListener implements Listener {
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(event.getPlayer());
 
-			if (event.getState() == State.CAUGHT_ENTITY && !(event.getCaught() instanceof Monster)) {
+			if (event.getState() == State.CAUGHT_ENTITY && !EntityUtils.isHostileMob(event.getCaught())) {
 				event.setCancelled(true);
 			}
 		}
