@@ -13,7 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 
-public class SpellFlameNova implements Spell {
+public class SpellFlameNova extends Spell {
 	private Plugin mPlugin;
 	private Random mRand = new Random();
 	private Entity mLauncher;

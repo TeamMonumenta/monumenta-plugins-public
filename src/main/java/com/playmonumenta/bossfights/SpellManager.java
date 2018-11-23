@@ -24,9 +24,9 @@ import com.playmonumenta.bossfights.spells.Spell;
  * chosen either immediately afterward OR the time after that). Etc.
  */
 public class SpellManager {
-	List<Spell> mReadySpells;
-	Queue<Spell> mCooldownSpells;
-	int mCooldown;
+	private final List<Spell> mReadySpells;
+	private final Queue<Spell> mCooldownSpells;
+	private final int mCooldown;
 
 	public SpellManager(List<Spell> spells) {
 		/*
@@ -71,6 +71,15 @@ public class SpellManager {
 
 		/* None of these spells can run - wait a second before trying again */
 		return 20;
+	}
+
+	public void cancelAll() {
+		for (Spell spell : mReadySpells) {
+			spell.cancel();
+		}
+		for (Spell spell : mCooldownSpells) {
+			spell.cancel();
+		}
 	}
 }
 

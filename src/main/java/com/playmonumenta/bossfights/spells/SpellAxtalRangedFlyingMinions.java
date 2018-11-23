@@ -16,7 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 // TODO: This entire spell is probably broken...
-public class SpellAxtalRangedFlyingMinions implements Spell {
+public class SpellAxtalRangedFlyingMinions extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mCount;

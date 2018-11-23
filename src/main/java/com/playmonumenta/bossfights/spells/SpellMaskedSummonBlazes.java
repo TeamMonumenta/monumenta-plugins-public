@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellMaskedSummonBlazes implements Spell {
+public class SpellMaskedSummonBlazes extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private Random mRand = new Random();

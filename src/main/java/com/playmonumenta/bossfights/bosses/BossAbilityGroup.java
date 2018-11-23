@@ -17,18 +17,21 @@ import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public abstract class BossAbilityGroup {
-	Plugin mPlugin;
-	LivingEntity mBoss;
-	BossBarManager mBossBar;
-	int mTaskIDpassive = -1;
-	int mTaskIDactive = -1;
-	boolean mUnloaded = false;
+	private Plugin mPlugin;
+	private LivingEntity mBoss;
+	private BossBarManager mBossBar;
+	private SpellManager mActiveSpells;
+	private int mTaskIDpassive = -1;
+	private int mTaskIDactive = -1;
+	private boolean mUnloaded = false;
+
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mBossBar = bossBar;
+		mActiveSpells = activeSpells;
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
@@ -130,6 +133,8 @@ public abstract class BossAbilityGroup {
 		/* Make sure we don't accidentally unload twice */
 		if (!mUnloaded) {
 			mUnloaded = true;
+
+			mActiveSpells.cancelAll();
 
 			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 			if (mTaskIDpassive != -1) {

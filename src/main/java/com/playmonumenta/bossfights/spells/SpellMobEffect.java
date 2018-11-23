@@ -3,7 +3,7 @@ package com.playmonumenta.bossfights.spells;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
-public class SpellMobEffect implements Spell {
+public class SpellMobEffect extends Spell {
 	private LivingEntity mLauncher;
 	private PotionEffect mPotion;
 

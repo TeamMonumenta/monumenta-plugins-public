@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class SpellBaseLaser implements Spell {
+public class SpellBaseLaser extends Spell {
 	@FunctionalInterface
 	public interface TickAction {
 		/**

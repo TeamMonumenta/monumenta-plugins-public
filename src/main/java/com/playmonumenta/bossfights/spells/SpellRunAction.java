@@ -4,7 +4,7 @@ package com.playmonumenta.bossfights.spells;
  * Super simple Spell which just runs in-line function
  * code from the caller
  */
-public class SpellRunAction implements Spell {
+public class SpellRunAction extends Spell {
 	@FunctionalInterface
 	public interface Action {
 		/**

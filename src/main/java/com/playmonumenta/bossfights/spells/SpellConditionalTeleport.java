@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 
-public class SpellConditionalTeleport implements Spell {
+public class SpellConditionalTeleport extends Spell {
 	private Entity mLauncher;
 	private Location mDest;
 	private Predicate<Entity> mPredicate;

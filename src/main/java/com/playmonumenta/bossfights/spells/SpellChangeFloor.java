@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
 
-public class SpellChangeFloor implements Spell {
+public class SpellChangeFloor extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private Location mCenterLoc;

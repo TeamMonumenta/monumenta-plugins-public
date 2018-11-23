@@ -10,7 +10,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 
-public class SpellMinionResist implements Spell {
+public class SpellMinionResist extends Spell {
 	private LivingEntity mLauncher;
 	private PotionEffect mPotion;
 	private int mRange;

@@ -1,15 +1,34 @@
 package com.playmonumenta.bossfights.spells;
 
-public interface Spell {
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.bukkit.scheduler.BukkitRunnable;
+
+public abstract class Spell {
+	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
+
 	/*
 	 * Used by some spells to indicate if they can be run
 	 * now (true) or not (false)
 	 */
-	default boolean canRun() {
+	public boolean canRun() {
 		return true;
 	}
-	void run();
+	public abstract void run();
+
+	/*
+	 * Cancels all currently running tasks (tasks in mActiveRunnables)
+	 *
+	 * To use this functionality, user needs to add every BukkitRunnable created to mActiveRunnables,
+	 * and then remove them from mActiveRunnables when they are finished
+	 */
+	public final void cancel() {
+		for (BukkitRunnable runnable : mActiveRunnables) {
+			runnable.cancel();
+		}
+	}
 
 	/* How long this spell takes to cast (in ticks) */
-	int duration();
+	public abstract int duration();
 }

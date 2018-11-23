@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellPushPlayersAway implements Spell {
+public class SpellPushPlayersAway extends Spell {
 	private Entity mLauncher;
 	private int mRadius;
 	private int mMaxNearTime;

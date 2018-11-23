@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellMaskedShadowGlade implements Spell {
+public class SpellMaskedShadowGlade extends Spell {
 	private Plugin mPlugin;
 	private int mCount;
 	private Location mLoc;

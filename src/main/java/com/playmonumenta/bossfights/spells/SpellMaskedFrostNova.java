@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellMaskedFrostNova implements Spell {
+public class SpellMaskedFrostNova extends Spell {
 	private Plugin mPlugin;
 	private Random mRand = new Random();
 	private Entity mLauncher;

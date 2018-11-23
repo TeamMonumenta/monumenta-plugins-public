@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class SpellChangeArrow implements Spell {
+public class SpellChangeArrow extends Spell {
 	private static final Random RAND = new Random();
 
 	private LivingEntity mLauncher;

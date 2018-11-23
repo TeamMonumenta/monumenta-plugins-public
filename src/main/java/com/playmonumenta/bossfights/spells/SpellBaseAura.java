@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
-public class SpellBaseAura implements Spell {
+public class SpellBaseAura extends Spell {
 	@FunctionalInterface
 	public interface ApplyAuraEffect {
 		/**

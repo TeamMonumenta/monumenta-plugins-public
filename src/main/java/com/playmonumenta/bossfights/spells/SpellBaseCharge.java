@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellBaseCharge implements Spell {
+public class SpellBaseCharge extends Spell {
 	@FunctionalInterface
 	interface WarningAction {
 		/**

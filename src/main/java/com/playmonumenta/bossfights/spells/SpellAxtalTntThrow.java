@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellAxtalTntThrow implements Spell {
+public class SpellAxtalTntThrow extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mCount;

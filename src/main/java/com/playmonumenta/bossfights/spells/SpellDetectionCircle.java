@@ -19,7 +19,7 @@ import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpellDetectionCircle implements Spell {
+public class SpellDetectionCircle extends Spell {
 	private Plugin mPlugin;
 	private double mRadius;
 	private int mDuration;

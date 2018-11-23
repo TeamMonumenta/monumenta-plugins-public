@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellAxtalWitherAoe implements Spell {
+public class SpellAxtalWitherAoe extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mRadius;

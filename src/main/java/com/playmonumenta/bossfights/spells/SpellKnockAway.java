@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class SpellKnockAway implements Spell {
+public class SpellKnockAway extends Spell {
 	private Plugin mPlugin;
 	private Random mRand = new Random();
 	private LivingEntity mLauncher;

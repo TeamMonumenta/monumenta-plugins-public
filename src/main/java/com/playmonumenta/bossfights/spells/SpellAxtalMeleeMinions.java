@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class SpellAxtalMeleeMinions implements Spell {
+public class SpellAxtalMeleeMinions extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mCount;

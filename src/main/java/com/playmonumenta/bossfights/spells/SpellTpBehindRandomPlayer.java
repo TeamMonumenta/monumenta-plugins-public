@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class SpellTpBehindRandomPlayer implements Spell {
+public class SpellTpBehindRandomPlayer extends Spell {
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private int mDuration;

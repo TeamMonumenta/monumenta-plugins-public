@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SpellMulti implements Spell {
+public class SpellMulti extends Spell {
 	private List<Spell> mSpells;
 
 	public SpellMulti(Spell ... spells) {

@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class SpellFireball implements Spell {
+public class SpellFireball extends Spell {
 	@FunctionalInterface
 	public interface LaunchFireballEffect {
 		/**
