@@ -28,18 +28,18 @@ public class SpellFireball extends Spell {
 		void run(Location loc);
 	}
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRange;
-	private int mDelay;
-	private int mCount;
-	private float mYield;
-	private boolean mIsIncendiary;
-	private boolean mSingleTarget;
-	private LaunchFireballEffect mLaunchEffect;
-	private int mDuration;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
+	private final int mDelay;
+	private final int mCount;
+	private final float mYield;
+	private final boolean mIsIncendiary;
+	private final boolean mSingleTarget;
+	private final LaunchFireballEffect mLaunchEffect;
+	private final int mDuration;
 
-	private Random mRandom = new Random();
+	private final Random mRandom = new Random();
 
 	/**
 	 * @param plugin          Plugin
@@ -69,7 +69,7 @@ public class SpellFireball extends Spell {
 
 	@Override
 	public void run() {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
 			private List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
@@ -107,11 +107,14 @@ public class SpellFireball extends Spell {
 				if (mLaunches >= mCount) {
 					this.cancel();
 					mBoss.setAI(true);
+					mActiveRunnables.remove(this);
 				}
 
 				mTicks += 2;
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override
@@ -124,7 +127,7 @@ public class SpellFireball extends Spell {
 		mLaunchEffect.run(target.getLocation());
 		mLaunchEffect.run(mBoss.getLocation());
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				// Summon a fireball slightly offset from the boss in the direction of the player
@@ -135,7 +138,11 @@ public class SpellFireball extends Spell {
 				fireball.setDirection(direction);
 				fireball.setYield(mYield);
 				fireball.setIsIncendiary(mIsIncendiary);
+				mActiveRunnables.remove(this);
 			}
-		}.runTaskLater(mPlugin, 14);
+		};
+
+		runnable.runTaskLater(mPlugin, 14);
+		mActiveRunnables.add(runnable);
 	}
 }

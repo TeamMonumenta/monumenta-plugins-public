@@ -74,7 +74,7 @@ public class SpellChangeFloor extends Spell {
 		final int PHASE1_TICKS = 30;
 		final int PHASE2_TICKS = mFloorDuration;
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			List<BlockState> restoreBlocks = new LinkedList<BlockState>();
 			Random mRandom = new Random();
@@ -113,16 +113,27 @@ public class SpellChangeFloor extends Spell {
 					for (BlockState state : restoreBlocks) {
 						state.getLocation().getBlock().setType(mMaterial);
 					}
+
+					/*
+					 * This is weird! But on purpose. The change floor spell can only be
+					 * cancelled before it changes the floor blocks. Once it changes them,
+					 * it must run until it changes the blocks back to what they should be
+					 */
+					mActiveRunnables.remove(this);
 				} else if (mTicks == PHASE2_TICKS) {
 					// Restore the block states saved earlier
 					for (BlockState state : restoreBlocks) {
 						state.update(true);
 					}
-				} else if (mTicks < PHASE1_TICKS && mBoss.isDead() || mTicks > PHASE2_TICKS) {
+				} else if (mTicks > PHASE2_TICKS) {
 					this.cancel();
+					// Don't need to remove runnable here, already done
 				}
 				mTicks++;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 }

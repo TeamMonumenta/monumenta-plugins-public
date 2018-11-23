@@ -201,7 +201,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	private void launch(Player target, List<Player> players) {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			Location targetLoc;
 
@@ -219,10 +219,13 @@ public class SpellBaseCharge extends Spell {
 					// Do the "real" charge attack
 					doCharge(target, mBoss, targetLoc, players, mStartAction, mParticleAction, mHitPlayerAction, mEndAction, true);
 					this.cancel();
+					mActiveRunnables.remove(this);
 				}
 
 				mTicks += 2;
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 }

@@ -84,15 +84,15 @@ public class SpellBaseLaser extends Spell {
 	@Override
 	public void run() {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
-		if (mSingleTarget)
+		if (mSingleTarget) {
 			// Single target chooses a random player within range
-		{
 			launch(players.get(mRandom.nextInt(players.size())));
-		} else
+		} else {
 			// Otherwise target all players within range
 			for (Player player : players) {
 				launch(player);
 			}
+		}
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class SpellBaseLaser extends Spell {
 	}
 
 	private void launch(Player target) {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 
 			@Override
@@ -133,6 +133,7 @@ public class SpellBaseLaser extends Spell {
 
 				if (blocked && mStopWhenBlocked) {
 					this.cancel();
+					mActiveRunnables.remove(this);
 					return;
 				}
 
@@ -146,11 +147,15 @@ public class SpellBaseLaser extends Spell {
 					}
 
 					this.cancel();
+					mActiveRunnables.remove(this);
 					return;
 				}
 
 				mTicks += 2;
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 }
