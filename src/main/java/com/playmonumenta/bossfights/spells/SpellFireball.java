@@ -128,9 +128,9 @@ public class SpellFireball implements Spell {
 			@Override
 			public void run() {
 				// Summon a fireball slightly offset from the boss in the direction of the player
-				Location spawnLoc = mBoss.getLocation().add(0, 0.5, 0);
-				Vector direction = target.getLocation().subtract(spawnLoc).toVector().normalize();
-				spawnLoc = spawnLoc.add(direction);
+				Location spawnLoc = mBoss.getEyeLocation();
+				Vector direction = target.getEyeLocation().subtract(spawnLoc).toVector().normalize();
+				spawnLoc = spawnLoc.add(direction.multiply(2));
 				Fireball fireball = (Fireball)mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
 				fireball.setDirection(direction);
 				fireball.setYield(mYield);
