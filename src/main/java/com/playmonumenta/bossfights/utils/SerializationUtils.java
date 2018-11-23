@@ -1,5 +1,12 @@
 package com.playmonumenta.bossfights.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
+import com.playmonumenta.bossfights.Plugin;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -9,6 +16,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class SerializationUtils {
@@ -119,5 +127,48 @@ public class SerializationUtils {
 				}
 			}
 		}
+	}
+
+	@FunctionalInterface
+	public interface BossConstructor {
+		BossAbilityGroup run(Location spawnLoc, Location endLoc);
+	}
+
+	public static BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
+	                                                        BossConstructor constructor) throws Exception {
+		String content = SerializationUtils.retrieveDataFromEntity(boss);
+
+		if (content == null || content.isEmpty()) {
+			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");
+		}
+
+		Gson gson = new Gson();
+		JsonObject object = gson.fromJson(content, JsonObject.class);
+
+		if (!(object.has("spawnX") && object.has("spawnY") && object.has("spawnZ") &&
+		        object.has("endX") && object.has("endY") && object.has("endZ"))) {
+			throw new Exception("Failed to instantiate " + identityTag + ": missing required data element");
+		}
+
+		Location spawnLoc = new Location(boss.getWorld(), object.get("spawnX").getAsDouble(),
+		                                 object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
+		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
+		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
+
+		return constructor.run(spawnLoc, endLoc);
+	}
+
+	public static String statefulBossSerializer(Location spawnLoc, Location endLoc) {
+		Gson gson = new GsonBuilder().create();
+		JsonObject root = new JsonObject();
+
+		root.addProperty("spawnX", spawnLoc.getX());
+		root.addProperty("spawnY", spawnLoc.getY());
+		root.addProperty("spawnZ", spawnLoc.getZ());
+		root.addProperty("endX", endLoc.getX());
+		root.addProperty("endY", endLoc.getY());
+		root.addProperty("endZ", endLoc.getZ());
+
+		return gson.toJson(root);
 	}
 }

@@ -1,9 +1,5 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,31 +30,19 @@ public class Masked_1 extends BossAbilityGroup {
 	public static final String identityTag = "boss_masked_1";
 	public static final int detectionRange = 50;
 
-	LivingEntity mBoss;
-	Location mSpawnLoc;
-	Location mEndLoc;
+	private final LivingEntity mBoss;
+	private final Location mSpawnLoc;
+	private final Location mEndLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		String content = SerializationUtils.retrieveDataFromEntity(boss);
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
+			return new Masked_1(plugin, boss, spawnLoc, endLoc);
+		});
+	}
 
-		if (content == null || content.isEmpty()) {
-			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");
-		}
-
-		Gson gson = new Gson();
-		JsonObject object = gson.fromJson(content, JsonObject.class);
-
-		if (!(object.has("spawnX") && object.has("spawnY") && object.has("spawnZ") &&
-		        object.has("endX") && object.has("endY") && object.has("endZ"))) {
-			throw new Exception("Failed to instantiate " + identityTag + ": missing required data element");
-		}
-
-		Location spawnLoc = new Location(boss.getWorld(), object.get("spawnX").getAsDouble(),
-		                                 object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
-		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
-		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
-
-		return new Masked_1(plugin, boss, spawnLoc, endLoc);
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
 	}
 
 	public Masked_1(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -119,20 +103,5 @@ public class Masked_1 extends BossAbilityGroup {
 	public void death() {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 		mBoss.teleport(mBoss.getLocation().add(0, -300, 0));
-	}
-
-	@Override
-	public String serialize() {
-		Gson gson = new GsonBuilder().create();
-		JsonObject root = new JsonObject();
-
-		root.addProperty("spawnX", mSpawnLoc.getX());
-		root.addProperty("spawnY", mSpawnLoc.getY());
-		root.addProperty("spawnZ", mSpawnLoc.getZ());
-		root.addProperty("endX", mEndLoc.getX());
-		root.addProperty("endY", mEndLoc.getY());
-		root.addProperty("endZ", mEndLoc.getZ());
-
-		return gson.toJson(root);
 	}
 }

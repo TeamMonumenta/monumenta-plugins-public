@@ -1,9 +1,5 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
 import com.playmonumenta.bossfights.Plugin;
@@ -16,7 +12,6 @@ import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellFireball;
 import com.playmonumenta.bossfights.spells.SpellKnockAway;
 import com.playmonumenta.bossfights.spells.SpellMinionResist;
-import com.playmonumenta.bossfights.spells.SpellMobEffect;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -43,33 +38,21 @@ import org.bukkit.Sound;
 public class Azacor extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
 	public static final int detectionRange = 50;
-	private Random mRand = new Random();
 
-	LivingEntity mBoss;
-	Location mSpawnLoc;
-	Location mEndLoc;
+	private final LivingEntity mBoss;
+	private final Location mSpawnLoc;
+	private final Location mEndLoc;
+	private final Random mRand = new Random();
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		String content = SerializationUtils.retrieveDataFromEntity(boss);
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
+			return new Azacor(plugin, boss, spawnLoc, endLoc);
+		});
+	}
 
-		if (content == null || content.isEmpty()) {
-			throw new Exception("Can't instantiate " + identityTag + " with no serialized data");
-		}
-
-		Gson gson = new Gson();
-		JsonObject object = gson.fromJson(content, JsonObject.class);
-
-		if (!(object.has("spawnX") && object.has("spawnY") && object.has("spawnZ") &&
-		      object.has("endX") && object.has("endY") && object.has("endZ"))) {
-			throw new Exception("Failed to instantiate " + identityTag + ": missing required data element");
-		}
-
-		Location spawnLoc = new Location(boss.getWorld(), object.get("spawnX").getAsDouble(),
-		                                 object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
-		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
-		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
-
-		return new Azacor(plugin, boss, spawnLoc, endLoc);
+	@Override
+	public String serialize() {
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
 	}
 
 	public Azacor(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -205,20 +188,5 @@ public class Azacor extends BossAbilityGroup {
 		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-	}
-
-	@Override
-	public String serialize() {
-		Gson gson = new GsonBuilder().create();
-		JsonObject root = new JsonObject();
-
-		root.addProperty("spawnX", mSpawnLoc.getX());
-		root.addProperty("spawnY", mSpawnLoc.getY());
-		root.addProperty("spawnZ", mSpawnLoc.getZ());
-		root.addProperty("endX", mEndLoc.getX());
-		root.addProperty("endY", mEndLoc.getY());
-		root.addProperty("endZ", mEndLoc.getZ());
-
-		return gson.toJson(root);
 	}
 }
