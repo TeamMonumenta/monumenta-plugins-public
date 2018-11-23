@@ -74,7 +74,7 @@ public class ChestOverride extends OverrideItem {
 		return _breakable(block);
 	}
 
-	private boolean _breakable(Block block) {
+	protected static boolean _breakable(Block block) {
 		Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
 		if (blockUnder != null && blockUnder.getType() == Material.BARRIER) {
 			return false;

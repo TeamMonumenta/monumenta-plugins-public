@@ -1,13 +1,15 @@
 package com.playmonumenta.plugins.items;
 
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+
+import org.bukkit.block.Block;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.GameMode;
+import org.bukkit.inventory.ItemStack;
 
 public class EnderChestOverride extends OverrideItem {
 	@Override
@@ -18,6 +20,15 @@ public class EnderChestOverride extends OverrideItem {
 			return true;
 		}
 
+		return false;
+	}
+
+	/* Chests placed on barriers can not be broken */
+	@Override
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+		if ((player.getGameMode() == GameMode.CREATIVE) || ChestOverride._breakable(block)) {
+			return true;
+		}
 		return false;
 	}
 }
