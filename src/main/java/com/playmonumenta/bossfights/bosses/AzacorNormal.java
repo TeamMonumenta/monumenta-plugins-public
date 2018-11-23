@@ -106,9 +106,9 @@ public class AzacorNormal extends BossAbilityGroup {
 			                       if (!blocked) {
 			                           double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*0.75);
 
-			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE) {
+			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			                               player.setHealth(0.0);
-			                           } else if (player.getGameMode() != GameMode.CREATIVE) {
+			                           } else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			                               player.setHealth(newHealth);
 			                           }
 			                       } else {
