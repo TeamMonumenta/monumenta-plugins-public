@@ -37,6 +37,7 @@ public class SpellFireball implements Spell {
 	private boolean mIsIncendiary;
 	private boolean mSingleTarget;
 	private LaunchFireballEffect mLaunchEffect;
+	private int mDuration;
 
 	private Random mRandom = new Random();
 
@@ -51,7 +52,7 @@ public class SpellFireball implements Spell {
 	 * @param singleTarget    Target random player (true) or all players (false)
 	 * @param launchEffect    Function to run on boss and targeted player(s)
 	 */
-	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count,
+	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
 	                     float yield, boolean isIncendiary, boolean singleTarget,
 	                     LaunchFireballEffect launchEffect) {
 		mPlugin = plugin;
@@ -59,6 +60,7 @@ public class SpellFireball implements Spell {
 		mRange = range;
 		mDelay = delay;
 		mCount = count;
+		mDuration = duration;
 		mYield = yield;
 		mIsIncendiary = isIncendiary;
 		mSingleTarget = singleTarget;
@@ -114,7 +116,7 @@ public class SpellFireball implements Spell {
 
 	@Override
 	public int duration() {
-		return 160; // 8 seconds
+		return mDuration;
 	}
 
 	private void launch(Player target) {

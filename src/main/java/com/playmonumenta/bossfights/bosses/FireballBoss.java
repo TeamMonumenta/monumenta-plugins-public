@@ -25,7 +25,7 @@ public class FireballBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellFireball(plugin, boss, detectionRange, 30, 1, 2.0f, true, true,
+			new SpellFireball(plugin, boss, detectionRange, 30, 1, 160, 2.0f, true, true,
 			                  // Launch effect
 			                  (Location loc) -> {
 			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);

@@ -29,6 +29,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -77,7 +78,7 @@ public class AzacorNormal extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellChangeFloor(plugin, mBoss, spawnLoc, 24, 3, Material.LAVA, 400),
-			new SpellFireball(plugin, boss, detectionRange, 40, 1, 2.0f, true, false,
+			new SpellFireball(plugin, boss, detectionRange, 40, 1, 100, 2.0f, true, false,
 			                  // Launch effect
 			                  (Location loc) -> {
 			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
@@ -101,9 +102,15 @@ public class AzacorNormal extends BossAbilityGroup {
 			                   (Player player, Location loc, boolean blocked) -> {
 			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
+
 			                       if (!blocked) {
-			                           player.damage(16f);
-			                           player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 80, 1), true);
+			                           double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*0.75);
+
+			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE) {
+			                               player.setHealth(0.0);
+			                           } else if (player.getGameMode() != GameMode.CREATIVE) {
+			                               player.setHealth(newHealth);
+			                           }
 			                       } else {
 			                           Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0}");
 			                       }
@@ -121,11 +128,18 @@ public class AzacorNormal extends BossAbilityGroup {
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange).size();
 		events.put(100, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?\",\"color\":\"dark_red\"}]");
+			if (player_count >= 3) {
+				randomMinion("");
+			}
 		});
 		events.put(50, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"Foolish mortals! Your efforts mean nothing. You cannot stop me. You will fall, just like the rest.\",\"color\":\"dark_red\"}]");
+			if (player_count >= 3) {
+				randomMinion("");
+			}
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -136,7 +150,7 @@ public class AzacorNormal extends BossAbilityGroup {
 	private void randomMinion(String tellraw) {
 		int rand = mRand.nextInt(4);
 		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange).size();
-		double elite_health = 125.0 + player_count * 50.0;
+		double elite_health = 100.0 + player_count * 50.0;
 		if (rand == 0) {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:wither_skeleton " + mSpawnLoc.getX() + " " + mSpawnLoc.getY() + " " + mSpawnLoc.getZ() + " {Tags:[\"boss_tpbehind\",\"boss_generic\"],HurtByTimestamp:0,Attributes:[{Base:" + elite_health + "d,Name:\"generic.maxHealth\"},{Base:0.0d,Name:\"generic.knockbackResistance\"},{Base:0.27d,Name:\"generic.movementSpeed\"},{Base:0.0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:100.0d,Name:\"generic.followRange\"},{Base:10.0d,Name:\"generic.attackDamage\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:0b,Spigot.ticksLived:133,Motion:[0.009843517136819713d,-0.0784000015258789d,-0.0730011114372536d],Leashed:0b,Health:" + elite_health + "f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:stone_sword\",Count:1b,tag:{display:{Name:\"{\\\"text\\\":\\\"§4§lCorrupted Watcher\\\\u0027s Sword\\\"}\"},Enchantments:[{lvl:4s,id:\"minecraft:smite\"},{lvl:5s,id:\"minecraft:unbreaking\"},{lvl:1s,id:\"minecraft:sweeping\"}],Damage:0}},{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:3,display:{Name:\"{\\\"text\\\":\\\"§4§lCorrupted Geomantic Dagger\\\"}\"},Enchantments:[{lvl:1s,id:\"minecraft:smite\"},{lvl:1s,id:\"minecraft:bane_of_arthropods\"},{lvl:12s,id:\"minecraft:unbreaking\"},{lvl:5s,id:\"minecraft:sharpness\"}],Damage:0,AttributeModifiers:[{UUIDMost:341186L,UUIDLeast:200116L,Amount:-2.4d,Slot:\"mainhand\",AttributeName:\"generic.attackSpeed\",Operation:0,Name:\"generic.attackSpeed\"},{UUIDMost:42236L,UUIDLeast:915731L,Amount:3.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"generic.attackDamage\"},{UUIDMost:197685L,UUIDLeast:254146L,Amount:3.0d,Slot:\"mainhand\",AttributeName:\"generic.armor\",Operation:0,Name:\"generic.armor\"}]}}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"{\\\"text\\\":\\\"§r§4§lSarin\\\\u0027tul the Unseen\\\"}\",Pos:[-720.0716621107997d,67.0d,-1455.2620444425788d],Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:2110023,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Boots\\\"}\"},Enchantments:[{lvl:5s,id:\"minecraft:projectile_protection\"}]}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:3033190,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Pants\\\"}\"},Enchantments:[{lvl:5s,id:\"minecraft:feather_falling\"}]}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:4088202,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Tunic\\\"}\"},Enchantments:[{lvl:20s,id:\"minecraft:blast_protection\"}],Damage:0}},{id:\"minecraft:player_head\",Count:1b,tag:{SkullOwner:{Id:\"ddb54214-900f-4067-9725-cd7c4ce52e93\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTBlY2E4MTA0MTVjMzM2OGNkNTg1M2U2ODc2ZTQ1OGQyYWU0MjE0OTZmZDQzMTY5NzY5ZWE3MTI4ZTZhMTkifX19\"}]}},display:{Name:\"{\\\"text\\\":\\\"Blue Fire Demon\\\"}\"}}}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,Team:\"Azac\"}");
 		} else if (rand == 1) {

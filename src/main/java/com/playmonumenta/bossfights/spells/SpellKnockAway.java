@@ -42,7 +42,7 @@ public class SpellKnockAway implements Spell {
 
 	@Override
 	public int duration() {
-		return 100; // 5 seconds
+		return 20; // 1 second
 	}
 
 	private void deal_damage() {
