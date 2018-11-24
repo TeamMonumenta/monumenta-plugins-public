@@ -134,7 +134,9 @@ public abstract class BossAbilityGroup {
 		if (!mUnloaded) {
 			mUnloaded = true;
 
-			mActiveSpells.cancelAll();
+			if (mActiveSpells != null) {
+				mActiveSpells.cancelAll();
+			}
 
 			BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 			if (mTaskIDpassive != -1) {
