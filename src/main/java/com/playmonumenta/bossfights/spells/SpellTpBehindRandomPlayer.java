@@ -31,9 +31,11 @@ public class SpellTpBehindRandomPlayer extends Spell {
 	@Override
 	public void run() {
 		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 80);
-		Player target = players.get(mRand.nextInt(players.size()));
-		launch(target);
-		animation(target);
+		if (!players.isEmpty()) {
+			Player target = players.get(mRand.nextInt(players.size()));
+			launch(target);
+			animation(target);
+		}
 	}
 
 	@Override

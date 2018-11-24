@@ -84,13 +84,15 @@ public class SpellBaseLaser extends Spell {
 	@Override
 	public void run() {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
-		if (mSingleTarget) {
-			// Single target chooses a random player within range
-			launch(players.get(mRandom.nextInt(players.size())));
-		} else {
-			// Otherwise target all players within range
-			for (Player player : players) {
-				launch(player);
+		if (!players.isEmpty()) {
+			if (mSingleTarget) {
+				// Single target chooses a random player within range
+				launch(players.get(mRandom.nextInt(players.size())));
+			} else {
+				// Otherwise target all players within range
+				for (Player player : players) {
+					launch(player);
+				}
 			}
 		}
 	}

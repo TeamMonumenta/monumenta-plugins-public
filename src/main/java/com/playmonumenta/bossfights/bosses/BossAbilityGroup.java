@@ -73,10 +73,11 @@ public abstract class BossAbilityGroup {
 				/* Check if somehow the boss entity is missing even though this is still running */
 				boolean bossCheck = true;
 				Location bossLoc = mBoss.getLocation();
-				for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4))
+				for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {
 					if (entity.getUniqueId().equals(mBoss.getUniqueId())) {
 						bossCheck = false;
 					}
+				}
 				if (bossCheck) {
 					mPlugin.getLogger().log(Level.WARNING,
 					                        "Boss is missing but still registered as an active boss. Unloading...");
