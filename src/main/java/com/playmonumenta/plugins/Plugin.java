@@ -285,14 +285,14 @@ public class Plugin extends JavaPlugin {
 		//
 		// Janky workaround!
 		//
-		// Reload functions and loot tables two minutes after this plugin loads
+		// Reload functions and loot tables 15s after plugin loads
 		//
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
 			}
-		}.runTaskLater(this, 2 * 60 * Constants.TICKS_PER_SECOND);
+		}.runTaskLater(this, 15 * Constants.TICKS_PER_SECOND);
 	}
 
 	//  Logic that is performed upon disabling the plugin.
