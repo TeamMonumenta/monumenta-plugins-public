@@ -182,6 +182,7 @@ public class ItemOverrides {
 		mItems.put(Material.SPAWNER, new MobSpawnerOverride());
 		mItems.put(Material.FLOWER_POT, new FlowerPotOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
+		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
