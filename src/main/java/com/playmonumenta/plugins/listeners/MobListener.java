@@ -75,6 +75,12 @@ public class MobListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void SpawnerSpawnEvent(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
+
+		/* This can apparently happen sometimes...? */
+		if (spawner == null) {
+			return;
+		}
+
 		Entity mob = event.getEntity();
 		int spawnCount = 1;
 
