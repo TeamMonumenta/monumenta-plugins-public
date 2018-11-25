@@ -90,7 +90,8 @@ public class AzacorNormal extends BossAbilityGroup {
 			                           double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*0.75);
 
 			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			                               player.setHealth(0.0);
+			                               // Kill the player, but allow totems to trigger
+			                               player.damage(100);
 			                           } else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			                               player.setHealth(newHealth);
 			                           }

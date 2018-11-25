@@ -62,7 +62,7 @@ public class Azacor extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellChangeFloor(plugin, mBoss, spawnLoc, 24, 3, Material.LAVA, 400),
-			new SpellFireball(plugin, boss, detectionRange, 40, 1, 100, 2.0f, true, false,
+			new SpellFireball(plugin, boss, detectionRange, 40, 1, 160, 2.0f, true, false,
 			                  // Launch effect
 			                  (Location loc) -> {
 			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
@@ -92,7 +92,8 @@ public class Azacor extends BossAbilityGroup {
 			                           double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*0.75);
 
 			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			                               player.setHealth(0.0);
+			                               // Kill the player, but allow totems to trigger
+			                               player.damage(100);
 			                           } else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			                               player.setHealth(newHealth);
 			                           }
