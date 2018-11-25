@@ -712,7 +712,9 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event, Player player) {
+	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+		Player player = event.getPlayer();
+
 		if (event.isSneaking()) {
 			/*
 			 * Player started sneaking
