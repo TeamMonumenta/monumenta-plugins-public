@@ -119,7 +119,7 @@ public class CooldownTimers {
 				cd -= ticks;
 				if (cd <= 0) {
 					MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
-					cds.remove(spell);
+					it.remove();
 				} else {
 					cds.put(spell, cd);
 				}
