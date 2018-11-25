@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.listeners;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -12,8 +15,8 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
-
-import com.playmonumenta.plugins.Plugin;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 
 public class VehicleListener implements Listener {
 	Plugin mPlugin;
@@ -37,31 +40,38 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
 
-		if (entity.getVehicle() != vehicle) {
-			if (entity instanceof Player) {
-				Player player = (Player)entity;
-				if (player.getGameMode() == GameMode.ADVENTURE) {
-					vehicle.remove();
-				}
-			}
+		if (!(entity instanceof Player)
+		    || (vehicle instanceof Minecart
+		        && (((Player)entity).getGameMode() != GameMode.SURVIVAL
+					|| LocationUtils.getLocationType(mPlugin, entity) != LocationType.Capital))) {
+			/*
+			 * Vehicles are removed if they:
+			 *
+			 * Collide with non-player entities
+			 * OR
+			 * are minecarts that collide with anything outside of a safezone
+			 */
+			vehicle.remove();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void VehicleEnterEvent(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
+		Vehicle vehicle = event.getVehicle();
 
-		if (entity instanceof Player) {
-			// Players are allowed to enter boats unless they are in adventure mode
-			if (((Player)entity).getGameMode() == GameMode.ADVENTURE) {
-				event.setCancelled(true);
-			}
-		} else {
-			// Only players are allowed to enter vehicles
+		if (!(entity instanceof Player)
+		    || (vehicle instanceof Minecart
+		        && (((Player)entity).getGameMode() != GameMode.SURVIVAL
+					|| LocationUtils.getLocationType(mPlugin, entity) != LocationType.Capital))) {
+
+			/*
+			 * Only players are allowed to enter vehicles
+			 * If the vehicle is a minecart, can only enter in the capital
+			 */
 			Location loc = entity.getLocation();
 			entity.teleport(loc);
 			event.setCancelled(true);
 		}
 	}
-
 }

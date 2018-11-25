@@ -162,6 +162,12 @@ public class ItemOverrides {
 		mItems.put(Material.JUNGLE_BOAT, boatOverride);
 		mItems.put(Material.SPRUCE_BOAT, boatOverride);
 
+		OverrideItem minecartOverride = new MinecartOverride();
+		mItems.put(Material.MINECART, minecartOverride);
+		mItems.put(Material.CHEST_MINECART, minecartOverride);
+		mItems.put(Material.FURNACE_MINECART, minecartOverride);
+		mItems.put(Material.COMMAND_BLOCK_MINECART, minecartOverride);
+
 		OverrideItem bucketOverride = new BucketOverride();
 		mItems.put(Material.BUCKET, bucketOverride);
 		mItems.put(Material.WATER_BUCKET, bucketOverride);

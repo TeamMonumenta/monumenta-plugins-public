@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
+
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.util.Vector;
 
 public class LocationUtils {
 	public enum LocationType {
@@ -65,7 +66,7 @@ public class LocationUtils {
 		Vector vTo = to.toVector();
 		return vTo.subtract(vFrom).normalize();
 	}
-	
+
 	public static Location getEntityCenter(Entity e) {
 		return e.getLocation().add(0, e.getHeight() / 2, 0);
 	}
@@ -76,5 +77,29 @@ public class LocationUtils {
 
 	public static boolean isPathBlockingBlock(Material mat) {
 		return mat.isSolid() || mat.equals(Material.LAVA);
+	}
+
+	public static boolean isValidBoatLocation(Location loc) {
+		Block block = loc.getBlock();
+		if (block.isLiquid() || loc.subtract(0, 1, 0).getBlock().isLiquid()) {
+			return true;
+		}
+
+		/*
+		 * Check up to 50 blocks underneath the location. Stop when
+		 * a non-air block is hit. If it's a liquid, this is allowed, otherwise it's not
+		 */
+		loc = loc.clone();
+		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
+			loc.setY(i);
+			block = loc.getBlock();
+			if (block.isLiquid()) {
+				return true;
+			} else if (!block.isEmpty()) {
+				return false;
+			}
+		}
+
+		return false;
 	}
 }

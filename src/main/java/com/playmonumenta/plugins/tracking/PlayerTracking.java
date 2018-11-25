@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -19,9 +18,9 @@ import java.util.Set;
 
 import org.bukkit.block.Block;
 import org.bukkit.Color;
-import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -205,7 +204,7 @@ public class PlayerTracking implements EntityTracking {
 
 		Entity vehicle = player.getVehicle();
 		if (vehicle != null) {
-			if (vehicle instanceof Boat) {
+			if (vehicle instanceof Minecart) {
 				vehicle.remove();
 			}
 		}
