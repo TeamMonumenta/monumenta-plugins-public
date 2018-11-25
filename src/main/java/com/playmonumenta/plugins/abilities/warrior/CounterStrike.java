@@ -30,16 +30,14 @@ public class CounterStrike extends Ability {
 		//  If we're not going to succeed in our Random we probably don't want to attempt to grab the scoreboard value anyways.
 		if (mRandom.nextFloat() < 0.15f) {
 			int counterStrike = getAbilityScore();
-			if (counterStrike > 0) {
-				Location loc = mPlayer.getLocation();
-				mPlayer.spawnParticle(Particle.SWEEP_ATTACK, loc.getX(), loc.getY() + 1.5D, loc.getZ(), 20, 1.5D, 1.5D, 1.5D);
-				mPlayer.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
+			Location loc = mPlayer.getLocation();
+			mPlayer.spawnParticle(Particle.SWEEP_ATTACK, loc.getX(), loc.getY() + 1.5D, loc.getZ(), 20, 1.5D, 1.5D, 1.5D);
+			mPlayer.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
 
-				double csDamage = counterStrike == 1 ? 12D : 24D;
+			double csDamage = counterStrike == 1 ? 12D : 24D;
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS)) {
-					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
-				}
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS)) {
+				EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
 			}
 		}
 		return true;
