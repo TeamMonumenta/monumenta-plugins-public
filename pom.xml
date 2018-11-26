@@ -6,7 +6,7 @@
 
     <groupId>com.playmonumenta</groupId>
     <artifactId>monumenta-plugins</artifactId>
-    <version>dev</version>
+    <version>3.3.1-6-ga6a940f-dirty</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
