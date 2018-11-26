@@ -73,7 +73,7 @@ public class SpellChangeFloor extends Spell {
 		 * Second phase - convert top layer of ground under player to mMaterial, particles
 		 * Third phase - cleanup converted blocks
 		 */
-		final int PHASE1_TICKS = 30;
+		final int PHASE1_TICKS = 60;
 		final int PHASE2_TICKS = mFloorDuration;
 
 		BukkitRunnable runnable = new BukkitRunnable() {
