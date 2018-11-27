@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Cow;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,5 +24,16 @@ public class BucketOverride extends OverrideItem {
 		}
 
 		return false;
+	}
+
+	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
+	                                           ItemStack itemInHand) {
+		if (clickedEntity == null) {
+			return true;
+		} else if (clickedEntity instanceof Cow) {
+			return false;
+		}
+
+		return true;
 	}
 }
