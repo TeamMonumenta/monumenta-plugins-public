@@ -28,6 +28,7 @@ public class ItemOverrides {
 			Material.FLINT_AND_STEEL,
 			Material.ENDER_CHEST,
 			Material.PACKED_ICE,
+			Material.MAGMA_BLOCK,
 
 			Material.WHITE_BANNER,
 			Material.ORANGE_BANNER,
