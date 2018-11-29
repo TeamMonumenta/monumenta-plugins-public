@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 public class LocationUtils {
 	public enum LocationType {
@@ -59,6 +60,14 @@ public class LocationUtils {
 		}
 
 		return LocationType.None;
+	}
+
+	public static boolean isInPlot(Plugin plugin, World world, Location location) {
+		if (getLocationType(plugin, location) == LocationType.Capital) {
+			Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
+			return (mat == Material.SPONGE || mat == Material.OBSIDIAN);
+		}
+		return false;
 	}
 
 	public static Vector getDirectionTo(Location to, Location from) {

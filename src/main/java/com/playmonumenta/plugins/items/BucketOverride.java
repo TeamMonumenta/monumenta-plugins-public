@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Cow;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import com.playmonumenta.plugins.Plugin;
 
@@ -42,7 +44,13 @@ public class BucketOverride extends OverrideItem {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		if ( blockType.equals(Material.AIR) || dispensed == null ) {
 			return false;
-		} else if (!blockType.equals(Material.DISPENSER)) {
+		} else if (blockType.equals(Material.DISPENSER)) {
+			if (LocationUtils.isInPlot(plugin, block.getWorld(), block.getLocation())) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (blockType.equals(Material.DROPPER)) {
 			return true;
 		}
 
