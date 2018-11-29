@@ -16,8 +16,10 @@ import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
@@ -148,6 +150,19 @@ public class WorldListener implements Listener {
 				// Debug to visualize the removed blocks
 				// blk.setType(Material.REDSTONE_BLOCK);
 			}
+		}
+	}
+
+	// Block Dispense Event
+	// Cancel dispensers/droppers dropping specific items
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void BlockDispenseEvent(BlockDispenseEvent event) {
+		Block block = event.getBlock();
+		ItemStack dispensed = event.getItem();
+
+		if (!mPlugin.mItemOverrides.blockDispenseInteraction(mPlugin, block, dispensed)) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 }

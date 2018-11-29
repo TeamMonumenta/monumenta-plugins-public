@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -35,5 +36,16 @@ public class BucketOverride extends OverrideItem {
 		}
 
 		return true;
+	}
+
+	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
+		Material blockType = (block != null) ? block.getType() : Material.AIR;
+		if ( blockType.equals(Material.AIR) || dispensed == null ) {
+			return false;
+		} else if (!blockType.equals(Material.DISPENSER)) {
+			return true;
+		}
+
+		return false;
 	}
 }

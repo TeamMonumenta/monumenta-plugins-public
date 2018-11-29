@@ -1,6 +1,6 @@
 name: Monumenta-Plugins
 main: com.playmonumenta.plugins.Plugin
-version: 3.3.1-8-g672c4ac-dirty
+version: 3.3.1-9-g3e09d72-dirty
 api-version: 1.13
 softdepend: [PlaceholderAPI,Votifier]
 commands:

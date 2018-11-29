@@ -41,4 +41,8 @@ public class OverrideItem {
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
 		return true;
 	}
+
+	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
+		return true;
+	}
 }

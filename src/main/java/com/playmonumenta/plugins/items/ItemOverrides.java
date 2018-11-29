@@ -321,4 +321,13 @@ public class ItemOverrides {
 
 		return true;
 	}
+
+	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
+		OverrideItem override = mItems.get(dispensed.getType());
+		if (override != null) {
+			return override.blockDispenseInteraction(plugin, block, dispensed);
+		}
+
+		return true;
+	}
 }
