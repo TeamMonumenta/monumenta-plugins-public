@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.items;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import org.bukkit.Location;
+import org.bukkit.Material;
 
 public class ItemOverrides {
 	/*
@@ -196,7 +196,7 @@ public class ItemOverrides {
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-										 Block block) {
+	                                     Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem itemOverride = mItems.get(itemType);
@@ -215,7 +215,7 @@ public class ItemOverrides {
 	}
 
 	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-										Block block) {
+	                                    Block block) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem itemOverride = mItems.get(itemType);
@@ -234,7 +234,7 @@ public class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-											   ItemStack itemInHand) {
+	                                           ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		OverrideItem override = mItems.get(itemType);
 
@@ -242,7 +242,7 @@ public class ItemOverrides {
 	}
 
 	public boolean physicsInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-									  Block block) {
+	                                  Block block) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		OverrideItem override = mItems.get(blockType);
 
@@ -257,7 +257,7 @@ public class ItemOverrides {
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (LocationUtils.getLocationType(plugin, block.getLocation()) != LocationType.None &&
-				LocationUtils.getLocationType(plugin, player.getLocation()) == LocationType.None) {
+			    LocationUtils.getLocationType(plugin, player.getLocation()) == LocationType.None) {
 				// Allow breaking if the player would be in survival mode at that spot
 				Location testLocation = block.getLocation();
 				testLocation.setY(10.0);
@@ -272,7 +272,7 @@ public class ItemOverrides {
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-										 BlockPlaceEvent event) {
+	                                     BlockPlaceEvent event) {
 		boolean eventCancelled = false;
 
 		//  If it's not not a certain lore item go ahead and run the normal override place interaction.
@@ -283,7 +283,7 @@ public class ItemOverrides {
 
 		//  Don't allow placing of certain items with Lore.
 		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() != GameMode.CREATIVE
-			&& !(ALLOW_LORE_MATS.contains(item.getType()))) {
+		    && !(ALLOW_LORE_MATS.contains(item.getType()))) {
 			eventCancelled |= true;
 		}
 
@@ -303,7 +303,7 @@ public class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-			plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
+		    plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
 			eventCancelled |= true;
 		}
 

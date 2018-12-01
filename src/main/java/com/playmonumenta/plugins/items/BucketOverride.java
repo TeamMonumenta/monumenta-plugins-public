@@ -1,21 +1,18 @@
 package com.playmonumenta.plugins.items;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
-import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Cow;
 import org.bukkit.event.block.Action;
+import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Location;
-import org.bukkit.World;
-
-import com.playmonumenta.plugins.Plugin;
+import org.bukkit.Material;
 
 public class BucketOverride extends OverrideItem {
 	@Override
@@ -42,7 +39,7 @@ public class BucketOverride extends OverrideItem {
 
 	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
-		if ( blockType.equals(Material.AIR) || dispensed == null ) {
+		if (blockType.equals(Material.AIR) || dispensed == null) {
 			return false;
 		} else if (blockType.equals(Material.DISPENSER)) {
 			if (LocationUtils.isInPlot(plugin, block.getWorld(), block.getLocation())) {
