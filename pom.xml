@@ -42,6 +42,10 @@
             <name>ParallelBlock Public Repository</name>
             <url>https://repo.parallelblock.com/repository/maven-public/</url>
         </repository>
+		<repository>
+			<id>jorelali</id>
+			<url>https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/</url>
+		</repository>
     </repositories>
 
     <dependencies>
@@ -54,7 +58,7 @@
         <dependency>
             <groupId>io.github.jorelali</groupId>
             <artifactId>commandapi</artifactId>
-            <version>v1.5</version>
+            <version>1.7</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

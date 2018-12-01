@@ -25,7 +25,7 @@ public class TransferServer extends GenericCommand {
 	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		String command = "transferserver";
-		CommandPermission perms = new CommandPermission("monumenta.command.transferserver");
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.transferserver");
 
 		/* No-argument variant to get server list */
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();

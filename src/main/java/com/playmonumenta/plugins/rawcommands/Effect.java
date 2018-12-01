@@ -27,7 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 public class Effect {
 	@SuppressWarnings("unchecked")
 	public static void register(PotionManager manager) {
-		CommandPermission perms = new CommandPermission("minecraft.command.effect");
+		CommandPermission perms = CommandPermission.fromString("minecraft.command.effect");
 
 		/* Unregister the default /effect command */
 		CommandAPI.getInstance().unregister("effect");

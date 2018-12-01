@@ -39,7 +39,7 @@ public class GenericCommand {
 
 	@SuppressWarnings("unchecked")
 	protected static void registerPlayerCommand(String command, String permission, PlayerCommandExecutor exec) {
-		CommandPermission perms = new CommandPermission(permission);
+		CommandPermission perms = CommandPermission.fromString(permission);
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
@@ -56,7 +56,7 @@ public class GenericCommand {
 
 	@SuppressWarnings("unchecked")
 	protected static void registerEntityCommand(String command, String permission, EntityCommandExecutor exec) {
-		CommandPermission perms = new CommandPermission(permission);
+		CommandPermission perms = CommandPermission.fromString(permission);
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("entities", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));

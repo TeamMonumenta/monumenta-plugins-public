@@ -47,7 +47,7 @@ public class BroadcastCommand extends GenericCommand {
 		arguments.put("command", new SuggestedStringArgument(ALLOWED_COMMANDS));
 		arguments.put("args", new GreedyStringArgument());
 		CommandAPI.getInstance().register("broadcastcommand",
-		                                  new CommandPermission("monumenta.command.broadcastcommand"),
+		                                  CommandPermission.fromString("monumenta.command.broadcastcommand"),
 		                                  arguments,
 		                                  (sender, args) -> {
 											  run(plugin, sender, (String)args[0], (String)args[1]);
