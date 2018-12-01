@@ -28,7 +28,7 @@ public class BossFight {
 		arguments.put("redstone_pos", new LocationArgument());
 
 		CommandAPI.getInstance().register("bossfight",
-		                                  new CommandPermission("bossfights.bossfight"),
+		                                  CommandPermission.fromString("bossfights.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateful(manager, sender, (Entity)args[0],
@@ -44,7 +44,7 @@ public class BossFight {
 		arguments.put("boss_tag", new StringArgument());
 
 		CommandAPI.getInstance().register("bossfight",
-		                                  new CommandPermission("bossfights.bossfight"),
+		                                  CommandPermission.fromString("bossfights.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateless(manager, sender, (Entity)args[0],

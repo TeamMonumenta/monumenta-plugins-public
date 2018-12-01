@@ -39,7 +39,7 @@
 		<dependency>
             <groupId>io.github.jorelali</groupId>
             <artifactId>commandapi</artifactId>
-            <version>1.5</version>
+            <version>1.7</version>
             <scope>provided</scope>
         </dependency>
 

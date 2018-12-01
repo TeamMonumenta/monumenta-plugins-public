@@ -36,7 +36,7 @@ public class SpellDetectionCircle extends Spell {
 		arguments.put("redstone_pos", new LocationArgument());
 
 		CommandAPI.getInstance().register("mobspell",
-		                                  new CommandPermission("mobspell.detectioncircle"),
+		                                  CommandPermission.fromString("mobspell.detectioncircle"),
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      new SpellDetectionCircle(plugin, (Location)args[0], (Integer)args[1],
