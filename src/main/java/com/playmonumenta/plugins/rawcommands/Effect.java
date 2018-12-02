@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.rawcommands;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
@@ -26,7 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Effect {
 	@SuppressWarnings("unchecked")
-	public static void register(PotionManager manager) {
+	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("minecraft.command.effect");
 
 		/* Unregister the default /effect command */
@@ -43,7 +44,7 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      giveEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      giveEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                 (PotionEffectType)args[1], 30, 0, false);
 		                                  }
 		);
@@ -53,7 +54,7 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      giveEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      giveEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                 (PotionEffectType)args[1], (Integer)args[2],
 		                                                 0, false);
 		                                  }
@@ -64,7 +65,7 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      giveEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      giveEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                 (PotionEffectType)args[1], (Integer)args[2],
 		                                                 (Integer)args[3], false);
 		                                  }
@@ -75,7 +76,7 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      giveEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      giveEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                 (PotionEffectType)args[1], (Integer)args[2],
 		                                                 (Integer)args[3], (Boolean)args[4]);
 		                                  }
@@ -91,7 +92,7 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      clearEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      clearEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                  null);
 		                                  }
 		);
@@ -101,17 +102,18 @@ public class Effect {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      clearEffect(manager, sender, (Collection<Entity>)args[0],
+		                                      clearEffect(plugin, sender, (Collection<Entity>)args[0],
 		                                                 (PotionEffectType)args[1]);
 		                                  }
 		);
 	}
 
-	private static void giveEffect(PotionManager manager, CommandSender sender, Collection<Entity>entities,
+	private static void giveEffect(Plugin plugin, CommandSender sender, Collection<Entity>entities,
 	                               PotionEffectType type, int seconds, int amplifier, boolean hideParticles) {
+		PotionManager manager = plugin.mPotionManager;
 
 		for (Entity e : entities) {
-			if (e instanceof Player) {
+			if (e instanceof Player && manager != null) {
 				// This is a player - use the potion manager
 				Player player = (Player)e;
 
@@ -129,11 +131,12 @@ public class Effect {
 		                   " to entities for " + Integer.toString(seconds) + "s");
 	}
 
-	private static void clearEffect(PotionManager manager, CommandSender sender, Collection<Entity>entities,
+	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity>entities,
 	                                PotionEffectType type) {
+		PotionManager manager = plugin.mPotionManager;
 
 		for (Entity e : entities) {
-			if (e instanceof Player) {
+			if (e instanceof Player && manager != null) {
 				// This is a player - use the potion manager
 				Player player = (Player)e;
 

@@ -92,6 +92,10 @@ public class TransferServer extends GenericCommand {
 
 	private static void sendPlayer(Plugin plugin, CommandSender sender, Collection<Player>players,
 	                               String server, boolean sendPlayerStuff) {
+		if (plugin.mServerProperties == null) {
+			return;
+		}
+
 		for (Player player : players) {
 			/* Error if target server is not allowed */
 			if (!(plugin.mServerProperties.mAllowedTransferTargets.isEmpty()

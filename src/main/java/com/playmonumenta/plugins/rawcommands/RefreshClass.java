@@ -1,23 +1,26 @@
 package com.playmonumenta.plugins.rawcommands;
 
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.managers.potion.PotionManager;
+import com.playmonumenta.plugins.Plugin;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class RefreshClass extends GenericCommand {
-	public static void register(PotionManager potionManager, AbilityManager abilityManager) {
+	public static void register(Plugin plugin) {
 		registerPlayerCommand("refreshclass", "monumenta.command.refreshclass",
 		                      (sender, player) -> {
-		                          run(potionManager, abilityManager, sender, player);
+		                          run(plugin, sender, player);
 		                      });
 	}
 
-	private static void run(PotionManager potionManager, AbilityManager abilityManager, CommandSender sender, Player player) {
-		abilityManager.updatePlayerAbilities(player);
-		potionManager.refreshClassEffects(player);
+	private static void run(Plugin plugin, CommandSender sender, Player player) {
+		if (plugin.mAbilityManager != null) {
+			plugin.mAbilityManager.updatePlayerAbilities(player);
+		}
+		if (plugin.mPotionManager != null) {
+			plugin.mPotionManager.refreshClassEffects(player);
+		}
 		sender.sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
 	}
 }

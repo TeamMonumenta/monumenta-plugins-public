@@ -129,6 +129,28 @@ public class Plugin extends JavaPlugin {
 		return plugin;
 	}
 
+	@Override
+	public void onLoad() {
+		/*
+		 * CommandAPI commands which register directly and are usable in functions
+		 *
+		 * These need to register immediately on load to prevent function loading errors
+		 */
+
+		TransferServer.register(this);
+		HopeifyHeldItem.register();
+		GildifyHeldItem.register();
+		DebugInfo.register(this);
+		RefreshClass.register(this);
+		Effect.register(this);
+		RemoveTags.register();
+
+		mServerProperties.load(this);
+		if (mServerProperties.getBroadcastCommandEnabled()) {
+			BroadcastCommand.register(this);
+		}
+	}
+
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
@@ -178,18 +200,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
 		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
-
-		// Register raw commands
-		TransferServer.register(this);
-		HopeifyHeldItem.register();
-		GildifyHeldItem.register();
-		DebugInfo.register(mPotionManager, mAbilityManager);
-		RefreshClass.register(mPotionManager, mAbilityManager);
-		Effect.register(mPotionManager);
-		RemoveTags.register();
-		if (mServerProperties.getBroadcastCommandEnabled()) {
-			BroadcastCommand.register(this);
-		}
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
