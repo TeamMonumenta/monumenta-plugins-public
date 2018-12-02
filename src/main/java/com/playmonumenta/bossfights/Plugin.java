@@ -11,19 +11,26 @@ public class Plugin extends JavaPlugin {
 	public BossManager mBossManager;
 
 	@Override
-	public void onEnable() {
-		Bukkit.getConsoleSender().sendMessage("[Monumenta_bossfights] Plugin enabled!");
+	public void onLoad() {
+		/*
+		 * CommandAPI commands which register directly and are usable in functions
+		 *
+		 * These need to register immediately on load to prevent function loading errors
+		 */
 
-		mBossManager = new BossManager(this);
-		getServer().getPluginManager().registerEvents(mBossManager, this);
-
-		BossFight.register(mBossManager);
+		BossFight.register(this);
 
 		/*
 		 * Register spells that can be run by themselves
 		 * By convention, these are always like: /mobspell <spell_label> <args>
 		 */
 		SpellDetectionCircle.registerCommand(this);
+	}
+
+	@Override
+	public void onEnable() {
+		mBossManager = new BossManager(this);
+		getServer().getPluginManager().registerEvents(mBossManager, this);
 	}
 
 	@Override

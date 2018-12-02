@@ -1,6 +1,6 @@
 package com.playmonumenta.bossfights.commands;
 
-import com.playmonumenta.bossfights.BossManager;
+import com.playmonumenta.bossfights.Plugin;
 
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.Location;
 
 public class BossFight {
-	public static void register(BossManager manager) {
+	public static void register(Plugin plugin) {
 		/* First one of these includes coordinate arguments */
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
@@ -31,7 +31,7 @@ public class BossFight {
 		                                  CommandPermission.fromString("bossfights.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      createBossStateful(manager, sender, (Entity)args[0],
+		                                      createBossStateful(plugin, sender, (Entity)args[0],
 		                                                         (String)args[1],
 		                                                         (Location)args[2]);
 		                                  }
@@ -47,23 +47,27 @@ public class BossFight {
 		                                  CommandPermission.fromString("bossfights.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      createBossStateless(manager, sender, (Entity)args[0],
+		                                      createBossStateless(plugin, sender, (Entity)args[0],
 		                                                          (String)args[1]);
 		                                  }
 		);
 	}
 
-	private static void createBossStateless(BossManager manager, CommandSender sender, Entity entity, String requestedTag) {
+	private static void createBossStateless(Plugin plugin, CommandSender sender, Entity entity, String requestedTag) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-			manager.createBoss((LivingEntity)entity, requestedTag);
+			if (plugin.mBossManager != null) {
+				plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag);
+			}
 		} else {
 			sender.sendMessage("This command must be on a LivingEntity!");
 		}
 	}
 
-	private static void createBossStateful(BossManager manager, CommandSender sender, Entity entity, String requestedTag, Location endLoc) {
+	private static void createBossStateful(Plugin plugin, CommandSender sender, Entity entity, String requestedTag, Location endLoc) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
-			manager.createBoss((LivingEntity)entity, requestedTag, endLoc);
+			if (plugin.mBossManager != null) {
+				plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag, endLoc);
+			}
 		} else {
 			sender.sendMessage("This command must be on a LivingEntity!");
 		}
