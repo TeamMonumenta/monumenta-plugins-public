@@ -286,23 +286,6 @@ public class Plugin extends JavaPlugin {
 		if (Bukkit.getPluginManager().isPluginEnabled("Votifier")) {
 			manager.registerEvents(new VotifierIntegration(this), this);
 		}
-
-		// TODO
-		// ***
-		// TODO
-		// ***
-		// TODO
-		//
-		// Janky workaround!
-		//
-		// Reload functions and loot tables 15s after plugin loads
-		//
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
-			}
-		}.runTaskLater(this, 15 * Constants.TICKS_PER_SECOND);
 	}
 
 	//  Logic that is performed upon disabling the plugin.
