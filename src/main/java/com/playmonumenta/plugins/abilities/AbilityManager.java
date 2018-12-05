@@ -140,12 +140,8 @@ public class AbilityManager {
 		mAbilities.put(player.getUniqueId(), getCurrentAbilities(player));
 	}
 
-	public Ability getPlayerAbility(Player player, String scoreboardId) {
-		return getPlayerAbilities(player).getAbility(scoreboardId);
-	}
-
-	public Ability getPlayerAbility(Player player, Spells spell) {
-		return getPlayerAbilities(player).getAbility(spell);
+	public Ability getPlayerAbility(Player player, Class<?> cls) {
+		return getPlayerAbilities(player).getAbility(cls);
 	}
 
 	public String printInfo(Player player) {

@@ -4,52 +4,32 @@ import com.google.gson.JsonObject;
 
 import com.playmonumenta.plugins.classes.Spells;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AbilityCollection {
-
-	private List<Ability> mAbilities;
+	private Map<Class<?>, Ability> mAbilities = new HashMap<Class<?>, Ability>();
 
 	public AbilityCollection(List<Ability> abilities) {
-		mAbilities = abilities;
-	}
-
-	public List<Ability> getAbilities() {
-		return mAbilities;
-	}
-
-	public Ability getAbility(String scoreboardId) {
-		for (Ability abil : mAbilities) {
-			if (abil.getInfo() != null) {
-				AbilityInfo info = abil.getInfo();
-				if (info.scoreboardId != null) {
-					if (scoreboardId.equals(info.scoreboardId)) {
-						return abil;
-					}
-				}
-			}
+		for (Ability ability : abilities) {
+			mAbilities.put(ability.getClass(), ability);
 		}
-		return null;
 	}
 
-	public Ability getAbility(Spells spell) {
-		for (Ability abil : mAbilities) {
-			if (abil.getInfo() != null) {
-				AbilityInfo info = abil.getInfo();
-				if (info.linkedSpell != null) {
-					if (spell.equals(info.linkedSpell)) {
-						return abil;
-					}
-				}
-			}
-		}
-		return null;
+	public Collection<Ability> getAbilities() {
+		return mAbilities.values();
+	}
+
+	public Ability getAbility(Class<?> cls) {
+		return mAbilities.get(cls);
 	}
 
 	public JsonObject getAsJsonObject() {
 		JsonObject playerAbilities = new JsonObject();
 
-		for (Ability ability : mAbilities) {
+		for (Ability ability : mAbilities.values()) {
 			playerAbilities.add(ability.getClass().getName(), ability.getAsJsonObject());
 		}
 
