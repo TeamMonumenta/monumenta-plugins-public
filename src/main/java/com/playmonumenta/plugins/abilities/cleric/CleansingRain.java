@@ -71,7 +71,7 @@ public class CleansingRain extends Ability {
 				}
 
 				mTicks += CLEANSING_APPLY_PERIOD;
-				if (mTicks > CLEANSING_EFFECT_DURATION) {
+				if (mTicks > CLEANSING_DURATION) {
 					this.cancel();
 				}
 			}
