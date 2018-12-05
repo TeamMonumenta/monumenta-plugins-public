@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.Plugin;
@@ -70,13 +71,26 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		// Must be sneaking
+		if (!mPlayer.isSneaking()) {
+			return false;
+		}
+
+		// Must be holding a shield
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		//TODO Find a way to make HoL and Cleansing Rain not cast at the same tim
-		if (mPlayer.isSneaking()) {
-			return (offHand != null && offHand.getType() == Material.SHIELD) || (mainHand != null && mainHand.getType() == Material.SHIELD);
+		if (offHand == null || offHand.getType() != Material.SHIELD
+		    && (mainHand == null || mainHand.getType() != Material.SHIELD)) {
+			return false;
 		}
-		return false;
+
+		// Must not match conditions for cleansing rain
+		Ability cleansing = AbilityManager.getManager().getPlayerAbility(mPlayer, CleansingRain.class);
+		if (cleansing != null && cleansing.runCheck()) {
+			return false;
+		}
+
+		return true;
 	}
 
 }
