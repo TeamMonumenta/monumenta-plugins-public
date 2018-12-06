@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -13,8 +12,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,12 +22,24 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 
 public class Dodging extends Ability {
+	/*
+	 * This skill is a freaking nightmare because it spans two different events.
+	 *
+	 * Because of the way the ability system works, one event triggers (which puts
+	 * it on cooldown), then the other event is missed because the skill is on
+	 * cooldown...
+	 *
+	 * So this skill has mInfo.ignoreCooldown = true, meaning the events will always
+	 * be triggered here, even when the skill is on cooldown. It must check itself
+	 * that cooldown is active and behave accordingly.
+	 */
 
 	private static final int DODGING_SPEED_EFFECT_DURATION = 15 * 20;
 	private static final int DODGING_SPEED_EFFECT_LEVEL = 0;
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
-	private static final String ROGUE_DODGING_NONCE_METAKEY = "MonumentaRogueDodgingNonce";
+
+	private int mTriggerTick = 0;
 
 	public Dodging(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -38,26 +49,29 @@ public class Dodging extends Ability {
 		mInfo.scoreboardId = "Dodging";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.cooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		// NOTE: This skill will get events even when it is on cooldown!
+		mInfo.ignoreCooldown = true;
+	}
+
+	@Override
+	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
+		// See if we should dodge. If false, allow the event to proceed normally
+		if (!_dodge()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		EntityType type = event.getDamager().getType();
-		Projectile damager = (Projectile) event.getDamager();
-		int dodging = getAbilityScore();
-		if (dodging > 1) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.SPEED,
-			                                                  DODGING_SPEED_EFFECT_DURATION,
-			                                                  DODGING_SPEED_EFFECT_LEVEL,
-			                                                  true, false));
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
+		// See if we should dodge. If false, allow the event to proceed normally
+		if (!_dodge()) {
+			return true;
 		}
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
-
-		int cooldown = dodging == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
-		mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.DODGING, cooldown);
+		EntityType type = event.getDamager().getType();
+		Projectile damager = (Projectile) event.getDamager();
 
 		// Remove effects from tipped arrows
 		// TODO: This is the same code as for removing from shields, should probably be
@@ -76,20 +90,46 @@ public class Dodging extends Ability {
 			}
 		}
 
-		// Set metadata indicating this event happened this tick
-		MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, ROGUE_DODGING_NONCE_METAKEY);
-		event.setCancelled(true);
-		putOnCooldown();
 		return false;
 	}
 
-	@Override
-	public boolean runCheck() {
-		if (mPlayer != null &&
-		    mPlayer.getLastDamageCause() != null &&
-		    mPlayer.getLastDamageCause().getCause() != null) {
-			return mPlayer.getLastDamageCause().getCause() == DamageCause.PROJECTILE;
+	private boolean _dodge() {
+		if (mTriggerTick == mPlayer.getTicksLived()) {
+			// Dodging was activated this tick - allow it
+			return true;
 		}
-		return false;
+
+		/*
+		 * Must check with cooldown timers directly because isAbilityOnCooldown always returns
+		 * false (because ignoreCooldown is true)
+		 */
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			/*
+			 * This ability is actually on cooldown (and was not triggered this tick)
+			 * Don't process dodging
+			 */
+			return false;
+
+		}
+
+		/*
+		 * Make note of which tick this triggered on so that any other event that triggers this
+		 * tick will also be dodged
+		 */
+		mTriggerTick = mPlayer.getTicksLived();
+		putOnCooldown();
+
+		int dodging = getAbilityScore();
+		if (dodging > 1) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.SPEED,
+			                                                  DODGING_SPEED_EFFECT_DURATION,
+			                                                  DODGING_SPEED_EFFECT_LEVEL,
+			                                                  true, false));
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
+		}
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
+
+		return true;
 	}
 }

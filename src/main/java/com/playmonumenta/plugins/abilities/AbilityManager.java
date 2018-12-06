@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -199,6 +200,17 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				if (!abil.PlayerDamagedByProjectileEvent(event)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean PlayerCombustByEntityEvent(Player player, EntityCombustByEntityEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerCombustByEntityEvent(event)) {
 					return false;
 				}
 			}

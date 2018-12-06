@@ -135,6 +135,10 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+
+			if (!AbilityManager.getManager().PlayerCombustByEntityEvent(player, event)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 

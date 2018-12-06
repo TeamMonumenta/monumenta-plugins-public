@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -113,6 +114,10 @@ public abstract class Ability {
 	}
 
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+		return true;
+	}
+
+	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		return true;
 	}
 
