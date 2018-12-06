@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -267,14 +269,6 @@ public class AbilityManager {
 		}
 	}
 
-	public void PlayerRespawnEvent(Player player) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.PlayerRespawnEvent();
-			}
-		}
-	}
-
 	public void ProjectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
@@ -350,6 +344,10 @@ public class AbilityManager {
 	}
 
 	public void setupClassPotionEffects(Player player) {
+		// Make sure non-warriors don't have passive knockback resistance...
+		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		att.setBaseValue(0);
+
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			abil.setupClassPotionEffects();
 		}

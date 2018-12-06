@@ -20,20 +20,11 @@ public class Toughness extends Ability {
 		mInfo.scoreboardId = "Toughness";
 	}
 
-	private void toughness() {
+	@Override
+	public void setupClassPotionEffects() {
 		int toughness = getAbilityScore();
 		int healthBoost = toughness == 1 ? 0 : 1;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.HEALTH_BOOST, 1000000, healthBoost, true, false));
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 100, 4, true, false));
-	}
-
-	@Override
-	public void setupClassPotionEffects() {
-		toughness();
-	}
-
-	@Override
-	public void PlayerRespawnEvent() {
-		toughness();
 	}
 }

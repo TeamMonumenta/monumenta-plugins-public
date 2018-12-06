@@ -35,15 +35,6 @@ public class Agility extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		testForAgility();
-	}
-
-	@Override
-	public void PlayerRespawnEvent() {
-		testForAgility();
-	}
-
-	public void testForAgility() {
 		int effectLevel = getAbilityScore() == 1 ? AGILITY_1_EFFECT_LVL : AGILITY_2_EFFECT_LVL;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.FAST_DIGGING, 1000000, effectLevel, true, false));

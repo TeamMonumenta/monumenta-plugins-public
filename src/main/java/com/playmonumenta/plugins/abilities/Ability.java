@@ -150,8 +150,6 @@ public abstract class Ability {
 
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
-	public void PlayerRespawnEvent() { }
-
 	public void PlayerExtendedSneakEvent() { }
 
 	//---------------------------------------------------------------------------------------------------------------

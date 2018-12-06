@@ -25,15 +25,6 @@ public class Swiftness extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		testForSwiftness();
-	}
-
-	@Override
-	public void PlayerRespawnEvent() {
-		testForSwiftness();
-	}
-
-	public void testForSwiftness() {
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
 
