@@ -68,7 +68,7 @@ public abstract class Ability {
 
 	public boolean isOnCooldown() {
 		AbilityInfo info = getInfo();
-		if (info.linkedSpell != null) {
+		if (info.linkedSpell != null && !info.ignoreCooldown) {
 			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
 				return true;
 			}

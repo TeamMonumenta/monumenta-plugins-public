@@ -21,6 +21,13 @@ public class AbilityInfo {
 	//This is in ticks
 	public int cooldown = 0;
 
+	/*
+	 * If this is set to true, methods of the class will be called even when the skill
+	 * is still on cooldown. This is needed for some skills that have multiple possible
+	 * triggers or need to catch events after the skill has been put on cooldown
+	 */
+	public boolean ignoreCooldown = false;
+
 	public int classId = 0;
 
 	//If the ability does not require a spec, input a negative number.
