@@ -36,11 +36,20 @@ public class Volley extends Ability {
 		mInfo.linkedSpell = Spells.VOLLEY;
 		mInfo.scoreboardId = "Volley";
 		mInfo.cooldown = VOLLEY_COOLDOWN;
+
+		/*
+		 * NOTE! Because Volley has two events - the actual shot event won't trigger by default
+		 * when volley is on cooldown. Therefor it needs to bypass the automatic cooldown check
+		 * and manage cooldown itself
+		 */
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (!mPlayer.isSneaking()) {
+		if (!mPlayer.isSneaking()
+            || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
 
