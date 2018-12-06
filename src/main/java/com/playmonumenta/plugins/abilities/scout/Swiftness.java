@@ -15,14 +15,14 @@ public class Swiftness extends Ability {
 
 	private static final int SWIFTNESS_EFFECT_SPEED_LVL = 0;
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
-	
+
 	public Swiftness(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 6;
 		mInfo.specId = -1;
 		mInfo.scoreboardId = "Swiftness";
 	}
-	
+
 	@Override
 	public void setupClassPotionEffects() {
 		testForSwiftness();
@@ -32,17 +32,15 @@ public class Swiftness extends Ability {
 	public void PlayerRespawnEvent() {
 		testForSwiftness();
 	}
-	
-	public void testForSwiftness() {
-		int swiftness = getAbilityScore();
-		if (swiftness > 0) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
 
-			if (swiftness > 1) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				                                 new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
-			}
+	public void testForSwiftness() {
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+		                                 new PotionEffect(PotionEffectType.SPEED, 1000000, SWIFTNESS_EFFECT_SPEED_LVL, true, false));
+
+		int swiftness = getAbilityScore();
+		if (swiftness > 1) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.JUMP, 1000000, SWIFTNESS_EFFECT_JUMP_LVL, true, false));
 		}
 	}
 
