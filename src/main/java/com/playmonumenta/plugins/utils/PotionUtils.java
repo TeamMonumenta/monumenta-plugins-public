@@ -37,7 +37,6 @@ public class PotionUtils {
 	    PotionEffectType.INCREASE_DAMAGE,
 	    PotionEffectType.INVISIBILITY,
 	    PotionEffectType.JUMP,
-	    PotionEffectType.LEVITATION,
 	    PotionEffectType.NIGHT_VISION,
 	    PotionEffectType.REGENERATION,
 	    PotionEffectType.SATURATION,
@@ -56,6 +55,7 @@ public class PotionUtils {
 	    PotionEffectType.WEAKNESS,
 	    PotionEffectType.HARM,
 	    PotionEffectType.HUNGER,
+	    PotionEffectType.LEVITATION,
 	    PotionEffectType.UNLUCK
 	};
 
