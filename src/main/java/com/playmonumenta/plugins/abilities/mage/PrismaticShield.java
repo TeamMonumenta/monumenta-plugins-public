@@ -14,7 +14,6 @@ import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
@@ -49,6 +48,18 @@ public class PrismaticShield extends Ability {
 	 */
 	@Override
 	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
+		// Do not process cancelled damage events
+		if (event.isCancelled()) {
+			return true;
+		}
+
+		// Calculate whether this effect should not be run based on player health
+		double correctHealth = mPlayer.getHealth() - event.getFinalDamage();
+		if (mPlayer.isDead() || correctHealth <= 0 || correctHealth > PRISMATIC_SHIELD_TRIGGER_HEALTH) {
+			return true;
+		}
+
+		// Conditions match - prismatic shield
 		int prismatic = getAbilityScore();
 		int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
 		int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
@@ -69,17 +80,5 @@ public class PrismaticShield extends Ability {
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.PRISMATIC_SHIELD);
 		putOnCooldown();
 		return true;
-	}
-
-	@Override
-	public boolean runCheck() {
-		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
-		if (lastDamage != null && !lastDamage.isCancelled()) {
-			double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
-			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= PRISMATIC_SHIELD_TRIGGER_HEALTH) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
