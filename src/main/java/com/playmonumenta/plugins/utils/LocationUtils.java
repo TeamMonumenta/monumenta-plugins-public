@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -88,9 +90,22 @@ public class LocationUtils {
 		return mat.isSolid() || mat.equals(Material.LAVA);
 	}
 
+	public static boolean isWaterlogged(Block block) {
+		BlockData data = block.getBlockData();
+		if (data != null && data instanceof Waterlogged) {
+			return ((Waterlogged)data).isWaterlogged();
+		}
+		return false;
+	}
+
 	public static boolean isValidBoatLocation(Location loc) {
 		Block block = loc.getBlock();
-		if (block.isLiquid() || loc.subtract(0, 1, 0).getBlock().isLiquid()) {
+		if (block.isLiquid() || isWaterlogged(block)) {
+			return true;
+		}
+
+		block = loc.subtract(0, 1, 0).getBlock();
+		if (block.isLiquid() || isWaterlogged(block)) {
 			return true;
 		}
 
