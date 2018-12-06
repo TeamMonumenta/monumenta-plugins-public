@@ -32,10 +32,8 @@ public class DivineJustice extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damagee = (LivingEntity) event.getEntity();
-		if (damagee.getLastDamageCause() != null
-				&& damagee.getLastDamageCause().getCause() != DamageCause.PROJECTILE
-				&& EntityUtils.isUndead(damagee)) {
+		LivingEntity damagee = (LivingEntity)event.getEntity();
+		if (!event.getCause().equals(DamageCause.PROJECTILE) && EntityUtils.isUndead(damagee)) {
 			EntityUtils.damageEntity(mPlugin, damagee, DIVINE_JUSTICE_DAMAGE, mPlayer);
 
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_CRIT_HEAL);
@@ -53,7 +51,7 @@ public class DivineJustice extends Ability {
 		LivingEntity killedEntity = event.getEntity();
 		if (getAbilityScore() > 1
 				&& killedEntity.getLastDamageCause() != null
-				&& killedEntity.getLastDamageCause().getCause() != DamageCause.PROJECTILE
+				&& !killedEntity.getLastDamageCause().getCause().equals(DamageCause.PROJECTILE)
 				&& EntityUtils.isUndead(killedEntity)) {
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_HEAL);
 
