@@ -70,7 +70,7 @@ public class Gilded implements ItemProperty {
 
 				// Very infrequently check if the item is still actually there
 				numTicks++;
-				if (numTicks > 200) {
+				if (numTicks > 100) {
 					numTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
