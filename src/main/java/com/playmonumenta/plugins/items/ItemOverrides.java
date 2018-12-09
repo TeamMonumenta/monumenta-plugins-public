@@ -190,9 +190,32 @@ public class ItemOverrides {
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());
 		mItems.put(Material.FIREWORK_ROCKET, new FireworkOverride());
 		mItems.put(Material.SPAWNER, new MobSpawnerOverride());
-		mItems.put(Material.FLOWER_POT, new FlowerPotOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
+
+		OverrideItem flowerOverride = new FlowerPotOverride();
+		mItems.put(Material.FLOWER_POT, flowerOverride);
+		mItems.put(Material.POTTED_DANDELION, flowerOverride);
+		mItems.put(Material.POTTED_POPPY, flowerOverride);
+		mItems.put(Material.POTTED_BLUE_ORCHID, flowerOverride);
+		mItems.put(Material.POTTED_ALLIUM, flowerOverride);
+		mItems.put(Material.POTTED_AZURE_BLUET, flowerOverride);
+		mItems.put(Material.POTTED_RED_TULIP, flowerOverride);
+		mItems.put(Material.POTTED_ORANGE_TULIP, flowerOverride);
+		mItems.put(Material.POTTED_WHITE_TULIP, flowerOverride);
+		mItems.put(Material.POTTED_PINK_TULIP, flowerOverride);
+		mItems.put(Material.POTTED_OXEYE_DAISY, flowerOverride);
+		mItems.put(Material.POTTED_OAK_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_SPRUCE_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_BIRCH_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_JUNGLE_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_ACACIA_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_DARK_OAK_SAPLING, flowerOverride);
+		mItems.put(Material.POTTED_RED_MUSHROOM, flowerOverride);
+		mItems.put(Material.POTTED_BROWN_MUSHROOM, flowerOverride);
+		mItems.put(Material.POTTED_FERN, flowerOverride);
+		mItems.put(Material.POTTED_DEAD_BUSH, flowerOverride);
+		mItems.put(Material.POTTED_CACTUS, flowerOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
