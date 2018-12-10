@@ -13,9 +13,6 @@ commands:
   giveSoulbound:
     permission: monumenta.command.giveSoulbound
     description: Appends the player's name into lore text on the given item
-  checkEmptyInventory:
-    permission: monumenta.command.checkEmptyInventory
-    description: Return success if the player's inventory is empty, fails otherwise
   incrementDaily:
     permission: monumenta.command.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.

@@ -19,7 +19,6 @@ public class CommandFactory {
 	 */
 	public static void createCommands(JavaPlugin plugin, ServerProperties properties, World world, PotionManager potionManager) {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
-			createCommand(plugin, new CheckEmptyInventory(plugin));
 			createCommand(plugin, new DeathMsg(plugin));
 			createCommand(plugin, new GiveSoulbound(plugin));
 			createCommand(plugin, new IncrementDaily(plugin));
