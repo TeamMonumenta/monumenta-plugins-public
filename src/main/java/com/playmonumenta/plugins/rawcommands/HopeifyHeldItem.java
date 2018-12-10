@@ -49,7 +49,10 @@ public class HopeifyHeldItem extends GenericCommand {
 				kingsValleyFound = true;
 			}
 
-			if (!hopeAdded && (loreEntry.contains("King's Valley") || ChatColor.stripColor(loreEntry).trim().isEmpty())) {
+			if (!hopeAdded && (loreEntry.contains("King's Valley") ||
+			                   loreEntry.contains("Armor") ||
+			                   loreEntry.contains("Magic Wand") ||
+			                   ChatColor.stripColor(loreEntry).trim().isEmpty())) {
 				newLore.add(ChatColor.GRAY + "Hope");
 				hopeAdded = true;
 			}

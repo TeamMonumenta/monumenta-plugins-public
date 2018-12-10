@@ -60,7 +60,10 @@ public class GildifyHeldItem extends GenericCommand {
 				duplicateItem = false;
 			}
 
-			if (!gildedAdded && (loreEntry.contains("King's Valley") || ChatColor.stripColor(loreEntry).trim().isEmpty())) {
+			if (!gildedAdded && (loreEntry.contains("King's Valley") ||
+			                     loreEntry.contains("Armor") ||
+			                     loreEntry.contains("Magic Wand") ||
+			                     ChatColor.stripColor(loreEntry).trim().isEmpty())) {
 				newLore.add(ChatColor.GRAY + "Gilded");
 				gildedAdded = true;
 			}
