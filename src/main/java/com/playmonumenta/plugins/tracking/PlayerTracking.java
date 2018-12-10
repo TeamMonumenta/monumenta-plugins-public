@@ -208,14 +208,10 @@ public class PlayerTracking implements EntityTracking {
 				vehicle.remove();
 			}
 		}
-
-		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
 	void _transitionToSurvival(Player player) {
 		player.setGameMode(GameMode.SURVIVAL);
-
-		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
 	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);

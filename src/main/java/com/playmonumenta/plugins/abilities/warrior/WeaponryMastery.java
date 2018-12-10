@@ -50,22 +50,16 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-
-		//  Player has an sword in their mainHand.
-		if (InventoryUtils.isSwordItem(mainHand)) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
-		}
+		PlayerItemHeldEvent(mPlayer.getInventory().getItemInMainHand(), null);
 	}
 
 	@Override
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
-		mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
-
 		//  Player has an sword in their mainHand.
-		if (InventoryUtils.isSwordItem(mainHand)) {
+		if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));
+		} else {
+			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.DAMAGE_RESISTANCE);
 		}
 	}
 }

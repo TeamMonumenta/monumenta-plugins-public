@@ -153,19 +153,6 @@ public class PotionManager {
 		}
 	}
 
-	public void refreshClassEffects(Player player) {
-		//  We can just get rid of the ABILITY_SELF, it's useless to us as it's possibly unreliable and we want
-		//  to refresh the timers on those that should be applied anyways.
-		clearPotionIDType(player, PotionID.ABILITY_SELF);
-
-		//  Next we want to get this players class and call into an initialization function to make sure they have the correct potion
-		//  effect types applied.
-		AbilityManager.getManager().setupClassPotionEffects(player);
-
-		//  Once all the potion stuff is setup apply the best effects.
-		applyBestPotionEffect(player);
-	}
-
 	public JsonObject getAsJsonObject(Player player) {
 		PlayerPotionInfo info = mPotionManager.get(player.getUniqueId());
 		if (info != null) {

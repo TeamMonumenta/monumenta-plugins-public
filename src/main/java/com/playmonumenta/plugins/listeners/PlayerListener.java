@@ -119,7 +119,6 @@ public class PlayerListener implements Listener {
 
 				mPlugin.mTrackingManager.addEntity(player);
 				DailyReset.handle(mPlugin, player);
-				AbilityManager.getManager().updatePlayerAbilities(player);
 			}
 		}.runTaskLater(mPlugin, 20);
 	}
@@ -395,7 +394,6 @@ public class PlayerListener implements Listener {
 		// Clear effects
 		mPlugin.mPotionManager.clearAllPotions(player);
 		mPlugin.mAbilityManager.updatePlayerAbilities(player);
-		mPlugin.mPotionManager.refreshClassEffects(player);
 	}
 
 	// The player has respawned.
@@ -411,7 +409,6 @@ public class PlayerListener implements Listener {
 
 				mPlugin.mPotionManager.clearAllPotions(player);
 				mPlugin.mAbilityManager.updatePlayerAbilities(player);
-				mPlugin.mPotionManager.refreshClassEffects(player);
 
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();

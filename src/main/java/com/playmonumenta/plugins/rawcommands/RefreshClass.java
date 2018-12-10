@@ -18,9 +18,6 @@ public class RefreshClass extends GenericCommand {
 		if (plugin.mAbilityManager != null) {
 			plugin.mAbilityManager.updatePlayerAbilities(player);
 		}
-		if (plugin.mPotionManager != null) {
-			plugin.mPotionManager.refreshClassEffects(player);
-		}
 		sender.sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
 	}
 }

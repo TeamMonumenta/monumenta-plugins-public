@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.abilities.warlock.*;
 import com.playmonumenta.plugins.abilities.warrior.*;
 import com.playmonumenta.plugins.abilities.warrior.berserker.*;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 
 import java.util.ArrayList;
@@ -140,7 +141,47 @@ public class AbilityManager {
 	}
 
 	public void updatePlayerAbilities(Player player) {
-		mAbilities.put(player.getUniqueId(), getCurrentAbilities(player));
+		// Clear self-given potions
+		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
+
+		// Make sure non-warriors don't have passive knockback resistance
+		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		att.setBaseValue(0);
+
+		List<Ability> abilities = new ArrayList<Ability>();
+
+		/* If player has the "disable_class" tag, no abilities are assigned to them */
+		for (String tag : player.getScoreboardTags()) {
+			if (tag.equals("disable_class")) {
+				/* This player's abilities are disabled - give them an empty set and stop here */
+				mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
+				return;
+			}
+		}
+
+		try {
+			for (Ability ab : mReferenceAbilities) {
+				if (ab.canUse(player)) {
+					Class[] constructorTypes = new Class[4];
+					constructorTypes[0] = Plugin.class;
+					constructorTypes[1] = World.class;
+					constructorTypes[2] = Random.class;
+					constructorTypes[3] = Player.class;
+
+					Ability newAbility = ab.getClass().getDeclaredConstructor(constructorTypes).newInstance(mPlugin, mWorld, mRandom, player);
+					abilities.add(newAbility);
+				}
+			}
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
+			e.printStackTrace();
+		}
+
+		mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
+
+		// Set up new class potion abilities
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			abil.setupClassPotionEffects();
+		}
 	}
 
 	public Ability getPlayerAbility(Player player, Class<?> cls) {
@@ -343,49 +384,9 @@ public class AbilityManager {
 		}
 	}
 
-	public void setupClassPotionEffects(Player player) {
-		// Make sure non-warriors don't have passive knockback resistance...
-		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-		att.setBaseValue(0);
-
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			abil.setupClassPotionEffects();
-		}
-	}
-
 	//---------------------------------------------------------------------------------------------------------------
 
 	//Private methods
-	private AbilityCollection getCurrentAbilities(Player player) {
-		List<Ability> abilities = new ArrayList<Ability>();
-
-		/* If player has the "disable_class" tag, no abilities are assigned to them */
-		for (String tag : player.getScoreboardTags()) {
-			if (tag.equals("disable_class")) {
-				return new AbilityCollection(abilities);
-			}
-		}
-
-		try {
-			for (Ability ab : mReferenceAbilities) {
-				if (ab.canUse(player)) {
-					Class[] constructorTypes = new Class[4];
-					constructorTypes[0] = Plugin.class;
-					constructorTypes[1] = World.class;
-					constructorTypes[2] = Random.class;
-					constructorTypes[3] = Player.class;
-
-					Ability newAbility = ab.getClass().getDeclaredConstructor(constructorTypes).newInstance(mPlugin, mWorld, mRandom, player);
-					abilities.add(newAbility);
-				}
-			}
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new AbilityCollection(abilities);
-	}
-
 	private AbilityCollection getPlayerAbilities(Player player) {
 		if (!mAbilities.containsKey(player.getUniqueId())) {
 			updatePlayerAbilities(player);

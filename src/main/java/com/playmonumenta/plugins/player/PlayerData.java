@@ -5,6 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NetworkUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -14,12 +21,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.NetworkUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PlayerData {
 	/**
@@ -182,7 +183,7 @@ public class PlayerData {
 		}
 
 		// Now that the player is all set up, refresh their abilities based on their class
-		plugin.mPotionManager.refreshClassEffects(player);
+		AbilityManager.getManager().updatePlayerAbilities(player);
 	}
 
 	/**
