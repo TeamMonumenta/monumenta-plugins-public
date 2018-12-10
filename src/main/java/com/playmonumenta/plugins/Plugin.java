@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.rawcommands.BroadcastCommand;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
 import com.playmonumenta.plugins.rawcommands.Effect;
 import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
+import com.playmonumenta.plugins.rawcommands.GiveSoulbound;
 import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.RefreshClass;
 import com.playmonumenta.plugins.rawcommands.RemoveTags;
@@ -138,6 +139,7 @@ public class Plugin extends JavaPlugin {
 		 */
 
 		TransferServer.register(this);
+		GiveSoulbound.register();
 		HopeifyHeldItem.register();
 		GildifyHeldItem.register();
 		DebugInfo.register(this);

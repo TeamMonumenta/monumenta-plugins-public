@@ -10,9 +10,6 @@ commands:
   transferScores:
     permission: monumenta.command.transferScores
     description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.
-  giveSoulbound:
-    permission: monumenta.command.giveSoulbound
-    description: Appends the player's name into lore text on the given item
   incrementDaily:
     permission: monumenta.command.incrementDaily
     description: Increments the servers Daily Version so we can message logging in players and online players when the Daily has reset.

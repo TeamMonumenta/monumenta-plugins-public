@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
@@ -20,6 +21,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -345,6 +348,17 @@ public class InventoryUtils {
 			int a = ar[index];
 			ar[index] = ar[i];
 			ar[i] = a;
+		}
+	}
+
+	public static void giveItem(Player player, ItemStack item) {
+		PlayerInventory inv = player.getInventory();
+		if (inv.firstEmpty() == -1) {
+			Location ploc = player.getLocation();
+			ploc.getWorld().dropItem(ploc, item);
+			player.sendMessage(ChatColor.RED + "Your inventory is full! Some items were dropped on the ground!");
+		} else {
+			inv.addItem(item);
 		}
 	}
 }
