@@ -1,5 +1,14 @@
 package com.playmonumenta.plugins.managers.potion;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -10,14 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)
 	// Each PotionID has an iterable TreeMap with one entry per effect level
@@ -25,17 +26,19 @@ public class PotionMap {
 	// This implementation allows only one status effect of each (type, level)
 	// So you can have a level 0 regen from a safezone and a level 0 regen from an item,
 	//   but not two level 0 regens from items
-	private EnumMap<PotionID, TreeMap<Integer, PotionInfo>> mPotionMap;
+	private final EnumMap<PotionID, TreeMap<Integer, PotionInfo>> mPotionMap;
 
 	// Type of this particular map
-	private PotionEffectType mType;
+	private final PotionEffectType mType;
 
-	private boolean isNegative;
+	private final Plugin mPlugin;
+	private final boolean mIsNegative;
 
-	public PotionMap(PotionEffectType type) {
+	public PotionMap(Plugin plugin, PotionEffectType type) {
+		mPlugin = plugin;
 		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
 		mType = type;
-		isNegative = PotionUtils.hasNegativeEffects(type);
+		mIsNegative = PotionUtils.hasNegativeEffects(type);
 	}
 
 	private void _addPotionMap(PotionID id, PotionInfo newPotionInfo) {
@@ -46,7 +49,7 @@ public class PotionMap {
 			trackedPotionInfo = new TreeMap<Integer, PotionInfo>();
 		}
 
-		if (isNegative) {
+		if (mIsNegative) {
 			// Negative potions don't track multiple levels - only the highest / longest one
 			PotionInfo bestEffect = getBestEffect();
 
@@ -76,7 +79,7 @@ public class PotionMap {
 	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
 		_addPotionMap(id, newPotionInfo);
 
-		applyBestPotionEffect(player);
+		applyBestPotionEffect(player, true);
 	}
 
 	public void removePotionMap(Player player, PotionID id) {
@@ -88,7 +91,7 @@ public class PotionMap {
 			mPotionMap.remove(id);
 		}
 
-		applyBestPotionEffect(player);
+		applyBestPotionEffect(player, false);
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
@@ -119,11 +122,11 @@ public class PotionMap {
 
 		//  If a timer wears out, run another check to make sure the best potion effect is applied.
 		if (effectWoreOff) {
-			applyBestPotionEffect(player);
+			applyBestPotionEffect(player, true);
 		}
 	}
 
-	PotionInfo getBestEffect() {
+	private PotionInfo getBestEffect() {
 		PotionInfo bestEffect = null;
 
 		Iterator<Entry<PotionID, TreeMap<Integer, PotionInfo>>> potionSourceIter = mPotionMap.entrySet().iterator();
@@ -147,21 +150,32 @@ public class PotionMap {
 		return bestEffect;
 	}
 
-	void applyBestPotionEffect(Player player) {
+	private void applyBestPotionEffect(Player player, boolean logOnRemove) {
 		PotionInfo bestEffect = getBestEffect();
 
-		// TODO: Until we catch all potion effect sources, this will likely clear those effects not tracked
-		player.removePotionEffect(mType);
+		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
+		if (currentVanillaEffect != null) {
+			if (bestEffect == null
+			    || currentVanillaEffect.getDuration() > (bestEffect.duration + 20)
+			    || currentVanillaEffect.getDuration() < (bestEffect.duration - 20)
+			    || bestEffect.amplifier != currentVanillaEffect.getAmplifier()) {
+
+				// The current effect must be removed because the "best" effect is either less than it
+				// OR the same strength but less duration
+				player.removePotionEffect(mType);
+			}
+		}
 
 		if (bestEffect != null) {
 			// Effects over 100 "mask" all other effects of that type
 			if (bestEffect.amplifier < 100) {
-				player.addPotionEffect(new PotionEffect(mType, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles));
+				PotionEffect effect = new PotionEffect(mType, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles);
+				player.addPotionEffect(effect);
 			}
 		}
 	}
 
-	JsonObject getAsJsonObject() {
+	protected JsonObject getAsJsonObject() {
 		JsonObject potionIDObject = null;
 		JsonObject potionMapObject = new JsonObject();
 		boolean hasMapping = false;
@@ -197,7 +211,7 @@ public class PotionMap {
 		return potionIDObject;
 	}
 
-	void loadFromJsonObject(JsonObject object) throws Exception {
+	protected void loadFromJsonObject(JsonObject object) throws Exception {
 		// Remove all current entries
 		mPotionMap.clear();
 

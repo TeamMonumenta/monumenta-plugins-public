@@ -100,7 +100,7 @@ public class PotionManager {
 			if (potionInfo != null) {
 				potionInfo.addPotionInfo(player, id, info);
 			} else {
-				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo();
+				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo(mPlugin);
 				newPotionInfo.addPotionInfo(player, id, info);
 				mPlugin.mPotionManager.mPotionManager.put(uuid, newPotionInfo);
 			}
@@ -146,13 +146,6 @@ public class PotionManager {
 		}
 	}
 
-	public void applyBestPotionEffect(Player player) {
-		PlayerPotionInfo potionInfo = mPlugin.mPotionManager.mPotionManager.get(player.getUniqueId());
-		if (potionInfo != null) {
-			potionInfo.applyBestPotionEffect(player);
-		}
-	}
-
 	public JsonObject getAsJsonObject(Player player) {
 		PlayerPotionInfo info = mPotionManager.get(player.getUniqueId());
 		if (info != null) {
@@ -167,7 +160,7 @@ public class PotionManager {
 		if (potionInfo != null) {
 			clearAllPotions(player);
 
-			PlayerPotionInfo info = new PlayerPotionInfo();
+			PlayerPotionInfo info = new PlayerPotionInfo(mPlugin);
 			info.loadFromJsonObject(potionInfo.getAsJsonObject());
 
 			mPotionManager.put(player.getUniqueId(), info);

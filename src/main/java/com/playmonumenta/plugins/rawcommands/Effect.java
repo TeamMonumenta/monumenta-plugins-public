@@ -119,8 +119,7 @@ public class Effect {
 
 				/* Apply potion via potion manager */
 				manager.addPotion(player, PotionID.APPLIED_POTION,
-										 new PotionEffect(type, seconds * 20, amplifier, true, true));
-				manager.applyBestPotionEffect(player);
+				                  new PotionEffect(type, seconds * 20, amplifier, true, true));
 			} else if (e instanceof LivingEntity) {
 				LivingEntity entity = (LivingEntity)e;
 				// Not a player - apply the effect directly

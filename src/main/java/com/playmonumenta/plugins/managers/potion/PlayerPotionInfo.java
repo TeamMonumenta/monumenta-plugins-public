@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 import java.util.HashMap;
@@ -16,10 +17,11 @@ import org.bukkit.potion.PotionEffectType;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
-	public HashMap<PotionEffectType, PotionMap> mPotionInfo;
+	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
+	private final Plugin mPlugin;
 
-	public PlayerPotionInfo() {
-		mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
+	public PlayerPotionInfo(Plugin plugin) {
+		mPlugin = plugin;
 	}
 
 	public void addPotionInfo(Player player, PotionID id, PotionInfo info) {
@@ -27,7 +29,7 @@ public class PlayerPotionInfo {
 		if (type != null) {
 			type.addPotionMap(player, id, info);
 		} else {
-			PotionMap newMap = new PotionMap(info.type);
+			PotionMap newMap = new PotionMap(mPlugin, info.type);
 			newMap.addPotionMap(player, id, info);
 			mPotionInfo.put(info.type, newMap);
 		}
@@ -70,15 +72,7 @@ public class PlayerPotionInfo {
 		}
 	}
 
-	public void applyBestPotionEffect(Player player) {
-		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
-		while (potionMapIter.hasNext()) {
-			Entry<PotionEffectType, PotionMap> potionEntry = potionMapIter.next();
-			potionEntry.getValue().applyBestPotionEffect(player);
-		}
-	}
-
-	JsonObject getAsJsonObject() {
+	protected JsonObject getAsJsonObject() {
 		JsonObject playerPotionInfoObject = new JsonObject();
 
 		Iterator<Entry<PotionEffectType, PotionMap>> potionMapIter = mPotionInfo.entrySet().iterator();
@@ -94,11 +88,11 @@ public class PlayerPotionInfo {
 		return playerPotionInfoObject;
 	}
 
-	void loadFromJsonObject(JsonObject object) throws Exception {
+	protected void loadFromJsonObject(JsonObject object) throws Exception {
 		Set<Entry<String, JsonElement>> potionInfo = object.entrySet();
 		for (Entry<String, JsonElement> info : potionInfo) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
-			PotionMap map = new PotionMap(type);
+			PotionMap map = new PotionMap(mPlugin, type);
 
 			JsonElement mapElement = info.getValue();
 			if (mapElement != null) {
