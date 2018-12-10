@@ -358,6 +358,14 @@ public class AbilityManager {
 	//Private methods
 	private AbilityCollection getCurrentAbilities(Player player) {
 		List<Ability> abilities = new ArrayList<Ability>();
+
+		/* If player has the "disable_class" tag, no abilities are assigned to them */
+		for (String tag : player.getScoreboardTags()) {
+			if (tag.equals("disable_class")) {
+				return new AbilityCollection(abilities);
+			}
+		}
+
 		try {
 			for (Ability ab : mReferenceAbilities) {
 				if (ab.canUse(player)) {
