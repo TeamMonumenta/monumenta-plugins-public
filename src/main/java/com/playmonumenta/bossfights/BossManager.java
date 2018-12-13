@@ -1,26 +1,52 @@
 package com.playmonumenta.bossfights;
 
-import com.playmonumenta.bossfights.bosses.*;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.Location;
+
+import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
+import com.playmonumenta.bossfights.bosses.AuraLargeHungerBoss;
+import com.playmonumenta.bossfights.bosses.AuraLargeSlownessBoss;
+import com.playmonumenta.bossfights.bosses.AuraLargeWeaknessBoss;
+import com.playmonumenta.bossfights.bosses.AuraSmallFatigueBoss;
+import com.playmonumenta.bossfights.bosses.AuraSmallHungerBoss;
+import com.playmonumenta.bossfights.bosses.AuraSmallSlownessBoss;
+import com.playmonumenta.bossfights.bosses.AuraSmallWeaknessBoss;
+import com.playmonumenta.bossfights.bosses.Azacor;
+import com.playmonumenta.bossfights.bosses.AzacorNormal;
+import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
+import com.playmonumenta.bossfights.bosses.CAxtal;
+import com.playmonumenta.bossfights.bosses.ChargerBoss;
+import com.playmonumenta.bossfights.bosses.FireResistantBoss;
+import com.playmonumenta.bossfights.bosses.FireballBoss;
+import com.playmonumenta.bossfights.bosses.FlameNovaBoss;
+import com.playmonumenta.bossfights.bosses.GenericBoss;
+import com.playmonumenta.bossfights.bosses.HiddenBoss;
+import com.playmonumenta.bossfights.bosses.InfestedBoss;
+import com.playmonumenta.bossfights.bosses.InvisibleBoss;
+import com.playmonumenta.bossfights.bosses.Masked_1;
+import com.playmonumenta.bossfights.bosses.Masked_2;
+import com.playmonumenta.bossfights.bosses.Orangyboi;
+import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
+import com.playmonumenta.bossfights.bosses.TpBehindBoss;
+import com.playmonumenta.bossfights.bosses.Virius;
+import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
+import com.playmonumenta.bossfights.utils.SerializationUtils;
 
 public class BossManager implements Listener {
 	Plugin mPlugin;
@@ -28,7 +54,7 @@ public class BossManager implements Listener {
 
 	@FunctionalInterface
 	public interface StatelessBossConstructor {
-		BossAbilityGroup construct(Plugin plugin, LivingEntity entity);
+		BossAbilityGroup construct(Plugin plugin, LivingEntity entity) throws Exception;
 	}
 
 	@FunctionalInterface
@@ -52,6 +78,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
 		mStatelessBosses.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> new FireResistantBoss(p, e));
 		mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
+		mStatelessBosses.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new WeaponSwitchBoss(p, e));
 		mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
 		mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
 		mStatelessBosses.put(FireballBoss.identityTag, (Plugin p, LivingEntity e) -> new FireballBoss(p, e));
@@ -83,6 +110,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> HiddenBoss.deserialize(p, e));
 		mBossDeserializers.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> FireResistantBoss.deserialize(p, e));
 		mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
+		mBossDeserializers.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> WeaponSwitchBoss.deserialize(p, e));
 		mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));
 		mBossDeserializers.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> InfestedBoss.deserialize(p, e));
 		mBossDeserializers.put(FireballBoss.identityTag, (Plugin p, LivingEntity e) -> FireballBoss.deserialize(p, e));
@@ -119,14 +147,14 @@ public class BossManager implements Listener {
 		}
 	}
 
-	public void createBoss(LivingEntity targetEntity, String requestedTag) {
+	public void createBoss(LivingEntity targetEntity, String requestedTag) throws Exception {
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
 			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
 		}
 	}
 
-	public void createBoss(LivingEntity targetEntity, String requestedTag, Location endLoc) {
+	public void createBoss(LivingEntity targetEntity, String requestedTag, Location endLoc) throws Exception {
 		StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
 		if (stateful != null) {
 			createBossInternal(targetEntity, stateful.construct(mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
@@ -135,7 +163,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) {
+	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
 		/* Set up boss health / armor / etc */
 		ability.init();
 

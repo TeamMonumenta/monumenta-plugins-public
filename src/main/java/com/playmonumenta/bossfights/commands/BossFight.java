@@ -1,22 +1,23 @@
 package com.playmonumenta.bossfights.commands;
 
+import java.util.LinkedHashMap;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
 import com.playmonumenta.bossfights.Plugin;
 
+import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.LocationArgument;
 import io.github.jorelali.commandapi.api.arguments.StringArgument;
-import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
-
-import java.util.LinkedHashMap;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.Location;
 
 public class BossFight {
 	public static void register(Plugin plugin) {
@@ -56,7 +57,11 @@ public class BossFight {
 	private static void createBossStateless(Plugin plugin, CommandSender sender, Entity entity, String requestedTag) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 			if (plugin.mBossManager != null) {
-				plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag);
+				try {
+					plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag);
+				} catch (Exception ex) {
+					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
+				}
 			}
 		} else {
 			sender.sendMessage("This command must be on a LivingEntity!");
@@ -66,7 +71,11 @@ public class BossFight {
 	private static void createBossStateful(Plugin plugin, CommandSender sender, Entity entity, String requestedTag, Location endLoc) {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 			if (plugin.mBossManager != null) {
-				plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag, endLoc);
+				try {
+					plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag, endLoc);
+				} catch (Exception ex) {
+					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
+				}
 			}
 		} else {
 			sender.sendMessage("This command must be on a LivingEntity!");
