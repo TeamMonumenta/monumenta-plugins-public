@@ -30,7 +30,7 @@ public class SpellBlockBreak extends Spell {
 				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(loc.getZ() + (double)z);
 					Material material = testloc.getBlock().getType();
-					if (testloc.getBlock().getType() != Material.BEDROCK && testloc.getBlock().getType() != Material.BARRIER && material.isSolid()) {
+					if (material != Material.BEDROCK && material != Material.BARRIER && (material.isSolid() || material.equals(Material.COBWEB))) {
 						badBlockList.add(testloc.clone());
 					}
 				}
