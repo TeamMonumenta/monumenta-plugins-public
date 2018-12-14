@@ -47,6 +47,11 @@ public class EagleEye extends Ability {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > EAGLE_EYE_DOT_ANGLE) {
+				// Don't apply vulnerability to arena mobs
+				if (mob.getScoreboardTags().contains("arena_mob")) {
+					continue;
+				}
+
 				mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 
 				int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
