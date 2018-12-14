@@ -1,20 +1,20 @@
 package com.playmonumenta.plugins.player;
 
-import com.playmonumenta.plugins.item.properties.ItemProperty;
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.GameMode;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemProperty;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
 
 public class PlayerInventory {
 	/*
@@ -22,6 +22,7 @@ public class PlayerInventory {
 	 * including ones that are on duplicate specialized lists below
 	 */
 	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
+	Map<ItemProperty, Integer> mPreviousProperties = new HashMap<ItemProperty, Integer>();
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player);
@@ -43,17 +44,39 @@ public class PlayerInventory {
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
-		/*
-		 * Loop through existing equipment properties, remove all of them
-		 *
-		 * TODO: Modify this so only the removed effects are removed
-		 * This is probably hard to do without making any new objects
-		 * (which defeats the purpose)
-		 */
-		removeProperties(plugin, player);
+		// Swap current and previous lists
+		Map<ItemProperty, Integer> temp = mPreviousProperties;
+		mPreviousProperties = mCurrentProperties;
+		mCurrentProperties = temp;
 
-		/* Once that's done, loop through the current players inventory and re-register the properties */
-		getAndApplyProperties(plugin, player);
+		// Clear the current map and update it with current properties
+		mCurrentProperties.clear();
+		ItemPropertyManager.getItemProperties(mCurrentProperties, player);
+
+		// Remove properties from the player that were removed
+		for (ItemProperty property : mPreviousProperties.keySet()) {
+			if (!mCurrentProperties.containsKey(property)) {
+				property.removeProperty(plugin, player);
+			}
+		}
+
+		// Apply properties to the player that changed or have a new level
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+
+			Integer oldLevel = mPreviousProperties.get(property);
+			if (oldLevel == level) {
+				// Don't need to do anything - player already had effects from this
+			} else if (oldLevel == null) {
+				// This didn't exist before - just apply the new property
+				property.applyProperty(plugin, player, level);
+			} else {
+				// This existed before but was a different level - clear and re-add
+				property.removeProperty(plugin, player);
+				property.applyProperty(plugin, player, level);
+			}
+		}
 	}
 
 	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, DamageCause cause) {
@@ -97,16 +120,5 @@ public class PlayerInventory {
 		}
 
 		mCurrentProperties.clear();
-	}
-
-	private void getAndApplyProperties(Plugin plugin, Player player) {
-		ItemPropertyManager.getItemProperties(mCurrentProperties, player);
-
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
-			Integer level = iter.getValue();
-
-			property.applyProperty(plugin, player, level);
-		}
 	}
 }
