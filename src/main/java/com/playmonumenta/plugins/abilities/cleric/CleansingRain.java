@@ -84,7 +84,7 @@ public class CleansingRain extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE &&
+		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE &&
 		       (mainHand == null || mainHand.getType() != Material.BOW) &&
 		       (offHand == null || offHand.getType() != Material.BOW);
 	}
