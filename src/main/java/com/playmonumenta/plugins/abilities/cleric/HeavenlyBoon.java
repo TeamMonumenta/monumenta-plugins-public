@@ -1,29 +1,27 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class HeavenlyBoon extends Ability {
 
@@ -109,6 +107,11 @@ public class HeavenlyBoon extends Ability {
 			/* If within range, apply full strength of all potion effects to all nearby players */
 
 			for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEAVENLY_BOON_RADIUS, true)) {
+				// Don't buff players that have their class disabled
+				if (p.getScoreboardTags().contains("disable_class")) {
+					continue;
+				}
+
 				/* Apply full-strength effects to players within range */
 				for (PotionEffect effect : potion.getEffects()) {
 					PotionUtils.applyPotion(mPlugin, p, effect);

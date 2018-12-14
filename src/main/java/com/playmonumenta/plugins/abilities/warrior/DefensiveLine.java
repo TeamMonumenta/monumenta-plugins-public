@@ -41,6 +41,11 @@ public class DefensiveLine extends Ability {
 	@Override
 	public boolean cast() {
 		for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
+			// Don't buff players that have their class disabled
+			if (target.getScoreboardTags().contains("disable_class")) {
+				continue;
+			}
+
 			Location loc = target.getLocation();
 
 			target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);

@@ -30,6 +30,11 @@ public class Rejuvenation extends Ability {
 			if (threeSeconds) {
 				int rejuvenation = getAbilityScore();
 				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, REJUVENATION_RADIUS, true)) {
+					// Don't buff players that have their class disabled
+					if (p.getScoreboardTags().contains("disable_class")) {
+						continue;
+					}
+
 					//  If this is us or we're allowing anyone to get it.
 					if (p == mPlayer || rejuvenation > 1) {
 						double oldHealth = p.getHealth();

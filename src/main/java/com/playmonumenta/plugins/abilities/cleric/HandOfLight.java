@@ -1,24 +1,23 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import java.util.Random;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.util.Vector;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class HandOfLight extends Ability {
 
@@ -49,7 +48,7 @@ public class HandOfLight extends Ability {
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			// Only heal players in the correct direction
 			// Only heal players that have a class score > 0 (so it doesn't work on arena contenders)
-			if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE && ScoreboardUtils.getScoreboardValue(mPlayer, "Class") > 0) {
+			if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE && !p.getScoreboardTags().contains("disable_class")) {
 				PlayerUtils.healPlayer(p, healAmount);
 
 				Location loc = p.getLocation();

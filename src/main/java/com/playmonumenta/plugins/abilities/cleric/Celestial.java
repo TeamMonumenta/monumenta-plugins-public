@@ -49,6 +49,9 @@ public class Celestial extends Ability {
 
 		List<Player> affectedPlayers = PlayerUtils.getNearbyPlayers(mPlayer, CELESTIAL_RADIUS, true);
 
+		// Don't buff players that have their class disabled
+		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
+
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
 			p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
