@@ -89,8 +89,16 @@ public class EntityUtils {
 	}
 
 	public static void applyFreeze(Plugin plugin, int ticks, LivingEntity mob) {
-		if (!mob.hasAI() || isBoss(mob)) {
+		if (isBoss(mob)) {
 			return;
+		}
+
+		if (!mob.hasAI()) {
+			FreezeObject obj = FreezeObject.getHandle(mob);
+			if (obj != null) {
+				obj.setRemainingDuration(ticks);
+				return;
+			}
 		}
 
 		new FreezeObject(plugin, ticks, mob);
@@ -470,12 +478,11 @@ public class EntityUtils {
 	}
 	public static class FreezeObject {
 		private static final String FREEZE_METAKEY = "MonumentaFreezeMetakey";
-		private int mNumTicks;
-		private int mTicksSoFar;
+		private static final int TICK_PERIOD = 5;
+		private int mTicksRemaining;
 
 		public FreezeObject(Plugin plugin, int ticks, LivingEntity mob) {
-			mNumTicks = ticks;
-			mTicksSoFar = 0;
+			mTicksRemaining = ticks;
 
 			mob.setMetadata(FREEZE_METAKEY, new FixedMetadataValue(plugin, this));
 
@@ -484,38 +491,28 @@ public class EntityUtils {
 				public void run() {
 					mob.setAI(false);
 
-					if (mNumTicks % 5 == 0) {
-						plugin.mWorld.spawnParticle(Particle.SNOWBALL, mob.getLocation(), 15, 0.25, (float)(mob.getHeight() / 2), 0.25, 0);
-					}
+					plugin.mWorld.spawnParticle(Particle.SNOWBALL, mob.getLocation(), 15, 0.25, (float)(mob.getHeight() / 2), 0.25, 0);
 
-					mNumTicks++;
-					if (mNumTicks >= mNumTicks || mob.isDead() || mob.hasAI()) {
+					mTicksRemaining -= TICK_PERIOD;
+					if (mTicksRemaining <= 0 || mob.isDead() || mob.hasAI()) {
 						this.cancel();
 						mob.setAI(true);
 						mob.removeMetadata(FREEZE_METAKEY, plugin);
 					}
 				}
-			}.runTaskTimer(plugin, 0, 1);
-		}
-
-		public int getTotalDuration() {
-			return mNumTicks;
+			}.runTaskTimer(plugin, 0, TICK_PERIOD);
 		}
 
 		public int getRemainingDuration() {
-			return mNumTicks - mTicksSoFar;
+			return mTicksRemaining;
 		}
 
 		public void setRemainingDuration(int ticks) {
-			mNumTicks = mTicksSoFar + ticks;
-		}
-
-		public void setTotalDuration(int ticks) {
-			mNumTicks = ticks;
+			mTicksRemaining = ticks;
 		}
 
 		public void addDuration(int ticks) {
-			mNumTicks += ticks;
+			mTicksRemaining += ticks;
 		}
 
 		public static FreezeObject getHandle(LivingEntity mob) {
