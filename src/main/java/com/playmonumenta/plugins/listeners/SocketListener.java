@@ -32,9 +32,8 @@ public class SocketListener implements Listener {
 		 * So this deferred task pokes bungee a bit later to remind it this server is connected
 		 */
 		new BukkitRunnable() {
-			Integer tick = 0;
+			Integer heartbeat = 0;
 			public void run() {
-				if (++tick == 100) {
 					try {
 						mPlugin.getLogger().info("Sending heartbeat message to bungee");
 						// Send a simple hello message to bungee
@@ -44,10 +43,11 @@ public class SocketListener implements Listener {
 						ex.printStackTrace();
 					}
 
+				if (++heartbeat == 5) {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 200, 1000);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
