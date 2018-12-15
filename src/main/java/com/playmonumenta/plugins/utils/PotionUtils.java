@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -11,10 +12,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-
-import com.google.gson.JsonObject;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
@@ -208,7 +208,7 @@ public class PotionUtils {
 			double health = player.getHealth();
 			double healthToAdd = 4 * (effect.getAmplifier() + 1);
 
-			health = Math.min(health + healthToAdd, 20);
+			health = Math.min(health + healthToAdd, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
 			player.setHealth(health);
 		} else {
