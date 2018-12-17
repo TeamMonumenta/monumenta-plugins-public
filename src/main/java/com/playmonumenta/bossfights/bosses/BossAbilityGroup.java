@@ -59,7 +59,8 @@ public abstract class BossAbilityGroup {
 		mTaskIDpassive = scheduler.scheduleSyncRepeatingTask(plugin, passive, 1L, 5L);
 
 		Runnable active = new Runnable() {
-			Integer mNextActiveTimer = 0;
+			private boolean mDisabled = true;
+			private Integer mNextActiveTimer = 0;
 
 			@Override
 			public void run() {
@@ -88,8 +89,16 @@ public abstract class BossAbilityGroup {
 
 				/* Don't progress if players aren't present */
 				if (Utils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty()) {
+					if (!mDisabled) {
+						/* Cancel all the spells just in case they were activated */
+						mDisabled = true;
+						activeSpells.cancelAll();
+					}
 					return;
 				}
+
+				/* Some spells might have been run - so when this next deactivates they need to be cancelled */
+				mDisabled = false;
 
 				if (activeSpells != null) {
 					// Run the next spell and store how long before the next spell can run
