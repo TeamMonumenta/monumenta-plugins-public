@@ -23,7 +23,7 @@ public abstract class Spell {
 	 * To use this functionality, user needs to add every BukkitRunnable created to mActiveRunnables,
 	 * and then remove them from mActiveRunnables when they are finished
 	 */
-	public final void cancel() {
+	public void cancel() {
 		for (BukkitRunnable runnable : mActiveRunnables) {
 			runnable.cancel();
 		}
