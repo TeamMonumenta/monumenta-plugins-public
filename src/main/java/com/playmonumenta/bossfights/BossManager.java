@@ -51,8 +51,10 @@ import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 
 public class BossManager implements Listener {
-	Plugin mPlugin;
-	Map<UUID, Boss> mBosses;
+
+	/********************************************************************************
+	 * Classes/Interfaces
+	 *******************************************************************************/
 
 	@FunctionalInterface
 	public interface StatelessBossConstructor {
@@ -69,9 +71,13 @@ public class BossManager implements Listener {
 		BossAbilityGroup deserialize(Plugin plugin, LivingEntity entity) throws Exception;
 	}
 
-	static Map<String, StatelessBossConstructor> mStatelessBosses;
-	static Map<String, StatefulBossConstructor> mStatefulBosses;
-	static Map<String, BossDeserializer> mBossDeserializers;
+	/********************************************************************************
+	 * Static Fields
+	 *******************************************************************************/
+
+	static final Map<String, StatelessBossConstructor> mStatelessBosses;
+	static final Map<String, StatefulBossConstructor> mStatefulBosses;
+	static final Map<String, BossDeserializer> mBossDeserializers;
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
@@ -139,6 +145,12 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e) -> AzacorNormal.deserialize(p, e));
 	}
 
+	/********************************************************************************
+	 * Member Variables
+	 *******************************************************************************/
+	private final Plugin mPlugin;
+	private final Map<UUID, Boss> mBosses;
+
 	public BossManager(Plugin plugin) {
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
@@ -151,6 +163,84 @@ public class BossManager implements Listener {
 
 			ProcessEntity((LivingEntity)entity);
 		}
+	}
+
+	/********************************************************************************
+	 * Event Handlers
+	 *******************************************************************************/
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void EntitySpawnEvent(EntitySpawnEvent event) {
+		Entity entity = event.getEntity();
+
+		if (!(entity instanceof LivingEntity)) {
+			return;
+		}
+
+		ProcessEntity((LivingEntity)entity);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void ChunkLoadEvent(ChunkLoadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (!(entity instanceof LivingEntity)) {
+				continue;
+			}
+
+			ProcessEntity((LivingEntity)entity);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void ChunkUnloadEvent(ChunkUnloadEvent event) {
+		Entity[] entities = event.getChunk().getEntities();
+
+		for (Entity entity : entities) {
+			if (!(entity instanceof LivingEntity)) {
+				continue;
+			}
+
+			unload((LivingEntity)entity);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void EntityDeathEvent(EntityDeathEvent event) {
+		Entity entity = event.getEntity();
+		if (!(entity instanceof LivingEntity)) {
+			return;
+		}
+
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.death();
+			boss.unload();
+
+			/*
+			 * Remove special serialization data from drops. Should not be
+			 * necessary since loaded bosses already have this data stripped
+			 */
+			SerializationUtils.stripSerializationDataFromDrops(event);
+		}
+	}
+
+	/********************************************************************************
+	 * Public Methods
+	 *******************************************************************************/
+
+	public void unload(LivingEntity entity) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.unload();
+			mBosses.remove(entity.getUniqueId());
+		}
+	}
+
+	public void unloadAll() {
+		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet()) {
+			entry.getValue().unload();
+		}
+		mBosses.clear();
 	}
 
 	public void createBoss(LivingEntity targetEntity, String requestedTag) throws Exception {
@@ -169,6 +259,10 @@ public class BossManager implements Listener {
 		}
 	}
 
+	/********************************************************************************
+	 * Private Methods
+	 *******************************************************************************/
+
 	private void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) throws Exception {
 		/* Set up boss health / armor / etc */
 		ability.init();
@@ -181,17 +275,6 @@ public class BossManager implements Listener {
 		}
 
 		mBosses.put(targetEntity.getUniqueId(), boss);
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntitySpawnEvent(EntitySpawnEvent event) {
-		Entity entity = event.getEntity();
-
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
-
-		ProcessEntity((LivingEntity)entity);
 	}
 
 	private void ProcessEntity(LivingEntity entity) {
@@ -230,62 +313,4 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void ChunkLoadEvent(ChunkLoadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
-			}
-
-			ProcessEntity((LivingEntity)entity);
-		}
-	}
-
-	public void unload(LivingEntity entity) {
-		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null) {
-			boss.unload();
-			mBosses.remove(entity.getUniqueId());
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void ChunkUnloadEvent(ChunkUnloadEvent event) {
-		Entity[] entities = event.getChunk().getEntities();
-
-		for (Entity entity : entities) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
-			}
-
-			unload((LivingEntity)entity);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void EntityDeathEvent(EntityDeathEvent event) {
-		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
-
-		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null) {
-			boss.death();
-			boss.unload();
-
-			/*
-			 * Remove special serialization data from drops. Should not be
-			 * necessary since loaded bosses already have this data stripped
-			 */
-			SerializationUtils.stripSerializationDataFromDrops(event);
-		}
-	}
-
-	public void unloadAll() {
-		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet()) {
-			entry.getValue().unload();
-		}
-		mBosses.clear();
-	}
 }
