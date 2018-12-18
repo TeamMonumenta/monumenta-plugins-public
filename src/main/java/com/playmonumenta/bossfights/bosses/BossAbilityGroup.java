@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.Location;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.bossfights.BossBarManager;
@@ -108,6 +111,31 @@ public abstract class BossAbilityGroup {
 		};
 		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 2L);
 	}
+
+
+	/********************************************************************************
+	 * Event Handlers
+	 *******************************************************************************/
+
+	/*
+	 * Boss damaged another entity
+	 */
+	public void bossDamagedEntity(EntityDamageByEntityEvent event) {};
+
+	/*
+	 * Boss was damaged
+	 */
+	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {};
+
+	/*
+	 * Boss shot a projectile
+	 */
+	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {};
+
+	/*
+	 * Boss-shot projectile hit something
+	 */
+	public void bossProjectileHit(ProjectileHitEvent event) {};
 
 	/*
 	 * Called only the first time the boss is summoned into the world

@@ -31,7 +31,7 @@
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>${minecraft.server.version}</version>
             <scope>provided</scope>
         </dependency>

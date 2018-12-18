@@ -11,13 +11,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
 import com.playmonumenta.bossfights.bosses.AuraLargeHungerBoss;
@@ -48,6 +55,7 @@ import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
 import com.playmonumenta.bossfights.bosses.TpBehindBoss;
 import com.playmonumenta.bossfights.bosses.Virius;
 import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
+import com.playmonumenta.bossfights.bosses.WinterSnowmanEventBoss;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 
 public class BossManager implements Listener {
@@ -94,6 +102,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(TpBehindBoss.identityTag, (Plugin p, LivingEntity e) -> new TpBehindBoss(p, e));
 		mStatelessBosses.put(FlameNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameNovaBoss(p, e));
 		mStatelessBosses.put(PlayerTargetBoss.identityTag, (Plugin p, LivingEntity e) -> new PlayerTargetBoss(p, e));
+		mStatelessBosses.put(WinterSnowmanEventBoss.identityTag, (Plugin p, LivingEntity e) -> new WinterSnowmanEventBoss(p, e));
 		mStatelessBosses.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeFatigueBoss(p, e));
 		mStatelessBosses.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeHungerBoss(p, e));
 		mStatelessBosses.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraLargeSlownessBoss(p, e));
@@ -128,6 +137,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TpBehindBoss.identityTag, (Plugin p, LivingEntity e) -> TpBehindBoss.deserialize(p, e));
 		mBossDeserializers.put(FlameNovaBoss.identityTag, (Plugin p, LivingEntity e) -> FlameNovaBoss.deserialize(p, e));
 		mBossDeserializers.put(PlayerTargetBoss.identityTag, (Plugin p, LivingEntity e) -> PlayerTargetBoss.deserialize(p, e));
+		mBossDeserializers.put(WinterSnowmanEventBoss.identityTag, (Plugin p, LivingEntity e) -> WinterSnowmanEventBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraLargeFatigueBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeFatigueBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraLargeHungerBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeHungerBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraLargeSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraLargeSlownessBoss.deserialize(p, e));
@@ -222,6 +232,68 @@ public class BossManager implements Listener {
 			 */
 			SerializationUtils.stripSerializationDataFromDrops(event);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+		Projectile proj = event.getEntity();
+		if (proj != null && !event.isCancelled()) {
+			ProjectileSource shooter = proj.getShooter();
+			if (shooter != null && shooter instanceof LivingEntity) {
+				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
+				if (boss != null) {
+					// May cancel the event
+					boss.bossLaunchedProjectile(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void ProjectileHitEvent(ProjectileHitEvent event) {
+		Projectile proj = event.getEntity();
+		if (proj != null) {
+			ProjectileSource shooter = proj.getShooter();
+			if (shooter != null && shooter instanceof LivingEntity) {
+				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
+				if (boss != null) {
+					boss.bossProjectileHit(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		Entity damagee = event.getEntity();
+		Entity damager = event.getDamager();
+
+		if (damagee != null && !event.isCancelled()) {
+			Boss boss = mBosses.get(damagee.getUniqueId());
+			if (boss != null) {
+				// May cancel the event
+				boss.bossDamagedByEntity(event);
+			}
+		}
+
+		if (damager != null && !event.isCancelled()) {
+			Boss boss = mBosses.get(damager.getUniqueId());
+			if (boss != null) {
+				// May cancel the event
+				boss.bossDamagedEntity(event);
+			}
+		}
+	}
+
+	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PlayerDeathEvent(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
+			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
+			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
+		}
+
 	}
 
 	/********************************************************************************
