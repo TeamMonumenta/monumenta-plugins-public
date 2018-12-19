@@ -2,6 +2,7 @@ package com.playmonumenta.bossfights;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -16,10 +17,12 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -262,6 +265,28 @@ public class BossManager implements Listener {
 				if (boss != null) {
 					boss.bossProjectileHit(event);
 				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
+		// Make a copy so it can be iterated while bosses modify the actual list
+		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.areaEffectAppliedToBoss(event);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PotionSplashEvent(PotionSplashEvent event) {
+		// Make a copy so it can be iterated while bosses modify the actual list
+		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.splashPotionAppliedToBoss(event);
 			}
 		}
 	}

@@ -1,13 +1,19 @@
 package com.playmonumenta.bossfights.bosses;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,6 +58,9 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
+					Location loc = mBoss.getLocation();
+					loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
+					loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
 					mBoss.setHealth(Math.max(0, mBoss.getHealth() - 1));
 				}
 			}.runTaskLater(mPlugin, 0);
@@ -65,21 +74,29 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
-			if (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) {
+			if (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE) && !player.isDead() && player.getHealth() > 0) {
 				EntityLiving handle = ((CraftPlayer)player).getHandle();
 				float absorb = handle.getAbsorptionHearts();
-				if (absorb > 0) {
-					absorb -= 2;
-					handle.setAbsorptionHearts(absorb);
-					if (absorb <= 0) {
-						if (mBoss.getCustomName() != null) {
-							player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getCustomName()));
-						}
-						player.setHealth(0);
+				absorb -= 2;
+				handle.setAbsorptionHearts(Math.max(0, absorb));
+				Location loc = player.getLocation().add(0, 1.4, 0);
+				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);
+				loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
+				if (absorb <= 0) {
+					if (mBoss.getCustomName() != null) {
+						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getCustomName()));
 					}
+					player.setHealth(0);
 				}
 			}
 		}
-
 	};
+
+	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
+		event.getAffectedEntities().remove(mBoss);
+	}
+
+	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
+		event.getAffectedEntities().remove(mBoss);
+	}
 }

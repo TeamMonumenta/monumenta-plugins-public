@@ -7,7 +7,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -95,7 +97,9 @@ public abstract class BossAbilityGroup {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
-						activeSpells.cancelAll();
+						if (activeSpells != null) {
+							activeSpells.cancelAll();
+						}
 					}
 					return;
 				}
@@ -136,6 +140,16 @@ public abstract class BossAbilityGroup {
 	 * Boss-shot projectile hit something
 	 */
 	public void bossProjectileHit(ProjectileHitEvent event) {};
+
+	/*
+	 * Boss hit by area effect cloud
+	 */
+	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {};
+
+	/*
+	 * Boss-shot projectile hit something
+	 */
+	public void splashPotionAppliedToBoss(PotionSplashEvent event) {};
 
 	/*
 	 * Called only the first time the boss is summoned into the world

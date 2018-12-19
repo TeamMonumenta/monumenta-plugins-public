@@ -3,7 +3,9 @@ package com.playmonumenta.bossfights;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
@@ -48,6 +50,18 @@ public class Boss {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossProjectileHit(event);
+		}
+	}
+
+	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.areaEffectAppliedToBoss(event);
+		}
+	}
+
+	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.splashPotionAppliedToBoss(event);
 		}
 	}
 
