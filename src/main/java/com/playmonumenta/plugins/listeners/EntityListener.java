@@ -529,6 +529,9 @@ public class EntityListener implements Listener {
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
 
+		// Don't apply effects to dead entities
+		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));
+
 		/* Don't let the player interact with the world when transferring */
 		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
