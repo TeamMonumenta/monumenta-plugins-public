@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.abilities.scout.*;
 import com.playmonumenta.plugins.abilities.warlock.*;
 import com.playmonumenta.plugins.abilities.warrior.*;
 import com.playmonumenta.plugins.abilities.warrior.berserker.*;
-import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.Plugin;
 
@@ -26,7 +25,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -101,8 +99,8 @@ public class AbilityManager {
 		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
 		                          // BERSERKER
 		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
-		                          new Psychosis(mPlugin, mWorld, mRandom, null),
-		                          new RecklessSwing(mPlugin, mWorld, mRandom, null),
+								  new GrowingRage(mPlugin, mWorld, mRandom, null),
+		                          new Rampage(mPlugin, mWorld, mRandom, null),
 
 		                          // CLERIC
 		                          new Celestial(mPlugin, mWorld, mRandom, null),
@@ -144,9 +142,9 @@ public class AbilityManager {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
-		// Make sure non-warriors don't have passive knockback resistance
-		AttributeInstance att = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-		att.setBaseValue(0);
+		// Make sure non-warriors don't have passive knockback resistance or armor
+		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
+		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 
 		List<Ability> abilities = new ArrayList<Ability>();
 

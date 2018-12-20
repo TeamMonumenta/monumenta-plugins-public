@@ -1,26 +1,25 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import java.util.Random;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.Sound;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
@@ -38,7 +37,7 @@ public class MeteorSlam extends Ability {
 	private static final double METEOR_SLAM_ANGLE = 70;
 	private static final int METEOR_SLAM_1_EFFECT_LVL = 2;
 	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
-	private static final int METEOR_SLAM_DURATION = 2 * 20;
+	private static final int METEOR_SLAM_DURATION = 2 * 20; //ticks
 	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
 	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
 
@@ -86,7 +85,7 @@ public class MeteorSlam extends Ability {
 
 	@Override
 	public void PlayerExtendedSneakEvent() {
-		int meteorSlam = ScoreboardUtils.getScoreboardValue(mPlayer, "MeteorSlam");
+		int meteorSlam = getAbilityScore();
 		if (mPlayer.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) {
 				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;

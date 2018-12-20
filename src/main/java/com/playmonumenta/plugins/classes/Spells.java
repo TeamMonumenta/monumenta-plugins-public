@@ -108,7 +108,6 @@ public enum Spells {
 	DEFENSIVE_LINE("Defensive Line", Classes.WARRIOR),
 
 	//--Berserker
-	RECKLESS_SWING("Reckless Swing", Classes.WARRIOR),
 	METEOR_SLAM("Meteor Slam", Classes.WARRIOR),
 
 	//Alchemist
