@@ -414,22 +414,10 @@ public class EntityListener implements Listener {
 				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
 				    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
 				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
-					// If they do, cancel the event. This means players can't throw eachother's
-					// soulbound snowballs
-					event.setCancelled(true);
 
-					if (((itemInMainHand.getType().equals(Material.SNOWBALL)) &&
-					     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
-					     (InventoryUtils.isSoulboundToPlayer(itemInMainHand, player))) ||
-					    ((itemInOffHand.getType().equals(Material.SNOWBALL)) &&
-					     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) &&
-					     (InventoryUtils.isSoulboundToPlayer(itemInOffHand, player)))) {
-
-						Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
-
-						newBall.setShooter(player);
-						newBall.setVelocity(origBall.getVelocity());
-					}
+					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
+					newBall.setShooter(player);
+					newBall.setVelocity(origBall.getVelocity());
 					return;
 				}
 			}
