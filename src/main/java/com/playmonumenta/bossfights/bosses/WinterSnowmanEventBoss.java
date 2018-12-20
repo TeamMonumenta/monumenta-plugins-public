@@ -68,7 +68,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
-			if (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE) && !player.isDead() && player.getHealth() > 0) {
+			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
 				EntityLiving handle = ((CraftPlayer)player).getHandle();
 				float absorb = handle.getAbsorptionHearts();
 				absorb -= 2;
