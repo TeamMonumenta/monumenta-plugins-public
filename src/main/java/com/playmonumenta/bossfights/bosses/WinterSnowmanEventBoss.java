@@ -16,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.Plugin;
 
@@ -55,15 +54,10 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 
 		// If hit by a snowball thrown by a player, damage the snowman by 1 HP after this tick is over
 		if (damager instanceof Snowball && (((Snowball)damager).getShooter() instanceof Player)) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					Location loc = mBoss.getLocation();
-					loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
-					loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
-					mBoss.setHealth(Math.max(0, mBoss.getHealth() - 1));
-				}
-			}.runTaskLater(mPlugin, 0);
+			Location loc = mBoss.getLocation();
+			loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
+			loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
+			event.setDamage(1);
 			return;
 		}
 
