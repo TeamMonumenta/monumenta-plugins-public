@@ -1,15 +1,9 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.google.gson.JsonObject;
-
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,7 +16,12 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.World;
+
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -82,6 +81,7 @@ public abstract class Ability {
 		if (info.linkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
 				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), info.linkedSpell, info.cooldown);
+				PlayerUtils.callAbilityCastEvent(mPlayer, info.linkedSpell);
 			}
 		}
 	}
@@ -100,6 +100,8 @@ public abstract class Ability {
 
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
+
+	public boolean AbilityCastEvent(AbilityCastEvent event) { return true; }
 
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		return true;

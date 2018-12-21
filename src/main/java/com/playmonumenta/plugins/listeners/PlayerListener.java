@@ -743,5 +743,6 @@ public class PlayerListener implements Listener {
 	public void AbilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		mPlugin.getSpecialization(player).AbilityCastEvent(player, event);
+		AbilityManager.getManager().AbilityCastEvent(player, event);
 	}
 }

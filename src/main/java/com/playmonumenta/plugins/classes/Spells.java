@@ -47,6 +47,7 @@ public enum Spells {
 	SNAKE_HEAD("Snake Head", Classes.ROGUE),
 	BLADE_SURGE("Blade Surge", Classes.ROGUE),
 	BLADE_DANCE("Blade Dance", Classes.ROGUE),
+	WIND_WALK("Wind Walk", Classes.ROGUE),
 
 	//--Assassin Spec.
 	PERFECT_KILL("Perfect Kill", Classes.ROGUE),
