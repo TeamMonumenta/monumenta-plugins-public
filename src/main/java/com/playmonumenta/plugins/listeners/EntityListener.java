@@ -418,6 +418,7 @@ public class EntityListener implements Listener {
 					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
+					event.setCancelled(true);
 					return;
 				}
 			}
