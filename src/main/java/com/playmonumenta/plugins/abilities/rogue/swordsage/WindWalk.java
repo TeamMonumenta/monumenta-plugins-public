@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import java.util.Random;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -58,7 +57,7 @@ public class WindWalk extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isSprinting()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
+			if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 				return true;
 			}
 		}

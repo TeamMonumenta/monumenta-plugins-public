@@ -4,11 +4,9 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +26,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 
 public class BladeDance extends Ability {
-
 
 	/*
 	 * Blade Dance: Sprint Right Click to begin a blade dance.
@@ -53,20 +50,21 @@ public class BladeDance extends Ability {
 
 	@Override
 	public boolean cast() {
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 		mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
 		int bladeDance = getAbilityScore();
 		double damage = bladeDance == 1 ? 18 : 25;
-		if (bladeDance >= 2)
+		if (bladeDance >= 2) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED,
 			                                 20 * 2, 1, true, false));
+		}
 		new BukkitRunnable() {
 			int i = 0;
 			float pitch = 0;
 			@Override
 			public void run() {
 				i += 2;
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
+				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
 				pitch += 0.2;
 				new BukkitRunnable() {
 					Location loc1 = mPlayer.getLocation().add(6, 6, 6);
@@ -75,12 +73,12 @@ public class BladeDance extends Ability {
 					double x1 = ThreadLocalRandom.current().nextDouble(loc2.getX(), loc1.getX());
 					double y1 = ThreadLocalRandom.current().nextDouble(loc2.getY(), loc1.getY());
 					double z1 = ThreadLocalRandom.current().nextDouble(loc2.getZ(), loc1.getZ());
-					Location l1 = new Location(mPlayer.getWorld(), x1, y1, z1);
+					Location l1 = new Location(mWorld, x1, y1, z1);
 
 					double x2 = ThreadLocalRandom.current().nextDouble(loc2.getX(), loc1.getX());
 					double y2 = ThreadLocalRandom.current().nextDouble(loc2.getY(), loc1.getY());
 					double z2 = ThreadLocalRandom.current().nextDouble(loc2.getZ(), loc1.getZ());
-					Location l2 = new Location(mPlayer.getWorld(), x2, y2, z2);
+					Location l2 = new Location(mWorld, x2, y2, z2);
 
 					Vector dir = LocationUtils.getDirectionTo(l2, l1);
 
@@ -106,11 +104,8 @@ public class BladeDance extends Ability {
 					mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 150, 0, 0, 0, 0.25);
 					mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 70, 0, 0, 0, 0.25);
 					mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
-					for (Entity e : mPlayer.getNearbyEntities(4, 4, 4)) {
-						if (EntityUtils.isHostileMob(e)) {
-							LivingEntity le = (LivingEntity) e;
-							EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-						}
+					for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 4)) {
+						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					}
 				}
 			}
@@ -123,7 +118,7 @@ public class BladeDance extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isSprinting()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
+			if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 				return true;
 			}
 		}

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -13,7 +12,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class DeadlyRonde extends Ability {
@@ -34,56 +32,50 @@ public class DeadlyRonde extends Ability {
 		mInfo.scoreboardId = "DeadlyRonde";
 	}
 
-	boolean active = false;
 	boolean cancelled = false;
+	BukkitRunnable activeRunnable = null;
 
 	@Override
 	public boolean AbilityCastEvent(AbilityCastEvent event) {
-		if (!active) {
-			active = true;
-
-			new BukkitRunnable() {
-				int t = 0;
-				@Override
-				public void run() {
-					t++;
-
-					if (t >= 20 * 5 || !active) {
-						this.cancel();
-						active = false;
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
+		/* Re-up the duration every time an ability is cast */
+		if (activeRunnable != null) {
+			activeRunnable.cancel();
 		}
+
+		activeRunnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				activeRunnable = null;
+			}
+		};
+		activeRunnable.runTaskLater(mPlugin, 20 * 5);
+
 		return true;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active) {
+		if (activeRunnable != null) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isSwordItem(mainHand)) {
-				int deadlyRonde = getAbilityScore();
-				double damage = deadlyRonde == 1 ? 4 : 6;
-				LivingEntity damaged = (LivingEntity) event.getEntity();
+				double damage = getAbilityScore() == 1 ? 4 : 6;
 				if (event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
-					EntityUtils.damageEntity(mPlugin, damaged, damage / 2, mPlayer);
+					event.setDamage(event.getFinalDamage() + damage / 2);
 				} else {
-					EntityUtils.damageEntity(mPlugin, damaged, damage, mPlayer);
+					event.setDamage(event.getFinalDamage() + damage);
 				}
 			}
 
 			//The cancelled variable is so we don't spout multiple BukkitRunnables
 			if (!cancelled) {
 				cancelled = true;
-				//Sets active to false 1 tick after the strike so that way the sweep bonus is applied.
+				//Deactivates 1 tick after the strike so that way the sweep bonus is applied.
 				//If we had it cancelled on damage, then entities affected by sweeps wouldn't get damaged.
 				new BukkitRunnable() {
-
 					@Override
 					public void run() {
-						active = false;
+						activeRunnable.cancel();
+						activeRunnable = null;
 						cancelled = false;
 					}
 				}.runTaskLater(mPlugin, 1);

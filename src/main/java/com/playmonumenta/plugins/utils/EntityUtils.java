@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.block.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
@@ -32,15 +30,17 @@ import org.bukkit.entity.Slime;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Location;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class EntityUtils {
 	public static boolean isUndead(LivingEntity mob) {
@@ -286,8 +286,7 @@ public class EntityUtils {
 		return false;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class arrowClass) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends Arrow> arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch() + (float)rotation.getX());
@@ -303,8 +302,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class arrowClass) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends Arrow> arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
@@ -357,11 +355,10 @@ public class EntityUtils {
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
 		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
+		entities.removeIf(e -> !(e instanceof LivingEntity && isHostileMob(e)));
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
-			if ((entity instanceof LivingEntity) && isHostileMob(entity)) {
-				mobs.add((LivingEntity)entity);
-			}
+			mobs.add((LivingEntity)entity);
 		}
 
 		return mobs;
