@@ -78,9 +78,8 @@ public enum Spells {
 	ENCHANTED_ARROW("Enchanted Arrow", Classes.SCOUT),
 
 	//--Ranger
-	QUICKSHOT("Quickshot", Classes.SCOUT),
+	QUICKDRAW("Quickdraw", Classes.SCOUT),
 	DISENGAGE("Disengage", Classes.SCOUT),
-	DEADEYE("Deadeye", Classes.SCOUT),
 	PRECISION_STRIKE("Precision Strike", Classes.SCOUT),
 
 	//Warlock

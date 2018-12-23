@@ -72,6 +72,9 @@ import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.scout.ranger.Disengage;
+import com.playmonumenta.plugins.abilities.scout.ranger.PrecisionStrike;
+import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
 import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
@@ -146,6 +149,11 @@ public class AbilityManager {
 		                          new EagleEye(mPlugin, mWorld, mRandom, null),
 		                          new ScoutPassive(mPlugin, mWorld, mRandom, null),
 
+		                          //RANGER
+		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
+		                          new Disengage(mPlugin, mWorld, mRandom, null),
+		                          new PrecisionStrike(mPlugin, mWorld, mRandom, null),
+
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
 		                          new CounterStrike(mPlugin, mWorld, mRandom, null),
@@ -157,7 +165,7 @@ public class AbilityManager {
 		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
 		                          // BERSERKER
 		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
-								  new GrowingRage(mPlugin, mWorld, mRandom, null),
+		                          new GrowingRage(mPlugin, mWorld, mRandom, null),
 		                          new Rampage(mPlugin, mWorld, mRandom, null),
 
 		                          // CLERIC

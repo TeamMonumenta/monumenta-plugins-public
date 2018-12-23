@@ -33,14 +33,14 @@ public class RangerSpecialization extends BaseSpecialization {
 		mWorld = world;
 	}
 
-	public static final String ARROW_QUICKSHOT_METAKEY = "ArrowQuickshotMetakey";
+	public static final String ARROW_QUICKDRAW_METAKEY = "ArrowQuickdrawMetakey";
 	public static final String PLAYER_DEADEYE_METAKEY = "PlayerDeadeyeMetakey";
 
 	@Override
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			if (InventoryUtils.isBowItem(itemInHand)) {
-				int quickshot = ScoreboardUtils.getScoreboardValue(player, "Quickshot");
+				int quickdraw = ScoreboardUtils.getScoreboardValue(player, "Quickdraw");
 				/*
 				 * Quickdraw: Left Clicking with a bow instantly
 				 * fires an arrow that deals 9 damage (+ any other
@@ -49,18 +49,18 @@ public class RangerSpecialization extends BaseSpecialization {
 				 * decreases the cooldown to 10 seconds and increases
 				 * the arrow damage to 12 + effects.
 				 */
-				if (quickshot > 0) {
-					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.QUICKSHOT)) {
+				if (quickdraw > 0) {
+					if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.QUICKDRAW)) {
 
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.25f);
 						mWorld.spawnParticle(Particle.CRIT, player.getEyeLocation().add(player.getLocation().getDirection()), 10, 0, 0, 0, 0.2f);
 						Arrow arrow = player.launchProjectile(Arrow.class);
-						double damage = quickshot == 1 ? 6 : 9;
-						arrow.setMetadata(ARROW_QUICKSHOT_METAKEY, new FixedMetadataValue(mPlugin, damage));
+						double damage = quickdraw == 1 ? 6 : 9;
+						arrow.setMetadata(ARROW_QUICKDRAW_METAKEY, new FixedMetadataValue(mPlugin, damage));
 						mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 
-						int cooldown = quickshot == 1 ? 20 * 12 : 20 * 10;
-						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.QUICKSHOT, cooldown);
+						int cooldown = quickdraw == 1 ? 20 * 12 : 20 * 10;
+						mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.QUICKDRAW, cooldown);
 					}
 				}
 			}
