@@ -1,41 +1,39 @@
-package com.playmonumenta.plugins.command.commands;
+package com.playmonumenta.plugins.rawcommands;
+
+import java.util.LinkedHashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.command.CommandSender;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import com.playmonumenta.plugins.command.AbstractCommand;
-import com.playmonumenta.plugins.command.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.sourceforge.argparse4j.inf.ArgumentParser;
+import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.CommandPermission;
+import io.github.jorelali.commandapi.api.arguments.Argument;
 
-public class UpdateApartments extends AbstractCommand {
-
-	public UpdateApartments(Plugin plugin) {
-		super(
-		    "updateApartments",
-		    "Updates player apartment scores",
-		    plugin
+public class UpdateApartments {
+	public static void register() {
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		CommandAPI.getInstance().register("updateapartments",
+		                                  CommandPermission.fromString("monumenta.command.updateapartments"),
+		                                  arguments,
+		                                  (sender, args) -> {
+											  run(sender);
+		                                  }
 		);
 	}
 
-	@Override
-	protected void configure(ArgumentParser parser) {
-	}
-
-	@Override
-	protected boolean run(CommandContext context) {
+	private static void run(CommandSender sender) throws CommandSyntaxException {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Objective aptObjective = scoreboard.getObjective("Apartment");
 		Objective aptIdleObjective = scoreboard.getObjective("AptIdle");
 
 		if (aptObjective == null) {
-			sendErrorMessage(context, "Scoreboard 'Apartment' does not exist!");
-			return false;
+			CommandAPI.fail("Scoreboard 'Apartment' does not exist!");
 		} else if (aptIdleObjective == null) {
-			sendErrorMessage(context, "Scoreboard 'AptIdle' does not exist!");
-			return false;
+			CommandAPI.fail("Scoreboard 'AptIdle' does not exist!");
 		}
 
 		for (String entry : scoreboard.getEntries()) {
@@ -60,7 +58,5 @@ public class UpdateApartments extends AbstractCommand {
 				aptObjective.getScore(entry).setScore(aptScore);
 			}
 		}
-
-		return true;
 	}
 }

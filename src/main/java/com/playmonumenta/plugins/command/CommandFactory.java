@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.command.commands.IncrementDaily;
 import com.playmonumenta.plugins.command.commands.TestNoScore;
 import com.playmonumenta.plugins.command.commands.TransferScores;
-import com.playmonumenta.plugins.command.commands.UpdateApartments;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
@@ -25,7 +24,6 @@ public class CommandFactory {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
 			createCommand(plugin, new IncrementDaily(plugin));
 			createCommand(plugin, new TransferScores(plugin));
-			createCommand(plugin, new UpdateApartments(plugin));
 
 			// Streamlined command for performance
 			plugin.getCommand("testNoScore").setExecutor(new TestNoScore());

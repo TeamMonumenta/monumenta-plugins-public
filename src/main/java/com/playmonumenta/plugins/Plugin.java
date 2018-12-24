@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.RefreshClass;
 import com.playmonumenta.plugins.rawcommands.RemoveTags;
 import com.playmonumenta.plugins.rawcommands.TransferServer;
+import com.playmonumenta.plugins.rawcommands.UpdateApartments;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.specializations.ArcanistSpecialization;
 import com.playmonumenta.plugins.specializations.AssassinSpecialization;
@@ -157,6 +158,7 @@ public class Plugin extends JavaPlugin {
 		Effect.register(this);
 		RemoveTags.register();
 		DeathMsg.register();
+		UpdateApartments.register();
 
 		mServerProperties.load(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {

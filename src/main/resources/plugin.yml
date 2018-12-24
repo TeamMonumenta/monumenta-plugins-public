@@ -13,6 +13,3 @@ commands:
   testnoscore:
     permission: monumenta.command.testnoscore
     description: Succeeds if no entry exists with a particular score on a scoreboard
-  updateapartments:
-    permission: monumenta.command.updateapartments
-    description: Updates player apartment scores
