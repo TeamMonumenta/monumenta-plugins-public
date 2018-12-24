@@ -4,7 +4,6 @@ import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.command.commands.IncrementDaily;
 import com.playmonumenta.plugins.command.commands.TestNoScore;
 import com.playmonumenta.plugins.command.commands.TransferScores;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
@@ -22,7 +21,6 @@ public class CommandFactory {
 	 */
 	public static void createCommands(JavaPlugin plugin, ServerProperties properties, World world, PotionManager potionManager) {
 		if (Constants.COMMANDS_SERVER_ENABLED) {
-			createCommand(plugin, new IncrementDaily(plugin));
 			createCommand(plugin, new TransferScores(plugin));
 
 			// Streamlined command for performance
