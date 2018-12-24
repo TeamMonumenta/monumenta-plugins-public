@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
@@ -349,16 +350,16 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static List<LivingEntity> getNearbyMobs(Location loc, double radius) {
+	public static List<Mob> getNearbyMobs(Location loc, double radius) {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
-	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
+	public static List<Mob> getNearbyMobs(Location loc, double rx, double ry, double rz) {
 		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
-		entities.removeIf(e -> !(e instanceof LivingEntity && isHostileMob(e)));
-		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
+		entities.removeIf(e -> !(e instanceof Mob && isHostileMob(e)));
+		List<Mob> mobs = new ArrayList<Mob>(entities.size());
 		for (Entity entity : entities) {
-			mobs.add((LivingEntity)entity);
+			mobs.add((Mob)entity);
 		}
 
 		return mobs;

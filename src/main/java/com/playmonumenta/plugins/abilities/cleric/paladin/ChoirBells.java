@@ -5,8 +5,7 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,13 +17,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-
-/*
-* Right-Clicking while sprinting causes the Paladin to become the target of any
-* undead within a conical area 8 blocks in front of them. Affected Undead are given
-* slowness II for 20s (level 1) and 8 damage and fire for 5 seconds (level 2).
-* Cooldown 30/20s
-*/
 
 /*
 * Right-Clicking while sprinting causes the Paladin to become the target of any
@@ -61,19 +53,20 @@ public class ChoirBells extends Ability {
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 8, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
 		Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHOIR_BELLS_RANGE)) {
-			if (EntityUtils.isUndead(le)) {
-				Vector toMobDirection = le.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
+		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHOIR_BELLS_RANGE)) {
+			if (EntityUtils.isUndead(mob)) {
+				Vector toMobDirection = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 				if (playerDirection.dot(toMobDirection) > CHOIR_BELLS_CONICAL_THRESHOLD) {
-					((Monster) le).setTarget(mPlayer);
-					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, CHOIR_BELLS_SLOWNESS_DURATION, CHOIR_BELLS_SLOWNESS_LEVEL, true, false));
+					mob.setTarget(mPlayer);
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, CHOIR_BELLS_SLOWNESS_DURATION, CHOIR_BELLS_SLOWNESS_LEVEL, true, false));
 					if (getAbilityScore() == 2) {
-						le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, CHOIR_BELLS_VULNERABILITY_DURATION, CHOIR_BELLS_VULNERABILITY_LEVEL, true, false));
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, CHOIR_BELLS_VULNERABILITY_DURATION, CHOIR_BELLS_VULNERABILITY_LEVEL, true, false));
 					}
 				}
 			}
 		}
 
+		putOnCooldown();
 		return true;
 	}
 }

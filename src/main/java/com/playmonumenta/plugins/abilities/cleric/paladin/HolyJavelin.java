@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.Color;
@@ -8,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -55,23 +58,37 @@ public class HolyJavelin extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 0.9f);
 		int damageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
 		int damage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
-		Location location = mPlayer.getEyeLocation();
+		Location playerLoc = mPlayer.getEyeLocation();
+		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
-		for (int i = 0; i < HOLY_JAVELIN_RANGE; i++) {
+
+		// Get a list of all the mobs this could possibly hit (that are within range of the player)
+		List<Mob> mobs = EntityUtils.getNearbyMobs(location, HOLY_JAVELIN_RANGE);
+
+		while (location.distance(playerLoc) < HOLY_JAVELIN_RANGE) {
 			location.add(increment);
 			mWorld.spawnParticle(Particle.REDSTONE, location, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), HOLY_JAVELIN_RADIUS)) {
-				if (EntityUtils.isHostileMob(le)) {
+
+			ListIterator<Mob> iter = mobs.listIterator();
+			while(iter.hasNext()){
+				LivingEntity le = iter.next();
+
+				if (le.getLocation().distance(location) < HOLY_JAVELIN_RADIUS) {
+					// Mob is close enough to be hit by the javelin.
 					if (EntityUtils.isUndead(le)) {
 						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
 					} else {
 						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					}
 					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+
+					// Remove the mob from the list so it can't be hit more than once
+					iter.remove();
 				}
 			}
+
 			if (location.getBlock().getType().isSolid()) {
 				location.subtract(increment.multiply(0.5));
 				mWorld.spawnParticle(Particle.CLOUD, location, 30, 0, 0, 0, 0.125f);
@@ -81,6 +98,7 @@ public class HolyJavelin extends Ability {
 			}
 		}
 
+		putOnCooldown();
 		return true;
 	}
 }
