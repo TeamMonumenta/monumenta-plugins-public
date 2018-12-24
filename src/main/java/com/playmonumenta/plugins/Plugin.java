@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.managers.ZoneManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.rawcommands.BroadcastCommand;
+import com.playmonumenta.plugins.rawcommands.DeathMsg;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
 import com.playmonumenta.plugins.rawcommands.Effect;
 import com.playmonumenta.plugins.rawcommands.GildifyHeldItem;
@@ -155,6 +156,7 @@ public class Plugin extends JavaPlugin {
 		RefreshClass.register(this);
 		Effect.register(this);
 		RemoveTags.register();
+		DeathMsg.register();
 
 		mServerProperties.load(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {

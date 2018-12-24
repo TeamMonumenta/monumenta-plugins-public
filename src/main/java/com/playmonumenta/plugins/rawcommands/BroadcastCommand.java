@@ -17,7 +17,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
 import io.github.jorelali.commandapi.api.arguments.SuggestedStringArgument;
 
-public class BroadcastCommand extends GenericCommand {
+public class BroadcastCommand {
 	private static final ImmutableList<String> ALLOWED_COMMANDS = ImmutableList.of(
 	            "whitelist",
 	            "ban",
