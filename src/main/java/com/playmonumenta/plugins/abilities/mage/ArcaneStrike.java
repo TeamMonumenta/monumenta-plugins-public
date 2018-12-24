@@ -33,8 +33,6 @@ public class ArcaneStrike extends Ability {
 
 	public ArcaneStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.scoreboardId = "ArcaneStrike";
 		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;

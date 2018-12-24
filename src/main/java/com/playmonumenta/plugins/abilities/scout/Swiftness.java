@@ -18,8 +18,6 @@ public class Swiftness extends Ability {
 
 	public Swiftness(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 6;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "Swiftness";
 	}
 

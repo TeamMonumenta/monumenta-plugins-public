@@ -29,8 +29,6 @@ public class ConsumingFlames extends Ability {
 
 	public ConsumingFlames(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 7;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "ConsumingFlames";
 		mInfo.linkedSpell = Spells.CONSUMING_FLAMES;
 		mInfo.cooldown = CONSUMING_FLAMES_COOLDOWN;

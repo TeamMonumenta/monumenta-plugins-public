@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ClericPassive extends Ability {
 
@@ -18,8 +19,11 @@ public class ClericPassive extends Ability {
 
 	public ClericPassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
+	}
+
+	@Override
+	public boolean canUse(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "Class") == 3;
 	}
 
 	@Override

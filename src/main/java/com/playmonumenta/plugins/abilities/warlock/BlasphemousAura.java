@@ -30,8 +30,6 @@ public class BlasphemousAura extends Ability {
 
 	public BlasphemousAura(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 7;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "BlasphemousAura";
 	}
 

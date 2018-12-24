@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class WarlockPassive extends Ability {
 
@@ -22,8 +23,11 @@ public class WarlockPassive extends Ability {
 
 	public WarlockPassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 7;
-		mInfo.specId = -1;
+	}
+
+	@Override
+	public boolean canUse(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "Class") == 7;
 	}
 
 	@Override

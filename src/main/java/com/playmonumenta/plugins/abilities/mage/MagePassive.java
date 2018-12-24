@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class MagePassive extends Ability {
 
@@ -19,8 +20,11 @@ public class MagePassive extends Ability {
 
 	public MagePassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
+	}
+
+	@Override
+	public boolean canUse(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, "Class") == 1;
 	}
 
 	@Override

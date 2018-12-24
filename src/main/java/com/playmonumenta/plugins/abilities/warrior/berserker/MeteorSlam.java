@@ -43,8 +43,6 @@ public class MeteorSlam extends Ability {
 
 	public MeteorSlam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = 11;
 		mInfo.linkedSpell = Spells.METEOR_SLAM;
 		mInfo.scoreboardId = "MeteorSlam";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!

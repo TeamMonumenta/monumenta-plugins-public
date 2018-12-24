@@ -42,8 +42,6 @@ public class AmplifyingHex extends Ability {
 
 	public AmplifyingHex(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 7;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "AmplifyingHex";
 		mInfo.linkedSpell = Spells.AMPLIFYING;
 		mInfo.cooldown = (getAbilityScore() == 1) ? AMPLIFYING_1_COOLDOWN : AMPLIFYING_2_COOLDOWN;

@@ -24,8 +24,6 @@ public class BrutalAlchemy extends Ability {
 
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
 	}
 

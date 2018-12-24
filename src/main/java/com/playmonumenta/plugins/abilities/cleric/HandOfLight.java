@@ -30,8 +30,6 @@ public class HandOfLight extends Ability {
 
 	public HandOfLight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.HEALING;
 		mInfo.scoreboardId = "Healing";
 		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;

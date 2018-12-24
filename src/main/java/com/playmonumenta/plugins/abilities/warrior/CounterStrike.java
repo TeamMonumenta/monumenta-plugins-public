@@ -20,8 +20,6 @@ public class CounterStrike extends Ability {
 
 	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "CounterStrike";
 	}
 

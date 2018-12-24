@@ -26,8 +26,6 @@ public class WindWalk extends Ability {
 
 	public WindWalk(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = 1;
 		mInfo.linkedSpell = Spells.WIND_WALK;
 		mInfo.scoreboardId = "WindWalk";
 		mInfo.cooldown = 20 * 14;

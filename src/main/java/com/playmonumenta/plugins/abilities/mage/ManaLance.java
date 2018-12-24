@@ -35,8 +35,6 @@ public class ManaLance extends Ability {
 
 	public ManaLance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.MANA_LANCE;
 		mInfo.scoreboardId = "ManaLance";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!

@@ -45,8 +45,6 @@ public class PrecisionStrike extends Ability {
 
 	public PrecisionStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 6;
-		mInfo.specId = 8;
 		mInfo.linkedSpell = Spells.PRECISION_STRIKE;
 		mInfo.scoreboardId = "PrecisionStrike";
 		mInfo.cooldown = PRECISION_STRIKE_COOLDOWN;

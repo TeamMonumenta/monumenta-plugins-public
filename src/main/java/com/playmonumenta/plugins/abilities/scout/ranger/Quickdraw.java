@@ -38,8 +38,6 @@ public class Quickdraw extends Ability {
 
 	public Quickdraw(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 6;
-		mInfo.specId = 8;
 		mInfo.linkedSpell = Spells.QUICKDRAW;
 		mInfo.scoreboardId = "Quickdraw";
 		mInfo.cooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;

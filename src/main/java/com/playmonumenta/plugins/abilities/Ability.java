@@ -180,11 +180,12 @@ public abstract class Ability {
 	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
 
 	//---------------------------------------------------------------------------------------------------------------
+	/*
+	 * By default, players can only use abilities if the ability has a scoreboard defined and it is nonzero
+	 * For different conditions, an ability must override this method
+	 */
 	public boolean canUse(Player player) {
-		AbilityInfo info = getInfo();
-		if (info.classId == ScoreboardUtils.getScoreboardValue(player, "Class")
-		    && (info.specId < 0 || info.specId == ScoreboardUtils.getScoreboardValue(player, "Specialization"))
-		    && (info.scoreboardId == null || ScoreboardUtils.getScoreboardValue(player, info.scoreboardId) > 0)) {
+		if (mInfo.scoreboardId == null && ScoreboardUtils.getScoreboardValue(player, mInfo.scoreboardId) > 0) {
 			return true;
 		}
 		return false;

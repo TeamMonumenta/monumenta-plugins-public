@@ -28,8 +28,6 @@ public class EnfeeblingElixir extends Ability {
 
 	public EnfeeblingElixir(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.scoreboardId = "EnfeeblingElixir";
 		mInfo.cooldown = ENFEEBLING_COOLDOWN;

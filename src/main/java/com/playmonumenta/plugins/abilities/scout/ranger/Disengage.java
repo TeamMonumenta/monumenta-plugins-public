@@ -40,8 +40,6 @@ public class Disengage extends Ability {
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 6;
-		mInfo.specId = 8;
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
 		mInfo.cooldown = DISENGAGE_COOLDOWN;

@@ -30,8 +30,6 @@ public class IronTincture extends Ability {
 
 	public IronTincture(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
 		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown

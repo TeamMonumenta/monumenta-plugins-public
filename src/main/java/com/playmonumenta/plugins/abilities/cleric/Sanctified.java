@@ -29,8 +29,6 @@ public class Sanctified extends Ability {
 
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "Sanctified";
 	}
 

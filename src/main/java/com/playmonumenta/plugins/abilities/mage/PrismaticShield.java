@@ -36,8 +36,6 @@ public class PrismaticShield extends Ability {
 
 	public PrismaticShield(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.scoreboardId = "Prismatic";
 		mInfo.cooldown = PRISMATIC_SHIELD_COOLDOWN;

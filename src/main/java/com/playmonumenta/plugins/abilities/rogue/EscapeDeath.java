@@ -37,8 +37,6 @@ public class EscapeDeath extends Ability {
 
 	public EscapeDeath(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.scoreboardId = "EscapeDeath";
 		mInfo.cooldown = ESCAPE_DEATH_COOLDOWN;

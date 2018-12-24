@@ -23,8 +23,6 @@ public class GruesomeAlchemy extends Ability {
 
 	public GruesomeAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = GRUESOME_ALCHEMY_SCOREBOARD;
 	}
 

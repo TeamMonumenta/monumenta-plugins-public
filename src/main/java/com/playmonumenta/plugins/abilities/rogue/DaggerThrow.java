@@ -34,8 +34,6 @@ public class DaggerThrow extends Ability {
 
 	public DaggerThrow(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.DAGGER_THROW;
 		mInfo.scoreboardId = "DaggerThrow";
 		mInfo.cooldown = DAGGER_THROW_COOLDOWN;

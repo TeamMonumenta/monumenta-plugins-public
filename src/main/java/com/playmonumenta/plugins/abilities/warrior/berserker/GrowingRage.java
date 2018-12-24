@@ -32,8 +32,6 @@ public class GrowingRage extends Ability {
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = 11;
 		mInfo.scoreboardId = "Growing Rage";
 	}
 

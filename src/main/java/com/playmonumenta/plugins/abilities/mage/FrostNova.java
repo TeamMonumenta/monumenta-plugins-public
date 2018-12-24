@@ -32,8 +32,6 @@ public class FrostNova extends Ability {
 
 	public FrostNova(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.FROST_NOVA;
 		mInfo.scoreboardId = "FrostNova";
 		mInfo.cooldown = FROST_NOVA_COOLDOWN;

@@ -32,8 +32,6 @@ public class Riposte extends Ability {
 
 	public Riposte(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 2;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.RIPOSTE;
 		mInfo.scoreboardId = "Obliteration";
 		mInfo.cooldown = RIPOSTE_COOLDOWN;

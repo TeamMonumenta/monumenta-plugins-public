@@ -28,8 +28,6 @@ public class ElementalArrows extends Ability {
 
 	public ElementalArrows(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.scoreboardId = "Elemental";
 	}

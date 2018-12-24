@@ -32,8 +32,6 @@ public class UnstableArrows extends Ability {
 
 	public UnstableArrows(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
 		mInfo.cooldown = UNSTABLE_ARROWS_COOLDOWN;

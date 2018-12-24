@@ -34,8 +34,6 @@ public class MagmaShield extends Ability {
 
 	public MagmaShield(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 1;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.scoreboardId = "Magma";
 		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;

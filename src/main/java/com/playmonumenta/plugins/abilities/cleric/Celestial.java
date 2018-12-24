@@ -31,8 +31,6 @@ public class Celestial extends Ability {
 
 	public Celestial(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.CELESTIAL_BLESSING;
 		mInfo.scoreboardId = "Celestial";
 		mInfo.cooldown = CELESTIAL_COOLDOWN;

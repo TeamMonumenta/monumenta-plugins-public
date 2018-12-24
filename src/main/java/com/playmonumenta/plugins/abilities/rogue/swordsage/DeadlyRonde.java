@@ -27,8 +27,6 @@ public class DeadlyRonde extends Ability {
 
 	public DeadlyRonde(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = 1;
 		mInfo.scoreboardId = "DeadlyRonde";
 	}
 

@@ -27,11 +27,6 @@ public class AbilityInfo {
 	 */
 	public boolean ignoreCooldown = false;
 
-	public int classId = 0;
-
-	//If the ability does not require a spec, input a negative number.
-	public int specId = -1;
-
 	public JsonObject getAsJsonObject() {
 		JsonObject info = new JsonObject();
 		if (scoreboardId != null) {
@@ -44,8 +39,6 @@ public class AbilityInfo {
 			info.addProperty("trigger", trigger.toString());
 		}
 		info.addProperty("cooldown", cooldown);
-		info.addProperty("classId", classId);
-		info.addProperty("specId", specId);
 
 		return info;
 	}

@@ -41,8 +41,6 @@ public class AdvancingShadows extends Ability {
 
 	public AdvancingShadows(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.ADVANCING_SHADOWS;
 		mInfo.scoreboardId = "AdvancingShadows";
 		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;

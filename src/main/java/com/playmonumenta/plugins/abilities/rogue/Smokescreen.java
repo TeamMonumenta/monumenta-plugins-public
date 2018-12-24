@@ -32,8 +32,6 @@ public class Smokescreen extends Ability {
 
 	public Smokescreen(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.SMOKESCREEN;
 		mInfo.scoreboardId = "SmokeScreen";
 		mInfo.cooldown = SMOKESCREEN_COOLDOWN;

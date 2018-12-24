@@ -22,8 +22,6 @@ public class Frenzy extends Ability {
 
 	public Frenzy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 2;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "Frenzy";
 	}
 

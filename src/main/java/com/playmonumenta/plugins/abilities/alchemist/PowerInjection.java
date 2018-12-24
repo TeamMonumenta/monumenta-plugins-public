@@ -28,8 +28,6 @@ public class PowerInjection extends Ability {
 
 	public PowerInjection(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.POWER_INJECTION;
 		mInfo.scoreboardId = "PowerInjection";
 		mInfo.cooldown = POWER_INJECTION_COOLDOWN;

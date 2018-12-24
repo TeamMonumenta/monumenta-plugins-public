@@ -34,8 +34,6 @@ public class CleansingRain extends Ability {
 
 	public CleansingRain(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.CLEANSING;
 		mInfo.scoreboardId = "Cleansing";
 		mInfo.cooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;

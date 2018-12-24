@@ -29,8 +29,6 @@ public class EagleEye extends Ability {
 
 	public EagleEye(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 6;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
 		mInfo.scoreboardId = "Tinkering";
 		mInfo.cooldown = EAGLE_EYE_COOLDOWN;

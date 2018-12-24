@@ -32,8 +32,6 @@ public class HeavenlyBoon extends Ability {
 
 	public HeavenlyBoon(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 3;
-		mInfo.specId = -1;
 		mInfo.scoreboardId = "HeavenlyBoon";
 	}
 

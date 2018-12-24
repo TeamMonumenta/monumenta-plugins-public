@@ -33,8 +33,6 @@ public class ByMyBlade extends Ability {
 
 	public ByMyBlade(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = -1;
 		mInfo.linkedSpell = Spells.BY_MY_BLADE;
 		mInfo.scoreboardId = "ByMyBlade";
 		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;

@@ -23,8 +23,6 @@ public class AlchemistPotions extends Ability {
 
 	public AlchemistPotions(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 5;
-		mInfo.specId = -1;
 	}
 
 	/*
@@ -33,8 +31,8 @@ public class AlchemistPotions extends Ability {
 	 */
 	@Override
 	public boolean canUse(Player player) {
-		return super.canUse(player) && (ScoreboardUtils.getScoreboardValue(player, BrutalAlchemy.BRUTAL_ALCHEMY_SCOREBOARD) > 0 ||
-		                                ScoreboardUtils.getScoreboardValue(player, GruesomeAlchemy.GRUESOME_ALCHEMY_SCOREBOARD) > 0);
+		return ScoreboardUtils.getScoreboardValue(player, BrutalAlchemy.BRUTAL_ALCHEMY_SCOREBOARD) > 0 ||
+		       ScoreboardUtils.getScoreboardValue(player, GruesomeAlchemy.GRUESOME_ALCHEMY_SCOREBOARD) > 0;
 	}
 
 	@Override

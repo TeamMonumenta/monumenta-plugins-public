@@ -40,8 +40,6 @@ public class BladeDance extends Ability {
 
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.classId = 4;
-		mInfo.specId = 1;
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
 		mInfo.cooldown = 20 * 40;
