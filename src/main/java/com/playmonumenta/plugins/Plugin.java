@@ -16,7 +16,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.command.CommandFactory;
+import com.playmonumenta.plugins.command.commands.TestNoScore;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
@@ -217,7 +217,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
-		CommandFactory.createCommands(this, mServerProperties, mWorld, mPotionManager);
+		// The last remaining Spigot-style command...
+		plugin.getCommand("testNoScore").setExecutor(new TestNoScore());
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
