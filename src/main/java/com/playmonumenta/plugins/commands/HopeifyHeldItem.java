@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.rawcommands;
+package com.playmonumenta.plugins.commands;
 
 import java.util.ArrayList;
 import java.util.List;

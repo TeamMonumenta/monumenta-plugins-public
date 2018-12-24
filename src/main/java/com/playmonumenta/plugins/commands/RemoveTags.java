@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.rawcommands;
+package com.playmonumenta.plugins.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
