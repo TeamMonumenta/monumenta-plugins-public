@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -62,13 +61,10 @@ public class Disengage extends Ability {
 
 	@Override
 	public boolean cast() {
-		for (Entity e : mPlayer.getNearbyEntities(DISENGAGE_STUN_RADIUS, DISENGAGE_STUN_RADIUS, DISENGAGE_STUN_RADIUS)) {
-			if (EntityUtils.isHostileMob(e)) {
-				LivingEntity le = (LivingEntity) e;
-				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
-				int damage = getAbilityScore() == 1 ? DISENGAGE_1_DAMAGE : DISENGAGE_2_DAMAGE;
-				EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-			}
+		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS)) {
+			EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
+			int damage = getAbilityScore() == 1 ? DISENGAGE_1_DAMAGE : DISENGAGE_2_DAMAGE;
+			EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 		}
 
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);

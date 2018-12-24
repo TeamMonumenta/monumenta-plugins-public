@@ -187,7 +187,6 @@ public class Plugin extends JavaPlugin {
 		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.RANGER.getId(), new RangerSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.PALADIN.getId(), new PaladinSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.HIEROPHANT.getId(), new HierophantSpecialization(this, mRandom, mWorld));
 		mSpecializationMap.put(ClassSpecialization.ELEMENTALIST.getId(), new ElementalistSpecialization(this, mRandom, mWorld));
