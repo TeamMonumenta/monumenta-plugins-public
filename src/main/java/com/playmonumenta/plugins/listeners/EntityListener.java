@@ -55,7 +55,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -141,6 +140,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	/* TODO: Specialization needed?
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void CustomDamageEvent(CustomDamageEvent event) {
@@ -154,6 +154,7 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
+	*/
 
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -172,15 +173,14 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
-				if (!mPlugin.getSpecialization(player).PlayerDamagedByLivingEntityEvent(player, event)) {
-					event.setCancelled(true);
-				}
 				if (!AbilityManager.getManager().PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
+				/* TODO: Specialization needed?
 				for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
 					mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
 				}
+				*/
 
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
@@ -188,19 +188,20 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			} else {
 				if (damager instanceof Projectile) {
-					Projectile proj = (Projectile) damager;
-
 					if (!AbilityManager.getManager().PlayerDamagedByProjectileEvent(player, event)) {
 						damager.remove();
 						event.setCancelled(true);
 					}
 
+					/* TODO: Specialization needed?
+					Projectile proj = (Projectile) damager;
 					if (proj.getShooter() instanceof LivingEntity) {
 						LivingEntity shooter = (LivingEntity) proj.getShooter();
 						for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
 							mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, shooter, event);
 						}
 					}
+					*/
 				}
 			}
 		} else {
@@ -239,25 +240,15 @@ public class EntityListener implements Listener {
 
 						AbilityManager.getManager().modifyDamage(player, event);
 
-						mPlugin.getSpecialization(player).LivingEntityDamagedByPlayerEvent(player, event);
-
 						if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
 							event.setCancelled(true);
 						}
-					}
-					if (damagee instanceof Player) {
-						// We don't damage players right?
-						event.setCancelled(true);
-						Player p = (Player) damagee;
-						mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, p);
 					}
 				}
 			} else if (damager instanceof Arrow) {
 				Arrow arrow = (Arrow)damager;
 				if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					Player player = (Player)arrow.getShooter();
-
-					mPlugin.getSpecialization(player).LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event);
 
 					if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 						damager.remove();
@@ -426,10 +417,6 @@ public class EntityListener implements Listener {
 			Arrow arrow = (Arrow)event.getEntity();
 			if (arrow.getShooter() instanceof Player) {
 				Player player = (Player)arrow.getShooter();
-				if (!mPlugin.getSpecialization(player).PlayerShotArrowEvent(player, arrow)) {
-					event.setCancelled(true);
-				}
-
 				if (!AbilityManager.getManager().PlayerShotArrowEvent(player, arrow)) {
 					arrow.remove();
 					event.setCancelled(true);

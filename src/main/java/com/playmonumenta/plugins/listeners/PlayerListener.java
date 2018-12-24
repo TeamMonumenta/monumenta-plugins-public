@@ -35,8 +35,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
@@ -83,7 +81,6 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -149,7 +146,6 @@ public class PlayerListener implements Listener {
 		}
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
-		mPlugin.getSpecialization(player).PlayerInteractEvent(player, action, item, mat);
 		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
 
 		// Left Click.
@@ -683,6 +679,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	/* TODO: Specialization needed?
 	// This serves as a workaround for damaging players since PVP has been toggled off. EntityDamgedByEntityEvent doesn't work for Player v Player
 	@EventHandler
 	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
@@ -703,6 +700,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
+	*/
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
@@ -741,7 +739,6 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void AbilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
-		mPlugin.getSpecialization(player).AbilityCastEvent(player, event);
 		AbilityManager.getManager().AbilityCastEvent(player, event);
 	}
 }

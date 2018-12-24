@@ -2,7 +2,6 @@ package com.playmonumenta.plugins;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -16,17 +15,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
-import com.playmonumenta.plugins.integrations.VotifierIntegration;
-import com.playmonumenta.plugins.items.ItemOverrides;
-import com.playmonumenta.plugins.listeners.EntityListener;
-import com.playmonumenta.plugins.listeners.MobListener;
-import com.playmonumenta.plugins.listeners.PlayerListener;
-import com.playmonumenta.plugins.listeners.SocketListener;
-import com.playmonumenta.plugins.listeners.VehicleListener;
-import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.managers.ZoneManager;
-import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
@@ -41,63 +29,27 @@ import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.commands.TransferScores;
 import com.playmonumenta.plugins.commands.TransferServer;
 import com.playmonumenta.plugins.commands.UpdateApartments;
+import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
+import com.playmonumenta.plugins.integrations.VotifierIntegration;
+import com.playmonumenta.plugins.items.ItemOverrides;
+import com.playmonumenta.plugins.listeners.EntityListener;
+import com.playmonumenta.plugins.listeners.MobListener;
+import com.playmonumenta.plugins.listeners.PlayerListener;
+import com.playmonumenta.plugins.listeners.SocketListener;
+import com.playmonumenta.plugins.listeners.VehicleListener;
+import com.playmonumenta.plugins.listeners.WorldListener;
+import com.playmonumenta.plugins.managers.ZoneManager;
+import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.specializations.ArcanistSpecialization;
-import com.playmonumenta.plugins.specializations.AssassinSpecialization;
-import com.playmonumenta.plugins.specializations.BaseSpecialization;
-import com.playmonumenta.plugins.specializations.ClassSpecialization;
-import com.playmonumenta.plugins.specializations.CyromancerSpecialization;
-import com.playmonumenta.plugins.specializations.ElementalistSpecialization;
-import com.playmonumenta.plugins.specializations.HierophantSpecialization;
-import com.playmonumenta.plugins.specializations.PaladinSpecialization;
-import com.playmonumenta.plugins.specializations.PyromancerSpecialization;
-import com.playmonumenta.plugins.specializations.ReaperSpecialization;
-import com.playmonumenta.plugins.specializations.SniperSpecialization;
-import com.playmonumenta.plugins.specializations.SwordsageSpecialization;
-import com.playmonumenta.plugins.specializations.TenebristSpecialization;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 
 public class Plugin extends JavaPlugin {
-	//  TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?
-	public enum Classes {
-		NONE(0),
-		MAGE(1),
-		WARRIOR(2),
-		CLERIC(3),
-		ROGUE(4),
-		ALCHEMIST(5),
-		SCOUT(6),
-		WARLOCK(7),
-
-		COUNT(7);   //  Please update when new classes are added!
-
-		private int value;
-		private Classes(int value)  {
-			this.value = value;
-		}
-		public int getValue()       {
-			return this.value;
-		}
-
-		public static Classes getClassById(int id) {
-			for (Classes cl : Classes.values()) {
-				if (cl != Classes.COUNT) {
-					if (cl.getValue() == id) {
-						return cl;
-					}
-				}
-			}
-			return NONE;
-		}
-	}
-
 	public enum Times {
 		ONE(1),
 		TWO(2),
@@ -114,7 +66,6 @@ public class Plugin extends JavaPlugin {
 		}
 	}
 
-	public HashMap<Integer, BaseSpecialization> mSpecializationMap = new HashMap<Integer, BaseSpecialization>();
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public CombatLoggingTimers mCombatLoggingTimers = null;
@@ -195,20 +146,6 @@ public class Plugin extends JavaPlugin {
 		_loadConfig();
 		mServerProperties.load(this);
 
-		//  Initialize Specializations
-		mSpecializationMap.put(ClassSpecialization.NONE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.SWORDSAGE.getId(), new SwordsageSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.ASSASSIN.getId(), new AssassinSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.PYROMANCER.getId(), new PyromancerSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.CYROMANCER.getId(), new CyromancerSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.REAPER.getId(), new ReaperSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.TENEBRIST.getId(), new TenebristSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.SNIPER.getId(), new SniperSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.PALADIN.getId(), new PaladinSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.HIEROPHANT.getId(), new HierophantSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.ELEMENTALIST.getId(), new ElementalistSpecialization(this, mRandom, mWorld));
-		mSpecializationMap.put(ClassSpecialization.ARCANIST.getId(), new ArcanistSpecialization(this, mRandom, mWorld));
-
 		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
@@ -250,13 +187,6 @@ public class Plugin extends JavaPlugin {
 					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
 
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
-						try {
-							BaseSpecialization pSpec = getSpecialization(player);
-							pSpec.PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
 						try {
 							AbilityManager.getManager().PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
 						} catch (Exception e) {
@@ -319,18 +249,6 @@ public class Plugin extends JavaPlugin {
 
 	public Player getPlayer(UUID playerID) {
 		return getServer().getPlayer(playerID);
-	}
-
-	public BaseSpecialization getSpecialization(Player player) {
-		if (Constants.SPECIALIZATIONS_ENABLED) {
-			int playerClass = ScoreboardUtils.getScoreboardValue(player, "Specialization");
-			if (playerClass >= 0 && playerClass <= ClassSpecialization.values().length) {
-				return mSpecializationMap.get(playerClass);
-			}
-		}
-
-		//  We Seem to be missing a class.
-		return mSpecializationMap.get(0);
 	}
 
 	public void incrementDailyVersion() {

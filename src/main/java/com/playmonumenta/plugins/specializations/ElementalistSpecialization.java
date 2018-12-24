@@ -243,12 +243,14 @@ public class ElementalistSpecialization extends BaseSpecialization {
 
 								int elementalSpirit = ScoreboardUtils.getScoreboardValue(player, "ElementalSpirit");
 
+								/* This code disabled because getSpecialization() no longer exists - need to use new ability system
 								BaseSpecialization spec = mPlugin.getSpecialization(player);
 								if (elementalSpirit < 0 || !player.isOnline()
 								    || !(spec instanceof ElementalistSpecialization)) {
 									this.cancel();
 									spirits.remove(player);
 								}
+								*/
 
 								if (!spirits.containsKey(player)) {
 									this.cancel();

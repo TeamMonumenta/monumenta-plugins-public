@@ -1,137 +1,129 @@
 package com.playmonumenta.plugins.classes;
 
-import com.playmonumenta.plugins.Plugin.Classes;
-
 public enum Spells {
 
 	//Mage
 
 	//--Core Abilities
-	MANA_LANCE("Mana Lance", Classes.MAGE),
-	FROST_NOVA("Frost Nova", Classes.MAGE),
-	PRISMATIC_SHIELD("Prismatic Shield", Classes.MAGE),
-	MAGMA_SHIELD("Magma Shield", Classes.MAGE),
-	ARCANE_STRIKE("Arcane Strike", Classes.MAGE),
-	ELEMENTAL_ARROWS("Elemental Arrows", Classes.MAGE),
+	MANA_LANCE("Mana Lance"),
+	FROST_NOVA("Frost Nova"),
+	PRISMATIC_SHIELD("Prismatic Shield"),
+	MAGMA_SHIELD("Magma Shield"),
+	ARCANE_STRIKE("Arcane Strike"),
+	ELEMENTAL_ARROWS("Elemental Arrows"),
 
 	//--Pyromancer Spec
-	INFERNO("Inferno", Classes.MAGE),
-	ASHEN_HEART("Ashen Heart", Classes.MAGE),
+	INFERNO("Inferno"),
+	ASHEN_HEART("Ashen Heart"),
 
 	//--Cyromancer Spec.
 
-	BLIZZARD("Blizzard", Classes.MAGE),
-	COLD_WAVE("Cold Wave", Classes.MAGE),
-	FROZEN_HEART("Frozen Heart", Classes.MAGE),
+	BLIZZARD("Blizzard"),
+	COLD_WAVE("Cold Wave"),
+	FROZEN_HEART("Frozen Heart"),
 
 	//--Elementalist Spec.
 
-	METEOR_STRIKE("Meteor Strike", Classes.MAGE),
-	ELEMENTAL_SPIRIT("Elemental Spirit", Classes.MAGE),
-	GLACIAL_RIFT("Glacial Rift", Classes.MAGE),
+	METEOR_STRIKE("Meteor Strike"),
+	ELEMENTAL_SPIRIT("Elemental Spirit"),
+	GLACIAL_RIFT("Glacial Rift"),
 
 	//--Arcanist Spec.
-	FSWORD("Flash Sword", Classes.MAGE),
+	FSWORD("Flash Sword"),
 
 	//Rogue
 
 	//--Core Abilities
-	BY_MY_BLADE("By My Blade", Classes.ROGUE),
-	ADVANCING_SHADOWS("Advancing Shadows", Classes.ROGUE),
-	DODGING("Dodging", Classes.ROGUE),
-	ESCAPE_DEATH("Escape Death", Classes.ROGUE),
-	SMOKESCREEN("Smokescreen", Classes.ROGUE),
-	DAGGER_THROW("Dagger Throw", Classes.ROGUE),
+	BY_MY_BLADE("By My Blade"),
+	ADVANCING_SHADOWS("Advancing Shadows"),
+	DODGING("Dodging"),
+	ESCAPE_DEATH("Escape Death"),
+	SMOKESCREEN("Smokescreen"),
+	DAGGER_THROW("Dagger Throw"),
 
 	//--Swordsage Spec.
-	SNAKE_HEAD("Snake Head", Classes.ROGUE),
-	BLADE_SURGE("Blade Surge", Classes.ROGUE),
-	BLADE_DANCE("Blade Dance", Classes.ROGUE),
-	WIND_WALK("Wind Walk", Classes.ROGUE),
+	SNAKE_HEAD("Snake Head"),
+	BLADE_SURGE("Blade Surge"),
+	BLADE_DANCE("Blade Dance"),
+	WIND_WALK("Wind Walk"),
 
 	//--Assassin Spec.
-	PERFECT_KILL("Perfect Kill", Classes.ROGUE),
+	PERFECT_KILL("Perfect Kill"),
 
 	//Cleric
 
 	//--Core Abilities
-	CELESTIAL_BLESSING("Celestial Blessing", Classes.CLERIC),
-	CLEANSING("Cleansing Rain", Classes.CLERIC),
-	HEALING("Hand of Light", Classes.CLERIC),
+	CELESTIAL_BLESSING("Celestial Blessing"),
+	CLEANSING("Cleansing Rain"),
+	HEALING("Hand of Light"),
 
 	//--Pally
-	HOLY_JAVELIN("Holy Javelin", Classes.CLERIC),
-	CHOIR_BELLS("Choir Bells", Classes.CLERIC),
-	LUMINOUS_INFUSION("Luminous Infusion", Classes.CLERIC),
+	HOLY_JAVELIN("Holy Javelin"),
+	CHOIR_BELLS("Choir Bells"),
+	LUMINOUS_INFUSION("Luminous Infusion"),
 
 	//--Hierophant
-	HALLOWED_BEAM("Hallowed Beam", Classes.CLERIC),
-	INCENSED_THURIBLE("Incensed Thurible", Classes.CLERIC),
+	HALLOWED_BEAM("Hallowed Beam"),
+	INCENSED_THURIBLE("Incensed Thurible"),
 
 	//Scout
 
 	//-- Core Abilities
-	VOLLEY("Volley", Classes.SCOUT),
-	EAGLE_EYE("Eagle Eye", Classes.SCOUT),
+	VOLLEY("Volley"),
+	EAGLE_EYE("Eagle Eye"),
 
 	//--Camper/Sniper
-	ENCHANTED_ARROW("Enchanted Arrow", Classes.SCOUT),
+	ENCHANTED_ARROW("Enchanted Arrow"),
 
 	//--Ranger
-	QUICKDRAW("Quickdraw", Classes.SCOUT),
-	DISENGAGE("Disengage", Classes.SCOUT),
-	PRECISION_STRIKE("Precision Strike", Classes.SCOUT),
+	QUICKDRAW("Quickdraw"),
+	DISENGAGE("Disengage"),
+	PRECISION_STRIKE("Precision Strike"),
 
 	//Warlock
 
 	//--Core Abilities
-	AMPLIFYING("Amplifying Hex", Classes.WARLOCK),
-	BLASPHEMY("Blasphemous Aura", Classes.WARLOCK),
-	SOUL_REND("Soul Rend", Classes.WARLOCK),
-	CONSUMING_FLAMES("Consuming Flames", Classes.WARLOCK),
-	GRASPING_CLAW("Grasping Claw", Classes.WARLOCK),
+	AMPLIFYING("Amplifying Hex"),
+	BLASPHEMY("Blasphemous Aura"),
+	SOUL_REND("Soul Rend"),
+	CONSUMING_FLAMES("Consuming Flames"),
+	GRASPING_CLAW("Grasping Claw"),
 
 	//--Reaper
-	DARK_ERUPTION("Dark Eruption", Classes.WARLOCK),
-	PETRIFYING_GLARE("Petrifying Glare", Classes.WARLOCK),
-	SOULREAPING("Soulreaping", Classes.WARLOCK),
+	DARK_ERUPTION("Dark Eruption"),
+	PETRIFYING_GLARE("Petrifying Glare"),
+	SOULREAPING("Soulreaping"),
 
 	//--Tenebrist
-	HYPNOTIC_RAGE("Hypnotic Rage", Classes.WARLOCK),
-	SABLE_SPHERE("Sable Sphere", Classes.WARLOCK),
-	BLACK_CLOUDS("Black Clouds", Classes.WARLOCK),
+	HYPNOTIC_RAGE("Hypnotic Rage"),
+	SABLE_SPHERE("Sable Sphere"),
+	BLACK_CLOUDS("Black Clouds"),
 
 	//Warrior
 
 	//--Core Abilites
-	RIPOSTE("Riposte", Classes.WARRIOR),
-	DEFENSIVE_LINE("Defensive Line", Classes.WARRIOR),
+	RIPOSTE("Riposte"),
+	DEFENSIVE_LINE("Defensive Line"),
 
 	//--Berserker
-	METEOR_SLAM("Meteor Slam", Classes.WARRIOR),
+	METEOR_SLAM("Meteor Slam"),
 
 	//Alchemist
-	POWER_INJECTION("Power Injection", Classes.ALCHEMIST),
-	GRUESOME_ALCHEMY("Gruesome Alchemy", Classes.ALCHEMIST),
-	PUTRID_FUMES("Putrid Fumes", Classes.ALCHEMIST),
-	CAUSTIC_BLADE("Caustic Blade", Classes.ALCHEMIST),
-	IRON_TINCTURE("Iron Tincture", Classes.ALCHEMIST),
-	ENFEEBLING_ELIXIR("Enfeebling Elixir", Classes.ALCHEMIST),
-	UNSTABLE_ARROWS("Unstable Arrows", Classes.ALCHEMIST);
+	POWER_INJECTION("Power Injection"),
+	GRUESOME_ALCHEMY("Gruesome Alchemy"),
+	PUTRID_FUMES("Putrid Fumes"),
+	CAUSTIC_BLADE("Caustic Blade"),
+	IRON_TINCTURE("Iron Tincture"),
+	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
+	UNSTABLE_ARROWS("Unstable Arrows");
 
 	private final String name;
-	private final Classes classes;
 
-	Spells(String name, Classes classes) {
+	Spells(String name) {
 		this.name = name;
-		this.classes = classes;
 	}
 
 	public String getName() {
 		return name;
-	}
-
-	public Classes getBelongingClass() {
-		return classes;
 	}
 }
