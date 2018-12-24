@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.point;
 
 import org.bukkit.Location;
+
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class AreaBounds {

@@ -1,16 +1,15 @@
 package com.playmonumenta.plugins.tracking;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class BoatTracking implements EntityTracking {
 	Plugin mPlugin = null;

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public class MovementUtils {

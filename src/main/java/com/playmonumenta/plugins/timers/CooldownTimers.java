@@ -1,9 +1,5 @@
 package com.playmonumenta.plugins.timers;
 
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -11,6 +7,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class CooldownTimers {
 	public HashMap<UUID, HashMap<Spells, Integer>> mTimers = null;

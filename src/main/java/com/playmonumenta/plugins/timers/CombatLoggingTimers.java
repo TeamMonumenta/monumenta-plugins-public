@@ -2,16 +2,15 @@ package com.playmonumenta.plugins.timers;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
-
-import java.util.UUID;
 
 //	TODO - Expand this to take in a "Timer Type" id as well so we can store multiple different types of
 //	timers for players in the future with this.

@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 public class ScoutPassive extends Ability {
 
 	private static float PASSIVE_ARROW_SAVE = 0.20f;
-	
+
 	public ScoutPassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.classId = 6;
@@ -62,7 +62,7 @@ public class ScoutPassive extends Ability {
 		}
 		return true;
 	}
-	
-	
-	
+
+
+
 }

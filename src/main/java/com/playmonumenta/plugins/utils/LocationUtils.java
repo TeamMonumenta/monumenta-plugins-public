@@ -1,17 +1,17 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.util.Vector;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
 
 public class LocationUtils {
 	public enum LocationType {

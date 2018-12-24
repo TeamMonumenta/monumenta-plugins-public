@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.items;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class FishingRodOverride extends OverrideItem {
 	@Override

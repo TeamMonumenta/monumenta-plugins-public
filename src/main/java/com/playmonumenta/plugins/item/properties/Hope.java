@@ -1,15 +1,15 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.lang.reflect.Field;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Item;
 import org.bukkit.Particle;
+import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Hope implements ItemProperty {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hope";

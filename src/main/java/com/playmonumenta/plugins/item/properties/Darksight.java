@@ -8,8 +8,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
 public class Darksight implements ItemProperty {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Darksight";

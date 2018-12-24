@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.items;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ChestUtils;
-
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.GameMode;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Location;
-import org.bukkit.Material;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ChestUtils;
 
 public class ChestOverride extends OverrideItem {
 	@Override

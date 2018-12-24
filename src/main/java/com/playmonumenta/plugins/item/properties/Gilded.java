@@ -1,19 +1,18 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Gilded implements ItemProperty {
 	private static final Particle.DustOptions GILDED_1_COLOR = new Particle.DustOptions(Color.fromRGB(191, 166, 51), 1.0f);

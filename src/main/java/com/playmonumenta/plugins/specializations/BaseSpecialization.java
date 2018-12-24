@@ -1,13 +1,8 @@
 package com.playmonumenta.plugins.specializations;
 
-import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.timers.CooldownTimers;
-
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,7 +14,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.timers.CooldownTimers;
 
 public class BaseSpecialization {
 

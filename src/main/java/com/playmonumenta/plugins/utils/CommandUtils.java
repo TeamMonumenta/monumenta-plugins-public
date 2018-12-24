@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Method;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.point.AreaBounds;
+import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class CommandUtils {

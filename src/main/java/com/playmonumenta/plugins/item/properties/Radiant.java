@@ -1,18 +1,18 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class Radiant implements ItemProperty {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Radiant";

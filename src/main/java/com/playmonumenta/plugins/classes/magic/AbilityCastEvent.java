@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.classes.magic;
 
-import com.playmonumenta.plugins.classes.Spells;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import com.playmonumenta.plugins.classes.Spells;
 
 public class AbilityCastEvent extends Event implements Cancellable {
 

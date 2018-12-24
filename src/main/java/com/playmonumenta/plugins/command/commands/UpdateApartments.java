@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.command.commands;
 
-import com.playmonumenta.plugins.command.AbstractCommand;
-import com.playmonumenta.plugins.command.CommandContext;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+
+import com.playmonumenta.plugins.command.AbstractCommand;
+import com.playmonumenta.plugins.command.CommandContext;
+
+import net.sourceforge.argparse4j.inf.ArgumentParser;
 
 public class UpdateApartments extends AbstractCommand {
 

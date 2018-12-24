@@ -13,7 +13,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class IceAspect implements ItemProperty {

@@ -1,15 +1,15 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.Random;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
 public class Toughness extends Ability {
 

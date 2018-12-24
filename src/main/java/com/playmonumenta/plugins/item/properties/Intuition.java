@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Intuition implements ItemProperty {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Intuition";

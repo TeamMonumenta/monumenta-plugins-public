@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.google.gson.JsonObject;
-
-import com.playmonumenta.plugins.classes.Spells;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.JsonObject;
 
 public class AbilityCollection {
 	private Map<Class<?>, Ability> mAbilities = new HashMap<Class<?>, Ability>();

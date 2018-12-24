@@ -1,11 +1,16 @@
 package com.playmonumenta.plugins.command;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.command.commands.*;
-import com.playmonumenta.plugins.managers.potion.PotionManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.command.commands.DeathMsg;
+import com.playmonumenta.plugins.command.commands.IncrementDaily;
+import com.playmonumenta.plugins.command.commands.TestNoScore;
+import com.playmonumenta.plugins.command.commands.TransferScores;
+import com.playmonumenta.plugins.command.commands.UpdateApartments;
+import com.playmonumenta.plugins.managers.potion.PotionManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 public class CommandFactory {
 

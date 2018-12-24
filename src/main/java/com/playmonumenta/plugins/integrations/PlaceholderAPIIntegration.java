@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.integrations;
 
+import org.bukkit.entity.Player;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	Plugin mPlugin;

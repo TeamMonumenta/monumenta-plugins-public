@@ -1,7 +1,22 @@
 package com.playmonumenta.plugins;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.command.*;
+import com.playmonumenta.plugins.command.CommandFactory;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.items.ItemOverrides;
@@ -11,8 +26,8 @@ import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.managers.ZoneManager;
+import com.playmonumenta.plugins.managers.potion.PotionManager;
 import com.playmonumenta.plugins.rawcommands.BroadcastCommand;
 import com.playmonumenta.plugins.rawcommands.DebugInfo;
 import com.playmonumenta.plugins.rawcommands.Effect;
@@ -23,7 +38,19 @@ import com.playmonumenta.plugins.rawcommands.RefreshClass;
 import com.playmonumenta.plugins.rawcommands.RemoveTags;
 import com.playmonumenta.plugins.rawcommands.TransferServer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.specializations.*;
+import com.playmonumenta.plugins.specializations.ArcanistSpecialization;
+import com.playmonumenta.plugins.specializations.AssassinSpecialization;
+import com.playmonumenta.plugins.specializations.BaseSpecialization;
+import com.playmonumenta.plugins.specializations.ClassSpecialization;
+import com.playmonumenta.plugins.specializations.CyromancerSpecialization;
+import com.playmonumenta.plugins.specializations.ElementalistSpecialization;
+import com.playmonumenta.plugins.specializations.HierophantSpecialization;
+import com.playmonumenta.plugins.specializations.PaladinSpecialization;
+import com.playmonumenta.plugins.specializations.PyromancerSpecialization;
+import com.playmonumenta.plugins.specializations.ReaperSpecialization;
+import com.playmonumenta.plugins.specializations.SniperSpecialization;
+import com.playmonumenta.plugins.specializations.SwordsageSpecialization;
+import com.playmonumenta.plugins.specializations.TenebristSpecialization;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
@@ -32,24 +59,6 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.Random;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.GameMode;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.World;
 
 public class Plugin extends JavaPlugin {
 	//  TODO: Remove all Class related information out of Plugin and into it's own class "ClassManager" maybe?

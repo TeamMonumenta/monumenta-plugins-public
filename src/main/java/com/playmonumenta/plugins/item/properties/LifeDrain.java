@@ -1,17 +1,17 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.Particle;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class LifeDrain implements ItemProperty {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Life Drain";

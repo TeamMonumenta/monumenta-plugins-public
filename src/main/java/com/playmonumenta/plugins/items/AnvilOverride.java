@@ -1,19 +1,19 @@
 package com.playmonumenta.plugins.items;
 
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
-import org.bukkit.block.Block;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.GameMode;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.Sound;
 
 public class AnvilOverride extends OverrideItem {
 	final static String REPAIR_OBJECTIVE = "RepairT";

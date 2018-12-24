@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.network.packet;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.PacketUtils;
-
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.PacketUtils;
 
 public class ForwardErrorPacket implements Packet {
 	public static final String StaticPacketChannel = "Monumenta.Bungee.Error.Forward";

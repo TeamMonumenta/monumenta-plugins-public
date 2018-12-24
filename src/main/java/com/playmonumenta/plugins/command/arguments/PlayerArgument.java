@@ -1,11 +1,12 @@
 package com.playmonumenta.plugins.command.arguments;
 
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.ArgumentType;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Player type conversion for the argument parser.

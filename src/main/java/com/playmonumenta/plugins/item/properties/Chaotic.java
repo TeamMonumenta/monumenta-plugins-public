@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Chaotic implements ItemProperty {

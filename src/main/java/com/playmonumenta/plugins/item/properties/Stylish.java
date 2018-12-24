@@ -8,7 +8,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Stylish implements ItemProperty {

@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.Plugin;
-
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
 
 public class ParticleUtils {
 	public static void explodingSphereEffect(Plugin plugin, Player player, float radius, Particle type1, double percent1, Particle type2, double percent2) {

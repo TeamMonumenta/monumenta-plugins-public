@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.command.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.command.AbstractPlayerCommand;
 import com.playmonumenta.plugins.command.CommandContext;
-import net.sourceforge.argparse4j.inf.*;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import org.bukkit.plugin.Plugin;
+
+import net.sourceforge.argparse4j.inf.ArgumentParser;
 
 public class DeathMsg extends AbstractPlayerCommand {
 

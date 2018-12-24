@@ -1,20 +1,20 @@
 package com.playmonumenta.plugins.item.properties;
 
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
-import com.playmonumenta.plugins.Plugin;
-
 import java.util.EnumSet;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.Sound;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Thunder implements ItemProperty {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";

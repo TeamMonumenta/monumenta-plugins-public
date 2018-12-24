@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities;
 
 import com.google.gson.JsonObject;
-
 import com.playmonumenta.plugins.classes.Spells;
 
 /**

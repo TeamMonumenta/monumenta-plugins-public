@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.command;
 
-import net.sourceforge.argparse4j.inf.Namespace;
+import java.util.Optional;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class CommandContext {

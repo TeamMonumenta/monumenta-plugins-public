@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.player.PlayerData;
-import com.playmonumenta.plugins.utils.PacketUtils;
 import com.playmonumenta.plugins.utils.NetworkUtils;
+import com.playmonumenta.plugins.utils.PacketUtils;
 
 public class TransferPlayerDataPacket implements Packet {
 	public static final String StaticPacketChannel = "Monumenta.Bungee.Forward.TransferPlayerData";

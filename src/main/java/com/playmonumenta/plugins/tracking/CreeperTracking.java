@@ -9,8 +9,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
-import com.playmonumenta.plugins.utils.ParticleUtils;
-
 public class CreeperTracking implements EntityTracking {
 	private Set<Creeper> mEntities = new HashSet<Creeper>();
 

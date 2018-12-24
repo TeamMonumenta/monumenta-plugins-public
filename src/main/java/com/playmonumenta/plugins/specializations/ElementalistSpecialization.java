@@ -1,32 +1,32 @@
 package com.playmonumenta.plugins.specializations;
 
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.specializations.objects.ElementalSpirit;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
-import org.bukkit.World;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.specializations.objects.ElementalSpirit;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ElementalistSpecialization extends BaseSpecialization {
 

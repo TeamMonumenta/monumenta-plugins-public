@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.timers;
 
-import com.playmonumenta.plugins.utils.ParticleUtils;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 
 public class ProjectileEffectTimers {
 	private World mWorld;
