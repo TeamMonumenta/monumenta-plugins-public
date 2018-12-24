@@ -47,7 +47,6 @@ public class ManaLance extends Ability {
 	@Override
 	public boolean cast() {
 		int manaLance = getAbilityScore();
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
 		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 

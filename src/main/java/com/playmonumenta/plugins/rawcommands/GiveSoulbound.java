@@ -21,6 +21,7 @@ import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.Entity
 import io.github.jorelali.commandapi.api.arguments.ItemStackArgument;
 
 public class GiveSoulbound extends GenericCommand {
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.givesoulbound");
 

@@ -13,7 +13,6 @@ import org.bukkit.potion.PotionEffectType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
@@ -30,11 +29,9 @@ public class PotionMap {
 	// Type of this particular map
 	private final PotionEffectType mType;
 
-	private final Plugin mPlugin;
 	private final boolean mIsNegative;
 
-	public PotionMap(Plugin plugin, PotionEffectType type) {
-		mPlugin = plugin;
+	public PotionMap(PotionEffectType type) {
 		mPotionMap = new EnumMap<PotionID, TreeMap<Integer, PotionInfo>>(PotionID.class);
 		mType = type;
 		mIsNegative = PotionUtils.hasNegativeEffects(type);

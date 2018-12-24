@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -34,7 +33,6 @@ public class WeaponryMastery extends Ability {
 		// The extra damage that will be applied to the hit damagee at the end of this function
 		double extraDamage = 0;
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		LivingEntity damagee = (LivingEntity) event.getEntity();
 
 		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
 			extraDamage += (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;

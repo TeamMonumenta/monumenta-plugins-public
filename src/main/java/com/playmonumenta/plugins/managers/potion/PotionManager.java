@@ -14,13 +14,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class PotionManager {
-	Plugin mPlugin = null;
 	//  Player ID / Player Potion Info
-	public HashMap<UUID, PlayerPotionInfo> mPotionManager;
+	public HashMap<UUID, PlayerPotionInfo> mPlayerPotions = new HashMap<UUID, PlayerPotionInfo>();
 
 	public enum PotionID {
 		APPLIED_POTION(0, "APPLIED_POTION"),
@@ -60,12 +58,6 @@ public class PotionManager {
 		}
 	}
 
-	public PotionManager(Plugin plugin) {
-		mPlugin = plugin;
-		mPotionManager = new HashMap<UUID, PlayerPotionInfo>();
-	}
-
-
 	public void addPotion(Player player, PotionID id, Collection<PotionEffect> effects, double intensity) {
 		for (PotionEffect effect : effects) {
 			addPotion(player, id, effect, intensity);
@@ -92,19 +84,19 @@ public class PotionManager {
 		    && !info.type.equals(PotionEffectType.HEAL)) {
 
 			UUID uuid = player.getUniqueId();
-			PlayerPotionInfo potionInfo = mPotionManager.get(uuid);
+			PlayerPotionInfo potionInfo = mPlayerPotions.get(uuid);
 			if (potionInfo != null) {
 				potionInfo.addPotionInfo(player, id, info);
 			} else {
-				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo(mPlugin);
+				PlayerPotionInfo newPotionInfo = new PlayerPotionInfo();
 				newPotionInfo.addPotionInfo(player, id, info);
-				mPlugin.mPotionManager.mPotionManager.put(uuid, newPotionInfo);
+				mPlayerPotions.put(uuid, newPotionInfo);
 			}
 		}
 	}
 
 	public void removePotion(Player player, PotionID id, PotionEffectType type) {
-		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.removePotionInfo(player, id, type);
 		}
@@ -112,7 +104,7 @@ public class PotionManager {
 
 
 	public void clearAllPotions(Player player) {
-		mPotionManager.remove(player.getUniqueId());
+		mPlayerPotions.remove(player.getUniqueId());
 
 		// Make a copy of the list to prevent ConcurrentModificationException's
 		for (PotionEffect type : new ArrayList<PotionEffect>(player.getActivePotionEffects())) {
@@ -121,14 +113,14 @@ public class PotionManager {
 	}
 
 	public void clearPotionIDType(Player player, PotionID id) {
-		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.clearPotionIDType(player, id);
 		}
 	}
 
 	public void clearPotionEffectType(Player player, PotionEffectType type) {
-		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.clearPotionEffectType(player, type);
 		}
@@ -136,14 +128,14 @@ public class PotionManager {
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
-		PlayerPotionInfo potionInfo = mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
 		if (potionInfo != null) {
 			potionInfo.updatePotionStatus(player, ticks);
 		}
 	}
 
 	public JsonObject getAsJsonObject(Player player) {
-		PlayerPotionInfo info = mPotionManager.get(player.getUniqueId());
+		PlayerPotionInfo info = mPlayerPotions.get(player.getUniqueId());
 		if (info != null) {
 			return info.getAsJsonObject();
 		}
@@ -156,15 +148,15 @@ public class PotionManager {
 		if (potionInfo != null) {
 			clearAllPotions(player);
 
-			PlayerPotionInfo info = new PlayerPotionInfo(mPlugin);
+			PlayerPotionInfo info = new PlayerPotionInfo();
 			info.loadFromJsonObject(potionInfo.getAsJsonObject());
 
-			mPotionManager.put(player.getUniqueId(), info);
+			mPlayerPotions.put(player.getUniqueId(), info);
 		}
 	}
 
 	public void loadFromPlayer(Player player) {
-		mPotionManager.remove(player.getUniqueId());
+		mPlayerPotions.remove(player.getUniqueId());
 
 		for (PotionEffect type : player.getActivePotionEffects()) {
 			/*

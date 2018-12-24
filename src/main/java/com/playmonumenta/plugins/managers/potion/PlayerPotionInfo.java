@@ -10,25 +10,19 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class PlayerPotionInfo {
 	//  Effect Type / Potion List
 	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
-	private final Plugin mPlugin;
-
-	public PlayerPotionInfo(Plugin plugin) {
-		mPlugin = plugin;
-	}
 
 	public void addPotionInfo(Player player, PotionID id, PotionInfo info) {
 		PotionMap type = mPotionInfo.get(info.type);
 		if (type != null) {
 			type.addPotionMap(player, id, info);
 		} else {
-			PotionMap newMap = new PotionMap(mPlugin, info.type);
+			PotionMap newMap = new PotionMap(info.type);
 			newMap.addPotionMap(player, id, info);
 			mPotionInfo.put(info.type, newMap);
 		}
@@ -91,7 +85,7 @@ public class PlayerPotionInfo {
 		Set<Entry<String, JsonElement>> potionInfo = object.entrySet();
 		for (Entry<String, JsonElement> info : potionInfo) {
 			PotionEffectType type = PotionEffectType.getByName(info.getKey());
-			PotionMap map = new PotionMap(mPlugin, type);
+			PotionMap map = new PotionMap(type);
 
 			JsonElement mapElement = info.getValue();
 			if (mapElement != null) {

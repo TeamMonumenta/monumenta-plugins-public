@@ -178,7 +178,7 @@ public class Plugin extends JavaPlugin {
 		mWorld = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
 
-		mPotionManager = new PotionManager(this);
+		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new ZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);

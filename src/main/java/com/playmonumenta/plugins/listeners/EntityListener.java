@@ -525,7 +525,7 @@ public class EntityListener implements Listener {
 
 		// Class effects from splashing potion
 		if (source instanceof Player) {
-			Player player = (Player)source;
+			//Player player = (Player)source;
 
 			//mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
 		}

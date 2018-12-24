@@ -40,7 +40,6 @@ public class BroadcastCommand extends GenericCommand {
 	            "setblock"
 	        );
 
-	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("command", new SuggestedStringArgument(ALLOWED_COMMANDS));

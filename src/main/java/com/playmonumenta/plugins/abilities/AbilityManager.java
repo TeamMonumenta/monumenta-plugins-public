@@ -204,6 +204,7 @@ public class AbilityManager {
 		return mManager;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void updatePlayerAbilities(Player player) {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
