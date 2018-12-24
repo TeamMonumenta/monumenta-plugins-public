@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.rawcommands.HopeifyHeldItem;
 import com.playmonumenta.plugins.rawcommands.IncrementDaily;
 import com.playmonumenta.plugins.rawcommands.RefreshClass;
 import com.playmonumenta.plugins.rawcommands.RemoveTags;
+import com.playmonumenta.plugins.rawcommands.TransferScores;
 import com.playmonumenta.plugins.rawcommands.TransferServer;
 import com.playmonumenta.plugins.rawcommands.UpdateApartments;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -161,6 +162,7 @@ public class Plugin extends JavaPlugin {
 		DeathMsg.register();
 		UpdateApartments.register();
 		IncrementDaily.register(this);
+		TransferScores.register(this);
 
 		mServerProperties.load(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {

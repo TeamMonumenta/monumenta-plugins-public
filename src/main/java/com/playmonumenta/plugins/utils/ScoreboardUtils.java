@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.utils;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +17,7 @@ import org.bukkit.scoreboard.Team;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 
 public class ScoreboardUtils {
 	public static final String[] NOT_TRANSFERRED_OBJECTIVES_VALS =
@@ -267,13 +267,12 @@ public class ScoreboardUtils {
 		}
 	}
 
-	public static void transferPlayerScores(String from, String to) throws Exception {
-		List<Player> players = Bukkit.getWorlds().get(0).getPlayers();
+	public static void transferPlayerScores(Plugin plugin, String from, Player to) throws Exception {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Set<Objective> objectives = scoreboard.getObjectives();
 
 		boolean fromPlayerExist = scoreboard.getEntries().contains(from);
-		boolean toPlayerExist = scoreboard.getEntries().contains(to);
+		boolean toPlayerExist = scoreboard.getEntries().contains(to.getName());
 
 		if (!fromPlayerExist) {
 			throw new Exception("Old player scoreboard does not exist. Have they ever been on the server or was the name typed incorrectly?");
@@ -283,34 +282,25 @@ public class ScoreboardUtils {
 			throw new Exception("New player scoreboard does not exist. Have they ever been on the server or was the name typed incorrectly?");
 		}
 
-		//  Additionally to prevent any potential fuck ups by people using this....we want to make sure the from player is offline
-		//  and to too player is online...
-		boolean fromPlayerOffline = true;
-		boolean toPlayerOnline = false;
+		// Additionally to prevent any potential fuck ups by people using this....we want to make sure the from player is offline
+		// and the 'to' player is online...
 
-		for (Player player : players) {
-			if (fromPlayerOffline == true && player.getName().contains(from)) {
-				fromPlayerOffline = false;
-			} else if (toPlayerOnline == false && player.getName().contains(to)) {
-				toPlayerOnline = true;
-			}
-
-			if (fromPlayerOffline == false && toPlayerOnline == true) {
-				break;
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getName().equals(from) || !to.isOnline()) {
+				throw new Exception("Can only transfer scores from an offline player to an online player. (To prevent accidently breaking people)");
 			}
 		}
 
-		if (!fromPlayerOffline || !toPlayerOnline) {
-			throw new Exception("Can only transfer scores from an offline player to an online player. (To prevent accidently breaking people)");
-		}
-
-		//  Transfer Scoreboards from the old name to the new name!
+		// Transfer Scoreboards from the old name to the new name!
 		for (Objective objective : objectives) {
-			Score toScore = objective.getScore(to);
+			Score toScore = objective.getScore(to.getName());
 			Score fromScore = objective.getScore(from);
 			if (toScore != null && fromScore != null) {
 				toScore.setScore(fromScore.getScore());
 			}
 		}
+
+		// Reset the 'from' player's scores if everything went well up to this point
+		NetworkUtils.broadcastCommand(plugin, "scoreboard players reset " + from);
 	}
 }

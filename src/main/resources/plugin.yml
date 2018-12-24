@@ -4,9 +4,6 @@ version: 0.0.1
 api-version: 1.13
 softdepend: [PlaceholderAPI,Votifier]
 commands:
-  transferScores:
-    permission: monumenta.command.transferScores
-    description: Transfers Scoreboard values between one offline player to an online player. This is used to fix players changing names.
   testnoscore:
     permission: monumenta.command.testnoscore
     description: Succeeds if no entry exists with a particular score on a scoreboard
