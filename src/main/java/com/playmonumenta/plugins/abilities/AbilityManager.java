@@ -47,6 +47,9 @@ import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.Sanctified;
+import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
+import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
+import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
@@ -177,6 +180,10 @@ public class AbilityManager {
 		                          new HeavenlyBoon(mPlugin, mWorld, mRandom, null),
 		                          new Rejuvenation(mPlugin, mWorld, mRandom, null),
 		                          new Sanctified(mPlugin, mWorld, mRandom, null),
+		                          // PALADIN
+		                          new HolyJavelin(mPlugin, mWorld, mRandom, null),
+		                          new ChoirBells(mPlugin, mWorld, mRandom, null),
+		                          new LuminousInfusion(mPlugin, mWorld, mRandom, null),
 
 		                          //WARLOCK
 		                          new AmplifyingHex(mPlugin, mWorld, mRandom, null),

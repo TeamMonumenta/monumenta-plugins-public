@@ -1,0 +1,86 @@
+package com.playmonumenta.plugins.abilities.cleric.paladin;
+
+import java.util.Random;
+
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
+/*
+* Attacking while sprinting throws a spear of light in a 12 block line, dealing
+* 10/15 damage to undead and 5/10 damage to all others, also lights all targets
+* on fire for 5s. (10s/8s cooldown)
+*/
+
+public class HolyJavelin extends Ability {
+
+	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 150), 1.0f);
+	private static final double HOLY_JAVELIN_RADIUS = 0.65;
+	private static final int HOLY_JAVELIN_RANGE = 12;
+	private static final int HOLY_JAVELIN_1_UNDEAD_DAMAGE = 10;
+	private static final int HOLY_JAVELIN_2_UNDEAD_DAMAGE = 15;
+	private static final int HOLY_JAVELIN_1_DAMAGE = 5;
+	private static final int HOLY_JAVELIN_2_DAMAGE = 10;
+	private static final int HOLY_JAVELIN_FIRE_DURATION = 5 * 20;
+	private static final int HOLY_JAVELIN_1_COOLDOWN = 10 * 20;
+	private static final int HOLY_JAVELIN_2_COOLDOWN = 8 * 20;
+
+	public HolyJavelin(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
+		mInfo.scoreboardId = "HolyJavelin";
+		mInfo.cooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+	}
+
+	@Override
+	public boolean runCheck() {
+		return mPlayer.isSprinting();
+	}
+
+	@Override
+	public boolean cast() {
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 0.9f);
+		int damageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
+		int damage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
+		Location location = mPlayer.getEyeLocation();
+		Vector increment = location.getDirection();
+		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
+		for (int i = 0; i < HOLY_JAVELIN_RANGE; i++) {
+			location.add(increment);
+			mWorld.spawnParticle(Particle.REDSTONE, location, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), HOLY_JAVELIN_RADIUS)) {
+				if (EntityUtils.isHostileMob(le)) {
+					if (EntityUtils.isUndead(le)) {
+						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
+					} else {
+						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+					}
+					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+				}
+			}
+			if (location.getBlock().getType().isSolid()) {
+				location.subtract(increment.multiply(0.5));
+				mWorld.spawnParticle(Particle.CLOUD, location, 30, 0, 0, 0, 0.125f);
+				mWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				mWorld.playSound(location, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+				break;
+			}
+		}
+
+		return true;
+	}
+}
