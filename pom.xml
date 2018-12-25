@@ -93,6 +93,12 @@
             <version>2.3.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>de.jeffclan</groupId>
+            <artifactId>JeffChestSort</artifactId>
+            <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
