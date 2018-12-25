@@ -30,6 +30,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.BrewEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -59,6 +61,7 @@ import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -72,6 +75,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.server.reset.DailyReset;
@@ -298,10 +302,40 @@ public class PlayerListener implements Listener {
 	// If an inventory interaction happened.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
-		Inventory inventory = event.getInventory();
-		InventoryHolder holder = inventory.getHolder();
-		if (holder != null && holder instanceof Player) {
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player)holder);
+		if (JeffChestSortIntegration.isPresent()) {
+			if (event.getWhoClicked() instanceof Player) {
+				Player player = (Player)event.getWhoClicked();
+				Inventory inventory = event.getClickedInventory();
+				if (inventory instanceof PlayerInventory) {
+					// Don't sort player inventories until support is added
+					// to prevent sorting hotbar / armor slots
+					return;
+				}
+				if (event.getClick().equals(ClickType.RIGHT) &&
+						inventory.getItem(event.getSlot()) == null &&
+						event.getAction().equals(InventoryAction.NOTHING)) {
+
+					// Player right clicked an empty space and nothing happened
+					// Check if the last thing the player did was also the same thing.
+					// If so, sort the chest
+					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+						JeffChestSortIntegration.sortInventory(inventory);
+						player.updateInventory();
+						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+
+						// Just in case we sorted an item on top of where the player was clicking
+						event.setCancelled(true);
+					} else {
+						// Mark the player as having right clicked an empty slot
+						player.setMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, new FixedMetadataValue(mPlugin, 1));
+					}
+				} else {
+					// Player did something else with this inventory - clear the right click metadata if present
+					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+					}
+				}
+			}
 		}
 	}
 
@@ -310,6 +344,11 @@ public class PlayerListener implements Listener {
 	public void InventoryOpenEvent(InventoryOpenEvent event) {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
+
+			// Clear the player's sorting flag if present
+			if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+				player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+			}
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
@@ -330,6 +369,11 @@ public class PlayerListener implements Listener {
 		InventoryHolder holder = inventory.getHolder();
 		if (holder != null && holder instanceof Player) {
 			Player player = (Player)holder;
+
+			// Clear the player's sorting flag if present
+			if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+				player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+			}
 
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
