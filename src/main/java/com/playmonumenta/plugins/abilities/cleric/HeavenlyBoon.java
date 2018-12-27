@@ -101,6 +101,11 @@ public class HeavenlyBoon extends Ability {
 			return true;
 		}
 
+		if (event.isCancelled()) {
+			//Another cleric already spread this potion
+			return false;
+		}
+
 		if (event.getIntensity(mPlayer) >= HEAVENLY_BOON_TRIGGER_INTENSITY) {
 			/* If within range, apply full strength of all potion effects to all nearby players */
 
@@ -118,6 +123,7 @@ public class HeavenlyBoon extends Ability {
 				/* Remove this player from the "usual" application of potion effects */
 				affectedEntities.remove(p);
 			}
+			return false;
 		}
 
 		return true;

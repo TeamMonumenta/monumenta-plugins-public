@@ -53,6 +53,11 @@ public class Dodging extends Ability {
 
 	@Override
 	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
+		// Don't proc on Fire Aspect
+		if (!(event.getCombuster() instanceof Projectile)) {
+			return true;
+		}
+
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (!_dodge()) {
 			return true;
@@ -67,13 +72,14 @@ public class Dodging extends Ability {
 		if (!_dodge()) {
 			return true;
 		}
-
-		EntityType type = event.getDamager().getType();
 		Projectile damager = (Projectile) event.getDamager();
+		EntityType type = damager.getType();
 
 		// Remove effects from tipped arrows
 		// TODO: This is the same code as for removing from shields, should probably be
 		// a utility function
+		// TODO: This code is bugged. It correctly identifies tipped arrows and runs
+		// but the player is hit with potion effects anyway.
 		if (type == EntityType.TIPPED_ARROW) {
 			TippedArrow arrow = (TippedArrow)damager;
 			PotionData data = new PotionData(PotionType.AWKWARD);
