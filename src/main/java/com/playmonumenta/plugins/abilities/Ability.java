@@ -185,7 +185,7 @@ public abstract class Ability {
 	 * For different conditions, an ability must override this method
 	 */
 	public boolean canUse(Player player) {
-		if (mInfo.scoreboardId == null && ScoreboardUtils.getScoreboardValue(player, mInfo.scoreboardId) > 0) {
+		if (mInfo.scoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.scoreboardId) > 0) {
 			return true;
 		}
 		return false;
