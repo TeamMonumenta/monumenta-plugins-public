@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
 import com.playmonumenta.plugins.commands.Effect;
+import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
@@ -105,6 +106,7 @@ public class Plugin extends JavaPlugin {
 		TransferServer.register(this);
 		GiveSoulbound.register();
 		HopeifyHeldItem.register();
+		FestiveHeldItem.register();
 		GildifyHeldItem.register();
 		DebugInfo.register(this);
 		RefreshClass.register(this);
