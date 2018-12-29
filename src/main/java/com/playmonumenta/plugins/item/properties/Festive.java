@@ -3,10 +3,8 @@ package com.playmonumenta.plugins.item.properties;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -16,8 +14,6 @@ import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Festive implements ItemProperty {
-	private static final BlockData FESTIVE_PARTICLE_DATA_1 = Material.GREEN_GLAZED_TERRACOTTA.createBlockData();
-	private static final BlockData FESTIVE_PARTICLE_DATA_2 = Material.RED_MUSHROOM_BLOCK.createBlockData();
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Festive";
 	private static final int tickPeriod = 6;
 
@@ -38,8 +34,8 @@ public class Festive implements ItemProperty {
 
 	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
-		world.spawnParticle(Particle.BLOCK_DUST, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, FESTIVE_PARTICLE_DATA_1);
-		world.spawnParticle(Particle.BLOCK_DUST, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, FESTIVE_PARTICLE_DATA_2);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 0.8, 0), 2, 0.3, 0.5, 0.3);
+		world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 0.5, 0), 2, 0.3, 0.2, 0.3);
 	}
 
 	@Override
@@ -53,8 +49,8 @@ public class Festive implements ItemProperty {
 					this.cancel();
 				}
 
-				item.getWorld().spawnParticle(Particle.BLOCK_DUST, item.getLocation(), 1, 0.1, 0.1, 0.1, FESTIVE_PARTICLE_DATA_1);
-				item.getWorld().spawnParticle(Particle.BLOCK_DUST, item.getLocation(), 1, 0.1, 0.1, 0.1, FESTIVE_PARTICLE_DATA_2);
+				item.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, item.getLocation().add(0, 0.8, 0), 1, 0.1, 0.1, 0.1);
+				item.getWorld().spawnParticle(Particle.SPELL_WITCH, item.getLocation().add(0, 0.5, 0), 1, 0.1, 0.1, 0.1);
 
 				// Very infrequently check if the item is still actually there
 				numTicks++;
