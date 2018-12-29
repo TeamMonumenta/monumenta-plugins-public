@@ -37,6 +37,7 @@ import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.EnfeeblingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
+import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
@@ -203,7 +204,10 @@ public class AbilityManager {
 		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
 		                          new AlchemistPassive(mPlugin, mWorld, mRandom, null),
-		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null)
+		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null),
+
+		                          // ALL PLAYERS (but technically for Alchemist)
+		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
