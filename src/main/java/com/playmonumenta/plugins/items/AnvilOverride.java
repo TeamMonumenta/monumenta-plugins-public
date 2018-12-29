@@ -27,6 +27,12 @@ public class AnvilOverride extends OverrideItem {
 			return false;
 		}
 
+		/*
+		 * Make sure to only repair the item in the player's main hand. Otherwise
+		 * if you sneak+right click an anvil the "item" might be the offhand item
+		 */
+		item = player.getInventory().getItemInMainHand();
+
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
 		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
