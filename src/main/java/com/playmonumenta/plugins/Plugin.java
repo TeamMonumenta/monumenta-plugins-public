@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
+import com.playmonumenta.plugins.commands.CreateGuild;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
 import com.playmonumenta.plugins.commands.Effect;
@@ -117,6 +118,7 @@ public class Plugin extends JavaPlugin {
 		UpdateApartments.register();
 		IncrementDaily.register(this);
 		TransferScores.register(this);
+		CreateGuild.register(this);
 
 		mServerProperties.load(this);
 		Bot.register(this);
