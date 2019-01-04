@@ -15,6 +15,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
@@ -118,6 +119,7 @@ public class Plugin extends JavaPlugin {
 		TransferScores.register(this);
 
 		mServerProperties.load(this);
+		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
 			BroadcastCommand.register(this);
 		}
