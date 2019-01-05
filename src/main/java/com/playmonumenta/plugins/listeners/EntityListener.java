@@ -453,8 +453,7 @@ public class EntityListener implements Listener {
 		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
-		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getEffects())) {
-			//TODO: Alchemist? Should they be able to splash themselves with negatives like everyone else?
+		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getItem())) {
 			affectedEntities.removeIf(entity -> (entity instanceof Player && entity != source));
 		}
 
@@ -484,7 +483,7 @@ public class EntityListener implements Listener {
 		if (!event.isCancelled()) {
 			for (LivingEntity entity : affectedEntities) {
 				if (entity instanceof Player) {
-					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, potion.getEffects(),
+					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
 					                                 event.getIntensity(entity));
 				}
 			}

@@ -96,7 +96,7 @@ public class HeavenlyBoon extends Ability {
 	@Override
 	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
 	                                           PotionSplashEvent event) {
-		if (PotionUtils.hasNegativeEffects(potion.getEffects())) {
+		if (PotionUtils.hasNegativeEffects(potion.getItem())) {
 			// This potion is bad - don't do anything with it
 			return true;
 		}
@@ -116,7 +116,7 @@ public class HeavenlyBoon extends Ability {
 				}
 
 				/* Apply full-strength effects to players within range */
-				for (PotionEffect effect : potion.getEffects()) {
+				for (PotionEffect effect : PotionUtils.getEffects(potion.getItem())) {
 					PotionUtils.applyPotion(mPlugin, p, effect);
 				}
 

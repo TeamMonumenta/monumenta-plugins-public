@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemistPassive;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BasiliskPoison;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
@@ -203,7 +202,6 @@ public class AbilityManager {
 		                          new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
-		                          new AlchemistPassive(mPlugin, mWorld, mRandom, null),
 		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null),
 
 		                          // ALL PLAYERS (but technically for Alchemist)

@@ -485,41 +485,21 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		ItemStack item = event.getItem();
-		if (item.getType() == Material.POTION) {
-			PotionMeta meta = ItemUtils.getPotionMeta(item);
-			if (meta != null) {
-				// Add base potion effect.
-				PotionData data = meta.getBasePotionData();
-				PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 1) : null;
+		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
+			// Kill the player if they drink a potion with instant damage 10+
+			if (effect.getType() != null &&
+				effect.getType().equals(PotionEffectType.HARM) &&
+				effect.getAmplifier() >= 9) {
 
-				if (info != null) {
-					info.showParticles = true;
-					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
-				}
-
-				// Add custom potion effects.
-				List<PotionEffect> effects = meta.getCustomEffects();
-				if (effects != null) {
-
-					// Kill the player if they drink a potion with instant damage 10+
-					for (PotionEffect effect : effects) {
-						if (effect.getType() != null &&
-						    effect.getType().equals(PotionEffectType.HARM) &&
-						    effect.getAmplifier() >= 9) {
-
-							player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-								@Override
-								public void run() {
-									player.setHealth(0);
-								}
-							}, 0);
-						}
+				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+					@Override
+					public void run() {
+						player.setHealth(0);
 					}
-
-					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
-				}
+				}, 0);
 			}
+
+			mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 		}
 	}
 

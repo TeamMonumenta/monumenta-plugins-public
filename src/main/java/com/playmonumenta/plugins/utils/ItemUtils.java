@@ -107,16 +107,6 @@ public class ItemUtils {
 		potion.setItemMeta(meta);
 	}
 
-	public static PotionMeta getPotionMeta(ItemStack potion) {
-		Material type = potion.getType();
-		if (type == Material.POTION || type == Material.SPLASH_POTION || type == Material.LINGERING_POTION) {
-			PotionMeta meta = (PotionMeta)potion.getItemMeta();
-			return meta;
-		}
-
-		return null;
-	}
-
 	public static boolean isArmorItem(Material item) {
 		return armors.contains(item);
 	}

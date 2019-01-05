@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -180,6 +181,14 @@ public class PotionUtils {
 		return newInfo;
 	}
 
+	public static List<PotionEffect> getEffects(ItemStack item) {
+		if (item != null && item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta) {
+			return getEffects((PotionMeta)item.getItemMeta());
+		}
+		// Not a potion - return an empty list to simplify callers iterating the result
+		return new ArrayList<PotionEffect>(0);
+	}
+
 	public static List<PotionEffect> getEffects(PotionMeta meta) {
 		List<PotionEffect> effectsList = new ArrayList<PotionEffect>();
 
@@ -237,8 +246,8 @@ public class PotionUtils {
 		return false;
 	}
 
-	public static boolean hasNegativeEffects(Collection<PotionEffect> effects) {
-		for (PotionEffect effect : effects) {
+	public static boolean hasNegativeEffects(ItemStack potionItem) {
+		for (PotionEffect effect : getEffects(potionItem)) {
 			if (hasNegativeEffects(effect.getType())) {
 				return true;
 			}
