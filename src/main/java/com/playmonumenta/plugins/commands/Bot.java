@@ -30,6 +30,7 @@ public class Bot {
 	private static final int BUF_SIZE = 8096;
 	private static final boolean DEBUG = true;
 	private static final int TICK_PERIOD = 40;
+	private static final int IDLE_TIMEOUT_TICKS = 20 * 60 * 3;
 
 	public static void register(Plugin plugin) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
@@ -55,6 +56,7 @@ public class Bot {
 		JsonObject reqObj = new JsonObject();
 		reqObj.addProperty("player_name", player.getName());
 		reqObj.addProperty("player_uuid", player.getUniqueId().toString());
+		reqObj.addProperty("action", "command");
 		reqObj.addProperty("command", command);
 
 		initiateBotRequest(plugin, player, reqObj.toString(),
@@ -96,6 +98,7 @@ public class Bot {
 				private ByteBuffer mReadBuffer = ByteBuffer.allocate(BUF_SIZE);
 				private int mNotConnectedTicks = 0;
 				private boolean mConnected = false;
+				private int mNoMessageTicks = 0;
 
 				@Override
 				public void run() {
@@ -108,7 +111,13 @@ public class Bot {
 							}
 							mNotConnectedTicks += TICK_PERIOD;
 						}
-						//TODO: Idle timeout for no messages
+
+						mNoMessageTicks += TICK_PERIOD;
+						if (mNoMessageTicks > IDLE_TIMEOUT_TICKS) {
+							player.sendMessage(ChatColor.RED + "No messages received from bot in 3 minutes - aborting request");
+							this.cancel();
+							return;
+						}
 
 						if (DEBUG) player.sendMessage("Ticking");
 						/* Sent a request - got any messages yet? NON-BLOCKING! */
@@ -130,6 +139,8 @@ public class Bot {
 										mConnected = true;
 										if (DEBUG) player.sendMessage("Successfully connected");
 
+										mNoMessageTicks = 0;
+
 										// Now that we are connected, can listen for read events
 										channel.register(selector, SelectionKey.OP_READ);
 
@@ -149,6 +160,8 @@ public class Bot {
 									int len = client.read(mReadBuffer);
 									if (len > 0) {
 										if (DEBUG) player.sendMessage("Read something! : " + Integer.toString(len));
+
+										mNoMessageTicks = 0;
 
 										// Important to make buffer readable apparently
 										mReadBuffer.flip();
