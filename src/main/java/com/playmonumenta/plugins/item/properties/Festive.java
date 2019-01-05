@@ -34,8 +34,8 @@ public class Festive implements ItemProperty {
 
 	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
-		world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 0.8, 0), 2, 0.3, 0.5, 0.3);
-		world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 0.5, 0), 2, 0.3, 0.2, 0.3);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 0.8, 0), 2, 0.3, 0.5, 0.3, 0);
+		world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 0.5, 0), 2, 0.3, 0.2, 0.3, 0);
 	}
 
 	@Override
@@ -49,8 +49,8 @@ public class Festive implements ItemProperty {
 					this.cancel();
 				}
 
-				item.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, item.getLocation().add(0, 0.8, 0), 1, 0.1, 0.1, 0.1);
-				item.getWorld().spawnParticle(Particle.SPELL_WITCH, item.getLocation().add(0, 0.5, 0), 1, 0.1, 0.1, 0.1);
+				item.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, item.getLocation().add(0, 0.8, 0), 2, 0.1, 0.1, 0.1, 0);
+				item.getWorld().spawnParticle(Particle.SPELL_WITCH, item.getLocation().add(0, 0.5, 0), 2, 0.1, 0.1, 0.1, 0);
 
 				// Very infrequently check if the item is still actually there
 				numTicks++;
