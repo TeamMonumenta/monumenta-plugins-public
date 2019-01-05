@@ -249,7 +249,11 @@ public class PotionUtils {
 	public static boolean hasNegativeEffects(ItemStack potionItem) {
 		for (PotionEffect effect : getEffects(potionItem)) {
 			if (hasNegativeEffects(effect.getType())) {
-				return true;
+				if (effect.getDuration() > 30 || effect.getAmplifier() == 0) {
+					// The negative effect lasts longer than 1s or is only level 1
+					// Probably not an antidote / other "good" negative potion
+					return true;
+				}
 			}
 		}
 
