@@ -32,7 +32,7 @@ public class GrowingRage extends Ability {
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.scoreboardId = "Growing Rage";
+		mInfo.scoreboardId = "GrowingRage";
 	}
 
 	@Override
