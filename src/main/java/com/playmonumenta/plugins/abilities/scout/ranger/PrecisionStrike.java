@@ -72,8 +72,16 @@ public class PrecisionStrike extends Ability {
 		mPlayer.setVelocity(velocity);
 
 		new BukkitRunnable() {
+			private int mTicks = 0;
+
 			@Override
 			public void run() {
+				mTicks++;
+				if (mPlayer.isOnGround() || mTicks >= PRECISION_STRIKE_COOLDOWN || !mPlayer.isOnline()) {
+					this.cancel();
+					return;
+				}
+
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
@@ -82,15 +90,8 @@ public class PrecisionStrike extends Ability {
 					this.cancel();
 					break;
 				}
-				if (mPlayer.isOnGround()) {
-					this.cancel();
-				}
 			}
 		}.runTaskTimer(mPlugin, 1, 1);
-
-		if (mPlayer.isOnGround()) {
-			return false;
-		}
 
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
 		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
@@ -100,6 +101,8 @@ public class PrecisionStrike extends Ability {
 					EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 			}
 		}
+
+		putOnCooldown();
 
 		return true;
 	}
