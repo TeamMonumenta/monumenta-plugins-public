@@ -26,6 +26,7 @@ import org.bukkit.metadata.MetadataValue;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
@@ -49,6 +50,19 @@ public class MobListener implements Listener {
 		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
 			event.setCancelled(true);
 			return;
+		}
+
+		// We need to allow spawning hostile mobs intentionally, but disable natural spawns.
+		// It's easier to check the intentional ways than the natural ones.
+		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
+		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
+		    EntityUtils.isHostileMob(event.getEntity())) {
+			LocationType locType = LocationUtils.getLocationType(mPlugin, event.getEntity());
+			if (locType.equals(LocationType.Capital) ||
+			    locType.equals(LocationType.SafeZone)) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 
 		if ((entity instanceof LivingEntity) && !(entity instanceof Player) && !(entity instanceof ArmorStand)) {
