@@ -8,6 +8,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +28,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
@@ -163,6 +167,22 @@ public class WorldListener implements Listener {
 		if (!mPlugin.mItemOverrides.blockDispenseInteraction(mPlugin, block, dispensed)) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void BlockFormEvent(BlockFormEvent event) {
+		Block block = event.getBlock();
+		Material blockType = (block != null) ? block.getType() : Material.AIR;
+
+		if (blockType.equals(Material.SNOW) ||
+		    blockType.equals(Material.ICE)) {
+			LocationType locType = LocationUtils.getLocationType(mPlugin, block.getLocation());
+			if (locType.equals(LocationType.Capital) ||
+			    locType.equals(LocationType.SafeZone)) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 	}
 }
