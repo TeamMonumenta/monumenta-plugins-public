@@ -2,10 +2,16 @@ package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Method;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
@@ -59,7 +65,7 @@ public class CommandUtils {
 		}
 
 		if (senderLoc == null) {
-			sender.sendMessage(ChatColor.RED + "Failed to get required command sender coordinates");
+			error(sender, "Failed to get required command sender coordinates");
 			throw new Exception("Failed to get required command sender coordinates");
 		}
 
@@ -73,7 +79,7 @@ public class CommandUtils {
 			value = Integer.parseInt(str);
 		} catch (NumberFormatException e) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
+				error(sender, "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
 			}
 			throw new Exception(e);
 		}
@@ -88,7 +94,7 @@ public class CommandUtils {
 			value = Float.parseFloat(str);
 		} catch (Exception e) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
+				error(sender, "Invalid parameter " + str + ". Must be a value between " + Float.MIN_VALUE + " and " + Float.MAX_VALUE);
 			}
 			throw new Exception(e);
 		}
@@ -106,7 +112,7 @@ public class CommandUtils {
 			pos1 = Point.fromString(sender, xStr1, yStr1, zStr1, true);
 		} catch (Exception e) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Failed to parse first coordinate");
+				error(sender, "Failed to parse first coordinate");
 			}
 			throw new Exception(e);
 		}
@@ -115,7 +121,7 @@ public class CommandUtils {
 			pos2 = Point.fromString(sender, xStr2, yStr2, zStr2, true);
 		} catch (Exception e) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Failed to parse second coordinate");
+				error(sender, "Failed to parse second coordinate");
 			}
 			throw new Exception(e);
 		}
@@ -139,9 +145,110 @@ public class CommandUtils {
 			}
 		} catch (Exception e) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Failed to parse coordinate '" + str + "'");
+				error(sender, "Failed to parse coordinate '" + str + "'");
 			}
 			throw new Exception(e);
 		}
+	}
+
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment) {
+		enchantify(sender, player, region, enchantment, null);
+	}
+
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix) {
+		enchantify(sender, player, region, enchantment, ownerPrefix, false);
+	}
+
+	public static void error(CommandSender sender, String msg) {
+		sender.sendMessage(ChatColor.RED + msg);
+	}
+
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix, boolean duplicateItem) {
+		ItemStack item = player.getEquipment().getItemInMainHand();
+		if (item == null) {
+			error(sender, "Player must have a " + region + " item in their main hand!");
+			return;
+		}
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) {
+			error(sender, "Player must have a " + region + " item in their main hand!");
+			return;
+		}
+
+		List<String> lore = meta.getLore();
+		if (lore == null || lore.isEmpty()) {
+			error(sender, "Player must have a " + region + " item in their main hand!");
+			return;
+		}
+
+		List<String> newLore = new ArrayList<>();
+		boolean enchantmentFound = false;
+		boolean nameAdded = (ownerPrefix == null);
+		boolean regionFound = false;
+		for (String loreEntry : lore) {
+			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
+				if (duplicateItem) {
+					error(sender, "Player's item already has the " + enchantment + " enchantment");
+					return;
+				} else {
+					enchantmentFound = true;
+				}
+			}
+
+			if (loreEntry.contains(region)) {
+				regionFound = true;
+			}
+
+			String loreStripped = ChatColor.stripColor(loreEntry).trim();
+			if (loreStripped.contains("Ephemeral Corridors") ||
+				loreStripped.contains("King's Valley : Epic") ||
+				loreStripped.contains("King's Valley : Artifact") ||
+				loreStripped.contains("King's Valley : Enhanced Rare") ||
+				loreStripped.contains("King's Valley : Enhanced Uncommon")) {
+				duplicateItem = false;
+			}
+
+			if (!enchantmentFound && (loreEntry.contains(region) ||
+			                          loreEntry.contains("Armor") ||
+			                          loreEntry.contains("Magic Wand") ||
+			                          ChatColor.stripColor(loreEntry).trim().isEmpty())) {
+				newLore.add(ChatColor.GRAY + enchantment);
+				enchantmentFound = true;
+			}
+
+			if (!nameAdded && ChatColor.stripColor(loreEntry).trim().isEmpty()) {
+				newLore.add(ownerPrefix + " " + player.getName());
+				nameAdded = true;
+			}
+
+			newLore.add(loreEntry);
+		}
+
+		if (!nameAdded) {
+			newLore.add(ownerPrefix + " " + player.getName());
+		}
+
+		if (!regionFound) {
+			error(sender, "Player must have a " + region + " item in their main hand!");
+			return;
+		}
+
+		ItemStack dupe = null;
+		if (duplicateItem) {
+			// Give the player a copy of their un-modified item
+			dupe = item.clone();
+			dupe.setAmount(1);
+		}
+
+		meta.setLore(newLore);
+		item.setItemMeta(meta);
+		item.setAmount(1);
+
+		if (duplicateItem) {
+			player.getInventory().addItem(dupe);
+		}
+
+		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
 	}
 }
