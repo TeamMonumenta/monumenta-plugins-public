@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +8,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+
+import io.github.jorelali.commandapi.api.CommandAPI;
 
 public class CommandUtils {
 
@@ -151,35 +154,37 @@ public class CommandUtils {
 		}
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment) {
+	public static void error(CommandSender sender, String msg) {
+		if ((sender instanceof Player)
+			|| ((sender instanceof ProxiedCommandSender) && (((ProxiedCommandSender)sender).getCaller() instanceof Player))) {
+			sender.sendMessage(ChatColor.RED + msg);
+		} else {
+			sender.sendMessage(msg);
+		}
+	}
+
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment) throws CommandSyntaxException {
 		enchantify(sender, player, region, enchantment, null);
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix) {
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix) throws CommandSyntaxException {
 		enchantify(sender, player, region, enchantment, ownerPrefix, false);
 	}
 
-	public static void error(CommandSender sender, String msg) {
-		sender.sendMessage(ChatColor.RED + msg);
-	}
-
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix, boolean duplicateItem) {
+	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix, boolean duplicateItem) throws CommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
-			error(sender, "Player must have a " + region + " item in their main hand!");
-			return;
+			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
 		}
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
-			error(sender, "Player must have a " + region + " item in their main hand!");
-			return;
+			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
 		}
 
 		List<String> lore = meta.getLore();
 		if (lore == null || lore.isEmpty()) {
-			error(sender, "Player must have a " + region + " item in their main hand!");
-			return;
+			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
 		}
 
 		List<String> newLore = new ArrayList<>();
@@ -189,8 +194,7 @@ public class CommandUtils {
 		for (String loreEntry : lore) {
 			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
 				if (duplicateItem) {
-					error(sender, "Player's item already has the " + enchantment + " enchantment");
-					return;
+					CommandAPI.fail("Player's item already has the " + enchantment + " enchantment");
 				} else {
 					enchantmentFound = true;
 				}
@@ -202,10 +206,10 @@ public class CommandUtils {
 
 			String loreStripped = ChatColor.stripColor(loreEntry).trim();
 			if (loreStripped.contains("Ephemeral Corridors") ||
-				loreStripped.contains("King's Valley : Epic") ||
-				loreStripped.contains("King's Valley : Artifact") ||
-				loreStripped.contains("King's Valley : Enhanced Rare") ||
-				loreStripped.contains("King's Valley : Enhanced Uncommon")) {
+			    loreStripped.contains("King's Valley : Epic") ||
+			    loreStripped.contains("King's Valley : Artifact") ||
+			    loreStripped.contains("King's Valley : Enhanced Rare") ||
+			    loreStripped.contains("King's Valley : Enhanced Uncommon")) {
 				duplicateItem = false;
 			}
 
@@ -230,8 +234,7 @@ public class CommandUtils {
 		}
 
 		if (!regionFound) {
-			error(sender, "Player must have a " + region + " item in their main hand!");
-			return;
+			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
 		}
 
 		ItemStack dupe = null;
