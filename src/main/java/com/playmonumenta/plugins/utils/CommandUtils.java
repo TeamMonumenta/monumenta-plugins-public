@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,48 +31,22 @@ public class CommandUtils {
 		return getLocation(sender, false);
 	}
 
-	// TODO: Reflection is cute and all, but instanceof would be way simpler/better
 	public static Location getLocation(CommandSender sender, boolean doSubtractEntityOffset) throws Exception {
 		if (sender == null) {
 			throw new Exception("sender is null!");
-		}
-		Location senderLoc = null;
-
-		// Use reflection to find out if the sender's position can be obtained via getLocation()
-		// If it can, call it to get those coordinates.
-		Method[] methods = sender.getClass().getMethods();
-		try {
-			for (Method m : methods) {
-				if (m.getName().equals("getLocation") && (m.getParameterTypes().length == 0)) {
-					// This is for an entity which has a location
-					senderLoc = (Location)m.invoke(sender, (Object[])null);
-					if (doSubtractEntityOffset) {
-						senderLoc.subtract(0.5, 0.5, 0.5);
-					}
-					break;
-				} else if (m.getName().equals("getBlock") && (m.getParameterTypes().length == 0)) {
-					// This is for a block like a command block
-					// Note that the coordinate returned for blocks is the lowest corner
-					senderLoc = ((Block)m.invoke(sender, (Object[])null)).getLocation();
-					break;
-				} else if (m.getName().equals("getCallee") && (m.getParameterTypes().length == 0)) {
-					// This is for execute commands - CommandSender is a ProxiedCommandSender
-					// Get the callee command sender and recurse (only expect to recurse once)
-					return getLocation(((CommandSender)(m.invoke(sender, (Object[])null))), doSubtractEntityOffset);
-				}
+		} else if (sender instanceof Entity) {
+			Location senderLoc = ((Entity)sender).getLocation();
+			if (doSubtractEntityOffset) {
+				senderLoc.subtract(0.5, 0.5, 0.5);
 			}
-		} catch (Exception e) {
-			// Just in case somehow senderLoc was not null and a subsequent call failed
-			senderLoc = null;
-			e.printStackTrace();
-		}
-
-		if (senderLoc == null) {
-			error(sender, "Failed to get required command sender coordinates");
+			return senderLoc;
+		} else if (sender instanceof BlockCommandSender) {
+			return ((BlockCommandSender)sender).getBlock().getLocation();
+		} else if (sender instanceof ProxiedCommandSender) {
+			return getLocation(((ProxiedCommandSender)sender).getCallee(), doSubtractEntityOffset);
+		} else {
 			throw new Exception("Failed to get required command sender coordinates");
 		}
-
-		return senderLoc;
 	}
 
 	public static int parseIntFromString(CommandSender sender, String str) throws Exception {
