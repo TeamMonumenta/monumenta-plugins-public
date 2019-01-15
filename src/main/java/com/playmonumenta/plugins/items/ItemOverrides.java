@@ -166,8 +166,10 @@ public class ItemOverrides {
 		OverrideItem minecartOverride = new MinecartOverride();
 		mItems.put(Material.MINECART, minecartOverride);
 		mItems.put(Material.CHEST_MINECART, minecartOverride);
-		mItems.put(Material.FURNACE_MINECART, minecartOverride);
 		mItems.put(Material.COMMAND_BLOCK_MINECART, minecartOverride);
+		mItems.put(Material.FURNACE_MINECART, minecartOverride);
+		mItems.put(Material.HOPPER_MINECART, minecartOverride);
+		mItems.put(Material.TNT_MINECART, minecartOverride);
 
 		OverrideItem conduitOverride = new ConduitOverride();
 		mItems.put(Material.CONDUIT, conduitOverride);

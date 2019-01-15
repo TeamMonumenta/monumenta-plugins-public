@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.items;
 
-import org.bukkit.GameMode;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -8,12 +8,20 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class MinecartOverride extends OverrideItem {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return (player == null) || (player.getGameMode() == GameMode.CREATIVE)
-			|| (player.getGameMode() == GameMode.SURVIVAL && LocationUtils.getLocationType(plugin, player) == LocationType.Capital);
+		if (player == null) {
+			return true;
+		}
+
+		// Ignore the passed-in block and compute which block the player is looking at
+		block = player.getTargetBlockExact(6, FluidCollisionMode.SOURCE_ONLY);
+		if (block == null) {
+			return false;
+		}
+
+		return LocationUtils.isValidMinecartLocation(block.getLocation());
 	}
 }

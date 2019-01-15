@@ -14,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -201,13 +200,6 @@ public class PlayerTracking implements EntityTracking {
 
 	void _transitionToAdventure(Player player) {
 		player.setGameMode(GameMode.ADVENTURE);
-
-		Entity vehicle = player.getVehicle();
-		if (vehicle != null) {
-			if (vehicle instanceof Minecart) {
-				vehicle.remove();
-			}
-		}
 	}
 
 	void _transitionToSurvival(Player player) {

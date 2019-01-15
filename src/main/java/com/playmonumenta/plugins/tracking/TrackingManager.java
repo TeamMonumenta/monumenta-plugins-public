@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
@@ -28,6 +29,7 @@ public class TrackingManager {
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
 	public BoatTracking mBoats;
+	public MinecartTracking mMinecarts;
 	public SilverfishTracking mSilverfish;
 	public FishingHookTracking mFishingHook;
 
@@ -47,6 +49,7 @@ public class TrackingManager {
 		mPlayers = new PlayerTracking(mPlugin);
 		mCreepers = new CreeperTracking();
 		mBoats = new BoatTracking(mPlugin);
+		mMinecarts = new MinecartTracking(mPlugin);
 		mSilverfish = new SilverfishTracking(mPlugin);
 		mFishingHook = new FishingHookTracking();
 
@@ -60,6 +63,7 @@ public class TrackingManager {
 		mPlayers.unloadTrackedEntities();
 		mCreepers.unloadTrackedEntities();
 		mBoats.unloadTrackedEntities();
+		mMinecarts.unloadTrackedEntities();
 		mSilverfish.unloadTrackedEntities();
 		mFishingHook.unloadTrackedEntities();
 	}
@@ -82,6 +86,8 @@ public class TrackingManager {
 				mCreepers.addEntity(entity);
 			} else if (entity instanceof Boat) {
 				mBoats.addEntity(entity);
+			} else if (entity instanceof Minecart) {
+				mMinecarts.addEntity(entity);
 			} else if (entity instanceof Silverfish) {
 				mSilverfish.addEntity(entity);
 			}
@@ -95,6 +101,8 @@ public class TrackingManager {
 			mCreepers.removeEntity(entity);
 		} else if (entity instanceof Boat) {
 			mBoats.removeEntity(entity);
+		} else if (entity instanceof Minecart) {
+			mMinecarts.removeEntity(entity);
 		} else if (entity instanceof Silverfish) {
 			mSilverfish.removeEntity(entity);
 		}
@@ -115,6 +123,12 @@ public class TrackingManager {
 
 		try {
 			mBoats.update(world, ticks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			mMinecarts.update(world, ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
