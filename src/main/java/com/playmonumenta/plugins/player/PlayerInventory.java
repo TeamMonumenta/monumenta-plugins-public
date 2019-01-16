@@ -7,7 +7,9 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -86,12 +88,12 @@ public class PlayerInventory {
 		}
 	}
 
-	public void onShootAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
+	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();
 
-			property.onShootAttack(plugin, player, level, target, event);
+			property.onLaunchProjectile(plugin, player, level, proj, event);
 		}
 	}
 

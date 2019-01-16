@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.item.properties;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -11,16 +12,16 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
-public class Frost implements ItemProperty {
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Frost";
-	private static final int FROST_DURATION = 20 * 4;
-	private static final String LEVEL_METAKEY = "FrostLevelMetakey";
+public class PointBlank implements ItemProperty {
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Point Blank";
+	private static final int DISTANCE = 8;
+	private static final int DAMAGE_PER_LEVEL = 2;
+	private static final String LEVEL_METAKEY = "PointBlankLevelMetakey";
+	private static final String LOCATION_METAKEY = "PointBlankLocationMetakey";
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
 
 	@Override
@@ -41,6 +42,7 @@ public class Frost implements ItemProperty {
 			 * If they do, subtract from level the level of the lower of the two bows
 			 */
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
+			proj.setMetadata(LOCATION_METAKEY, new FixedMetadataValue(plugin, player.getLocation()));
 		}
 	}
 
@@ -52,11 +54,16 @@ public class Frost implements ItemProperty {
 	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
 	 */
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (proj.hasMetadata(LEVEL_METAKEY)) {
-			// Level isn't actually used currently
+		if (proj.hasMetadata(LEVEL_METAKEY) && proj.hasMetadata(LOCATION_METAKEY)) {
+			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+			Location loc = (Location)proj.getMetadata(LOCATION_METAKEY).get(0).value();
 
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_DURATION, 1, true, true));
-			target.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1.15, 0), 10, 0.2, 0.35, 0.2, 0.05);
+			if (loc.distance(target.getLocation()) < DISTANCE) {
+				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
+
+				// TODO: Fix this shitty particle! Maybe add sound?
+				target.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
+			}
 		}
 	}
 }

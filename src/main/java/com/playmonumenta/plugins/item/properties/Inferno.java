@@ -8,10 +8,14 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -19,10 +23,12 @@ import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
 
 public class Inferno implements ItemProperty {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
+	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 	private static final int INFERNO_MAX_LEVEL = 4;
 
 	private static final Map<LivingEntity, Integer> sTaggedMobs = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable sRunnable = null;
+	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
 
 	@Override
 	public String getProperty() {
@@ -40,11 +46,17 @@ public class Inferno implements ItemProperty {
 	}
 
 	@Override
-	public void onShootAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		infernoTagMob(plugin, target, level);
+	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
+		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
+			/*
+			 * TODO: Check that player doesn't have two bows with this enchant in main and offhand
+			 * If they do, subtract from level the level of the lower of the two bows
+			 */
+			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
+		}
 	}
 
-	private void infernoTagMob(Plugin plugin, LivingEntity target, int level) {
+	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level) {
 		/* Cap inferno level at the maximum */
 		level = level < INFERNO_MAX_LEVEL ? level : INFERNO_MAX_LEVEL;
 
@@ -78,7 +90,27 @@ public class Inferno implements ItemProperty {
 		}
 	}
 
-	/* Called by EntityDamageEvent on mobs damaged by DamageCause.FIRE_TICK */
+	/*
+	 * TODO: This needs some kind of better registration than expecting it to be called directly
+	 *
+	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageByEntityEvent !
+	 *
+	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
+	 */
+	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
+		if (proj.hasMetadata(LEVEL_METAKEY)) {
+			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+
+			infernoTagMob(plugin, target, level);
+		}
+	}
+
+
+	/*
+	 * TODO: This needs some kind of better registration than expecting it to be called directly
+	 *
+	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageEvent !
+	 */
 	public static void onFireTick(LivingEntity mob, EntityDamageEvent event) {
 		if (!sTaggedMobs.isEmpty()) {
 			Integer infernoValue = sTaggedMobs.get(mob);

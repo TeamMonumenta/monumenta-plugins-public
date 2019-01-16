@@ -55,8 +55,11 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.item.properties.Frost;
 import com.playmonumenta.plugins.item.properties.Inferno;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
+import com.playmonumenta.plugins.item.properties.PointBlank;
+import com.playmonumenta.plugins.item.properties.Sniper;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -252,9 +255,14 @@ public class EntityListener implements Listener {
 						damager.remove();
 						event.setCancelled(true);
 					}
-
-					mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, (LivingEntity)damagee, event);
 				}
+			}
+
+			if (damager instanceof Projectile && damagee instanceof LivingEntity) {
+				Sniper.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+				PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+				Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+				Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			}
 
 			if (damagee instanceof LivingEntity) {
@@ -390,16 +398,23 @@ public class EntityListener implements Listener {
 	// Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
-		ProjectileSource shooter = event.getEntity().getShooter();
+		Projectile proj = event.getEntity();
+		ProjectileSource shooter = proj.getShooter();
 		if (shooter != null && shooter instanceof Player && ((Player)shooter).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 			event.setCancelled(true);
 			return;
 		}
 
-		if (event.getEntityType() == EntityType.SNOWBALL) {
-			Snowball origBall = (Snowball)event.getEntity();
-			if (origBall.getShooter() instanceof Player) {
-				Player player = (Player)origBall.getShooter();
+		if (shooter instanceof Player) {
+			Player player = (Player)shooter;
+
+			mPlugin.mTrackingManager.mPlayers.onLaunchProjectile(mPlugin, player, proj, event);
+			if (event.isCancelled()) {
+				return;
+			}
+
+			if (event.getEntityType() == EntityType.SNOWBALL) {
+				Snowball origBall = (Snowball)proj;
 				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
 				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
 
@@ -415,26 +430,16 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-			}
-		}
-		if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
-			Arrow arrow = (Arrow)event.getEntity();
-			if (arrow.getShooter() instanceof Player) {
-				Player player = (Player)arrow.getShooter();
+			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
+				Arrow arrow = (Arrow)proj;
 				if (!AbilityManager.getManager().PlayerShotArrowEvent(player, arrow)) {
-					arrow.remove();
 					event.setCancelled(true);
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
-			}
-		} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
-			SplashPotion potion = (SplashPotion)event.getEntity();
-			if (potion.getShooter() instanceof Player) {
-				Player player = (Player)potion.getShooter();
-
+			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
+				SplashPotion potion = (SplashPotion)proj;
 				if (!AbilityManager.getManager().PlayerThrewSplashPotionEvent(player, potion)) {
-					potion.remove();
 					event.setCancelled(true);
 				}
 			}

@@ -15,7 +15,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
 import com.playmonumenta.plugins.Constants;
@@ -82,10 +84,10 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
-	public void onShootAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
+	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
-			manager.onShootAttack(plugin, player, target, event);
+			manager.onLaunchProjectile(plugin, player, proj, event);
 		}
 	}
 

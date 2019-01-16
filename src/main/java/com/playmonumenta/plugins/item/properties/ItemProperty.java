@@ -6,7 +6,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -75,7 +77,7 @@ public interface ItemProperty {
 	 * The onShootAttack() method will be called whenever the player damages something with a projectile while
 	 * they have any levels of this property
 	 */
-	default public void onShootAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	default public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile target, ProjectileLaunchEvent event) { }
 
 	default public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
 
