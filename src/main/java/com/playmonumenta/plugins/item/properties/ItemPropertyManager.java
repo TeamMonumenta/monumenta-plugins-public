@@ -60,6 +60,7 @@ public class ItemPropertyManager {
 		init.add(new IceAspect());
 		init.add(new Slayer());
 		init.add(new Thunder());
+		init.add(new Inferno());
 
 		/* Build the map of which slots have which properties */
 		for (ItemProperty property : init) {

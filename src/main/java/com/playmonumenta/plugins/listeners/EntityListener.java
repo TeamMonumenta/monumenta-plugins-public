@@ -55,6 +55,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.item.properties.Inferno;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -271,10 +272,10 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
+		DamageCause source = event.getCause();
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
-			DamageCause source = event.getCause();
 
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -322,6 +323,13 @@ public class EntityListener implements Listener {
 						}
 					}
 				}
+			}
+		} else {
+			// Not damaging a player
+
+			// If this damage was caused by burning, check if the mob takes extra damage from Inferno
+			if (source.equals(DamageCause.FIRE_TICK) && (damagee instanceof LivingEntity)) {
+				Inferno.onFireTick((LivingEntity)damagee, event);
 			}
 		}
 	}
