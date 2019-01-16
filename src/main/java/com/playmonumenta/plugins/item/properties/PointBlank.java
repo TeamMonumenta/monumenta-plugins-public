@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -31,16 +32,22 @@ public class PointBlank implements ItemProperty {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND);
+		return EnumSet.of(ItemSlot.HAND);
 	}
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
-			/*
-			 * TODO: Check that player doesn't have two bows with this enchant in main and offhand
-			 * If they do, subtract from level the level of the lower of the two bows
-			 */
+			int mainHandLevel = this.getLevelFromItem(player.getInventory().getItemInMainHand());
+			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
+
+			if (mainHandLevel > 0 && offHandLevel > 0
+				&& player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
+				&& player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
+				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
+				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
+			}
+
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
 			proj.setMetadata(LOCATION_METAKEY, new FixedMetadataValue(plugin, player.getLocation()));
 		}
