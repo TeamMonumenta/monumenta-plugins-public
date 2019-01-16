@@ -4,11 +4,10 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -30,14 +29,12 @@ public class IceAspect implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ICE_ASPECT_DURATION, level - 1, false, true));
-		world.spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
+		player.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {
-			damage = damage + 1.0;
+			event.setDamage(event.getDamage() + 1.0);
 		}
-
-		return damage;
 	}
 }

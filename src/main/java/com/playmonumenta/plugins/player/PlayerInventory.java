@@ -7,9 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -79,15 +77,22 @@ public class PlayerInventory {
 		}
 	}
 
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
 		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
 			ItemProperty property = iter.getKey();
 			Integer level = iter.getValue();
 
-			damage = property.onAttack(plugin, world, player, target, damage, level, cause);
+			property.onAttack(plugin, player, level, target, event);
 		}
+	}
 
-		return damage;
+	public void onShootAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
+		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
+			ItemProperty property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onShootAttack(plugin, player, level, target, event);
+		}
 	}
 
 	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
@@ -97,19 +102,6 @@ public class PlayerInventory {
 
 			property.onExpChange(plugin, player, event, level);
 		}
-	}
-
-	public double onShootAttack(Plugin plugin, Player player, Projectile proj, EntityDamageByEntityEvent event) {
-		double damage = event.getDamage();
-
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
-			Integer level = iter.getValue();
-
-			damage = property.onShootAttack(plugin, player, level, proj, event);
-		}
-
-		return damage;
 	}
 
 	public void removeProperties(Plugin plugin, Player player) {

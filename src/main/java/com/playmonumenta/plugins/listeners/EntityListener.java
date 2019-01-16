@@ -234,10 +234,7 @@ public class EntityListener implements Listener {
 						}
 
 						// Apply any damage modifications that items they have may apply.
-						double damage = mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player.getWorld(), player,
-						                                                           (LivingEntity)damagee, event.getDamage(), event.getCause());
-
-						event.setDamage(Math.max(damage, 0));
+						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
 
 						AbilityManager.getManager().modifyDamage(player, event);
 
@@ -256,8 +253,7 @@ public class EntityListener implements Listener {
 						event.setCancelled(true);
 					}
 
-					double damage = mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, arrow, event);
-					event.setDamage(Math.max(damage, 0));
+					mPlugin.mTrackingManager.mPlayers.onShootAttack(mPlugin, player, (LivingEntity)damagee, event);
 				}
 			}
 

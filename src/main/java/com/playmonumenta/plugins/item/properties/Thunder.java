@@ -5,11 +5,10 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -33,20 +32,18 @@ public class Thunder implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		double rand = mRandom.nextDouble();
 
-		if (damage >= 4 && rand < level * 0.1) {
+		if (event.getDamage() >= 4 && rand < level * 0.1) {
 			target.addPotionEffect(THUNDER_SLOWNESS);
 			target.addPotionEffect(THUNDER_WEAKNESS);
 
 			if (target instanceof Guardian) {
-				damage = damage + 1.0;
+				event.setDamage(event.getDamage() + 1.0);
 			}
 
-			world.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.4f, 1.0f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.4f, 1.0f);
 		}
-
-		return damage;
 	}
 }

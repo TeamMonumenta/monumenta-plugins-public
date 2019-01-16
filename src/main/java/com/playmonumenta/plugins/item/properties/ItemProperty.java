@@ -6,9 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -71,13 +69,13 @@ public interface ItemProperty {
 	 * The onAttack() method will be called whenever the player damages something while
 	 * they have any levels of this property
 	 */
-	default public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
-		return damage;
-	}
+	default public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
 
-	default public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
-		return event.getDamage();
-	}
+	/*
+	 * The onShootAttack() method will be called whenever the player damages something with a projectile while
+	 * they have any levels of this property
+	 */
+	default public void onShootAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
 
 	default public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
 

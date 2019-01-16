@@ -5,9 +5,9 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
@@ -27,20 +27,18 @@ public class Chaotic implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		Random mRandom = new Random();
 		int rand = mRandom.nextInt(2 * level + 1) - level;
 
 		if (rand > 0) {
-			world.spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
+			player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, target.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001);
 		}
 
-		if (cause == DamageCause.ENTITY_SWEEP_ATTACK) {
+		if (event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
 			rand = rand / 2;
 		}
 
-		damage = damage + rand;
-
-		return damage;
+		event.setDamage(Math.max(0, event.getDamage() + rand));
 	}
 }

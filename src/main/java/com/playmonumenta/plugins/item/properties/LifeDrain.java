@@ -4,10 +4,9 @@ import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
@@ -28,12 +27,10 @@ public class LifeDrain implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (PlayerUtils.isCritical(player)) {
 			PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL);
-			world.spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
+			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
 		}
-
-		return damage;
 	}
 }

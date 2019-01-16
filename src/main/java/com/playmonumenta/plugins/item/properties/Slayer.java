@@ -3,14 +3,13 @@ package com.playmonumenta.plugins.item.properties;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Endermite;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager.ItemSlot;
@@ -29,11 +28,9 @@ public class Slayer implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (target instanceof Creeper || target instanceof Blaze || target instanceof Enderman || target instanceof Endermite) {
-			damage = damage + 2.5 * level;
+			event.setDamage(event.getDamage() + 2.5 * level);
 		}
-
-		return damage;
 	}
 }

@@ -8,13 +8,10 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -38,19 +35,13 @@ public class Inferno implements ItemProperty {
 	}
 
 	@Override
-	public double onAttack(Plugin plugin, World world, Player player, LivingEntity target, double damage, int level, DamageCause cause) {
+	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		infernoTagMob(plugin, target, level);
-
-		return damage;
 	}
 
 	@Override
-	public double onShootAttack(Plugin plugin, Player player, int level, Projectile proj, EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof LivingEntity) {
-			infernoTagMob(plugin, (LivingEntity)event.getEntity(), level);
-		}
-
-		return event.getDamage();
+	public void onShootAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		infernoTagMob(plugin, target, level);
 	}
 
 	private void infernoTagMob(Plugin plugin, LivingEntity target, int level) {
