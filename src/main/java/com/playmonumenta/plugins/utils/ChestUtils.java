@@ -22,21 +22,29 @@ public class ChestUtils {
 
 			int luckLevel;
 
-			if (playerCount <= 1) {
-				luckLevel = -1;
-			} else if (playerCount == 2) {
-				Random mRandom = new Random();
-				double rand = mRandom.nextDouble();
+			Random mRandom = new Random();
+			double rand = mRandom.nextDouble();
 
-				if (rand < 0.6) {
-					luckLevel = 1;
+			if (playerCount <= 1) {
+				if (rand < 0.5) {
+					luckLevel = -1;
 				} else {
 					luckLevel = 0;
 				}
+			} else if (playerCount == 2) {
+				if (rand < 0.6) {
+					luckLevel = 0;
+				} else {
+					luckLevel = 1;
+				}
 			} else if (playerCount == 3) {
-				luckLevel = 2;
+				if (rand < 0.7) {
+					luckLevel = 1;
+				} else {
+					luckLevel = 2;
+				}
 			} else {
-				luckLevel = 3;
+				luckLevel = 2;
 			}
 
 			player.getPotionEffect(PotionEffectType.LUCK);
