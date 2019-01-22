@@ -41,14 +41,18 @@ import com.playmonumenta.bossfights.bosses.AzacorNormal;
 import com.playmonumenta.bossfights.bosses.BlockBreakBoss;
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
 import com.playmonumenta.bossfights.bosses.CAxtal;
+import com.playmonumenta.bossfights.bosses.CShura_1;
+import com.playmonumenta.bossfights.bosses.CShura_2;
 import com.playmonumenta.bossfights.bosses.ChargerBoss;
 import com.playmonumenta.bossfights.bosses.DamageReducedBoss;
+import com.playmonumenta.bossfights.bosses.DebuffHitBoss;
 import com.playmonumenta.bossfights.bosses.FireResistantBoss;
 import com.playmonumenta.bossfights.bosses.FireballBoss;
 import com.playmonumenta.bossfights.bosses.FlameNovaBoss;
 import com.playmonumenta.bossfights.bosses.FrostNovaBoss;
 import com.playmonumenta.bossfights.bosses.GenericBoss;
 import com.playmonumenta.bossfights.bosses.HiddenBoss;
+import com.playmonumenta.bossfights.bosses.IceAspectBoss;
 import com.playmonumenta.bossfights.bosses.InfestedBoss;
 import com.playmonumenta.bossfights.bosses.InvisibleBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
@@ -117,6 +121,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallSlownessBoss(p, e));
 		mStatelessBosses.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraSmallWeaknessBoss(p, e));
 		mStatelessBosses.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FrostNovaBoss(p, e));
+		mStatelessBosses.put(DebuffHitBoss.identityTag, (Plugin p, LivingEntity e) -> new DebuffHitBoss(p, e));
+		mStatelessBosses.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> new IceAspectBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -127,6 +133,8 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
 		mStatefulBosses.put(Azacor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Azacor(p, e, s, l));
 		mStatefulBosses.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new AzacorNormal(p, e, s, l));
+		mStatefulBosses.put(CShura_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_1(p, e, s, l));
+		mStatefulBosses.put(CShura_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_2(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -154,6 +162,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AuraSmallSlownessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallSlownessBoss.deserialize(p, e));
 		mBossDeserializers.put(AuraSmallWeaknessBoss.identityTag, (Plugin p, LivingEntity e) -> AuraSmallWeaknessBoss.deserialize(p, e));
 		mBossDeserializers.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> FrostNovaBoss.deserialize(p, e));
+		mBossDeserializers.put(DebuffHitBoss.identityTag, (Plugin p, LivingEntity e) -> DebuffHitBoss.deserialize(p, e));
+		mBossDeserializers.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> IceAspectBoss.deserialize(p, e));
 		mBossDeserializers.put(CAxtal.identityTag, (Plugin p, LivingEntity e) -> CAxtal.deserialize(p, e));
 		mBossDeserializers.put(Masked_1.identityTag, (Plugin p, LivingEntity e) -> Masked_1.deserialize(p, e));
 		mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
@@ -161,6 +171,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
 		mBossDeserializers.put(Azacor.identityTag, (Plugin p, LivingEntity e) -> Azacor.deserialize(p, e));
 		mBossDeserializers.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e) -> AzacorNormal.deserialize(p, e));
+		mBossDeserializers.put(CShura_1.identityTag, (Plugin p, LivingEntity e) -> CShura_1.deserialize(p, e));
+		mBossDeserializers.put(CShura_2.identityTag, (Plugin p, LivingEntity e) -> CShura_2.deserialize(p, e));
 	}
 
 	/********************************************************************************
