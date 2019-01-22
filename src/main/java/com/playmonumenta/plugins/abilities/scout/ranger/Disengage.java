@@ -36,7 +36,7 @@ public class Disengage extends Ability {
 	private static final int DISENGAGE_2_DAMAGE = 10;
 	private static final int DISENGAGE_COOLDOWN = 12 * 20;
 
-	private Material blockClicked;
+	private Material mBlockClicked;
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -47,14 +47,14 @@ public class Disengage extends Ability {
 	}
 
 	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		this.blockClicked = blockClicked;
+		mBlockClicked = blockClicked;
 	}
 
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) && !blockClicked.isInteractable();
+		return mBlockClicked != null && !mBlockClicked.isInteractable() && mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
 	}
 
 	@Override
