@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,6 +39,11 @@ public class Sniper implements ItemProperty {
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
+			if ((proj instanceof Arrow) && !((Arrow)proj).isCritical()) {
+				// If this is an arrow, it must be critical. Since this is not, abort early
+				return;
+			}
+
 			int mainHandLevel = this.getLevelFromItem(player.getInventory().getItemInMainHand());
 			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
 
