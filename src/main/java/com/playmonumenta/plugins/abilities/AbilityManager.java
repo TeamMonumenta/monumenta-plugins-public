@@ -39,6 +39,9 @@ import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
@@ -58,6 +61,8 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
+import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -128,6 +133,9 @@ public class AbilityManager {
 		                          new ManaLance(mPlugin, mWorld, mRandom, null),
 		                          new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                          new Spellshock(mPlugin, mWorld, mRandom, null),
+		                          // ELEMENTALIST
+		                          new FrostRay(mPlugin, mWorld, mRandom, null),
+		                          new MeteorStrike(mPlugin, mWorld, mRandom, null),
 
 		                          // ROGUE
 		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
@@ -204,6 +212,10 @@ public class AbilityManager {
 		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
 		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null),
+		                          // HARBINGER
+		                          new AdrenalSerum(mPlugin, mWorld, mRandom, null),
+		                          new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
+		                          new PurpleHaze(mPlugin, mWorld, mRandom, null),
 
 		                          // ALL PLAYERS (but technically for Alchemist)
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null)

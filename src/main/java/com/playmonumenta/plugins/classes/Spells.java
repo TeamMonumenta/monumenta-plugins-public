@@ -26,7 +26,7 @@ public enum Spells {
 
 	METEOR_STRIKE("Meteor Strike"),
 	ELEMENTAL_SPIRIT("Elemental Spirit"),
-	GLACIAL_RIFT("Glacial Rift"),
+	FROST_RAY("Frost Ray"),
 
 	//--Arcanist Spec.
 	FSWORD("Flash Sword"),
@@ -115,7 +115,10 @@ public enum Spells {
 	CAUSTIC_BLADE("Caustic Blade"),
 	IRON_TINCTURE("Iron Tincture"),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
-	UNSTABLE_ARROWS("Unstable Arrows");
+	UNSTABLE_ARROWS("Unstable Arrows"),
+
+	//Harbinger
+	ADRENAL_SERUM("Adrenal Serum");
 
 	private final String name;
 
