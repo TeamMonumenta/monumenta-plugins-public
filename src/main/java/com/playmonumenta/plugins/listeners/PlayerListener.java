@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +65,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -86,7 +91,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PlayerListener implements Listener {
@@ -412,10 +416,115 @@ public class PlayerListener implements Listener {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
 	}
 
+	private boolean _isKeptItemOnDeath(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			List<String> lore = meta.getLore();
+			if (lore != null && !lore.isEmpty()) {
+				for (String loreEntry : lore) {
+					if ((ChatColor.stripColor(loreEntry).equals("King's Valley : Tier I")) ||
+						(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
+						(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private static final List<Integer> ITEM_SLOTS_TO_PRESERVE =
+			Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
+	private static final List<Integer> ITEM_SLOTS_TO_DROP =
+			Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
+
+	private static final int KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 10;
+	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 100;
+
 	// The player has died
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+
+		if (!event.getKeepInventory()) {
+			/* Monumenta-custom keep inventory
+			 *
+			 * Keep armor and hotbar items if they meet some conditions (_isKeptItemOnDeath)
+			 *
+			 * The player always gets keepinv set on them to prevent relog bugs - so items must
+			 * be manually dropped here if they don't meet the conditions.
+			 *
+			 * Items dropped are invulnerable for a short while to prevent double-creepering
+			 */
+			event.setKeepInventory(true);
+			event.setKeepLevel(false);
+
+			List<Item> droppedItems = new ArrayList<Item>();
+
+			PlayerInventory inv = player.getInventory();
+			for (int slotId : ITEM_SLOTS_TO_PRESERVE) {
+				// Potentially kept slot
+				ItemStack item = inv.getItem(slotId);
+				if (item != null) {
+					if (_isKeptItemOnDeath(item)) {
+						// Good matching item - will be kept on death
+						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
+						if (meta == null || !(meta instanceof Damageable)) {
+							// This item can be damaged - remove some durability from it
+							Damageable dMeta = (Damageable)meta;
+							short maxDurability = item.getType().getMaxDurability();
+							int currentDamage = dMeta.getDamage();
+							dMeta.setDamage(Math.min(maxDurability, currentDamage + (maxDurability * KEPT_ITEM_DURABILITY_DAMAGE_PERCENT) / 100));
+
+							// Probably redundant, but can't hurt
+							item.setItemMeta(meta);
+						}
+					} else {
+						// Non-matching item, need to drop it and remove from inventory
+						Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
+
+						// Make the dropped item invulnerable for a short while to prevent double-creepering
+						droppedItem.setInvulnerable(true);
+						droppedItems.add(droppedItem);
+
+						inv.clear(slotId);
+					}
+				}
+			}
+			for (int slotId : ITEM_SLOTS_TO_DROP) {
+				// Regular inventory item - don't check, just drop it
+				ItemStack item = inv.getItem(slotId);
+				if (item != null) {
+					Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
+
+					// Make the dropped item invulnerable for a short while to prevent double-creepering
+					droppedItem.setInvulnerable(true);
+					droppedItems.add(droppedItem);
+
+					inv.clear(slotId);
+				}
+			}
+
+			if (droppedItems.size() > 0) {
+				player.sendMessage(ChatColor.RED + "Some of your items were dropped! See /deathhelp for info");
+
+				/* Some items were dropped and they were set to invulnerable
+				 *
+				 * Set them to be un-invulnerable 3s later unless it has 'Hope' in lore text!
+				 */
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						for (Item droppedItem : droppedItems) {
+							if (!InventoryUtils.testForItemWithLore(droppedItem.getItemStack(), ChatColor.GRAY + "Hope")) {
+								// This item doesn't have hope - shouldn't be invulnerable anymore
+								droppedItem.setInvulnerable(false);
+							}
+						}
+					}
+				}.runTaskLater(mPlugin, DROPPED_ITEM_INVULNERABLE_TICKS);
+			}
+		}
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
