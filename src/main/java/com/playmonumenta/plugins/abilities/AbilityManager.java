@@ -97,6 +97,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.GrowingRage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 
 public class AbilityManager {
@@ -465,6 +466,14 @@ public class AbilityManager {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	public void PlayerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PlayerDealtCustomDamageEvent(event);
 			}
 		}
 	}

@@ -49,7 +49,7 @@ public class EntityUtils {
 		return type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER || type == EntityType.PIG_ZOMBIE || type == EntityType.HUSK ||
 		       type == EntityType.SKELETON || type == EntityType.WITHER_SKELETON || type == EntityType.STRAY ||
 		       type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE ||
-			   type == EntityType.PHANTOM || type == EntityType.DROWNED;
+		       type == EntityType.PHANTOM || type == EntityType.DROWNED;
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -401,6 +401,18 @@ public class EntityUtils {
 			target.damage(event.getDamage(), damager);
 		} else {
 			target.damage(event.getDamage());
+		}
+	}
+
+	public static void damageEntityNoEvent(Plugin plugin, LivingEntity target, double damage, Entity damager) {
+
+		damage = damage * vulnerabilityMult(target);
+
+		if (damager != null) {
+			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
+			target.damage(damage, damager);
+		} else {
+			target.damage(damage);
 		}
 	}
 

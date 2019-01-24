@@ -55,6 +55,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.item.properties.Frost;
 import com.playmonumenta.plugins.item.properties.Inferno;
 import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
@@ -144,21 +145,12 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	/* TODO: Specialization needed?
-	//  An Entity hit another Entity.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler
 	public void CustomDamageEvent(CustomDamageEvent event) {
-		Entity damager = event.getDamager();
-		LivingEntity damagee = event.getDamaged();
-
-		if (damager instanceof Player) {
-			Player player = (Player) damager;
-			if (!mPlugin.getSpecialization(player).EntityCustomDamagedByPlayerEvent(player, damagee, event.getDamage(), event.getMagicType(), event)) {
-				event.setCancelled(true);
-			}
+		if (event.getDamager() instanceof Player) {
+			AbilityManager.getManager().PlayerDealtCustomDamageEvent((Player)event.getDamager(), event);
 		}
 	}
-	*/
 
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.LOWEST)

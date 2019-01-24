@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -101,7 +102,9 @@ public abstract class Ability {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean AbilityCastEvent(AbilityCastEvent event) { return true; }
+	public boolean AbilityCastEvent(AbilityCastEvent event) {
+		return true;
+	}
 
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		return true;
@@ -153,6 +156,8 @@ public abstract class Ability {
 	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
 	public void PlayerExtendedSneakEvent() { }
+
+	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

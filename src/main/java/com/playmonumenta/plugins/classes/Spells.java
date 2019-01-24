@@ -90,9 +90,9 @@ public enum Spells {
 	GRASPING_CLAW("Grasping Claw"),
 
 	//--Reaper
-	DARK_ERUPTION("Dark Eruption"),
-	PETRIFYING_GLARE("Petrifying Glare"),
-	SOULREAPING("Soulreaping"),
+	HUNGERING_VORTEX("Hungering Vortex"),
+	DEATHS_TOUCH("Death's Touch"),
+	DARK_PACT("Dark Pact"),
 
 	//--Tenebrist
 	HYPNOTIC_RAGE("Hypnotic Rage"),
