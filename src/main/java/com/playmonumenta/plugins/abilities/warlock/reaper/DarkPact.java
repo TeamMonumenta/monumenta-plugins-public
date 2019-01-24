@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -26,6 +25,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class DarkPact extends Ability {
+	private static final int DARK_PACT_COOLDOWN = 20 * 30;
+	private static final int DARK_PACT_DURATION = 20 * 10;
+	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1.5;
+	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1.75;
+	private static final int DARK_PACT_WEAKNESS_AMPLIFIER = 1;
+	private static final int DARK_PACT_WEAKNESS_DURATION = 20 * 10;
+
 
 	/*
 	 * Dark Pact: Sprint + left-click to greatly amplify your
@@ -40,13 +46,23 @@ public class DarkPact extends Ability {
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "DarkPact";
-		mInfo.cooldown = 20 * 30;
+		mInfo.cooldown = DARK_PACT_COOLDOWN;
 		mInfo.linkedSpell = Spells.DARK_PACT;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+
+		/*
+		 * NOTE! Because this skill has two events it needs to bypass the automatic cooldown check
+		 * and manage cooldown itself
+		 */
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
 	public boolean cast() {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			return true;
+		}
+
 		active = true;
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1.25f);
@@ -57,12 +73,14 @@ public class DarkPact extends Ability {
 			public void run() {
 				t++;
 				mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 1, 0.25, 0.35, 0.25, 0);
-				if (t >= 20 * 10 || mPlayer.isDead() || mPlayer == null) {
+				if (t >= DARK_PACT_DURATION || mPlayer.isDead()) {
 					this.cancel();
 					active = false;
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 0.75f);
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 1, true, true));
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+					                                 new PotionEffect(PotionEffectType.WEAKNESS, DARK_PACT_WEAKNESS_DURATION,
+					                                                  DARK_PACT_WEAKNESS_AMPLIFIER, true, true));
 				}
 			}
 
@@ -74,27 +92,24 @@ public class DarkPact extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (active) {
-			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			// Melee attacks only
+			if (!event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 				return true;
 			}
+
 			int level = getAbilityScore();
-			double percent = level == 1 ? 1.5 : 1.75;
+			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 			event.setDamage(event.getDamage() * percent);
-			if (level > 1) {
-				if (InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
-					Location loc = mPlayer.getLocation().add(0, 1.35, 0);
-					Vector dir = loc.getDirection();
-					loc.add(dir);
-					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
-					for (Entity e : loc.getWorld().getNearbyEntities(loc, 1.5, 1.5, 1.5)) {
-						if (EntityUtils.isHostileMob(e)) {
-							Vector toMobVector = e.getLocation().toVector().subtract(loc.toVector())
-							                     .normalize();
-							if (dir.dot(toMobVector) > 0.6) {
-								EntityUtils.damageEntityNoEvent(mPlugin, (LivingEntity) e, event.getDamage() / 2, mPlayer);
-							}
-						}
+			if (level > 1 && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+				Location loc = mPlayer.getLocation().add(0, 1.35, 0);
+				Vector dir = loc.getDirection();
+				loc.add(dir);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0);
+				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 1.5)) {
+					Vector toMobVector = mob.getLocation().toVector().subtract(loc.toVector()).normalize();
+					if (dir.dot(toMobVector) > 0.6) {
+						EntityUtils.damageEntityNoEvent(mPlugin, mob, event.getDamage() / 2, mPlayer);
 					}
 				}
 			}
@@ -105,7 +120,7 @@ public class DarkPact extends Ability {
 	@Override
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (active) {
-			double percent = getAbilityScore() == 1 ? 1.5 : 1.75;
+			double percent = getAbilityScore() == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 			event.setDamage(event.getDamage() * percent);
 		}
 	}

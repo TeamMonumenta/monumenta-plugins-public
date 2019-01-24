@@ -26,6 +26,13 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class HungeringVortex extends Ability {
+	private static final int HUNGERING_VORTEX_DURATION = 8 * 20;
+	private static final int HUNGERING_VORTEX_COOLDOWN = 18 * 20;
+	private static final int HUNGERING_VORTEX_RADIUS = 7;
+	private static final int HUNGERING_VORTEX_1_WEAKNESS_AMPLIFIER = 0;
+	private static final int HUNGERING_VORTEX_2_WEAKNESS_AMPLIFIER = 1;
+	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 0.5;
+	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 1;
 
 	/*
 	 * Hungering Vortex: Shift + right click looking down pulls
@@ -39,14 +46,14 @@ public class HungeringVortex extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "HungeringVortex";
 		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
-		mInfo.cooldown = 20 * 18;
+		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
 	public boolean cast() {
 		int vortex = getAbilityScore();
-		int weakness = vortex == 1 ? 0 : 1;
+		int weakness = vortex == 1 ? HUNGERING_VORTEX_1_WEAKNESS_AMPLIFIER : HUNGERING_VORTEX_2_WEAKNESS_AMPLIFIER;
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1, 1.25f);
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 0.75f);
 		Location loc = mPlayer.getLocation();
@@ -56,7 +63,7 @@ public class HungeringVortex extends Ability {
 		 */
 		new BukkitRunnable() {
 			double rotation = 0;
-			double radius = 7;
+			double radius = HUNGERING_VORTEX_RADIUS;
 
 			@Override
 			public void run() {
@@ -72,18 +79,19 @@ public class HungeringVortex extends Ability {
 					radius -= 0.25;
 					if (radius <= 0) {
 						this.cancel();
-						break;
+						return;
 					}
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-		List<Mob> mobs = EntityUtils.getNearbyMobs(loc, 7);
+
+		List<Mob> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
 		for (LivingEntity mob : mobs) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 8, weakness));
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
 			MovementUtils.PullTowards(mPlayer, mob, 1);
 		}
 
-		double damageInc = vortex == 1 ? 0.5 : 1;
+		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
 		double extra_dam = mobs.size() * damageInc;
 		if (extra_dam > 4 * vortex) {
 			extra_dam = 4 * vortex;
@@ -97,7 +105,7 @@ public class HungeringVortex extends Ability {
 			@Override
 			public void run() {
 				t++;
-				if (t >= 20 * 8 || mPlayer.isDead() || mPlayer == null) {
+				if (t >= HUNGERING_VORTEX_DURATION || mPlayer.isDead()) {
 					this.cancel();
 					mPlayer.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "The power of your Vortex fades away...");

@@ -222,6 +222,7 @@ public class AbilityManager {
 		// Make sure non-warriors don't have passive knockback resistance or armor
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
+		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 
 		List<Ability> abilities = new ArrayList<Ability>();
 

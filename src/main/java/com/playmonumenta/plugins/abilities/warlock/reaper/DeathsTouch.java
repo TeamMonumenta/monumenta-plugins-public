@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
@@ -24,6 +25,11 @@ import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class DeathsTouch extends Ability {
+	private static final int DEATHS_TOUCH_1_COOLDOWN = 30 * 20;
+	private static final int DEATHS_TOUCH_2_COOLDOWN = 20 * 20;
+	private static final int DEATHS_TOUCH_1_BUFF_DURATION = 15 * 20;
+	private static final int DEATHS_TOUCH_2_BUFF_DURATION = 20 * 20;
+	private static final int DEATHS_TOUCH_RANGE = 20;
 
 	/*
 	 * Death’s Touch: Sprint + right-click marks the enemy
@@ -41,22 +47,28 @@ public class DeathsTouch extends Ability {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.scoreboardId = "DeathsTouch";
-		mInfo.cooldown = getAbilityScore() == 1 ? 30 * 20 : 20 * 20;
+		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+
+		/*
+		 * NOTE! Because this skill has two events it needs to bypass the automatic cooldown check
+		 * and manage cooldown itself
+		 */
+		mInfo.ignoreCooldown = true;
 	}
 
-	public List<PotionEffectType> getOppositeEffects(LivingEntity e) {
+	private static List<PotionEffectType> getOppositeEffects(LivingEntity e) {
 		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
 		for (PotionEffect effect : e.getActivePotionEffects()) {
-			if (effect.getType() == PotionEffectType.WEAKNESS) {
+			if (effect.getType().equals(PotionEffectType.WEAKNESS)) {
 				types.add(PotionEffectType.INCREASE_DAMAGE);
-			} else if (effect.getType() == PotionEffectType.SLOW) {
+			} else if (effect.getType().equals(PotionEffectType.SLOW)) {
 				types.add(PotionEffectType.SPEED);
-			} else if (effect.getType() == PotionEffectType.WITHER || effect.getType() == PotionEffectType.POISON) {
+			} else if (effect.getType().equals(PotionEffectType.WITHER) || effect.getType().equals(PotionEffectType.POISON)) {
 				types.add(PotionEffectType.REGENERATION);
-			} else if (effect.getType() == PotionEffectType.SLOW_DIGGING) {
+			} else if (effect.getType().equals(PotionEffectType.SLOW_DIGGING)) {
 				types.add(PotionEffectType.FAST_DIGGING);
-			} else if (effect.getType() == PotionEffectType.BLINDNESS) {
+			} else if (effect.getType().equals(PotionEffectType.BLINDNESS)) {
 				types.add(PotionEffectType.NIGHT_VISION);
 			}
 		}
@@ -68,56 +80,61 @@ public class DeathsTouch extends Ability {
 
 	@Override
 	public boolean cast() {
+        if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			return true;
+		}
+
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
-		boolean cancel = false;
 		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1, 0.25f);
-		for (int i = 0; i < 20; i++) {
+
+		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
+		List<Mob> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE);
+
+		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
 			loc.add(dir);
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 3, 0.1, 0.1, 0.1);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
-				if (target == null) {
+			for (LivingEntity mob : mobsInRange) {
+				if (mob.getLocation().distance(loc) < 0.8) {
 					target = mob;
-					cancel = true;
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 1, 1f);
+
 					new BukkitRunnable() {
+						int runnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 						double width = mob.getWidth() / 2;
 						int t = 0;
+
 						@Override
 						public void run() {
 							t++;
 							mPlayer.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width);
 							mPlayer.spawnParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width);
-							if (t >= 20 * 15) {
+							if (t >= runnableDuration || target == null) {
 								this.cancel();
 								target = null;
 							}
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-					break;
+
+					// This loop only runs at most once!
+					putOnCooldown();
+					return true;
 				}
 			}
-			if (cancel) {
-				break;
-			}
 		}
-		putOnCooldown();
 		return true;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (target != null) {
-			if (event.getEntity().equals(target)) {
-				LivingEntity e = event.getEntity();
-				List<PotionEffectType> effects = getOppositeEffects(e);
-				int duration = getAbilityScore() == 1 ? 20 * 15 : 20 * 20;
-				for (PotionEffectType effect : effects) {
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(effect, duration, 0, true, true));
-				}
-				target = null;
+		if (event.getEntity().equals(target)) {
+			List<PotionEffectType> effects = getOppositeEffects(event.getEntity());
+			int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
+			for (PotionEffectType effect : effects) {
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(effect, duration, 0, true, true));
 			}
+			target = null;
 		}
 	}
 
