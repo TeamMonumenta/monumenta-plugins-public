@@ -26,7 +26,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  * kill the player). At level 2 you also gain Resistance I and Haste I (Cooldown
  * 30s)
  *
- * NOTE: Particle effects need flair
+ * TODO: Particle effects need flair
  */
 
 public class AdrenalSerum extends Ability {
@@ -65,7 +65,9 @@ public class AdrenalSerum extends Ability {
 
 	@Override
 	public boolean cast() {
+		//TODO: This almost certainly does not work
 		AbilityUtils.addAlchemistPotions(mPlayer, -1 * ADRENAL_SERUM_POTIONS_CONSUMED);
+
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ADRENAL_SERUM_DURATION, 0, true, true));
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, ADRENAL_SERUM_DURATION, 0, true, true));

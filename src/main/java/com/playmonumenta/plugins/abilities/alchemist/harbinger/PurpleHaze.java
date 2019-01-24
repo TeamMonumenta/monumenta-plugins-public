@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
  * 6/12s of Weakness to all targets within 3 blocks. Mobs dying from this cloud
  * can also trigger Purple Haze.
  *
- * NOTE: Particle effects need flair
+ * TODO: Particle effects need flair, weakness not implemented
  */
 
 public class PurpleHaze extends Ability {

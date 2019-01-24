@@ -99,7 +99,8 @@ public class ElementalistSpecialization extends BaseSpecialization {
 					 * cooldown)
 					 */
 					if (glacialRift > 0) {
-						if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.GLACIAL_RIFT)) {
+						// if (!mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.GLACIAL_RIFT)) {
+						if (true) {
 							Location loc = player.getLocation();
 							Vector dir = loc.getDirection().normalize();
 							dir.multiply(1.2);
@@ -155,7 +156,7 @@ public class ElementalistSpecialization extends BaseSpecialization {
 								}
 
 							}.runTaskTimer(mPlugin, 0, 1);
-							mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GLACIAL_RIFT, 20 * 16);
+							//mPlugin.mTimers.AddCooldown(player.getUniqueId(), Spells.GLACIAL_RIFT, 20 * 16);
 						}
 					}
 				}

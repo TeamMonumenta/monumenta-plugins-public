@@ -63,7 +63,8 @@ public class FrostRay extends Ability {
 		int damage = getAbilityScore() == 1 ? FROST_RAY_1_DAMAGE : FROST_RAY_2_DAMAGE;
 		new BukkitRunnable() {
 			int t = 0;
-			Location playerLocation = mPlayer.getLocation();
+			Location castLocation = mPlayer.getLocation();
+			int maxDuration = getAbilityScore() == 1 ? FROST_RAY_1_DURATION : FROST_RAY_2_DURATION;
 
 			@Override
 			public void run() {
@@ -71,7 +72,7 @@ public class FrostRay extends Ability {
 				Location location = mPlayer.getLocation();
 				Vector increment = location.getDirection();
 				List<Mob> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
-				if (!playerLocation.equals(location)) {
+				if (castLocation.distance(location) > 1 || t >= maxDuration) {
 					this.cancel();
 				}
 				for (int i = 0; i <= FROST_RAY_RANGE; i++) {
