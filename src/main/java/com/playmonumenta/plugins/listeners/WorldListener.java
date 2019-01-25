@@ -27,9 +27,8 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
@@ -177,7 +176,7 @@ public class WorldListener implements Listener {
 
 		if (blockType.equals(Material.SNOW) ||
 		    blockType.equals(Material.ICE)) {
-			LocationType locType = LocationUtils.getLocationType(mPlugin, block.getLocation());
+			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(block.getLocation());
 			if (locType.equals(LocationType.Capital) ||
 			    locType.equals(LocationType.SafeZone)) {
 				event.setCancelled(true);

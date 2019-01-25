@@ -9,8 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class SilverfishTracking implements EntityTracking {
 	Plugin mPlugin = null;
@@ -36,7 +35,7 @@ public class SilverfishTracking implements EntityTracking {
 		while (silverfishIter.hasNext()) {
 			Silverfish silverfish = silverfishIter.next();
 			if (silverfish != null && silverfish.isValid()) {
-				if (LocationUtils.getLocationType(mPlugin, silverfish) != LocationType.None) {
+				if (mPlugin.mSafeZoneManager.getLocationType(silverfish) != LocationType.None) {
 					silverfish.remove();
 					silverfishIter.remove();
 				}

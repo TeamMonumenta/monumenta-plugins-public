@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.utils;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
@@ -10,69 +9,7 @@ import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
-
 public class LocationUtils {
-	public enum LocationType {
-		None(-1),
-
-		// Adventure + Resistance + Speed
-		Capital(0),
-
-		// Adventure + Resistance
-		SafeZone(1),
-
-		// Adventure
-		AdventureZone(2),
-
-		// Restricted - Adventure and some interactions are restricted
-		RestrictedZone(3);
-
-		public int mValue;
-		private LocationType(int value) {
-			this.mValue = value;
-		}
-	}
-
-	public static final AreaBounds OLDLABS = new AreaBounds("oldLabs", LocationType.None, new Point(-416.0, 48.0, -976.0), new Point(574.0, 200.0, -750.0));
-
-	public static LocationType getLocationType(Plugin plugin, Entity entity) {
-		return getLocationType(plugin, entity.getLocation());
-	}
-
-	public static LocationType getLocationType(Plugin plugin, Location location) {
-		return getLocationType(plugin, new Point(location));
-	}
-
-	public static LocationType getLocationType(Plugin plugin, Point point) {
-		if (plugin.mServerProperties.getIsTownWorld()) {
-			return LocationType.Capital;
-		}
-
-
-		if (OLDLABS.within(point)) {
-			return OLDLABS.getType();
-		}
-
-		for (AreaBounds area : plugin.mServerProperties.mLocationBounds) {
-			if (area.within(point)) {
-				return area.getType();
-			}
-		}
-
-		return LocationType.None;
-	}
-
-	public static boolean isInPlot(Plugin plugin, World world, Location location) {
-		if (getLocationType(plugin, location) == LocationType.Capital) {
-			Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
-			return (mat == Material.SPONGE || mat == Material.OBSIDIAN);
-		}
-		return false;
-	}
-
 	public static Vector getDirectionTo(Location to, Location from) {
 		Vector vFrom = from.toVector();
 		Vector vTo = to.toVector();

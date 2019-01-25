@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.IncrementDaily;
+import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.TestNoScore;
@@ -42,6 +44,7 @@ import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.safezone.SafeZoneManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
@@ -84,6 +87,7 @@ public class Plugin extends JavaPlugin {
 	public PotionManager mPotionManager;
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
+	public SafeZoneManager mSafeZoneManager;
 
 	public SocketClient mSocketClient;
 
@@ -119,6 +123,7 @@ public class Plugin extends JavaPlugin {
 		IncrementDaily.register(this);
 		TransferScores.register(this);
 		CreateGuild.register(this);
+		MonumentaReload.register(this);
 
 		mServerProperties.load(this);
 		Bot.register(this);
@@ -147,12 +152,11 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
+		mSafeZoneManager = new SafeZoneManager(this);
 
 		//  Load info.
-		_loadConfig();
-		mServerProperties.load(this);
+		reloadMonumentaConfig(null);
 
-		//  TODO: Move this out of here and into it's own EventManager class.
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
@@ -264,7 +268,8 @@ public class Plugin extends JavaPlugin {
 		}
 	}
 
-	private void _loadConfig() {
+	/* Sender will be sent debugging info if non-null */
+	public void reloadMonumentaConfig(CommandSender sender) {
 		if (mConfigFile == null) {
 			mConfigFile = new File(getDataFolder(), "config.yml");
 		}
@@ -272,6 +277,10 @@ public class Plugin extends JavaPlugin {
 		mConfig = YamlConfiguration.loadConfiguration(mConfigFile);
 
 		mDailyQuestVersion = mConfig.getInt("daily_version");
+
+		mServerProperties.load(this);
+
+		mSafeZoneManager.reload(sender);
 	}
 
 	private void _saveConfig() {

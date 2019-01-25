@@ -7,8 +7,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class PackedIceOverride extends BaseOverride {
 	@Override
@@ -20,7 +19,7 @@ public class PackedIceOverride extends BaseOverride {
 		if (item.hasItemMeta()
 		    && item.getItemMeta().hasLore()
 		    && player.getGameMode() == GameMode.SURVIVAL) {
-			if (LocationUtils.getLocationType(plugin, player) == LocationType.Capital) {
+			if (plugin.mSafeZoneManager.getLocationType(player) == LocationType.Capital) {
 				event.getBlockPlaced().setType(Material.WATER);
 			} else {
 				return false;

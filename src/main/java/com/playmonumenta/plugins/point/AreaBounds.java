@@ -2,19 +2,13 @@ package com.playmonumenta.plugins.point;
 
 import org.bukkit.Location;
 
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
-
 public class AreaBounds {
-	public String mName;
-	public LocationType mType;
 	public Point mLowerCorner;
 	public Point mUpperCorner;
 
-	public AreaBounds(String name, LocationType type, Point lowerCorner, Point upperCorner) {
+	public AreaBounds(Point lowerCorner, Point upperCorner) {
 		double temp;
 
-		mName = name;
-		mType = type;
 		mLowerCorner = lowerCorner;
 		mUpperCorner = upperCorner;
 
@@ -47,17 +41,8 @@ public class AreaBounds {
 		        loc.getZ() >= mLowerCorner.mZ && loc.getZ() <= mUpperCorner.mZ;
 	}
 
-	public String getName() {
-		return mName;
-	}
-
-	public LocationType getType() {
-		return mType;
-	}
-
 	@Override
 	public String toString() {
-		return "{" + mName + ", " + mType.toString() + ", " +
-		       mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";
+		return "{" + mLowerCorner.toString() + ", " + mUpperCorner.toString() + "}";
 	}
 }

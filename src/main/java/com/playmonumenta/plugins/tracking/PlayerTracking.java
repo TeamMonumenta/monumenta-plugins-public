@@ -26,8 +26,7 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -125,7 +124,7 @@ public class PlayerTracking implements EntityTracking {
 
 					PlayerUtils.awardStrike(mPlugin, player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					LocationType zone = LocationUtils.getLocationType(mPlugin, player);
+					LocationType zone = mPlugin.mSafeZoneManager.getLocationType(player);
 					inSafeZone = (zone != LocationType.None);
 					inCapital = (zone == LocationType.Capital);
 					applyEffects = (zone == LocationType.Capital || zone == LocationType.SafeZone);
@@ -136,16 +135,16 @@ public class PlayerTracking implements EntityTracking {
 							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
 
 							if (mode == GameMode.SURVIVAL && !neededMat) {
-								_transitionToAdventure(player);
+								player.setGameMode(GameMode.ADVENTURE);
 
 							} else if (mode == GameMode.ADVENTURE && neededMat
 							           && loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
 							           && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
-								_transitionToSurvival(player);
+								player.setGameMode(GameMode.SURVIVAL);
 							}
 						} else {
 							if (mode == GameMode.SURVIVAL) {
-								_transitionToAdventure(player);
+								player.setGameMode(GameMode.ADVENTURE);
 							}
 						}
 					}
@@ -166,7 +165,7 @@ public class PlayerTracking implements EntityTracking {
 					}
 				} else {
 					if (mode == GameMode.ADVENTURE) {
-						_transitionToSurvival(player);
+						player.setGameMode(GameMode.SURVIVAL);
 					}
 				}
 			}
@@ -190,14 +189,6 @@ public class PlayerTracking implements EntityTracking {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	void _transitionToAdventure(Player player) {
-		player.setGameMode(GameMode.ADVENTURE);
-	}
-
-	void _transitionToSurvival(Player player) {
-		player.setGameMode(GameMode.SURVIVAL);
 	}
 
 	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);

@@ -26,10 +26,9 @@ import org.bukkit.metadata.MetadataValue;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -57,7 +56,7 @@ public class MobListener implements Listener {
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
 		    EntityUtils.isHostileMob(event.getEntity())) {
-			LocationType locType = LocationUtils.getLocationType(mPlugin, event.getEntity());
+			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(event.getEntity());
 			if (locType.equals(LocationType.Capital) ||
 			    locType.equals(LocationType.SafeZone)) {
 				event.setCancelled(true);
@@ -129,7 +128,7 @@ public class MobListener implements Listener {
 		Block block = event.getBlock();
 
 		// If the block is within a safezone, cancel the ignition unless it was from a player in creative mode
-		if (LocationUtils.getLocationType(mPlugin, block.getLocation()) != LocationType.None) {
+		if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
 			if (event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL)) {
 				Player player = event.getPlayer();
 				if (player != null && player.getGameMode() != GameMode.ADVENTURE) {

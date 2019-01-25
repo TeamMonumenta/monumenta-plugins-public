@@ -83,13 +83,12 @@ import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -201,7 +200,7 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -229,7 +228,7 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -270,7 +269,7 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -287,7 +286,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 			        && player.getGameMode() != GameMode.CREATIVE)) {
 				event.setCancelled(true);
 				return;
@@ -356,7 +355,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 			        && player.getGameMode() != GameMode.CREATIVE
 			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
@@ -395,7 +394,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (LocationUtils.getLocationType(mPlugin, player) == LocationType.RestrictedZone
+			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 			        && player.getGameMode() != GameMode.CREATIVE
 			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
@@ -630,7 +629,7 @@ public class PlayerListener implements Listener {
 			}
 
 			// Players that get resistance from safezones don't take armor damage
-			LocationType zone = LocationUtils.getLocationType(mPlugin, event.getPlayer());
+			LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getPlayer());
 			if (damage < 0 || zone == LocationType.Capital || zone == LocationType.SafeZone) {
 				damage = 0;
 			}
@@ -642,17 +641,11 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
-		Integer xp = event.getAmount();
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 			event.setAmount(0);
 			return;
-		}
-
-		if (LocationUtils.OLDLABS.within(player.getLocation())) {
-			xp = xp / 3;
-			event.setAmount(xp);
 		}
 
 		mPlugin.mTrackingManager.mPlayers.onExpChange(mPlugin, player, event);

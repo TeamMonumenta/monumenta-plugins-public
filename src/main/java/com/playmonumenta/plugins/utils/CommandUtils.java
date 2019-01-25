@@ -16,7 +16,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 
@@ -107,7 +106,7 @@ public class CommandUtils {
 		pos2.mY += 1;
 		pos2.mZ += 1;
 
-		return new AreaBounds("", LocationType.None, pos1, pos2);
+		return new AreaBounds(pos1, pos2);
 	}
 
 	public static double parseCoordFromString(CommandSender sender,

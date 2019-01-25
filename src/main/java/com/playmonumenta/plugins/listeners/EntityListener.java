@@ -62,9 +62,8 @@ import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -279,7 +278,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			LocationType locType = LocationUtils.getLocationType(mPlugin, player.getLocation());
+			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(player.getLocation());
 			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
 				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
 					event.setCancelled(true);
@@ -540,7 +539,7 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
-		LocationType zone = LocationUtils.getLocationType(mPlugin, event.getLocation());
+		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getLocation());
 		if (zone != LocationType.None) {
 			event.setCancelled(true);
 			return;
@@ -551,7 +550,7 @@ public class EntityListener implements Listener {
 			Block block = iter.next();
 
 			// If any block damaged by an explosion is with a safezone, cancel the explosion
-			if (LocationUtils.getLocationType(mPlugin, block.getLocation()) != LocationType.None) {
+			if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
 				event.setCancelled(true);
 				return;
 			}

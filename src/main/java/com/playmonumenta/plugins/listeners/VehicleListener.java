@@ -13,8 +13,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class VehicleListener implements Listener {
 	Plugin mPlugin;
@@ -38,7 +37,7 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
 
-		if (!(entity instanceof Player) && LocationUtils.getLocationType(mPlugin, vehicle) != LocationType.None) {
+		if (!(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None) {
 			/*
 			 * Vehicles are removed if they:
 			 *
@@ -55,7 +54,7 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntered();
 		Vehicle vehicle = event.getVehicle();
 
-		if (!(entity instanceof Player) && LocationUtils.getLocationType(mPlugin, vehicle) != LocationType.None) {
+		if (!(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None) {
 			/*
 			 * Vehicles cannot be entered if:
 			 *

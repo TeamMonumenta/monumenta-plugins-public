@@ -14,8 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class ItemOverrides {
 	/*
@@ -281,8 +280,8 @@ public class ItemOverrides {
 
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (LocationUtils.getLocationType(plugin, block.getLocation()) != LocationType.None &&
-			    LocationUtils.getLocationType(plugin, player.getLocation()) == LocationType.None) {
+			if (plugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None &&
+			    plugin.mSafeZoneManager.getLocationType(player.getLocation()) == LocationType.None) {
 				// Allow breaking if the player would be in survival mode at that spot
 				Location testLocation = block.getLocation();
 				testLocation.setY(10.0);

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.server.properties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,10 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
 
 public class ServerProperties {
 	private final static String FILE_NAME = "Properties.json";
@@ -34,7 +30,6 @@ public class ServerProperties {
 	private boolean mIsSleepingEnabled = true;
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
-	public ArrayList<AreaBounds> mLocationBounds = new ArrayList<>();
 
 	public EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 
@@ -109,7 +104,6 @@ public class ServerProperties {
 
 					mShardZoneID               = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
-					mLocationBounds            = _getPropertyValueLocationList(plugin, object, "locationBounds");
 
 					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks");
 				}
@@ -161,40 +155,6 @@ public class ServerProperties {
 			plugin.getLogger().info("Properties: " + properyName + " = <all>");
 		} else {
 			plugin.getLogger().info("Properties: " + properyName + " = " + value.toString());
-		}
-
-		return value;
-	}
-
-	private ArrayList<AreaBounds> _getPropertyValueLocationList(Plugin plugin, JsonObject object, String propertyName) {
-		ArrayList<AreaBounds> value = new ArrayList<AreaBounds>();
-
-		JsonElement element = object.get(propertyName);
-		if (element != null) {
-			Iterator<JsonElement> targetIter = element.getAsJsonArray().iterator();
-			while (targetIter.hasNext()) {
-				JsonObject iter = targetIter.next().getAsJsonObject();
-
-				if (iter.has("name") && iter.has("type") && iter.has("pos1") && iter.has("pos2")) {
-					try {
-						value.add(new AreaBounds(iter.get("name").getAsString(),
-						                         LocationType.valueOf(iter.get("type").getAsString()),
-						                         Point.fromString(iter.get("pos1").getAsString()),
-						                         Point.fromString(iter.get("pos2").getAsString())));
-					} catch (Exception e) {
-						plugin.getLogger().severe("Invalid locationBounds element at: '" + iter.toString() + "'");
-						e.printStackTrace();
-					}
-				} else {
-					plugin.getLogger().severe("Invalid locationBounds element at: '" + iter.toString() + "'");
-				}
-			}
-		}
-
-		if (value.isEmpty()) {
-			plugin.getLogger().info("Properties: " + propertyName + " = []");
-		} else {
-			plugin.getLogger().info("Properties: " + propertyName + " = " + value.toString());
 		}
 
 		return value;
