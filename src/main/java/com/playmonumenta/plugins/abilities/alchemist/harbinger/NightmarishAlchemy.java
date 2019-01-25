@@ -34,7 +34,6 @@ public class NightmarishAlchemy extends Ability {
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				int brutalAlchemy = getAbilityScore();
 				int damage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 				int duration = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_SHATTER_DURATION : NIGHTMARISH_ALCHEMY_2_SHATTER_DURATION;
 				for (LivingEntity entity : affectedEntities) {

@@ -56,12 +56,12 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.item.properties.Frost;
-import com.playmonumenta.plugins.item.properties.Inferno;
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
-import com.playmonumenta.plugins.item.properties.PointBlank;
-import com.playmonumenta.plugins.item.properties.Sniper;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager;
+import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.LocationUtils.LocationType;
@@ -648,6 +648,6 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ItemSpawnEvent(ItemSpawnEvent event) {
-		ItemPropertyManager.ItemSpawnEvent(mPlugin, event.getEntity());
+		EnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
 	}
 }

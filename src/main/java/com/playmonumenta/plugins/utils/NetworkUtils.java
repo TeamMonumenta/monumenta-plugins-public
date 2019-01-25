@@ -5,10 +5,10 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.packet.BroadcastCommandPacket;
-import com.playmonumenta.plugins.network.packet.GetServerListPacket;
-import com.playmonumenta.plugins.network.packet.SendPlayerPacket;
-import com.playmonumenta.plugins.network.packet.TransferPlayerDataPacket;
+import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
+import com.playmonumenta.plugins.packets.GetServerListPacket;
+import com.playmonumenta.plugins.packets.SendPlayerPacket;
+import com.playmonumenta.plugins.packets.TransferPlayerDataPacket;
 import com.playmonumenta.plugins.player.PlayerData;
 
 public class NetworkUtils {

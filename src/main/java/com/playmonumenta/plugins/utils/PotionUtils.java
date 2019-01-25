@@ -15,7 +15,7 @@ import org.bukkit.potion.PotionType;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;

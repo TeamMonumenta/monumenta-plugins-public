@@ -13,16 +13,16 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.item.properties.ItemProperty;
-import com.playmonumenta.plugins.item.properties.ItemPropertyManager;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 
 public class PlayerInventory {
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
 	 */
-	Map<ItemProperty, Integer> mCurrentProperties = new HashMap<ItemProperty, Integer>();
-	Map<ItemProperty, Integer> mPreviousProperties = new HashMap<ItemProperty, Integer>();
+	Map<BaseEnchantment, Integer> mCurrentProperties = new HashMap<BaseEnchantment, Integer>();
+	Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player);
@@ -35,8 +35,8 @@ public class PlayerInventory {
 			return;
 		}
 
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			property.tick(plugin, world, player, level);
@@ -45,24 +45,24 @@ public class PlayerInventory {
 
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
 		// Swap current and previous lists
-		Map<ItemProperty, Integer> temp = mPreviousProperties;
+		Map<BaseEnchantment, Integer> temp = mPreviousProperties;
 		mPreviousProperties = mCurrentProperties;
 		mCurrentProperties = temp;
 
 		// Clear the current map and update it with current properties
 		mCurrentProperties.clear();
-		ItemPropertyManager.getItemProperties(mCurrentProperties, player);
+		EnchantmentManager.getItemProperties(mCurrentProperties, player);
 
 		// Remove properties from the player that were removed
-		for (ItemProperty property : mPreviousProperties.keySet()) {
+		for (BaseEnchantment property : mPreviousProperties.keySet()) {
 			if (!mCurrentProperties.containsKey(property)) {
 				property.removeProperty(plugin, player);
 			}
 		}
 
 		// Apply properties to the player that changed or have a new level
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			Integer oldLevel = mPreviousProperties.get(property);
@@ -80,8 +80,8 @@ public class PlayerInventory {
 	}
 
 	public void onAttack(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			property.onAttack(plugin, player, level, target, event);
@@ -89,8 +89,8 @@ public class PlayerInventory {
 	}
 
 	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			property.onLaunchProjectile(plugin, player, level, proj, event);
@@ -98,8 +98,8 @@ public class PlayerInventory {
 	}
 
 	public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event) {
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			property.onExpChange(plugin, player, event, level);
@@ -107,8 +107,8 @@ public class PlayerInventory {
 	}
 
 	public void removeProperties(Plugin plugin, Player player) {
-		for (Map.Entry<ItemProperty, Integer> iter : mCurrentProperties.entrySet()) {
-			ItemProperty property = iter.getKey();
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
 
 			property.removeProperty(plugin, player);
 		}

@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.packet.HeartbeatPacket;
+import com.playmonumenta.plugins.packets.HeartbeatPacket;
 import com.playmonumenta.plugins.utils.PacketUtils;
 
 import fr.rhaz.socket4mc.Bukkit.BukkitSocketHandshakeEvent;

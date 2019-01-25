@@ -34,16 +34,16 @@ import com.playmonumenta.plugins.commands.TransferServer;
 import com.playmonumenta.plugins.commands.UpdateApartments;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
-import com.playmonumenta.plugins.items.ItemOverrides;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
-import com.playmonumenta.plugins.managers.ZoneManager;
-import com.playmonumenta.plugins.managers.potion.PotionManager;
+import com.playmonumenta.plugins.overrides.ItemOverrides;
+import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
@@ -82,7 +82,7 @@ public class Plugin extends JavaPlugin {
 
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
-	public ZoneManager mZoneManager;
+	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 
 	public SocketClient mSocketClient;
@@ -145,7 +145,7 @@ public class Plugin extends JavaPlugin {
 
 		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this, mWorld);
-		mZoneManager = new ZoneManager(this);
+		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
 
 		//  Load info.

@@ -2,16 +2,16 @@ package com.playmonumenta.plugins.utils;
 
 import com.google.gson.Gson;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.network.packet.BroadcastCommandPacket;
-import com.playmonumenta.plugins.network.packet.ForwardErrorPacket;
-import com.playmonumenta.plugins.network.packet.GetServerListPacket;
-import com.playmonumenta.plugins.network.packet.HeartbeatPacket;
-import com.playmonumenta.plugins.network.packet.Packet;
-import com.playmonumenta.plugins.network.packet.SendPlayerPacket;
-import com.playmonumenta.plugins.network.packet.TransferPlayerDataPacket;
+import com.playmonumenta.plugins.packets.BasePacket;
+import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
+import com.playmonumenta.plugins.packets.ForwardErrorPacket;
+import com.playmonumenta.plugins.packets.GetServerListPacket;
+import com.playmonumenta.plugins.packets.HeartbeatPacket;
+import com.playmonumenta.plugins.packets.SendPlayerPacket;
+import com.playmonumenta.plugins.packets.TransferPlayerDataPacket;
 
 public class PacketUtils {
-	public static void SendPacket(Plugin plugin, Packet packet) throws Exception {
+	public static void SendPacket(Plugin plugin, BasePacket packet) throws Exception {
 		// Serialize the packet data into a string that can be sent
 		String data = packet.getPacketData();
 
