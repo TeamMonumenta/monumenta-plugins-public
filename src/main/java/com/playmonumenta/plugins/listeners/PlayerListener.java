@@ -441,7 +441,7 @@ public class PlayerListener implements Listener {
 	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 100;
 
 	// The player has died
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void PlayerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
