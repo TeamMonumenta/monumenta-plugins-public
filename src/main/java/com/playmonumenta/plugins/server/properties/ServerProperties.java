@@ -28,9 +28,8 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
-	private int mShardZoneID = 0;
-	private boolean mQuestCompassEnabled = true;
 	private boolean mIsSleepingEnabled = true;
+	private boolean mKeepLowTierInventory = false;
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 
@@ -60,16 +59,12 @@ public class ServerProperties {
 		return mPlotSurvivalMinHeight;
 	}
 
-	public int getShardZoneID() {
-		return mShardZoneID;
-	}
-
-	public boolean getQuestCompassEnabled() {
-		return mQuestCompassEnabled;
-	}
-
 	public boolean getIsSleepingEnabled() {
 		return mIsSleepingEnabled;
+	}
+
+	public boolean getKeepLowTierInventory() {
+		return mKeepLowTierInventory;
 	}
 
 	public void load(Plugin plugin, CommandSender sender) {
@@ -107,10 +102,9 @@ public class ServerProperties {
 					mIsTownWorld               = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
 					mBroadcastCommandEnabled   = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
 					mPlotSurvivalMinHeight     = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mQuestCompassEnabled       = _getPropertyValueBool(plugin, object, "questCompassEnabled", mQuestCompassEnabled);
 					mIsSleepingEnabled         = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mKeepLowTierInventory      = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 
-					mShardZoneID               = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 
 					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);

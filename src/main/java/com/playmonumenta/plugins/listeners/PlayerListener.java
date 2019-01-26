@@ -416,15 +416,17 @@ public class PlayerListener implements Listener {
 	}
 
 	private boolean _isKeptItemOnDeath(ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			List<String> lore = meta.getLore();
-			if (lore != null && !lore.isEmpty()) {
-				for (String loreEntry : lore) {
-					if ((ChatColor.stripColor(loreEntry).equals("King's Valley : Tier I")) ||
-						(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
-						(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
-						return true;
+		if (item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null && !lore.isEmpty()) {
+					for (String loreEntry : lore) {
+						if ((ChatColor.stripColor(loreEntry).equals("King's Valley : Tier I")) ||
+							(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
+							(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
+							return true;
+						}
 					}
 				}
 			}
@@ -445,7 +447,7 @@ public class PlayerListener implements Listener {
 	public void PlayerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-		if (!event.getKeepInventory()) {
+		if (!event.getKeepInventory() && mPlugin.mServerProperties.getKeepLowTierInventory()) {
 			/* Monumenta-custom keep inventory
 			 *
 			 * Keep armor and hotbar items if they meet some conditions (_isKeptItemOnDeath)
@@ -465,8 +467,8 @@ public class PlayerListener implements Listener {
 				// Potentially kept slot
 				ItemStack item = inv.getItem(slotId);
 				if (item != null) {
-					if (_isKeptItemOnDeath(item)) {
-						// Good matching item - will be kept on death
+					if (_isKeptItemOnDeath(item) && (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
+						// Good matching item that does not have curse of binding - will be kept on death
 						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
 						if (meta == null || !(meta instanceof Damageable)) {
 							// This item can be damaged - remove some durability from it
