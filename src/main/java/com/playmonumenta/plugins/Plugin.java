@@ -125,7 +125,9 @@ public class Plugin extends JavaPlugin {
 		CreateGuild.register(this);
 		MonumentaReload.register(this);
 
-		mServerProperties.load(this);
+		mSafeZoneManager = new SafeZoneManager(this);
+		mServerProperties.load(this, null);
+
 		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
 			BroadcastCommand.register(this);
@@ -152,7 +154,6 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
-		mSafeZoneManager = new SafeZoneManager(this);
 
 		//  Load info.
 		reloadMonumentaConfig(null);
@@ -278,9 +279,7 @@ public class Plugin extends JavaPlugin {
 
 		mDailyQuestVersion = mConfig.getInt("daily_version");
 
-		mServerProperties.load(this);
-
-		mSafeZoneManager.reload(sender);
+		mServerProperties.load(this, sender);
 	}
 
 	private void _saveConfig() {

@@ -7,13 +7,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class ServerProperties {
 	private final static String FILE_NAME = "Properties.json";
@@ -69,23 +72,28 @@ public class ServerProperties {
 		return mIsSleepingEnabled;
 	}
 
-	public void load(Plugin plugin) {
+	public void load(Plugin plugin, CommandSender sender) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
 		try {
 			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {
-				_loadFromString(plugin, content);
+				_loadFromString(plugin, content, sender);
 			}
 		} catch (FileNotFoundException e) {
-			plugin.getLogger().info("Properties.json file does not exist - using default values" + e);
+			plugin.getLogger().info("Properties.json file does not exist - using default values");
 		} catch (Exception e) {
 			plugin.getLogger().severe("Caught exception: " + e);
 			e.printStackTrace();
+
+			if (sender != null) {
+				sender.sendMessage(ChatColor.RED + "Properties.json file does not exist - using default values");
+				MessagingUtils.sendStackTrace(sender, e);
+			}
 		}
 	}
 
-	private void _loadFromString(Plugin plugin, String content) throws Exception {
+	private void _loadFromString(Plugin plugin, String content, CommandSender sender) throws Exception {
 		if (content != null && content != "") {
 			try {
 				Gson gson = new Gson();
@@ -105,11 +113,22 @@ public class ServerProperties {
 					mShardZoneID               = _getPropertyValueInt(plugin, object, "shardZoneID", mShardZoneID);
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 
-					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks");
+					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
+
+					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
+
+					if (sender != null) {
+						sender.sendMessage(ChatColor.GOLD + "Successfully reloaded monumenta configuration");
+					}
 				}
 			} catch (Exception e) {
 				plugin.getLogger().severe("Caught exception: " + e);
 				e.printStackTrace();
+
+				if (sender != null) {
+					sender.sendMessage(ChatColor.RED + "Failed to load configuration!");
+					MessagingUtils.sendStackTrace(sender, e);
+				}
 			}
 		}
 	}
@@ -160,7 +179,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private EnumSet<Material> _getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName) {
+	private EnumSet<Material> _getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender) {
 		EnumSet<Material> value = EnumSet.noneOf(Material.class);
 
 		JsonElement element = object.get(propertyName);
@@ -177,6 +196,11 @@ public class ServerProperties {
 				} catch (Exception e) {
 					plugin.getLogger().severe("Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
 					e.printStackTrace();
+
+					if (sender != null) {
+						sender.sendMessage(ChatColor.RED + "Invalid unbreakableBlocks element at: '" + iter.toString() + "'");
+						MessagingUtils.sendStackTrace(sender, e);
+					}
 				}
 			}
 		}
