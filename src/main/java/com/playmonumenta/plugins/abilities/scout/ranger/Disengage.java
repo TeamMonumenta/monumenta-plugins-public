@@ -36,8 +36,6 @@ public class Disengage extends Ability {
 	private static final int DISENGAGE_2_DAMAGE = 10;
 	private static final int DISENGAGE_COOLDOWN = 12 * 20;
 
-	private Material mBlockClicked;
-
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.DISENGAGE;
@@ -46,15 +44,11 @@ public class Disengage extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		mBlockClicked = blockClicked;
-	}
-
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		return mBlockClicked != null && !mBlockClicked.isInteractable() && mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
+		return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
 	}
 
 	@Override
@@ -69,10 +63,12 @@ public class Disengage extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
 		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
-		double xVelocity = mPlayer.getLocation().getDirection().getX() * DISENGAGE_VELOCITY_MULTIPLIER;
-		double zVelocity = mPlayer.getLocation().getDirection().getZ() * DISENGAGE_VELOCITY_MULTIPLIER;
+		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
+		Vector dir = mPlayer.getLocation().getDirection().setY(0).normalize();
+		double xVelocity = dir.getX() * DISENGAGE_VELOCITY_MULTIPLIER;
+		double zVelocity = dir.getZ() * DISENGAGE_VELOCITY_MULTIPLIER;
 		mPlayer.setVelocity(new Vector(-xVelocity, DISENGAGE_Y_VELOCITY, -zVelocity));
-
+		putOnCooldown();
 		return true;
 	}
 }

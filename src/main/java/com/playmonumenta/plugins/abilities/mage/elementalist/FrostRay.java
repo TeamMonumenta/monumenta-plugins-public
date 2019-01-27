@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,12 +15,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
@@ -43,6 +46,7 @@ public class FrostRay extends Ability {
 	private static final int FROST_RAY_SLOWNESS_LEVEL = 1;
 	private static final int FROST_RAY_SLOWNESS_DURATION = 2 * 20;
 	private static final double FROST_RAY_RADIUS = 0.65;
+	private static final Particle.DustOptions FROST_RAY_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1f);
 
 	public FrostRay(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -59,41 +63,40 @@ public class FrostRay extends Ability {
 
 	@Override
 	public boolean cast() {
-		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
+		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 30, 0f, 0f, 0f, 0.15f); //Rudimentary effects
 		int damage = getAbilityScore() == 1 ? FROST_RAY_1_DAMAGE : FROST_RAY_2_DAMAGE;
 		new BukkitRunnable() {
 			int t = 0;
-			Location castLocation = mPlayer.getLocation();
+			Location castLocation = mPlayer.getLocation().add(0, 1.2, 0);
 			int maxDuration = getAbilityScore() == 1 ? FROST_RAY_1_DURATION : FROST_RAY_2_DURATION;
 
 			@Override
 			public void run() {
 				t++;
-				Location location = mPlayer.getLocation();
+				Location location = mPlayer.getLocation().add(0, 1.2, 0);
 				Vector increment = location.getDirection();
-				List<Mob> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
 				if (castLocation.distance(location) > 1 || t >= maxDuration) {
 					this.cancel();
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 				}
+				List<Mob> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
+				BoundingBox box = BoundingBox.of(location, 1, 1, 1);
 				for (int i = 0; i <= FROST_RAY_RANGE; i++) {
-					location.add(increment);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, location, 5, 0.05f, 0.05f, 0.05f, 0); //Rudimentary effects
+					box.shift(increment);
+					Location loc = box.getCenter().toLocation(mWorld);
+					mWorld.spawnParticle(Particle.REDSTONE, loc, 4, 0.1, 0.1, 0.1, FROST_RAY_COLOR);
+					mWorld.spawnParticle(Particle.SNOWBALL, loc, 2, 0.1, 0.1, 0.1, 0.1);
 					if (t % 10 == 0) {
-						ListIterator<Mob> iter = mobs.listIterator();
-						while (iter.hasNext()) {
-							LivingEntity le = iter.next();
-							if (le.getLocation().distance(location) < FROST_RAY_RADIUS) {
-								EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-								le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_RAY_SLOWNESS_DURATION, FROST_RAY_SLOWNESS_LEVEL, true, false));
-								iter.remove();
+						for (LivingEntity e : mobs) {
+							if (e.getBoundingBox().overlaps(box)) {
+								EntityUtils.damageEntity(mPlugin, e, damage, mPlayer, MagicType.ICE);
+								e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_RAY_SLOWNESS_DURATION, FROST_RAY_SLOWNESS_LEVEL, true, false));
 							}
 						}
 					}
-					if (location.getBlock().getType().isSolid()) {
-						location.subtract(increment.multiply(0.5));
-						mWorld.spawnParticle(Particle.CLOUD, location, 30, 0, 0, 0, 0.125f);
-						mWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
-						mWorld.playSound(location, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+					if (loc.getBlock().getType().isSolid()) {
+						mWorld.spawnParticle(Particle.CLOUD, box.getCenter().toLocation(mWorld), 3, 0, 0, 0, 0.125f);
 						break;
 					}
 				}

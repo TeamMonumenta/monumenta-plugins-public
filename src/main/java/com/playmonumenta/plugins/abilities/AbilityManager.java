@@ -61,6 +61,7 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
@@ -90,6 +91,9 @@ import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
+import com.playmonumenta.plugins.abilities.warlock.reaper.HungeringVortex;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
@@ -136,6 +140,7 @@ public class AbilityManager {
 		                          // ELEMENTALIST
 		                          new FrostRay(mPlugin, mWorld, mRandom, null),
 		                          new MeteorStrike(mPlugin, mWorld, mRandom, null),
+		                          new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
 
 		                          // ROGUE
 		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
@@ -202,6 +207,11 @@ public class AbilityManager {
 		                          new GraspingClaws(mPlugin, mWorld, mRandom, null),
 		                          new SoulRend(mPlugin, mWorld, mRandom, null),
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
+		                          
+		                          //REAPER
+		                          new DarkPact(mPlugin, mWorld, mRandom, null),
+		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
+		                          new HungeringVortex(mPlugin, mWorld, mRandom, null),
 
 		                          // ALCHEMIST
 		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),

@@ -75,20 +75,16 @@ public class MeteorStrike extends Ability {
 
 	private void launchMeteor(final Player player, final Location loc) {
 		double damage = getAbilityScore() == 1 ? METEOR_STRIKE_1_DAMAGE : METEOR_STRIKE_2_DAMAGE;
+		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
 		new BukkitRunnable() {
 			double t = 0;
-			double yminus = 0;
-
 			public void run() {
-				t = t + 0.85;
-
-				double y = 40 + yminus;
+				t += 1;
 				for (int i = 0; i < 8; i++) {
-					yminus -= 0.25;
 					loc.subtract(0, 0.25, 0);
 					if (loc.getBlock().getType().isSolid()) {
-						if (y <= 10) {
+						if (loc.getY() - ogLoc.getY() <= 4) {
 							loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
 							mWorld.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);
 							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F);

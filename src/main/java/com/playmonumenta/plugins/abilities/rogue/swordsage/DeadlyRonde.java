@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import java.util.Random;
 
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -47,7 +48,7 @@ public class DeadlyRonde extends Ability {
 			}
 		};
 		activeRunnable.runTaskLater(mPlugin, 20 * 5);
-
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1, 1.25f);
 		return true;
 	}
 

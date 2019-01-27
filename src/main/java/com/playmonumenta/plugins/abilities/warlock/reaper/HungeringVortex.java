@@ -88,7 +88,7 @@ public class HungeringVortex extends Ability {
 		List<Mob> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
 		for (LivingEntity mob : mobs) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
-			MovementUtils.PullTowards(mPlayer, mob, 1);
+			MovementUtils.PullTowards(mPlayer, mob, 0.25f);
 		}
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;

@@ -50,6 +50,7 @@ public class BladeDance extends Ability {
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 		mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
+		mPlayer.setInvulnerable(true);
 		int bladeDance = getAbilityScore();
 		double damage = bladeDance == 1 ? 18 : 25;
 		if (bladeDance >= 2) {
@@ -62,6 +63,7 @@ public class BladeDance extends Ability {
 			@Override
 			public void run() {
 				i += 2;
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
 				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
 				pitch += 0.2;
 				new BukkitRunnable() {
@@ -95,8 +97,40 @@ public class BladeDance extends Ability {
 
 				}.runTaskTimer(mPlugin, 0, 1);
 				if (i >= 40) {
+					mPlayer.setInvulnerable(false);
 					this.cancel();
-					ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 6, Particle.EXPLOSION_NORMAL, 0.75f, Particle.SWEEP_ATTACK, 0.25f, 1);
+					new BukkitRunnable() {
+						double rotation = 0;
+						Location loc = mPlayer.getLocation();
+						double radius = 0;
+						double y = 2.5;
+						double yminus = 0.35;
+
+						@Override
+						public void run() {
+
+							radius += 1;
+							for (int i = 0; i < 15; i += 1) {
+								rotation += 24;
+								double radian1 = Math.toRadians(rotation);
+								loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
+								mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
+								loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+
+							}
+							y -= y * yminus;
+							yminus += 0.02;
+							if (yminus >= 1) {
+								yminus = 1;
+							}
+							if (radius >= 7) {
+								this.cancel();
+							}
+
+						}
+
+					}.runTaskTimer(mPlugin, 0, 1);
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
 					mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 150, 0, 0, 0, 0.25);

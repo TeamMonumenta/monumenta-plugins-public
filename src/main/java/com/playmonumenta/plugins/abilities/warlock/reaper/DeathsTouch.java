@@ -93,9 +93,9 @@ public class DeathsTouch extends Ability {
 
 		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
 			loc.add(dir);
-			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 3, 0.1, 0.1, 0.1);
+			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 5, 0.15, 0.15, 0.15, 0);
 			for (LivingEntity mob : mobsInRange) {
-				if (mob.getLocation().distance(loc) < 0.8) {
+				if (mob.getLocation().add(0, mob.getHeight() / 2, 0).distance(loc) < 1.25) {
 					target = mob;
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 1, 1f);
 
@@ -107,28 +107,28 @@ public class DeathsTouch extends Ability {
 						@Override
 						public void run() {
 							t++;
-							mPlayer.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width);
-							mPlayer.spawnParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width);
-							if (t >= runnableDuration || target == null) {
+							mPlayer.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
+							mPlayer.spawnParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
+							if (t >= runnableDuration || target == null || target.isDead()) {
 								this.cancel();
 								target = null;
 							}
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-
-					// This loop only runs at most once!
 					putOnCooldown();
+					// This loop only runs at most once!
 					return true;
 				}
 			}
 		}
+		putOnCooldown();
 		return true;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (event.getEntity().equals(target)) {
+		if (target != null && event.getEntity().getUniqueId().equals(target.getUniqueId())) {
 			List<PotionEffectType> effects = getOppositeEffects(event.getEntity());
 			int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
 			for (PotionEffectType effect : effects) {

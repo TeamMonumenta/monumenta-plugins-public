@@ -59,7 +59,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public boolean cast() {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting()) {
 			return true;
 		}
 
@@ -123,11 +123,6 @@ public class DarkPact extends Ability {
 			double percent = getAbilityScore() == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 			event.setDamage(event.getDamage() * percent);
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSprinting();
 	}
 
 }
