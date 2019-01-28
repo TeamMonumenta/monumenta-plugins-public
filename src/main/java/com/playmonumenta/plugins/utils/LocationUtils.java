@@ -36,6 +36,21 @@ public class LocationUtils {
 		return false;
 	}
 
+	public static boolean containsWater(Block block) {
+		if (isWaterlogged(block)) {
+			return true;
+		}
+		Material mat = block.getType();
+		if (mat.equals(Material.BUBBLE_COLUMN) ||
+		    mat.equals(Material.KELP) ||
+		    mat.equals(Material.KELP_PLANT) ||
+		    mat.equals(Material.SEAGRASS) ||
+		    mat.equals(Material.TALL_SEAGRASS)) {
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean isRail(Block block) {
 		BlockData data = block.getBlockData();
 		if (data != null && data instanceof Rail) {
@@ -75,12 +90,12 @@ public class LocationUtils {
 
 	public static boolean isValidBoatLocation(Location loc) {
 		Block block = loc.getBlock();
-		if (block.isLiquid() || isWaterlogged(block)) {
+		if (block.isLiquid() || containsWater(block)) {
 			return true;
 		}
 
 		block = loc.subtract(0, 1, 0).getBlock();
-		if (block.isLiquid() || isWaterlogged(block)) {
+		if (block.isLiquid() || containsWater(block)) {
 			return true;
 		}
 
@@ -92,7 +107,7 @@ public class LocationUtils {
 		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
 			loc.setY(i);
 			block = loc.getBlock();
-			if (block.isLiquid() || isWaterlogged(block)) {
+			if (block.isLiquid() || containsWater(block)) {
 				return true;
 			} else if (!block.isEmpty()) {
 				return false;

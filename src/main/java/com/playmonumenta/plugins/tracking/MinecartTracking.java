@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.World;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Minecart;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
