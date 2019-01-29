@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -76,7 +75,7 @@ public class LuminousInfusion extends Ability {
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (inMainHand == null || !mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand)
-				|| mPlayer.getLocation().getPitch() < LUMINOUS_INFUSION_ACTIVATION_ANGLE) {
+		    || mPlayer.getLocation().getPitch() < LUMINOUS_INFUSION_ACTIVATION_ANGLE) {
 			// Conditions not met - can't cast
 			return false;
 		}
@@ -120,7 +119,7 @@ public class LuminousInfusion extends Ability {
 		if (EntityUtils.isUndead(le)) {
 			// Passive damage to undead from every hit, regardless of active
 			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE
-					: LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
+			             : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
 			event.setDamage(event.getFinalDamage() + damage);
 		}
 
@@ -152,9 +151,9 @@ public class LuminousInfusion extends Ability {
 			} else {
 				// Active damage to non-undead
 				le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
-						LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
+				                                    LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
 				le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
-						LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
+				                                    LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
 			}
 		}
 		return true;

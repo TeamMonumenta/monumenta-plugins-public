@@ -85,10 +85,12 @@ public class ElementalSpirit {
 					if (permDir == null) {
 						Vector dir = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(tar), loc);
 						loc.add(dir);
-						if (tar.isDead())
+						if (tar.isDead()) {
 							permDir = dir;
-					} else
+						}
+					} else {
 						loc.add(permDir);
+					}
 
 					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9)) {
 						EntityUtils.damageEntity(Plugin.getInstance(), e, dmg, player);
@@ -108,8 +110,9 @@ public class ElementalSpirit {
 					}
 					if (permDir != null) {
 						t++;
-						if (t >= 40)
+						if (t >= 40) {
 							this.cancel();
+						}
 					}
 
 				}
@@ -147,17 +150,19 @@ public class ElementalSpirit {
 									t++;
 									EntityUtils.damageEntity(Plugin.getInstance(), tar, linger, player);
 									mWorld.spawnParticle(Particle.SNOWBALL, tar.getLocation().add(0, 1, 0), 25, 0.1,
-											0.1, 0.1, 0.025);
+									                     0.1, 0.1, 0.025);
 									mWorld.spawnParticle(Particle.CLOUD, tar.getLocation().add(0, 1, 0), 10, 0.1, 0.1,
-											0.1, 0.2);
+									                     0.1, 0.2);
 									loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1.35f);
-									if (t >= 3 || tar.isDead())
+									if (t >= 3 || tar.isDead()) {
 										this.cancel();
+									}
 								}
 							}.runTaskTimer(Plugin.getInstance(), 20, 20);
 						}
-					} else
+					} else {
 						this.cancel();
+					}
 
 				}
 
@@ -173,11 +178,11 @@ public class ElementalSpirit {
 				@Override
 				public void run() {
 					mWorld.spawnParticle(Particle.DRAGON_BREATH, LocationUtils.getEntityCenter(tar), 250, 0, 0, 0,
-							0.35);
+					                     0.35);
 					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, LocationUtils.getEntityCenter(tar), 50, 0, 0, 0,
-							0.2);
+					                     0.2);
 					loc.getWorld().playSound(LocationUtils.getEntityCenter(tar), Sound.ENTITY_GENERIC_EXPLODE, 1,
-							1.25f);
+					                         1.25f);
 					EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
 					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3)) {
 						e.setFireTicks(20 * 3);

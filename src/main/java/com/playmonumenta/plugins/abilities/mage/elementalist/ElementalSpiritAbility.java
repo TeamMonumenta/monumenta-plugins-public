@@ -26,11 +26,11 @@ public class ElementalSpiritAbility extends Ability {
 		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT;
 		mInfo.cooldown = 20 * 6;
 	}
-	
+
 	private ElementalSpirit spirit = null;
-	
+
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { 
+	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (spirit != null) {
 			MagicType type = event.getMagicType();
 			if (type == MagicType.FIRE || type == MagicType.ARCANE || type == MagicType.ICE) {
@@ -39,7 +39,7 @@ public class ElementalSpiritAbility extends Ability {
 			}
 		}
 	}
-	
+
 	@Override
 	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		Player player = mPlayer;
@@ -68,8 +68,8 @@ public class ElementalSpiritAbility extends Ability {
 								BaseSpecialization spec = mPlugin.getSpecialization(player);
 								if (elementalSpirit < 0 || !player.isOnline()
 								    || !(spec instanceof ElementalistSpecialization)) {
-									this.cancel();
-									spirits.remove(player);
+								    this.cancel();
+								    spirits.remove(player);
 								}
 								*/
 								if (ScoreboardUtils.getScoreboardValue(mPlayer, mInfo.scoreboardId) <= 0 || !mPlayer.isOnline() || mPlayer == null) {

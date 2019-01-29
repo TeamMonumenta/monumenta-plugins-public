@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.Color;

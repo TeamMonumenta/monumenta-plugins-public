@@ -2,13 +2,11 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import java.util.Random;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 

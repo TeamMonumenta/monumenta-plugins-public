@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.Color;
@@ -83,7 +82,7 @@ public class HolyJavelin extends Ability {
 					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
 				}
 			}
-			
+
 			if (loc.getBlock().getType().isSolid()) {
 				loc.subtract(increment.multiply(0.5));
 				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);

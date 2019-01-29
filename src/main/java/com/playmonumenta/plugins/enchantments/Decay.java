@@ -22,17 +22,17 @@ public class Decay implements BaseEnchantment {
 	public String getProperty() {
 		return PROPERTY_NAME;
 	}
-	
+
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND);
 	}
-	
+
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 4, level - 1, false, true));
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		player.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4, fallingDustData);
 	}
-	
+
 }

@@ -34,7 +34,7 @@ public class EnchantmentManager {
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
 	private static Map<ItemSlot, List<BaseEnchantment>> mProperties
-	    = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
+	                                                 = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
 	private static List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
 
 	//  Static list of Item Properties.

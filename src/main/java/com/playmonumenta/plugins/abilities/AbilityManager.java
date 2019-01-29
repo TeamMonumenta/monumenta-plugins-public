@@ -207,7 +207,7 @@ public class AbilityManager {
 		                          new GraspingClaws(mPlugin, mWorld, mRandom, null),
 		                          new SoulRend(mPlugin, mWorld, mRandom, null),
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          //REAPER
 		                          new DarkPact(mPlugin, mWorld, mRandom, null),
 		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
