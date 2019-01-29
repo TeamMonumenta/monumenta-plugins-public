@@ -12,11 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.specializations.objects.ElementalSpirit;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ElementalSpiritAbility extends Ability {
 
@@ -72,14 +72,12 @@ public class ElementalSpiritAbility extends Ability {
 								    spirits.remove(player);
 								}
 								*/
-								if (ScoreboardUtils.getScoreboardValue(mPlayer, mInfo.scoreboardId) <= 0 || !mPlayer.isOnline() || mPlayer == null) {
+								if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritAbility.class) == null ||
+									!mPlayer.isOnline() || mPlayer == null || spirit == null) {
 									this.cancel();
 									spirit = null;
 								}
 
-								if (spirit == null) {
-									this.cancel();
-								}
 								if (spirit.getHurt().size() > 0) {
 									List<LivingEntity> list = spirit.getHurt();
 

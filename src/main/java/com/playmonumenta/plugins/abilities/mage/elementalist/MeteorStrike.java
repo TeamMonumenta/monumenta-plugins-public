@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * Sprint left-click makes a meteor fall where the player is looking, dealing
- * 14 / 20 damage in a 5-block radius and setting mobs on fire for 3s.
+ * 16 / 22 damage in a 5-block radius and setting mobs on fire for 3s.
  * Cooldown 16 / 12 s
  */
 

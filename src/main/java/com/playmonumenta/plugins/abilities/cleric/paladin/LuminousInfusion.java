@@ -96,12 +96,8 @@ public class LuminousInfusion extends Ability {
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				if (t >= LUMINOUS_INFUSION_MAX_DURATION) {
+				if (t >= LUMINOUS_INFUSION_MAX_DURATION || !mActive) {
 					mActive = false;
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
-					this.cancel();
-				}
-				if (!mActive) {
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
 					this.cancel();
 				}
@@ -120,15 +116,15 @@ public class LuminousInfusion extends Ability {
 			// Passive damage to undead from every hit, regardless of active
 			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE
 			             : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
-			event.setDamage(event.getFinalDamage() + damage);
+			event.setDamage(event.getDamage() + damage);
 		}
 
 		if (mActive) {
+			mActive = false;
 
 			if (EntityUtils.isUndead(le)) {
-				mActive = false;
 				// Active damage to undead
-				event.setDamage(event.getFinalDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
+				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
 
 				new BukkitRunnable() {
 					// Need to get this when launching runnable, before the mob

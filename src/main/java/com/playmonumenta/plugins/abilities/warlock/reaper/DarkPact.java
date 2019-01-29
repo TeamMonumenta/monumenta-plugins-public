@@ -60,7 +60,7 @@ public class DarkPact extends Ability {
 	@Override
 	public boolean cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting()) {
-			return true;
+			return false;
 		}
 
 		active = true;

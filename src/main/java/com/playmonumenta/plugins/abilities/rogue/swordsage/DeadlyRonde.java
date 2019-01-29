@@ -4,10 +4,13 @@ import java.util.Random;
 
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -16,6 +19,9 @@ import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class DeadlyRonde extends Ability {
+	private static final int RONDE_2_SLOWNESS_AMPLIFIER = 1;
+	private static final int RONDE_2_SLOWNESS_DURATION = 4 * 20;
+
 
 	/*
 	 * Deadly Ronde: After using a skill, your next sword
@@ -58,10 +64,15 @@ public class DeadlyRonde extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isSwordItem(mainHand)) {
 				double damage = getAbilityScore() == 1 ? 4 : 6;
-				if (event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
-					event.setDamage(event.getFinalDamage() + damage / 2);
+				if (getAbilityScore() == 1 && event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
+					event.setDamage(event.getDamage() + damage / 2);
 				} else {
-					event.setDamage(event.getFinalDamage() + damage);
+					event.setDamage(event.getDamage() + damage);
+				}
+
+				if (!event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
+					LivingEntity le = (LivingEntity)event.getEntity();
+					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RONDE_2_SLOWNESS_DURATION, RONDE_2_SLOWNESS_AMPLIFIER, true, false));
 				}
 			}
 

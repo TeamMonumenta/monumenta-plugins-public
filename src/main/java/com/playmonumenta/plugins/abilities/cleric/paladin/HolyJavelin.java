@@ -91,48 +91,6 @@ public class HolyJavelin extends Ability {
 				break;
 			}
 		}
-//		while (box.getCenter().toLocation(mWorld).distance(playerLoc) < HOLY_JAVELIN_RANGE) {
-//			box.shift(increment);
-//			Location loc = box.getCenter().toLocation(mWorld);
-//			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
-//			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-//
-//			for (LivingEntity le : mobs) {
-//				if (le.getBoundingBox().overlaps(box)) {
-//					if (EntityUtils.isUndead(le)) {
-//						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
-//					} else {
-//						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-//					}
-//					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
-//				}
-//			}
-//			ListIterator<Mob> iter = mobs.listIterator();
-//			while(iter.hasNext()){
-//				LivingEntity le = iter.next();
-//
-//				if (le.getLocation().distance(location) < HOLY_JAVELIN_RADIUS) {
-//					// Mob is close enough to be hit by the javelin.
-//					if (EntityUtils.isUndead(le)) {
-//						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
-//					} else {
-//						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-//					}
-//					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
-//
-//					// Remove the mob from the list so it can't be hit more than once
-//					iter.remove();
-//				}
-//			}
-//
-//			if (loc.getBlock().getType().isSolid()) {
-//				loc.subtract(increment.multiply(0.5));
-//				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
-//				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
-//				mWorld.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
-//				break;
-//			}
-//		}
 
 		putOnCooldown();
 		return true;

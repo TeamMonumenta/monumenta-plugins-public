@@ -118,14 +118,16 @@ public class DeathsTouch extends Ability {
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-					putOnCooldown();
+
 					// This loop only runs at most once!
+					putOnCooldown();
 					return true;
 				}
 			}
 		}
-		putOnCooldown();
-		return true;
+
+		// Didn't find a mob - don't put on cooldown
+		return false;
 	}
 
 	@Override
