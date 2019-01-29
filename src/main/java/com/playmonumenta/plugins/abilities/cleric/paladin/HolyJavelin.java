@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -28,7 +29,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class HolyJavelin extends Ability {
 
-	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 150), 1.0f);
+	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
 	private static final double HOLY_JAVELIN_RADIUS = 0.65;
 	private static final int HOLY_JAVELIN_RANGE = 12;
 	private static final int HOLY_JAVELIN_1_UNDEAD_DAMAGE = 10;
@@ -55,7 +56,7 @@ public class HolyJavelin extends Ability {
 	@Override
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 0.9f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
 		int damageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
 		int damage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
 		Location playerLoc = mPlayer.getEyeLocation();
@@ -65,38 +66,74 @@ public class HolyJavelin extends Ability {
 
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
 		List<Mob> mobs = EntityUtils.getNearbyMobs(location, HOLY_JAVELIN_RANGE);
+		BoundingBox box = BoundingBox.of(playerLoc, HOLY_JAVELIN_RADIUS, HOLY_JAVELIN_RADIUS, HOLY_JAVELIN_RADIUS);
+		for (int i = 0; i < HOLY_JAVELIN_RANGE; i++) {
+			box.shift(increment);
+			Location loc = box.getCenter().toLocation(mWorld);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, HOLY_JAVELIN_COLOR);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
 
-		while (location.distance(playerLoc) < HOLY_JAVELIN_RANGE) {
-			location.add(increment);
-			mWorld.spawnParticle(Particle.REDSTONE, location, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location, 2, 0.05f, 0.05f, 0.05f, 0.025f);
-
-			ListIterator<Mob> iter = mobs.listIterator();
-			while(iter.hasNext()){
-				LivingEntity le = iter.next();
-
-				if (le.getLocation().distance(location) < HOLY_JAVELIN_RADIUS) {
-					// Mob is close enough to be hit by the javelin.
+			for (LivingEntity le : mobs) {
+				if (le.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(le)) {
 						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
 					} else {
 						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					}
 					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
-
-					// Remove the mob from the list so it can't be hit more than once
-					iter.remove();
 				}
 			}
-
-			if (location.getBlock().getType().isSolid()) {
-				location.subtract(increment.multiply(0.5));
-				mWorld.spawnParticle(Particle.CLOUD, location, 30, 0, 0, 0, 0.125f);
-				mWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
-				mWorld.playSound(location, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+			
+			if (loc.getBlock().getType().isSolid()) {
+				loc.subtract(increment.multiply(0.5));
+				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				mWorld.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
 				break;
 			}
 		}
+//		while (box.getCenter().toLocation(mWorld).distance(playerLoc) < HOLY_JAVELIN_RANGE) {
+//			box.shift(increment);
+//			Location loc = box.getCenter().toLocation(mWorld);
+//			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.35, 0.35, 0.35, HOLY_JAVELIN_COLOR);
+//			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05f, 0.05f, 0.05f, 0.025f);
+//
+//			for (LivingEntity le : mobs) {
+//				if (le.getBoundingBox().overlaps(box)) {
+//					if (EntityUtils.isUndead(le)) {
+//						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
+//					} else {
+//						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+//					}
+//					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+//				}
+//			}
+//			ListIterator<Mob> iter = mobs.listIterator();
+//			while(iter.hasNext()){
+//				LivingEntity le = iter.next();
+//
+//				if (le.getLocation().distance(location) < HOLY_JAVELIN_RADIUS) {
+//					// Mob is close enough to be hit by the javelin.
+//					if (EntityUtils.isUndead(le)) {
+//						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
+//					} else {
+//						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+//					}
+//					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+//
+//					// Remove the mob from the list so it can't be hit more than once
+//					iter.remove();
+//				}
+//			}
+//
+//			if (loc.getBlock().getType().isSolid()) {
+//				loc.subtract(increment.multiply(0.5));
+//				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f);
+//				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+//				mWorld.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+//				break;
+//			}
+//		}
 
 		putOnCooldown();
 		return true;

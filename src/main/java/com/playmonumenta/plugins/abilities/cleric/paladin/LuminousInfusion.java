@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,7 +34,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class LuminousInfusion extends Ability {
 
-	private static final String LUMINOUS_INFUSION_EXPIRATION_MESSAGE = "The light from your hands fades";
+	private static final String LUMINOUS_INFUSION_EXPIRATION_MESSAGE = "The light from your hands fades...";
 	private static final int LUMINOUS_INFUSION_ACTIVATION_ANGLE = 75;
 	private static final double LUMINOUS_INFUSION_RADIUS = 4;
 	private static final int LUMINOUS_INFUSION_EXPLOSION_DAMAGE = 10;
@@ -58,9 +59,10 @@ public class LuminousInfusion extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*
-		 * NOTE! Because LuminousInfusion has two events (cast and damage), we need both events
-		 * to trigger even when it is on cooldown. Therefor it needs to bypass the automatic
-		 * cooldown check and manage cooldown itself
+		 * NOTE! Because LuminousInfusion has two events (cast and damage), we
+		 * need both events to trigger even when it is on cooldown. Therefor it
+		 * needs to bypass the automatic cooldown check and manage cooldown
+		 * itself
 		 */
 		mInfo.ignoreCooldown = true;
 	}
@@ -69,19 +71,21 @@ public class LuminousInfusion extends Ability {
 	public boolean cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			// On cooldown - can't cast it again yet
-			return true;
+			return false;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand) || mPlayer.getLocation().getPitch() > LUMINOUS_INFUSION_ACTIVATION_ANGLE) {
+		if (inMainHand == null || !mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand)
+				|| mPlayer.getLocation().getPitch() < LUMINOUS_INFUSION_ACTIVATION_ANGLE) {
 			// Conditions not met - can't cast
-			return true;
+			return false;
 		}
 
 		// Cast conditions met
 		mActive = true;
-
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Holy energy radiates from your hands...");
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1);
 		new BukkitRunnable() {
 			int t = 0;
@@ -93,12 +97,13 @@ public class LuminousInfusion extends Ability {
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				if (t > LUMINOUS_INFUSION_MAX_DURATION) {
+				if (t >= LUMINOUS_INFUSION_MAX_DURATION) {
 					mActive = false;
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
 					this.cancel();
 				}
 				if (!mActive) {
+					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
 					this.cancel();
 				}
 			}
@@ -109,27 +114,26 @@ public class LuminousInfusion extends Ability {
 		return true;
 	}
 
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
-		if (EntityUtils.isHostileMob(le)) {
-			return true;
-		}
-
 		if (EntityUtils.isUndead(le)) {
 			// Passive damage to undead from every hit, regardless of active
-			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
+			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE
+					: LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
 			event.setDamage(event.getFinalDamage() + damage);
 		}
 
 		if (mActive) {
-			mActive = false;
 
 			if (EntityUtils.isUndead(le)) {
+				mActive = false;
 				// Active damage to undead
 				event.setDamage(event.getFinalDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
 
 				new BukkitRunnable() {
-					// Need to get this when launching runnable, before the mob has died
+					// Need to get this when launching runnable, before the mob
+					// has died
 					Location loc = le.getLocation();
 
 					@Override
@@ -144,14 +148,15 @@ public class LuminousInfusion extends Ability {
 						}
 					}
 
-				}.runTaskLater(mPlugin, 0);
+				}.runTaskLater(mPlugin, 1);
 			} else {
 				// Active damage to non-undead
-				le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION, LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
-				le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION, LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
+				le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
+						LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
+				le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
+						LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
 			}
 		}
-
 		return true;
 	}
 }

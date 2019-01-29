@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +16,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -80,8 +82,8 @@ public class DeathsTouch extends Ability {
 
 	@Override
 	public boolean cast() {
-        if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-			return true;
+        if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting()) {
+			return false;
 		}
 
 		Location loc = mPlayer.getEyeLocation();
@@ -90,12 +92,13 @@ public class DeathsTouch extends Ability {
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
 		List<Mob> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE);
-
+		BoundingBox box = BoundingBox.of(loc, 1, 1, 1);
 		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
-			loc.add(dir);
-			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 5, 0.15, 0.15, 0.15, 0);
+			box.shift(dir);
+			Location bloc = box.getCenter().toLocation(mWorld);
+			mWorld.spawnParticle(Particle.SPELL_MOB, bloc, 5, 0.15, 0.15, 0.15, 0);
 			for (LivingEntity mob : mobsInRange) {
-				if (mob.getLocation().add(0, mob.getHeight() / 2, 0).distance(loc) < 1.25) {
+				if (mob.getBoundingBox().overlaps(box)) {
 					target = mob;
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 1, 1f);
 
@@ -136,11 +139,6 @@ public class DeathsTouch extends Ability {
 			}
 			target = null;
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSprinting();
 	}
 
 }

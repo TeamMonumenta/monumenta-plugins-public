@@ -48,7 +48,7 @@ public class DeadlyRonde extends Ability {
 			}
 		};
 		activeRunnable.runTaskLater(mPlugin, 20 * 5);
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1, 1.25f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2f);
 		return true;
 	}
 

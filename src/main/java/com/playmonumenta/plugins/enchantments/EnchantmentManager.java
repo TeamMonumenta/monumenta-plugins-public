@@ -63,6 +63,7 @@ public class EnchantmentManager {
 		init.add(new Inferno());
 		init.add(new Sniper());
 		init.add(new PointBlank());
+		init.add(new Decay());
 
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {

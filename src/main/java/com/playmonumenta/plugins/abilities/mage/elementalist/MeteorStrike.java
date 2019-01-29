@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class MeteorStrike extends Ability {
 	private static final int METEOR_STRIKE_1_COOLDOWN = 16 * 20;
 	private static final int METEOR_STRIKE_2_COOLDOWN = 12 * 20;
-	private static final int METEOR_STRIKE_1_DAMAGE = 14;
-	private static final int METEOR_STRIKE_2_DAMAGE = 20;
+	private static final int METEOR_STRIKE_1_DAMAGE = 16;
+	private static final int METEOR_STRIKE_2_DAMAGE = 22;
 	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
 	private static final double METEOR_STRIKE_RADIUS = 5;
 
@@ -84,7 +84,7 @@ public class MeteorStrike extends Ability {
 				for (int i = 0; i < 8; i++) {
 					loc.subtract(0, 0.25, 0);
 					if (loc.getBlock().getType().isSolid()) {
-						if (loc.getY() - ogLoc.getY() <= 4) {
+						if (loc.getY() - ogLoc.getY() <= 2) {
 							loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
 							mWorld.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F);
 							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F);

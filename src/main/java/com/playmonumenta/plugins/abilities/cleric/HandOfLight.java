@@ -87,7 +87,7 @@ public class HandOfLight extends Ability {
 			return false;
 		}
 
-		return true;
+		return mPlayer.getLocation().getPitch() > -50 && mPlayer.getLocation().getPitch() < 50;
 	}
 
 }
