@@ -12,6 +12,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -19,26 +20,27 @@ public class AnvilOverride extends BaseOverride {
 	final static String REPAIR_OBJECTIVE = "RepairT";
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action,
-	                                          ItemStack item, Block block) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item,
+			Block block) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (player.getGameMode() == GameMode.ADVENTURE) {
+		} else if (player.getGameMode() == GameMode.ADVENTURE
+				&& block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
 			return false;
 		}
 
 		/*
-		 * Make sure to only repair the item in the player's main hand. Otherwise
-		 * if you sneak+right click an anvil the "item" might be the offhand item
+		 * Make sure to only repair the item in the player's main hand. Otherwise if you
+		 * sneak+right click an anvil the "item" might be the offhand item
 		 */
 		item = player.getInventory().getItemInMainHand();
 
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
-		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
-		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
-		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
+				&& (!item.hasItemMeta() || !item.getItemMeta().hasLore()
+						|| !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
+				&& block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 
-			item.setDurability((short)0);
+			item.setDurability((short) 0);
 			plugin.mWorld.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 			block.setType(Material.AIR);
