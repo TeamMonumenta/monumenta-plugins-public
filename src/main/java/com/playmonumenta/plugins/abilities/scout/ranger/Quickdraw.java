@@ -59,8 +59,8 @@ public class Quickdraw extends Ability {
 		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 		arrow.setVelocity(arrow.getVelocity().multiply(2));
 		int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
-		if (AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class) != null) {
-			BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
+		BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
+		if (bm != null) {
 			damage += bm.getBonusDamage();
 		}
 		arrow.setMetadata("Quickdraw", new FixedMetadataValue(mPlugin, damage));

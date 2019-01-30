@@ -38,21 +38,35 @@ public class BladeDance extends Ability {
 	 * seconds
 	 */
 
-	private boolean active = false;
+	private boolean mActive = false;
+
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
 		mInfo.cooldown = 20 * 40;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+
+		/*
+		 * NOTE! Because BladeDance has two events (cast and damage), we
+		 * need both events to trigger even when it is on cooldown. Therefor it
+		 * needs to bypass the automatic cooldown check and manage cooldown
+		 * itself
+		 */
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
 	public boolean cast() {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			// On cooldown - can't cast it again yet
+			return false;
+		}
+
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 		mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
 		mPlayer.setInvulnerable(true);
-		active = true;
+		mActive = true;
 		int bladeDance = getAbilityScore();
 		double damage = bladeDance == 1 ? 18 : 25;
 		if (bladeDance >= 2) {
@@ -101,7 +115,7 @@ public class BladeDance extends Ability {
 
 				if (i >= 40) {
 					mPlayer.setInvulnerable(false);
-					active = false;
+					mActive = false;
 					this.cancel();
 
 					//Ultra flash
@@ -154,7 +168,7 @@ public class BladeDance extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active) {
+		if (mActive) {
 			event.setCancelled(true);
 		}
 		return true;
