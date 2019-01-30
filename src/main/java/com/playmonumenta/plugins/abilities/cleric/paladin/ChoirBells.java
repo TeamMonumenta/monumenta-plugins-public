@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 public class ChoirBells extends Ability {
 
 	private static final double CHOIR_BELLS_CONICAL_THRESHOLD = 0.33;
-	private static final double CHOIR_BELLS_RANGE = 8;
+	private static final double CHOIR_BELLS_RANGE = 10;
 	private static final int CHOIR_BELLS_SLOWNESS_DURATION = 20 * 20;
 	private static final int CHOIR_BELLS_SLOWNESS_LEVEL = 1;
 	private static final int CHOIR_BELLS_VULNERABILITY_DURATION = 20 * 20;
@@ -50,7 +50,7 @@ public class ChoirBells extends Ability {
 
 	@Override
 	public boolean cast() {
-		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 8, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
+		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 10, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
 		Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHOIR_BELLS_RANGE)) {

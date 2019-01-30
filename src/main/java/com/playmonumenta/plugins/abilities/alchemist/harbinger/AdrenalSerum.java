@@ -2,8 +2,12 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import java.util.Random;
 
+import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +38,7 @@ public class AdrenalSerum extends Ability {
 	private static final int ADRENAL_SERUM_DURATION = 20 * 20;
 	private static final int ADRENAL_SERUM_POTIONS_CONSUMED = 4;
 	private static final double ADRENAL_SERUM_DAMAGE = 4;
+	private static final Particle.DustOptions ADRENAL_SERUM_COLOR = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 
 	public AdrenalSerum(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -69,6 +74,8 @@ public class AdrenalSerum extends Ability {
 		AbilityUtils.addAlchemistPotions(mPlayer, -1 * ADRENAL_SERUM_POTIONS_CONSUMED);
 
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1f, 1.15f);
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ADRENAL_SERUM_DURATION, 0, true, true));
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, ADRENAL_SERUM_DURATION, 0, true, true));
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADRENAL_SERUM_DURATION, 0, true, true));
@@ -83,7 +90,7 @@ public class AdrenalSerum extends Ability {
 			@Override
 			public void run() {
 				t++;
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 1, 0.05f, 0.05f, 0.05f, 0); //Rudimentary effects
+				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, ADRENAL_SERUM_COLOR);
 
 				if (t > ADRENAL_SERUM_DURATION) {
 					if (mPlayer.getHealth() > ADRENAL_SERUM_DAMAGE + 1) {
@@ -92,10 +99,13 @@ public class AdrenalSerum extends Ability {
 						mPlayer.damage(mPlayer.getHealth() - 1);
 					}
 					this.cancel();
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
+					BlockData fallingDustData = Material.NETHER_WART_BLOCK.createBlockData();
+					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, fallingDustData);
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 1, 1);
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		putOnCooldown();
 		return true;

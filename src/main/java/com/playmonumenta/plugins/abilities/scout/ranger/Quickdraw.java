@@ -16,7 +16,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -57,6 +59,10 @@ public class Quickdraw extends Ability {
 		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 		arrow.setVelocity(arrow.getVelocity().multiply(2));
 		int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
+		if (AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class) != null) {
+			BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
+			damage += bm.getBonusDamage();
+		}
 		arrow.setMetadata("Quickdraw", new FixedMetadataValue(mPlugin, damage));
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 

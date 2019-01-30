@@ -56,8 +56,9 @@ public class HolyJavelin extends Ability {
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
-		int damageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
-		int damage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
+		int holyJavelin = getAbilityScore();
+		int damageUndead = holyJavelin == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
+		int damage = holyJavelin == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
 		Location playerLoc = mPlayer.getEyeLocation();
 		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();

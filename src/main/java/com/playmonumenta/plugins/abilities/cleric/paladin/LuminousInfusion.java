@@ -116,16 +116,19 @@ public class LuminousInfusion extends Ability {
 			// Passive damage to undead from every hit, regardless of active
 			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE
 			             : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
-			event.setDamage(event.getDamage() + damage);
+			// Have it deal straight damage rather than increasing the event damage
+			// (As discussed before, there's a weird bug where the damage doesn't go right)
+			EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 		}
 
 		if (mActive) {
 			mActive = false;
-
 			if (EntityUtils.isUndead(le)) {
 				// Active damage to undead
-				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
 
+				// Have it deal straight damage rather than increasing the event damage
+				// (As discussed before, there's a weird bug where the damage doesn't go right)
+				EntityUtils.damageEntity(mPlugin, le, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer);
 				new BukkitRunnable() {
 					// Need to get this when launching runnable, before the mob
 					// has died
@@ -138,7 +141,7 @@ public class LuminousInfusion extends Ability {
 								EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
 								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
 								mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-								mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1.1f);
+								mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.85f, 1.1f);
 							}
 						}
 					}

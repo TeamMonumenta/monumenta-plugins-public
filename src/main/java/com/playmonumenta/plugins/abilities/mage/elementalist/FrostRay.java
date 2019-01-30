@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,6 +24,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Sneak and right-click to trigger a channeled frost ray (range: 12 blocks),
@@ -39,7 +41,7 @@ public class FrostRay extends Ability {
 	private static final int FROST_RAY_2_COOLDOWN = 25 * 20;
 	private static final int FROST_RAY_1_DURATION = 5 * 20;
 	private static final int FROST_RAY_2_DURATION = 6 * 20;
-	private static final int FROST_RAY_RANGE = 12;
+	private static final int FROST_RAY_RANGE = 14;
 	private static final int FROST_RAY_1_DAMAGE = 5;
 	private static final int FROST_RAY_2_DAMAGE = 7;
 	private static final int FROST_RAY_SLOWNESS_LEVEL = 1;
@@ -57,7 +59,9 @@ public class FrostRay extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking();
+		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
+		return mPlayer.getVelocity().length() <= 0 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
 	}
 
 	@Override
@@ -80,7 +84,7 @@ public class FrostRay extends Ability {
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 				}
 				List<Mob> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
-				BoundingBox box = BoundingBox.of(location, 1, 1, 1);
+				BoundingBox box = BoundingBox.of(location, FROST_RAY_RADIUS, FROST_RAY_RADIUS, FROST_RAY_RADIUS);
 				for (int i = 0; i <= FROST_RAY_RANGE; i++) {
 					box.shift(increment);
 					Location loc = box.getCenter().toLocation(mWorld);

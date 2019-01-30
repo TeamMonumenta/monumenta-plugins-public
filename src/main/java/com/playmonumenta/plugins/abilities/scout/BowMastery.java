@@ -38,4 +38,8 @@ public class BowMastery extends Ability {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
 		return true;
 	}
+
+	public int getBonusDamage() {
+		return getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+	}
 }

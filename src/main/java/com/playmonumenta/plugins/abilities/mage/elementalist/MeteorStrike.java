@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Sprint left-click makes a meteor fall where the player is looking, dealing
@@ -27,8 +29,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class MeteorStrike extends Ability {
 	private static final int METEOR_STRIKE_1_COOLDOWN = 16 * 20;
 	private static final int METEOR_STRIKE_2_COOLDOWN = 12 * 20;
-	private static final int METEOR_STRIKE_1_DAMAGE = 16;
-	private static final int METEOR_STRIKE_2_DAMAGE = 22;
+	private static final int METEOR_STRIKE_1_DAMAGE = 18;
+	private static final int METEOR_STRIKE_2_DAMAGE = 24;
 	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
 	private static final double METEOR_STRIKE_RADIUS = 5;
 
@@ -42,7 +44,9 @@ public class MeteorStrike extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSprinting();
+		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
+		return mPlayer.isSprinting() && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
 	}
 
 	@Override
@@ -57,13 +61,7 @@ public class MeteorStrike extends Ability {
 
 			mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
 			int size = EntityUtils.getNearbyMobs(loc, 2).size();
-			if (loc.getBlock().getType().isSolid()) {
-				launchMeteor(mPlayer, loc);
-				break;
-			} else if (i >= 24) {
-				launchMeteor(mPlayer, loc);
-				break;
-			} else if (size > 0) {
+			if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
 				launchMeteor(mPlayer, loc);
 				break;
 			}

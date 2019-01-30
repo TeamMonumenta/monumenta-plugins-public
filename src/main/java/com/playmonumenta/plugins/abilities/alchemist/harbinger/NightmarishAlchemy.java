@@ -8,6 +8,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -27,7 +29,7 @@ public class NightmarishAlchemy extends Ability {
 
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.scoreboardId = "NightmarishAlchemy";
+		mInfo.scoreboardId = "Nightmarish";
 	}
 
 	@Override
@@ -39,7 +41,8 @@ public class NightmarishAlchemy extends Ability {
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
 						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
-						//SHATTER EFFECT HERE
+						entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 0, true, false));
+						entity.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, 0, true, false));
 					}
 				}
 			}

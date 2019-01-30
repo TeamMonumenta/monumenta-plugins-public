@@ -125,8 +125,8 @@ public class DeathsTouch extends Ability {
 				}
 			}
 		}
-
-		// Didn't find a mob - don't put on cooldown
+		putOnCooldown();
+		// Didn't find a mob - Due to lack of skill possessed by the caster, put it on cooldown
 		return false;
 	}
 

@@ -50,22 +50,27 @@ public class ElementalSpirit {
 	}
 
 	/*
-	 * Elemental Spirit: You are accompanied by a spirit of elemental energy.
-	 * Upon using a spell, the spirit will rush towards the nearest enemy hit by
-	 * the spell, and remain at it for 3 seconds. Based on what kind of spell
-	 * was used, the effect will differ.
+	 * Elemental Spirit: You are accompanied by a spirit of
+	 * elemental energy. Upon using a spell, the spirit will
+	 * rush towards the nearest enemy hit by the spell, and
+	 * remain at it for 3 seconds (with the exception of the
+	 * fire spirit, which remains in the spot past the enemy).
+	 * Based on what kind of spell was used, the effect will differ.
 	 *
-	 * If the spell was a fire based spell, the spirit rushes in a fiery path
-	 * towards that enemy, dealing 3/6 damage to each enemy it passes on the way
-	 * and continues to go for 5 blocks.
+	 * If the spell was a fire based spell, the spirit rushes
+	 * a fiery path towards that enemy, dealing 5/10 damage to
+	 * each enemy it passes on the way and continues to go for 2 seconds.
 	 *
-	 * If the spell was an ice based spell, the spirit rushes to that enemy,
-	 * dealing 4/5 damage when it arrives at the target, and dealing an
-	 * additional 1/2 damage per 4s while it remains at the target.
+	 * If the spell was an ice based spell, the spirit rushes
+	 * to that enemy, dealing 7/10 damage when it arrives at
+	 * the target, and dealing an additional 1/2 damage per
+	 * 3s while it remains at the target.
 	 *
-	 * If the spell was an arcane spell, the spirit warps to that enemy, deals
-	 * 2/4 damage, and inflicts all enemies within 3 blocks with Fire and
-	 * Slowness 1 for 3 seconds. (6s cooldown)
+	 * If the spell was an arcane spell, the spirit warps to
+	 * that enemy, deals 4/8 damage to that target, and inflicts
+	 * all enemies within 3 blocks with Fire and Slowness 2
+	 * for 3 seconds.
+	 * (4s cooldown)
 	 */
 	public void damage(Player damager, LivingEntity tar, Location loc) {
 		int elementalSpirit = ScoreboardUtils.getScoreboardValue(player, "ElementalSpirit");
@@ -74,7 +79,7 @@ public class ElementalSpirit {
 			mWorld.spawnParticle(Particle.FLAME, loc, 50, 0.1, 0.1, 0.1, 0.25);
 			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.1, 0.1, 0.1, 0.1);
 			loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.25f);
-			double dmg = elementalSpirit == 1 ? 3 : 6;
+			double dmg = elementalSpirit == 1 ? 5 : 10;
 			new BukkitRunnable() {
 				Vector permDir = null;
 				int t = 0;
@@ -122,7 +127,7 @@ public class ElementalSpirit {
 			mWorld.spawnParticle(Particle.SNOWBALL, loc, 25, 0.1, 0.1, 0.1, 0.025);
 			mWorld.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.2);
 			loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
-			double dmg = elementalSpirit == 1 ? 4 : 6;
+			double dmg = elementalSpirit == 1 ? 7 : 10;
 			double linger = elementalSpirit == 1 ? 1 : 2;
 			new BukkitRunnable() {
 				@Override
@@ -168,7 +173,7 @@ public class ElementalSpirit {
 
 			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 		} else if (magic == MagicType.ARCANE) {
-			double dmg = elementalSpirit == 1 ? 2 : 4;
+			double dmg = elementalSpirit == 1 ? 4 : 8;
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0.1, 0.1, 0.1, 0.025);
 			mWorld.spawnParticle(Particle.DRAGON_BREATH, loc, 20, 0.1, 0.1, 0.1, 0.15);
 			loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.35f);

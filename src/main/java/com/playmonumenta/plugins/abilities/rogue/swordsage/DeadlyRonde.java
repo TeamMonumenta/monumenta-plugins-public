@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import java.util.Random;
 
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -17,11 +19,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class DeadlyRonde extends Ability {
 	private static final int RONDE_2_SLOWNESS_AMPLIFIER = 1;
 	private static final int RONDE_2_SLOWNESS_DURATION = 4 * 20;
-
+	private static final Particle.DustOptions RONDE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
 	/*
 	 * Deadly Ronde: After using a skill, your next sword
@@ -55,6 +58,17 @@ public class DeadlyRonde extends Ability {
 		};
 		activeRunnable.runTaskLater(mPlugin, 20 * 5);
 		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2f);
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, RONDE_COLOR);
+				if (activeRunnable == null) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde activated!");
 		return true;
 	}
 

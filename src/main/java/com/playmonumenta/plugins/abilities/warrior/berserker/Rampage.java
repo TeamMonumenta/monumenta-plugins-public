@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 /* Rampage: Killing an enemy starts a kill streak. If
- * you kill another mob within 2/3 seconds, the streak
+ * you kill another mob within 3/5 seconds, the streak
  * continues and your kill count increases. Every 4 kills,
  * you are granted 1 armor point and +1 damage. This caps
  * at 24 kills (+6 in stats). At level 2, earn regen 1
@@ -30,8 +30,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 */
 public class Rampage extends Ability {
 
-	private static final int RAMPAGE_1_KILL_TIMER = 2 * 20; //ticks
-	private static final int RAMPAGE_2_KILL_TIMER = 3 * 20; //ticks
+	private static final int RAMPAGE_1_KILL_TIMER = 3 * 20; //ticks
+	private static final int RAMPAGE_2_KILL_TIMER = 5 * 20; //ticks
 	private static final int RAMPAGE_KILL_THRESHOLD = 4;
 	private static final int RAMPAGE_KILL_LIMIT = 24;
 	private static final int RAMPAGE_2_REGEN_THRESHOLD = 5;

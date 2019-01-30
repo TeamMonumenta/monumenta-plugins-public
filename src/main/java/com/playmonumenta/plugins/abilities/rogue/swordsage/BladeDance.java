@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -37,6 +38,7 @@ public class BladeDance extends Ability {
 	 * seconds
 	 */
 
+	private boolean active = false;
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "BladeDance";
@@ -50,6 +52,7 @@ public class BladeDance extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 		mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
 		mPlayer.setInvulnerable(true);
+		active = true;
 		int bladeDance = getAbilityScore();
 		double damage = bladeDance == 1 ? 18 : 25;
 		if (bladeDance >= 2) {
@@ -95,9 +98,13 @@ public class BladeDance extends Ability {
 					}
 
 				}.runTaskTimer(mPlugin, 0, 1);
+
 				if (i >= 40) {
 					mPlayer.setInvulnerable(false);
+					active = false;
 					this.cancel();
+
+					//Ultra flash
 					new BukkitRunnable() {
 						double rotation = 0;
 						Location loc = mPlayer.getLocation();
@@ -142,6 +149,14 @@ public class BladeDance extends Ability {
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
 		putOnCooldown();
+		return true;
+	}
+
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (active) {
+			event.setCancelled(true);
+		}
 		return true;
 	}
 
