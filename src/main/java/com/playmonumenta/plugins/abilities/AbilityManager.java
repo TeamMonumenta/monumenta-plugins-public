@@ -61,6 +61,9 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
+import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
+import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
@@ -137,10 +140,16 @@ public class AbilityManager {
 		                          new ManaLance(mPlugin, mWorld, mRandom, null),
 		                          new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                          new Spellshock(mPlugin, mWorld, mRandom, null),
+
 		                          // ELEMENTALIST
 		                          new FrostRay(mPlugin, mWorld, mRandom, null),
 		                          new MeteorStrike(mPlugin, mWorld, mRandom, null),
 		                          new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
+
+		                          // MAGE SWORDSMAN
+		                          new FlashSword(mPlugin, mWorld, mRandom, null),
+		                          new Overload(mPlugin, mWorld, mRandom, null),
+		                          new SagesInsight(mPlugin, mWorld, mRandom, null),
 
 		                          // ROGUE
 		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
