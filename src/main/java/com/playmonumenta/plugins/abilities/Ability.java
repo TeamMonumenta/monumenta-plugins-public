@@ -92,7 +92,7 @@ public abstract class Ability {
 	 * @param player
 	 * @return
 	 */
-	public boolean canCast() {
+	public final boolean canCast() {
 		if (runCheck() && !isOnCooldown()) {
 			return true;
 		}
