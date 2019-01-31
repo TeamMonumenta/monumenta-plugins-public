@@ -63,15 +63,33 @@ public class AdrenalSerum extends Ability {
 					potCount += item.getAmount();
 				}
 			}
-			return potCount > ADRENAL_SERUM_POTIONS_CONSUMED;
+			return potCount > ADRENAL_SERUM_POTIONS_CONSUMED && mPlayer.isSneaking();
 		}
 		return false;
 	}
 
 	@Override
 	public boolean cast() {
-		//TODO: This almost certainly does not work
-		AbilityUtils.addAlchemistPotions(mPlayer, -1 * ADRENAL_SERUM_POTIONS_CONSUMED);
+		Inventory inv = mPlayer.getInventory();
+		int amountConsumed = 0;
+		for (ItemStack item : inv.getContents()) {
+			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+				if (amountConsumed >= 3)
+					break;
+				if (item.getAmount() >= 3) {
+					item.setAmount(item.getAmount() - 3);
+					break;
+				} else {
+					for (int i = 0; i < item.getAmount(); i++) {
+						item.setAmount(item.getAmount() - 1);
+						amountConsumed++;
+						if (item.getAmount() <= 0 || amountConsumed >= 3) {
+							break;
+						}
+					}
+				}
+			}
+		}
 
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);

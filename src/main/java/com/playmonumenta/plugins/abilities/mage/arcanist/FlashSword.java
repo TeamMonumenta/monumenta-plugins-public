@@ -16,6 +16,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -44,6 +45,7 @@ public class FlashSword extends Ability {
 	public FlashSword(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "FlashSword";
+		mInfo.linkedSpell = Spells.FSWORD;
 		mInfo.cooldown = FSWORD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
@@ -52,19 +54,20 @@ public class FlashSword extends Ability {
 	public boolean cast() {
 		int flashSword = getAbilityScore();
 		Player player = mPlayer;
+		putOnCooldown();
 		new BukkitRunnable() {
 			int t = 0;
 			float pitch = 1.2f;
 			int sw = 0;
+
 			@Override
 			public void run() {
 				t++;
 				sw++;
 				Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(),
-				                                                  FSWORD_RADIUS)) {
-					Vector toMobVector = mob.getLocation().toVector()
-					                     .subtract(player.getLocation().toVector()).setY(0).normalize();
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), FSWORD_RADIUS)) {
+					Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0)
+							.normalize();
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
 						mob.setNoDamageTicks(0);
@@ -78,16 +81,15 @@ public class FlashSword extends Ability {
 				if (t >= FSWORD_SWINGS) {
 					pitch = 1.45f;
 				}
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP,
-				                            1.0f, 0.8f);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT,
-				                            1.0f, pitch);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 0.8f);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1.0f, pitch);
 				Location loc = player.getLocation();
 				new BukkitRunnable() {
 					final int i = sw;
 					double roll;
 					double d = 45;
 					boolean init = false;
+
 					@Override
 					public void run() {
 						if (!init) {
@@ -147,7 +149,6 @@ public class FlashSword extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 7);
-		putOnCooldown();
 		return true;
 	}
 
@@ -155,7 +156,8 @@ public class FlashSword extends Ability {
 	public boolean canCast() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSprinting() && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
+		return mPlayer.isSprinting() && (mHand != null && (InventoryUtils.isWandItem(mHand))
+				|| (oHand != null && InventoryUtils.isWandItem(oHand)));
 	}
 
 }
