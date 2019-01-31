@@ -10,6 +10,8 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -55,6 +57,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.enchantments.Frost;
@@ -176,7 +179,6 @@ public class EntityListener implements Listener {
 					mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
 				}
 				*/
-
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
@@ -234,6 +236,23 @@ public class EntityListener implements Listener {
 
 						if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
 							event.setCancelled(true);
+						}
+						
+						if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+							if (player.hasMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY)) {
+								int enchantedPrayer = player.getMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY).get(0).asInt();
+								player.removeMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY, mPlugin);
+								damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
+								damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
+								mWorld.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
+								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
+								double damage = enchantedPrayer == 1 ? 7 : 12;
+								double heal = enchantedPrayer == 1 ? 2 : 4;
+								for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
+									EntityUtils.damageEntity(mPlugin, le, damage, damager);
+								}
+								PlayerUtils.healPlayer(player, heal);
+							}
 						}
 					}
 				}

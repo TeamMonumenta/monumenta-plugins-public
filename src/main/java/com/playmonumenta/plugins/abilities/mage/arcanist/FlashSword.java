@@ -153,7 +153,7 @@ public class FlashSword extends Ability {
 	}
 
 	@Override
-	public boolean canCast() {
+	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
 		return mPlayer.isSprinting() && (mHand != null && (InventoryUtils.isWandItem(mHand))

@@ -1,0 +1,105 @@
+package com.playmonumenta.plugins.abilities.cleric.hierophant;
+
+import java.util.Random;
+
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
+/*
+ * Enchanted Prayer: Jump and right-click to enchant the 
+ * weapons of all players in a 15-block radius (including 
+ * yourself) with holy magic, making their next melee attack 
+ * release light energy. The amplified attack deals additional 
+ * 7 / 12 damage in a 3.5 block radius around the target, 
+ * while healing the player for 2 / 4 hearts. (Cooldown: 18 s)
+ * 
+ * TODO: The enchanting portion of this ability is not currently very
+ * organized/efficient with our current systems setup. A workaround 
+ * will be used for now but I recommend we get some sort of Custom Effect
+ * system implemented for current and future effects like this. - Fire
+ */
+public class EnchantedPrayer extends Ability {
+
+	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
+		super(plugin, world, random, player);
+		mInfo.scoreboardId = "EPrayer";
+		mInfo.linkedSpell = Spells.ENCHANTED_PRAYER;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.cooldown = 20 * 18;
+	}
+	
+	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
+	
+	@Override
+	public boolean cast() {
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
+		new BukkitRunnable() {
+			double rotation = 0;
+			Location loc = mPlayer.getLocation();
+			double radius = 0;
+
+			@Override
+			public void run() {
+
+				radius += 0.25;
+				for (int i = 0; i < 36; i += 1) {
+					rotation += 10;
+					double radian1 = Math.toRadians(rotation);
+					loc.add(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.15, 0.15, 0.15, 0);
+					loc.subtract(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
+
+				}
+				if (radius >= 5) {
+					this.cancel();
+				}
+
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+		int enchantedPrayer = getAbilityScore();
+		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, 15, true)) {
+			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
+			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
+			p.setMetadata(ENCHANTED_PRAYER_METAKEY, new FixedMetadataValue(mPlugin, enchantedPrayer));
+			new BukkitRunnable() {
+				int t = 0;
+				@Override
+				public void run() {
+					t++;
+					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
+					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
+					if (!p.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
+						this.cancel();
+					}
+					
+					if (t >= 20 * 8 || p.isDead() || !p.isOnline() || p == null) {
+						this.cancel();
+						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
+					}
+				}
+				
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean runCheck() {
+		return mPlayer.getVelocity().getY() > 0;
+	}
+
+}
