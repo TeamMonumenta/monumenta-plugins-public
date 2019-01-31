@@ -70,7 +70,6 @@ public class AnvilOverride extends BaseOverride {
 		} else {
 			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");
 			if (!block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
-				block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));
 				new BukkitRunnable() {
 					Location loc = block.getLocation().add(0.5, 1.2, 0.5);
 					World world = loc.getWorld();
@@ -89,6 +88,7 @@ public class AnvilOverride extends BaseOverride {
 					
 				}.runTaskTimer(plugin, 0, 2);
 			}
+			block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));
 		}
 		return false;
 	}
