@@ -596,7 +596,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getHitEntity();
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player)entity;
-
+			AbilityManager.getManager().PlayerHitByProjectileEvent(player, event);
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 

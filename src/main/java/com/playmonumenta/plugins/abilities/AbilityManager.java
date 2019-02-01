@@ -443,6 +443,13 @@ public class AbilityManager {
 			}
 		}
 	}
+	
+	public void PlayerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast())
+				abil.PlayerHitByProjectileEvent(event);
+		}
+	}
 
 	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {
