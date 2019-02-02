@@ -111,6 +111,11 @@ public enum Spells {
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),
+	
+	//--Guardian
+	SHIELD_WALL("Shield Wall"),
+	CHELLENGE("Challenge"),
+	BODYGUARD("Bodyguard"),
 
 	//Alchemist
 	POWER_INJECTION("Power Injection"),

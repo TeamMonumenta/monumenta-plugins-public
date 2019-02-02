@@ -54,6 +54,9 @@ import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.Sanctified;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
@@ -121,6 +124,9 @@ import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GrowingRage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
+import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
+import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
@@ -218,7 +224,12 @@ public class AbilityManager {
 		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
 		                          new GrowingRage(mPlugin, mWorld, mRandom, null),
 		                          new Rampage(mPlugin, mWorld, mRandom, null),
-
+		                          
+		                          //GUARDIAN
+		                          new ShieldWall(mPlugin, mWorld, mRandom, null),
+		                          new Challenge(mPlugin, mWorld, mRandom, null),
+		                          new Bodyguard(mPlugin, mWorld, mRandom, null),
+		                          
 		                          // CLERIC
 		                          new Celestial(mPlugin, mWorld, mRandom, null),
 		                          new CleansingRain(mPlugin, mWorld, mRandom, null),
@@ -232,6 +243,11 @@ public class AbilityManager {
 		                          new HolyJavelin(mPlugin, mWorld, mRandom, null),
 		                          new ChoirBells(mPlugin, mWorld, mRandom, null),
 		                          new LuminousInfusion(mPlugin, mWorld, mRandom, null),
+		                          
+		                          // HIEROPHANT
+		                          new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
+		                          new HallowedBeam(mPlugin, mWorld, mRandom, null),
+		                          new ThuribleProcession(mPlugin, mWorld, mRandom, null),
 
 		                          //WARLOCK
 		                          new AmplifyingHex(mPlugin, mWorld, mRandom, null),
