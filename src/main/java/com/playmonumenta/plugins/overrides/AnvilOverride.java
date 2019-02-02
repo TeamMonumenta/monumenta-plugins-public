@@ -46,7 +46,7 @@ public class AnvilOverride extends BaseOverride {
 			item.setDurability((short) 0);
 			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
 			World world = loc.getWorld();
-			world.playSound(loc, Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
+			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, 1.0f, 1.0f);
 			new BukkitRunnable() {
 				int t = 0;
 				Location loc = block.getLocation().add(0.5, 1.1, 0.5);
@@ -55,10 +55,13 @@ public class AnvilOverride extends BaseOverride {
 					t++;
 					if (t >= 3) {
 						this.cancel();
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 25, 0.15, 0.15, 0.15, 0.4F, Material.ANVIL.createBlockData());
+						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 0.8F, Material.ANVIL.createBlockData());
+						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
+						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.755f);
 						block.setType(Material.AIR);
+						block.removeMetadata(ANVIL_USED_METAKEY, plugin);
 					} else {
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
+						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 					}
 				}
 				

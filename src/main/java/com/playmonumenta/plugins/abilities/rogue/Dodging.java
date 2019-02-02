@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.Random;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -149,7 +151,8 @@ public class Dodging extends Ability {
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
 		putOnCooldown();
-
+		
+		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		int dodging = getAbilityScore();
 		if (dodging > 1) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
@@ -157,9 +160,11 @@ public class Dodging extends Ability {
 			                                                  DODGING_SPEED_EFFECT_DURATION,
 			                                                  DODGING_SPEED_EFFECT_LEVEL,
 			                                                  true, false));
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 0.5f);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
+			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
+		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
+		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 
 		return true;
 	}

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,6 +47,7 @@ public class NightmarishAlchemy extends Ability {
 					}
 				}
 			}
+			mWorld.spawnParticle(Particle.SPELL_WITCH, potion.getLocation(), 30, 0, 0, 0, 1);
 		}
 
 		return true;
