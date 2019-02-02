@@ -33,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -686,5 +687,10 @@ public class EntityListener implements Listener {
 			Player player = (Player) event.getApplier();
 			AbilityManager.getManager().PotionEffectApplyEvent(player, event);
 		}
+	}
+	
+	@EventHandler
+	public void EntityBlockChangeEvent(EntityChangeBlockEvent event) {
+		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 	}
 }

@@ -45,4 +45,8 @@ public class BaseOverride {
 	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
 		return true;
 	}
+	
+	public boolean blockChangeInteraction(Plugin plugin, Block block) {
+		return true;
+	}
 }

@@ -354,4 +354,12 @@ public class ItemOverrides {
 
 		return true;
 	}
+	
+	public boolean blockChangeInteraction(Plugin plugin, Block block) {
+		BaseOverride override = mItems.get(block.getType());
+		if (override != null) {
+			return override.blockChangeInteraction(plugin, block);
+		}
+		return true;
+	}
 }

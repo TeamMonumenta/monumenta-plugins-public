@@ -55,9 +55,9 @@ public class AnvilOverride extends BaseOverride {
 					t++;
 					if (t >= 3) {
 						this.cancel();
-						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 0.8F, Material.ANVIL.createBlockData());
+						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
 						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.755f);
+						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 						block.setType(Material.AIR);
 						block.removeMetadata(ANVIL_USED_METAKEY, plugin);
 					} else {
@@ -95,5 +95,21 @@ public class AnvilOverride extends BaseOverride {
 			block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean blockChangeInteraction(Plugin plugin, Block block) {
+		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
+			return false;
+		}
+		return true;
 	}
 }
