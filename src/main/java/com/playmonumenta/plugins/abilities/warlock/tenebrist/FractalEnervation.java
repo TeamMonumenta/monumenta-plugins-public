@@ -59,13 +59,12 @@ public class FractalEnervation extends Ability {
 		for (int i = 0; i < range; i++) {
 			box.shift(dir);
 			Location loc = box.getCenter().toLocation(mWorld);
-			// mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
-			// 0.15, 0.15);
-			// mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
-			// 0.15, 0.075);
-			// mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
-			// 0.1);
-			mWorld.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0);
+			 mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
+			 0.15, 0.15);
+			 mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
+			 0.15, 0.075);
+			 mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
+			 0.1);
 			for (Mob mob : mobs) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (!hit.contains(mob)) {
@@ -107,6 +106,7 @@ public class FractalEnervation extends Ability {
 			}
 
 		}
+		putOnCooldown();
 		return true;
 	}
 

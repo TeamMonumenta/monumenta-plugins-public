@@ -100,7 +100,7 @@ public class WitheringGaze extends Ability {
 	}
 	
 	@Override
-	public boolean canCast() {
+	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSprinting() && InventoryUtils.isScytheItem(mHand);
 	}

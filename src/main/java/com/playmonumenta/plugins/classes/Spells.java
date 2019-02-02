@@ -122,7 +122,10 @@ public enum Spells {
 	UNSTABLE_ARROWS("Unstable Arrows"),
 
 	//Harbinger
-	ADRENAL_SERUM("Adrenal Serum");
+	ADRENAL_SERUM("Adrenal Serum"),
+	
+	//Apothecary
+	ALCHEMICAL_AMALGAM("Alchemical Amalgam");
 
 	private final String name;
 

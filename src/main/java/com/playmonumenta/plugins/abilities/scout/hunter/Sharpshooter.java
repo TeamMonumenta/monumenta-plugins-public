@@ -59,8 +59,9 @@ public class Sharpshooter extends Ability {
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 		int max = sharpshooter == 1 ? 5 : 7;
-		if (sharpshot < max)
+		if (sharpshot < max) 
 			sharpshot++;
+		t = 0;
 		event.setDamage(event.getDamage() + sharpshot);
 		return true;
 	}

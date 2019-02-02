@@ -40,6 +40,9 @@ import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.Beozar;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
@@ -262,6 +265,11 @@ public class AbilityManager {
 		                          new AdrenalSerum(mPlugin, mWorld, mRandom, null),
 		                          new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new PurpleHaze(mPlugin, mWorld, mRandom, null),
+		                          
+		                          // APOTHECARY
+		                          new Beozar(mPlugin, mWorld, mRandom, null),
+		                          new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
+		                          new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
 
 		                          // ALL PLAYERS (but technically for Alchemist)
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null)

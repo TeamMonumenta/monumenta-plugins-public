@@ -49,10 +49,6 @@ public class CloakAndDagger extends Ability {
 		if (active) {
 			active = false;
 			time = 0;
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
 			double damage = getAbilityScore() == 1 ? 2 : 4;
 			event.setDamage(event.getDamage() + (damage * time));
@@ -83,7 +79,7 @@ public class CloakAndDagger extends Ability {
 			public void run() {
 				if (t % 20 == 0)
 					time++;
-				if (t >= 20 * 5) {
+				if (t >= 20 * 5 || !active) {
 					this.cancel();
 					time = 0;
 					active = false;
