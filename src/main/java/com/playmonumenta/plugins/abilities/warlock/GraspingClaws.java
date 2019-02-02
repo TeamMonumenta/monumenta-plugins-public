@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class GraspingClaws extends Ability {
 
@@ -50,7 +51,7 @@ public class GraspingClaws extends Ability {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS)) {
 			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 			MovementUtils.PullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
 			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 		}
 

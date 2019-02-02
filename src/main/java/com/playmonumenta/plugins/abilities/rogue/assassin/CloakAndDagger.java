@@ -49,9 +49,10 @@ public class CloakAndDagger extends Ability {
 		if (active) {
 			active = false;
 			time = 0;
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 70, 0, 0, 0, 0.15);
-			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 50, 0.2, 0, 0.2, 0.1);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
 			double damage = getAbilityScore() == 1 ? 2 : 4;
 			event.setDamage(event.getDamage() + (damage * time));
@@ -64,13 +65,15 @@ public class CloakAndDagger extends Ability {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.CLOAK_AND_DAGGER))
 			return;
 		
+		active = true;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 0, false, true));
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 70, 0, 0, 0, 0.15);
-		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 50, 0.2, 0, 0.2, 0.1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
+		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
+		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 20)) {
-			if (mob.getTarget().equals(mPlayer)) {
+			if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
 				mob.setTarget(null);
 			}
 		}
@@ -78,17 +81,18 @@ public class CloakAndDagger extends Ability {
 			int t = 0;
 			@Override
 			public void run() {
-				t++;
 				if (t % 20 == 0)
 					time++;
 				if (t >= 20 * 5) {
 					this.cancel();
 					time = 0;
 					active = false;
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 70, 0, 0, 0, 0.15);
-					mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 50, 0.2, 0, 0.2, 0.1);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
+					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 				}
+				t++;
 			}
 			
 		}.runTaskTimer(mPlugin, 0, 1);

@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BlasphemousAura extends Ability {
 
@@ -57,8 +58,7 @@ public class BlasphemousAura extends Ability {
 			int vulnLevel = (getAbilityScore() == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), BLASPHEMY_RADIUS)) {
-				mob.addPotionEffect(
-				    new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
+				PotionUtils.applyPotion(mob, mob, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
 			}
 		}
 		return true;

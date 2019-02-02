@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ConsumingFlames extends Ability {
 
@@ -48,7 +49,7 @@ public class ConsumingFlames extends Ability {
 		boolean effect = false;
 		int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius)) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
+			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
 			mob.setFireTicks(CONSUMING_FLAMES_DURATION);
 
 			EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);

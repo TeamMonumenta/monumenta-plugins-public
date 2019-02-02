@@ -2,16 +2,20 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import java.util.Random;
 
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Coup De Grâce: If you melee attack a non-boss enemy when 
@@ -33,8 +37,11 @@ public class CoupDeGrace extends Ability {
 		int coupDeGrace = getAbilityScore();
 		double threshhold = coupDeGrace == 1 ? 0.25 : 0.3;
 		if (le.getHealth() < le.getMaxHealth() * threshhold) {
-			le.setHealth(0);
+			//Setting health does not count for a kill. Deal damage beyond god-level tiers
+			EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer);
+			mWorld.spawnParticle(Particle.CRIT, le.getLocation().add(0, le.getHeight() / 2, 0), 35, 0, 0, 0, 1);
 			if (coupDeGrace > 1) {
+				mWorld.spawnParticle(Particle.CRIT_MAGIC, le.getLocation().add(0, le.getHeight() / 2, 0), 25, 0, 0, 0, 1);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 8, 0));
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 0));
@@ -44,4 +51,10 @@ public class CoupDeGrace extends Ability {
 		return true;
 	}
 
+	@Override
+	public boolean runCheck() {
+		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
+		return InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
+	}
 }

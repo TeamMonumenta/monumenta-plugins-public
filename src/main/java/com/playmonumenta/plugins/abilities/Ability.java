@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -165,6 +166,8 @@ public abstract class Ability {
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { }
 	
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
+	
+	public void PotionApplyEvent(PotionEffectApplyEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

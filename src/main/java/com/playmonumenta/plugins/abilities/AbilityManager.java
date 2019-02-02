@@ -88,6 +88,9 @@ import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
+import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.ranger.Disengage;
 import com.playmonumenta.plugins.abilities.scout.ranger.PrecisionStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
@@ -101,6 +104,9 @@ import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
 import com.playmonumenta.plugins.abilities.warlock.reaper.HungeringVortex;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.EerieEminence;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
+import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
@@ -114,6 +120,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class AbilityManager {
@@ -189,6 +196,11 @@ public class AbilityManager {
 		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
 		                          new Disengage(mPlugin, mWorld, mRandom, null),
 		                          new PrecisionStrike(mPlugin, mWorld, mRandom, null),
+		                          
+		                          //HUNTER
+		                          new EnchantedShot(mPlugin, mWorld, mRandom, null),
+		                          new PinningShot(mPlugin, mWorld, mRandom, null),
+		                          new Sharpshooter(mPlugin, mWorld, mRandom, null),
 
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
@@ -231,6 +243,11 @@ public class AbilityManager {
 		                          new DarkPact(mPlugin, mWorld, mRandom, null),
 		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
 		                          new HungeringVortex(mPlugin, mWorld, mRandom, null),
+		                          
+		                          //TENEBRIST
+		                          new EerieEminence(mPlugin, mWorld, mRandom, null),
+		                          new FractalEnervation(mPlugin, mWorld, mRandom, null),
+		                          new WitheringGaze(mPlugin, mWorld, mRandom, null),
 
 		                          // ALCHEMIST
 		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),
@@ -532,6 +549,14 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.EntityTargetLivingEntityEvent(event);
+			}
+		}
+	}
+	
+	public void PotionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PotionApplyEvent(event);
 			}
 		}
 	}

@@ -100,6 +100,8 @@ public enum Spells {
 	HYPNOTIC_RAGE("Hypnotic Rage"),
 	SABLE_SPHERE("Sable Sphere"),
 	BLACK_CLOUDS("Black Clouds"),
+	FRACTAL_ENERVATION("Fractal Enervation"),
+	WITHERING_GAZE("Withering Gaze"),
 
 	//Warrior
 

@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -15,6 +19,7 @@ import org.bukkit.potion.PotionType;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class PotionUtils {
@@ -275,5 +280,22 @@ public class PotionUtils {
 		}
 
 		return false;
+	}
+	
+	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
+		PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
+		Bukkit.getPluginManager().callEvent(event);
+		applied.addPotionEffect(event.getEffect());
+	}
+	
+	public static List<PotionEffectType> getNegativeEffects(LivingEntity le) {
+		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
+		List<PotionEffectType> negatives = Arrays.asList(NEGATIVE_EFFECTS);
+		for (PotionEffect effect : le.getActivePotionEffects()) {
+			if (negatives.contains(effect.getType())) {
+				types.add(effect.getType());
+			}
+		}
+		return types;
 	}
 }

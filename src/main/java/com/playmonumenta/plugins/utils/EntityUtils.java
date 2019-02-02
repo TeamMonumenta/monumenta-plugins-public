@@ -527,7 +527,7 @@ public class EntityUtils {
 
 		public static FreezeObject getHandle(LivingEntity mob) {
 			if (mob.hasMetadata(FREEZE_METAKEY)) {
-				return (FreezeObject)mob.getMetadata(FREEZE_METAKEY).get(0);
+				return (FreezeObject)mob.getMetadata(FREEZE_METAKEY).get(0).value();
 			}
 			return null;
 		}

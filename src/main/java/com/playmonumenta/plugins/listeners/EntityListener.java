@@ -60,6 +60,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Inferno;
@@ -676,6 +677,14 @@ public class EntityListener implements Listener {
 		if (event.getTarget() instanceof Player) {
 			Player player = (Player) event.getTarget();
 			AbilityManager.getManager().EntityTargetLivingEntityEvent(player, event);
+		}
+	}
+	
+	@EventHandler
+	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
+		if (event.getApplier() instanceof Player) {
+			Player player = (Player) event.getApplier();
+			AbilityManager.getManager().PotionEffectApplyEvent(player, event);
 		}
 	}
 }

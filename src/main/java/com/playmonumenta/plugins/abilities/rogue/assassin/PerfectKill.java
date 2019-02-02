@@ -34,7 +34,8 @@ public class PerfectKill extends Ability {
 		LivingEntity le = (LivingEntity) event.getEntity();
 		
 		if (!EntityUtils.isBoss(le) && !EntityUtils.isElite(le)) {
-			le.setHealth(0);
+			//Setting health does not count for a kill. Deal damage beyond god-level tiers
+			EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer);
 			le.getWorld().playSound(le.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1.75f);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, 1.15, 0), 50, 0.3, 0.35, 0.3, 1);
 			mWorld.spawnParticle(Particle.SPELL_MOB, le.getLocation().add(0, 1.15, 0), 50, 0.2, 0.35, 0.2, 0);
@@ -49,7 +50,7 @@ public class PerfectKill extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSneaking() && InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
+		return mPlayer.isSprinting() && InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
 	}
 
 }

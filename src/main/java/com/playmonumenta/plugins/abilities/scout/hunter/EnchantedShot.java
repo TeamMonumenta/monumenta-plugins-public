@@ -43,7 +43,7 @@ public class EnchantedShot extends Ability {
 	
 	@Override
 	public boolean cast() { 
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW) && mPlayer.getLocation().getPitch() > 50) {
 			Player player = mPlayer;
 			active = true;
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
@@ -67,6 +67,7 @@ public class EnchantedShot extends Ability {
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (active) {
 			arrow.remove();
+			active = false;
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.65, 0.65, 0.65);
 			double damage = getAbilityScore() == 1 ? 20 : 30;
 			
@@ -82,8 +83,8 @@ public class EnchantedShot extends Ability {
 			for (int i = 0; i < 30; i++) {
 				box.shift(dir);
 				Location bLoc = box.getCenter().toLocation(mWorld);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, bLoc, 3, 0.1, 0.1, 0.1, 0);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 1, 0.1, 0.1, 0.1, 0.1);
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, bLoc, 5, 0.35, 0.35, 0.35, 0);
+				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 2, 0.1, 0.1, 0.1, 0.1);
 				for (Mob mob : mobs) {
 					if (mob.getBoundingBox().overlaps(box)) {
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
@@ -98,11 +99,6 @@ public class EnchantedShot extends Ability {
 			return false;
 		}
 		return true;
-	}
-	
-	@Override
-	public boolean runCheck() {
-		return mPlayer.getLocation().getPitch() > 50;
 	}
 	
 
