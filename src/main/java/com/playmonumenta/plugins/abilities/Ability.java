@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -162,6 +163,8 @@ public abstract class Ability {
 	public void PlayerExtendedSneakEvent() { }
 
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { }
+	
+	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

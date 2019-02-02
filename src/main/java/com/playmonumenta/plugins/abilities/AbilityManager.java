@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -75,6 +76,9 @@ import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
 import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
+import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
+import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
+import com.playmonumenta.plugins.abilities.rogue.assassin.PerfectKill;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
@@ -166,6 +170,12 @@ public class AbilityManager {
 		                          new WindWalk(mPlugin, mWorld, mRandom, null),
 		                          new BladeDance(mPlugin, mWorld, mRandom, null),
 		                          new DeadlyRonde(mPlugin, mWorld, mRandom, null),
+		                          
+		                          // ROGUE -- ASSASSIN
+		                          
+		                          new PerfectKill(mPlugin, mWorld, mRandom, null),
+		                          new CoupDeGrace(mPlugin, mWorld, mRandom, null),
+		                          new CloakAndDagger(mPlugin, mWorld, mRandom, null),
 
 		                          // SCOUT
 		                          new Agility(mPlugin, mWorld, mRandom, null),
@@ -514,6 +524,14 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.PlayerDealtCustomDamageEvent(event);
+			}
+		}
+	}
+	
+	public void EntityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.EntityTargetLivingEntityEvent(event);
 			}
 		}
 	}

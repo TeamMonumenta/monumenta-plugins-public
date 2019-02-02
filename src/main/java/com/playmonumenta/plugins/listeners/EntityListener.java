@@ -40,6 +40,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -668,5 +669,13 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ItemSpawnEvent(ItemSpawnEvent event) {
 		EnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
+	}
+	
+	@EventHandler
+	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+		if (event.getTarget() instanceof Player) {
+			Player player = (Player) event.getTarget();
+			AbilityManager.getManager().EntityTargetLivingEntityEvent(player, event);
+		}
 	}
 }

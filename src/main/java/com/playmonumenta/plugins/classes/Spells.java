@@ -49,6 +49,7 @@ public enum Spells {
 
 	//--Assassin Spec.
 	PERFECT_KILL("Perfect Kill"),
+	CLOAK_AND_DAGGER("Cloak And Dagger"),
 
 	//Cleric
 
