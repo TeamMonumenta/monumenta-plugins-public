@@ -22,23 +22,23 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 
 /*
- * Hallowed Beam: Level 1 – Firing a fully-drawn bow while sneaking, 
- * if pointed directly at a non-boss undead, will instantly deal 40 damage 
- * to the undead instead of consuming the arrow. Cooldown: 20s. Level 2 - 
- * The targeted undead explodes, dealing 20 damage to undead within a 
+ * Hallowed Beam: Level 1 – Firing a fully-drawn bow while sneaking,
+ * if pointed directly at a non-boss undead, will instantly deal 40 damage
+ * to the undead instead of consuming the arrow. Cooldown: 20s. Level 2 -
+ * The targeted undead explodes, dealing 20 damage to undead within a
  * 5-block radius, and giving slowness 4 to all enemies.
  */
 public class HallowedBeam extends Ability {
 
 	private static final Particle.DustOptions HALLOWED_BEAM_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 150), 1.0f);
-	
+
 	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "HallowedBeam";
 		mInfo.linkedSpell = Spells.HALLOWED_BEAM;
 		mInfo.cooldown = 20 * 20;
 	}
-	
+
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (arrow.isCritical()) {
@@ -82,7 +82,7 @@ public class HallowedBeam extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		return mPlayer.isSneaking();

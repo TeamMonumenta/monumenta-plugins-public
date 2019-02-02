@@ -67,7 +67,7 @@ public class FlashSword extends Ability {
 				Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), FSWORD_RADIUS)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0)
-							.normalize();
+					                     .normalize();
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
 						mob.setNoDamageTicks(0);
@@ -157,7 +157,7 @@ public class FlashSword extends Ability {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
 		return mPlayer.isSprinting() && (mHand != null && (InventoryUtils.isWandItem(mHand))
-				|| (oHand != null && InventoryUtils.isWandItem(oHand)));
+		                                 || (oHand != null && InventoryUtils.isWandItem(oHand)));
 	}
 
 }

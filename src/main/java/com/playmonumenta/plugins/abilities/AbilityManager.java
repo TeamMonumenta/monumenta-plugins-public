@@ -443,11 +443,12 @@ public class AbilityManager {
 			}
 		}
 	}
-	
+
 	public void PlayerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast())
+			if (abil.canCast()) {
 				abil.PlayerHitByProjectileEvent(event);
+			}
 		}
 	}
 

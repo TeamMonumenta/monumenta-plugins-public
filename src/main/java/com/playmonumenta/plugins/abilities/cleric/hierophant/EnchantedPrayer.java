@@ -17,15 +17,15 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Enchanted Prayer: Jump and right-click to enchant the 
- * weapons of all players in a 15-block radius (including 
- * yourself) with holy magic, making their next melee attack 
- * release light energy. The amplified attack deals additional 
- * 7 / 12 damage in a 3.5 block radius around the target, 
+ * Enchanted Prayer: Jump and right-click to enchant the
+ * weapons of all players in a 15-block radius (including
+ * yourself) with holy magic, making their next melee attack
+ * release light energy. The amplified attack deals additional
+ * 7 / 12 damage in a 3.5 block radius around the target,
  * while healing the player for 2 / 4 hearts. (Cooldown: 18 s)
- * 
+ *
  * TODO: The enchanting portion of this ability is not currently very
- * organized/efficient with our current systems setup. A workaround 
+ * organized/efficient with our current systems setup. A workaround
  * will be used for now but I recommend we get some sort of Custom Effect
  * system implemented for current and future effects like this. - Fire
  */
@@ -38,9 +38,9 @@ public class EnchantedPrayer extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.cooldown = 20 * 18;
 	}
-	
+
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
-	
+
 	@Override
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
@@ -85,18 +85,18 @@ public class EnchantedPrayer extends Ability {
 					if (!p.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
 						this.cancel();
 					}
-					
+
 					if (t >= 20 * 8 || p.isDead() || !p.isOnline() || p == null) {
 						this.cancel();
 						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
 					}
 				}
-				
+
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		return mPlayer.getVelocity().getY() > 0;

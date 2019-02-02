@@ -12,8 +12,10 @@ import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -32,7 +34,7 @@ public class Dodging extends Ability {
 	 * be triggered here, even when the skill is on cooldown. It must check itself
 	 * that cooldown is active and behave accordingly.
 	 */
-	
+
 	/*
 	 * Debug findings:
 	 * ProjectileHitEvent occurs before EntityDamageByEntityEvent
@@ -55,7 +57,7 @@ public class Dodging extends Ability {
 		// NOTE: This skill will get events even when it is on cooldown!
 		mInfo.ignoreCooldown = true;
 	}
-	
+
 	@Override
 	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		// Don't proc on Fire Aspect
@@ -71,7 +73,7 @@ public class Dodging extends Ability {
 		return false;
 	}
 
-	
+
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
@@ -79,53 +81,26 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		// Remove effects from tipped arrows
-		// TODO: This is the same code as for removing from shields, should probably be
-		// a utility function
-		// TODO: This code is bugged. It correctly identifies tipped arrows and runs
-		// but the player is hit with potion effects anyway.
-//		if (type == EntityType.TIPPED_ARROW) {
-//			TippedArrow arrow = (TippedArrow)damager;
-//			PotionData data = new PotionData(PotionType.AWKWARD);
-//			arrow.setBasePotionData(data);
-//
-//			if (arrow.hasCustomEffects()) {
-//				List<PotionEffectType> types = new ArrayList<PotionEffectType>();
-//				if (!mPlayer.getActivePotionEffects().isEmpty()) {
-//					for (PotionEffect pEffect : mPlayer.getActivePotionEffects())
-//						types.add(pEffect.getType());
-//				}
-//				Iterator<PotionEffect> effectIter = arrow.getCustomEffects().iterator();
-//				while (effectIter.hasNext()) {
-//					PotionEffect effect = effectIter.next();
-//					arrow.removeCustomEffect(effect.getType());
-//					Bukkit.broadcastMessage("" + effect.getType());
-//					Bukkit.broadcastMessage("" + (types.isEmpty()) + " " + (!types.contains(effect.getType())));
-//					if (types.isEmpty() || !types.contains(effect.getType())) {
-//						Bukkit.broadcastMessage("Delet " + effect.getType());
-//						mPlayer.removePotionEffect(effect.getType());
-//					}
-//				}
-//			}
-//		}
-
 		return false;
 	}
-	
-	
+
+
 	@Override
 	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (!_dodge()) {
 			return true;
 		}
+
 		if (event.getEntity() instanceof TippedArrow) {
 			TippedArrow arrow = (TippedArrow) event.getEntity();
 			arrow.clearCustomEffects();
+			PotionData data = new PotionData(PotionType.MUNDANE);
+			arrow.setBasePotionData(data);
 		}
 		return true;
 	}
-	
+
 	private boolean _dodge() {
 		if (mTriggerTick == mPlayer.getTicksLived()) {
 			// Dodging was activated this tick - allow it
@@ -151,7 +126,7 @@ public class Dodging extends Ability {
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
 		putOnCooldown();
-		
+
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		int dodging = getAbilityScore();
 		if (dodging > 1) {

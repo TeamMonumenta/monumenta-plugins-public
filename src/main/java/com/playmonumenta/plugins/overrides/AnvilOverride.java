@@ -24,11 +24,11 @@ public class AnvilOverride extends BaseOverride {
 	final static String ANVIL_USED_METAKEY = "AnvilUsedMetakey";
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-			Block block) {
+	                                          Block block) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		} else if (player.getGameMode() == GameMode.ADVENTURE
-				&& block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
+		           && block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
 			return false;
 		}
 
@@ -39,9 +39,9 @@ public class AnvilOverride extends BaseOverride {
 		item = player.getInventory().getItemInMainHand();
 
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
-				&& (!item.hasItemMeta() || !item.getItemMeta().hasLore()
-						|| !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
-				&& block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) && !block.hasMetadata(ANVIL_USED_METAKEY)) {
+		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
+		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
+		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) && !block.hasMetadata(ANVIL_USED_METAKEY)) {
 
 			item.setDurability((short) 0);
 			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
@@ -64,7 +64,7 @@ public class AnvilOverride extends BaseOverride {
 						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 					}
 				}
-				
+
 			}.runTaskTimer(plugin, 0, 7);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 			block.setMetadata(ANVIL_USED_METAKEY, new FixedMetadataValue(plugin, true));
@@ -81,14 +81,15 @@ public class AnvilOverride extends BaseOverride {
 					public void run() {
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0);
 						t++;
-						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) || block == null)
+						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) || block == null) {
 							this.cancel();
-						if (t >= 20*4) {
+						}
+						if (t >= 20 * 4) {
 							this.cancel();
 							block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 						}
 					}
-					
+
 				}.runTaskTimer(plugin, 0, 2);
 			}
 			block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));

@@ -121,7 +121,7 @@ public abstract class Ability {
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
-	
+
 	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
 		return true;
 	}

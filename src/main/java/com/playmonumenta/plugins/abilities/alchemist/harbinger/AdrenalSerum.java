@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
@@ -74,8 +73,9 @@ public class AdrenalSerum extends Ability {
 		int amountConsumed = 0;
 		for (ItemStack item : inv.getContents()) {
 			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-				if (amountConsumed >= 3)
+				if (amountConsumed >= 3) {
 					break;
+				}
 				if (item.getAmount() >= 3) {
 					item.setAmount(item.getAmount() - 3);
 					break;

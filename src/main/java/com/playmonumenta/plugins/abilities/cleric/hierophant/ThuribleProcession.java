@@ -23,31 +23,31 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Thurible Procession: 
- * Level 1 - Blocking with a shield in either hand 
- * procedurally builds up passive buffs, which are applied to all players 
- * (except the user) within 20 blocks for as long as the block is held. 
- * The Hierophant moves at ~80% normal walking speed when blocking to use 
- * this ability. Progression: Speed 1 (0:01) (2 Seconds of Blocking), 
- * Strength 1 (0:01) (4 seconds of blocking), Resistance 1 (0:01) (6 seconds 
- * of blocking) 
- * Level 2 - The radius of the buffs increase to 30, and the 
- * Hiero moves at normal walk speed while blocking. Progression: In addition 
- * to the previous progression, after blocking for 10 seconds, all players 
- * (including the user) within the range are given 10 seconds of Absorption 
+ * Thurible Procession:
+ * Level 1 - Blocking with a shield in either hand
+ * procedurally builds up passive buffs, which are applied to all players
+ * (except the user) within 20 blocks for as long as the block is held.
+ * The Hierophant moves at ~80% normal walking speed when blocking to use
+ * this ability. Progression: Speed 1 (0:01) (2 Seconds of Blocking),
+ * Strength 1 (0:01) (4 seconds of blocking), Resistance 1 (0:01) (6 seconds
+ * of blocking)
+ * Level 2 - The radius of the buffs increase to 30, and the
+ * Hiero moves at normal walk speed while blocking. Progression: In addition
+ * to the previous progression, after blocking for 10 seconds, all players
+ * (including the user) within the range are given 10 seconds of Absorption
  * 1, Speed 1, Strength 1, and Resistance 1.
  */
 public class ThuribleProcession extends Ability {
 
 	private static final Particle.DustOptions THURIBLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 175), 1.0f);
 	public static final String PLAYER_THURIBLE_METAKEY = "PlayerIncensedThuribleMetakey";
-	
+
 	public ThuribleProcession(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Thurible";
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		int incensedThurible = getAbilityScore();
@@ -138,5 +138,5 @@ public class ThuribleProcession extends Ability {
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
 		return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
 	}
-	
+
 }

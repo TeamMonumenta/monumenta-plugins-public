@@ -176,7 +176,7 @@ public class EntityListener implements Listener {
 				}
 				/* TODO: Specialization needed?
 				for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
-					mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
+				    mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
 				}
 				*/
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
@@ -193,10 +193,10 @@ public class EntityListener implements Listener {
 					/* TODO: Specialization needed?
 					Projectile proj = (Projectile) damager;
 					if (proj.getShooter() instanceof LivingEntity) {
-						LivingEntity shooter = (LivingEntity) proj.getShooter();
-						for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
-							mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, shooter, event);
-						}
+					    LivingEntity shooter = (LivingEntity) proj.getShooter();
+					    for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
+					        mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, shooter, event);
+					    }
 					}
 					*/
 				}
@@ -237,7 +237,8 @@ public class EntityListener implements Listener {
 						if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
 							event.setCancelled(true);
 						}
-						
+
+						/* TODO: Move this into a static method in the appropriate spec file */
 						if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 							if (player.hasMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY)) {
 								int enchantedPrayer = player.getMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY).get(0).asInt();
