@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,6 +24,8 @@ import com.playmonumenta.plugins.utils.NetworkUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PlayerData {
+	static private Map<UUID, String> PLAYER_DATA_CACHE = new ConcurrentSkipListMap<UUID, String>();
+
 	/**
 	 * Saves player data to a file
 	 *
@@ -49,14 +54,22 @@ public class PlayerData {
 			return;
 		}
 
-		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + playerUUID + ".json";
+		PLAYER_DATA_CACHE.put(playerUUID, writeContent);
 
-		try {
-			FileUtils.writeFile(fileLocation, writeContent);
-		} catch (Exception e) {
-			plugin.getLogger().severe("Failed to write player data to " + fileLocation);
-			e.printStackTrace();
-		}
+		// Save the player data to file asynchronously so as not to hold up the main thread
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + playerUUID + ".json";
+
+				try {
+					FileUtils.writeFile(fileLocation, writeContent);
+				} catch (Exception e) {
+					plugin.getLogger().severe("Failed to write player data to " + fileLocation);
+					e.printStackTrace();
+				}
+			}
+		}.runTaskAsynchronously(plugin);
 	}
 
 	/**
@@ -66,15 +79,23 @@ public class PlayerData {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 		final String backupFileLocation = plugin.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
 
-		try {
-			FileUtils.moveFile(fileLocation, backupFileLocation);
-		} catch (FileNotFoundException e) {
-			// Player file didn't exist, no problem
-			return;
-		} catch (Exception e) {
-			plugin.getLogger().severe("Generic failure backing up player data file");
-			e.printStackTrace();
-		}
+		PLAYER_DATA_CACHE.remove(player.getUniqueId());
+
+		// Move the player's data file to the backup file directory - do this asynchronously so as not to hold up the main thread
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				try {
+					FileUtils.moveFile(fileLocation, backupFileLocation);
+				} catch (FileNotFoundException e) {
+					// Player file didn't exist, no problem
+					return;
+				} catch (Exception e) {
+					plugin.getLogger().severe("Generic failure backing up player data file");
+					e.printStackTrace();
+				}
+			}
+		}.runTaskAsynchronously(plugin);
 	}
 
 	/**
@@ -193,6 +214,14 @@ public class PlayerData {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 
 		String content = null;
+
+		// First look at the cache to see if the data is already available
+		content = PLAYER_DATA_CACHE.get(player.getUniqueId());
+		if (content != null && !content.isEmpty()) {
+			// Cache hit! Return the data
+			return content;
+		}
+
 		try {
 			content = FileUtils.readFile(fileLocation);
 		} catch (FileNotFoundException e) {
