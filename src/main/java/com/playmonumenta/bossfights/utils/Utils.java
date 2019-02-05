@@ -1,19 +1,20 @@
 package com.playmonumenta.bossfights.utils;
 
-import com.playmonumenta.bossfights.spells.SpellBaseCharge;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.util.Vector;
+
+import com.playmonumenta.bossfights.spells.SpellBaseCharge;
 
 public class Utils {
 	public static class ArgumentException extends Exception {
@@ -137,6 +138,29 @@ public class Utils {
 	 * Uses the charge mechanic to detect if a player has line of sight to a location (usually boss.getEyeLocation())
 	 */
 	public static boolean hasLineOfSight(Player player, LivingEntity target) {
-		return SpellBaseCharge.doCharge(player, target, player.getEyeLocation(), Arrays.asList(player), null, null, null, null, false);
+		return SpellBaseCharge.doCharge(player, target, player.getEyeLocation(), Arrays.asList(player), null, null, null, null, false, false);
+	}
+
+	public static Vector getDirectionTo(Location to, Location from) {
+		Vector vFrom = from.toVector();
+		Vector vTo = to.toVector();
+		return vTo.subtract(vFrom).normalize();
+	}
+
+	public static Vector getDirectionTo(Location to, Location from, boolean normalized) {
+		if (normalized) {
+			return getDirectionTo(to, from);
+		} else {
+			Vector vFrom = from.toVector();
+			Vector vTo = to.toVector();
+			return vTo.subtract(vFrom);
+		}
+	}
+
+	public static void KnockAway(Location loc, LivingEntity target, float speed) {
+		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().multiply(speed);
+		dir.setY(0.5f);
+
+		target.setVelocity(dir);
 	}
 }

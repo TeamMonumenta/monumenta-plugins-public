@@ -1,14 +1,14 @@
 package com.playmonumenta.bossfights.spells;
 
-import com.playmonumenta.bossfights.utils.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
+import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellBaseAura extends Spell {
 	@FunctionalInterface
@@ -88,8 +88,8 @@ public class SpellBaseAura extends Spell {
 			for (Player player : Utils.playersInRange(bossLoc, mRadius)) {
 				Location playerLoc = player.getLocation();
 				if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
+				    Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
+				    Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX) {
 					// Player is within range
 					mAuraEffect.run(player);
 				}

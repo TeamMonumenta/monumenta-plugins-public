@@ -30,6 +30,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
 import com.playmonumenta.bossfights.bosses.AuraLargeHungerBoss;
@@ -63,12 +64,14 @@ import com.playmonumenta.bossfights.bosses.HiddenBoss;
 import com.playmonumenta.bossfights.bosses.IceAspectBoss;
 import com.playmonumenta.bossfights.bosses.InfestedBoss;
 import com.playmonumenta.bossfights.bosses.InvisibleBoss;
+import com.playmonumenta.bossfights.bosses.LivingBladeBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
 import com.playmonumenta.bossfights.bosses.Masked_2;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
 import com.playmonumenta.bossfights.bosses.SnowballDamageBoss;
+import com.playmonumenta.bossfights.bosses.SwordsageRichter;
 import com.playmonumenta.bossfights.bosses.TpBehindBoss;
 import com.playmonumenta.bossfights.bosses.TsunamiChargerBoss;
 import com.playmonumenta.bossfights.bosses.UnstableBoss;
@@ -142,6 +145,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new SnowballDamageBoss(p, e));
 		mStatelessBosses.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new CorruptInfestedBoss(p, e));
 		mStatelessBosses.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameLaserBoss(p, e));
+		mStatelessBosses.put(LivingBladeBoss.identityTag, (Plugin p, LivingEntity e) -> new LivingBladeBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -154,6 +158,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new AzacorNormal(p, e, s, l));
 		mStatefulBosses.put(CShura_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_1(p, e, s, l));
 		mStatefulBosses.put(CShura_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_2(p, e, s, l));
+		mStatefulBosses.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new SwordsageRichter(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -200,6 +205,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> SnowballDamageBoss.deserialize(p, e));
 		mBossDeserializers.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> CorruptInfestedBoss.deserialize(p, e));
 		mBossDeserializers.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> FlameLaserBoss.deserialize(p, e));
+		mBossDeserializers.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e) -> SwordsageRichter.deserialize(p, e));
+		mBossDeserializers.put(LivingBladeBoss.identityTag, (Plugin p, LivingEntity e) -> LivingBladeBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
@@ -305,6 +312,13 @@ public class BossManager implements Listener {
 				Boss boss = mBosses.get(((LivingEntity)shooter).getUniqueId());
 				if (boss != null) {
 					boss.bossProjectileHit(event);
+				}
+			}
+			if (event.getHitEntity() != null && event.getHitEntity() instanceof LivingEntity) {
+				LivingEntity hit = (LivingEntity) event.getHitEntity();
+				Boss boss = mBosses.get(((LivingEntity) hit).getUniqueId());
+				if (boss != null) {
+					boss.bossHitByProjectile(event);
 				}
 			}
 		}
@@ -433,14 +447,21 @@ public class BossManager implements Listener {
 		/* Set up boss health / armor / etc */
 		ability.init();
 
-		Boss boss = mBosses.get(targetEntity.getUniqueId());
-		if (boss == null) {
-			boss = new Boss(ability);
-		} else {
-			boss.add(ability);
-		}
+		new BukkitRunnable() {
 
-		mBosses.put(targetEntity.getUniqueId(), boss);
+			@Override
+			public void run() {
+				Boss boss = mBosses.get(targetEntity.getUniqueId());
+				if (boss == null) {
+					boss = new Boss(ability);
+				} else {
+					boss.add(ability);
+				}
+
+				mBosses.put(targetEntity.getUniqueId(), boss);
+			}
+
+		}.runTaskLater(mPlugin, ability.waitAfterInit());
 	}
 
 	private void ProcessEntity(LivingEntity entity) {

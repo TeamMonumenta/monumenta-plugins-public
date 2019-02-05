@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.bossfights.BossBarManager;
@@ -22,14 +23,46 @@ import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public abstract class BossAbilityGroup {
+	@FunctionalInterface
+	public interface PhaseAction {
+		/**
+		 * Function called whenever the boss changes phase
+		 */
+		void run(LivingEntity entity);
+	}
+
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private BossBarManager mBossBar;
 	private SpellManager mActiveSpells;
+	private List<Spell> mPassiveSpells;
 	private int mTaskIDpassive = -1;
 	private int mTaskIDactive = -1;
 	private boolean mUnloaded = false;
 
+	public void changePhase(SpellManager activeSpells,
+	                        List<Spell> passiveSpells, PhaseAction action) {
+		action.run(mBoss);
+
+		if (mActiveSpells != null) {
+			mActiveSpells.cancelAll();
+		}
+
+		mActiveSpells = activeSpells;
+		mPassiveSpells = passiveSpells;
+	}
+
+	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, int wait) {
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar);
+			}
+
+		}.runTaskLater(plugin, wait);
+	}
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
@@ -37,9 +70,12 @@ public abstract class BossAbilityGroup {
 		mBoss = boss;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
+		mPassiveSpells = passiveSpells;
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
+
+
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable passive = new Runnable() {
@@ -54,8 +90,8 @@ public abstract class BossAbilityGroup {
 					return;
 				}
 
-				if (passiveSpells != null) {
-					for (Spell spell : passiveSpells) {
+				if (mPassiveSpells != null) {
+					for (Spell spell : mPassiveSpells) {
 						spell.run();
 					}
 				}
@@ -97,8 +133,8 @@ public abstract class BossAbilityGroup {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
-						if (activeSpells != null) {
-							activeSpells.cancelAll();
+						if (mActiveSpells != null) {
+							mActiveSpells.cancelAll();
 						}
 					}
 					return;
@@ -107,9 +143,9 @@ public abstract class BossAbilityGroup {
 				/* Some spells might have been run - so when this next deactivates they need to be cancelled */
 				mDisabled = false;
 
-				if (activeSpells != null) {
+				if (mActiveSpells != null) {
 					// Run the next spell and store how long before the next spell can run
-					mNextActiveTimer = activeSpells.runNextSpell();
+					mNextActiveTimer = mActiveSpells.runNextSpell();
 				}
 			}
 		};
@@ -120,6 +156,10 @@ public abstract class BossAbilityGroup {
 	/********************************************************************************
 	 * Event Handlers
 	 *******************************************************************************/
+
+	public List<Spell> getPassives() {
+		return mPassiveSpells;
+	}
 
 	/*
 	 * Boss damaged another entity
@@ -142,6 +182,11 @@ public abstract class BossAbilityGroup {
 	public void bossProjectileHit(ProjectileHitEvent event) {};
 
 	/*
+	 * Boss gets hit by a projectile
+	 */
+	public void bossHitByProjectile(ProjectileHitEvent event) {};
+
+	/*
 	 * Boss hit by area effect cloud
 	 */
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {};
@@ -157,6 +202,10 @@ public abstract class BossAbilityGroup {
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
 	public void init() {};
+
+	public int waitAfterInit() {
+		return 0;
+	}
 
 	/*
 	 * Called when the boss dies

@@ -10,6 +10,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
+import com.playmonumenta.bossfights.spells.Spell;
 
 public class Boss {
 	List<BossAbilityGroup> mAbilities;
@@ -27,6 +28,9 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossDamagedByEntity(event);
+				for (Spell passives : ability.getPassives()) {
+					passives.bossDamagedByEntity(event);
+				}
 			}
 		}
 	}
@@ -35,6 +39,9 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossDamagedEntity(event);
+				for (Spell passives : ability.getPassives()) {
+					passives.bossDamagedEntity(event);
+				}
 			}
 		}
 	}
@@ -43,6 +50,9 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossLaunchedProjectile(event);
+				for (Spell passives : ability.getPassives()) {
+					passives.bossLaunchedProjectile(event);
+				}
 			}
 		}
 	}
@@ -50,18 +60,36 @@ public class Boss {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossProjectileHit(event);
+			for (Spell passives : ability.getPassives()) {
+				passives.bossProjectileHit(event);
+			}
+		}
+	}
+
+	public void bossHitByProjectile(ProjectileHitEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossHitByProjectile(event);
+			for (Spell passives : ability.getPassives()) {
+				passives.bossHitByProjectile(event);
+			}
 		}
 	}
 
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.areaEffectAppliedToBoss(event);
+			for (Spell passives : ability.getPassives()) {
+				passives.areaEffectAppliedToBoss(event);
+			}
 		}
 	}
 
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.splashPotionAppliedToBoss(event);
+			for (Spell passives : ability.getPassives()) {
+				passives.splashPotionAppliedToBoss(event);
+			}
 		}
 	}
 
