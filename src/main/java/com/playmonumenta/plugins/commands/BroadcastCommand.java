@@ -76,7 +76,9 @@ public class BroadcastCommand {
 		/* Replace all instances of @S with the player's name */
 		commandStr = commandStr.replaceAll("@S", name);
 
-		sender.sendMessage(ChatColor.GOLD + "Broadcasting command '" + commandStr + "' to all servers!");
+		if (!(sender instanceof Player) || ((Player)sender).isOp()) {
+			sender.sendMessage(ChatColor.GOLD + "Broadcasting command '" + commandStr + "' to all servers!");
+		}
 
 		try {
 			NetworkUtils.broadcastCommand(plugin, commandStr);
