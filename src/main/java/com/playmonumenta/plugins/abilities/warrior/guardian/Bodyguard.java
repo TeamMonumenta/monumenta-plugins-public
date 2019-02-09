@@ -30,11 +30,11 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Bodyguard: Blocking while looking directly at another player 
- * makes you charge to him (max range: 15 blocks, immune to 
- * knockback and damage). Upon arriving, you knock back all 
- * nearby mobs (radius: 4 blocks). Both you and the other player 
- * gain + 4 / + 8 armor and regen I/II for 8 s. At lvl 2, mobs 
+ * Bodyguard: Blocking while looking directly at another player
+ * makes you charge to him (max range: 15 blocks, immune to
+ * knockback and damage). Upon arriving, you knock back all
+ * nearby mobs (radius: 4 blocks). Both you and the other player
+ * gain + 4 / + 8 armor and regen I/II for 8 s. At lvl 2, mobs
  * are also stunned for 3 s. Cooldown: 45 / 35s
  */
 public class Bodyguard extends Ability {
@@ -43,10 +43,10 @@ public class Bodyguard extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.linkedSpell = Spells.BODYGUARD;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 45: 20 * 35;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 45 : 20 * 35;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
@@ -74,7 +74,7 @@ public class Bodyguard extends Ability {
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
 						mWorld.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), ThreadLocalRandom.current().nextDouble(0.1, 0.4));
 					}
-					
+
 					//Explosion_Normal
 					for (int k = 0; k < 60; k++) {
 						double x = ThreadLocalRandom.current().nextDouble(-3, 3);
@@ -83,7 +83,7 @@ public class Bodyguard extends Ability {
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), ThreadLocalRandom.current().nextDouble(0.15, 0.5));
 					}
-					
+
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 					mPlayer.teleport(player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0));
 					Location tloc = player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
@@ -93,13 +93,13 @@ public class Bodyguard extends Ability {
 					double armor = bodyguard == 1 ? 4 : 8;
 					int amp = bodyguard == 1 ? 0 : 1;
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-                            new PotionEffect(PotionEffectType.REGENERATION,
-                                             20 * 8,
-                                             amp, false, true));
+					                                 new PotionEffect(PotionEffectType.REGENERATION,
+					                                                  20 * 8,
+					                                                  amp, false, true));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-                            new PotionEffect(PotionEffectType.REGENERATION,
-                                             20 * 8,
-                                             amp, false, true));
+					                                 new PotionEffect(PotionEffectType.REGENERATION,
+					                                                  20 * 8,
+					                                                  amp, false, true));
 					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
 					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
 					new BukkitRunnable() {
@@ -109,12 +109,13 @@ public class Bodyguard extends Ability {
 							mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
 							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
 						}
-						
+
 					}.runTaskLater(mPlugin, 20 * 8);
 					for (Mob mob : EntityUtils.getNearbyMobs(player.getLocation(), 4)) {
 						MovementUtils.KnockAway(player, mob, 0.45f);
-						if (bodyguard > 1)
+						if (bodyguard > 1) {
 							EntityUtils.applyStun(mPlugin, 20 * 3, mob);
+						}
 					}
 					break;
 				}
@@ -122,7 +123,7 @@ public class Bodyguard extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();

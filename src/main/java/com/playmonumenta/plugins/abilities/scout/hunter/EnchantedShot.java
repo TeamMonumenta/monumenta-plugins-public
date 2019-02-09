@@ -8,7 +8,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,16 +21,16 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
- * Enchanted Arrow: Right click while looking the ground will 
- * prime an enchanted arrow. When the next arrow is fired, this 
- * arrow will instantaneously travel in a straight line for 30 
- * blocks until hitting a block, piercing through all targets, 
+ * Enchanted Arrow: Right click while looking the ground will
+ * prime an enchanted arrow. When the next arrow is fired, this
+ * arrow will instantaneously travel in a straight line for 30
+ * blocks until hitting a block, piercing through all targets,
  * dealing 20 / 30 damage. (Cooldown: 20s)
  */
 public class EnchantedShot extends Ability {
 
 	private boolean active = false;
-	
+
 	public EnchantedShot(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "EnchantedArrow";
@@ -40,9 +39,9 @@ public class EnchantedShot extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.ignoreCooldown = true;
 	}
-	
+
 	@Override
-	public boolean cast() { 
+	public boolean cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW) && mPlayer.getLocation().getPitch() > 50) {
 			Player player = mPlayer;
 			active = true;
@@ -62,7 +61,7 @@ public class EnchantedShot extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (active) {
@@ -70,15 +69,15 @@ public class EnchantedShot extends Ability {
 			active = false;
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.65, 0.65, 0.65);
 			double damage = getAbilityScore() == 1 ? 20 : 30;
-			
+
 			Player player = mPlayer;
 			Location loc = player.getEyeLocation();
 			Vector dir = loc.getDirection().normalize();
-				player.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.85f);
-				player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0.65f);
-				player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
-				
+			player.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.85f);
+			player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0.65f);
+			player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
+			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
+
 			List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30);
 			for (int i = 0; i < 30; i++) {
 				box.shift(dir);
@@ -100,6 +99,6 @@ public class EnchantedShot extends Ability {
 		}
 		return true;
 	}
-	
+
 
 }

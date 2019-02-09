@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 import java.util.Random;
 
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,10 +17,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Coup De Grâce: If you melee attack a non-boss enemy when 
- * they are under 25% health, they die instantly. At level 2, 
- * the threshold increases to 30% health and enemies within 8 
- * blocks of you are intimidated, taking Weakness I & Slowness 
+ * Coup De Grâce: If you melee attack a non-boss enemy when
+ * they are under 25% health, they die instantly. At level 2,
+ * the threshold increases to 30% health and enemies within 8
+ * blocks of you are intimidated, taking Weakness I & Slowness
  * I for 8 seconds
  */
 public class CoupDeGrace extends Ability {
@@ -30,7 +29,7 @@ public class CoupDeGrace extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "CoupDeGrace";
 	}
-	
+
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();

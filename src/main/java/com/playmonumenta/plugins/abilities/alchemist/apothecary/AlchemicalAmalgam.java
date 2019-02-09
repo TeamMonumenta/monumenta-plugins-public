@@ -25,20 +25,20 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Alchemical Amalgam: Shift - left clicking with a bow in hand 
- * causes the apothecary to launch an orb of positive and negative 
- * concoctions, this slow moving projectile gives allies within 5 
- * blocks of it regeneration II/III and Resistance I and giving 
- * enemies slowness I/II and Weakness I for 4 seconds. The projectile 
- * on collision with terrain heals allies within 5 blocks of it 
+ * Alchemical Amalgam: Shift - left clicking with a bow in hand
+ * causes the apothecary to launch an orb of positive and negative
+ * concoctions, this slow moving projectile gives allies within 5
+ * blocks of it regeneration II/III and Resistance I and giving
+ * enemies slowness I/II and Weakness I for 4 seconds. The projectile
+ * on collision with terrain heals allies within 5 blocks of it
  * for 2 / 4 hp. CD: 30s
  */
 public class AlchemicalAmalgam extends Ability {
 
 	private static final Particle.DustOptions ALCHEMICAL_LIGHT_COLOR = new Particle.DustOptions(
-			Color.fromRGB(255, 255, 100), 1.0f);
+	    Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions ALCHEMICAL_DARK_COLOR = new Particle.DustOptions(
-			Color.fromRGB(83, 0, 135), 1.0f);
+	    Color.fromRGB(83, 0, 135), 1.0f);
 
 	public AlchemicalAmalgam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -69,13 +69,13 @@ public class AlchemicalAmalgam extends Ability {
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.25, 0.25, 0.25, ALCHEMICAL_DARK_COLOR);
 				for (Player p : PlayerUtils.getNearbyPlayers(loc, 5)) {
 					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
-							new PotionEffect(PotionEffectType.REGENERATION, 20 * 3,
-									amp, true, true));
+					                                 new PotionEffect(PotionEffectType.REGENERATION, 20 * 3,
+					                                                  amp, true, true));
 					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
-							new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3,
-									0, true, true));
+					                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3,
+					                                                  0, true, true));
 				}
-				
+
 				for (Mob mob : EntityUtils.getNearbyMobs(loc, 5)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, amp - 1));
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));

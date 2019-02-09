@@ -26,12 +26,12 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
- * Fractal Enervation: Sprint right-click fires a dark magic beam 
- * (max range: 9), afflicting the first enemy it hits with an 
- * unnatural weakness that lasts 12s. The beam then instantly 
- * spreads to all enemies in a 3-block radius, and then from them, 
- * and so on. Affected enemies suffer from Vulnerability I / II 
- * and all debuffs on the enemies increase by 1 effect level. 
+ * Fractal Enervation: Sprint right-click fires a dark magic beam
+ * (max range: 9), afflicting the first enemy it hits with an
+ * unnatural weakness that lasts 12s. The beam then instantly
+ * spreads to all enemies in a 3-block radius, and then from them,
+ * and so on. Affected enemies suffer from Vulnerability I / II
+ * and all debuffs on the enemies increase by 1 effect level.
  * Cooldown: 16s / 13s
  */
 public class FractalEnervation extends Ability {
@@ -59,12 +59,12 @@ public class FractalEnervation extends Ability {
 		for (int i = 0; i < range; i++) {
 			box.shift(dir);
 			Location loc = box.getCenter().toLocation(mWorld);
-			 mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
-			 0.15, 0.15);
-			 mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
-			 0.15, 0.075);
-			 mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
-			 0.1);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.15, 0.15,
+			                     0.15, 0.15);
+			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.15, 0.15,
+			                     0.15, 0.075);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
+			                     0.1);
 			for (Mob mob : mobs) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (!hit.contains(mob)) {
@@ -73,7 +73,7 @@ public class FractalEnervation extends Ability {
 							PotionEffect effect = mob.getPotionEffect(types);
 							mob.removePotionEffect(types);
 							mob.addPotionEffect(
-									new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
+							    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 						}
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 5, level));
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 40, 0.25, 0.45, 0.25, 0.15);
@@ -83,14 +83,14 @@ public class FractalEnervation extends Ability {
 						double dist = 100;
 						for (Mob next : EntityUtils.getNearbyMobs(mob.getLocation(), 4)) {
 							if (next.getLocation().distance(loc) < dist && !next.getUniqueId().equals(mob.getUniqueId())
-									&& !hit.contains(next)) {
+							    && !hit.contains(next)) {
 								nextMob = next;
 								dist = next.getLocation().distance(loc);
 							}
 						}
 						if (nextMob != null) {
 							Vector to = LocationUtils
-									.getDirectionTo(nextMob.getLocation().add(0, nextMob.getHeight() / 2, 0), loc);
+							            .getDirectionTo(nextMob.getLocation().add(0, nextMob.getHeight() / 2, 0), loc);
 							dir = to;
 							range = 4;
 						} else {

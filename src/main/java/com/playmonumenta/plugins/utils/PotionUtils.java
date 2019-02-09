@@ -34,35 +34,35 @@ public class PotionUtils {
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 
 	private static final PotionEffectType[] POSITIVE_EFFECTS = new PotionEffectType[] {
-	    PotionEffectType.ABSORPTION,
-	    PotionEffectType.DAMAGE_RESISTANCE,
-	    PotionEffectType.FAST_DIGGING,
-	    PotionEffectType.FIRE_RESISTANCE,
-	    PotionEffectType.HEAL,
-	    PotionEffectType.HEALTH_BOOST,
-	    PotionEffectType.INCREASE_DAMAGE,
-	    PotionEffectType.INVISIBILITY,
-	    PotionEffectType.JUMP,
-	    PotionEffectType.NIGHT_VISION,
-	    PotionEffectType.REGENERATION,
-	    PotionEffectType.SATURATION,
-	    PotionEffectType.SPEED,
-	    PotionEffectType.LUCK,
-	    PotionEffectType.WATER_BREATHING
+		PotionEffectType.ABSORPTION,
+		PotionEffectType.DAMAGE_RESISTANCE,
+		PotionEffectType.FAST_DIGGING,
+		PotionEffectType.FIRE_RESISTANCE,
+		PotionEffectType.HEAL,
+		PotionEffectType.HEALTH_BOOST,
+		PotionEffectType.INCREASE_DAMAGE,
+		PotionEffectType.INVISIBILITY,
+		PotionEffectType.JUMP,
+		PotionEffectType.NIGHT_VISION,
+		PotionEffectType.REGENERATION,
+		PotionEffectType.SATURATION,
+		PotionEffectType.SPEED,
+		PotionEffectType.LUCK,
+		PotionEffectType.WATER_BREATHING
 	};
 
 	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[] {
-	    PotionEffectType.BLINDNESS,
-	    PotionEffectType.POISON,
-	    PotionEffectType.CONFUSION,
-	    PotionEffectType.SLOW,
-	    PotionEffectType.SLOW_DIGGING,
-	    PotionEffectType.WITHER,
-	    PotionEffectType.WEAKNESS,
-	    PotionEffectType.HARM,
-	    PotionEffectType.HUNGER,
-	    PotionEffectType.LEVITATION,
-	    PotionEffectType.UNLUCK
+		PotionEffectType.BLINDNESS,
+		PotionEffectType.POISON,
+		PotionEffectType.CONFUSION,
+		PotionEffectType.SLOW,
+		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.WITHER,
+		PotionEffectType.WEAKNESS,
+		PotionEffectType.HARM,
+		PotionEffectType.HUNGER,
+		PotionEffectType.LEVITATION,
+		PotionEffectType.UNLUCK
 	};
 
 	public static class PotionInfo {
@@ -281,13 +281,13 @@ public class PotionUtils {
 
 		return false;
 	}
-	
+
 	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
 		PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 		Bukkit.getPluginManager().callEvent(event);
 		applied.addPotionEffect(event.getEffect());
 	}
-	
+
 	public static List<PotionEffectType> getNegativeEffects(LivingEntity le) {
 		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
 		List<PotionEffectType> negatives = Arrays.asList(NEGATIVE_EFFECTS);

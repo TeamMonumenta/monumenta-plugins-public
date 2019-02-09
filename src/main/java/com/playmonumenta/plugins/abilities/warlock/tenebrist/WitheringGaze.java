@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,9 +25,9 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 
 /*
- * Withering Gaze: Sprinting and left clicking unleashes a cone of 
- * magic in the direction the player faces that freezes all enemies 
- * in it’s path (bosses are given slowness 3) and gives wither III 
+ * Withering Gaze: Sprinting and left clicking unleashes a cone of
+ * magic in the direction the player faces that freezes all enemies
+ * in it’s path (bosses are given slowness 3) and gives wither III
  * for 6/10 seconds. 40/30 second cooldown.
  */
 public class WitheringGaze extends Ability {
@@ -40,7 +39,7 @@ public class WitheringGaze extends Ability {
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 40 : 20 * 30;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		Player player = mPlayer;
@@ -58,11 +57,11 @@ public class WitheringGaze extends Ability {
 				for (double degree = 0; degree < 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
 					vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-		            vec = VectorUtils.rotateXAxis(vec, 0);
-		            vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-		            
-		            Location l = loc.clone().add(vec);
-		            mWorld.spawnParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15);
+					vec = VectorUtils.rotateXAxis(vec, 0);
+					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+					Location l = loc.clone().add(vec);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, l, 3, 0.15, 0.15, 0.15, 0.15);
 					mWorld.spawnParticle(Particle.SPELL_MOB, l, 3, 0.15, 0.15, 0.15, 0);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 2, 0.15, 0.15, 0.15, 0.05);
 				}
@@ -76,19 +75,21 @@ public class WitheringGaze extends Ability {
 							if (EntityUtils.isBoss(le)) {
 								le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
-								if (!EntityUtils.isFrozen(le))
+								if (!EntityUtils.isFrozen(le)) {
 									EntityUtils.applyFreeze(mPlugin, duration, le);
+								}
 							}
 							le.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, 2));
 						}
 					}
 				}
-				
+
 				damagerange += 1;
 				player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.85f, 0.4f);
 				loc.add(direction.clone().multiply(0.75));
-				if (loc.getBlock().getType().isSolid())
+				if (loc.getBlock().getType().isSolid()) {
 					this.cancel();
+				}
 
 				if (t >= 9) {
 					this.cancel();
@@ -98,7 +99,7 @@ public class WitheringGaze extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();

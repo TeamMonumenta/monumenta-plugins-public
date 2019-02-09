@@ -27,12 +27,12 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
- * Shield Wall: Blocking and then blocking again within 0.25s 
- * Creates a 180 degree arc of particles with a height of 5 blocks 
- * and width of 4 blocks in front of the user, blocking all enemy 
- * projectiles and dealing 6 damage to enemies who pass through the 
- * wall. The shield lasts 8/10 seconds. At level 2, this shield knocks 
- * back enemies as well. (Ghast fireballs explode on the wall) 
+ * Shield Wall: Blocking and then blocking again within 0.25s
+ * Creates a 180 degree arc of particles with a height of 5 blocks
+ * and width of 4 blocks in front of the user, blocking all enemy
+ * projectiles and dealing 6 damage to enemies who pass through the
+ * wall. The shield lasts 8/10 seconds. At level 2, this shield knocks
+ * back enemies as well. (Ghast fireballs explode on the wall)
  * Cooldown: 30/20 seconds
  */
 public class ShieldWall extends Ability {
@@ -88,7 +88,7 @@ public class ShieldWall extends Ability {
 							mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0, 0, 0, 0);
 							if (!hitboxes) {
 								boxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-										l.clone().add(0.6, 5, 0.6)));
+								                         l.clone().add(0.6, 5, 0.6)));
 							}
 						}
 						hitboxes = true;
@@ -118,8 +118,9 @@ public class ShieldWall extends Ability {
 					boxes.clear();
 				}
 
-				if (t > 5 && !active)
+				if (t > 5 && !active) {
 					this.cancel();
+				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);

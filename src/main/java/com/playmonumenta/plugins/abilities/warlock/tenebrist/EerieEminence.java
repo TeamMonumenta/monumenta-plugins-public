@@ -15,13 +15,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Eerie Eminence: Provides an AoE debuff aura around the player 
- * that applies the last debuff (level 1 of debuff, ex: slowness 
- * 2 —> slowness 1, or 10% for Vulnerability) you have applied to 
- * everything around you in a 6/8 block radius for 4s. At level 2, 
- * it provides the opposite effect to other players (not including 
- * self) in the range. (Wither -> Regen, Slowness -> Speed, Vulnerability 
- * -> Resistance)	
+ * Eerie Eminence: Provides an AoE debuff aura around the player
+ * that applies the last debuff (level 1 of debuff, ex: slowness
+ * 2 —> slowness 1, or 10% for Vulnerability) you have applied to
+ * everything around you in a 6/8 block radius for 4s. At level 2,
+ * it provides the opposite effect to other players (not including
+ * self) in the range. (Wither -> Regen, Slowness -> Speed, Vulnerability
+ * -> Resistance)
  */
 
 public class EerieEminence extends Ability {
@@ -30,7 +30,7 @@ public class EerieEminence extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "EerieEminence";
 	}
-	
+
 	@Override
 	public void PotionApplyEvent(PotionEffectApplyEvent event) {
 		double radius = getAbilityScore() == 1 ? 6 : 8;

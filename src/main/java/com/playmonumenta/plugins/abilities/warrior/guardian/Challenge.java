@@ -22,9 +22,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 
 /*
- * Challenge: Shifting while left-clicking makes all enemies 
- * within 12 blocks target you. You gain Absorption I (2 hearts) 
- * / III (6 hearts) and one armor toughness per affected mob 
+ * Challenge: Shifting while left-clicking makes all enemies
+ * within 12 blocks target you. You gain Absorption I (2 hearts)
+ * / III (6 hearts) and one armor toughness per affected mob
  * (max: 8) for 10 s. Cooldown: 30 / 25 s
  */
 public class Challenge extends Ability {
@@ -36,13 +36,14 @@ public class Challenge extends Ability {
 		mInfo.linkedSpell = Spells.CHELLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
-	
+
 	@Override
 	public boolean cast() {
 		List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12);
 		int increase = mobs.size();
-		if (increase > 8)
+		if (increase > 8) {
 			increase = 8;
+		}
 		mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(increase);
 		new BukkitRunnable() {
 
@@ -50,13 +51,13 @@ public class Challenge extends Ability {
 			public void run() {
 				mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
 			}
-			
+
 		}.runTaskLater(mPlugin, 20 * 10);
 		int amp = getAbilityScore() == 1 ? 0 : 2;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-                new PotionEffect(PotionEffectType.ABSORPTION,
-                                 20 * 10,
-                                 amp, false, true));
+		                                 new PotionEffect(PotionEffectType.ABSORPTION,
+		                                                  20 * 10,
+		                                                  amp, false, true));
 		for (Mob mob : mobs) {
 			mob.setTarget(mPlayer);
 		}
@@ -68,7 +69,7 @@ public class Challenge extends Ability {
 		putOnCooldown();
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		return mPlayer.isSneaking();

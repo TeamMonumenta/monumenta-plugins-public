@@ -186,9 +186,9 @@ public class AbilityManager {
 		                          new WindWalk(mPlugin, mWorld, mRandom, null),
 		                          new BladeDance(mPlugin, mWorld, mRandom, null),
 		                          new DeadlyRonde(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          // ROGUE -- ASSASSIN
-		                          
+
 		                          new PerfectKill(mPlugin, mWorld, mRandom, null),
 		                          new CoupDeGrace(mPlugin, mWorld, mRandom, null),
 		                          new CloakAndDagger(mPlugin, mWorld, mRandom, null),
@@ -205,7 +205,7 @@ public class AbilityManager {
 		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
 		                          new Disengage(mPlugin, mWorld, mRandom, null),
 		                          new PrecisionStrike(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          //HUNTER
 		                          new EnchantedShot(mPlugin, mWorld, mRandom, null),
 		                          new PinningShot(mPlugin, mWorld, mRandom, null),
@@ -224,12 +224,12 @@ public class AbilityManager {
 		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
 		                          new GrowingRage(mPlugin, mWorld, mRandom, null),
 		                          new Rampage(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          //GUARDIAN
 		                          new ShieldWall(mPlugin, mWorld, mRandom, null),
 		                          new Challenge(mPlugin, mWorld, mRandom, null),
 		                          new Bodyguard(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          // CLERIC
 		                          new Celestial(mPlugin, mWorld, mRandom, null),
 		                          new CleansingRain(mPlugin, mWorld, mRandom, null),
@@ -243,7 +243,7 @@ public class AbilityManager {
 		                          new HolyJavelin(mPlugin, mWorld, mRandom, null),
 		                          new ChoirBells(mPlugin, mWorld, mRandom, null),
 		                          new LuminousInfusion(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          // HIEROPHANT
 		                          new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
 		                          new HallowedBeam(mPlugin, mWorld, mRandom, null),
@@ -262,7 +262,7 @@ public class AbilityManager {
 		                          new DarkPact(mPlugin, mWorld, mRandom, null),
 		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
 		                          new HungeringVortex(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          //TENEBRIST
 		                          new EerieEminence(mPlugin, mWorld, mRandom, null),
 		                          new FractalEnervation(mPlugin, mWorld, mRandom, null),
@@ -281,7 +281,7 @@ public class AbilityManager {
 		                          new AdrenalSerum(mPlugin, mWorld, mRandom, null),
 		                          new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new PurpleHaze(mPlugin, mWorld, mRandom, null),
-		                          
+
 		                          // APOTHECARY
 		                          new Beozar(mPlugin, mWorld, mRandom, null),
 		                          new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
@@ -568,7 +568,7 @@ public class AbilityManager {
 			}
 		}
 	}
-	
+
 	public void EntityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
@@ -576,7 +576,7 @@ public class AbilityManager {
 			}
 		}
 	}
-	
+
 	public void PotionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {

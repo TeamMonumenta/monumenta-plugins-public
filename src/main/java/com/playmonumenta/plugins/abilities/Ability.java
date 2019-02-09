@@ -164,9 +164,9 @@ public abstract class Ability {
 	public void PlayerExtendedSneakEvent() { }
 
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { }
-	
+
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
-	
+
 	public void PotionApplyEvent(PotionEffectApplyEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------

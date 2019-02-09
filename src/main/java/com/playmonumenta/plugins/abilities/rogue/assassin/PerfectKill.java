@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Perfect Kill: While sprinting, instantly 
+ * Perfect Kill: While sprinting, instantly
  * kill a non-boss/elite mob with a melee attack. (Cooldown: 30 / 20 seconds)
  */
 public class PerfectKill extends Ability {
@@ -28,11 +28,11 @@ public class PerfectKill extends Ability {
 		mInfo.linkedSpell = Spells.PERFECT_KILL;
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 20;
 	}
-	
+
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
-		
+
 		if (!EntityUtils.isBoss(le) && !EntityUtils.isElite(le)) {
 			//Setting health does not count for a kill. Deal damage beyond god-level tiers
 			EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer);
@@ -40,12 +40,12 @@ public class PerfectKill extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, 1.15, 0), 50, 0.3, 0.35, 0.3, 1);
 			mWorld.spawnParticle(Particle.SPELL_MOB, le.getLocation().add(0, 1.15, 0), 50, 0.2, 0.35, 0.2, 0);
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, le.getLocation().add(0, 1.15, 0), 5, 0.3, 0.35, 0.3, 0);
-			
+
 			putOnCooldown();
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();

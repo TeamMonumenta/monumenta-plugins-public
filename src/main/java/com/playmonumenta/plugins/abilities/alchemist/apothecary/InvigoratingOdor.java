@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import java.util.Collection;
 import java.util.Random;
 
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,9 +17,9 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
- * Invigorating Odor: Alchemist potions give Speed 1 and 
- * Regeneration 1 (0:10) on allies they hit, also your alch 
- * pots deal +2/3 damage. At level 2, they also provide Resistance 
+ * Invigorating Odor: Alchemist potions give Speed 1 and
+ * Regeneration 1 (0:10) on allies they hit, also your alch
+ * pots deal +2/3 damage. At level 2, they also provide Resistance
  * 1 for 10 seconds.
  */
 public class InvigoratingOdor extends Ability {
@@ -40,8 +39,9 @@ public class InvigoratingOdor extends Ability {
 						Player player = (Player) le;
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, 20 * 10, 0, true, true));
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 0, true, true));
-						if (resistance)
+						if (resistance) {
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
+						}
 					} else if (EntityUtils.isHostileMob(le)) {
 						EntityUtils.damageEntity(mPlugin, le, getAbilityScore() == 1 ? 2 : 3, mPlayer);
 					}
@@ -50,5 +50,5 @@ public class InvigoratingOdor extends Ability {
 		}
 		return true;
 	}
-	
+
 }

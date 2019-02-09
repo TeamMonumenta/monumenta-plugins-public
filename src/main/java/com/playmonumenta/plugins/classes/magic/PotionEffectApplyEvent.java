@@ -15,20 +15,28 @@ public class PotionEffectApplyEvent extends Event implements Cancellable {
 	private Entity applier;
 	private LivingEntity applied;
 	private PotionEffect effect;
-	
+
 	public PotionEffectApplyEvent(Entity applier, LivingEntity applied, PotionEffect effect) {
 		this.applier = applier;
 		this.applied = applied;
 		this.effect = effect;
 	}
-	
-	public PotionEffect getEffect() { return effect; }
-	
-	public LivingEntity getApplied() { return applied; }
-	
-	public Entity getApplier() { return applier; }
-	
-	public void setEffect(PotionEffect effect) { this.effect = effect; }
+
+	public PotionEffect getEffect() {
+		return effect;
+	}
+
+	public LivingEntity getApplied() {
+		return applied;
+	}
+
+	public Entity getApplier() {
+		return applier;
+	}
+
+	public void setEffect(PotionEffect effect) {
+		this.effect = effect;
+	}
 
 	@Override
 	public boolean isCancelled() {

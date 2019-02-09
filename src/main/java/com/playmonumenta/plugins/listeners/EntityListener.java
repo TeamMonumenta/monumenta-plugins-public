@@ -672,7 +672,7 @@ public class EntityListener implements Listener {
 	public void ItemSpawnEvent(ItemSpawnEvent event) {
 		EnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
 	}
-	
+
 	@EventHandler
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.getTarget() instanceof Player) {
@@ -680,7 +680,7 @@ public class EntityListener implements Listener {
 			AbilityManager.getManager().EntityTargetLivingEntityEvent(player, event);
 		}
 	}
-	
+
 	@EventHandler
 	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
 		if (event.getApplier() instanceof Player) {
@@ -688,7 +688,7 @@ public class EntityListener implements Listener {
 			AbilityManager.getManager().PotionEffectApplyEvent(player, event);
 		}
 	}
-	
+
 	@EventHandler
 	public void EntityBlockChangeEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));

@@ -23,12 +23,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * Cloak & Dagger: When you kill an enemy, you cloak
- *  yourself in Invisibility for 5 s, automatically 
- *  making enemies un-target you, and preventing them 
- *  from targeting you while invisible (dealing any 
- *  damage cancels this effect). Your next sword attack 
- *  after coming out of stealth deals 2 / 4 extra damage 
- *  per s you have been invisible. At Level 2, you gain 
+ *  yourself in Invisibility for 5 s, automatically
+ *  making enemies un-target you, and preventing them
+ *  from targeting you while invisible (dealing any
+ *  damage cancels this effect). Your next sword attack
+ *  after coming out of stealth deals 2 / 4 extra damage
+ *  per s you have been invisible. At Level 2, you gain
  *  Speed II during the effect. Cooldown: 20 s
  */
 public class CloakAndDagger extends Ability {
@@ -40,7 +40,7 @@ public class CloakAndDagger extends Ability {
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.ignoreCooldown = true;
 	}
-	
+
 	private boolean active = false;
 	private int time = 0;
 
@@ -55,15 +55,16 @@ public class CloakAndDagger extends Ability {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.CLOAK_AND_DAGGER))
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.CLOAK_AND_DAGGER)) {
 			return;
-		
+		}
+
 		active = true;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 0, false, true));
+		                                 new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 0, false, true));
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
@@ -77,8 +78,9 @@ public class CloakAndDagger extends Ability {
 			int t = 0;
 			@Override
 			public void run() {
-				if (t % 20 == 0)
+				if (t % 20 == 0) {
 					time++;
+				}
 				if (t >= 20 * 5 || !active) {
 					this.cancel();
 					time = 0;
@@ -90,13 +92,13 @@ public class CloakAndDagger extends Ability {
 				}
 				t++;
 			}
-			
+
 		}.runTaskTimer(mPlugin, 0, 1);
 		putOnCooldown();
 	}
-	
+
 	@Override
-	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { 
+	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (active) {
 			event.setCancelled(true);
 			event.setTarget(null);

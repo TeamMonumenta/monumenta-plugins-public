@@ -96,7 +96,7 @@ public class AnvilOverride extends BaseOverride {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
@@ -104,7 +104,7 @@ public class AnvilOverride extends BaseOverride {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean blockChangeInteraction(Plugin plugin, Block block) {
 		if (block.hasMetadata(ANVIL_USED_METAKEY)) {

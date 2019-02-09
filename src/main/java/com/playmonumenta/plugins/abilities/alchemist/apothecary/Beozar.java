@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import java.util.Random;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,25 +21,25 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Bezoar: Every 5/3 mob kills the enemy drops a Bezoar 
- * on the ground that lingers for 4/6 seconds. Any player 
- * walking over the stone consumes it, healing 4/6 HP and 
+ * Bezoar: Every 5/3 mob kills the enemy drops a Bezoar
+ * on the ground that lingers for 4/6 seconds. Any player
+ * walking over the stone consumes it, healing 4/6 HP and
  * ending non-infinite Poison and Wither..
  */
 
 public class Beozar extends Ability {
-	
+
 	private static final Particle.DustOptions BEZOAR_COLOR = new Particle.DustOptions(
-			Color.fromRGB(0, 155, 0), 1.0f);
-	
+	    Color.fromRGB(0, 155, 0), 1.0f);
+
 	public Beozar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Beozar";
 	}
-	
+
 	int kills = 0;
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { 
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int per = getAbilityScore() == 1 ? 5 : 3;
 		kills++;
 		if (kills >= per) {
@@ -57,7 +56,7 @@ public class Beozar extends Ability {
 				@Override
 				public void run() {
 					t++;
-					
+
 					mWorld.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, fallingDustData);
 					if (t >= 10) {
 						for (Player p : PlayerUtils.getNearbyPlayers(item.getLocation(), 0.75)) {
@@ -79,7 +78,7 @@ public class Beozar extends Ability {
 						item.remove();
 					}
 				}
-				
+
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
