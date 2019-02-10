@@ -41,19 +41,24 @@ import com.playmonumenta.bossfights.bosses.AuraSmallSlownessBoss;
 import com.playmonumenta.bossfights.bosses.AuraSmallWeaknessBoss;
 import com.playmonumenta.bossfights.bosses.Azacor;
 import com.playmonumenta.bossfights.bosses.AzacorNormal;
+import com.playmonumenta.bossfights.bosses.BerserkerBoss;
 import com.playmonumenta.bossfights.bosses.BlockBreakBoss;
+import com.playmonumenta.bossfights.bosses.BombTossBoss;
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
 import com.playmonumenta.bossfights.bosses.CAxtal;
 import com.playmonumenta.bossfights.bosses.CShura_1;
 import com.playmonumenta.bossfights.bosses.CShura_2;
 import com.playmonumenta.bossfights.bosses.ChargerBoss;
+import com.playmonumenta.bossfights.bosses.CorruptInfestedBoss;
 import com.playmonumenta.bossfights.bosses.DamageReducedBoss;
 import com.playmonumenta.bossfights.bosses.DebuffHitBoss;
 import com.playmonumenta.bossfights.bosses.FireResistantBoss;
 import com.playmonumenta.bossfights.bosses.FireballBoss;
+import com.playmonumenta.bossfights.bosses.FlameLaserBoss;
 import com.playmonumenta.bossfights.bosses.FlameNovaBoss;
 import com.playmonumenta.bossfights.bosses.FrostNovaBoss;
 import com.playmonumenta.bossfights.bosses.GenericBoss;
+import com.playmonumenta.bossfights.bosses.HandSwapBoss;
 import com.playmonumenta.bossfights.bosses.HiddenBoss;
 import com.playmonumenta.bossfights.bosses.IceAspectBoss;
 import com.playmonumenta.bossfights.bosses.InfestedBoss;
@@ -63,7 +68,10 @@ import com.playmonumenta.bossfights.bosses.Masked_2;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
+import com.playmonumenta.bossfights.bosses.SnowballDamageBoss;
 import com.playmonumenta.bossfights.bosses.TpBehindBoss;
+import com.playmonumenta.bossfights.bosses.TsunamiChargerBoss;
+import com.playmonumenta.bossfights.bosses.UnstableBoss;
 import com.playmonumenta.bossfights.bosses.Virius;
 import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
 import com.playmonumenta.bossfights.bosses.WinterSnowmanEventBoss;
@@ -126,6 +134,14 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FrostNovaBoss(p, e));
 		mStatelessBosses.put(DebuffHitBoss.identityTag, (Plugin p, LivingEntity e) -> new DebuffHitBoss(p, e));
 		mStatelessBosses.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> new IceAspectBoss(p, e));
+		mStatelessBosses.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new TsunamiChargerBoss(p, e));
+		mStatelessBosses.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossBoss(p, e));
+		mStatelessBosses.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new HandSwapBoss(p, e));
+		mStatelessBosses.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> new UnstableBoss(p, e));
+		mStatelessBosses.put(BerserkerBoss.identityTag, (Plugin p, LivingEntity e) -> new BerserkerBoss(p, e));
+		mStatelessBosses.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new SnowballDamageBoss(p, e));
+		mStatelessBosses.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new CorruptInfestedBoss(p, e));
+		mStatelessBosses.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameLaserBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -176,6 +192,14 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AzacorNormal.identityTag, (Plugin p, LivingEntity e) -> AzacorNormal.deserialize(p, e));
 		mBossDeserializers.put(CShura_1.identityTag, (Plugin p, LivingEntity e) -> CShura_1.deserialize(p, e));
 		mBossDeserializers.put(CShura_2.identityTag, (Plugin p, LivingEntity e) -> CShura_2.deserialize(p, e));
+		mBossDeserializers.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> TsunamiChargerBoss.deserialize(p, e));
+		mBossDeserializers.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossBoss.deserialize(p, e));
+		mBossDeserializers.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> HandSwapBoss.deserialize(p, e));
+		mBossDeserializers.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> UnstableBoss.deserialize(p, e));
+		mBossDeserializers.put(BerserkerBoss.identityTag, (Plugin p, LivingEntity e) -> BerserkerBoss.deserialize(p, e));
+		mBossDeserializers.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> SnowballDamageBoss.deserialize(p, e));
+		mBossDeserializers.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> CorruptInfestedBoss.deserialize(p, e));
+		mBossDeserializers.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> FlameLaserBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
