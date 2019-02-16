@@ -50,6 +50,7 @@ public class EnchantmentManager {
 		init.add(new Clucking());
 		init.add(new Oinking());
 		init.add(new Stylish());
+		init.add(new Colorful());
 		init.add(new Hope());
 		init.add(new Frost());
 		init.add(new Intuition());
