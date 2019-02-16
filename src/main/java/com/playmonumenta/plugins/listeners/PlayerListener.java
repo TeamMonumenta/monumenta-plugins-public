@@ -631,8 +631,7 @@ public class PlayerListener implements Listener {
 			}
 
 			// Players that get resistance from safezones don't take armor damage
-			LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getPlayer());
-			if (damage < 0 || zone == LocationType.Capital || zone == LocationType.SafeZone) {
+			if (damage < 0 || mPlugin.mSafeZoneManager.locationAllowsEquipmentDamage(event.getPlayer())) {
 				damage = 0;
 			}
 

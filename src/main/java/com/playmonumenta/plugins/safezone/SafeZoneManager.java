@@ -103,6 +103,28 @@ public class SafeZoneManager {
 		return LocationType.None;
 	}
 
+	public boolean locationAllowsEquipmentDamage(Entity entity) {
+		return locationAllowsEquipmentDamage(entity.getLocation());
+	}
+
+	public boolean locationAllowsEquipmentDamage(Location location) {
+		return locationAllowsEquipmentDamage(new Point(location));
+	}
+
+	public boolean locationAllowsEquipmentDamage(Point point) {
+		if (mPlugin.mServerProperties.getIsTownWorld()) {
+			return false;
+		}
+
+		for (SafeZone area : mLocationBounds) {
+			if (area.within(point)) {
+				return area.getEquipmentDamage();
+			}
+		}
+
+		return true;
+	}
+
 	public boolean isInPlot(Location location) {
 		if (getLocationType(location) == LocationType.Capital) {
 			Material mat = location.getWorld().getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
