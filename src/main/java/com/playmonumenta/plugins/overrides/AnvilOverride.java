@@ -40,7 +40,8 @@ public class AnvilOverride extends BaseOverride {
 
 		if (item != null && item.getDurability() > 0 && !item.getType().isBlock()
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
-		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *"))
+		        || !InventoryUtils.testForItemWithLore(item, "* Irreparable *")
+		        || !InventoryUtils.testForItemWithLore(item, "Curse of Irreparability"))
 		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) && !block.hasMetadata(ANVIL_USED_METAKEY)) {
 
 			item.setDurability((short) 0);
