@@ -8,7 +8,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -357,19 +359,37 @@ public class BossManager implements Listener {
 		mBosses.clear();
 	}
 
-	public void createBoss(LivingEntity targetEntity, String requestedTag) throws Exception {
+	public void createBoss(CommandSender sender, LivingEntity targetEntity, String requestedTag) throws Exception {
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
 			createBossInternal(targetEntity, stateless.construct(mPlugin, targetEntity));
+			sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
+		} else {
+			if (mStatefulBosses.get(requestedTag) != null) {
+				sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
+				                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+								   "' but it requires positional arguments");
+				sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
+			} else {
+				sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+			}
 		}
 	}
 
-	public void createBoss(LivingEntity targetEntity, String requestedTag, Location endLoc) throws Exception {
+	public void createBoss(CommandSender sender, LivingEntity targetEntity, String requestedTag, Location endLoc) throws Exception {
 		StatefulBossConstructor stateful = mStatefulBosses.get(requestedTag);
 		if (stateful != null) {
 			createBossInternal(targetEntity, stateful.construct(mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
+			sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
 		} else {
-			createBoss(targetEntity, requestedTag);
+			if (mStatelessBosses.get(requestedTag) != null) {
+				sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
+				                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+								   "' but it does not take positional arguments");
+				sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
+			} else {
+				sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+			}
 		}
 	}
 

@@ -58,13 +58,13 @@ public class BossFight {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 			if (plugin.mBossManager != null) {
 				try {
-					plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag);
+					plugin.mBossManager.createBoss(sender, (LivingEntity)entity, requestedTag);
 				} catch (Exception ex) {
 					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
 				}
 			}
 		} else {
-			sender.sendMessage("This command must be on a LivingEntity!");
+			sender.sendMessage(ChatColor.RED + "This command must be on a LivingEntity!");
 		}
 	}
 
@@ -72,13 +72,13 @@ public class BossFight {
 		if (entity instanceof LivingEntity && !(entity instanceof Player)) {
 			if (plugin.mBossManager != null) {
 				try {
-					plugin.mBossManager.createBoss((LivingEntity)entity, requestedTag, endLoc);
+					plugin.mBossManager.createBoss(sender, (LivingEntity)entity, requestedTag, endLoc);
 				} catch (Exception ex) {
 					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
 				}
 			}
 		} else {
-			sender.sendMessage("This command must be on a LivingEntity!");
+			sender.sendMessage(ChatColor.RED + "This command must be on a LivingEntity!");
 		}
 	}
 }
