@@ -314,7 +314,8 @@ public class PlayerListener implements Listener {
 					// to prevent sorting hotbar / armor slots
 					return;
 				}
-				if (event.getClick().equals(ClickType.RIGHT) &&
+				if (event.getClick() != null &&
+						event.getClick().equals(ClickType.RIGHT) &&
 						inventory.getItem(event.getSlot()) == null &&
 						event.getAction().equals(InventoryAction.NOTHING)) {
 
