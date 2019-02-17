@@ -632,7 +632,7 @@ public class PlayerListener implements Listener {
 			}
 
 			// Players that get resistance from safezones don't take armor damage
-			if (damage < 0 || mPlugin.mSafeZoneManager.locationAllowsEquipmentDamage(event.getPlayer())) {
+			if (damage < 0 || !mPlugin.mSafeZoneManager.locationAllowsEquipmentDamage(event.getPlayer())) {
 				damage = 0;
 			}
 
