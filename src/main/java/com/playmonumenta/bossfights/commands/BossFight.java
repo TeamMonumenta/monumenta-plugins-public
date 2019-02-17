@@ -14,20 +14,29 @@ import com.playmonumenta.bossfights.Plugin;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.arguments.DynamicSuggestedStringArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.LocationArgument;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
 
 public class BossFight {
 	public static void register(Plugin plugin) {
-		/* First one of these includes coordinate arguments */
+		/* First one has just the boss name (stateless) */
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("boss_tag", new StringArgument());
-		arguments.put("redstone_pos", new LocationArgument());
+		arguments.put("boss_tag", new DynamicSuggestedStringArgument(() -> { return plugin.mBossManager.listBosses(); }));
+		CommandAPI.getInstance().register("bossfight",
+		                                  CommandPermission.fromString("bossfights.bossfight"),
+		                                  arguments,
+		                                  (sender, args) -> {
+		                                      createBossStateless(plugin, sender, (Entity)args[0],
+		                                                          (String)args[1]);
+		                                  }
+		);
 
+		/* Second one of these includes coordinate arguments */
+		arguments.put("redstone_pos", new LocationArgument());
 		CommandAPI.getInstance().register("bossfight",
 		                                  CommandPermission.fromString("bossfights.bossfight"),
 		                                  arguments,
@@ -35,21 +44,6 @@ public class BossFight {
 		                                      createBossStateful(plugin, sender, (Entity)args[0],
 		                                                         (String)args[1],
 		                                                         (Location)args[2]);
-		                                  }
-		);
-
-		/* Second one has just the boss name (stateless) */
-		arguments = new LinkedHashMap<>();
-
-		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("boss_tag", new StringArgument());
-
-		CommandAPI.getInstance().register("bossfight",
-		                                  CommandPermission.fromString("bossfights.bossfight"),
-		                                  arguments,
-		                                  (sender, args) -> {
-		                                      createBossStateless(plugin, sender, (Entity)args[0],
-		                                                          (String)args[1]);
 		                                  }
 		);
 	}

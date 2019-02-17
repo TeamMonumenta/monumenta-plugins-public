@@ -2,6 +2,7 @@ package com.playmonumenta.bossfights;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -391,6 +392,13 @@ public class BossManager implements Listener {
 				sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
 			}
 		}
+	}
+
+	/* Machine readable list */
+	public String[] listBosses() {
+		Set<String> allBossTags = new HashSet<String>(mStatelessBosses.keySet());
+		allBossTags.addAll(mStatefulBosses.keySet());
+		return allBossTags.toArray(new String[mStatelessBosses.size()]);
 	}
 
 	/********************************************************************************
