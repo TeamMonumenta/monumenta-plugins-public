@@ -468,7 +468,9 @@ public class PlayerListener implements Listener {
 				// Potentially kept slot
 				ItemStack item = inv.getItem(slotId);
 				if (item != null) {
-					if (_isKeptItemOnDeath(item) && (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
+					if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) != 0) {
+						inv.clear(slotId);
+					} else if (_isKeptItemOnDeath(item) && (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
 						// Good matching item that does not have curse of binding - will be kept on death
 						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
 						if (meta == null || !(meta instanceof Damageable)) {
