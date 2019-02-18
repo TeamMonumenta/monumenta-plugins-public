@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class ChestOverride extends BaseOverride {
 	@Override
@@ -62,6 +63,8 @@ public class ChestOverride extends BaseOverride {
 		}
 		if ((player.getGameMode() == GameMode.CREATIVE) || _breakable(block)) {
 			return true;
+		} else {
+			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
 		}
 		return false;
 	}

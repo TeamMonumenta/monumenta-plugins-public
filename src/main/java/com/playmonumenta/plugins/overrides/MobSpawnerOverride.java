@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class MobSpawnerOverride extends BaseOverride {
 	@Override
@@ -17,6 +18,8 @@ public class MobSpawnerOverride extends BaseOverride {
 				block.removeMetadata(Constants.SPAWNER_COUNT_METAKEY, plugin);
 			}
 			return true;
+		} else {
+			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
 		}
 		return false;
 	}
