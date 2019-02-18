@@ -26,7 +26,6 @@ public class SpellChangeFloor extends Spell {
 	private int mRange;
 	private int mRadius;
 	private Material mMaterial;
-	private int mDuration;
 	private int mFloorDuration;
 
 	private Random mRandom = new Random();
@@ -36,6 +35,7 @@ public class SpellChangeFloor extends Spell {
 	            Material.COMMAND_BLOCK,
 	            Material.CHAIN_COMMAND_BLOCK,
 	            Material.REPEATING_COMMAND_BLOCK,
+				Material.BARRIER,
 	            Material.BEDROCK,
 	            Material.OBSIDIAN,
 	            Material.CHEST,

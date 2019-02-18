@@ -1,13 +1,14 @@
 package com.playmonumenta.bossfights.spells;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 
 public class SpellBlockBreak extends Spell {
 	private Entity mLauncher;
@@ -15,6 +16,16 @@ public class SpellBlockBreak extends Spell {
 	public SpellBlockBreak(Entity launcher) {
 		mLauncher = launcher;
 	}
+
+	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
+	            Material.AIR,
+	            Material.COMMAND_BLOCK,
+	            Material.CHAIN_COMMAND_BLOCK,
+	            Material.REPEATING_COMMAND_BLOCK,
+	            Material.BEDROCK,
+				Material.BARRIER,
+	            Material.SPAWNER
+	        );
 
 	@Override
 	public void run() {
@@ -30,7 +41,7 @@ public class SpellBlockBreak extends Spell {
 				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(loc.getZ() + (double)z);
 					Material material = testloc.getBlock().getType();
-					if (material != Material.BEDROCK && material != Material.BARRIER && (material.isSolid() || material.equals(Material.COBWEB))) {
+					if ((!mIgnoredMats.contains(material)) && (material.isSolid() || material.equals(Material.COBWEB))) {
 						badBlockList.add(testloc.clone());
 					}
 				}
