@@ -117,7 +117,7 @@ public class Bodyguard extends Ability {
 							EntityUtils.applyStun(mPlugin, 20 * 3, mob);
 						}
 					}
-					break;
+					return true;
 				}
 			}
 		}

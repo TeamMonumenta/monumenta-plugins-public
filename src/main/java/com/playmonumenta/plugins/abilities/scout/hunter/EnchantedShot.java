@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -84,9 +85,13 @@ public class EnchantedShot extends Ability {
 				Location bLoc = box.getCenter().toLocation(mWorld);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, bLoc, 5, 0.35, 0.35, 0.35, 0);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 2, 0.1, 0.1, 0.1, 0.1);
-				for (Mob mob : mobs) {
+				Iterator<Mob> iterator = mobs.iterator();
+				while (iterator.hasNext()) {
+					Mob mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						/* Prevent mob from being hit twice in one shot */
+						iterator.remove();
 					}
 				}
 				if (bLoc.getBlock().getType().isSolid()) {
@@ -99,6 +104,5 @@ public class EnchantedShot extends Ability {
 		}
 		return true;
 	}
-
 
 }

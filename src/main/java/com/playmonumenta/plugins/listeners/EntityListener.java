@@ -690,7 +690,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void EntityBlockChangeEvent(EntityChangeBlockEvent event) {
+	public void EntityChangeBlockEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 	}
 }
