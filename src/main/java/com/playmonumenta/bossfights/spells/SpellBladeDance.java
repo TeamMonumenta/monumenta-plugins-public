@@ -36,6 +36,11 @@ public class SpellBladeDance extends Spell {
 			float pitch = 0;
 			@Override
 			public void run() {
+				if (mCaster.isDead() || !mCaster.isValid()) {
+					this.cancel();
+					return;
+				}
+
 				i += 2;
 				world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0);
 				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
@@ -71,10 +76,6 @@ public class SpellBladeDance extends Spell {
 
 				}.runTaskTimer(mPlugin, 0, 1);
 
-				if (mCaster.isDead() || !mCaster.isValid()) {
-					this.cancel();
-					return;
-				}
 				if (i >= 40) {
 					mCaster.setInvulnerable(false);
 					this.cancel();

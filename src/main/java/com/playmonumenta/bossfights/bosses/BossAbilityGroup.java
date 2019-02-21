@@ -75,8 +75,6 @@ public abstract class BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
 
-
-
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		Runnable passive = new Runnable() {
 			@Override
@@ -202,10 +200,6 @@ public abstract class BossAbilityGroup {
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
 	public void init() {};
-
-	public int waitAfterInit() {
-		return 0;
-	}
 
 	/*
 	 * Called when the boss dies

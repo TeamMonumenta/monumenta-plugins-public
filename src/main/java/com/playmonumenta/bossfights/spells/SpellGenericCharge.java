@@ -11,7 +11,7 @@ import org.bukkit.Sound;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
-		super(plugin, boss, range, 25,
+		super(plugin, boss, range, 25, false,
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);

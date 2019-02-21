@@ -17,7 +17,7 @@ import com.playmonumenta.bossfights.utils.Utils;
 public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 
 	public SpellAGoshDamnAirCombo(Plugin plugin, LivingEntity boss, int range, int chargeTicks) {
-		super(plugin, boss, range, chargeTicks,
+		super(plugin, boss, range, chargeTicks, true,
 
 		// Warning sound/particles at boss location and slow boss
 		(Player player) -> {
@@ -114,7 +114,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 		() -> {
 			boss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15);
 			boss.getWorld().spawnParticle(Particle.SWEEP_ATTACK, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15);
-		}, true);
+		});
 
 	}
 

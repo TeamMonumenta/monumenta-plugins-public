@@ -92,11 +92,12 @@ public class SpellBaseCharge extends Spell {
 	private HitPlayerAction mHitPlayerAction;
 	private ParticleAction mParticleAction;
 	private EndAction mEndAction;
-	private boolean mSingleHit;
+	private boolean mStopOnFirstHit;
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
-	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-	                       EndAction end) {
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
+	                       WarningAction warning, ParticleAction warnParticles,
+	                       StartAction start, HitPlayerAction hitPlayer,
+	                       ParticleAction particle, EndAction end) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -107,22 +108,7 @@ public class SpellBaseCharge extends Spell {
 		mHitPlayerAction = hitPlayer;
 		mParticleAction = particle;
 		mEndAction = end;
-	}
-
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
-	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-	                       EndAction end, boolean singleHit) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mRange = range;
-		mChargeTicks = chargeTicks;
-		mWarningAction = warning;
-		mWarnParticleAction = warnParticles;
-		mStartAction = start;
-		mHitPlayerAction = hitPlayer;
-		mParticleAction = particle;
-		mEndAction = end;
-		mSingleHit = singleHit;
+		mStopOnFirstHit = stopOnFirstHit;
 	}
 
 	@Override
@@ -158,18 +144,17 @@ public class SpellBaseCharge extends Spell {
 	 * @param hitPlayer Action to run if a player is hit (may be null)
 	 * @param end Action to run on boss at end location (may be null)
 	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
-	 * @param singleHit Boolean indicating whether the boss should damage only one player at a time
+	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(Player target, LivingEntity charger, Location targetLoc, List<Player> validTargets,
-	                               StartAction start, ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean singleHit) {
+	public static boolean doCharge(Player target, LivingEntity charger, Location targetLoc, List<Player> validTargets, StartAction start,
+	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit) {
 		Location launLoc = charger.getEyeLocation();
 
 		/* Test locations that are iterated in the loop */
 		Location endLoc = launLoc.clone();
 		Location endLoc1 = launLoc.clone().add(0, 1, 0); // Same as endLoc but one block higher
 
-		Vector baseVect = new Vector(targetLoc.getX() - launLoc.getX(), targetLoc.getY() - launLoc.getY(),
-		                             targetLoc.getZ() - launLoc.getZ());
+		Vector baseVect = new Vector(targetLoc.getX() - launLoc.getX(), targetLoc.getY() - launLoc.getY(), targetLoc.getZ() - launLoc.getZ());
 		baseVect = baseVect.normalize().multiply(0.3);
 
 		if (start != null) {
@@ -178,7 +163,6 @@ public class SpellBaseCharge extends Spell {
 
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
-		Player hit = null;
 		for (int i = 0; i < 200; i++) {
 			endLoc.add(baseVect);
 			endLoc1.add(baseVect);
@@ -205,9 +189,8 @@ public class SpellBaseCharge extends Spell {
 					if (hitPlayer != null) {
 						hitPlayer.run(player);
 					}
-					if (singleHit) {
+					if (stopOnFirstHit) {
 						cancel = true;
-						hit = player;
 						break;
 					}
 				}
@@ -247,11 +230,11 @@ public class SpellBaseCharge extends Spell {
 					}
 				} else if (mTicks > 0 && mTicks < mChargeTicks) {
 					// This runs once every other tick while charging
-					doCharge(target, mBoss, targetLoc, players, null, mWarnParticleAction, null, null, false, mSingleHit);
+					doCharge(target, mBoss, targetLoc, players, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
 					doCharge(target, mBoss, targetLoc, players, mStartAction, mParticleAction, mHitPlayerAction,
-					         mEndAction, true, mSingleHit);
+					         mEndAction, true, mStopOnFirstHit);
 					this.cancel();
 					mActiveRunnables.remove(this);
 				}

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -126,13 +126,13 @@ public class SpellBaseBolt extends Spell {
 					if (t >= mDelay) {
 						this.cancel();
 						mCastAction.run(mCaster);
-						if (Utils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
-							List<Player> players = Utils.playersInRange(mCaster.getLocation(), mDetect_range);
+						List<Player> players = Utils.playersInRange(mCaster.getLocation(), mDetect_range);
+						if (players.size() > 0) {
 							if (mSingleTarget) {
-								if (mCaster instanceof Creature) {
-									Creature creature = (Creature) mCaster;
-									if (creature.getTarget() != null && creature.getTarget() instanceof Player) {
-										launchBolt((Player) creature.getTarget());
+								if (mCaster instanceof Mob) {
+									Mob mob = (Mob) mCaster;
+									if (mob.getTarget() != null && mob.getTarget() instanceof Player) {
+										launchBolt(mob.getTarget());
 									}
 								} else {
 									Player player = players.get(mRandom.nextInt(players.size()));
@@ -151,10 +151,10 @@ public class SpellBaseBolt extends Spell {
 		}
 	}
 
-	private void launchBolt(Player player) {
+	private void launchBolt(LivingEntity targetEntity) {
 		new BukkitRunnable() {
 			BoundingBox box = BoundingBox.of(mCaster.getEyeLocation(), mHitbox_radius, mHitbox_radius, mHitbox_radius);
-			Vector dir = Utils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
+			Vector dir = Utils.getDirectionTo(targetEntity.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
 			Location detLoc = mCaster.getLocation();
 			List<Player> players = Utils.playersInRange(detLoc, 75);
 			int i = 0;
@@ -187,7 +187,7 @@ public class SpellBaseBolt extends Spell {
 	@Override
 	public int duration() {
 		if (Utils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
-			return mDelay + (20 * 2);
+			return mDelay + mDuration;
 		} else {
 			return 1;
 		}

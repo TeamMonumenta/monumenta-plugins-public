@@ -110,7 +110,6 @@ public class SwordsageRichter extends BossAbilityGroup {
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 			new SpellProjectileDeflection(mBoss)
 		);
-		mBoss.addScoreboardTag("Boss");
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
@@ -217,48 +216,60 @@ public class SwordsageRichter extends BossAbilityGroup {
 
 	private void summonLivingBlades(Plugin plugin, LivingEntity mBoss) {
 		World world = mBoss.getWorld();
-		new BukkitRunnable() {
-			int t = 0;
+
+		if (mBoss.isDead()) {
+			return;
+		}
+
+		for (int t = 0; t < 3; t++) {
 			int summon_radius = 5;
 
-			@Override
-			public void run() {
-				t++;
-				new BukkitRunnable() {
-					Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
-					double rotation = 0;
-					double radius = 4;
-					String mobdata = getMobData(t);
-					@Override
-					public void run() {
-						for (int i = 0; i < 5; i++) {
-							double radian1 = Math.toRadians(rotation + (72 * i));
-							loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-							world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0);
-							world.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.15);
-							loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-						}
-						rotation += 8;
-						radius -= 0.25;
-						if (radius <= 0) {
-							this.cancel();
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
-							world.spawnParticle(Particle.SPELL_INSTANT, loc, 50, 0.1, 0.1, 0.1, 1);
-							world.spawnParticle(Particle.CRIT_MAGIC, loc, 150, 0.1, 0.1, 0.1, 1);
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + mobdata);
-						}
-						if (mBoss.isDead()) {
-							this.cancel();
-						}
-					}
-
-				}.runTaskTimer(plugin, 0, 1);
-				if (t >= 3 || mBoss.isDead()) {
-					this.cancel();
-				}
+			final String mobdata;
+			switch (t) {
+				case 3:
+					// Swing Living Sword
+					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:30f,CustomName:\"{\\\"text\\\":\\\"Swift Living Blade\\\"}\",HandItems:[{id:\"minecraft:iron_sword\",Count:1b,tag:{Damage:4}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:30},{Name:generic.movementSpeed,Base:0.425}]}";
+					break;
+				case 2:
+					// Fiery Living Sword
+					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:40f,CustomName:\"{\\\"text\\\":\\\"Fiery Living Blade\\\"}\",HandItems:[{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:4,Unbreakable:1b,Damage:6,Enchantments:[{id:\"minecraft:fire_aspect\",lvl:2}]}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:40},{Name:generic.movementSpeed,Base:0.325}]}";
+					break;
+				default:
+					// Heavy Living Sword
+					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:80f,CustomName:\"{\\\"text\\\":\\\"Heavy Living Blade\\\"}\",HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{Damage:16}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:80},{Name:generic.knockbackResistance,Base:0.5},{Name:generic.movementSpeed,Base:0.3}]}";
+					break;
 			}
 
-		}.runTaskTimer(plugin, 0, 10);
+			new BukkitRunnable() {
+				Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
+				double rotation = 0;
+				double radius = 4;
+				@Override
+				public void run() {
+					if (mBoss.isDead()) {
+						this.cancel();
+						return;
+					}
+
+					for (int i = 0; i < 5; i++) {
+						double radian1 = Math.toRadians(rotation + (72 * i));
+						loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0);
+						world.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.15);
+						loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+					}
+					rotation += 8;
+					radius -= 0.25;
+					if (radius <= 0) {
+						this.cancel();
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
+						world.spawnParticle(Particle.SPELL_INSTANT, loc, 50, 0.1, 0.1, 0.1, 1);
+						world.spawnParticle(Particle.CRIT_MAGIC, loc, 150, 0.1, 0.1, 0.1, 1);
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + mobdata);
+					}
+				}
+			}.runTaskTimer(plugin, t * 10, 1);
+		}
 	}
 
 	private void knockback(Plugin plugin, double r) {
@@ -302,27 +313,6 @@ public class SwordsageRichter extends BossAbilityGroup {
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
-	private String getMobData(int i) {
-		String mobdata_1 = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:80f,CustomName:\"{\\\"text\\\":\\\"Heavy Living Blade\\\"}\",HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{Damage:16}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:80},{Name:generic.knockbackResistance,Base:0.5},{Name:generic.movementSpeed,Base:0.3}]}";
-		String mobdata_2 = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:40f,CustomName:\"{\\\"text\\\":\\\"Fiery Living Blade\\\"}\",HandItems:[{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:4,Unbreakable:1b,Damage:6,Enchantments:[{id:\"minecraft:fire_aspect\",lvl:2}]}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:40},{Name:generic.movementSpeed,Base:0.325}]}";
-		String mobdata_3 = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:30f,CustomName:\"{\\\"text\\\":\\\"Swift Living Blade\\\"}\",HandItems:[{id:\"minecraft:iron_sword\",Count:1b,tag:{Damage:4}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:30},{Name:generic.movementSpeed,Base:0.425}]}";
-
-		// Heavy Living Sword
-		if (i == 1) {
-			return mobdata_1;
-
-			// Fiery Living Sword
-		} else if (i == 2) {
-			return mobdata_2;
-
-			// Swing Living Sword
-		} else if (i == 3) {
-			return mobdata_3;
-		} else {
-			return mobdata_1;
-		}
-	}
-
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
@@ -334,6 +324,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 			hp_del = hp_del / 2;
 			player_count--;
 		}
+		mBoss.addScoreboardTag("Boss");
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);

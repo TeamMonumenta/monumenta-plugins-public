@@ -142,18 +142,16 @@ public class Utils {
 	}
 
 	public static Vector getDirectionTo(Location to, Location from) {
-		Vector vFrom = from.toVector();
-		Vector vTo = to.toVector();
-		return vTo.subtract(vFrom).normalize();
+		return getDirectionTo(to, from, true);
 	}
 
 	public static Vector getDirectionTo(Location to, Location from, boolean normalized) {
+		Vector vFrom = from.toVector();
+		Vector vTo = to.toVector().subtract(vFrom);
 		if (normalized) {
-			return getDirectionTo(to, from);
+			return vTo.normalize();
 		} else {
-			Vector vFrom = from.toVector();
-			Vector vTo = to.toVector();
-			return vTo.subtract(vFrom);
+			return vTo;
 		}
 	}
 

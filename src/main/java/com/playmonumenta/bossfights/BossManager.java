@@ -447,21 +447,14 @@ public class BossManager implements Listener {
 		/* Set up boss health / armor / etc */
 		ability.init();
 
-		new BukkitRunnable() {
+		Boss boss = mBosses.get(targetEntity.getUniqueId());
+		if (boss == null) {
+			boss = new Boss(ability);
+		} else {
+			boss.add(ability);
+		}
 
-			@Override
-			public void run() {
-				Boss boss = mBosses.get(targetEntity.getUniqueId());
-				if (boss == null) {
-					boss = new Boss(ability);
-				} else {
-					boss.add(ability);
-				}
-
-				mBosses.put(targetEntity.getUniqueId(), boss);
-			}
-
-		}.runTaskLater(mPlugin, ability.waitAfterInit());
+		mBosses.put(targetEntity.getUniqueId(), boss);
 	}
 
 	private void ProcessEntity(LivingEntity entity) {
