@@ -43,7 +43,7 @@ public class CursedWound extends Ability {
 
 		if (cursedWound > 1 && PlayerUtils.isCritical(mPlayer)) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS)) {
-				mob.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
 			}
 		}
 		return true;

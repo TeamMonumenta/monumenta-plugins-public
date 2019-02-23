@@ -51,12 +51,16 @@ public class BruteForce extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS)) {
 				if (mob != damagee) {
 					EntityUtils.damageEntity(mPlugin, mob, bruteForceDamage, mPlayer);
-					MovementUtils.KnockAway(mPlayer, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+					if (!EntityUtils.isBoss(mob)) {
+						MovementUtils.KnockAway(mPlayer, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+					}
 				}
 			}
 
 			// Knock away just the hit entity
-			MovementUtils.KnockAway(mPlayer, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
+			if (!EntityUtils.isBoss(damagee)) {
+				MovementUtils.KnockAway(mPlayer, damagee, BRUTE_FORCE_KNOCKBACK_SPEED);
+			}
 		}
 
 		return true;

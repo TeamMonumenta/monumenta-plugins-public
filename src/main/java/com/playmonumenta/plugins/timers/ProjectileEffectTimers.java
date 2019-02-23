@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -49,12 +48,15 @@ public class ProjectileEffectTimers {
 			if (mDeadTicks > 100) {
 				mDeadTicks = 0;
 				boolean isPresent = false;
-				Location entityLoc = entity.getLocation();
-				for (Entity e : entityLoc.getWorld().getNearbyEntities(entityLoc, 4, 4, 4)) {
-					if (e.getUniqueId().equals(entity.getUniqueId())) {
-						isPresent = true;
-					}
+				if (!entity.isDead() && entity.isValid()) {
+					isPresent = true;
 				}
+//				Location entityLoc = entity.getLocation();
+//				for (Entity e : entityLoc.getWorld().getNearbyEntities(entityLoc, 4, 4, 4)) {
+//					if (e.getUniqueId().equals(entity.getUniqueId())) {
+//						isPresent = true;
+//					}
+//				}
 
 				if (!isPresent) {
 					entityIter.remove();

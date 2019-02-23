@@ -8,9 +8,14 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
@@ -88,6 +93,15 @@ public class PlayerInventory {
 		}
 	}
 
+	public void onDamage(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onDamage(plugin, player, level, target, event);
+		}
+	}
+
 	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
 		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
 			BaseEnchantment property = iter.getKey();
@@ -103,6 +117,42 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.onExpChange(plugin, player, event, level);
+		}
+	}
+
+	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onBlockBreak(plugin, player, event, item, level);
+		}
+	}
+
+	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onPlayerInteract(plugin, player, event, level);
+		}
+	}
+
+	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onDeath(plugin, player, event, level);
+		}
+	}
+
+	public void onHurt(Plugin plugin, Player player, EntityDamageEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onHurt(plugin, player, level, event);
 		}
 	}
 

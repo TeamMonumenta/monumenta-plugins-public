@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -47,6 +48,7 @@ public class EnchantedShot extends Ability {
 			Player player = mPlayer;
 			active = true;
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
+			putOnCooldown();
 			new BukkitRunnable() {
 				int t = 0;
 				@Override
@@ -80,6 +82,11 @@ public class EnchantedShot extends Ability {
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
 
 			List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30);
+			double extraDamage = 0;
+			if (AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class) != null) {
+				Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
+				extraDamage += ss.getSharpshot();
+			}
 			for (int i = 0; i < 30; i++) {
 				box.shift(dir);
 				Location bLoc = box.getCenter().toLocation(mWorld);
@@ -89,7 +96,7 @@ public class EnchantedShot extends Ability {
 				while (iterator.hasNext()) {
 					Mob mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, damage + extraDamage, mPlayer);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
 					}

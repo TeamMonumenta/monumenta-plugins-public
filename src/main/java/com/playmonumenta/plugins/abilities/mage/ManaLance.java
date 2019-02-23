@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Color;
@@ -8,11 +10,12 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -31,7 +34,7 @@ public class ManaLance extends Ability {
 	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
 	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
-	private static final int MANA_LANCE_STAGGER_DURATION = (int)(0.95 * 20);
+	private static final int MANA_LANCE_STAGGER_DURATION = 20;
 
 	public ManaLance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -49,27 +52,37 @@ public class ManaLance extends Ability {
 		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 
 		Location loc = mPlayer.getEyeLocation();
+		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
 		Vector dir = loc.getDirection();
-		loc.add(dir);
+		box.shift(dir);
+		List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10);
+		List<Mob> toRemove = new ArrayList<Mob>();
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
 
 		for (int i = 0; i < 8; i++) {
-			loc.add(dir);
+			box.shift(dir);
+			Location bLoc = box.getCenter().toLocation(mWorld);
 
-			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.05, 0.05, 0.05, 0.025);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
+			mWorld.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
 
-			if (loc.getBlock().getType().isSolid()) {
-				loc.subtract(dir.multiply(0.5));
-				mWorld.spawnParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125);
-				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+			if (bLoc.getBlock().getType().isSolid()) {
+				bLoc.subtract(dir.multiply(0.5));
+				mWorld.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
+				mWorld.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				break;
 			}
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.5)) {
-				Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
-				mob.addPotionEffect(
-				    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+			for (Mob mob : mobs) {
+				if (box.overlaps(mob.getBoundingBox())) {
+					Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
+					if (!EntityUtils.isBoss(mob))
+						mob.addPotionEffect(
+						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+					toRemove.add(mob);
+				}
 			}
+			mobs.removeAll(toRemove);
+			toRemove.clear();
 		}
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MANA_LANCE);
 		putOnCooldown();

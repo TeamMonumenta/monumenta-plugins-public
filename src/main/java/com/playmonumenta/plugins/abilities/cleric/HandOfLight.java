@@ -9,6 +9,8 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -16,6 +18,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -25,8 +28,8 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_1_HEAL = 10;
 	private static final int HEALING_2_HEAL = 16;
 	private static final double HEALING_DOT_ANGLE = 0.33;
-	private static final int HEALING_1_COOLDOWN = 20 * 20;
-	private static final int HEALING_2_COOLDOWN = 15 * 20;
+	private static final int HEALING_1_COOLDOWN = 14 * 20;
+	private static final int HEALING_2_COOLDOWN = 10 * 20;
 
 	public HandOfLight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -40,9 +43,9 @@ public class HandOfLight extends Ability {
 		int healing = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
-		int healAmount = healing == 1 ? HEALING_1_HEAL : HEALING_2_HEAL;
 
 		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEALING_RADIUS, false)) {
+			double healAmount = healing == 1 ? 2 + (p.getMaxHealth() * 0.1) : 4 + (p.getMaxHealth() * 0.2);
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			// Only heal players in the correct direction
 			// Only heal players that have a class score > 0 (so it doesn't work on arena contenders)
@@ -50,7 +53,8 @@ public class HandOfLight extends Ability {
 				PlayerUtils.healPlayer(p, healAmount);
 
 				Location loc = p.getLocation();
-
+				mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
+				                                 new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
 				world.spawnParticle(Particle.HEART, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 				world.spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
 				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
@@ -69,15 +73,14 @@ public class HandOfLight extends Ability {
 	@Override
 	public boolean runCheck() {
 		// Must be sneaking
-		if (!mPlayer.isSneaking()) {
+		if (!mPlayer.isSneaking() && (mPlayer.isOnGround() || mPlayer.getVelocity().getY() < 0)) {
 			return false;
 		}
 
 		// Must be holding a shield
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (offHand == null || offHand.getType() != Material.SHIELD
-		    && (mainHand == null || mainHand.getType() != Material.SHIELD)) {
+		if (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) {
 			return false;
 		}
 

@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -53,7 +54,7 @@ public class Celestial extends Ability {
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
 			p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
-
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 			Location loc = p.getLocation();
 			world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
 			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
@@ -65,6 +66,7 @@ public class Celestial extends Ability {
 			public void run() {
 				for (Player p : affectedPlayers) {
 					p.removeMetadata(tagName, mPlugin);
+					p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
 				}
 			}
 		}.runTaskLater(mPlugin, duration);

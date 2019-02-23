@@ -82,7 +82,9 @@ public class AdvancingShadows extends Ability {
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
 				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE)) {
-					MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+					if (!mob.getUniqueId().equals(entity.getUniqueId())) {
+						MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+					}
 				}
 			}
 

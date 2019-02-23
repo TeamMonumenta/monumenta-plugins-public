@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 import java.util.Random;
 
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -57,7 +59,7 @@ public class DeadlyRonde extends Ability {
 			}
 		};
 		activeRunnable.runTaskLater(mPlugin, 20 * 5);
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 2f);
 		new BukkitRunnable() {
 
 			@Override
@@ -77,16 +79,20 @@ public class DeadlyRonde extends Ability {
 		if (activeRunnable != null) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isSwordItem(mainHand)) {
+				Entity ent = event.getEntity();
 				double damage = getAbilityScore() == 1 ? 4 : 6;
-				if (getAbilityScore() == 1 && event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
-					event.setDamage(event.getDamage() + damage / 2);
+				if (event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
+					event.setDamage(event.getDamage() + (damage / 2));
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 10, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
 				} else {
 					event.setDamage(event.getDamage() + damage);
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 25, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
 				}
 
 				if (!event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
 					LivingEntity le = (LivingEntity)event.getEntity();
 					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RONDE_2_SLOWNESS_DURATION, RONDE_2_SLOWNESS_AMPLIFIER, true, false));
+					mWorld.spawnParticle(Particle.FALLING_DUST, ent.getLocation().add(0, 1, 0), 10, 0.25, 0.45, 0.25, 0.25, Material.GRAVEL.createBlockData());
 				}
 			}
 

@@ -50,6 +50,7 @@ public class MeteorSlam extends Ability {
 		mInfo.scoreboardId = "MeteorSlam";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
@@ -90,9 +91,8 @@ public class MeteorSlam extends Ability {
 		if (mPlayer.getLocation().getPitch() > METEOR_SLAM_ANGLE) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) {
 				int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
-				int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
-				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM, cooldown);
+				putOnCooldown();
 				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
 				mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 1, 0f, 1, 0);
 

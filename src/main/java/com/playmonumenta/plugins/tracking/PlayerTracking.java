@@ -16,9 +16,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -83,10 +88,38 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
+	public void onDamage(Plugin plugin, Player player, LivingEntity target, EntityDamageByEntityEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onDamage(plugin, player, target, event);
+		}
+	}
+
 	public void onLaunchProjectile(Plugin plugin, Player player, Projectile proj, ProjectileLaunchEvent event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onLaunchProjectile(plugin, player, proj, event);
+		}
+	}
+
+	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onBlockBreak(plugin, player, event, item);
+		}
+	}
+
+	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onPlayerInteract(plugin, player, event);
+		}
+	}
+
+	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onDeath(plugin, player, event);
 		}
 	}
 
@@ -96,6 +129,15 @@ public class PlayerTracking implements EntityTracking {
 			manager.onExpChange(plugin, player, event);
 		}
 	}
+
+	public void onHurt(Plugin plugin, Player player, EntityDamageEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onHurt(plugin, player, event);
+		}
+	}
+
+
 
 	@Override
 	public void update(World world, int ticks) {

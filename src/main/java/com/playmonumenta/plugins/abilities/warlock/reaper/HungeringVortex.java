@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -58,6 +59,7 @@ public class HungeringVortex extends Ability {
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 0.75f);
 		Location loc = mPlayer.getLocation();
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 200, 3.5, 3.5, 3.5, 1);
+		float velocity = loc.getBlock().isLiquid() ? 0.2f : 0.3f;
 		/*
 		 * Creates a fast-spiraling helix.
 		 */
@@ -88,7 +90,7 @@ public class HungeringVortex extends Ability {
 		List<Mob> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
 		for (LivingEntity mob : mobs) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
-			MovementUtils.PullTowards(mPlayer, mob, 0.25f);
+			MovementUtils.PullTowards(mPlayer, mob, velocity);
 		}
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
@@ -123,7 +125,7 @@ public class HungeringVortex extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > 50 &&
 		       (mainHand == null || mainHand.getType() != Material.BOW) &&
-		       (offHand == null || offHand.getType() != Material.BOW);
+		       (offHand == null || offHand.getType() != Material.BOW) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 
 	}
 

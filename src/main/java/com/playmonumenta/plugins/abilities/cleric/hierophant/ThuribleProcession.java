@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -46,15 +47,19 @@ public class ThuribleProcession extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Thurible";
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.cooldown = 20 * 10;
+		mInfo.linkedSpell = Spells.INCENSED_THURIBLE;
 	}
 
 	@Override
 	public boolean cast() {
 		int incensedThurible = getAbilityScore();
 		Player player = mPlayer;
+		float walkSpeed = incensedThurible == 1 ? 0.5f : 0.6f;
 		if (!player.hasMetadata(PLAYER_THURIBLE_METAKEY)) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 			player.setMetadata(PLAYER_THURIBLE_METAKEY, new FixedMetadataValue(mPlugin, 0));
+			player.setWalkSpeed(player.getWalkSpeed() + walkSpeed);
 			new BukkitRunnable() {
 				int t = 0;
 				int seconds = 0;
@@ -83,9 +88,9 @@ public class ThuribleProcession extends Ability {
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1.15, 40), 15, 2, 0.4f, 2, 0);
 					}
 
+					int duration = 20 * 1;
 					int radius = incensedThurible == 1 ? 20 : 30;
-					int duration = 20 * 5;
-					List<Player> players = PlayerUtils.getNearbyPlayers(player.getLocation(), radius);
+					List<Player> players = PlayerUtils.getNearbyPlayers(player, radius, false);
 					if (incensedThurible < 2) {
 						if (players.contains(player) && seconds < 10) {
 							players.remove(player);
@@ -108,21 +113,35 @@ public class ThuribleProcession extends Ability {
 							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0, true, true));
 						}
 					}
-					if (incensedThurible > 1) {
-						if (seconds >= 10) {
-							for (Player pl : players) {
+					if (seconds >= 10) {
+						duration = 20 * 15;
+						for (Player pl : PlayerUtils.getNearbyPlayers(player, radius, true)) {
+							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, duration, 0, true, true));
+							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, 0, true, true));
+							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0, true, true));
+							// TODO: Make this not do a rapid check like this in the loop
+							if (incensedThurible > 1) {
 								mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.ABSORPTION, duration, 0, true, true));
+
 							}
 						}
+						this.cancel();
+						player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
+						player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+						putOnCooldown();
 					}
 					if (t >= 1) {
 						if (player.isDead()) {
 							this.cancel();
 							player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
+							player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+							putOnCooldown();
 						}
 						if ((!player.isHandRaised() && !player.isBlocking())) {
 							this.cancel();
 							player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
+							player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+							putOnCooldown();
 						}
 					}
 				}
@@ -136,7 +155,9 @@ public class ThuribleProcession extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
+		return ((mHand.getType() == Material.SHIELD && oHand.getType() != Material.BOW) ||
+		        (oHand.getType() == Material.SHIELD && mHand.getType() != Material.BOW))
+		       && !mPlayer.isSneaking();
 	}
 
 }

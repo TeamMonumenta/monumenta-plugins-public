@@ -40,19 +40,23 @@ public class ShieldWall extends Ability {
 	public ShieldWall(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "ShieldWall";
-		mInfo.cooldown = getAbilityScore() == 1 ? 30 : 20;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 20;
 		mInfo.linkedSpell = Spells.SHIELD_WALL;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
+	private boolean primed = false;
 	@Override
 	public boolean cast() {
+		if (primed) {
+			return false;
+		}
+
 		int time = getAbilityScore() == 1 ? 20 * 8 : 20 * 10;
 		boolean knockback = getAbilityScore() == 1 ? false : true;
 		new BukkitRunnable() {
 			int t = 0;
 			boolean active = false;
-			boolean primed = false;
 			Location loc = mPlayer.getLocation();
 			List<BoundingBox> boxes = new ArrayList<BoundingBox>();
 			boolean hitboxes = false;
@@ -68,11 +72,12 @@ public class ShieldWall extends Ability {
 				if (primed && !active) {
 					if (mPlayer.isHandRaised() || mPlayer.isBlocking()) {
 						active = true;
+						primed = false;
 						t = 0;
 						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
 						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
-
+						putOnCooldown();
 					}
 				}
 				if (active) {
@@ -85,7 +90,7 @@ public class ShieldWall extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0, 0, 0, 0);
+							mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
 							if (!hitboxes) {
 								boxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
 								                         l.clone().add(0.6, 5, 0.6)));
@@ -102,7 +107,7 @@ public class ShieldWall extends Ability {
 								if (!(proj.getShooter() instanceof Player)) {
 									proj.remove();
 									mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
-									mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 075, 1.5f);
+									mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 								}
 							} else if (knockback && EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
@@ -120,6 +125,7 @@ public class ShieldWall extends Ability {
 
 				if (t > 5 && !active) {
 					this.cancel();
+					primed = false;
 				}
 			}
 

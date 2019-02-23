@@ -67,4 +67,8 @@ public class Sharpshooter extends Ability {
 		return true;
 	}
 
+	public int getSharpshot() {
+		return sharpshot;
+	}
+
 }

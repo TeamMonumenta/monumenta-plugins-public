@@ -48,10 +48,10 @@ public class CloakAndDagger extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (active) {
 			active = false;
-			time = 0;
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
 			double damage = getAbilityScore() == 1 ? 2 : 4;
 			event.setDamage(event.getDamage() + (damage * time));
+			time = 0;
 		}
 		return true;
 	}

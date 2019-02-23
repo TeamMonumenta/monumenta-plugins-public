@@ -86,7 +86,11 @@ public class PrecisionStrike extends Ability {
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
-					EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
+
+					if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+						EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
+					}
+
 					this.cancel();
 					break;
 				}
@@ -98,7 +102,7 @@ public class PrecisionStrike extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 		if (getAbilityScore() == 2) {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_STUN_RADIUS)) {
-					EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
+				EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 			}
 		}
 

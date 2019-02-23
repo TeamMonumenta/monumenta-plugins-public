@@ -58,7 +58,7 @@ public class BlasphemousAura extends Ability {
 			int vulnLevel = (getAbilityScore() == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), BLASPHEMY_RADIUS)) {
-				PotionUtils.applyPotion(mob, mob, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
 			}
 		}
 		return true;

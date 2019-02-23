@@ -47,7 +47,7 @@ public class NightmarishAlchemy extends Ability {
 					}
 				}
 			}
-			mWorld.spawnParticle(Particle.SPELL_WITCH, potion.getLocation(), 50, 1, 0, 1, 1);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, potion.getLocation(), 40, 1, 0, 1, 1);
 		}
 
 		return true;

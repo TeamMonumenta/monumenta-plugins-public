@@ -64,6 +64,14 @@ public class EnchantmentManager {
 		init.add(new Sniper());
 		init.add(new PointBlank());
 		init.add(new Decay());
+		init.add(new Sapper());
+		init.add(new Multitool());
+		init.add(new Resurrection());
+		init.add(new HexEater());
+		init.add(new ThrowingKnife());
+		init.add(new Current());
+		init.add(new InstantDrink());
+		init.add(new DivineAura());
 
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {

@@ -73,17 +73,17 @@ public class AdrenalSerum extends Ability {
 		int amountConsumed = 0;
 		for (ItemStack item : inv.getContents()) {
 			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-				if (amountConsumed >= 3) {
+				if (amountConsumed >= ADRENAL_SERUM_POTIONS_CONSUMED) {
 					break;
 				}
-				if (item.getAmount() >= 3) {
-					item.setAmount(item.getAmount() - 3);
+				if (item.getAmount() >= ADRENAL_SERUM_POTIONS_CONSUMED) {
+					item.setAmount(item.getAmount() - ADRENAL_SERUM_POTIONS_CONSUMED);
 					break;
 				} else {
 					for (int i = 0; i < item.getAmount(); i++) {
 						item.setAmount(item.getAmount() - 1);
 						amountConsumed++;
-						if (item.getAmount() <= 0 || amountConsumed >= 3) {
+						if (item.getAmount() <= 0 || amountConsumed >= ADRENAL_SERUM_POTIONS_CONSUMED) {
 							break;
 						}
 					}

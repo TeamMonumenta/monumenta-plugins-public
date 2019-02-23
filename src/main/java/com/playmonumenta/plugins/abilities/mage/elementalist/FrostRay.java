@@ -61,7 +61,7 @@ public class FrostRay extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.getVelocity().length() <= 0 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
+		return mPlayer.getVelocity().length() <= 0.1 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
 	}
 
 	@Override

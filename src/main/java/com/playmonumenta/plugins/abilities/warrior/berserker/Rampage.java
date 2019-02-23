@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -78,6 +79,7 @@ public class Rampage extends Ability {
 				@Override
 				public void run() {
 					rampageDuration--;
+					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, Material.RED_CONCRETE.createBlockData());
 					if (rampageDuration <= 0) {
 						this.cancel();
 						deactivateRampage();

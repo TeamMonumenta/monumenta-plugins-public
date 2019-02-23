@@ -145,10 +145,12 @@ public class LuminousInfusion extends Ability {
 				}.runTaskLater(mPlugin, 1);
 			} else {
 				// Active damage to non-undead
-				le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
-				                                    LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
-				le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
-				                                    LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
+				if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+					le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
+					                                    LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
+					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
+					                                    LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
+				}
 			}
 		}
 		return true;

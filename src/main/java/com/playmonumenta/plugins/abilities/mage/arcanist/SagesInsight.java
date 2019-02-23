@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Sage’s Insight: Whenever you cast a spell, reduce the
@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
  */
 public class SagesInsight extends Ability {
 
-	private static final int ARCANIST_INSIGHT = (int)(1 * 20);
+	private static final int ARCANIST_INSIGHT = (int)(1 * 10);
 
 	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -29,6 +29,15 @@ public class SagesInsight extends Ability {
 	@Override
 	public boolean AbilityCastEvent(AbilityCastEvent event) {
 		mPlugin.mTimers.UpdateCooldowns(mPlayer, ARCANIST_INSIGHT);
+		return true;
+	}
+
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand())) {
+			double damage = getAbilityScore() == 1 ? 1 : 2;
+			event.setDamage(event.getDamage() + damage);
+		}
 		return true;
 	}
 

@@ -6,6 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -57,7 +58,8 @@ public class Quickdraw extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.25f);
 		mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 10, 0, 0, 0, 0.2f);
 		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-		arrow.setVelocity(arrow.getVelocity().multiply(2));
+		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		arrow.setVelocity(arrow.getVelocity().multiply(2.25));
 		int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
 		BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
 		if (bm != null) {

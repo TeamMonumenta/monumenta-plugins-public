@@ -24,8 +24,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class FrostNova extends Ability {
 
 	private static final float FROST_NOVA_RADIUS = 6.0f;
-	private static final int FROST_NOVA_1_DAMAGE = 3;
-	private static final int FROST_NOVA_2_DAMAGE = 6;
+	private static final int FROST_NOVA_1_DAMAGE = 4;
+	private static final int FROST_NOVA_2_DAMAGE = 8;
 	private static final int FROST_NOVA_EFFECT_LVL = 2;
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 8 * 20;
@@ -45,9 +45,15 @@ public class FrostNova extends Ability {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
 
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
 			if (frostNova > 1) {
-				EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
+				if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
+				} else {
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
+					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
+				}
+			} else {
+				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
 			}
 
 			if (mob.getFireTicks() > 1) {

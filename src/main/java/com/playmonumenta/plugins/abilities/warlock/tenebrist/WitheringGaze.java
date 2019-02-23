@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 
@@ -73,13 +74,15 @@ public class WitheringGaze extends Ability {
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
 							if (EntityUtils.isBoss(le)) {
-								le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2));
+								le.removePotionEffect(PotionEffectType.SLOW);
+								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
 								if (!EntityUtils.isFrozen(le)) {
 									EntityUtils.applyFreeze(mPlugin, duration, le);
 								}
 							}
-							le.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, 2));
+							le.removePotionEffect(PotionEffectType.WITHER);
+							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
 						}
 					}
 				}

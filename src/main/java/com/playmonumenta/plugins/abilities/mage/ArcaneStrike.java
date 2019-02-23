@@ -57,7 +57,11 @@ public class ArcaneStrike extends Ability {
 				dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
 			}
 
-			EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+			if (!damagee.getUniqueId().equals(mob.getUniqueId())) {
+				Spellshock.spellDamageMob(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+			} else {
+				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+			}
 		}
 
 		Location loc = damagee.getLocation();

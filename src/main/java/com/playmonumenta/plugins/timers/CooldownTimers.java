@@ -131,6 +131,25 @@ public class CooldownTimers {
 		}
 	}
 
+	public void UpdateCooldown(Player player, Spells spell, Integer ticks) {
+		HashMap<Spells, Integer> cds = mTimers.get(player.getUniqueId());
+
+		if (cds != null && cds.containsKey(spell)) {
+			int cd = cds.get(spell);
+			cd -= ticks;
+			if (cd <= 0) {
+				MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
+				cds.remove(spell);
+			} else {
+				cds.put(spell, cd);
+			}
+
+			if (mTimers.keySet().size() <= 0) {
+				mTimers.remove(player.getUniqueId());
+			}
+		}
+	}
+
 	public void removeAllCooldowns(UUID playerID) {
 		mTimers.remove(playerID);
 	}

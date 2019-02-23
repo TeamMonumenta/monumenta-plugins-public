@@ -267,7 +267,12 @@ public class PotionUtils {
 
 	public static void clearNegatives(Plugin plugin, Player player) {
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
-			plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+			if (player.hasPotionEffect(type)) {
+				PotionEffect effect = player.getPotionEffect(type);
+				if (effect.getDuration() < 20 * 120) {
+					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+				}
+			}
 		}
 	}
 

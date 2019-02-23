@@ -33,6 +33,7 @@ public abstract class Ability {
 	protected final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
+	public boolean mActive = true;
 
 	public Ability(Plugin plugin, World world, Random random, Player player) {
 		mPlugin = plugin;
@@ -156,6 +157,12 @@ public abstract class Ability {
 	}
 
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+
+	public void EntityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+
+	public double EntityDeathRadius() {
+		return 0;
+	}
 
 	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
 

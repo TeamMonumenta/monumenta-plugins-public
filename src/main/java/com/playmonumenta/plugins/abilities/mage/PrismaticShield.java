@@ -29,7 +29,8 @@ public class PrismaticShield extends Ability {
 	private static final int PRISMATIC_SHIELD_EFFECT_LVL_2 = 2;
 	private static final int PRISMATIC_SHIELD_1_DURATION = 12 * 20;
 	private static final int PRISMATIC_SHIELD_2_DURATION = 12 * 20;
-	private static final int PRISMATIC_SHIELD_COOLDOWN = 80 * 20;
+	private static final int PRISMATIC_SHIELD_1_COOLDOWN = 90 * 20;
+	private static final int PRISMATIC_SHIELD_2_COOLDOWN = 80 * 20;
 	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
 	private static final int PRISMATIC_SHIELD_1_DAMAGE = 3;
 	private static final int PRISMATIC_SHIELD_2_DAMAGE = 6;
@@ -38,7 +39,7 @@ public class PrismaticShield extends Ability {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.scoreboardId = "Prismatic";
-		mInfo.cooldown = PRISMATIC_SHIELD_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
 	}
 
 	/*

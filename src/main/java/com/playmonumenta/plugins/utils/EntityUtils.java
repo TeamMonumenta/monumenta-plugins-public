@@ -392,6 +392,11 @@ public class EntityUtils {
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType) {
 
+		if (magicType == null) {
+			damageEntity(plugin, target, damage, damager);
+			return;
+		}
+
 		damage = damage * vulnerabilityMult(target);
 
 		CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);

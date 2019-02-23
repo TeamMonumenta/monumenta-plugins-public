@@ -36,7 +36,7 @@ public class Rejuvenation extends Ability {
 					//  If this is us or we're allowing anyone to get it.
 					if (p == mPlayer || rejuvenation > 1) {
 						double oldHealth = p.getHealth();
-						PlayerUtils.healPlayer(p, REJUVENATION_HEAL_AMOUNT);
+						PlayerUtils.healPlayer(p, p.getMaxHealth() * 0.05);
 						if (p.getHealth() > oldHealth) {
 							mWorld.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}

@@ -101,6 +101,7 @@ public class AnvilOverride extends BaseOverride {
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
+			block.setType(Material.AIR);
 			return false;
 		}
 		return true;

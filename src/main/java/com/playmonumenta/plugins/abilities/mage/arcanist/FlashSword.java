@@ -37,7 +37,7 @@ public class FlashSword extends Ability {
 	private static final int FSWORD_SWINGS = 3;
 	private static final int FSWORD_RADIUS = 5;
 	private static final int FSWORD_COOLDOWN = 20 * 8;
-	private static final float FSWORD_KNOCKBACK_SPEED = 0.4f;
+	private static final float FSWORD_KNOCKBACK_SPEED = 0.3f;
 	private static final double FSWORD_DOT_ANGLE = 0.33;
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);

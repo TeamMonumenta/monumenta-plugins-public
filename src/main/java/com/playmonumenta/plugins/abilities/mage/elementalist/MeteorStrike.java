@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Sprint left-click makes a meteor fall where the player is looking, dealing
- * 16 / 22 damage in a 5-block radius and setting mobs on fire for 3s.
+ * 18 / 24 damage in a 5-block radius and setting mobs on fire for 3s.
  * Cooldown 16 / 12 s
  */
 
@@ -30,7 +30,7 @@ public class MeteorStrike extends Ability {
 	private static final int METEOR_STRIKE_1_COOLDOWN = 16 * 20;
 	private static final int METEOR_STRIKE_2_COOLDOWN = 12 * 20;
 	private static final int METEOR_STRIKE_1_DAMAGE = 18;
-	private static final int METEOR_STRIKE_2_DAMAGE = 24;
+	private static final int METEOR_STRIKE_2_DAMAGE = 26;
 	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
 	private static final double METEOR_STRIKE_RADIUS = 5;
 

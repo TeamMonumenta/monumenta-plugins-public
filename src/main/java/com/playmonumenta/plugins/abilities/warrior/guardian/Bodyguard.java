@@ -43,19 +43,23 @@ public class Bodyguard extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.linkedSpell = Spells.BODYGUARD;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 45 : 20 * 35;
+		mInfo.cooldown = 20 * 30;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
 	public boolean cast() {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
-		Vector dir = mPlayer.getLocation().getDirection();
+		Location oLoc = mPlayer.getLocation();
+		Vector dir = oLoc.getDirection();
 		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer.getEyeLocation(), 15);
 		players.remove(mPlayer);
 		for (int i = 0; i < 15; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(mWorld);
+			if (bLoc.getBlock().getType().isSolid()) {
+				break;
+			}
 			for (Player player : players) {
 				if (player.getBoundingBox().overlaps(box)) {
 					Location loc = mPlayer.getEyeLocation();
@@ -84,7 +88,8 @@ public class Bodyguard extends Ability {
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), ThreadLocalRandom.current().nextDouble(0.15, 0.5));
 					}
 
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+					putOnCooldown();
+					mWorld.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 					mPlayer.teleport(player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0));
 					Location tloc = player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
 					mWorld.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
@@ -100,14 +105,14 @@ public class Bodyguard extends Ability {
 					                                 new PotionEffect(PotionEffectType.REGENERATION,
 					                                                  20 * 8,
 					                                                  amp, false, true));
-					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
-					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
+					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 					new BukkitRunnable() {
 
 						@Override
 						public void run() {
-							mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
-							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
+							mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 						}
 
 					}.runTaskLater(mPlugin, 20 * 8);

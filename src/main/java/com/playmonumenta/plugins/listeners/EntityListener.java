@@ -167,6 +167,8 @@ public class EntityListener implements Listener {
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 
+
+
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 				event.setCancelled(true);
@@ -225,6 +227,8 @@ public class EntityListener implements Listener {
 					return;
 				}
 
+				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
+
 				if (event.getCause() != DamageCause.THORNS) {
 					if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
@@ -250,12 +254,12 @@ public class EntityListener implements Listener {
 								damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
 								mWorld.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
 								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-								double damage = enchantedPrayer == 1 ? 7 : 12;
-								double heal = enchantedPrayer == 1 ? 2 : 4;
+								double damage = enchantedPrayer == 1 ? 5 : 10;
+								double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
 								for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
 									EntityUtils.damageEntity(mPlugin, le, damage, damager);
 								}
-								PlayerUtils.healPlayer(player, heal);
+								PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
 							}
 						}
 					}
@@ -264,7 +268,7 @@ public class EntityListener implements Listener {
 				Arrow arrow = (Arrow)damager;
 				if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					Player player = (Player)arrow.getShooter();
-
+					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 						damager.remove();
 						event.setCancelled(true);
@@ -294,7 +298,7 @@ public class EntityListener implements Listener {
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
-
+			mPlugin.mTrackingManager.mPlayers.onHurt(mPlugin, player, event);
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 				event.setCancelled(true);

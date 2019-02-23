@@ -11,8 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -29,7 +29,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Spellshock extends Ability {
-	public class SpellShockedMob {
+	public static class SpellShockedMob {
 		public LivingEntity mob;
 		public int ticksLeft;
 		public Player initiator;
@@ -44,13 +44,11 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_DURATION = 6 * 20;
 	private static final int SPELL_SHOCK_TEST_PERIOD = 2;
 	private static final int SPELL_SHOCK_DEATH_RADIUS = 3;
-	private static final int SPELL_SHOCK_DEATH_DAMAGE = 3;
+	private static final int SPELL_SHOCK_DEATH_DAMAGE = 4;
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
-	private static final int SPELL_SHOCK_SPELL_DAMAGE = 3;
-	private static final int SPELL_SHOCK_REGEN_DURATION = 51;
-	private static final int SPELL_SHOCK_REGEN_AMPLIFIER = 1;
-	private static final int SPELL_SHOCK_SPEED_DURATION = 120;
-	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
+	private static final int SPELL_SHOCK_SPELL_DAMAGE = 4;
+	private static final int SPELL_SHOCK_SPEED_DURATION = 80;
+	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 2;
 	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
@@ -85,13 +83,19 @@ public class Spellshock extends Ability {
 
 						if (shocked.mob.isDead() || shocked.mob.getHealth() <= 0) {
 							// Mob has died - trigger effects
+							int spellShock = ScoreboardUtils.getScoreboardValue(shocked.initiator, SPELL_SHOCK_SCOREBOARD);
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
 							mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 100, 1, 1, 1, 0.25);
 							world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 							for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
-								EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator);
+								if (spellShock > 1) {
+									spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator, null, false);
+								} else {
+									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator);
+								}
+
 								nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-																		   SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+								                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 							}
 
 							it.remove();
@@ -116,7 +120,7 @@ public class Spellshock extends Ability {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
 			LivingEntity damagee = (LivingEntity)event.getEntity();
 			mSpellShockedMobs.put(damagee.getUniqueId(),
-								  new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, mPlayer));
+			                      new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, mPlayer));
 		}
 		return true;
 	}
@@ -127,6 +131,10 @@ public class Spellshock extends Ability {
 	}
 
 	public static void spellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type) {
+		spellDamageMob(plugin, mob, dmg, player, type, true);
+	}
+
+	public static void spellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type, boolean arcaneApply) {
 		SpellShockedMob shocked = mSpellShockedMobs.get(mob.getUniqueId());
 		if (shocked != null) {
 			// Hit a shocked mob with a real spell - extra damage
@@ -134,13 +142,9 @@ public class Spellshock extends Ability {
 			int spellShock = ScoreboardUtils.getScoreboardValue(player, SPELL_SHOCK_SCOREBOARD);
 			if (spellShock > 1) {
 				plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-				                                 new PotionEffect(PotionEffectType.REGENERATION,
-				                                                  SPELL_SHOCK_REGEN_DURATION,
-				                                                  SPELL_SHOCK_REGEN_AMPLIFIER, true, true));
-				plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-				                                 new PotionEffect(PotionEffectType.SPEED,
-				                                                  SPELL_SHOCK_SPEED_DURATION,
-				                                                  SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
+				                                new PotionEffect(PotionEffectType.SPEED,
+				                                                 SPELL_SHOCK_SPEED_DURATION,
+				                                                 SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
 			}
 
 			// Consume the "charge"
@@ -153,28 +157,38 @@ public class Spellshock extends Ability {
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.5f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 1.5f);
-			for (Entity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
+			for (Mob nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
-					EntityUtils.damageEntity(plugin, (LivingEntity)nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
+					if (spellShock > 1) {
+						spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type, false);
+					} else {
+						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
+					}
+
 					((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}
 
 			dmg += SPELL_SHOCK_SPELL_DAMAGE;
+
+			// Make sure to apply vulnerability after damage
+			if (!EntityUtils.isBoss(mob)) {
+				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SPELL_SHOCK_STAGGER_DURATION, 10, true, false));
+			}
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+		} else {
+			if (type == MagicType.ARCANE && arcaneApply) {
+				mSpellShockedMobs.put(mob.getUniqueId(),
+				                      new SpellShockedMob(mob, SPELL_SHOCK_DURATION, player));
+			}
 		}
 
 		// Apply damage to the hit mob all in one shot
 		if (dmg > 0) {
 			EntityUtils.damageEntity(plugin, mob, dmg, player, type);
-		}
-
-		// Make sure to apply vulnerability after damage
-		if (shocked != null) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SPELL_SHOCK_STAGGER_DURATION, 10, true, false));
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 		}
 	}
 }

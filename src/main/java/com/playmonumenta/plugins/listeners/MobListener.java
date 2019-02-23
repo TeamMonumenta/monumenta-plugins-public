@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -178,6 +179,9 @@ public class MobListener implements Listener {
 			if (player != null) {
 				//  Player kills a mob
 				AbilityManager.getManager().EntityDeathEvent(player, event, shouldGenDrops);
+				for (Player p : PlayerUtils.getNearbyPlayers(livingEntity.getLocation(), 20)) {
+					AbilityManager.getManager().EntityDeathRadiusEvent(p, event, shouldGenDrops);
+				}
 			}
 		}
 	}

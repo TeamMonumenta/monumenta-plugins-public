@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.Random;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -24,11 +23,11 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class MagmaShield extends Ability {
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 13 * 20;
+	private static final int MAGMA_SHIELD_COOLDOWN = 12 * 20;
 	private static final int MAGMA_SHIELD_RADIUS = 6;
 	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
-	private static final int MAGMA_SHIELD_1_DAMAGE = 6;
-	private static final int MAGMA_SHIELD_2_DAMAGE = 12;
+	private static final int MAGMA_SHIELD_1_DAMAGE = 7;
+	private static final int MAGMA_SHIELD_2_DAMAGE = 14;
 	private static final float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
 	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
 
@@ -71,8 +70,8 @@ public class MagmaShield extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if ((offHand.getType() == Material.SHIELD && InventoryUtils.isWandItem(mainHand))
-		    || (mainHand.getType() == Material.SHIELD)) {
+		if (InventoryUtils.isWandItem(mainHand)
+		    || InventoryUtils.isWandItem(offHand)) {
 			return mPlayer.isSneaking();
 		}
 		return false;

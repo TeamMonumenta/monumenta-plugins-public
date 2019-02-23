@@ -77,6 +77,12 @@ public class Dodging extends Ability {
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
+		Projectile proj = (Projectile) event.getEntity();
+		if (!(proj.getShooter() instanceof Player)) {
+			return true;
+		}
+
+
 		if (!_dodge()) {
 			return true;
 		}
@@ -88,6 +94,9 @@ public class Dodging extends Ability {
 	@Override
 	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
+		if (!(event.getEntity().getShooter() instanceof Player)) {
+			return true;
+		}
 		if (!_dodge()) {
 			return true;
 		}

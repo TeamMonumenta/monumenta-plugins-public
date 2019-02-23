@@ -63,7 +63,7 @@ public class AlchemicalAmalgam extends Ability {
 			double heal = getAbilityScore() == 1 ? 2 : 4;
 			@Override
 			public void run() {
-				loc.add(dir.clone().multiply(0.4));
+				loc.add(dir.clone().multiply(0.3));
 				t++;
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.25, 0.25, 0.25, ALCHEMICAL_LIGHT_COLOR);
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.25, 0.25, 0.25, ALCHEMICAL_DARK_COLOR);

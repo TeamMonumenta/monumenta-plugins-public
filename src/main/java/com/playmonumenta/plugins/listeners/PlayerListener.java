@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -154,6 +155,7 @@ public class PlayerListener implements Listener {
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
+		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
 		// Left Click.
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -424,8 +426,8 @@ public class PlayerListener implements Listener {
 				if (lore != null && !lore.isEmpty()) {
 					for (String loreEntry : lore) {
 						if ((ChatColor.stripColor(loreEntry).equals("King's Valley : Tier I")) ||
-							(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
-							(ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
+						    (ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
+						    (ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
 							return true;
 						}
 					}
@@ -436,9 +438,9 @@ public class PlayerListener implements Listener {
 	}
 
 	private static final List<Integer> ITEM_SLOTS_TO_PRESERVE =
-			Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
+	    Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
 	private static final List<Integer> ITEM_SLOTS_TO_DROP =
-			Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
+	    Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
 
 	private static final int KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 10;
 	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 100;
@@ -447,6 +449,13 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void PlayerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+
+
+		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
+
+		if (player.getHealth() > 0) {
+			return;
+		}
 
 		if (!event.getKeepInventory() && mPlugin.mServerProperties.getKeepLowTierInventory()) {
 			/* Monumenta-custom keep inventory
@@ -601,8 +610,8 @@ public class PlayerListener implements Listener {
 		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
 			// Kill the player if they drink a potion with instant damage 10+
 			if (effect.getType() != null &&
-				effect.getType().equals(PotionEffectType.HARM) &&
-				effect.getAmplifier() >= 9) {
+			    effect.getType().equals(PotionEffectType.HARM) &&
+			    effect.getAmplifier() >= 9) {
 
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 					@Override
@@ -816,22 +825,22 @@ public class PlayerListener implements Listener {
 	// This serves as a workaround for damaging players since PVP has been toggled off. EntityDamgedByEntityEvent doesn't work for Player v Player
 	@EventHandler
 	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
-		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-			Player player = event.getPlayer();
-			double maxDist = 3;
-			Player target = null;
-			for (Player p : PlayerUtils.getNearbyPlayers(player.getLocation(), 3D)) {
-				if (PlayerUtils.hasLineOfSight(player, p)) {
-					if (p.getLocation().distance(player.getLocation()) < maxDist) {
-						maxDist = p.getLocation().distance(player.getLocation());
-						target = p;
-					}
-				}
-			}
-			if (target != null) {
-				mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
-			}
-		}
+	    if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
+	        Player player = event.getPlayer();
+	        double maxDist = 3;
+	        Player target = null;
+	        for (Player p : PlayerUtils.getNearbyPlayers(player.getLocation(), 3D)) {
+	            if (PlayerUtils.hasLineOfSight(player, p)) {
+	                if (p.getLocation().distance(player.getLocation()) < maxDist) {
+	                    maxDist = p.getLocation().distance(player.getLocation());
+	                    target = p;
+	                }
+	            }
+	        }
+	        if (target != null) {
+	            mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
+	        }
+	    }
 	}
 	*/
 
@@ -848,10 +857,10 @@ public class PlayerListener implements Listener {
 			 * If that task fires, trigger the extended sneak event and remove the metadata
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
-				() -> {
-					AbilityManager.getManager().PlayerExtendedSneakEvent(player);
-					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
-				}, 40);
+			() -> {
+				AbilityManager.getManager().PlayerExtendedSneakEvent(player);
+				player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+			}, 40);
 
 			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
 		} else {
@@ -873,5 +882,12 @@ public class PlayerListener implements Listener {
 	public void AbilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		AbilityManager.getManager().AbilityCastEvent(player, event);
+	}
+
+	@EventHandler
+	public void BlockBreakEvent(BlockBreakEvent event) {
+		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItemInMainHand();
+		mPlugin.mTrackingManager.mPlayers.onBlockBreak(mPlugin, player, event, item);
 	}
 }

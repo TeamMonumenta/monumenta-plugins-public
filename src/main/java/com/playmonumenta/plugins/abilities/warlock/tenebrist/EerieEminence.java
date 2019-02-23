@@ -38,7 +38,7 @@ public class EerieEminence extends Ability {
 		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
 			mob.addPotionEffect(new PotionEffect(event.getEffect().getType(), 20 * 4, amp));
 		}
-		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer.getLocation(), radius)) {
+		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, false)) {
 			PotionEffectType type = null;
 			PotionEffect effect = event.getEffect();
 			if (effect.getType().equals(PotionEffectType.WEAKNESS)) {

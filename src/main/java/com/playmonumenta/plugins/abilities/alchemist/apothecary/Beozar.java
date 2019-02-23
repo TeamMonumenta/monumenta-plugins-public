@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import java.util.Random;
 
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -29,8 +28,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Beozar extends Ability {
 
-	private static final Particle.DustOptions BEZOAR_COLOR = new Particle.DustOptions(
-	    Color.fromRGB(0, 155, 0), 1.0f);
 
 	public Beozar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);

@@ -40,12 +40,12 @@ public class ChoirBells extends Ability {
 		mInfo.linkedSpell = Spells.CHOIR_BELLS;
 		mInfo.scoreboardId = "ChoirBells";
 		mInfo.cooldown = getAbilityScore() == 1 ? CHOIR_BELLS_1_COOLDOWN : CHOIR_BELLS_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSprinting();
+		return mPlayer.isSneaking() && !mPlayer.isOnGround();
 	}
 
 	@Override

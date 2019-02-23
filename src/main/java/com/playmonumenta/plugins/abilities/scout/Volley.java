@@ -18,6 +18,8 @@ import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.scout.hunter.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -46,7 +48,7 @@ public class Volley extends Ability {
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (!mPlayer.isSneaking()
-            || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -106,9 +108,13 @@ public class Volley extends Ability {
 		if (arrow.hasMetadata("Volley")) {
 			double damageMultiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_INCREASE : VOLLEY_2_DAMAGE_INCREASE;
 			double oldDamage = event.getDamage();
-
+			double extraDamage = 0;
+			if (AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class) != null) {
+				Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
+				extraDamage += ss.getSharpshot();
+			}
 			double newDamage = oldDamage + (oldDamage * damageMultiplier);
-			event.setDamage(newDamage);
+			event.setDamage(newDamage + extraDamage);
 		}
 		return true;
 	}

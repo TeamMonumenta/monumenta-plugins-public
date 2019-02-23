@@ -92,6 +92,7 @@ import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
@@ -105,6 +106,7 @@ import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
 import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
+import com.playmonumenta.plugins.abilities.warlock.Harvester;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
@@ -200,6 +202,7 @@ public class AbilityManager {
 		                          new Swiftness(mPlugin, mWorld, mRandom, null),
 		                          new EagleEye(mPlugin, mWorld, mRandom, null),
 		                          new ScoutPassive(mPlugin, mWorld, mRandom, null),
+		                          new SwiftCuts(mPlugin, mWorld, mRandom, null),
 
 		                          //RANGER
 		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
@@ -257,6 +260,7 @@ public class AbilityManager {
 		                          new GraspingClaws(mPlugin, mWorld, mRandom, null),
 		                          new SoulRend(mPlugin, mWorld, mRandom, null),
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
+		                          new Harvester(mPlugin, mWorld, mRandom, null),
 
 		                          //REAPER
 		                          new DarkPact(mPlugin, mWorld, mRandom, null),
@@ -304,9 +308,17 @@ public class AbilityManager {
 		// Make sure non-warriors don't have passive knockback resistance or armor
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
+		player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 
 		List<Ability> abilities = new ArrayList<Ability>();
+
+		if (mAbilities.containsKey(player.getUniqueId())) {
+			AbilityCollection coll = mAbilities.get(player.getUniqueId());
+			for (Ability abil : coll.getAbilities()) {
+				abil.mActive = false;
+			}
+		}
 
 		/* If player has the "disable_class" tag, no abilities are assigned to them */
 		for (String tag : player.getScoreboardTags()) {
@@ -471,6 +483,16 @@ public class AbilityManager {
 		}
 	}
 
+	public void EntityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (event.getEntity().getLocation().distance(player.getLocation()) <= abil.EntityDeathRadius()) {
+					abil.EntityDeathRadiusEvent(event, shouldGenDrops);
+				}
+			}
+		}
+	}
+
 	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
@@ -587,8 +609,7 @@ public class AbilityManager {
 
 	//---------------------------------------------------------------------------------------------------------------
 
-	//Private methods
-	private AbilityCollection getPlayerAbilities(Player player) {
+	public AbilityCollection getPlayerAbilities(Player player) {
 		if (!mAbilities.containsKey(player.getUniqueId())) {
 			updatePlayerAbilities(player);
 		}

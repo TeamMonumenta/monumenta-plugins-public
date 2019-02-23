@@ -128,7 +128,7 @@ public class ElementalSpirit {
 			mWorld.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.2);
 			loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
 			double dmg = elementalSpirit == 1 ? 7 : 10;
-			double linger = elementalSpirit == 1 ? 1 : 2;
+			double linger = elementalSpirit == 1 ? 2 : 3;
 			new BukkitRunnable() {
 				@Override
 				public void run() {

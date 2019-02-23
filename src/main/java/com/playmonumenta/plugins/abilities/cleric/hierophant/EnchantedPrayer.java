@@ -44,6 +44,7 @@ public class EnchantedPrayer extends Ability {
 	@Override
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
+		putOnCooldown();
 		new BukkitRunnable() {
 			double rotation = 0;
 			Location loc = mPlayer.getLocation();

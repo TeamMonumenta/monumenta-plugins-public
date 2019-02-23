@@ -32,7 +32,7 @@ public class Challenge extends Ability {
 	public Challenge(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Challenge";
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 25;
+		mInfo.cooldown = 20 * 20;
 		mInfo.linkedSpell = Spells.CHELLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}

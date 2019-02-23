@@ -24,7 +24,7 @@ public class ElementalSpiritAbility extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "ElementalSpirit";
 		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT;
-		mInfo.cooldown = 20 * 6;
+		mInfo.cooldown = 20 * 8;
 	}
 
 	private ElementalSpirit spirit = null;
@@ -41,7 +41,8 @@ public class ElementalSpiritAbility extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds,
+	                            boolean sixtySeconds, int originalTime) {
 		Player player = mPlayer;
 		if (oneSecond) {
 			int elementalSpirit = getAbilityScore();
@@ -64,21 +65,15 @@ public class ElementalSpiritAbility extends Ability {
 								mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
 								mWorld.spawnParticle(Particle.SNOWBALL, loc, 1, 0, 0, 0, 0);
 
-								/* This code disabled because getSpecialization() no longer exists - need to use new ability system
-								BaseSpecialization spec = mPlugin.getSpecialization(player);
-								if (elementalSpirit < 0 || !player.isOnline()
-								    || !(spec instanceof ElementalistSpecialization)) {
-								    this.cancel();
-								    spirits.remove(player);
-								}
-								*/
-								if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritAbility.class) == null ||
-									!mPlayer.isOnline() || mPlayer == null || spirit == null) {
+								if (AbilityManager.getManager().getPlayerAbility(mPlayer,
+								                                                 ElementalSpiritAbility.class) == null || !mPlayer.isOnline() || mPlayer == null
+								    || spirit == null || mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(),
+								            Spells.ELEMENTAL_SPIRIT) || !mActive) {
 									this.cancel();
 									spirit = null;
 								}
 
-								if (spirit.getHurt().size() > 0) {
+								if (spirit != null && spirit.getHurt().size() > 0) {
 									List<LivingEntity> list = spirit.getHurt();
 
 									LivingEntity target = null;

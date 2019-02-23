@@ -27,12 +27,16 @@ public class BasiliskPoison extends Ability {
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		apply(damagee);
+		mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
+		return true;
+	}
+
+	public void apply(LivingEntity entity) {
 		int basiliskPoison = getAbilityScore();
 		int effectLvl = basiliskPoison == 1 ? BASILISK_POISON_1_EFFECT_LVL : BASILISK_POISON_2_EFFECT_LVL;
 		int duration = basiliskPoison == 1 ? BASILISK_POISON_1_DURATION : BASILISK_POISON_2_DURATION;
-		damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
-		mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
-		return true;
+		entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
 	}
 
 	@Override

@@ -182,6 +182,16 @@ public class InventoryUtils {
 		return false;
 	}
 
+	public static boolean isShovelItem(ItemStack item) {
+		if (item != null) {
+			Material mat = item.getType();
+			return mat == Material.WOODEN_SHOVEL || mat == Material.STONE_SHOVEL || mat == Material.GOLDEN_SHOVEL
+			       || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
+		}
+
+		return false;
+	}
+
 	public static boolean isWandItem(ItemStack item) {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();

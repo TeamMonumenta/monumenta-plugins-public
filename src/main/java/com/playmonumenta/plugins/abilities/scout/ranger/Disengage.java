@@ -31,14 +31,15 @@ public class Disengage extends Ability {
 	private static final double DISENGAGE_STUN_RADIUS = 3;
 	private static final int DISENGAGE_STUN_DURATION = 4 * 20;
 	private static final int DISENGAGE_1_DAMAGE = 0;
-	private static final int DISENGAGE_2_DAMAGE = 10;
-	private static final int DISENGAGE_COOLDOWN = 12 * 20;
+	private static final int DISENGAGE_2_DAMAGE = 12;
+	private static final int DISENGAGE_1_COOLDOWN = 12 * 20;
+	private static final int DISENGAGE_2_COOLDOWN = 10 * 20;
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
-		mInfo.cooldown = DISENGAGE_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
@@ -52,7 +53,10 @@ public class Disengage extends Ability {
 	@Override
 	public boolean cast() {
 		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS)) {
-			EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
+			if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
+			}
+
 			int damage = getAbilityScore() == 1 ? DISENGAGE_1_DAMAGE : DISENGAGE_2_DAMAGE;
 			EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 		}

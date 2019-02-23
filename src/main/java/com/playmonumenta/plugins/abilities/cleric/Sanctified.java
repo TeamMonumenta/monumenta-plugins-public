@@ -21,8 +21,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class Sanctified extends Ability {
 
-	private static final double SANCTIFIED_1_DAMAGE = 3;
-	private static final double SANCTIFIED_2_DAMAGE = 5;
+	private static final double SANCTIFIED_1_DAMAGE = 5;
+	private static final double SANCTIFIED_2_DAMAGE = 7;
 	private static final int SANCTIFIED_EFFECT_LEVEL = 0;
 	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
