@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -21,6 +20,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -51,6 +51,7 @@ public class ManaLance extends Ability {
 		int manaLance = getAbilityScore();
 
 		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
+		boolean hasSpellShock = AbilityManager.getManager().getPlayerAbility(mPlayer, Spellshock.class) != null;
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
@@ -76,7 +77,10 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				Mob mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
+					if (hasSpellShock) {
+						Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
+					}
+					Spellshock.addStaticToMob(mob, mPlayer);
 					if (!EntityUtils.isBoss(mob))
 						mob.addPotionEffect(
 						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));

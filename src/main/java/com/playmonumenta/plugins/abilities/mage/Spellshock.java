@@ -48,7 +48,7 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
 	private static final int SPELL_SHOCK_SPELL_DAMAGE = 4;
 	private static final int SPELL_SHOCK_SPEED_DURATION = 80;
-	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 2;
+	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 1;
 	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%

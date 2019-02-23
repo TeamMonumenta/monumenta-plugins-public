@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -87,34 +86,22 @@ public class DivineAura implements BaseEnchantment {
 		if (staticTicks >= 20 * 300) {
 			staticTicks = 0;
 
-			Player neo = Bukkit.getPlayer(neodymeowm);
-			if (neo != null) {
+			UUID uuid = player.getUniqueId();
+			if (uuid.equals(neodymeowm)) {
 				String m = neo_lines[rand.nextInt(6)];
-				neo.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-			}
-
-			Player corpe = Bukkit.getPlayer(corpe_);
-			if (corpe != null) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
+			} else if (uuid.equals(corpe_)) {
 				String m = corpe_lines[rand.nextInt(6)];
-				corpe.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-			}
-
-			Player spy = Bukkit.getPlayer(spy21dd);
-			if (spy != null) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
+			} else if (uuid.equals(spy21dd)) {
 				String m = spy_lines[rand.nextInt(6)];
-				spy.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-			}
-
-			Player red = Bukkit.getPlayer(redvam);
-			if (red != null) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
+			} else if (uuid.equals(redvam)) {
 				String m = red_lines[rand.nextInt(6)];
-				red.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-			}
-
-			Player f_in_the_chat_bois = Bukkit.getPlayer(fire);
-			if (f_in_the_chat_bois != null) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
+			} else if (uuid.equals(fire)) {
 				String m = fire_lines[rand.nextInt(6)];
-				f_in_the_chat_bois.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 			}
 		}
 		world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0);

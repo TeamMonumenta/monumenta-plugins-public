@@ -77,16 +77,14 @@ public class Dodging extends Ability {
 	@Override
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
-		Projectile proj = (Projectile) event.getEntity();
-		if (!(proj.getShooter() != null && (proj.getShooter() instanceof Player))) {
+		Projectile proj = (Projectile) event.getDamager();
+		if ((proj.getShooter() != null && proj.getShooter() instanceof Player)) {
 			return true;
 		}
-
 
 		if (!_dodge()) {
 			return true;
 		}
-
 		return false;
 	}
 
@@ -94,7 +92,7 @@ public class Dodging extends Ability {
 	@Override
 	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
-		if (!(event.getEntity().getShooter() instanceof Player)) {
+		if ((event.getEntity().getShooter() instanceof Player)) {
 			return true;
 		}
 		if (!_dodge()) {
@@ -149,7 +147,6 @@ public class Dodging extends Ability {
 		}
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
-
 		return true;
 	}
 }
