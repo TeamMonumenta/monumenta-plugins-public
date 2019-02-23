@@ -821,29 +821,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	/* TODO: Specialization needed?
-	// This serves as a workaround for damaging players since PVP has been toggled off. EntityDamgedByEntityEvent doesn't work for Player v Player
-	@EventHandler
-	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
-	    if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-	        Player player = event.getPlayer();
-	        double maxDist = 3;
-	        Player target = null;
-	        for (Player p : PlayerUtils.getNearbyPlayers(player.getLocation(), 3D)) {
-	            if (PlayerUtils.hasLineOfSight(player, p)) {
-	                if (p.getLocation().distance(player.getLocation()) < maxDist) {
-	                    maxDist = p.getLocation().distance(player.getLocation());
-	                    target = p;
-	                }
-	            }
-	        }
-	        if (target != null) {
-	            mPlugin.getSpecialization(player).PlayerDamagedByPlayerEvent(player, target);
-	        }
-	    }
-	}
-	*/
-
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
@@ -857,10 +834,10 @@ public class PlayerListener implements Listener {
 			 * If that task fires, trigger the extended sneak event and remove the metadata
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
-			() -> {
-				AbilityManager.getManager().PlayerExtendedSneakEvent(player);
-				player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
-			}, 40);
+				() -> {
+					AbilityManager.getManager().PlayerExtendedSneakEvent(player);
+					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+				}, 40);
 
 			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
 		} else {

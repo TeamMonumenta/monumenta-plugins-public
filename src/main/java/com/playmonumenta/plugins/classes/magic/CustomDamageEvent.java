@@ -12,66 +12,62 @@ public class CustomDamageEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	public boolean isCancelled;
-	public Entity damager;
-	public LivingEntity damaged;
-	public double damage;
-	public MagicType magicType;
+	public boolean mIsCancelled;
+	public Entity mDamager;
+	public LivingEntity mDamaged;
+	public double mDamage;
+	public MagicType mMagicType;
 
-	public Spells spell = null;
+	public Spells mSpell = null;
 
 	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType) {
-		this.isCancelled = false;
-		this.damager = damager;
-		this.damaged = damaged;
-		this.damage = damage;
-		this.magicType = magicType;
-	}
-
-	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage) {
-		this.isCancelled = false;
-		this.damager = damager;
-		this.damaged = damaged;
-		this.damage = damage;
-		this.magicType = MagicType.NONE;
+		mIsCancelled = false;
+		mDamager = damager;
+		mDamaged = damaged;
+		mDamage = damage;
+		if (magicType == null) {
+			mMagicType = MagicType.NONE;
+		} else {
+			mMagicType = magicType;
+		}
 	}
 
 	@Override
 	public boolean isCancelled() {
-		return isCancelled;
+		return mIsCancelled;
 	}
 
 	@Override
 	public void setCancelled(boolean arg0) {
-		this.isCancelled = arg0;
+		mIsCancelled = arg0;
 	}
 
 	public void setSpell(Spells spell) {
-		this.spell = spell;
+		mSpell = spell;
 	}
 
 	public Spells getSpell() {
-		return spell;
+		return mSpell;
 	}
 
 	public MagicType getMagicType() {
-		return magicType;
+		return mMagicType;
 	}
 
 	public Entity getDamager() {
-		return damager;
+		return mDamager;
 	}
 
 	public LivingEntity getDamaged() {
-		return damaged;
+		return mDamaged;
 	}
 
 	public double getDamage() {
-		return damage;
+		return mDamage;
 	}
 
 	public void setDamage(double damage) {
-		this.damage = damage;
+		mDamage = damage;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

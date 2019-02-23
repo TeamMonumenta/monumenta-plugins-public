@@ -377,42 +377,21 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
-
-		damage = damage * vulnerabilityMult(target);
-
-		CustomDamageEvent event = new CustomDamageEvent(damager, target, damage);
-		Bukkit.getPluginManager().callEvent(event);
-		if (damager != null) {
-			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
-			target.damage(event.getDamage(), damager);
-		} else {
-			target.damage(event.getDamage());
-		}
+		damageEntity(plugin, target, damage, damager, null);
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType) {
-
-		if (magicType == null) {
-			damageEntity(plugin, target, damage, damager);
-			return;
-		}
-
-		damage = damage * vulnerabilityMult(target);
-
-		CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
-		Bukkit.getPluginManager().callEvent(event);
-		if (damager != null) {
-			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
-			target.damage(event.getDamage(), damager);
-		} else {
-			target.damage(event.getDamage());
-		}
+		damageEntity(plugin, target, damage, damager, magicType, true);
 	}
 
-	public static void damageEntityNoEvent(Plugin plugin, LivingEntity target, double damage, Entity damager) {
-
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent) {
 		damage = damage * vulnerabilityMult(target);
 
+		if (callEvent) {
+			CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
+			Bukkit.getPluginManager().callEvent(event);
+			damage = event.getDamage();
+		}
 		if (damager != null) {
 			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
 			target.damage(damage, damager);

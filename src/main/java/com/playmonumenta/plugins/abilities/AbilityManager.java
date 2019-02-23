@@ -307,18 +307,13 @@ public class AbilityManager {
 
 		// Make sure non-warriors don't have passive knockback resistance or armor
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
+		player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
+		// TODO: Attack speed!
 
 		List<Ability> abilities = new ArrayList<Ability>();
-
-		if (mAbilities.containsKey(player.getUniqueId())) {
-			AbilityCollection coll = mAbilities.get(player.getUniqueId());
-			for (Ability abil : coll.getAbilities()) {
-				abil.mActive = false;
-			}
-		}
 
 		/* If player has the "disable_class" tag, no abilities are assigned to them */
 		for (String tag : player.getScoreboardTags()) {
@@ -609,7 +604,8 @@ public class AbilityManager {
 
 	//---------------------------------------------------------------------------------------------------------------
 
-	public AbilityCollection getPlayerAbilities(Player player) {
+	//Private methods
+	private AbilityCollection getPlayerAbilities(Player player) {
 		if (!mAbilities.containsKey(player.getUniqueId())) {
 			updatePlayerAbilities(player);
 		}

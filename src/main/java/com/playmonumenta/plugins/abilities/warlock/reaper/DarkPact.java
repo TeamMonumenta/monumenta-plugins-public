@@ -109,7 +109,7 @@ public class DarkPact extends Ability {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 1.5)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(loc.toVector()).normalize();
 					if (dir.dot(toMobVector) > 0.6) {
-						EntityUtils.damageEntityNoEvent(mPlugin, mob, event.getDamage() / 2, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false);
 					}
 				}
 			}

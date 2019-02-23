@@ -33,7 +33,6 @@ public abstract class Ability {
 	protected final AbilityInfo mInfo;
 	protected final Player mPlayer;
 	private Integer mScore = null;
-	public boolean mActive = true;
 
 	public Ability(Plugin plugin, World world, Random random, Player player) {
 		mPlugin = plugin;

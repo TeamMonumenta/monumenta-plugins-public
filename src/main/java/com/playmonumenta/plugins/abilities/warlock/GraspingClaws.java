@@ -52,7 +52,7 @@ public class GraspingClaws extends Ability {
 
 	@Override
 	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (shot != null && arrow.getUniqueId().equals(shot.getUniqueId())) {
+		if (shot != null && arrow == shot) {
 			shot = null;
 			Location loc = arrow.getLocation();
 			World world = arrow.getWorld();

@@ -41,8 +41,7 @@ public class ElementalSpiritAbility extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds,
-	                            boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
 		Player player = mPlayer;
 		if (oneSecond) {
 			int elementalSpirit = getAbilityScore();
@@ -65,10 +64,9 @@ public class ElementalSpiritAbility extends Ability {
 								mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
 								mWorld.spawnParticle(Particle.SNOWBALL, loc, 1, 0, 0, 0, 0);
 
-								if (AbilityManager.getManager().getPlayerAbility(mPlayer,
-								                                                 ElementalSpiritAbility.class) == null || !mPlayer.isOnline() || mPlayer == null
-								    || spirit == null || mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(),
-								            Spells.ELEMENTAL_SPIRIT) || !mActive) {
+								if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritAbility.class) == null ||
+									!mPlayer.isOnline() || mPlayer == null || spirit == null ||
+									mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ELEMENTAL_SPIRIT)) {
 									this.cancel();
 									spirit = null;
 								}

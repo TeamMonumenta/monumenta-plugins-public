@@ -74,14 +74,12 @@ public class WitheringGaze extends Ability {
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
 							if (EntityUtils.isBoss(le)) {
-								le.removePotionEffect(PotionEffectType.SLOW);
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
 								if (!EntityUtils.isFrozen(le)) {
 									EntityUtils.applyFreeze(mPlugin, duration, le);
 								}
 							}
-							le.removePotionEffect(PotionEffectType.WITHER);
 							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
 						}
 					}

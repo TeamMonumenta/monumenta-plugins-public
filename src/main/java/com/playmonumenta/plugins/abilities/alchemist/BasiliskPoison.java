@@ -32,6 +32,7 @@ public class BasiliskPoison extends Ability {
 		return true;
 	}
 
+	/* This is used by other abilities to apply this player's basilisk poison to a mob if needed */
 	public void apply(LivingEntity entity) {
 		int basiliskPoison = getAbilityScore();
 		int effectLvl = basiliskPoison == 1 ? BASILISK_POISON_1_EFFECT_LVL : BASILISK_POISON_2_EFFECT_LVL;

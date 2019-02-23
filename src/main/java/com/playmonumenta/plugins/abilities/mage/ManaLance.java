@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -56,7 +57,6 @@ public class ManaLance extends Ability {
 		Vector dir = loc.getDirection();
 		box.shift(dir);
 		List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10);
-		List<Mob> toRemove = new ArrayList<Mob>();
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
 
 		for (int i = 0; i < 8; i++) {
@@ -72,17 +72,17 @@ public class ManaLance extends Ability {
 				mWorld.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				break;
 			}
-			for (Mob mob : mobs) {
+			Iterator<Mob> iter = mobs.iterator();
+			while (iter.hasNext()) {
+				Mob mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
 					Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 					if (!EntityUtils.isBoss(mob))
 						mob.addPotionEffect(
 						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
-					toRemove.add(mob);
+					iter.remove();
 				}
 			}
-			mobs.removeAll(toRemove);
-			toRemove.clear();
 		}
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MANA_LANCE);
 		putOnCooldown();

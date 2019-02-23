@@ -65,17 +65,16 @@ public class UnstableArrows extends Ability {
 						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.9f, 1.0f);
 
 						mWorld.spawnParticle(Particle.EXPLOSION_HUGE, explodeLoc, 3, 0.02, 0.02, 0.02, 0.001);
-						BasiliskPoison bp = null;
-						if (AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class) != null) {
-							bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
-						}
+						BasiliskPoison bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
 						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(explodeLoc, UNSTABLE_ARROWS_RADIUS)) {
 							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer);
 							MovementUtils.KnockAway(explodeLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED);
-							bp.apply(mob);
+							if (bp != null) {
+								bp.apply(mob);
+							}
 						}
 						this.cancel();
 					}

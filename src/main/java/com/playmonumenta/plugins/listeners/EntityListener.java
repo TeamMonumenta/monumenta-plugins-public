@@ -167,8 +167,6 @@ public class EntityListener implements Listener {
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 
-
-
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 				event.setCancelled(true);

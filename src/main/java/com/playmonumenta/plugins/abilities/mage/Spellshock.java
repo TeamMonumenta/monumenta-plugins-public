@@ -89,7 +89,7 @@ public class Spellshock extends Ability {
 							world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 							for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
 								if (spellShock > 1) {
-									spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator, null, false);
+									spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator, null);
 								} else {
 									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator);
 								}
@@ -115,12 +115,16 @@ public class Spellshock extends Ability {
 		}
 	}
 
+
+	public static void addStaticToMob(LivingEntity mob, Player player) {
+		mSpellShockedMobs.put(mob.getUniqueId(),
+		                      new SpellShockedMob(mob, SPELL_SHOCK_DURATION, player));
+	}
+
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
-			LivingEntity damagee = (LivingEntity)event.getEntity();
-			mSpellShockedMobs.put(damagee.getUniqueId(),
-			                      new SpellShockedMob(damagee, SPELL_SHOCK_DURATION, mPlayer));
+			addStaticToMob((LivingEntity)event.getEntity(), mPlayer);
 		}
 		return true;
 	}
@@ -131,10 +135,6 @@ public class Spellshock extends Ability {
 	}
 
 	public static void spellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type) {
-		spellDamageMob(plugin, mob, dmg, player, type, true);
-	}
-
-	public static void spellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type, boolean arcaneApply) {
 		SpellShockedMob shocked = mSpellShockedMobs.get(mob.getUniqueId());
 		if (shocked != null) {
 			// Hit a shocked mob with a real spell - extra damage
@@ -161,7 +161,7 @@ public class Spellshock extends Ability {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
 					if (spellShock > 1) {
-						spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type, false);
+						spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
 					} else {
 						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
 					}
@@ -179,11 +179,6 @@ public class Spellshock extends Ability {
 			}
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
-		} else {
-			if (type == MagicType.ARCANE && arcaneApply) {
-				mSpellShockedMobs.put(mob.getUniqueId(),
-				                      new SpellShockedMob(mob, SPELL_SHOCK_DURATION, player));
-			}
 		}
 
 		// Apply damage to the hit mob all in one shot

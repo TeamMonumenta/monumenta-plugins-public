@@ -59,7 +59,8 @@ public class ThuribleProcession extends Ability {
 		if (!player.hasMetadata(PLAYER_THURIBLE_METAKEY)) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 			player.setMetadata(PLAYER_THURIBLE_METAKEY, new FixedMetadataValue(mPlugin, 0));
-			player.setWalkSpeed(player.getWalkSpeed() + walkSpeed);
+			//TODO Attributes
+			//player.setWalkSpeed(player.getWalkSpeed() + walkSpeed);
 			new BukkitRunnable() {
 				int t = 0;
 				int seconds = 0;
@@ -127,20 +128,23 @@ public class ThuribleProcession extends Ability {
 						}
 						this.cancel();
 						player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
-						player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+						//TODO Attributes
+						//player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
 						putOnCooldown();
 					}
 					if (t >= 1) {
 						if (player.isDead()) {
 							this.cancel();
 							player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
-							player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+							//TODO Attributes
+							//player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
 							putOnCooldown();
 						}
 						if ((!player.isHandRaised() && !player.isBlocking())) {
 							this.cancel();
 							player.removeMetadata(PLAYER_THURIBLE_METAKEY, mPlugin);
-							player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
+							//TODO Attributes
+							//player.setWalkSpeed(player.getWalkSpeed() - walkSpeed);
 							putOnCooldown();
 						}
 					}
@@ -155,8 +159,8 @@ public class ThuribleProcession extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return ((mHand.getType() == Material.SHIELD && oHand.getType() != Material.BOW) ||
-		        (oHand.getType() == Material.SHIELD && mHand.getType() != Material.BOW))
+		return ((mHand != null && mHand.getType() == Material.SHIELD && oHand.getType() != Material.BOW) ||
+		        (oHand != null && oHand.getType() == Material.SHIELD && mHand.getType() != Material.BOW))
 		       && !mPlayer.isSneaking();
 	}
 

@@ -25,8 +25,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class HandOfLight extends Ability {
 
 	private static final int HEALING_RADIUS = 12;
-	private static final int HEALING_1_HEAL = 10;
-	private static final int HEALING_2_HEAL = 16;
 	private static final double HEALING_DOT_ANGLE = 0.33;
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
@@ -73,14 +71,15 @@ public class HandOfLight extends Ability {
 	@Override
 	public boolean runCheck() {
 		// Must be sneaking
-		if (!mPlayer.isSneaking() && (mPlayer.isOnGround() || mPlayer.getVelocity().getY() < 0)) {
+		if (!mPlayer.isSneaking()) {
 			return false;
 		}
 
 		// Must be holding a shield
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) {
+		if (offHand == null || offHand.getType() != Material.SHIELD
+		    && (mainHand == null || mainHand.getType() != Material.SHIELD)) {
 			return false;
 		}
 

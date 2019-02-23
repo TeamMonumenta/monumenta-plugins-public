@@ -45,10 +45,10 @@ public class ShieldWall extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
-	private boolean primed = false;
+	private boolean mPrimed = false;
 	@Override
 	public boolean cast() {
-		if (primed) {
+		if (mPrimed) {
 			return false;
 		}
 
@@ -66,13 +66,13 @@ public class ShieldWall extends Ability {
 				t++;
 
 				if (!mPlayer.isHandRaised() && !mPlayer.isBlocking() && !active) {
-					primed = true;
+					mPrimed = true;
 				}
 
-				if (primed && !active) {
+				if (mPrimed && !active) {
 					if (mPlayer.isHandRaised() || mPlayer.isBlocking()) {
 						active = true;
-						primed = false;
+						mPrimed = false;
 						t = 0;
 						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
@@ -125,7 +125,7 @@ public class ShieldWall extends Ability {
 
 				if (t > 5 && !active) {
 					this.cancel();
-					primed = false;
+					mPrimed = false;
 				}
 			}
 

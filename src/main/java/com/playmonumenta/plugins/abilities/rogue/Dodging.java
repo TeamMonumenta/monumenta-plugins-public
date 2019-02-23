@@ -78,7 +78,7 @@ public class Dodging extends Ability {
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		Projectile proj = (Projectile) event.getEntity();
-		if (!(proj.getShooter() instanceof Player)) {
+		if (!(proj.getShooter() != null && (proj.getShooter() instanceof Player))) {
 			return true;
 		}
 

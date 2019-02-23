@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -44,6 +45,8 @@ public class ArcaneStrike extends Ability {
 		LivingEntity damagee = (LivingEntity) event.getEntity();
 		int extraDamage = arcaneStrike == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 
+		boolean hasSpellShock = AbilityManager.getManager().getPlayerAbility(mPlayer, Spellshock.class) != null;
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS)) {
 			int dmg = extraDamage;
 
@@ -57,10 +60,11 @@ public class ArcaneStrike extends Ability {
 				dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
 			}
 
-			if (!damagee.getUniqueId().equals(mob.getUniqueId())) {
-				Spellshock.spellDamageMob(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
-			} else {
-				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+			EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+
+			// Don't apply spellshock to the mob you hit - that will be done directly via spellshock
+			if (damagee != mob && hasSpellShock) {
+				Spellshock.addStaticToMob(mob, mPlayer);
 			}
 		}
 

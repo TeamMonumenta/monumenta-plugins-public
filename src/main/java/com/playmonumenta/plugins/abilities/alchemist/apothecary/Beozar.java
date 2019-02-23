@@ -28,7 +28,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Beozar extends Ability {
 
-
 	public Beozar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Beozar";
