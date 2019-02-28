@@ -43,6 +43,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -769,6 +770,18 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
+
+	/*
+	 * Prevent players from passing through 1-thick barriers using beds
+	 */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PlayerBedLeaveEvent(PlayerBedLeaveEvent event) {
+		Player player = event.getPlayer();
+		Block bed = event.getBed();
+		Location loc = bed.getLocation();
+		player.teleport(loc.add(0.5, 1, 0.5));
+	}
+
 
 	public static Set<Material> POTION_TYPES = EnumSet.of(Material.POTION, Material.SPLASH_POTION,
 	                                                      Material.LINGERING_POTION);
