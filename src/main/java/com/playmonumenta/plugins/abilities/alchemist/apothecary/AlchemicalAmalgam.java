@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -76,7 +76,7 @@ public class AlchemicalAmalgam extends Ability {
 					                                                  0, true, true));
 				}
 
-				for (Mob mob : EntityUtils.getNearbyMobs(loc, 5)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, amp - 1));
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
 				}

@@ -41,7 +41,7 @@ public class ElementalArrows extends Ability {
 					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 					Spellshock.spellDamageMob(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 0, mPlayer, MagicType.FIRE);
 				} else if (elementalArrows == 2) {
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, mPlayer)) {
 						if (mob != damagee) {
 							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
 							Spellshock.spellDamageMob(mPlugin, mob, 0, mPlayer, MagicType.FIRE);
@@ -53,7 +53,7 @@ public class ElementalArrows extends Ability {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
 					Spellshock.spellDamageMob(mPlugin, damagee, 0, mPlayer, MagicType.ICE);
 				} else if (elementalArrows == 2) {
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, mPlayer)) {
 						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
 						Spellshock.spellDamageMob(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 0, mPlayer, MagicType.ICE);
 					}

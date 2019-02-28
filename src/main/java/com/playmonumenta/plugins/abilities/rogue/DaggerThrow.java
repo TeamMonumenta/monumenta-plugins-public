@@ -68,7 +68,7 @@ public class DaggerThrow extends Ability {
 					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1, mPlayer)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
 

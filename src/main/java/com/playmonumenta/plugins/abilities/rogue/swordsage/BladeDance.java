@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -44,7 +45,7 @@ public class BladeDance extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
-		mInfo.cooldown = 20 * 40;
+		mInfo.cooldown = 20 * 5;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*
@@ -70,7 +71,7 @@ public class BladeDance extends Ability {
 				mPlayer.setInvulnerable(true);
 				mActive = true;
 				int bladeDance = getAbilityScore();
-				double damage = bladeDance == 1 ? 18 : 25;
+				double damage = bladeDance == 1 ? 9 : 12;
 				if (bladeDance >= 2) {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED,
 					                                 20 * 2, 1, true, false));
@@ -78,9 +79,18 @@ public class BladeDance extends Ability {
 				new BukkitRunnable() {
 					int i = 0;
 					float pitch = 0;
+					Location loc = mPlayer.getLocation();
+					double y = loc.getY();
+					double extraDamage = 0;
 					@Override
 					public void run() {
 						i += 2;
+						Location checkLoc = mPlayer.getLocation();
+						checkLoc.setY(y);
+						extraDamage += checkLoc.distance(loc);
+						loc = mPlayer.getLocation();
+						loc.setY(y);
+						mPlayer.sendMessage(ChatColor.GREEN + "Damage: " + ChatColor.AQUA + (int) (extraDamage + damage));
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
 						pitch += 0.2;
@@ -158,8 +168,8 @@ public class BladeDance extends Ability {
 							mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 150, 0, 0, 0, 0.25);
 							mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 70, 0, 0, 0, 0.25);
 							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
-							for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 4)) {
-								EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+							for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 4, mPlayer)) {
+								EntityUtils.damageEntity(mPlugin, le, damage + extraDamage, mPlayer);
 							}
 						}
 					}

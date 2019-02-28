@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
@@ -39,7 +39,7 @@ public class PurpleHaze extends Ability {
 		int purpleHaze = getAbilityScore();
 		int damage = purpleHaze == 1 ? PURPLE_HAZE_1_DAMAGE : PURPLE_HAZE_2_DAMAGE;
 		int duration = purpleHaze == 1 ? PURPLE_HAZE_1_WEAKNESS_DURATION : PURPLE_HAZE_2_WEAKNESS_DURATION;
-		for (Mob mob : EntityUtils.getNearbyMobs(event.getEntity().getLocation(), PURPLE_HAZE_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(event.getEntity().getLocation(), PURPLE_HAZE_RADIUS)) {
 			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, 0, true, false));
 		}

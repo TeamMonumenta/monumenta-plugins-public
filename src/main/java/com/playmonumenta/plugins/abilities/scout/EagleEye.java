@@ -41,7 +41,7 @@ public class EagleEye extends Ability {
 		int eagleEye = getAbilityScore();
 		World world = player.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS, mPlayer)) {
 			// Don't apply vulnerability to arena mobs
 			if (mob.getScoreboardTags().contains("arena_mob")) {
 				continue;

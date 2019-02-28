@@ -48,7 +48,7 @@ public class BruteForce extends Ability {
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.135);
 
 			// Damage those non-hit nearby entities and knock them away
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), BRUTE_FORCE_RADIUS, mPlayer)) {
 				if (mob != damagee) {
 					EntityUtils.damageEntity(mPlugin, mob, bruteForceDamage, mPlayer);
 					if (!EntityUtils.isBoss(mob)) {

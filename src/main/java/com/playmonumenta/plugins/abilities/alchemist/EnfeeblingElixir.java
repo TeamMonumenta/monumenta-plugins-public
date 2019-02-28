@@ -44,7 +44,7 @@ public class EnfeeblingElixir extends Ability {
 				float kbSpeed = (enfeeblingElixir == 1) ? ENFEEBLING_KNOCKBACK_1_SPEED : ENFEEBLING_KNOCKBACK_2_SPEED;
 				int weaknessLevel = enfeeblingElixir;
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
 					MovementUtils.KnockAway(damagee, mob, kbSpeed);
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
 				}

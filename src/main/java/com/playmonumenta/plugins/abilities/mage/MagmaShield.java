@@ -43,7 +43,7 @@ public class MagmaShield extends Ability {
 	public boolean cast() {
 		int magmaShield = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0)
 			                     .normalize();
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {

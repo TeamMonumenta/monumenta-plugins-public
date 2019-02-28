@@ -10,7 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -116,7 +116,7 @@ public class Bodyguard extends Ability {
 						}
 
 					}.runTaskLater(mPlugin, 20 * 8);
-					for (Mob mob : EntityUtils.getNearbyMobs(player.getLocation(), 4)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 4)) {
 						MovementUtils.KnockAway(player, mob, 0.45f);
 						if (bodyguard > 1) {
 							EntityUtils.applyStun(mPlugin, 20 * 3, mob);

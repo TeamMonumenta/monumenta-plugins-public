@@ -45,7 +45,7 @@ public class Smokescreen extends Ability {
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SMOKESCREEN_RANGE)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SMOKESCREEN_RANGE, mPlayer)) {
 			int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
 			                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
 			int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :

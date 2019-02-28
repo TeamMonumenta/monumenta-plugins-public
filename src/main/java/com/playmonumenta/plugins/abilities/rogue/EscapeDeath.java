@@ -48,7 +48,7 @@ public class EscapeDeath extends Ability {
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		int escapeDeath = getAbilityScore();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ESCAPE_DEATH_RANGE)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ESCAPE_DEATH_RANGE, mPlayer)) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
 			                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,

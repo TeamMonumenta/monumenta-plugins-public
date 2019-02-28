@@ -75,6 +75,8 @@ public class EntityUtils {
 		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
 			LivingEntity target = ((Mob)entity).getTarget();
 			return target != null && target instanceof Player;  //  If a player is the target
+		} else if (entity instanceof Player) {
+			return entity.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG);
 		}
 
 		return false;
@@ -353,16 +355,23 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static List<Mob> getNearbyMobs(Location loc, double radius) {
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter) {
+		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
+		list.remove(getter);
+		return list;
+	}
+
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius) {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
-	public static List<Mob> getNearbyMobs(Location loc, double rx, double ry, double rz) {
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
 		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
-		entities.removeIf(e -> !(e instanceof Mob && isHostileMob(e)));
-		List<Mob> mobs = new ArrayList<Mob>(entities.size());
+
+		entities.removeIf(e -> !(e instanceof LivingEntity && (isHostileMob(e) || e.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG))));
+		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
-			mobs.add((Mob)entity);
+			mobs.add((LivingEntity)entity);
 		}
 
 		return mobs;

@@ -33,17 +33,19 @@ public class CoupDeGrace extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
-		int coupDeGrace = getAbilityScore();
-		double threshhold = coupDeGrace == 1 ? 0.25 : 0.3;
-		if (le.getHealth() < le.getMaxHealth() * threshhold) {
-			//Setting health does not count for a kill. Deal damage beyond god-level tiers
-			EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer);
-			mWorld.spawnParticle(Particle.CRIT, le.getLocation().add(0, le.getHeight() / 2, 0), 35, 0, 0, 0, 1);
-			if (coupDeGrace > 1) {
-				mWorld.spawnParticle(Particle.CRIT_MAGIC, le.getLocation().add(0, le.getHeight() / 2, 0), 25, 0, 0, 0, 1);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8)) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 8, 0));
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 0));
+		if (!EntityUtils.isBoss(le)) {
+			int coupDeGrace = getAbilityScore();
+			double threshhold = coupDeGrace == 1 ? 0.25 : 0.3;
+			if (le.getHealth() < le.getMaxHealth() * threshhold) {
+				//Setting health does not count for a kill. Deal damage beyond god-level tiers
+				EntityUtils.damageEntity(mPlugin, le, 9001, mPlayer);
+				mWorld.spawnParticle(Particle.CRIT, le.getLocation().add(0, le.getHeight() / 2, 0), 35, 0, 0, 0, 1);
+				if (coupDeGrace > 1) {
+					mWorld.spawnParticle(Particle.CRIT_MAGIC, le.getLocation().add(0, le.getHeight() / 2, 0), 25, 0, 0, 0, 1);
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8, mPlayer)) {
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 8, 0, false, true));
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 0, false, true));
+					}
 				}
 			}
 		}

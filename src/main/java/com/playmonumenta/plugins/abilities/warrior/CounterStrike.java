@@ -34,7 +34,7 @@ public class CounterStrike extends Ability {
 
 			double csDamage = counterStrike == 1 ? 12D : 24D;
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
 				EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
 			}
 		}

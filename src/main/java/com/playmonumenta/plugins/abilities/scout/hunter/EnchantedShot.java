@@ -9,7 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -81,7 +81,7 @@ public class EnchantedShot extends Ability {
 			player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
 
-			List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30);
 			double extraDamage = 0;
 			if (AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class) != null) {
 				Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
@@ -92,9 +92,9 @@ public class EnchantedShot extends Ability {
 				Location bLoc = box.getCenter().toLocation(mWorld);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, bLoc, 5, 0.35, 0.35, 0.35, 0);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 2, 0.1, 0.1, 0.1, 0.1);
-				Iterator<Mob> iterator = mobs.iterator();
+				Iterator<LivingEntity> iterator = mobs.iterator();
 				while (iterator.hasNext()) {
-					Mob mob = iterator.next();
+					LivingEntity mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
 						EntityUtils.damageEntity(mPlugin, mob, damage + extraDamage, mPlayer);
 						/* Prevent mob from being hit twice in one shot */

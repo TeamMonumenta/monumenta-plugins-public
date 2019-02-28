@@ -36,7 +36,7 @@ public class ViciousCombos extends Ability {
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		LivingEntity killedEntity = (LivingEntity) event.getEntity();
+		LivingEntity killedEntity = event.getEntity();
 		int viciousCombos = getAbilityScore();
 
 		//Run the task 1 tick later to let everything go on cooldown (ex. BMB)
@@ -52,7 +52,7 @@ public class ViciousCombos extends Ability {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
 					if (viciousCombos > 1) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), VICIOUS_COMBOS_RANGE)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), VICIOUS_COMBOS_RANGE, mPlayer)) {
 							AbilityUtils.rogueDamageMob(mPlugin, mPlayer, mob, VICIOUS_COMBOS_DAMAGE);
 						}
 					}

@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ByMyBlade extends Ability {
@@ -51,6 +52,8 @@ public class ByMyBlade extends Ability {
 
 
 			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
+			if (damagee instanceof Player)
+				extraDamage = BY_MY_BLADE_DAMAGE_1;
 			AbilityUtils.rogueDamageMob(mPlugin, mPlayer, damagee, extraDamage);
 
 			Location loc = damagee.getLocation();
@@ -59,6 +62,8 @@ public class ByMyBlade extends Ability {
 			if (byMyBlade > 1) {
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
+				if (damagee instanceof Player)
+					MovementUtils.KnockAway(mPlayer, damagee, 0.25f);
 			}
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 			mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);

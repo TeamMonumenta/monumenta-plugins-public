@@ -213,78 +213,81 @@ public class EntityListener implements Listener {
 			if (event.isCancelled()) {
 				return;
 			}
-
-			if (damager instanceof Player) {
-				Player player = (Player)damager;
-
-				//  Make sure to not trigger class abilities off Throrns.
-
-				/* Don't let the player interact with the world when transferring */
-				if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+		}
+		if (damager instanceof Player) {
+			Player player = (Player)damager;
+			if (damagee instanceof Player) {
+				if (!damagee.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG) || !damager.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG)) {
 					event.setCancelled(true);
 					return;
 				}
+			}
+			//  Make sure to not trigger class abilities off Throrns.
 
-				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
+			/* Don't let the player interact with the world when transferring */
+			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+				event.setCancelled(true);
+				return;
+			}
 
-				if (event.getCause() != DamageCause.THORNS) {
-					if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-						if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
-							// This damage was just added by the player's class - don't process class effects again
-							return;
-						}
+			mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 
-						// Apply any damage modifications that items they have may apply.
-						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
-
-						AbilityManager.getManager().modifyDamage(player, event);
-
-						if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
-							event.setCancelled(true);
-						}
-
-						/* TODO: Move this into a static method in the appropriate spec file */
-						if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-							if (player.hasMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY)) {
-								int enchantedPrayer = player.getMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY).get(0).asInt();
-								player.removeMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY, mPlugin);
-								damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
-								damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
-								mWorld.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
-								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-								double damage = enchantedPrayer == 1 ? 5 : 10;
-								double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
-								for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-									EntityUtils.damageEntity(mPlugin, le, damage, damager);
-								}
-								PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
-							}
-						}
+			if (event.getCause() != DamageCause.THORNS) {
+				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
+						// This damage was just added by the player's class - don't process class effects again
+						return;
 					}
-				}
-			} else if (damager instanceof Arrow) {
-				Arrow arrow = (Arrow)damager;
-				if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					Player player = (Player)arrow.getShooter();
-					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
-						damager.remove();
+
+					// Apply any damage modifications that items they have may apply.
+					mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
+
+					AbilityManager.getManager().modifyDamage(player, event);
+
+					if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
 						event.setCancelled(true);
 					}
+					/* TODO: Move this into a static method in the appropriate spec file */
+					if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+						if (player.hasMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY)) {
+							int enchantedPrayer = player.getMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY).get(0).asInt();
+							player.removeMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY, mPlugin);
+							damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
+							damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
+							mWorld.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
+							mWorld.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
+							double damage = enchantedPrayer == 1 ? 5 : 10;
+							double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
+							for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
+								EntityUtils.damageEntity(mPlugin, le, damage, damager);
+							}
+							PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
+						}
+					}
 				}
 			}
-
-			if (damager instanceof Projectile && damagee instanceof LivingEntity) {
-				Sniper.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-				PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-				Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-				Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+		} else if (damager instanceof Arrow) {
+			Arrow arrow = (Arrow)damager;
+			if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+				Player player = (Player)arrow.getShooter();
+				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
+				if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+					damager.remove();
+					event.setCancelled(true);
+				}
 			}
+		}
 
-			if (damagee instanceof LivingEntity) {
-				LivingEntity mob = (LivingEntity) damagee;
-				event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
-			}
+		if (damager instanceof Projectile && damagee instanceof LivingEntity) {
+			Sniper.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+		}
+
+		if (damagee instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) damagee;
+			event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
 		}
 	}
 

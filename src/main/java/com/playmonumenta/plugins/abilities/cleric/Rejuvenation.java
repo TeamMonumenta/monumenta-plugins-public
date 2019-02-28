@@ -6,6 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -29,7 +30,7 @@ public class Rejuvenation extends Ability {
 				int rejuvenation = getAbilityScore();
 				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, REJUVENATION_RADIUS, true)) {
 					// Don't buff players that have their class disabled
-					if (p.getScoreboardTags().contains("disable_class")) {
+					if (p.getScoreboardTags().contains("disable_class") || p.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG)) {
 						continue;
 					}
 

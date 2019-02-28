@@ -10,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -87,7 +86,7 @@ public class HungeringVortex extends Ability {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		List<Mob> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
 		for (LivingEntity mob : mobs) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
 			MovementUtils.PullTowards(mPlayer, mob, velocity);

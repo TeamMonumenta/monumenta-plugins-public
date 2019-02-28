@@ -64,7 +64,7 @@ public class PrismaticShield extends Ability {
 		int duration = prismatic == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 		float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
 			Spellshock.spellDamageMob(mPlugin, mob, prisDamage, mPlayer, MagicType.ARCANE);
 			MovementUtils.KnockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}

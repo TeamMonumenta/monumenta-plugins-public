@@ -81,7 +81,7 @@ public class AdvancingShadows extends Ability {
 
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE)) {
+				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 					if (mob != entity) {
 						MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 					}
@@ -113,12 +113,13 @@ public class AdvancingShadows extends Ability {
 				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
 				ray.throughBlocks = false;
 				ray.throughNonOccluding = false;
+				ray.targetPlayers = true;
 				RaycastData data = ray.shootRaycast();
 
 				List<LivingEntity> rayEntities = data.getEntities();
 				if (rayEntities != null && !rayEntities.isEmpty()) {
 					target = rayEntities.get(0);
-					if (target != null && !target.isDead() && EntityUtils.isHostileMob(target)) {
+					if (!target.getUniqueId().equals(mPlayer.getUniqueId()) && target != null && !target.isDead() && EntityUtils.isHostileMob(target)) {
 						return true;
 					}
 				}

@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -35,7 +35,7 @@ public class EerieEminence extends Ability {
 	public void PotionApplyEvent(PotionEffectApplyEvent event) {
 		double radius = getAbilityScore() == 1 ? 6 : 8;
 		int amp = event.getEffect().getType() == PotionEffectType.UNLUCK ? 1 : 0;
-		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
 			mob.addPotionEffect(new PotionEffect(event.getEffect().getType(), 20 * 4, amp));
 		}
 		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, false)) {

@@ -50,6 +50,19 @@ public class DeadlyRonde extends Ability {
 		/* Re-up the duration every time an ability is cast */
 		if (activeRunnable != null) {
 			activeRunnable.cancel();
+		} else {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 2f);
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, RONDE_COLOR);
+					if (activeRunnable == null) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde activated!");
 		}
 
 		activeRunnable = new BukkitRunnable() {
@@ -59,18 +72,6 @@ public class DeadlyRonde extends Ability {
 			}
 		};
 		activeRunnable.runTaskLater(mPlugin, 20 * 5);
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 2f);
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, RONDE_COLOR);
-				if (activeRunnable == null) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(mPlugin, 0, 1);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde activated!");
 		return true;
 	}
 
@@ -82,7 +83,8 @@ public class DeadlyRonde extends Ability {
 				Entity ent = event.getEntity();
 				double damage = getAbilityScore() == 1 ? 4 : 6;
 				if (event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
-					event.setDamage(event.getDamage() + (damage / 2));
+					double toAdd = getAbilityScore() == 1 ? (damage / 2) : damage;
+					event.setDamage(event.getDamage() + toAdd);
 					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 10, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
 				} else {
 					event.setDamage(event.getDamage() + damage);

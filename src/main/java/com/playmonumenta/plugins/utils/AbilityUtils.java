@@ -22,13 +22,14 @@ public class AbilityUtils {
 	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
 
 	public static void rogueDamageMob(Plugin mPlugin, Player player, LivingEntity damagee, double damage) {
-		double correctDamage = damage;
-		if (EntityUtils.isElite(damagee)) {
-			correctDamage = damage * PASSIVE_DAMAGE_ELITE_MODIFIER;
-		} else if (EntityUtils.isBoss(damagee)) {
-			correctDamage = damage * PASSIVE_DAMAGE_BOSS_MODIFIER;
-		}
-		EntityUtils.damageEntity(mPlugin, damagee, correctDamage, player);
+		//The RoguePassive class handles spell damage for us.
+//		double correctDamage = damage;
+//		if (EntityUtils.isElite(damagee)) {
+//			correctDamage = damage * PASSIVE_DAMAGE_ELITE_MODIFIER;
+//		} else if (EntityUtils.isBoss(damagee)) {
+//			correctDamage = damage * PASSIVE_DAMAGE_BOSS_MODIFIER;
+//		}
+		EntityUtils.damageEntity(mPlugin, damagee, damage, player);
 	}
 
 	private static final int BOW_MASTER_1_DAMAGE = 3;

@@ -12,7 +12,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -48,7 +47,7 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
 	private static final int SPELL_SHOCK_SPELL_DAMAGE = 4;
 	private static final int SPELL_SHOCK_SPEED_DURATION = 80;
-	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 1;
+	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
 	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
 	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
 	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
@@ -140,7 +139,7 @@ public class Spellshock extends Ability {
 			// Hit a shocked mob with a real spell - extra damage
 
 			int spellShock = ScoreboardUtils.getScoreboardValue(player, SPELL_SHOCK_SCOREBOARD);
-			if (spellShock > 1) {
+			if (spellShock > 1 && (!mob.isDead() || mob.getHealth() > 0)) {
 				plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
 				                                new PotionEffect(PotionEffectType.SPEED,
 				                                                 SPELL_SHOCK_SPEED_DURATION,
@@ -157,7 +156,7 @@ public class Spellshock extends Ability {
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.5f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 1.5f);
-			for (Mob nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS)) {
+			for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS, player)) {
 				// Only damage hostile mobs and specifically not the mob originally hit
 				if (nearbyMob != mob) {
 					if (spellShock > 1) {
@@ -166,7 +165,7 @@ public class Spellshock extends Ability {
 						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
 					}
 
-					((LivingEntity)nearbyMob).addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+					nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}

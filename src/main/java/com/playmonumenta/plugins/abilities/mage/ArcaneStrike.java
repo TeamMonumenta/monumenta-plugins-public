@@ -47,7 +47,7 @@ public class ArcaneStrike extends Ability {
 
 		boolean hasSpellShock = AbilityManager.getManager().getPlayerAbility(mPlayer, Spellshock.class) != null;
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS, mPlayer)) {
 			int dmg = extraDamage;
 
 			// Arcane strike extra fire damage

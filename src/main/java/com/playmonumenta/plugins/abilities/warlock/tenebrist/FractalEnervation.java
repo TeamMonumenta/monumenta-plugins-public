@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -44,7 +44,7 @@ public class FractalEnervation extends Ability {
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 16 : 20 * 13;
 	}
 
-	private List<Mob> hit = new ArrayList<Mob>();
+	private List<LivingEntity> hit = new ArrayList<LivingEntity>();
 
 	@Override
 	public boolean cast() {
@@ -52,7 +52,7 @@ public class FractalEnervation extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.7, 0.7, 0.7);
 		Vector dir = mPlayer.getEyeLocation().getDirection();
-		List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 9);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 9);
 		int level = getAbilityScore() == 1 ? 1 : 3;
 		int range = 9;
 		boolean cancel = false;
@@ -65,7 +65,7 @@ public class FractalEnervation extends Ability {
 			                     0.15, 0.075);
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1,
 			                     0.1);
-			for (Mob mob : mobs) {
+			for (LivingEntity mob : mobs) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (!hit.contains(mob)) {
 						hit.add(mob);
@@ -79,9 +79,9 @@ public class FractalEnervation extends Ability {
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 40, 0.25, 0.45, 0.25, 0.15);
 						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 20, 0.25, 0.45, 0.25, 0);
 						i = 0;
-						Mob nextMob = null;
+						LivingEntity nextMob = null;
 						double dist = 100;
-						for (Mob next : EntityUtils.getNearbyMobs(mob.getLocation(), 4)) {
+						for (LivingEntity next : EntityUtils.getNearbyMobs(mob.getLocation(), 4)) {
 							if (next.getLocation().distance(loc) < dist && !next.getUniqueId().equals(mob.getUniqueId())
 							    && !hit.contains(next)) {
 								nextMob = next;

@@ -55,7 +55,7 @@ public class AmplifyingHex extends Ability {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 1.6f);
 
 		Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), AMPLIFYING_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), AMPLIFYING_RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
 				int debuffCount = (int)DEBUFFS.stream()

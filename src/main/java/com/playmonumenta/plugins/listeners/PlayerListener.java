@@ -453,11 +453,40 @@ public class PlayerListener implements Listener {
 
 
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
-
+		player.setInvulnerable(false);
 		if (player.getHealth() > 0) {
 			return;
 		}
+		if (player.getKiller() != null) {
+			event.setReviveHealth(player.getMaxHealth());
+			event.setCancelled(true);
+			player.setGameMode(GameMode.SPECTATOR);
+			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
+			ItemStack[] inv = player.getInventory().getContents();
+			ItemStack[] armor = player.getInventory().getArmorContents();
+			player.getInventory().clear();
+			new BukkitRunnable() {
+				Location loc = player.getLocation();
+				@Override
+				public void run() {
+					player.teleport(loc);
+					for (ItemStack item : inv) {
+						if (item != null && item.getType().getMaxDurability() > 0)
+							item.setDurability((short) 0);
+					}
+					for (ItemStack item : armor) {
+						if (item != null && item.getType().getMaxDurability() > 0)
+							item.setDurability((short) 0);
+					}
+					player.setGameMode(GameMode.SURVIVAL);
+					player.getInventory().setContents(inv);
+					player.getInventory().setArmorContents(armor);
+					player.setInvulnerable(false);
+				}
 
+			}.runTaskLater(mPlugin, 20 * 2);
+			return;
+		}
 		if (!event.getKeepInventory() && mPlugin.mServerProperties.getKeepLowTierInventory()) {
 			/* Monumenta-custom keep inventory
 			 *

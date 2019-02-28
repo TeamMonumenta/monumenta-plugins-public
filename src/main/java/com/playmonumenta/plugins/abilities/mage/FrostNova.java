@@ -41,7 +41,7 @@ public class FrostNova extends Ability {
 	@Override
 	public boolean cast() {
 		int frostNova = getAbilityScore();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
 

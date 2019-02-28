@@ -5,6 +5,7 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -42,10 +43,13 @@ public class CloakAndDagger extends Ability {
 	}
 
 	private boolean active = false;
+	private int mTickAttacked = 0;
 	private int time = 0;
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mTickAttacked == mPlayer.getTicksLived())
+			return true;
 		if (active) {
 			active = false;
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
@@ -62,6 +66,7 @@ public class CloakAndDagger extends Ability {
 			return;
 		}
 
+		mTickAttacked = mPlayer.getTicksLived();
 		active = true;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 0, false, true));
@@ -69,9 +74,12 @@ public class CloakAndDagger extends Ability {
 		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
-		for (Mob mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 20)) {
-			if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
-				mob.setTarget(null);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32)) {
+			if (mob instanceof Mob) {
+				Mob m = (Mob) mob;
+				if (m.getTarget() != null && m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
+					m.setTarget(null);
+				}
 			}
 		}
 		new BukkitRunnable() {

@@ -7,6 +7,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -39,7 +40,7 @@ public class Challenge extends Ability {
 
 	@Override
 	public boolean cast() {
-		List<Mob> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12);
 		int increase = mobs.size();
 		if (increase > 8) {
 			increase = 8;
@@ -58,8 +59,9 @@ public class Challenge extends Ability {
 		                                 new PotionEffect(PotionEffectType.ABSORPTION,
 		                                                  20 * 10,
 		                                                  amp, false, true));
-		for (Mob mob : mobs) {
-			mob.setTarget(mPlayer);
+		for (LivingEntity mob : mobs) {
+			if (mob instanceof Mob)
+				((Mob)mob).setTarget(mPlayer);
 		}
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
 		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 25, 0.4, 1, 0.4, 0.7f);

@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -41,13 +42,14 @@ public class HandOfLight extends Ability {
 		int healing = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
-
-		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEALING_RADIUS, false)) {
+		boolean healCaster = mPlayer.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG);
+		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEALING_RADIUS, healCaster)) {
 			double healAmount = healing == 1 ? 2 + (p.getMaxHealth() * 0.1) : 4 + (p.getMaxHealth() * 0.2);
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			// Only heal players in the correct direction
 			// Only heal players that have a class score > 0 (so it doesn't work on arena contenders)
-			if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE && !p.getScoreboardTags().contains("disable_class")) {
+			if (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE && !p.getScoreboardTags().contains("disable_class")
+					&& (!p.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG) || p.equals(mPlayer))) {
 				PlayerUtils.healPlayer(p, healAmount);
 
 				Location loc = p.getLocation();

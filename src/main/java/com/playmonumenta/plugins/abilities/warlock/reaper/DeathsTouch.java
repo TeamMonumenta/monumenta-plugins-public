@@ -9,7 +9,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
@@ -91,7 +90,7 @@ public class DeathsTouch extends Ability {
 		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1, 0.25f);
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
-		List<Mob> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE);
+		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE);
 		BoundingBox box = BoundingBox.of(loc, 1, 1, 1);
 		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
 			box.shift(dir);

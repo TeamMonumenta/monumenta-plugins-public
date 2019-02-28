@@ -48,7 +48,7 @@ public class ConsumingFlames extends Ability {
 
 		boolean effect = false;
 		int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius, mPlayer)) {
 			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
 			mob.setFireTicks(CONSUMING_FLAMES_DURATION);
 

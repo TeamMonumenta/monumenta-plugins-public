@@ -9,7 +9,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -83,7 +82,7 @@ public class FrostRay extends Ability {
 					this.cancel();
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 				}
-				List<Mob> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, FROST_RAY_RANGE);
 				BoundingBox box = BoundingBox.of(location, FROST_RAY_RADIUS, FROST_RAY_RADIUS, FROST_RAY_RADIUS);
 				for (int i = 0; i <= FROST_RAY_RANGE; i++) {
 					box.shift(increment);
