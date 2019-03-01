@@ -40,7 +40,7 @@ public class SafeZone extends AreaBounds {
 	public static SafeZone fromJsonObject(JsonObject object) throws Exception {
 		LocationType type = LocationType.valueOf(object.get("type").getAsString());
 		JsonElement element = object.get("equipmentDamage");
-		boolean equipmentDamage = type.equals(LocationType.Capital) || type.equals(LocationType.SafeZone);
+		boolean equipmentDamage = !(type.equals(LocationType.Capital) || type.equals(LocationType.SafeZone));
 		if (element != null) {
 			equipmentDamage = object.get("equipmentDamage").getAsBoolean();
 		}
