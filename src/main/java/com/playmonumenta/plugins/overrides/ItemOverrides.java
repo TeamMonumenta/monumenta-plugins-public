@@ -193,6 +193,7 @@ public class ItemOverrides {
 		mItems.put(Material.SPAWNER, new MobSpawnerOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
+		mItems.put(Material.BEACON, new BeaconOverride());
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);
