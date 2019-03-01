@@ -67,7 +67,7 @@ public class WindWalk extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSprinting()) {
+		if (mPlayer.isSprinting() && mPlayer.getLocation().getPitch() > 65) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 				LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());

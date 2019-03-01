@@ -22,7 +22,7 @@ public class Harvester extends Ability {
 	public void EntityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int level = getAbilityScore();
 		World world = mPlayer.getWorld();
-		mPlugin.mTimers.UpdateCooldowns(mPlayer, 8);
+		mPlugin.mTimers.UpdateCooldowns(mPlayer, 10);
 		if (level > 1) {
 			PlayerUtils.healPlayer(mPlayer, 1);
 		}

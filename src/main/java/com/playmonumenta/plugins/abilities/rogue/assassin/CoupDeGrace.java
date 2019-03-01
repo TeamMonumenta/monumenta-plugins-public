@@ -31,6 +31,18 @@ public class CoupDeGrace extends Ability {
 	}
 
 	@Override
+	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+		if (twoHertz) {
+			int coupDeGrace = getAbilityScore();
+			double threshhold = coupDeGrace == 1 ? 0.25 : 0.3;
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 16, mPlayer)) {
+				if (mob.getHealth() < mob.getMaxHealth() * threshhold && !mob.isDead()) {
+					mPlayer.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, mob.getEyeHeight(), 0), 2, 0.15, 0.15, 0.15, 1);
+				}
+			}
+		}
+	}
+	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity le = (LivingEntity) event.getEntity();
 		if (!EntityUtils.isBoss(le)) {

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

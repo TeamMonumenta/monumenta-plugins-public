@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -17,6 +18,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -51,6 +54,12 @@ public class DefensiveLine extends Ability {
 			                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
 			                                                  DEFENSIVE_LINE_DURATION,
 			                                                  1, true, true));
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
+				MovementUtils.KnockAway(target, mob, 0.25f);
+				if (getAbilityScore() > 1) {
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
+				}
+			}
 		}
 
 		ParticleUtils.explodingSphereEffect(mPlugin, mPlayer, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
@@ -70,5 +79,4 @@ public class DefensiveLine extends Ability {
 		}
 		return false;
 	}
-
 }
