@@ -15,9 +15,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
@@ -28,6 +30,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Slime;
+import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
@@ -69,9 +72,9 @@ public class EntityUtils {
 			return ((Wolf)entity).isAngry();
 		} else if (entity instanceof Rabbit) {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
-		} else if (entity instanceof PolarBear) {
-			LivingEntity target = ((PolarBear)entity).getTarget();
-			return target != null && target instanceof Player;  //  If a player is the target of a Polar Bear it's hostile.
+		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
+			LivingEntity target = ((Mob)entity).getTarget();
+			return target != null && target instanceof Player;  //  If a player is the target
 		}
 
 		return false;
