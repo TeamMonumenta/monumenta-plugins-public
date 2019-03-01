@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
+import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -183,6 +185,13 @@ public class MobListener implements Listener {
 					AbilityManager.getManager().EntityDeathRadiusEvent(p, event, shouldGenDrops);
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void EntityZapEvent(EntityZapEvent event) {
+		if (event.getEntityType().equals(EntityType.VILLAGER)) {
+			event.setCancelled(true);
 		}
 	}
 }
