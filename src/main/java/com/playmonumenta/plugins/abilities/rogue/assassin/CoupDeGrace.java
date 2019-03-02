@@ -31,7 +31,7 @@ public class CoupDeGrace extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (twoHertz) {
 			int coupDeGrace = getAbilityScore();
 			double threshhold = coupDeGrace == 1 ? 0.25 : 0.3;

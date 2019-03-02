@@ -21,11 +21,10 @@ public class Rejuvenation extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		//  Don't trigger this if dead!
 		if (!mPlayer.isDead()) {
-			boolean threeSeconds = ((originalTime % 3) == 0);
-			if (threeSeconds) {
+			if (ticks % 60 == 0) {
 				int rejuvenation = getAbilityScore();
 				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, REJUVENATION_RADIUS, true)) {
 					// Don't buff players that have their class disabled or who have PvP enabled

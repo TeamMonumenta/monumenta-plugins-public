@@ -27,11 +27,10 @@ public class ClericPassive extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		//  Don't trigger this if dead!
 		if (!mPlayer.isDead()) {
-			boolean threeSeconds = ((originalTime % 3) == 0);
-			if (threeSeconds) {
+			if (ticks % 60 == 0) {
 				// Passive Heal Radius
 				World world = mPlayer.getWorld();
 				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, PASSIVE_HEAL_RADIUS, false)) {

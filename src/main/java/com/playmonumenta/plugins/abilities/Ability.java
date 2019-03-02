@@ -198,7 +198,7 @@ public abstract class Ability {
 		return false;
 	}
 
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {}
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {}
 
 	//---------------------------------------------------------------------------------------------------------------
 	/*

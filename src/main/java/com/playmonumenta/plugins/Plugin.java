@@ -56,22 +56,6 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 
 public class Plugin extends JavaPlugin {
-	public enum Times {
-		ONE(1),
-		TWO(2),
-		FOURTY(40),
-		SIXTY(60),
-		ONE_TWENTY(120);
-
-		private int value;
-		private Times(int value)    {
-			this.value = value;
-		}
-		public int getValue()       {
-			return this.value;
-		}
-	}
-
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public CombatLoggingTimers mCombatLoggingTimers = null;
@@ -188,24 +172,18 @@ public class Plugin extends JavaPlugin {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}
 
-					//  Update periodic timers.
-					mPeriodicTimer++;
-
-					final boolean one = (ticks % 20 == 0); //(mPeriodicTimer % Times.ONE.getValue()) == 0;
-					final boolean two = (mPeriodicTimer % Times.TWO.getValue()) == 0;
-					final boolean fourty = (mPeriodicTimer % Times.FOURTY.getValue()) == 0;
-					final boolean sixty = (mPeriodicTimer % Times.SIXTY.getValue()) == 0;
+				if (fourHertz) {
+					final boolean one = (ticks % 20 == 0);
 
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
-							AbilityManager.getManager().PeriodicTrigger(player, twoHertz, one, two, fourty, sixty, mPeriodicTimer);
+							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, one, ticks);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
-
-					mPeriodicTimer %= Times.ONE_TWENTY.getValue();
 				}
 
 				//  4 times a second.

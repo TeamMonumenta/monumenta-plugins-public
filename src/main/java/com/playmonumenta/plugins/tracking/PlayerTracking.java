@@ -5,11 +5,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -220,54 +218,9 @@ public class PlayerTracking implements EntityTracking {
 			}
 
 			try {
-				_updatePatreonEffects(player, world);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			try {
 				mPlugin.mPotionManager.updatePotionStatus(player, ticks);
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
-		}
-	}
-
-	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
-
-	// TODO: We should move this out of being ticked and into an event based system as well as store all
-	// Patrons in a list so we're not testing against every player 4 times a second.
-	// New Ability system would be great for this
-	void _updatePatreonEffects(Player player, World world) {
-		// Players in spectator do not have patreon particles
-		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-			return;
-		}
-
-		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
-		if (patreon > 0) {
-			int shinyWhite = ScoreboardUtils.getScoreboardValue(player, "ShinyWhite");
-			if (shinyWhite == 1 && patreon >= 5) {
-				world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
-				return;
-			}
-
-			int shinyPurple = ScoreboardUtils.getScoreboardValue(player, "ShinyPurple");
-			if (shinyPurple == 1 && patreon >= 10) {
-				world.spawnParticle(Particle.DRAGON_BREATH, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
-				return;
-			}
-
-			int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
-			if (shinyGreen == 1 && patreon >= 20) {
-				world.spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
-				return;
-			}
-
-			int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
-			if (shinyRed == 1 && patreon >= 30) {
-				world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, RED_PARTICLE_COLOR);
-				return;
 			}
 		}
 	}

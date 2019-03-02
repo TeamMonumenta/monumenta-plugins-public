@@ -41,7 +41,7 @@ public class ElementalSpiritAbility extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		Player player = mPlayer;
 		if (oneSecond) {
 			int elementalSpirit = getAbilityScore();

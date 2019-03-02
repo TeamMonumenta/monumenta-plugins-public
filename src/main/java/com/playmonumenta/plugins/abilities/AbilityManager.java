@@ -555,10 +555,10 @@ public class AbilityManager {
 		return re;
 	}
 
-	public void PeriodicTrigger(Player player, boolean twoHertz, boolean oneSecond, boolean twoSeconds, boolean fourtySeconds, boolean sixtySeconds, int originalTime) {
+	public void PeriodicTrigger(Player player, boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PeriodicTrigger(twoHertz, oneSecond, twoSeconds, fourtySeconds, sixtySeconds, originalTime);
+				abil.PeriodicTrigger(fourHertz, twoHertz, oneSecond, ticks);
 			}
 		}
 	}
