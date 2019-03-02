@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -697,6 +698,26 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		/* Prevent entering beds designed to glitch through blocks */
+		Material aboveMat = loc.add(0, 1, 0).getBlock().getType();
+		if (aboveMat.equals(Material.BEDROCK) || aboveMat.equals(Material.BARRIER) || aboveMat.equals(Material.OBSIDIAN)) {
+			new BukkitRunnable() {
+				float mFreq = 0;
+
+				@Override
+				public void run() {
+					player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1, mFreq);
+					mFreq += 0.05;
+					if (mFreq > 1.5) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 10);
+
 			event.setCancelled(true);
 			return;
 		}
