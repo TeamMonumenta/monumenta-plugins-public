@@ -43,6 +43,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 
@@ -76,7 +77,7 @@ public class EntityUtils {
 			LivingEntity target = ((Mob)entity).getTarget();
 			return target != null && target instanceof Player;  //  If a player is the target
 		} else if (entity instanceof Player) {
-			return entity.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG);
+			return AbilityManager.getManager().isPvPEnabled((Player)entity);
 		}
 
 		return false;
@@ -368,10 +369,11 @@ public class EntityUtils {
 	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
 		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
 
-		entities.removeIf(e -> !(e instanceof LivingEntity && (isHostileMob(e) || e.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG))));
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
-			mobs.add((LivingEntity)entity);
+			if (isHostileMob(entity)) {
+				mobs.add((LivingEntity)entity);
+			}
 		}
 
 		return mobs;

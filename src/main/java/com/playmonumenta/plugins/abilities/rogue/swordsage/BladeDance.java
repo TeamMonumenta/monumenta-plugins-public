@@ -90,7 +90,6 @@ public class BladeDance extends Ability {
 						extraDamage += checkLoc.distance(loc);
 						loc = mPlayer.getLocation();
 						loc.setY(y);
-						mPlayer.sendMessage(ChatColor.GREEN + "Damage: " + ChatColor.AQUA + (int) (extraDamage + damage));
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
 						pitch += 0.2;

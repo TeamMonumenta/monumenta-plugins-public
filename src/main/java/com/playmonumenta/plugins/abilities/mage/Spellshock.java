@@ -166,7 +166,7 @@ public class Spellshock extends Ability {
 					}
 
 					nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-					                                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+					                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}
 

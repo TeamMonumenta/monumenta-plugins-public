@@ -18,7 +18,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -82,7 +81,7 @@ public class ManaLance extends Ability {
 						Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 					}
 					Spellshock.addStaticToMob(mob, mPlayer);
-					if (!EntityUtils.isBoss(mob) && !mob.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG))
+					if (!EntityUtils.isBoss(mob))
 						mob.addPotionEffect(
 						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 					iter.remove();

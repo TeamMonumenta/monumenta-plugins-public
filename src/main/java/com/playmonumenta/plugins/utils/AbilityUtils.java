@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,23 +13,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-import com.playmonumenta.plugins.Plugin;
-
 public class AbilityUtils {
-
-	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.5;
-
-	public static void rogueDamageMob(Plugin mPlugin, Player player, LivingEntity damagee, double damage) {
-		//The RoguePassive class handles spell damage for us.
-//		double correctDamage = damage;
-//		if (EntityUtils.isElite(damagee)) {
-//			correctDamage = damage * PASSIVE_DAMAGE_ELITE_MODIFIER;
-//		} else if (EntityUtils.isBoss(damagee)) {
-//			correctDamage = damage * PASSIVE_DAMAGE_BOSS_MODIFIER;
-//		}
-		EntityUtils.damageEntity(mPlugin, damagee, damage, player);
-	}
 
 	private static final int BOW_MASTER_1_DAMAGE = 3;
 	private static final int BOW_MASTER_2_DAMAGE = 6;

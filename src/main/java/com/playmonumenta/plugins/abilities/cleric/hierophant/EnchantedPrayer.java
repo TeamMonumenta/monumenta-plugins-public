@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -103,4 +105,24 @@ public class EnchantedPrayer extends Ability {
 		return mPlayer.getVelocity().getY() > 0;
 	}
 
+	/*
+	 * Must be called for all players in the appropriate place in EntityDamageByEntityEvent!
+	 */
+	public static void onEntityAttack(Plugin plugin, Player player, LivingEntity damagee) {
+		if (player.hasMetadata(ENCHANTED_PRAYER_METAKEY)) {
+			World world = player.getWorld();
+			int enchantedPrayer = player.getMetadata(ENCHANTED_PRAYER_METAKEY).get(0).asInt();
+			player.removeMetadata(ENCHANTED_PRAYER_METAKEY, plugin);
+			world.playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
+			world.playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
+			world.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
+			world.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
+			double damage = enchantedPrayer == 1 ? 5 : 10;
+			double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
+			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
+				EntityUtils.damageEntity(plugin, le, damage, player);
+			}
+			PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
+		}
+	}
 }

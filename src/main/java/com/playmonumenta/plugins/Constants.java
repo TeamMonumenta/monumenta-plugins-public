@@ -46,8 +46,6 @@ public class Constants {
 	public static final String PLAYER_SNEAKING_TASK_METAKEY = "MonumentaPlayerSneaking";
 	public static final String PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY = "MonumentaPlayerChestSort";
 
-	public static final String PLAYER_DISABLE_PVP_TAG = "PlayerNoPVPTag";
-
 	public static final String SCOREBOARD_DEATH_MESSAGE = "DeathMessage";
 
 	// The max distance for spells that detected nearby damaged allies/enemies.

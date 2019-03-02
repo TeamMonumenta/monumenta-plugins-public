@@ -10,8 +10,6 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -106,10 +104,12 @@ public class EntityListener implements Listener {
 
 	Plugin mPlugin;
 	World mWorld;
+	AbilityManager mAbilities;
 
-	public EntityListener(Plugin plugin, World world) {
+	public EntityListener(Plugin plugin, World world, AbilityManager abilities) {
 		mPlugin = plugin;
 		mWorld = world;
+		mAbilities = abilities;
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -144,7 +144,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			if (!AbilityManager.getManager().PlayerCombustByEntityEvent(player, event)) {
+			if (!mAbilities.PlayerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
 			}
 		}
@@ -153,12 +153,12 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void CustomDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
-			AbilityManager.getManager().PlayerDealtCustomDamageEvent((Player)event.getDamager(), event);
+			mAbilities.PlayerDealtCustomDamageEvent((Player)event.getDamager(), event);
 		}
 	}
 
 	//  An Entity hit another Entity.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
@@ -174,34 +174,17 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
-				if (!AbilityManager.getManager().PlayerDamagedByLivingEntityEvent(player, event)) {
+				if (!mAbilities.PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
-				/* TODO: Specialization needed?
-				for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
-				    mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, (LivingEntity)damager, event);
-				}
-				*/
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
 			} else if (damager instanceof Firework) {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
-			} else {
-				if (damager instanceof Projectile) {
-					if (!AbilityManager.getManager().PlayerDamagedByProjectileEvent(player, event)) {
-						damager.remove();
-						event.setCancelled(true);
-					}
-
-					/* TODO: Specialization needed?
-					Projectile proj = (Projectile) damager;
-					if (proj.getShooter() instanceof LivingEntity) {
-					    LivingEntity shooter = (LivingEntity) proj.getShooter();
-					    for (Player pl : PlayerUtils.getNearbyPlayers(player.getLocation(), Constants.ABILITY_ENTITY_DAMAGE_BY_ENTITY_RADIUS)) {
-					        mPlugin.getSpecialization(pl).PlayerDamagedByLivingEntityRadiusEvent(pl, player, shooter, event);
-					    }
-					}
-					*/
+			} else if (damager instanceof Projectile) {
+				if (!mAbilities.PlayerDamagedByProjectileEvent(player, event)) {
+					damager.remove();
+					event.setCancelled(true);
 				}
 			}
 		} else {
@@ -214,15 +197,15 @@ public class EntityListener implements Listener {
 				return;
 			}
 		}
+
 		if (damager instanceof Player) {
 			Player player = (Player)damager;
 			if (damagee instanceof Player) {
-				if (!damagee.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG) || !damager.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG)) {
+				if (!mAbilities.isPvPEnabled((Player)damagee) || !mAbilities.isPvPEnabled((Player)damager)) {
 					event.setCancelled(true);
 					return;
 				}
 			}
-			//  Make sure to not trigger class abilities off Throrns.
 
 			/* Don't let the player interact with the world when transferring */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -232,6 +215,7 @@ public class EntityListener implements Listener {
 
 			mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 
+			//  Make sure to not trigger class abilities off Throrns.
 			if (event.getCause() != DamageCause.THORNS) {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
@@ -242,27 +226,14 @@ public class EntityListener implements Listener {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
 
-					AbilityManager.getManager().modifyDamage(player, event);
+					mAbilities.modifyDamage(player, event);
 
-					if (!AbilityManager.getManager().LivingEntityDamagedByPlayerEvent(player, event)) {
+					if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
 						event.setCancelled(true);
 					}
-					/* TODO: Move this into a static method in the appropriate spec file */
-					if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-						if (player.hasMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY)) {
-							int enchantedPrayer = player.getMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY).get(0).asInt();
-							player.removeMetadata(EnchantedPrayer.ENCHANTED_PRAYER_METAKEY, mPlugin);
-							damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);
-							damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
-							mWorld.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
-							mWorld.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-							double damage = enchantedPrayer == 1 ? 5 : 10;
-							double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
-							for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-								EntityUtils.damageEntity(mPlugin, le, damage, damager);
-							}
-							PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
-						}
+
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}
 				}
 			}
@@ -271,7 +242,7 @@ public class EntityListener implements Listener {
 			if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 				Player player = (Player)arrow.getShooter();
 				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-				if (!AbilityManager.getManager().LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 					damager.remove();
 					event.setCancelled(true);
 				}
@@ -314,11 +285,11 @@ public class EntityListener implements Listener {
 				}
 			}
 
-			if (!AbilityManager.getManager().PlayerDamagedEvent(player, event)) {
+			if (!mAbilities.PlayerDamagedEvent(player, event)) {
 				event.setCancelled(true);
 			}
 
-			if (source == DamageCause.SUFFOCATION && player.getVehicle() != null) {
+			if (source.equals(DamageCause.SUFFOCATION) && player.getVehicle() != null) {
 				// If the player is suffocating inside a wall we need to figure out what block they're suffocating in.
 				Location playerLoc = player.getLocation();
 
@@ -451,14 +422,14 @@ public class EntityListener implements Listener {
 				}
 			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
 				Arrow arrow = (Arrow)proj;
-				if (!AbilityManager.getManager().PlayerShotArrowEvent(player, arrow)) {
+				if (!mAbilities.PlayerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				SplashPotion potion = (SplashPotion)proj;
-				if (!AbilityManager.getManager().PlayerThrewSplashPotionEvent(player, potion)) {
+				if (!mAbilities.PlayerThrewSplashPotionEvent(player, potion)) {
 					event.setCancelled(true);
 				}
 			}
@@ -487,7 +458,7 @@ public class EntityListener implements Listener {
 
 		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
 		if (source instanceof Player) {
-			if (!AbilityManager.getManager().PlayerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
+			if (!mAbilities.PlayerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -500,7 +471,7 @@ public class EntityListener implements Listener {
 		 */
 		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
 			if (entity instanceof Player) {
-				if (!AbilityManager.getManager().PlayerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
+				if (!mAbilities.PlayerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -605,7 +576,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getHitEntity();
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player)entity;
-			AbilityManager.getManager().PlayerHitByProjectileEvent(player, event);
+			mAbilities.PlayerHitByProjectileEvent(player, event);
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 
@@ -643,7 +614,7 @@ public class EntityListener implements Listener {
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
-				AbilityManager.getManager().ProjectileHitEvent(player, event, arrow);
+				mAbilities.ProjectileHitEvent(player, event, arrow);
 			}
 		}
 
@@ -682,7 +653,7 @@ public class EntityListener implements Listener {
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.getTarget() instanceof Player) {
 			Player player = (Player) event.getTarget();
-			AbilityManager.getManager().EntityTargetLivingEntityEvent(player, event);
+			mAbilities.EntityTargetLivingEntityEvent(player, event);
 		}
 	}
 
@@ -690,7 +661,7 @@ public class EntityListener implements Listener {
 	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
 		if (event.getApplier() instanceof Player) {
 			Player player = (Player) event.getApplier();
-			AbilityManager.getManager().PotionEffectApplyEvent(player, event);
+			mAbilities.PotionEffectApplyEvent(player, event);
 		}
 	}
 

@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -54,7 +54,7 @@ public class ByMyBlade extends Ability {
 			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 			if (damagee instanceof Player)
 				extraDamage = BY_MY_BLADE_DAMAGE_1;
-			AbilityUtils.rogueDamageMob(mPlugin, mPlayer, damagee, extraDamage);
+			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, mPlayer);
 
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);

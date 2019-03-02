@@ -74,6 +74,7 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
+import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -292,7 +293,10 @@ public class AbilityManager {
 		                          new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
 
 		                          // ALL PLAYERS (but technically for Alchemist)
-		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null)
+		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
+
+								  // All other non-class abilities
+								  new PvP(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
@@ -351,6 +355,11 @@ public class AbilityManager {
 
 	public Ability getPlayerAbility(Player player, Class<?> cls) {
 		return getPlayerAbilities(player).getAbility(cls);
+	}
+
+	/* Convenience method */
+	public boolean isPvPEnabled(Player player) {
+		return getPlayerAbilities(player).getAbility(PvP.class) != null;
 	}
 
 	public String printInfo(Player player) {

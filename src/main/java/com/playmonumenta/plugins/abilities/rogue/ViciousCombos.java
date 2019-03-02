@@ -16,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
@@ -53,7 +52,7 @@ public class ViciousCombos extends Ability {
 
 					if (viciousCombos > 1) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), VICIOUS_COMBOS_RANGE, mPlayer)) {
-							AbilityUtils.rogueDamageMob(mPlugin, mPlayer, mob, VICIOUS_COMBOS_DAMAGE);
+							EntityUtils.damageEntity(mPlugin, mob, VICIOUS_COMBOS_DAMAGE, mPlayer);
 						}
 					}
 

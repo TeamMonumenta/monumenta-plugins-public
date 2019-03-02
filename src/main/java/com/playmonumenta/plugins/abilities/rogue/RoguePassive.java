@@ -39,10 +39,11 @@ public class RoguePassive extends Ability {
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				//  This test if the damagee is an instance of a Elite.
 				if (damagee instanceof LivingEntity) {
-					if (EntityUtils.isElite(damagee))
+					if (EntityUtils.isElite(damagee)) {
 						event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
-					else if (EntityUtils.isBoss(damagee))
+					} else if (EntityUtils.isBoss(damagee)) {
 						event.setDamage(event.getDamage() * PASSIVE_DAMAGE_BOSS_MODIFIER);
+					}
 				}
 			}
 		}

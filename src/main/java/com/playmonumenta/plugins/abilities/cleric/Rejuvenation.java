@@ -6,15 +6,14 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Rejuvenation extends Ability {
 
 	private static final int REJUVENATION_RADIUS = 12;
-	private static final int REJUVENATION_HEAL_AMOUNT = 1;
 
 	public Rejuvenation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -29,8 +28,8 @@ public class Rejuvenation extends Ability {
 			if (threeSeconds) {
 				int rejuvenation = getAbilityScore();
 				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, REJUVENATION_RADIUS, true)) {
-					// Don't buff players that have their class disabled
-					if (p.getScoreboardTags().contains("disable_class") || p.getScoreboardTags().contains(Constants.PLAYER_DISABLE_PVP_TAG)) {
+					// Don't buff players that have their class disabled or who have PvP enabled
+					if (p.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(p)) {
 						continue;
 					}
 
