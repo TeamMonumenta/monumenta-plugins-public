@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -309,7 +310,7 @@ public class AbilityManager {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
-		// Make sure non-warriors don't have passive knockback resistance or armor
+		// Reset passive buffs to player base attributes
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
@@ -319,13 +320,10 @@ public class AbilityManager {
 
 		List<Ability> abilities = new ArrayList<Ability>();
 
-		/* If player has the "disable_class" tag, no abilities are assigned to them */
-		for (String tag : player.getScoreboardTags()) {
-			if (tag.equals("disable_class")) {
-				/* This player's abilities are disabled - give them an empty set and stop here */
-				mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
-				return;
-			}
+		if (player.getScoreboardTags().contains("disable_class") || player.getGameMode().equals(GameMode.SPECTATOR)) {
+			/* This player's abilities are disabled - give them an empty set and stop here */
+			mAbilities.put(player.getUniqueId(), new AbilityCollection(abilities));
+			return;
 		}
 
 		try {

@@ -49,6 +49,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
@@ -864,6 +865,18 @@ public class PlayerListener implements Listener {
 				int taskId = player.getMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY).get(0).asInt();
 				Bukkit.getScheduler().cancelTask(taskId);
 				player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void PlayerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
+		if (!event.isCancelled()) {
+			Player player = event.getPlayer();
+
+			if (player.getGameMode().equals(GameMode.SPECTATOR) || event.getNewGameMode().equals(GameMode.SPECTATOR)) {
+				/* Refresh class abilities when switching to/from spectator */
+				AbilityManager.getManager().updatePlayerAbilities(player);
 			}
 		}
 	}
