@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
@@ -47,7 +47,7 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				mLauncher.teleport(loc);
-				loc.getWorld().spawnParticle(Particle.LAVA, loc, 4, 0, 0, 0, 0.01);
+				loc.getWorld().spawnParticle(Particle.LAVA, loc, 2, 0, 0, 0, 0.01);
 			}
 		};
 		Runnable particles2 = new Runnable() {
@@ -59,10 +59,10 @@ public class SpellAxtalTntThrow extends Spell {
 		};
 		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_PIGMAN_ANGRY, 1, 0.77F);
 		for (int i = 0; i < (40 + mCount * mCooldown); i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, (long)(i));
+			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, i);
 		}
 		for (int i = 0; i < mCount; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, (long)(40 + i * mCooldown));
+			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, 40 + i * mCooldown);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class SpellAxtalTntThrow extends Spell {
 			}
 		};
 		for (int i = 0; i < mCount; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, single_launch, (long)(40 + i * mCooldown));
+			scheduler.scheduleSyncDelayedTask(mPlugin, single_launch, 40 + i * mCooldown);
 		}
 	}
 }
