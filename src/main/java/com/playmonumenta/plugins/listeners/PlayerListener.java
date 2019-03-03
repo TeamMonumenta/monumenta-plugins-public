@@ -428,9 +428,13 @@ public class PlayerListener implements Listener {
 				List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
 					for (String loreEntry : lore) {
-						if ((ChatColor.stripColor(loreEntry).equals("King's Valley : Tier I")) ||
-						    (ChatColor.stripColor(loreEntry).equals("King's Valley : Tier II")) ||
-						    (ChatColor.stripColor(loreEntry).equals("King's Valley : Tier III"))) {
+						String stripped = ChatColor.stripColor(loreEntry);
+						if ((stripped.equals("King's Valley : Tier I")) ||
+						    (stripped.equals("King's Valley : Tier II")) ||
+						    (stripped.equals("King's Valley : Tier III")) ||
+							(stripped.equals("Celsian Isles : Tier I")) ||
+							(stripped.equals("Celsian Isles : Tier II")) ||
+							(stripped.equals("Celsian Isles : Tier III"))) {
 							return true;
 						}
 					}
