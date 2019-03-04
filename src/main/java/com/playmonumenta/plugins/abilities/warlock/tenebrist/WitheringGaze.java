@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -51,6 +52,7 @@ public class WitheringGaze extends Ability {
 			double t = 0;
 			double damagerange = 1.15;
 			double r = 1;
+			@Override
 			public void run() {
 
 				t += 1;
@@ -73,7 +75,7 @@ public class WitheringGaze extends Ability {
 						Vector eVec = e.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
-							if (EntityUtils.isBoss(le)) {
+							if (EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
 								if (!EntityUtils.isFrozen(le)) {

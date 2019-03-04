@@ -81,7 +81,7 @@ public class EnchantedShot extends Ability {
 			player.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc.clone().add(dir), 10, 0.1, 0.1, 0.1, 0.2);
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30, mPlayer);
 			double extraDamage = 0;
 			if (AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class) != null) {
 				Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
@@ -96,6 +96,10 @@ public class EnchantedShot extends Ability {
 				while (iterator.hasNext()) {
 					LivingEntity mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
+						double trueDamage = damage;
+						if (mob instanceof Player) {
+							trueDamage *= 0.75;
+						}
 						EntityUtils.damageEntity(mPlugin, mob, damage + extraDamage, mPlayer);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();

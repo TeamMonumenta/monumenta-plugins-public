@@ -57,7 +57,11 @@ public class ArcaneStrike extends Ability {
 			if (arcaneStrike > 0 && ((mob.getFireTicks() > 0 &&
 			                          MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) ||
 			                         mob.hasPotionEffect(PotionEffectType.SLOW))) {
-				dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
+				if (mob instanceof Player) {
+					dmg += 2;
+				} else {
+					dmg += (arcaneStrike == 1 ? ARCANE_STRIKE_BURN_DAMAGE_LVL_1 : ARCANE_STRIKE_BURN_DAMAGE_LVL_2);
+				}
 			}
 
 			EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);

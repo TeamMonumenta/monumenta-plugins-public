@@ -77,14 +77,16 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
+					Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 					if (hasSpellShock) {
-						Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
+						Spellshock.addStaticToMob(mob, mPlayer);
 					}
-					Spellshock.addStaticToMob(mob, mPlayer);
-					if (!EntityUtils.isBoss(mob))
+					if (!EntityUtils.isBoss(mob) && !AbilityManager.getManager().isPvPEnabled((Player)mob)) {
 						mob.addPotionEffect(
 						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+					}
 					iter.remove();
+					mobs.remove(mob);
 				}
 			}
 		}

@@ -39,6 +39,9 @@ public class PinningShot extends Ability {
 			mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 35, 0, 0, 0, 0.25);
 
 			int duration = getAbilityScore() == 1 ? 20 * 5 : 20 * 10;
+			if (damagee instanceof Player) {
+				duration *= 0.5;
+			}
 			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 6));
 		}
 		return true;

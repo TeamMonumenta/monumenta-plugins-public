@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -153,6 +154,14 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.onHurt(plugin, player, level, event);
+		}
+	}
+
+	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+			property.onConsume(plugin, player, event, level);
 		}
 	}
 

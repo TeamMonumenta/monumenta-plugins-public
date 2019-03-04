@@ -47,10 +47,14 @@ public class MagmaShield extends Ability {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0)
 			                     .normalize();
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
-				MovementUtils.KnockAway(mPlayer, mob, MAGMA_SHIELD_KNOCKBACK_SPEED);
+				float kb = (mob instanceof Player) ? 0.3f : MAGMA_SHIELD_KNOCKBACK_SPEED;
+				MovementUtils.KnockAway(mPlayer, mob, kb);
 				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
 				int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
+				if (mob instanceof Player && extraDamage > 10) {
+					extraDamage = 10;
+				}
 				Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
 			}
 		}
@@ -72,7 +76,7 @@ public class MagmaShield extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)
 		    || InventoryUtils.isWandItem(offHand)) {
-			return mPlayer.isSneaking();
+			return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50;
 		}
 		return false;
 	}

@@ -42,7 +42,7 @@ public class ThrowingKnife implements BaseEnchantment {
 			if (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW) {
 				if (player.getCooldown(item.getType()) <= 0) {
 					item.setAmount(item.getAmount() - 1);
-					player.setCooldown(item.getType(), (int)(20 * 1.5));
+					player.setCooldown(item.getType(), (int)(20 * 0.75));
 					Location loc = player.getLocation();
 					Vector dir = loc.getDirection();
 					if (item.getType() == Material.ARROW) {

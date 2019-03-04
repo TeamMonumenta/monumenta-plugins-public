@@ -63,6 +63,10 @@ public class ViciousCombos extends Ability {
 					mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 				} else if (EntityUtils.isHostileMob(killedEntity)) {
 					int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
+					if (killedEntity instanceof Player) {
+						timeReduction *= 2;
+					}
+
 					mPlugin.mTimers.UpdateCooldowns(mPlayer, timeReduction);
 
 					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);

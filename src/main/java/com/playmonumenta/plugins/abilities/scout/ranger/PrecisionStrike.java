@@ -101,7 +101,7 @@ public class PrecisionStrike extends Ability {
 		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 		if (getAbilityScore() == 2) {
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_STUN_RADIUS)) {
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
 				EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 			}
 		}

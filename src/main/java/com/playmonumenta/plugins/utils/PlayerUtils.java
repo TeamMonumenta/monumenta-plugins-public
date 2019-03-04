@@ -84,6 +84,10 @@ public class PlayerUtils {
 		List<Player> players = getNearbyPlayers(player.getLocation(), radius);
 		if (!includeSourcePlayer) {
 			players.removeIf(p -> (p == player));
+		} else {
+			if (!players.contains(player)) {
+				players.add(player);
+			}
 		}
 		return players;
 	}

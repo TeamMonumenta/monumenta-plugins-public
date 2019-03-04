@@ -44,7 +44,7 @@ public class BladeDance extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
-		mInfo.cooldown = 20 * 5;
+		mInfo.cooldown = 20 * 40;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*

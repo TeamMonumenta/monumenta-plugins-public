@@ -60,7 +60,7 @@ public class MeteorStrike extends Ability {
 			loc.add(dir);
 
 			mPlayer.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0);
-			int size = EntityUtils.getNearbyMobs(loc, 2).size();
+			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
 			if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
 				launchMeteor(mPlayer, loc);
 				break;
@@ -77,6 +77,7 @@ public class MeteorStrike extends Ability {
 		loc.add(0, 40, 0);
 		new BukkitRunnable() {
 			double t = 0;
+			@Override
 			public void run() {
 				t += 1;
 				for (int i = 0; i < 8; i++) {
@@ -89,8 +90,12 @@ public class MeteorStrike extends Ability {
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, METEOR_STRIKE_RADIUS)) {
-								EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE);
+							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, METEOR_STRIKE_RADIUS, mPlayer)) {
+								if (e instanceof Player) {
+									EntityUtils.damageEntity(mPlugin, e, damage * 0.75, player, MagicType.FIRE);
+								} else {
+									EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE);
+								}
 								e.setFireTicks(METEOR_STRIKE_FIRE_DURATION);
 
 								Vector v = e.getLocation().toVector().subtract(loc.toVector()).normalize();

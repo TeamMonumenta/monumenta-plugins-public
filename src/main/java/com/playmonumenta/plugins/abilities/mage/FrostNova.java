@@ -44,16 +44,16 @@ public class FrostNova extends Ability {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
-
+			int amp = (mob instanceof Player) ? FROST_NOVA_EFFECT_LVL - 1 : FROST_NOVA_EFFECT_LVL;
 			if (frostNova > 1) {
 				if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
 				} else {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
 				}
 			} else {
-				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, FROST_NOVA_EFFECT_LVL, true, false));
+				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 			}
 
 			if (mob.getFireTicks() > 1) {

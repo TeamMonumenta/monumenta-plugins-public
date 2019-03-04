@@ -20,8 +20,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -170,6 +173,36 @@ public class PlayerListener implements Listener {
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
+			}
+
+			if (block != null && item == null) {
+				if (block.getBlockData() instanceof Stairs) {
+					Location loc = block.getLocation().add(0.5, -1.2, 0.5);
+					Location pLoc = player.getLocation();
+					Stairs data = (Stairs) block.getBlockData();
+					Vector dir = data.getFacing().getOppositeFace().getDirection().setY(0).normalize();
+					loc.add(dir.multiply(0.1));
+					loc.setDirection(data.getFacing().getOppositeFace().getDirection());
+					ArmorStand stand = (ArmorStand) player.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+					mWorld.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1, 0.9f);
+					stand.setVisible(false);
+					stand.setInvulnerable(true);
+					stand.setGravity(false);
+					stand.addPassenger(player);
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+							if (!stand.getPassengers().contains(player) || block.getType() == Material.AIR || !player.isValid()) {
+								this.cancel();
+								stand.remove();
+								player.teleport(pLoc);
+								mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+							}
+						}
+
+					}.runTaskTimer(mPlugin, 0, 1);
+				}
 			}
 
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
@@ -613,6 +646,11 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+
+		if (event.getItem().containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			event.setReplacement(event.getItem());
+		}
+		mPlugin.mTrackingManager.mPlayers.onConsume(mPlugin, player, event);
 
 		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
 			// Kill the player if they drink a potion with instant damage 10+

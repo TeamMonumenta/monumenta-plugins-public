@@ -42,4 +42,12 @@ public class MagePassive extends Ability {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof Player) {
+			event.setDamage(event.getDamage() * 1.15);
+		}
+		return true;
+	}
 }

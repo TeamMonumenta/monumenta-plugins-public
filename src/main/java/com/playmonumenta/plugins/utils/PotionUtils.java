@@ -111,6 +111,7 @@ public class PotionUtils {
 			amplifier = _amplifier;
 			ambient = _ambient;
 			showParticles = _showParticles;
+
 		}
 
 		public PotionEffectType type;
@@ -184,6 +185,10 @@ public class PotionUtils {
 		}
 
 		return newInfo;
+	}
+
+	public static void apply(LivingEntity entity, PotionInfo info) {
+		entity.addPotionEffect(new PotionEffect(info.type, info.duration, info.amplifier, info.ambient, info.showParticles));
 	}
 
 	public static List<PotionEffect> getEffects(ItemStack item) {

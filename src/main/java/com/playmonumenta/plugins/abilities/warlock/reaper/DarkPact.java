@@ -99,6 +99,9 @@ public class DarkPact extends Ability {
 
 			int level = getAbilityScore();
 			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
+			if (event.getEntity() instanceof Player) {
+				percent = level == 1 ? 0.25 : 0.5;
+			}
 			event.setDamage(event.getDamage() * percent);
 			if (level > 1 && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 				Location loc = mPlayer.getLocation().add(0, 1.35, 0);

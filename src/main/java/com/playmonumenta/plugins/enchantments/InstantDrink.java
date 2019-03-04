@@ -1,10 +1,14 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -15,6 +19,8 @@ import org.bukkit.potion.PotionEffect;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class InstantDrink implements BaseEnchantment {
 
@@ -40,9 +46,28 @@ public class InstantDrink implements BaseEnchantment {
 					for (PotionEffect effect : meta.getCustomEffects()) {
 						plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 					}
+				} else {
+					PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
+					PotionUtils.apply(player, info);
 				}
+
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
-				item.setType(Material.AIR);
+				World world = player.getWorld();
+				if (meta.hasColor()) {
+					Color color = meta.getColor();
+					double red = color.getRed() / 255D;
+					double green = color.getGreen() / 255D;
+					double blue = color.getBlue() / 255D;
+					for (int i = 0; i < 30; i++) {
+						double y = ThreadLocalRandom.current().nextDouble(0.25, 1.75);
+						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 0, red, green, blue, 1);
+					}
+				} else {
+					world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1);
+				}
+
+				item.setAmount(item.getAmount() - 1);
+				player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
 			}
 		}
 	}

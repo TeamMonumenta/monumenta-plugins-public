@@ -52,7 +52,7 @@ public class Disengage extends Ability {
 
 	@Override
 	public boolean cast() {
-		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS)) {
+		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS, mPlayer)) {
 			if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
 			}

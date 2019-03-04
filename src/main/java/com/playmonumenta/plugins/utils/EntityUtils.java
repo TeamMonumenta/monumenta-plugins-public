@@ -401,16 +401,18 @@ public class EntityUtils {
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent) {
 		damage = damage * vulnerabilityMult(target);
 
-		if (callEvent) {
-			CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
-			Bukkit.getPluginManager().callEvent(event);
-			damage = event.getDamage();
-		}
-		if (damager != null) {
-			MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
-			target.damage(damage, damager);
-		} else {
-			target.damage(damage);
+		if (!target.isDead() && !target.isInvulnerable()) {
+			if (callEvent) {
+				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
+				Bukkit.getPluginManager().callEvent(event);
+				damage = event.getDamage();
+			}
+			if (damager != null) {
+				MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
+				target.damage(damage, damager);
+			} else {
+				target.damage(damage);
+			}
 		}
 	}
 

@@ -32,6 +32,7 @@ public class Spellshock extends Ability {
 		public LivingEntity mob;
 		public int ticksLeft;
 		public Player initiator;
+		public boolean triggered = false;
 
 		public SpellShockedMob(LivingEntity inMob, int ticks, Player inInitiator) {
 			mob = inMob;
@@ -80,7 +81,7 @@ public class Spellshock extends Ability {
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1);
 						mWorld.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
 
-						if (shocked.mob.isDead() || shocked.mob.getHealth() <= 0) {
+						if (!shocked.triggered && (shocked.mob.isDead() || shocked.mob.getHealth() <= 0)) {
 							// Mob has died - trigger effects
 							int spellShock = ScoreboardUtils.getScoreboardValue(shocked.initiator, SPELL_SHOCK_SCOREBOARD);
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
@@ -148,7 +149,7 @@ public class Spellshock extends Ability {
 
 			// Consume the "charge"
 			mSpellShockedMobs.remove(mob.getUniqueId());
-
+			shocked.triggered = true;
 			Location loc = shocked.mob.getLocation().add(0, 1, 0);
 			World world = loc.getWorld();
 			world.spawnParticle(Particle.SPELL_WITCH, loc, 100, 1, 1, 1, 0.001);
@@ -173,7 +174,7 @@ public class Spellshock extends Ability {
 			dmg += SPELL_SHOCK_SPELL_DAMAGE;
 
 			// Make sure to apply vulnerability after damage
-			if (!EntityUtils.isBoss(mob)) {
+			if (!EntityUtils.isBoss(mob) && !(mob instanceof Player)) {
 				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SPELL_SHOCK_STAGGER_DURATION, 10, true, false));
 			}
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,

@@ -90,7 +90,7 @@ public class DeathsTouch extends Ability {
 		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1, 0.25f);
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
-		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE);
+		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE, mPlayer);
 		BoundingBox box = BoundingBox.of(loc, 1, 1, 1);
 		for (int i = 0; i < DEATHS_TOUCH_RANGE; i++) {
 			box.shift(dir);

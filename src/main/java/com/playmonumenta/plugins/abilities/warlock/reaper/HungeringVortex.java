@@ -86,7 +86,7 @@ public class HungeringVortex extends Ability {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
 			MovementUtils.PullTowards(mPlayer, mob, velocity);

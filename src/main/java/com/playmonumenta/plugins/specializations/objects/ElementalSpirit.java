@@ -97,7 +97,7 @@ public class ElementalSpirit {
 						loc.add(permDir);
 					}
 
-					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9)) {
+					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9, player)) {
 						EntityUtils.damageEntity(Plugin.getInstance(), e, dmg, player);
 						e.setFireTicks(20 * 5);
 					}
@@ -189,7 +189,7 @@ public class ElementalSpirit {
 					loc.getWorld().playSound(LocationUtils.getEntityCenter(tar), Sound.ENTITY_GENERIC_EXPLODE, 1,
 					                         1.25f);
 					EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
-					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3)) {
+					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3, player)) {
 						e.setFireTicks(20 * 3);
 						e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1, false, true));
 					}

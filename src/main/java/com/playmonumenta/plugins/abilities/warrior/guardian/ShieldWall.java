@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -104,10 +105,13 @@ public class ShieldWall extends Ability {
 							Location eLoc = e.getLocation();
 							if (e instanceof Projectile) {
 								Projectile proj = (Projectile) e;
-								if (!(proj.getShooter() instanceof Player)) {
-									proj.remove();
-									mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
-									mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
+								if (proj.getShooter() instanceof LivingEntity) {
+									LivingEntity shooter = (LivingEntity) proj.getShooter();
+									if (!(shooter instanceof Player) || AbilityManager.getManager().isPvPEnabled((Player)shooter)) {
+										proj.remove();
+										mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f);
+										mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
+									}
 								}
 							} else if (knockback && EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;

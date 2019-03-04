@@ -52,7 +52,7 @@ public class FractalEnervation extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.7, 0.7, 0.7);
 		Vector dir = mPlayer.getEyeLocation().getDirection();
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 9);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 9, mPlayer);
 		int level = getAbilityScore() == 1 ? 1 : 3;
 		int range = 9;
 		boolean cancel = false;
@@ -81,7 +81,7 @@ public class FractalEnervation extends Ability {
 						i = 0;
 						LivingEntity nextMob = null;
 						double dist = 100;
-						for (LivingEntity next : EntityUtils.getNearbyMobs(mob.getLocation(), 4)) {
+						for (LivingEntity next : EntityUtils.getNearbyMobs(mob.getLocation(), 4, mPlayer)) {
 							if (next.getLocation().distance(loc) < dist && !next.getUniqueId().equals(mob.getUniqueId())
 							    && !hit.contains(next)) {
 								nextMob = next;

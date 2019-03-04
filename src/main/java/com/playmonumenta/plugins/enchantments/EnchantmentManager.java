@@ -72,6 +72,7 @@ public class EnchantmentManager {
 		init.add(new Current());
 		init.add(new InstantDrink());
 		init.add(new DivineAura());
+		init.add(new JunglesNourishment());
 
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {

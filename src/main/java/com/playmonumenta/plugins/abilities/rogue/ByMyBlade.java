@@ -62,8 +62,13 @@ public class ByMyBlade extends Ability {
 			if (byMyBlade > 1) {
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
-				if (damagee instanceof Player)
-					MovementUtils.KnockAway(mPlayer, damagee, 0.25f);
+				if (damagee instanceof Player) {
+					MovementUtils.KnockAway(mPlayer, damagee, 0.3f);
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+                            new PotionEffect(PotionEffectType.SPEED,
+                                             BY_MY_BLADE_HASTE_DURATION,
+                                             0, false, true));
+				}
 			}
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
 			mWorld.spawnParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001);

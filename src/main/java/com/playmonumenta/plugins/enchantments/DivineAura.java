@@ -110,8 +110,8 @@ public class DivineAura implements BaseEnchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		World world = target.getWorld();
-		world.spawnParticle(Particle.SPELL_INSTANT, target.getLocation().add(0, target.getHeight() / 2, 0), 5, target.getWidth(), target.getHeight() / 3, target.getWidth(), 1);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, target.getLocation().add(0, target.getHeight() / 2, 0), 3, 0, 0, 0, 0.15);
+		world.spawnParticle(Particle.SPELL_INSTANT, target.getLocation().add(0, target.getHeight() / 2, 0), 6, target.getWidth(), target.getHeight() / 2, target.getWidth(), 1);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, target.getLocation().add(0, target.getHeight() / 2, 0), 4, 0, 0, 0, 0.15);
 	}
 
 }

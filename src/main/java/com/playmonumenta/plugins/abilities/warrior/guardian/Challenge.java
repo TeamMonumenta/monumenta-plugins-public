@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,13 +14,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 
 /*
@@ -40,7 +44,7 @@ public class Challenge extends Ability {
 
 	@Override
 	public boolean cast() {
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12, mPlayer);
 		int increase = mobs.size();
 		if (increase > 8) {
 			increase = 8;
@@ -60,8 +64,14 @@ public class Challenge extends Ability {
 		                                                  20 * 10,
 		                                                  amp, false, true));
 		for (LivingEntity mob : mobs) {
-			if (mob instanceof Mob)
+			if (mob instanceof Mob) {
 				((Mob)mob).setTarget(mPlayer);
+			} else if (mob instanceof Player && AbilityManager.getManager().isPvPEnabled((Player)mob)) {
+				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation(), mob.getLocation());
+				Location loc = mob.getLocation();
+				loc.setDirection(dir);
+				mob.teleport(loc);
+			}
 		}
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 1);
 		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 25, 0.4, 1, 0.4, 0.7f);

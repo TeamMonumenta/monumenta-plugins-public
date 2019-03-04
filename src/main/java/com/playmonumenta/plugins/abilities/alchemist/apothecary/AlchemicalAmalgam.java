@@ -76,7 +76,7 @@ public class AlchemicalAmalgam extends Ability {
 					                                                  0, true, true));
 				}
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5, mPlayer)) {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, amp - 1));
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
 				}

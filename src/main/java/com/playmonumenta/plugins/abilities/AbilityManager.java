@@ -72,6 +72,7 @@ import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
 import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
@@ -169,6 +170,7 @@ public class AbilityManager {
 		                          new FrostRay(mPlugin, mWorld, mRandom, null),
 		                          new MeteorStrike(mPlugin, mWorld, mRandom, null),
 		                          new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
+		                          new Blizzard(mPlugin, mWorld, mRandom, null),
 
 		                          // MAGE SWORDSMAN
 		                          new FlashSword(mPlugin, mWorld, mRandom, null),

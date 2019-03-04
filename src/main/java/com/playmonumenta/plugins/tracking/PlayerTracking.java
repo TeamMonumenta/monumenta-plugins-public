@@ -21,6 +21,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Constants;
@@ -132,6 +133,14 @@ public class PlayerTracking implements EntityTracking {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onHurt(plugin, player, event);
+		}
+	}
+
+	public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+
+			manager.onConsume(plugin, player, event);
 		}
 	}
 

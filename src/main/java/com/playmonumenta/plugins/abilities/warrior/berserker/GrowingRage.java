@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,10 +39,17 @@ public class GrowingRage extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		int rage = getAbilityScore();
+		LivingEntity damagee = (LivingEntity) event.getEntity();
 		double rageDamage = rageCurrentStack * (rage == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT) * event.getDamage();
+		if (damagee instanceof Player) {
+			rageDamage *= 0.5;
+		}
 		double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		if (mPlayer.getHealth() > 0 && mPlayer.getHealth() <= GROWING_RAGE_2_TRIGGER_HEALTH_PERCENT * maxHealth) {
 			rageDamage = rageDamage * 2;
+			if (damagee instanceof Player) {
+				rageDamage *= 0.75;
+			}
 		}
 		event.setDamage(event.getDamage() + rageDamage);
 		return true;

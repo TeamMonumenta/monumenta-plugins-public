@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -145,7 +146,8 @@ public class LuminousInfusion extends Ability {
 				}.runTaskLater(mPlugin, 1);
 			} else {
 				// Active damage to non-undead
-				if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+				if ((!EntityUtils.isElite(le) && !EntityUtils.isBoss(le))
+						|| ((le instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)le))) {
 					le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
 					                                    LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
 					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
