@@ -901,7 +901,12 @@ public class PlayerListener implements Listener {
 
 			if (player.getGameMode().equals(GameMode.SPECTATOR) || event.getNewGameMode().equals(GameMode.SPECTATOR)) {
 				/* Refresh class abilities when switching to/from spectator */
-				AbilityManager.getManager().updatePlayerAbilities(player);
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						AbilityManager.getManager().updatePlayerAbilities(player);
+					}
+				}.runTaskLater(mPlugin, 0);
 			}
 		}
 	}
