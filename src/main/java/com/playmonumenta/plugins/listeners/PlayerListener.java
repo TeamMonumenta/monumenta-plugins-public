@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
@@ -45,6 +46,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -146,6 +149,47 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
+		Block block = event.getPlayer().getTargetBlock((Set<Material>) null, 5);
+		if (event.getAnimationType() == PlayerAnimationType.ARM_SWING && block.getType() != Material.AIR) {
+			Player player = event.getPlayer();
+			LocationType zone = mPlugin.mSafeZoneManager.getLocationType(player);
+			if (zone == LocationType.Capital || zone == LocationType.SafeZone)  {
+				ItemStack i = player.getInventory().getItemInMainHand();
+				if (block != null && (i == null || i.getType() == Material.AIR) && player.isSprinting()) {
+					if (block.getBlockData() instanceof Bed) {
+						Location loc = block.getLocation().add(0.5, -1.2, 0.5);
+						Location pLoc = player.getLocation();
+						Vector dir = pLoc.getDirection().setY(0).normalize();
+						loc.setDirection(dir.multiply(-1));
+						ArmorStand stand = (ArmorStand) player.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+						mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 0.6f);
+						stand.setVisible(false);
+						stand.setInvulnerable(true);
+						stand.setGravity(false);
+						stand.addPassenger(player);
+						new BukkitRunnable() {
+
+							@Override
+							public void run() {
+								if (!stand.getPassengers().contains(player) || block.getType() == Material.AIR || !player.isValid()) {
+									this.cancel();
+									stand.remove();
+									if (!player.isSleeping()) {
+										player.teleport(pLoc);
+									}
+									mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 0.8f);
+								}
+							}
+
+						}.runTaskTimer(mPlugin, 0, 1);
+					}
+				}
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
@@ -175,33 +219,38 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 			}
 
-			if (block != null && item == null) {
-				if (block.getBlockData() instanceof Stairs) {
-					Location loc = block.getLocation().add(0.5, -1.2, 0.5);
-					Location pLoc = player.getLocation();
-					Stairs data = (Stairs) block.getBlockData();
-					Vector dir = data.getFacing().getOppositeFace().getDirection().setY(0).normalize();
-					loc.add(dir.multiply(0.1));
-					loc.setDirection(data.getFacing().getOppositeFace().getDirection());
-					ArmorStand stand = (ArmorStand) player.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
-					mWorld.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1, 0.9f);
-					stand.setVisible(false);
-					stand.setInvulnerable(true);
-					stand.setGravity(false);
-					stand.addPassenger(player);
-					new BukkitRunnable() {
+			LocationType zone = mPlugin.mSafeZoneManager.getLocationType(player);
+			if (zone == LocationType.Capital || zone == LocationType.SafeZone)  {
+				ItemStack i = player.getInventory().getItemInMainHand();
+				if (block != null && (i == null || i.getType() == Material.AIR)) {
+					if (block.getBlockData() instanceof Stairs) {
+						Stairs data = (Stairs) block.getBlockData();
+						Location loc = block.getLocation().add(0.5, -1.2, 0.5);
+						Location pLoc = player.getLocation();
+						Vector dir = data.getFacing().getOppositeFace().getDirection().setY(0).normalize();
+						loc.add(dir.multiply(0.1));
+						loc.setDirection(data.getFacing().getOppositeFace().getDirection());
+						ArmorStand stand = (ArmorStand) player.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+						mWorld.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1, 0.9f);
+						stand.setVisible(false);
+						stand.setInvulnerable(true);
+						stand.setGravity(false);
+						stand.addPassenger(player);
+						new BukkitRunnable() {
 
-						@Override
-						public void run() {
-							if (!stand.getPassengers().contains(player) || block.getType() == Material.AIR || !player.isValid()) {
-								this.cancel();
-								stand.remove();
-								player.teleport(pLoc);
-								mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+							@Override
+							public void run() {
+
+								if (!stand.getPassengers().contains(player) || block.getType() == Material.AIR || !player.isValid()) {
+									this.cancel();
+									stand.remove();
+									player.teleport(pLoc);
+									mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_LEATHER, 1, 1);
+								}
 							}
-						}
 
-					}.runTaskTimer(mPlugin, 0, 1);
+						}.runTaskTimer(mPlugin, 0, 1);
+					}
 				}
 			}
 
@@ -353,9 +402,9 @@ public class PlayerListener implements Listener {
 					return;
 				}
 				if (event.getClick() != null &&
-						event.getClick().equals(ClickType.RIGHT) &&
-						inventory.getItem(event.getSlot()) == null &&
-						event.getAction().equals(InventoryAction.NOTHING)) {
+				    event.getClick().equals(ClickType.RIGHT) &&
+				    inventory.getItem(event.getSlot()) == null &&
+				    event.getAction().equals(InventoryAction.NOTHING)) {
 
 					// Player right clicked an empty space and nothing happened
 					// Check if the last thing the player did was also the same thing.
@@ -465,9 +514,9 @@ public class PlayerListener implements Listener {
 						if ((stripped.equals("King's Valley : Tier I")) ||
 						    (stripped.equals("King's Valley : Tier II")) ||
 						    (stripped.equals("King's Valley : Tier III")) ||
-							(stripped.equals("Celsian Isles : Tier I")) ||
-							(stripped.equals("Celsian Isles : Tier II")) ||
-							(stripped.equals("Celsian Isles : Tier III"))) {
+						    (stripped.equals("Celsian Isles : Tier I")) ||
+						    (stripped.equals("Celsian Isles : Tier II")) ||
+						    (stripped.equals("Celsian Isles : Tier III"))) {
 							return true;
 						}
 					}
@@ -492,6 +541,7 @@ public class PlayerListener implements Listener {
 
 
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
+		AbilityManager.getManager().PlayerDeathEvent(player, event);
 
 		if (player.getHealth() > 0) {
 			return;

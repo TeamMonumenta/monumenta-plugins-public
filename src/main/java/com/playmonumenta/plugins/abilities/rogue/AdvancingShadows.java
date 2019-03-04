@@ -16,6 +16,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.point.Raycast;
@@ -113,14 +114,19 @@ public class AdvancingShadows extends Ability {
 				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
 				ray.throughBlocks = false;
 				ray.throughNonOccluding = false;
-				ray.targetPlayers = true;
+				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
+					ray.targetPlayers = true;
+				}
+
 				RaycastData data = ray.shootRaycast();
 
 				List<LivingEntity> rayEntities = data.getEntities();
 				if (rayEntities != null && !rayEntities.isEmpty()) {
-					target = rayEntities.get(0);
-					if (!target.getUniqueId().equals(mPlayer.getUniqueId()) && target != null && !target.isDead() && EntityUtils.isHostileMob(target)) {
-						return true;
+					for (LivingEntity t : rayEntities) {
+						if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
+							target = t;
+							return true;
+						}
 					}
 				}
 			}

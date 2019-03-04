@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -95,12 +96,12 @@ import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
-import com.playmonumenta.plugins.abilities.scout.hunter.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.ranger.Disengage;
 import com.playmonumenta.plugins.abilities.scout.ranger.PrecisionStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
@@ -298,8 +299,8 @@ public class AbilityManager {
 		                          // ALL PLAYERS (but technically for Alchemist)
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
 
-								  // All other non-class abilities
-								  new PvP(mPlugin, mWorld, mRandom, null)
+		                          // All other non-class abilities
+		                          new PvP(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
@@ -316,7 +317,7 @@ public class AbilityManager {
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
 		if (player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() != 0.1
-				&& !player.getGameMode().equals(GameMode.CREATIVE) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+		    && !player.getGameMode().equals(GameMode.CREATIVE) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 		}
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
@@ -453,7 +454,7 @@ public class AbilityManager {
 	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.LivingEntityShotByPlayerEvent(arrow, (LivingEntity)damagee, event)) {
+				if (!abil.LivingEntityShotByPlayerEvent(arrow, damagee, event)) {
 					return false;
 				}
 			}
@@ -611,6 +612,14 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.PotionApplyEvent(event);
+			}
+		}
+	}
+
+	public void PlayerDeathEvent(Player player, PlayerDeathEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PlayerDeathEvent(event);
 			}
 		}
 	}

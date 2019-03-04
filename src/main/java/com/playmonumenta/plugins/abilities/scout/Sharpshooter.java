@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.abilities.scout.hunter;
+package com.playmonumenta.plugins.abilities.scout;
 
 import java.util.Random;
 
@@ -14,14 +14,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 /*
- * Sharpshooter:  Each time you hit something with an arrow
- * it gives you a level of “Sharpshot” for 7s. Each level
- * you have of Sharpshot increases your arrow damage by 1.
- * Every time you land an arrow shot, your level of Sharpshot
- * is increased (max of 5 Levels) and its duration is refreshed.
- * At level 2, you can have a max of 7 Sharpshot Levels, and
- * its duration is increased to 9 seconds. This damage buff
- * stacks with Enchanted Arrow and other bow skills.
+ * - Sharpshooter:  Each successful arrow hit increases your arrow damage by +1,
+ * up to a max of +5. This bonus lasts for 12s, and the time refreshes with each
+ * arrow hit. At level 2, each hit increases damage by +2 up to +8, with a 15s
+ * timer instead.
  *
  * TODO: This damage buff
  * stacks with Enchanted Arrow and other bow skills.
@@ -39,7 +35,7 @@ public class Sharpshooter extends Ability {
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		int sharpshooter = getAbilityScore();
-		int time = sharpshooter == 1 ? 20 * 7 : 20 * 9;
+		int time = sharpshooter == 1 ? 20 * 12 : 20 * 15;
 		if (sharpshot <= 0) {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have begun to stack Sharpshooter!");
 			new BukkitRunnable() {
@@ -58,9 +54,13 @@ public class Sharpshooter extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		int max = sharpshooter == 1 ? 5 : 7;
+		int max = sharpshooter == 1 ? 5 : 8;
 		if (sharpshot < max) {
-			sharpshot++;
+			if (sharpshooter > 1) {
+				sharpshot += 2;
+			} else if (sharpshooter > 0) {
+				sharpshot++;
+			}
 		}
 		t = 0;
 		event.setDamage(event.getDamage() + sharpshot);

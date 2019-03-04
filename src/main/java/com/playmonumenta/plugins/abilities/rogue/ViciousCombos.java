@@ -8,6 +8,8 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -35,49 +37,52 @@ public class ViciousCombos extends Ability {
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		LivingEntity killedEntity = event.getEntity();
-		int viciousCombos = getAbilityScore();
+		EntityDamageEvent e = event.getEntity().getLastDamageCause();
+		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+			LivingEntity killedEntity = event.getEntity();
+			int viciousCombos = getAbilityScore();
 
-		//Run the task 1 tick later to let everything go on cooldown (ex. BMB)
-		new BukkitRunnable() {
+			//Run the task 1 tick later to let everything go on cooldown (ex. BMB)
+			new BukkitRunnable() {
 
-			@Override
-			public void run() {
-				Location loc = killedEntity.getLocation();
-				loc = loc.add(0, 0.5, 0);
-				if (EntityUtils.isElite(killedEntity)) {
-					mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
+				@Override
+				public void run() {
+					Location loc = killedEntity.getLocation();
+					loc = loc.add(0, 0.5, 0);
+					if (EntityUtils.isElite(killedEntity)) {
+						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
+						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
+						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, false));
 
-					if (viciousCombos > 1) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), VICIOUS_COMBOS_RANGE, mPlayer)) {
-							EntityUtils.damageEntity(mPlugin, mob, VICIOUS_COMBOS_DAMAGE, mPlayer);
+						if (viciousCombos > 1) {
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
+								EntityUtils.damageEntity(mPlugin, mob, VICIOUS_COMBOS_DAMAGE, mPlayer);
+							}
 						}
+
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
+						mWorld.spawnParticle(Particle.CRIT, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+						mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+					} else if (EntityUtils.isHostileMob(killedEntity)) {
+						int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
+						if (killedEntity instanceof Player) {
+							timeReduction *= 2;
+						}
+
+						mPlugin.mTimers.UpdateCooldowns(mPlayer, timeReduction);
+
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
+						mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+						mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
+						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 					}
 
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.5f);
-					mWorld.spawnParticle(Particle.CRIT, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 500, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
-					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-					mWorld.spawnParticle(Particle.SPELL_MOB, loc, 350, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-				} else if (EntityUtils.isHostileMob(killedEntity)) {
-					int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
-					if (killedEntity instanceof Player) {
-						timeReduction *= 2;
-					}
-
-					mPlugin.mTimers.UpdateCooldowns(mPlayer, timeReduction);
-
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
-					mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);
-					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
-					mWorld.spawnParticle(Particle.SPELL_MOB, loc, 30, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.001);
 				}
 
-			}
-
-		}.runTaskLater(mPlugin, 1);
+			}.runTaskLater(mPlugin, 1);
+		}
 	}
 }

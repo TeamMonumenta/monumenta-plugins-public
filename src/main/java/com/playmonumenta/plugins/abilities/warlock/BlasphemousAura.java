@@ -2,23 +2,18 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BlasphemousAura extends Ability {
@@ -35,33 +30,26 @@ public class BlasphemousAura extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damager = (LivingEntity) event.getDamager();
-		if (!(damager instanceof Player)) {
-			// ABILITY: Blasphemous Aura
-			if (damager instanceof Skeleton) {
-				Skeleton skelly = (Skeleton) damager;
-				ItemStack mainHand = skelly.getEquipment().getItemInMainHand();
-				if (mainHand != null && mainHand.getType() == Material.BOW) {
-					return true;
+	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+		LivingEntity damagee = event.getDamaged();
+		int amp = getAbilityScore() == 1 ? 2 : 4;
+		PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.UNLUCK, 20 * 5, amp, false, true));
+		if (getAbilityScore() > 1) {
+			int affected = 0;
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 16, mPlayer)) {
+				if (mob.hasPotionEffect(PotionEffectType.UNLUCK)) {
+					affected++;
 				}
 			}
 
-			Location loc = mPlayer.getLocation();
-			World world = mPlayer.getWorld();
-
-			world.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-			world.spawnParticle(Particle.SPELL, loc.add(0, 1, 0), 30, 1.5, 0.6, 1.5, 0.001);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.8f, 0.6f);
-
-			MovementUtils.KnockAway(mPlayer, damager, BLASPHEMY_KNOCKBACK_SPEED);
-			int vulnLevel = (getAbilityScore() == 1) ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
-
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), BLASPHEMY_RADIUS, mPlayer)) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, vulnLevel, false, true));
+			if (affected >= 5) {
+				for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, 16, true)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
+					                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 20,
+					                                                  0, true, false));
+				}
 			}
 		}
-		return true;
 	}
 
 }
