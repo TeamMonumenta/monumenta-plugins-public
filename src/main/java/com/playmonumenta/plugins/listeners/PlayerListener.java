@@ -548,13 +548,17 @@ public class PlayerListener implements Listener {
 				// Regular inventory item - don't check, just drop it
 				ItemStack item = inv.getItem(slotId);
 				if (item != null) {
-					Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
+					if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) != 0) {
+						inv.clear(slotId);
+					} else {
+						Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
 
-					// Make the dropped item invulnerable for a short while to prevent double-creepering
-					droppedItem.setInvulnerable(true);
-					droppedItems.add(droppedItem);
+						// Make the dropped item invulnerable for a short while to prevent double-creepering
+						droppedItem.setInvulnerable(true);
+						droppedItems.add(droppedItem);
 
-					inv.clear(slotId);
+						inv.clear(slotId);
+					}
 				}
 			}
 
