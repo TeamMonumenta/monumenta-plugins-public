@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.overrides;
 
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -13,14 +17,67 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class ChestOverride extends BaseOverride {
+	// Convenience list of offsets to get adjacent blocks
+	private final static List<Vector> ADJACENT_OFFSETS = Arrays.asList(
+	                                                         new Vector(1, 0, 0),
+	                                                         new Vector(-1, 0, 0),
+	                                                         new Vector(0, -1, 0),
+	                                                         new Vector(0, 0, 1),
+	                                                         new Vector(0, 0, -1)
+	                                                     );
+	// Convenience list of offsets to get adjacent blocks
+	private final static EnumSet<Material> GRAVITY_BLOCKS = EnumSet.of(
+			Material.SAND,
+			Material.RED_SAND,
+			Material.GRAVEL,
+			Material.WHITE_CONCRETE_POWDER,
+			Material.ORANGE_CONCRETE_POWDER,
+			Material.MAGENTA_CONCRETE_POWDER,
+			Material.LIGHT_BLUE_CONCRETE_POWDER,
+			Material.YELLOW_CONCRETE_POWDER,
+			Material.LIME_CONCRETE_POWDER,
+			Material.PINK_CONCRETE_POWDER,
+			Material.GRAY_CONCRETE_POWDER,
+			Material.LIGHT_GRAY_CONCRETE_POWDER,
+			Material.CYAN_CONCRETE_POWDER,
+			Material.PURPLE_CONCRETE_POWDER,
+			Material.BLUE_CONCRETE_POWDER,
+			Material.BROWN_CONCRETE_POWDER,
+			Material.GREEN_CONCRETE_POWDER,
+			Material.RED_CONCRETE_POWDER,
+			Material.BLACK_CONCRETE_POWDER,
+			Material.WATER,
+			Material.LAVA,
+			Material.ANVIL
+	);
+
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+		// Iterate over adjacent blocks to trigger physics
+		for (Vector vec : ADJACENT_OFFSETS) {
+			Location tmpLoc = block.getLocation().add(vec);
+			Block blk = tmpLoc.getBlock();
+			Material type = blk.getType();
+			Location underLoc = tmpLoc.clone().subtract(0, 1, 0);
+			Material underType = underLoc.getBlock().getType();
+			if (GRAVITY_BLOCKS.contains(type) && (underType.equals(Material.AIR) || underType.equals(Material.CAVE_AIR))) {
+				if (underType.equals(Material.CAVE_AIR)) {
+					underLoc.getBlock().setType(Material.AIR);
+					underLoc.getBlock().setType(Material.CAVE_AIR);
+				} else {
+					underLoc.getBlock().setType(Material.CAVE_AIR);
+					underLoc.getBlock().setType(Material.AIR);
+				}
+			}
+		}
+
 		if (!command_chest(block)) {
 			return false;
 		}

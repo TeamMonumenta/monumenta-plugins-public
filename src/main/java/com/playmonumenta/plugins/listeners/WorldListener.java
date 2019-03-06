@@ -63,6 +63,21 @@ public class WorldListener implements Listener {
 		}
 	}
 
+	// Convenience list of offsets to get adjacent blocks
+	private final static List<Vector> ADJACENT_OFFSETS = Arrays.asList(
+	                                                         new Vector(1, 0, 0),
+	                                                         new Vector(-1, 0, 0),
+	                                                         new Vector(0, 1, 0),
+	                                                         new Vector(0, 0, 1),
+	                                                         new Vector(0, 0, -1),
+
+	                                                         // Acacia fix
+	                                                         new Vector(-1, 1, 0),
+	                                                         new Vector(1, 1, 0),
+	                                                         new Vector(0, 1, -1),
+	                                                         new Vector(0, 1, 1)
+	                                                     );
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void StructureGrowEvent(StructureGrowEvent event) {
 		List<BlockState> blockStates = event.getBlocks();
@@ -105,26 +120,11 @@ public class WorldListener implements Listener {
 		// Starting block is reachable - prevent it from being re-checked
 		event.getLocation().getBlock().removeMetadata(Constants.TREE_METAKEY, mPlugin);
 
-		// Convenience list of offsets to get adjacent blocks
-		List<Vector> adjacentOffsets = Arrays.asList(
-		                                   new Vector(1, 0, 0),
-		                                   new Vector(-1, 0, 0),
-		                                   new Vector(0, 1, 0),
-		                                   new Vector(0, 0, 1),
-		                                   new Vector(0, 0, -1),
-
-		                                   // Acacia fix
-		                                   new Vector(-1, 1, 0),
-		                                   new Vector(1, 1, 0),
-		                                   new Vector(0, 1, -1),
-		                                   new Vector(0, 1, 1)
-		                               );
-
 		while (!locList.isEmpty()) {
 			Location loc = locList.remove();
 
 			// Add adjacent blocks with metadata to the back of the queue
-			for (Vector vec : adjacentOffsets) {
+			for (Vector vec : ADJACENT_OFFSETS) {
 				Location tmpLoc = loc.clone().add(vec);
 				Block blk = tmpLoc.getBlock();
 				if (blk.hasMetadata(Constants.TREE_METAKEY)) {
