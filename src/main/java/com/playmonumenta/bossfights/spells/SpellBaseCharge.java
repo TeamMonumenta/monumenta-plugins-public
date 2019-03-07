@@ -14,7 +14,7 @@ import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellBaseCharge extends Spell {
 	@FunctionalInterface
-	interface WarningAction {
+	public interface WarningAction {
 		/**
 		 * Action to notify player when the boss starts the attack
 		 *
@@ -26,7 +26,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	interface WarningParticles {
+	public interface WarningParticles {
 		/**
 		 * Particles to indicate the path of the boss's charge
 		 *
@@ -36,7 +36,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	interface StartAction {
+	public interface StartAction {
 		/**
 		 * Action run when the boss begins the attack
 		 * Boss location will be the origin point
@@ -49,7 +49,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	interface HitPlayerAction {
+	public interface HitPlayerAction {
 		/**
 		 * Action to take when a player is hit by the boss charge
 		 *
@@ -61,7 +61,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	interface ParticleAction {
+	public interface ParticleAction {
 		/**
 		 * User function called many times per tick with the location where
 		 * the boss's charge is drawn like a laser
@@ -72,7 +72,7 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	interface EndAction {
+	public interface EndAction {
 		/**
 		 * Action to run on the boss when the attack is completed
 		 * Boss location will be the end point
@@ -93,11 +93,29 @@ public class SpellBaseCharge extends Spell {
 	private ParticleAction mParticleAction;
 	private EndAction mEndAction;
 	private boolean mStopOnFirstHit;
+	private int mCharges;
+	private int mRate;
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
-	                       WarningAction warning, ParticleAction warnParticles,
-	                       StartAction start, HitPlayerAction hitPlayer,
-	                       ParticleAction particle, EndAction end) {
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
+	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
+	                       EndAction end) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mRange = range;
+		mChargeTicks = chargeTicks;
+		mWarningAction = warning;
+		mWarnParticleAction = warnParticles;
+		mStartAction = start;
+		mHitPlayerAction = hitPlayer;
+		mParticleAction = particle;
+		mEndAction = end;
+		mCharges = 0;
+		mRate = 0;
+	}
+
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
+	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
+	                       EndAction end, boolean stopOnFirstHit) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -109,6 +127,26 @@ public class SpellBaseCharge extends Spell {
 		mParticleAction = particle;
 		mEndAction = end;
 		mStopOnFirstHit = stopOnFirstHit;
+		mCharges = 0;
+		mRate = 0;
+	}
+
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
+	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
+	                       EndAction end, boolean stopOnFirstHit, int charges, int rate) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mRange = range;
+		mChargeTicks = chargeTicks;
+		mWarningAction = warning;
+		mWarnParticleAction = warnParticles;
+		mStartAction = start;
+		mHitPlayerAction = hitPlayer;
+		mParticleAction = particle;
+		mEndAction = end;
+		mStopOnFirstHit = stopOnFirstHit;
+		mCharges = charges;
+		mRate = rate;
 	}
 
 	@Override
@@ -121,7 +159,11 @@ public class SpellBaseCharge extends Spell {
 		Collections.shuffle(players);
 		for (Player player : players) {
 			if (Utils.hasLineOfSight(player, mBoss)) {
-				launch(player, bystanders);
+				if (mCharges <= 0 || mRate <= 0) {
+					launch(player, bystanders);
+				} else {
+					launch(player, bystanders, mCharges, mRate);
+				}
 				break;
 			}
 		}
@@ -173,7 +215,7 @@ public class SpellBaseCharge extends Spell {
 
 			if (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid()) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
-				endLoc.subtract(baseVect.multiply(11));
+				endLoc.subtract(baseVect.multiply(1));
 				// Charge terminated at a block
 				break;
 			} else if (launLoc.distance(endLoc) > (launLoc.distance(targetLoc) + 6.0f)) {
@@ -210,6 +252,60 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		return chargeHitsPlayer;
+	}
+
+	private void launch(Player target, List<Player> players, int charges, int rate) {
+		BukkitRunnable runnable = new BukkitRunnable() {
+			private int mTicks = 0;
+			private int charges_done = 0;
+			Location targetLoc;
+			List<Player> bystanders = players;
+			Player mTarget = target;
+			@Override
+			public void run() {
+				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null) {
+					this.cancel();
+					return;
+				}
+				if (mTicks == 0) {
+					targetLoc = mTarget.getLocation().add(0, 1.25f, 0);
+					if (mWarningAction != null) {
+						mWarningAction.run(target);
+					}
+				} else if (mTicks > 0 && mTicks < mChargeTicks) {
+					// This runs once every other tick while charging
+					doCharge(mTarget, mBoss, targetLoc, bystanders, null, mWarnParticleAction, null, null, false, mStopOnFirstHit);
+				} else if (mTicks >= mChargeTicks) {
+					// Do the "real" charge attack
+					doCharge(mTarget, mBoss, targetLoc, bystanders, mStartAction, mParticleAction, mHitPlayerAction,
+					         mEndAction, true, mStopOnFirstHit);
+					charges_done++;
+					if (charges_done >= charges) {
+						this.cancel();
+						mActiveRunnables.remove(this);
+					} else {
+						// Get list of all nearby players who could be hit by the attack
+						bystanders = Utils.playersInRange(mBoss.getLocation(), mRange * 2);
+
+						// Choose random player within range that has line of sight to boss
+						List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+						Collections.shuffle(players);
+						for (Player player : players) {
+							if (Utils.hasLineOfSight(player, mBoss)) {
+								mTarget = player;
+								targetLoc = mTarget.getLocation().add(0, 1.0f, 0);
+								break;
+							}
+						}
+						mTicks -= rate;
+					}
+				}
+
+				mTicks += 2;
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void launch(Player target, List<Player> players) {

@@ -28,8 +28,17 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossDamagedByEntity(event);
-				for (Spell passives : ability.getPassives()) {
-					passives.bossDamagedByEntity(event);
+
+				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+					for (Spell passives : ability.getPassives()) {
+						passives.bossDamagedByEntity(event);
+					}
+				}
+
+				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+					for (Spell actives : ability.getActiveSpells()) {
+						actives.bossDamagedByEntity(event);
+					}
 				}
 			}
 		}
@@ -39,8 +48,17 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossDamagedEntity(event);
-				for (Spell passives : ability.getPassives()) {
-					passives.bossDamagedEntity(event);
+
+				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+					for (Spell passives : ability.getPassives()) {
+						passives.bossDamagedEntity(event);
+					}
+				}
+
+				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+					for (Spell actives : ability.getActiveSpells()) {
+						actives.bossDamagedEntity(event);
+					}
 				}
 			}
 		}
@@ -50,8 +68,17 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossLaunchedProjectile(event);
-				for (Spell passives : ability.getPassives()) {
-					passives.bossLaunchedProjectile(event);
+
+				if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+					for (Spell passives : ability.getPassives()) {
+						passives.bossLaunchedProjectile(event);
+					}
+				}
+
+				if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+					for (Spell actives : ability.getActiveSpells()) {
+						actives.bossLaunchedProjectile(event);
+					}
 				}
 			}
 		}
@@ -60,8 +87,16 @@ public class Boss {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossProjectileHit(event);
-			for (Spell passives : ability.getPassives()) {
-				passives.bossProjectileHit(event);
+			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+				for (Spell passives : ability.getPassives()) {
+					passives.bossProjectileHit(event);
+				}
+			}
+
+			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+				for (Spell actives : ability.getActiveSpells()) {
+					actives.bossProjectileHit(event);
+				}
 			}
 		}
 	}
@@ -69,8 +104,16 @@ public class Boss {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossHitByProjectile(event);
-			for (Spell passives : ability.getPassives()) {
-				passives.bossHitByProjectile(event);
+			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+				for (Spell passives : ability.getPassives()) {
+					passives.bossHitByProjectile(event);
+				}
+			}
+
+			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+				for (Spell actives : ability.getActiveSpells()) {
+					actives.bossHitByProjectile(event);
+				}
 			}
 		}
 	}
@@ -78,8 +121,17 @@ public class Boss {
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.areaEffectAppliedToBoss(event);
-			for (Spell passives : ability.getPassives()) {
-				passives.areaEffectAppliedToBoss(event);
+
+			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+				for (Spell passives : ability.getPassives()) {
+					passives.areaEffectAppliedToBoss(event);
+				}
+			}
+
+			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+				for (Spell actives : ability.getActiveSpells()) {
+					actives.areaEffectAppliedToBoss(event);
+				}
 			}
 		}
 	}
@@ -87,8 +139,34 @@ public class Boss {
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.splashPotionAppliedToBoss(event);
-			for (Spell passives : ability.getPassives()) {
-				passives.splashPotionAppliedToBoss(event);
+
+			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+				for (Spell passives : ability.getPassives()) {
+					passives.splashPotionAppliedToBoss(event);
+				}
+			}
+
+			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+				for (Spell actives : ability.getActiveSpells()) {
+					actives.splashPotionAppliedToBoss(event);
+				}
+			}
+		}
+	}
+
+	public void bossCastAbility(SpellCastEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossCastAbility(event);
+			if (ability.getPassives() != null && !ability.getPassives().isEmpty()) {
+				for (Spell passives : ability.getPassives()) {
+					passives.bossCastAbility(event);
+				}
+			}
+
+			if (ability.getActiveSpells() != null && !ability.getActiveSpells().isEmpty()) {
+				for (Spell actives : ability.getActiveSpells()) {
+					actives.bossCastAbility(event);
+				}
 			}
 		}
 	}
@@ -111,6 +189,7 @@ public class Boss {
 
 	public void death() {
 		for (BossAbilityGroup ability : mAbilities) {
+			ability.mDead = true;
 			ability.death();
 		}
 	}

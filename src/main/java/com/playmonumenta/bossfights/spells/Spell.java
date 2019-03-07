@@ -10,7 +10,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public abstract class Spell {
+import com.playmonumenta.bossfights.SpellCastEvent;
+
+public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
 
 	/*
@@ -36,6 +38,11 @@ public abstract class Spell {
 
 	/* How long this spell takes to cast (in ticks) */
 	public abstract int duration();
+
+	/* How long the cast time is. The duration() method is more of a "cooldown before the next ability" */
+	public int castTime() {
+		return 0;
+	}
 
 	/*
 	 * Boss damaged another entity
@@ -71,4 +78,7 @@ public abstract class Spell {
 	 * Boss-shot projectile hit something
 	 */
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {};
+
+	public void bossCastAbility(SpellCastEvent event) {};
+
 }

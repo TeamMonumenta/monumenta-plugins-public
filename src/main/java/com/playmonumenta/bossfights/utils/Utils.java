@@ -7,6 +7,8 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
@@ -156,9 +158,74 @@ public class Utils {
 	}
 
 	public static void KnockAway(Location loc, LivingEntity target, float speed) {
-		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().multiply(speed);
+		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().normalize().multiply(1 + speed);
 		dir.setY(0.5f);
 
 		target.setVelocity(dir);
+	}
+
+	public static void KnockAway(Location loc, LivingEntity target, float speed, float y) {
+		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().normalize().multiply(1 + speed);
+		dir.setY(y);
+
+		target.setVelocity(dir);
+	}
+
+	public static ArrayList<Block> getNearbyBlocks(Block start, int radius) {
+		ArrayList<Block> blocks = new ArrayList<Block>();
+		for (double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++) {
+			for (double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++) {
+				for (double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++) {
+					Location loc = new Location(start.getWorld(), x, y, z);
+					blocks.add(loc.getBlock());
+				}
+			}
+		}
+		return blocks;
+	}
+
+	/* Note:
+	 * loc1 must be the location with a lesser x, y, and z coordinate than loc2.
+	 * loc2 must be the location with a greater x, y, and z coordinate than loc1.
+	 */
+
+	public static List<Block> getEdge(Location loc1, Location loc2) {
+		List<Block> blocks = new ArrayList<Block>();
+		int x1 = loc1.getBlockX();
+		int y1 = loc1.getBlockY();
+		int z1 = loc1.getBlockZ();
+
+		int x2 = loc2.getBlockX();
+		int y2 = loc2.getBlockY();
+		int z2 = loc2.getBlockZ();
+
+		World world = loc1.getWorld();
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y1, z1);
+			blocks.add(currentBlock);
+		}
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y2, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x1, yPoint, z1);
+			blocks.add(currentBlock);
+		}
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x2, yPoint, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x1, y1, zPoint);
+			blocks.add(currentBlock);
+		}
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x2, y2, zPoint);
+			blocks.add(currentBlock);
+		}
+		return blocks;
 	}
 }

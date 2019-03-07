@@ -2,9 +2,11 @@ package com.playmonumenta.bossfights;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import com.playmonumenta.bossfights.spells.Spell;
@@ -24,22 +26,30 @@ import com.playmonumenta.bossfights.spells.Spell;
  * chosen either immediately afterward OR the time after that). Etc.
  */
 public class SpellManager {
-	private final List<Spell> mReadySpells;
+	private Map < Class<?>, Spell > mReadySpells;
 	private final Queue<Spell> mCooldownSpells;
 	private final int mCooldown;
+	private Spell mLastCasted;
+
+	public List<Spell> getSpells() {
+		List<Spell> spells = new ArrayList<Spell>();
+		spells.addAll(mCooldownSpells);
+		spells.addAll(mReadySpells.values());
+		return spells;
+	}
 
 	public SpellManager(List<Spell> spells) {
 		/*
 		 * Need a new copy of the list because the passed-in version doesn't
 		 * support removing during iteration... Weird
 		 */
-		mReadySpells = new ArrayList<Spell>();
+		mReadySpells = new HashMap < Class<?>, Spell > ();
 		for (Spell spell : spells) {
-			mReadySpells.add(spell);
+			mReadySpells.put(spell.getClass(), spell);
 		}
 
 		mCooldownSpells = new LinkedList<Spell>();
-		mCooldown = (int)Math.floor(((double)mReadySpells.size() - 1.0) / 2.0);
+		mCooldown = (int)Math.floor((mReadySpells.size() - 1.0) / 2.0);
 	}
 
 	public int runNextSpell() {
@@ -48,24 +58,28 @@ public class SpellManager {
 		 * the cooldown list and add it to the ready list.
 		 */
 		if (mCooldownSpells.size() > mCooldown) {
-			mReadySpells.add(mCooldownSpells.remove());
+			Spell toAdd = mCooldownSpells.remove();
+			mReadySpells.put(toAdd.getClass(), toAdd);
 		}
 
 
 		/*
 		 * Try the ready spells in random order until can be run or none remain
 		 */
-		Collections.shuffle(mReadySpells);
-		Iterator<Spell> iterator = mReadySpells.iterator();
+		List<Spell> spells = new ArrayList<Spell>(mReadySpells.values());
+		Collections.shuffle(spells);
+		Iterator<Spell> iterator = spells.iterator();
 		while (iterator.hasNext()) {
 			Spell spell = iterator.next();
 			if (spell.canRun()) {
 				spell.run();
+				mLastCasted = spell;
 				mCooldownSpells.add(spell);
 				iterator.remove();
-
 				/* Return how much time the spell takes */
 				return spell.duration();
+			} else {
+				mLastCasted = null;
 			}
 		}
 
@@ -73,8 +87,29 @@ public class SpellManager {
 		return 20;
 	}
 
+	public int forceCastSpell(Class<?> spell) {
+
+		Spell sp = mReadySpells.get(spell);
+		if (sp != null) {
+			if (sp.canRun()) {
+				sp.run();
+				mLastCasted = sp;
+				mCooldownSpells.add(sp);
+				return sp.duration();
+			} else {
+				mLastCasted = null;
+			}
+		}
+		/* None of these spells can run - wait a second before trying again */
+		return 20;
+	}
+
+	public Spell getLastCastedSpell() {
+		return mLastCasted;
+	}
+
 	public void cancelAll() {
-		for (Spell spell : mReadySpells) {
+		for (Spell spell : mReadySpells.values()) {
 			spell.cancel();
 		}
 		for (Spell spell : mCooldownSpells) {

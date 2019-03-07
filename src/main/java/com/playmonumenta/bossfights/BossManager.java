@@ -30,7 +30,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
 import com.playmonumenta.bossfights.bosses.AuraLargeHungerBoss;
@@ -51,6 +50,7 @@ import com.playmonumenta.bossfights.bosses.CShura_1;
 import com.playmonumenta.bossfights.bosses.CShura_2;
 import com.playmonumenta.bossfights.bosses.ChargerBoss;
 import com.playmonumenta.bossfights.bosses.CorruptInfestedBoss;
+import com.playmonumenta.bossfights.bosses.CrownbearerBoss;
 import com.playmonumenta.bossfights.bosses.DamageReducedBoss;
 import com.playmonumenta.bossfights.bosses.DebuffHitBoss;
 import com.playmonumenta.bossfights.bosses.FireResistantBoss;
@@ -62,16 +62,20 @@ import com.playmonumenta.bossfights.bosses.GenericBoss;
 import com.playmonumenta.bossfights.bosses.HandSwapBoss;
 import com.playmonumenta.bossfights.bosses.HiddenBoss;
 import com.playmonumenta.bossfights.bosses.IceAspectBoss;
+import com.playmonumenta.bossfights.bosses.ImmortalElementalKaulBoss;
 import com.playmonumenta.bossfights.bosses.InfestedBoss;
 import com.playmonumenta.bossfights.bosses.InvisibleBoss;
+import com.playmonumenta.bossfights.bosses.Kaul;
 import com.playmonumenta.bossfights.bosses.LivingBladeBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
 import com.playmonumenta.bossfights.bosses.Masked_2;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
+import com.playmonumenta.bossfights.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
 import com.playmonumenta.bossfights.bosses.SnowballDamageBoss;
 import com.playmonumenta.bossfights.bosses.SwordsageRichter;
+import com.playmonumenta.bossfights.bosses.TCalin;
 import com.playmonumenta.bossfights.bosses.TpBehindBoss;
 import com.playmonumenta.bossfights.bosses.TsunamiChargerBoss;
 import com.playmonumenta.bossfights.bosses.UnstableBoss;
@@ -146,6 +150,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new CorruptInfestedBoss(p, e));
 		mStatelessBosses.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameLaserBoss(p, e));
 		mStatelessBosses.put(LivingBladeBoss.identityTag, (Plugin p, LivingEntity e) -> new LivingBladeBoss(p, e));
+		mStatelessBosses.put(PrimordialElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new PrimordialElementalKaulBoss(p, e));
+		mStatelessBosses.put(ImmortalElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalElementalKaulBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -159,6 +165,9 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(CShura_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_1(p, e, s, l));
 		mStatefulBosses.put(CShura_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CShura_2(p, e, s, l));
 		mStatefulBosses.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new SwordsageRichter(p, e, s, l));
+		mStatefulBosses.put(Kaul.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Kaul(p, e, s, l));
+		mStatefulBosses.put(TCalin.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TCalin(p, e, s, l));
+		mStatefulBosses.put(CrownbearerBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CrownbearerBoss(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -207,6 +216,11 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> FlameLaserBoss.deserialize(p, e));
 		mBossDeserializers.put(SwordsageRichter.identityTag, (Plugin p, LivingEntity e) -> SwordsageRichter.deserialize(p, e));
 		mBossDeserializers.put(LivingBladeBoss.identityTag, (Plugin p, LivingEntity e) -> LivingBladeBoss.deserialize(p, e));
+		mBossDeserializers.put(Kaul.identityTag, (Plugin p, LivingEntity e) -> Kaul.deserialize(p, e));
+		mBossDeserializers.put(PrimordialElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> PrimordialElementalKaulBoss.deserialize(p, e));
+		mBossDeserializers.put(ImmortalElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> ImmortalElementalKaulBoss.deserialize(p, e));
+		mBossDeserializers.put(TCalin.identityTag, (Plugin p, LivingEntity e) -> TCalin.deserialize(p, e));
+		mBossDeserializers.put(CrownbearerBoss.identityTag, (Plugin p, LivingEntity e) -> CrownbearerBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
@@ -278,13 +292,15 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			boss.death();
-			boss.unload();
+			if (((LivingEntity) entity).getHealth() <= 0) {
+				boss.unload();
 
-			/*
-			 * Remove special serialization data from drops. Should not be
-			 * necessary since loaded bosses already have this data stripped
-			 */
-			SerializationUtils.stripSerializationDataFromDrops(event);
+				/*
+				 * Remove special serialization data from drops. Should not be
+				 * necessary since loaded bosses already have this data stripped
+				 */
+				SerializationUtils.stripSerializationDataFromDrops(event);
+			}
 		}
 	}
 
@@ -316,7 +332,7 @@ public class BossManager implements Listener {
 			}
 			if (event.getHitEntity() != null && event.getHitEntity() instanceof LivingEntity) {
 				LivingEntity hit = (LivingEntity) event.getHitEntity();
-				Boss boss = mBosses.get(((LivingEntity) hit).getUniqueId());
+				Boss boss = mBosses.get(hit.getUniqueId());
 				if (boss != null) {
 					boss.bossHitByProjectile(event);
 				}
@@ -365,6 +381,15 @@ public class BossManager implements Listener {
 				// May cancel the event
 				boss.bossDamagedEntity(event);
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void SpellCastEvent(SpellCastEvent event) {
+		LivingEntity boss = event.getBoss();
+		Boss b = mBosses.get(boss.getUniqueId());
+		if (b != null) {
+			b.bossCastAbility(event);
 		}
 	}
 

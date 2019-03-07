@@ -2,12 +2,12 @@ package com.playmonumenta.bossfights;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -27,6 +27,10 @@ public class BossBarManager {
 		mRange = range;
 		mEvents = events;
 		mEventCursor = 100;
+		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
+		while (mEvents != null && mEventCursor > (progress * 100)) {
+			mEventCursor--;
+		}
 
 		mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
 		mBar.setVisible(true);
@@ -51,7 +55,13 @@ public class BossBarManager {
 		}
 
 		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-
+		if ((progress * 100) > 99 && mEventCursor >= 99) {
+			BossHealthAction event = mEvents.get(mEventCursor);
+			if (event != null) {
+				event.run(mBoss);
+			}
+			mEventCursor--;
+		}
 		while (mEvents != null && mEventCursor > (progress * 100)) {
 			BossHealthAction event = mEvents.get(mEventCursor);
 			if (event != null) {

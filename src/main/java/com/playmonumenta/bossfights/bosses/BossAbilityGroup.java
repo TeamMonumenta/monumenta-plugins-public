@@ -12,11 +12,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
@@ -39,6 +39,8 @@ public abstract class BossAbilityGroup {
 	private int mTaskIDpassive = -1;
 	private int mTaskIDactive = -1;
 	private boolean mUnloaded = false;
+	private Integer mNextActiveTimer = 0;
+	public boolean mDead = false;
 
 	public void changePhase(SpellManager activeSpells,
 	                        List<Spell> passiveSpells, PhaseAction action) {
@@ -53,19 +55,7 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, int wait) {
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar);
-			}
-
-		}.runTaskLater(plugin, wait);
-	}
-
-	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mBossBar = bossBar;
@@ -79,7 +69,7 @@ public abstract class BossAbilityGroup {
 		Runnable passive = new Runnable() {
 			@Override
 			public void run() {
-				if (mBossBar != null) {
+				if (mBossBar != null && !mDead) {
 					mBossBar.update();
 				}
 
@@ -99,7 +89,7 @@ public abstract class BossAbilityGroup {
 
 		Runnable active = new Runnable() {
 			private boolean mDisabled = true;
-			private Integer mNextActiveTimer = 0;
+
 
 			@Override
 			public void run() {
@@ -131,6 +121,7 @@ public abstract class BossAbilityGroup {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
+
 						if (mActiveSpells != null) {
 							mActiveSpells.cancelAll();
 						}
@@ -144,10 +135,31 @@ public abstract class BossAbilityGroup {
 				if (mActiveSpells != null) {
 					// Run the next spell and store how long before the next spell can run
 					mNextActiveTimer = mActiveSpells.runNextSpell();
+
+					// The event goes after the spell casts because Kaul's abilities take place where he previously was.
+					Spell spell = mActiveSpells.getLastCastedSpell();
+					if (spell != null) {
+						SpellCastEvent event = new SpellCastEvent(mBoss, spell);
+						Bukkit.getPluginManager().callEvent(event);
+					}
 				}
 			}
 		};
-		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, 100L, 2L);
+		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, spellDelay, 2L);
+	}
+
+	public void forceCastSpell(Class<?> spell) {
+		mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
+		Spell sp = mActiveSpells.getLastCastedSpell();
+		if (sp != null) {
+			SpellCastEvent event = new SpellCastEvent(mBoss, sp);
+			Bukkit.getPluginManager().callEvent(event);
+		}
+	}
+
+	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
+		constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 
@@ -157,6 +169,14 @@ public abstract class BossAbilityGroup {
 
 	public List<Spell> getPassives() {
 		return mPassiveSpells;
+	}
+
+	public List<Spell> getActiveSpells() {
+		if (mActiveSpells != null) {
+			return mActiveSpells.getSpells();
+		} else {
+			return null;
+		}
 	}
 
 	/*
@@ -193,6 +213,8 @@ public abstract class BossAbilityGroup {
 	 * Boss-shot projectile hit something
 	 */
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {};
+
+	public void bossCastAbility(SpellCastEvent event) {};
 
 	/*
 	 * Called only the first time the boss is summoned into the world

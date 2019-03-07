@@ -1,6 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -15,9 +16,16 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 
 public class SpellBlockBreak extends Spell {
 	private Entity mLauncher;
+	private List<Material> mNoBreak;
 
 	public SpellBlockBreak(Entity launcher) {
 		mLauncher = launcher;
+		mNoBreak = new ArrayList<Material>();
+	}
+
+	public SpellBlockBreak(Entity launcher, Material... noBreak) {
+		mLauncher = launcher;
+		mNoBreak = Arrays.asList(noBreak);
 	}
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
@@ -38,13 +46,14 @@ public class SpellBlockBreak extends Spell {
 		List<Block> badBlockList = new ArrayList<Block>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		for (int x = -1; x <= 1; x++) {
-			testloc.setX(loc.getX() + (double)x);
+			testloc.setX(loc.getX() + (double) x);
 			for (int y = 1; y <= 3; y++) {
-				testloc.setY(loc.getY() + (double)y);
+				testloc.setY(loc.getY() + (double) y);
 				for (int z = -1; z <= 1; z++) {
-					testloc.setZ(loc.getZ() + (double)z);
+					testloc.setZ(loc.getZ() + (double) z);
 					Material material = testloc.getBlock().getType();
-					if ((!mIgnoredMats.contains(material)) && (material.isSolid() || material.equals(Material.COBWEB))) {
+					if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
+						(material.isSolid() || material.equals(Material.COBWEB))) {
 						badBlockList.add(testloc.getBlock());
 					}
 				}

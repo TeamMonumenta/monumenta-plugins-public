@@ -1,10 +1,10 @@
 package com.playmonumenta.bossfights;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.playmonumenta.bossfights.commands.BossFight;
 import com.playmonumenta.bossfights.spells.SpellDetectionCircle;
 import com.playmonumenta.bossfights.utils.MetadataUtils;
-
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin {
 	public BossManager mBossManager;
