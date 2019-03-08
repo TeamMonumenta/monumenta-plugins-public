@@ -315,14 +315,14 @@ public class AbilityManager {
 		// Reset passive buffs to player base attributes
 		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
-		if (player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() != 0.1 && !player.getGameMode().equals(GameMode.CREATIVE)) {
+		if (player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() != 0.1
+				&& !player.getGameMode().equals(GameMode.CREATIVE) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 		}
 		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
 		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
-		// TODO: Attack speed!
 
 		List<Ability> abilities = new ArrayList<Ability>();
 
