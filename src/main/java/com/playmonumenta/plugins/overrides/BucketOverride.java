@@ -24,6 +24,7 @@ public class BucketOverride extends BaseOverride {
 		return false;
 	}
 
+	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
 	                                           ItemStack itemInHand) {
 		if (clickedEntity == null) {
@@ -35,6 +36,7 @@ public class BucketOverride extends BaseOverride {
 		return true;
 	}
 
+	@Override
 	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		if (blockType.equals(Material.AIR) || dispensed == null) {
