@@ -450,7 +450,7 @@ public class PlayerListener implements Listener {
 	    Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
 
 	private static final int KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 10;
-	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 100;
+	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 600;
 
 	// The player has died
 	@EventHandler(priority = EventPriority.HIGHEST)
