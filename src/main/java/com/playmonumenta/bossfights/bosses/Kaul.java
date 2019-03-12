@@ -286,9 +286,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 2
 		events.put(66, mBoss -> {
-			super.changePhase(null, null, (LivingEntity entity) -> {
-
-			});
+			changePhase(null, null, null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -330,9 +328,7 @@ public class Kaul extends BossAbilityGroup {
 							if (radius <= 0) {
 								this.cancel();
 								Location loc = mHeight.getLocation().subtract(0, 0.5, 0);
-								changePhase(null, phase2PassiveSpells, (LivingEntity entity) -> {
-
-								});
+								changePhase(null, phase2PassiveSpells, null);
 								new BukkitRunnable() {
 									int t = 0;
 									double rotation = 0;
@@ -384,9 +380,7 @@ public class Kaul extends BossAbilityGroup {
 
 											@Override
 											public void run() {
-												changePhase(phase2Spells, phase2PassiveSpells, (LivingEntity entity) -> {
-
-												});
+												changePhase(phase2Spells, phase2PassiveSpells, null);
 											}
 
 										}.runTaskLater(mPlugin, 20 * 10);
@@ -405,9 +399,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 2.5
 		events.put(50, mBoss -> {
-			super.changePhase(null, passiveSpells, (LivingEntity entity) -> {
-
-			});
+			changePhase(null, passiveSpells, null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -456,9 +448,7 @@ public class Kaul extends BossAbilityGroup {
 
 										@Override
 										public void run() {
-											changePhase(phase2Spells, passiveSpells, (LivingEntity entity) -> {
-
-											});
+											changePhase(phase2Spells, passiveSpells, null);
 										}
 
 									}.runTaskLater(mPlugin, 20 * 10);
@@ -487,9 +477,7 @@ public class Kaul extends BossAbilityGroup {
 
 		// Phase 3
 		events.put(33, mBoss -> {
-			super.changePhase(null, passiveSpells, (LivingEntity entity) -> {
-
-			});
+			changePhase(null, passiveSpells, null);
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -561,9 +549,7 @@ public class Kaul extends BossAbilityGroup {
 										world.spawnParticle(Particle.FLAME, mHeight.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
 										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
-										changePhase(null, phase3PassiveSpells, (LivingEntity entity) -> {
-
-										});
+										changePhase(null, phase3PassiveSpells, null);
 										world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175);
 										world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
@@ -616,10 +602,7 @@ public class Kaul extends BossAbilityGroup {
 
 													@Override
 													public void run() {
-														changePhase(phase3Spells, phase3PassiveSpells,
-														(LivingEntity entity) -> {
-
-														});
+														changePhase(phase3Spells, phase3PassiveSpells, null);
 													}
 
 												}.runTaskLater(mPlugin, 20 * 10);
@@ -694,10 +677,7 @@ public class Kaul extends BossAbilityGroup {
 		});
 
 		events.put(10, mBoss -> {
-			changePhase(phase3Spells, phase4PassiveSpells,
-			(LivingEntity entity) -> {
-
-			});
+			changePhase(phase3Spells, phase4PassiveSpells, null);
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I WILL NOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -874,9 +854,7 @@ public class Kaul extends BossAbilityGroup {
 			player.removePotionEffect(PotionEffectType.REGENERATION);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
 		}
-		super.changePhase(null, null, (LivingEntity entity) -> {
-
-		});
+		changePhase(null, null, null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);

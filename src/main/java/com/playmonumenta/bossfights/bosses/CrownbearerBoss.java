@@ -132,18 +132,14 @@ public class CrownbearerBoss extends BossAbilityGroup {
 			},
 			//Warning
 			(Location loc) -> {
-				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 25, 4, 4,
-				4, 0.175);
-				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 5,
-				4, 4, 4, 0.05);
+				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 25, 4, 4, 4, 0.175);
+				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 5, 4, 4, 4, 0.05);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 			},
 			//End
 			(Location loc) -> {
-				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 150, 4, 4,
-				4, 0.175);
-				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 100,
-				4, 4, 4, 0.175);
+				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 150, 4, 4, 4, 0.175);
+				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 100, 4, 4, 4, 0.175);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 2f);
@@ -179,10 +175,8 @@ public class CrownbearerBoss extends BossAbilityGroup {
 					t++;
 					Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
 					summonSOTF(loc);
-					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45,
-					0.25, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45,
-					0, 0.15);
+					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);
 					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					if (t >= 4) {
 						this.cancel();
@@ -194,9 +188,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		});
 		events.put(30, mBoss -> {
 			knockback(plugin, 6);
-			changePhase(phase2Spells, null, (LivingEntity entity) -> {
-
-			});
+			changePhase(phase2Spells, null, null);
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
 		});
 		events.put(20, mBoss -> {
@@ -208,10 +200,8 @@ public class CrownbearerBoss extends BossAbilityGroup {
 					t++;
 					Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
 					summonSOTF(loc);
-					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45,
-					0.25, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45,
-					0, 0.15);
+					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);
 					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					if (t >= 5) {
 						this.cancel();

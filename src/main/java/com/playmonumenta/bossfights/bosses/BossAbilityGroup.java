@@ -44,7 +44,10 @@ public abstract class BossAbilityGroup {
 
 	public void changePhase(SpellManager activeSpells,
 	                        List<Spell> passiveSpells, PhaseAction action) {
-		action.run(mBoss);
+
+		if (action != null) {
+			action.run(mBoss);
+		}
 
 		if (mActiveSpells != null) {
 			mActiveSpells.cancelAll();
@@ -52,6 +55,11 @@ public abstract class BossAbilityGroup {
 
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
+	}
+
+	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
+	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
+		constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
@@ -156,12 +164,6 @@ public abstract class BossAbilityGroup {
 			Bukkit.getPluginManager().callEvent(event);
 		}
 	}
-
-	public void constructBoss(Plugin plugin, String identityTag, LivingEntity boss, SpellManager activeSpells,
-	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar) {
-		constructBoss(plugin, identityTag, boss, activeSpells, passiveSpells, detectionRange, bossBar, 100);
-	}
-
 
 	/********************************************************************************
 	 * Event Handlers

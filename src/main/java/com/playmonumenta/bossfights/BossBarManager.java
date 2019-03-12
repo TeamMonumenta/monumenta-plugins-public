@@ -35,10 +35,11 @@ public class BossBarManager {
 		mBar = Bukkit.getServer().createBossBar(boss.getCustomName(), color, style, BarFlag.CREATE_FOG, BarFlag.DARKEN_SKY, BarFlag.PLAY_BOSS_MUSIC);
 		mBar.setVisible(true);
 
-		for (Player player : Bukkit.getServer().getOnlinePlayers())
+		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.getLocation().distance(boss.getLocation()) < range) {
 				mBar.addPlayer(player);
 			}
+		}
 	}
 
 	public void update() {

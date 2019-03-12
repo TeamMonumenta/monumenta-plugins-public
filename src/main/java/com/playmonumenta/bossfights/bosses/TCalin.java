@@ -208,9 +208,7 @@ public class TCalin extends BossAbilityGroup {
 			world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
-			super.changePhase(null, null, (LivingEntity entity) -> {
-
-			});
+			super.changePhase(null, null, null);
 			new BukkitRunnable() {
 				float j = 0;
 				double rotation = 0;
@@ -240,16 +238,12 @@ public class TCalin extends BossAbilityGroup {
 						                    0.10);
 						mBoss.setAI(true);
 						mBoss.setInvulnerable(false);
-						changePhase(null, passiveSpells, (LivingEntity entity) -> {
-
-						});
+						changePhase(null, passiveSpells, null);
 						new BukkitRunnable() {
 
 							@Override
 							public void run() {
-								changePhase(phase2Spells, passiveSpells, (LivingEntity entity) -> {
-
-								});
+								changePhase(phase2Spells, passiveSpells, null);
 							}
 
 						}.runTaskLater(plugin, 20 * 10);

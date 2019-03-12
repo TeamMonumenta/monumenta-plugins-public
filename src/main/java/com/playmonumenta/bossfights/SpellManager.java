@@ -68,6 +68,7 @@ public class SpellManager {
 		 */
 		List<Spell> spells = new ArrayList<Spell>(mReadySpells.values());
 		Collections.shuffle(spells);
+		mLastCasted = null;
 		Iterator<Spell> iterator = spells.iterator();
 		while (iterator.hasNext()) {
 			Spell spell = iterator.next();
@@ -78,8 +79,6 @@ public class SpellManager {
 				iterator.remove();
 				/* Return how much time the spell takes */
 				return spell.duration();
-			} else {
-				mLastCasted = null;
 			}
 		}
 
@@ -88,17 +87,13 @@ public class SpellManager {
 	}
 
 	public int forceCastSpell(Class<?> spell) {
-
+		mLastCasted = null;
 		Spell sp = mReadySpells.get(spell);
-		if (sp != null) {
-			if (sp.canRun()) {
-				sp.run();
-				mLastCasted = sp;
-				mCooldownSpells.add(sp);
-				return sp.duration();
-			} else {
-				mLastCasted = null;
-			}
+		if (sp != null && sp.canRun()) {
+			sp.run();
+			mLastCasted = sp;
+			mCooldownSpells.add(sp);
+			return sp.duration();
 		}
 		/* None of these spells can run - wait a second before trying again */
 		return 20;
