@@ -96,44 +96,21 @@ public class SpellBaseCharge extends Spell {
 	private int mCharges;
 	private int mRate;
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
-	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-	                       EndAction end) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mRange = range;
-		mChargeTicks = chargeTicks;
-		mWarningAction = warning;
-		mWarnParticleAction = warnParticles;
-		mStartAction = start;
-		mHitPlayerAction = hitPlayer;
-		mParticleAction = particle;
-		mEndAction = end;
-		mCharges = 0;
-		mRate = 0;
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
+	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
+	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+		this(plugin, boss, range, chargeTicks, false, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
-	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-	                       EndAction end, boolean stopOnFirstHit) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mRange = range;
-		mChargeTicks = chargeTicks;
-		mWarningAction = warning;
-		mWarnParticleAction = warnParticles;
-		mStartAction = start;
-		mHitPlayerAction = hitPlayer;
-		mParticleAction = particle;
-		mEndAction = end;
-		mStopOnFirstHit = stopOnFirstHit;
-		mCharges = 0;
-		mRate = 0;
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit,
+	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
+	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
+		this(plugin, boss, range, chargeTicks, stopOnFirstHit, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, WarningAction warning,
-	                       ParticleAction warnParticles, StartAction start, HitPlayerAction hitPlayer, ParticleAction particle,
-	                       EndAction end, boolean stopOnFirstHit, int charges, int rate) {
+	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks, boolean stopOnFirstHit, int charges, int rate,
+	                       WarningAction warning, ParticleAction warnParticles, StartAction start,
+	                       HitPlayerAction hitPlayer, ParticleAction particle, EndAction end) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;

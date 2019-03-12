@@ -58,7 +58,7 @@ public class TCalin extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
-		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, (Player player) -> {
+		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, true, (Player player) -> {
 			boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
 			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
@@ -87,9 +87,9 @@ public class TCalin extends BossAbilityGroup {
 		// Ending particles on boss
 		() -> {
 			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
-		}, true);
-		SpellBaseBolt bolt = new SpellBaseBolt(plugin, mBoss, (int)(20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5,
-		true, (Entity entity, int tick) -> {
+		});
+		SpellBaseBolt bolt = new SpellBaseBolt(plugin, mBoss, (int)(20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5, true, true, 2, 10,
+		(Entity entity, int tick) -> {
 			float t = tick / 15;
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05);
 			world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 1, 0), 5, 0.25, 0.45, 0.25,
@@ -122,7 +122,7 @@ public class TCalin extends BossAbilityGroup {
 			world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
-		}, true, 2, 10);
+		});
 		SpellDelayedAction aoe = new SpellDelayedAction(plugin, mBoss.getLocation(), 20 * 3,
 		                                                // Start
 		(Location loc) -> {

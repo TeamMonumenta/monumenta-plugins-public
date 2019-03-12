@@ -726,14 +726,7 @@ public class Kaul extends BossAbilityGroup {
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar);
-			}
-
-		}.runTaskLater(mPlugin, waitAfterInit());
+		constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar, (20 * 32) + 1);
 	}
 
 	private void knockback(Plugin plugin, double r) {
@@ -1109,10 +1102,4 @@ public class Kaul extends BossAbilityGroup {
 
 		}.runTaskLater(mPlugin, 1);
 	}
-
-	@Override
-	public int waitAfterInit() {
-		return (20 * 32) + 1;
-	}
-
 }

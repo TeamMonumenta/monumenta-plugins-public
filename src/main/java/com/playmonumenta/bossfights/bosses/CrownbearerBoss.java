@@ -87,8 +87,8 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		// Ending particles on boss
 		() -> {
 			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
-		}, false);
-		SpellBaseCharge multidash = new SpellBaseCharge(plugin, mBoss, 20, 25,
+		});
+		SpellBaseCharge multidash = new SpellBaseCharge(plugin, mBoss, 20, 25, false, 3, 15,
 		(Player player) -> {
 			boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
 			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
@@ -117,7 +117,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		// Ending particles on boss
 		() -> {
 			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
-		}, false, 3, 15);
+		});
 		SpellDelayedAction aoe = new SpellDelayedAction(plugin, mBoss.getLocation(), 40,
 		                                                //Start
 		(Location loc) -> {

@@ -69,7 +69,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBladeDance(plugin, mBoss),
 			new SpellWindWalk(plugin, mBoss),
-			new SpellBaseBolt(plugin, mBoss, (int)(20 * 2.5), 30, 1.4, 20, 0.5, false,
+			new SpellBaseBolt(plugin, mBoss, (int)(20 * 2.5), 30, 1.4, 20, 0.5, false, false,
 			                  (Entity entity, int tick) -> {
 			                      float t = tick / 10;
 			                      world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005);

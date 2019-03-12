@@ -84,7 +84,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		    Arrays.asList(new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
 		                  new SpellEarthenRupture(plugin, mBoss),
 		                  new SpellBaseBolt(plugin, mBoss, 20 * 2,
-		20 * 5, 1.1, detectionRange, 0.5, false, (Entity entity, int tick) -> {
+		20 * 5, 1.1, detectionRange, 0.5, false, true, (Entity entity, int tick) -> {
 			float t = tick / 15;
 			world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
 			world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
@@ -135,7 +135,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
 			world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-		}, true
+		}
 
 		                                   )));
 		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {

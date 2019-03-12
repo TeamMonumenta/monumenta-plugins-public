@@ -71,45 +71,19 @@ public class SpellBaseBolt extends Spell {
 	private double mDetect_range;
 	private double mHitbox_radius;
 	private final boolean mSingleTarget;
+	private final boolean mStopOnFirstHit;
+	private final int mShots;
+	private final int mRate;
 	private final TickAction mTickAction;
 	private final CastAction mCastAction;
 	private final ParticleAction mParticleAction;
 	private final IntersectAction mIntersectAction;
-	private final boolean mStopOnHit;
-	private int mShots = 1;
-	private int mRate = 1;
 	private final Random mRandom = new Random();
 
-	/**
-	 *
-	 * @param plugin The main plugin
-	 * @param caster The mob casting the spell
-	 * @param delay The chargeup timer;the time before the bolt is casted (in ticks)
-	 * @param duration The duration of the bolt;how long it lasts (in ticks)
-	 * @param velocity The velocity of the bolt
-	 * @param detect_range The range in which a player has to be in in order for the spell to be charged and used
-	 * @param hitbox_radius The radius of the hitbox
-	 * @param singleTarget Whether to target a single player (Default is its current target, otherwise select at random)
-	 * @param tickAction The action to perform while charging the bolt
-	 * @param castAction The action to perform when the bolt is casted
-	 * @param particleAction The action the bolt performs while it travels
-	 * @param intersectAction The action the bolt performs when it intersects a block or player
-	 */
-	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity, double detect_range, double hitbox_radius, boolean singleTarget,
-	                     TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, boolean stopOnHit) {
-		mPlugin = plugin;
-		mCaster = caster;
-		mDelay = delay;
-		mDuration = duration;
-		mVelocity = velocity;
-		mDetect_range = detect_range;
-		mHitbox_radius = hitbox_radius;
-		mSingleTarget = singleTarget;
-		mTickAction = tickAction;
-		mCastAction = castAction;
-		mParticleAction = particleAction;
-		mIntersectAction = intersectAction;
-		mStopOnHit = stopOnHit;
+	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
+	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit,
+						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction) {
+		this(plugin, caster, delay, duration, velocity, detectRange, hitboxRadius, singleTarget, stopOnFirstHit, 1, 1, tickAction, castAction, particleAction, intersectAction);
 	}
 
 	/**
@@ -119,33 +93,34 @@ public class SpellBaseBolt extends Spell {
 	 * @param delay The chargeup timer;the time before the bolt is casted (in ticks)
 	 * @param duration The duration of the bolt;how long it lasts (in ticks)
 	 * @param velocity The velocity of the bolt
-	 * @param detect_range The range in which a player has to be in in order for the spell to be charged and used
-	 * @param hitbox_radius The radius of the hitbox
-	 * @param singleTarget Whether to target a single player (Default is its current target, otherwise select at random)
+	 * @param detectRange The range in which a player has to be in in order for the spell to be charged and used
+	 * @param hitboxRadius The radius of the hitbox
+	 * @param stopOnFirstHit Whether to target a single player (Default is its current target, otherwise select at random)
+	 * @param shots The amount of shots
+	 * @param rate The rate of fire for shots
 	 * @param tickAction The action to perform while charging the bolt
 	 * @param castAction The action to perform when the bolt is casted
 	 * @param particleAction The action the bolt performs while it travels
 	 * @param intersectAction The action the bolt performs when it intersects a block or player
-	 * @param shots The amount of shots
-	 * @param rate The rate of fire for shots
 	 */
-	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity, double detect_range, double hitbox_radius, boolean singleTarget,
-	                     TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, boolean stopOnHit, int shots, int rate) {
+	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
+	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
+						 TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction) {
 		mPlugin = plugin;
 		mCaster = caster;
 		mDelay = delay;
 		mDuration = duration;
 		mVelocity = velocity;
-		mDetect_range = detect_range;
-		mHitbox_radius = hitbox_radius;
+		mDetect_range = detectRange;
+		mHitbox_radius = hitboxRadius;
 		mSingleTarget = singleTarget;
+		mStopOnFirstHit = stopOnFirstHit;
+		mShots = shots;
+		mRate = rate;
 		mTickAction = tickAction;
 		mCastAction = castAction;
 		mParticleAction = particleAction;
 		mIntersectAction = intersectAction;
-		mStopOnHit = stopOnHit;
-		mShots = shots;
-		mRate = rate;
 	}
 
 	@Override
@@ -216,7 +191,7 @@ public class SpellBaseBolt extends Spell {
 							for (Player player : players) {
 								if (player.getBoundingBox().overlaps(box)) {
 									mIntersectAction.run(player, loc, false);
-									if (mStopOnHit) {
+									if (mStopOnFirstHit) {
 										this.cancel();
 									}
 								}
