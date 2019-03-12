@@ -101,8 +101,8 @@ public class SpellRaiseJungle extends Spell {
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:husk " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " " + elemental);
 					LivingEntity element = null;
-					for (Entity e : spawn.getWorld().getNearbyEntities(spawn, 0.65, 0.65, 0.65)) {
-						if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Zombie) {
+					for (Entity e : spawn.getWorld().getNearbyEntities(spawn, 0.4, 0.4, 0.4)) {
+						if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Zombie && !summoned.contains(e.getUniqueId())) {
 							element = (LivingEntity) e;
 							break;
 						}
@@ -120,9 +120,6 @@ public class SpellRaiseJungle extends Spell {
 							@Override
 							public void run() {
 								t++;
-								if (t % 5 == 0 && !raised) {
-									ele.getWorld().playSound(ele.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
-								}
 
 								if (!raised) {
 									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 2, 0.25, 0.1, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
@@ -132,7 +129,6 @@ public class SpellRaiseJungle extends Spell {
 								if (t >= mSummonTime && !raised) {
 									raised = true;
 									ele.setAI(true);
-									pLoc.getWorld().playSound(pLoc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 20, 0.25, 0.1, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
 								}
 
@@ -160,6 +156,31 @@ public class SpellRaiseJungle extends Spell {
 
 						}.runTaskTimer(mPlugin, 0, 1);
 					}
+
+					new BukkitRunnable() {
+						int t = 0;
+						@Override
+						public void run() {
+							t++;
+							if (t % 5 == 0) {
+								for (Player player : players) {
+									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
+								}
+							}
+
+							if (mSummonTime <= t && !summoned.isEmpty()) {
+								for (Player player : players) {
+									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+								}
+								this.cancel();
+							}
+
+							if (summoned.isEmpty()) {
+								this.cancel();
+							}
+						}
+
+					}.runTaskTimer(mPlugin, 0, 1);
 				}
 			}
 

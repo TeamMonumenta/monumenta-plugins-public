@@ -160,7 +160,7 @@ public class Kaul extends BossAbilityGroup {
 		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mHeight.getLocation().getY()),
 		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, 10, detectionRange)));
+		                  new SpellArachnopocolypse(mPlugin, mBoss, mHeight.getLocation(), detectionRange)));
 
 		SpellManager phase2Spells = new SpellManager(
 		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false),
@@ -765,6 +765,13 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1);
 				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
+			}
+		}
+
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 30);
 			}
 		}
 	}

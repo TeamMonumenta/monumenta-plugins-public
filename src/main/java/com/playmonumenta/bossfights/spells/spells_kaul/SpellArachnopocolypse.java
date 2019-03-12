@@ -21,15 +21,15 @@ import com.playmonumenta.bossfights.utils.Utils;
 public class SpellArachnopocolypse extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private double mRange;
+	private Location mLoc;
 	private double mDetectRange;
 	private Random rand = new Random();
 	private boolean cooldown = false;
 
-	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, double range, double detectRange) {
+	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mRange = range;
+		mLoc = loc;
 		mDetectRange = detectRange;
 	}
 
@@ -41,7 +41,6 @@ public class SpellArachnopocolypse extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		Location loc = mBoss.getLocation();
 		cooldown = true;
 		new BukkitRunnable() {
 
@@ -69,7 +68,7 @@ public class SpellArachnopocolypse extends Spell {
 					@Override
 					public void run() {
 						t++;
-						riseSpider(getRandomLocation(loc, mRange));
+						riseSpider(getRandomLocation(mLoc, 32));
 						if (t >= a) {
 							this.cancel();
 						}
@@ -118,7 +117,11 @@ public class SpellArachnopocolypse extends Spell {
 
 	private Location getRandomLocation(Location origin, double range) {
 		ThreadLocalRandom rand = ThreadLocalRandom.current();
-		return origin.clone().add(rand.nextDouble(-range, range), 0, rand.nextDouble(-range, range));
+		Location loc = origin.clone().add(rand.nextDouble(-range, range), 0, rand.nextDouble(-range, range));
+		while (loc.getBlock().getType().isSolid()) {
+			loc = origin.clone().add(rand.nextDouble(-range, range), 0, rand.nextDouble(-range, range));
+		}
+		return loc;
 	}
 
 	@Override

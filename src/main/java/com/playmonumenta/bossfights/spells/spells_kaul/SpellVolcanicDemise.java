@@ -24,7 +24,7 @@ import com.playmonumenta.bossfights.utils.Utils;
  * Death.
 =======
  * Volcanic Demise (CD: 20): Kaul starts summoning meteors that fall from the sky in random areas.
- * Each Meteor deals 30 damage in a 4 block radius on collision with the ground.
+ * Each Meteor deals 42 damage in a 4 block radius on collision with the ground.
  * This ability lasts X seconds and continues spawning meteors until the ability duration runs out.
  * Kaul is immune to damage during the channel of this ability.
  *
@@ -98,7 +98,7 @@ public class SpellVolcanicDemise extends Spell {
 											world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
 											world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 											for (Player player : Utils.playersInRange(loc, 4)) {
-												player.damage(35, mBoss);
+												player.damage(42, mBoss);
 												Utils.KnockAway(loc, player, 0.5f, 0.65f);
 											}
 											for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {

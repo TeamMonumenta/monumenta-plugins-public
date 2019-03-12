@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -164,6 +165,17 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, null);
 	}
+
+	@Override
+	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 30);
+			}
+		}
+	}
+
 	private Random rand = new Random();
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {

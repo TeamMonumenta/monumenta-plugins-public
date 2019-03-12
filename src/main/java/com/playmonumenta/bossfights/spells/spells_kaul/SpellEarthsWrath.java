@@ -63,7 +63,8 @@ public class SpellEarthsWrath extends Spell {
 									if (player.getBoundingBox().overlaps(box)) {
 										player.damage(24, mBoss);
 										Utils.KnockAway(mBoss.getLocation(), player, -0.5f, 0.65f);
-										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 5));
+										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
+										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
 									}
 								}
 								if (t >= 20 * 3) {

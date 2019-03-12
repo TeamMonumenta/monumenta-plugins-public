@@ -17,6 +17,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -171,5 +172,15 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 
+	}
+
+	@Override
+	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 30);
+			}
+		}
 	}
 }
