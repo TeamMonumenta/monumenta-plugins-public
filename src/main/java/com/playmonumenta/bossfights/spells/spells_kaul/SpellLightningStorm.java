@@ -32,10 +32,8 @@ public class SpellLightningStorm extends Spell {
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private LivingEntity mHeight;
 	private List<Player> players = new ArrayList<Player>();
-	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20),
-	        1.0f);
-	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120),
-	        1.0f);
+	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
+	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
 	public SpellLightningStorm(LivingEntity boss, double range) {
 		mBoss = boss;
@@ -105,8 +103,6 @@ public class SpellLightningStorm extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

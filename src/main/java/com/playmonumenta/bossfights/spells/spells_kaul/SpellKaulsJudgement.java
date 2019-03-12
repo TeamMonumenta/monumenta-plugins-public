@@ -194,10 +194,8 @@ public class SpellKaulsJudgement extends Spell {
 									@Override
 									public void run() {
 										world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
-										world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25,
-										                    0.45, 0.25, 0.15);
-										world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3,
-										                    0.45, 0.3, 0, Material.ANVIL.createBlockData());
+										world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
+										world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
 										double health = player.getHealth() - (player.getMaxHealth() - 10);
 										if (health <= 0) {
 											player.damage(100, mBoss);

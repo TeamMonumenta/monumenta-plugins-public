@@ -103,8 +103,7 @@ public class SpellArachnopocolypse extends Spell {
 			@Override
 			public void run() {
 				t++;
-				loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25,
-				                             Material.DIRT.createBlockData());
+				loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
 
 				if (t >= 20) {
 					this.cancel();

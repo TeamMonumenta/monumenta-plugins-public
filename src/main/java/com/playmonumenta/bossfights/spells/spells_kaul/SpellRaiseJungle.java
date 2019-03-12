@@ -182,7 +182,6 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return mSummonTime + (20 * 18);
 	}
 

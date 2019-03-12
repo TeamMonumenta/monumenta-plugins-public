@@ -118,19 +118,16 @@ public class SpellPutridPlague extends Spell {
 						for (Player player : players) {
 							if (!safe.contains(player)) {
 								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
-								world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25,
-								                    0.45, 0.25, 0.15);
-								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3,
-								                    0.45, 0.3, 0, Material.LIME_CONCRETE.createBlockData());
+								world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
+								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
+								                    Material.LIME_CONCRETE.createBlockData());
 								player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
 								player.damage(damage, mBoss);
 							} else {
-								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45,
-								                    0.25, 1);
-								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25,
-								                    0.45, 0.25, 1);
+								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1);
+								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1);
 								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
@@ -167,7 +164,6 @@ public class SpellPutridPlague extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return mTime + (20 * 12);
 	}
 

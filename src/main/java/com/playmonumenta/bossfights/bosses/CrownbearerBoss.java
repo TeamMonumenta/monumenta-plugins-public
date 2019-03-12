@@ -58,108 +58,114 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
-		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25,
-		(Player player) -> {
-			boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
-		},
-		// Warning particles
-		(Location loc) -> {
-			loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
-		},
-		// Charge attack sound/particles at boss location
-		(Player player) -> {
-			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
-		},
-		// Attack hit a player
-		(Player player) -> {
-			player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-			player.damage(14, boss);
-		},
-		// Attack particles
-		(Location loc) -> {
-			loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.75, 0.75, 0.75, 0);
-		},
-		// Ending particles on boss
-		() -> {
-			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
-		});
-		SpellBaseCharge multidash = new SpellBaseCharge(plugin, mBoss, 20, 25, false, 3, 15,
-		(Player player) -> {
-			boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
-		},
-		// Warning particles
-		(Location loc) -> {
-			loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
-		},
-		// Charge attack sound/particles at boss location
-		(Player player) -> {
-			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
-		},
-		// Attack hit a player
-		(Player player) -> {
-			player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-			player.damage(7, boss);
-		},
-		// Attack particles
-		(Location loc) -> {
-			loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.75, 0.75, 0.75, 0);
-		},
-		// Ending particles on boss
-		() -> {
-			boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
-		});
-		SpellDelayedAction aoe = new SpellDelayedAction(plugin, mBoss.getLocation(), 40,
-		                                                //Start
-		(Location loc) -> {
-			mBoss.removePotionEffect(PotionEffectType.SLOW);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1));
 
-		},
-		//Warning
-		(Location loc) -> {
-			world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 25, 4, 4,
-			4, 0.175);
-			world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 5,
-			4, 4, 4, 0.05);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-		},
-		//End
-		(Location loc) -> {
-			world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 150, 4, 4,
-			4, 0.175);
-			world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 100,
-			4, 4, 4, 0.175);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 2f);
-			for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
-				player.damage(16, mBoss);
-				Utils.KnockAway(mBoss.getLocation(), player, 0.2f);
+		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25,
+			(Player player) -> {
+				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
+				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
+			},
+			// Warning particles
+			(Location loc) -> {
+				loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
+			},
+			// Charge attack sound/particles at boss location
+			(Player player) -> {
+				boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
+			},
+			// Attack hit a player
+			(Player player) -> {
+				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
+				player.damage(14, boss);
+			},
+			// Attack particles
+			(Location loc) -> {
+				loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.75, 0.75, 0.75, 0);
+			},
+			// Ending particles on boss
+			() -> {
+				boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
 			}
-		}
-		                                               );
+		);
+
+		SpellBaseCharge multidash = new SpellBaseCharge(plugin, mBoss, 20, 25, false, 3, 15,
+			(Player player) -> {
+				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
+				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
+			},
+			// Warning particles
+			(Location loc) -> {
+				loc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0);
+			},
+			// Charge attack sound/particles at boss location
+			(Player player) -> {
+				boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
+			},
+			// Attack hit a player
+			(Player player) -> {
+				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
+				player.damage(7, boss);
+			},
+			// Attack particles
+			(Location loc) -> {
+				loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 2, 0.75, 0.75, 0.75, 0);
+			},
+			// Ending particles on boss
+			() -> {
+				boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0);
+			}
+		);
+
+		SpellDelayedAction aoe = new SpellDelayedAction(plugin, mBoss.getLocation(), 40,
+			//Start
+			(Location loc) -> {
+				mBoss.removePotionEffect(PotionEffectType.SLOW);
+				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1));
+
+			},
+			//Warning
+			(Location loc) -> {
+				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 25, 4, 4,
+				4, 0.175);
+				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 5,
+				4, 4, 4, 0.05);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+			},
+			//End
+			(Location loc) -> {
+				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 150, 4, 4,
+				4, 0.175);
+				world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 100,
+				4, 4, 4, 0.175);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 2f);
+				for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
+					player.damage(16, mBoss);
+					Utils.KnockAway(mBoss.getLocation(), player, 0.2f);
+				}
+			}
+		);
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 charge, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 6)
-		                                             ));
+			charge, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 6)
+		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-		                                                 multidash, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 5), aoe
-		                                             ));
+			multidash, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 5), aoe
+		));
+
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!\",\"color\":\"white\"}]"));
 		});
-
 		events.put(75, mBoss -> {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Don't underestimate me! After you fall, so will the King, and all of Sierhaven with him!\",\"color\":\"white\"}]"));
 		});

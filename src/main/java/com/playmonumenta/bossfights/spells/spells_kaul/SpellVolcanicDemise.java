@@ -82,10 +82,11 @@ public class SpellVolcanicDemise extends Spell {
 									public void run() {
 										y -= 2;
 										for (Player player : players) {
-											if (player.getLocation().distance(loc) < 15)
+											if (player.getLocation().distance(loc) < 15) {
 												for (double t = 10; t > 0; t -= 0.5) {
 													player.spawnParticle(Particle.FLAME, loc.clone().add(0, t, 0), 1, 0.15, 0.15, 0.15, 0);
 												}
+											}
 										}
 										Location particle = loc.clone().add(0, y, 0);
 										world.spawnParticle(Particle.FLAME, particle, 4, 0.2f, 0.2f, 0.2f, 0.05, null, true);

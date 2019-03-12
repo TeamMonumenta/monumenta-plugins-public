@@ -57,10 +57,8 @@ public class SpellEarthsWrath extends Spell {
 								t++;
 								box.shift(dir.clone().multiply(0.45));
 								Location bLoc = box.getCenter().toLocation(world);
-								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25,
-								                    0);
-								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0,
-								                    0);
+								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
+								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : Utils.playersInRange(mBoss.getLocation(), 40)) {
 									if (player.getBoundingBox().overlaps(box)) {
 										player.damage(24, mBoss);
@@ -85,7 +83,6 @@ public class SpellEarthsWrath extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 12;
 	}
 

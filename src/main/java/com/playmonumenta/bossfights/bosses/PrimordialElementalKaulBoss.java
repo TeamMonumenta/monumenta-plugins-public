@@ -80,73 +80,78 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 		mBoss.setHealth(bossTargetHp);
-		SpellManager activeSpells = new SpellManager(
-		    Arrays.asList(new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
-		                  new SpellEarthenRupture(plugin, mBoss),
-		                  new SpellBaseBolt(plugin, mBoss, 20 * 2,
-		20 * 5, 1.1, detectionRange, 0.5, false, true, (Entity entity, int tick) -> {
-			float t = tick / 15;
-			world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
-			world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
-			Material.STONE.createBlockData());
-			world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 10, t);
-			mBoss.removePotionEffect(PotionEffectType.SLOW);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
-		},
+		SpellManager activeSpells = new SpellManager(Arrays.asList(
+			new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
+			new SpellEarthenRupture(plugin, mBoss),
+			new SpellBaseBolt(plugin, mBoss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
+				(Entity entity, int tick) -> {
+					float t = tick / 15;
+					world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
+					world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
+					Material.STONE.createBlockData());
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 10, t);
+					mBoss.removePotionEffect(PotionEffectType.SLOW);
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
+				},
 
-		(Entity entity) -> {
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
-			world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
-			0.2, 0.2);
-			world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 30, 0.2,
-			0.45, 0.2, 0.1);
-		},
+				(Entity entity) -> {
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
+					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
+					0.2, 0.2);
+					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 30, 0.2,
+					0.45, 0.2, 0.1);
+				},
 
-		(Location loc) -> {
-			world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
-			Material.STONE.createBlockData());
-			world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
-			for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 1)) {
-				if (block.getType().isSolid()) {
-					Material material = block.getType();
-					if (material == Material.SMOOTH_SANDSTONE
-					|| material == Material.SMOOTH_RED_SANDSTONE
-					|| material == Material.NETHERRACK
-					|| material == Material.MAGMA_BLOCK) {
-						block.setType(Material.AIR);
+				(Location loc) -> {
+					world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
+					Material.STONE.createBlockData());
+					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
+					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 1)) {
+						if (block.getType().isSolid()) {
+							Material material = block.getType();
+							if (material == Material.SMOOTH_SANDSTONE
+							    || material == Material.SMOOTH_RED_SANDSTONE
+							    || material == Material.NETHERRACK
+							    || material == Material.MAGMA_BLOCK) {
+								block.setType(Material.AIR);
+							}
+						}
 					}
-				}
-			}
-		},
+				},
 
-		(Player player, Location loc, boolean blocked) -> {
-			if (!blocked) {
-				player.damage(22, mBoss);
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-				player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
-			} else {
-				for (Player p : Utils.playersInRange(loc, 2.5)) {
-					p.damage(16, mBoss);
-					Utils.KnockAway(loc, p, 0.3f);
-					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
-					p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
+				(Player player, Location loc, boolean blocked) -> {
+					if (!blocked) {
+						player.damage(22, mBoss);
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
+					} else {
+						for (Player p : Utils.playersInRange(loc, 2.5)) {
+							p.damage(16, mBoss);
+							Utils.KnockAway(loc, p, 0.3f);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
+							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
+						}
+					}
+					world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 				}
-			}
-			world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
-			world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
-			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-		}
+			)
+		));
 
-		                                   )));
-		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-			world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-			0.4, 0.35, Material.BROWN_CONCRETE.createBlockData());
-		}), new SpellConditionalTeleport(mBoss, spawnLoc,
-		b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-		|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-		|| b.getLocation().getBlock().getType() == Material.LAVA
-		|| b.getLocation().getBlock().getType() == Material.WATER),
-		new SpellPurgeNegatives(mBoss, 20 * 5));
+		List<Spell> passiveSpells = Arrays.asList(
+			new SpellBaseParticleAura(boss, 1,
+				(LivingEntity mBoss) -> {
+					world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
+					                    0.4, 0.35, Material.BROWN_CONCRETE.createBlockData());
+				}
+			),
+			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+														       || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+														       || b.getLocation().getBlock().getType() == Material.LAVA
+														       || b.getLocation().getBlock().getType() == Material.WATER),
+			new SpellPurgeNegatives(mBoss, 20 * 5)
+		);
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, null);
 
@@ -167,5 +172,4 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	public void init() {
 
 	}
-
 }
