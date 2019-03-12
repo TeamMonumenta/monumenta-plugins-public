@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -190,11 +189,11 @@ public class TCalin extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Fangride! You dare test the might of the boss-coder FirelordWeaponry!? Let me show you his efficiency!\",\"color\":\"white\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Fangride! You dare test the might of the boss-coder FirelordWeaponry!? Let me show you his efficiency!\",\"color\":\"white\"}]");
 		});
 
 		events.put(75, mBoss -> {
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You're strong, but this fight is only beginning for you!\",\"color\":\"white\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You're strong, but this fight is only beginning for you!\",\"color\":\"white\"}]");
 		});
 
 		events.put(50, mBoss -> {
@@ -258,7 +257,7 @@ public class TCalin extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 30, 1);
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]");
 		});
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10,
@@ -311,7 +310,7 @@ public class TCalin extends BossAbilityGroup {
 	@Override
 	public void death() {
 		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Now you understand... Now... Change my... damn dialogue...\",\"color\":\"white\"}]"));
+		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Now you understand... Now... Change my... damn dialogue...\",\"color\":\"white\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 

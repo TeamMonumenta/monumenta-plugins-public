@@ -280,9 +280,7 @@ public class Kaul extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			if (players.size() == 1) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(
-					spawnLoc, detectionRange,
-					"tellraw @s [\"\",{\"text\":\"HOW BOLD FOR ONLY YOU TO COME TRY TO STRIKE ME DOWN. YOU WILL REGRET IT.\",\"color\":\"dark_green\"}]"));
+				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"HOW BOLD FOR ONLY YOU TO COME TRY TO STRIKE ME DOWN. YOU WILL REGRET IT.\",\"color\":\"dark_green\"}]");
 			}
 		});
 
@@ -402,9 +400,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(
-			                                       spawnLoc, detectionRange,
-			                                       "tellraw @s [\"\",{\"text\":\"DO NOT TRY TO STOP ME. THIS WORLD WILL PAY FOR ITS SINS.\",\"color\":\"dark_green\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"DO NOT TRY TO STOP ME. THIS WORLD WILL PAY FOR ITS SINS.\",\"color\":\"dark_green\"}]");
 		});
 
 		// Phase 2.5
@@ -481,9 +477,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(
-			                                       spawnLoc, detectionRange,
-			                                       "tellraw @s [\"\",{\"text\":\"I GROW WEARY OF THIS. PRIMODIAL, END THESE FOOLS. DO NOT FAIL ME.\",\"color\":\"dark_green\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I GROW WEARY OF THIS. PRIMODIAL, END THESE FOOLS. DO NOT FAIL ME.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -641,9 +635,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getExecuteCommandOnNearbyPlayers(
-			                                       spawnLoc, detectionRange,
-			                                       "tellraw @s [\"\",{\"text\":\"NO! I WILL NOT ALLOW THIS. YOU WILL PAY FOR YOUR TRANSGRESSIONS. THIS PLACE WILL BE YOUR GRAVE!\",\"color\":\"dark_green\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! I WILL NOT ALLOW THIS. YOU WILL PAY FOR YOUR TRANSGRESSIONS. THIS PLACE WILL BE YOUR GRAVE!\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -698,8 +690,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-			                                   Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN TO ME. HELP ME REMOVE THESE PESTS FROM MY SIGHT.\",\"color\":\"dark_green\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN TO ME. HELP ME REMOVE THESE PESTS FROM MY SIGHT.\",\"color\":\"dark_green\"}]");
 		});
 
 		events.put(10, mBoss -> {
@@ -707,8 +698,7 @@ public class Kaul extends BossAbilityGroup {
 			(LivingEntity entity) -> {
 
 			});
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-			                                   Utils.getExecuteCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I WILL NOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]"));
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I WILL NOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -939,8 +929,7 @@ public class Kaul extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-				                                   Utils.getExecuteCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + d[t].toUpperCase() + "\",\"color\":\"dark_green\"}]"));
+				Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + d[t].toUpperCase() + "\",\"color\":\"dark_green\"}]");
 				t++;
 				if (t == d.length) {
 					this.cancel();
@@ -1036,10 +1025,7 @@ public class Kaul extends BossAbilityGroup {
 						}
 
 						if (t % (20 * 5) == 0) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							                                   Utils.getExecuteCommandOnNearbyPlayers(mSpawnLoc, detectionRange,
-							                                           "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase()
-							                                           + "\",\"color\":\"dark_green\"}]"));
+							Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
 							index++;
 						}
 						t++;
