@@ -37,6 +37,7 @@ public class SpellGroundSurge extends Spell {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
 		Player target = (Player)((Mob) mBoss).getTarget();
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		players.removeIf(p -> p.getLocation().getY() >= 61);
 		new BukkitRunnable() {
 			int t = 0;
 			float pitch = 0;
@@ -61,7 +62,7 @@ public class SpellGroundSurge extends Spell {
 						@Override
 						public void run() {
 							i++;
-							box.shift(dir.clone().multiply(1.25));
+							box.shift(dir.clone().multiply(1.1));
 							Location bLoc = box.getCenter().toLocation(world);
 							if (bLoc.getBlock().getType().isSolid()) {
 								bLoc.add(0, 1, 0);
@@ -82,7 +83,7 @@ public class SpellGroundSurge extends Spell {
 							}
 							bLoc.add(0, 0.5, 0);
 
-							if (i >= 50) {
+							if (i >= 45) {
 								this.cancel();
 							}
 
@@ -129,9 +130,12 @@ public class SpellGroundSurge extends Spell {
 													}
 													_bLoc.add(0, 1, 0);
 													world.playSound(_bLoc, Sound.BLOCK_STONE_BREAK, 0f, 1);
-													world.spawnParticle(Particle.BLOCK_DUST, _bLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
+													//Have particles with collision show only for the player who's targetted.
+													//This is to prevent lag from the numerous other surges that have these same
+													//Particles
+													player.spawnParticle(Particle.BLOCK_DUST, _bLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
 													world.spawnParticle(Particle.FLAME, _bLoc, 6, 0.2, 0.2, 0.2, 0.075);
-													world.spawnParticle(Particle.LAVA, _bLoc, 1, 0.2, 0.2, 0.2, 0.25);
+													player.spawnParticle(Particle.LAVA, _bLoc, 1, 0.2, 0.2, 0.2, 0.25);
 													for (Player _player : players) {
 														if (_player.getBoundingBox().overlaps(box) && !_player.getUniqueId().equals(player.getUniqueId())) {
 															this.cancel();

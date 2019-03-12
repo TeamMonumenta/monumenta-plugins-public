@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -51,7 +52,8 @@ public class SpellVolcanicDemise extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = Utils.playersInRange(mCenter, 40);
+		List<Player> players = Utils.playersInRange(mCenter, 50);
+		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
 		}
@@ -74,48 +76,14 @@ public class SpellVolcanicDemise extends Spell {
 						@Override
 						public void run() {
 							i++;
+							for (Player player : players) {
+								Vector loc = player.getLocation().toVector();
+								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
+									rainMeteor(player.getLocation(), players, 20);
+								}
+							}
 							for (int j = 0; j < 4; j++) {
-								new BukkitRunnable() {
-									double y = 40;
-									Location loc = mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange));
-									@Override
-									public void run() {
-										y -= 2;
-										for (Player player : players) {
-											if (player.getLocation().distance(loc) < 15) {
-												for (double t = 10; t > 0; t -= 0.5) {
-													player.spawnParticle(Particle.FLAME, loc.clone().add(0, t, 0), 1, 0.15, 0.15, 0.15, 0);
-												}
-											}
-										}
-										Location particle = loc.clone().add(0, y, 0);
-										world.spawnParticle(Particle.FLAME, particle, 4, 0.2f, 0.2f, 0.2f, 0.05, null, true);
-										world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
-										world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-										if (y <= 0) {
-											this.cancel();
-											world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175, null, true);
-											world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
-											world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-											for (Player player : Utils.playersInRange(loc, 4)) {
-												player.damage(42, mBoss);
-												Utils.KnockAway(loc, player, 0.5f, 0.65f);
-											}
-											for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
-												if (random.nextBoolean() && random.nextBoolean()) {
-													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
-														block.setType(Material.NETHERRACK);
-													} else if (block.getType() == Material.NETHERRACK) {
-														block.setType(Material.MAGMA_BLOCK);
-													} else if (block.getType() == Material.SMOOTH_SANDSTONE) {
-														block.setType(Material.SMOOTH_RED_SANDSTONE);
-													}
-												}
-											}
-										}
-									}
-
-								}.runTaskTimer(mPlugin, 0, 1);
+								rainMeteor(mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange)), players, 40);
 							}
 
 							if (i >= 20) {
@@ -128,6 +96,51 @@ public class SpellVolcanicDemise extends Spell {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 2);
+	}
+
+	private void rainMeteor(Location loc, List<Player> players, double spawnY) {
+		World world = loc.getWorld();
+		new BukkitRunnable() {
+			double y = spawnY;
+			Location loc = mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange));
+			@Override
+			public void run() {
+				y -= 2;
+				for (Player player : players) {
+					if (player.getLocation().distance(loc) < 15) {
+						for (double t = 10; t > 0; t -= 0.5) {
+							player.spawnParticle(Particle.FLAME, loc.clone().add(0, t, 0), 1, 0.15, 0.15, 0.15, 0);
+						}
+					}
+				}
+				Location particle = loc.clone().add(0, y, 0);
+				world.spawnParticle(Particle.FLAME, particle, 4, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				if (y <= 0) {
+					this.cancel();
+					world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175, null, true);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					for (Player player : Utils.playersInRange(loc, 4)) {
+						player.damage(42, mBoss);
+						Utils.KnockAway(loc, player, 0.5f, 0.65f);
+					}
+					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
+						if (random.nextBoolean() && random.nextBoolean()) {
+							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
+								block.setType(Material.NETHERRACK);
+							} else if (block.getType() == Material.NETHERRACK) {
+								block.setType(Material.MAGMA_BLOCK);
+							} else if (block.getType() == Material.SMOOTH_SANDSTONE) {
+								block.setType(Material.SMOOTH_RED_SANDSTONE);
+							}
+						}
+					}
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	@Override

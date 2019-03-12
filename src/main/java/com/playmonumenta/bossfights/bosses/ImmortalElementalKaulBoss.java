@@ -26,6 +26,7 @@ import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseBolt;
 import com.playmonumenta.bossfights.spells.SpellBaseCharge;
 import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
+import com.playmonumenta.bossfights.spells.SpellBlockBreak;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellEarthenRupture;
@@ -155,6 +156,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 			0.4, 0.35, Material.BROWN_CONCRETE.createBlockData());
 		}),
+		new SpellBlockBreak(mBoss),
 		new SpellPurgeNegatives(mBoss, 2),
 		new SpellConditionalTeleport(mBoss, spawnLoc,
 		                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK

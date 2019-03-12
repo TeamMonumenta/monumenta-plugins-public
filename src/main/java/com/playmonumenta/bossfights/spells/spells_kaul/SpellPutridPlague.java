@@ -71,27 +71,44 @@ public class SpellPutridPlague extends Spell {
 			if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color blue");
 				for (Player player : Utils.playersInRange(loc, mRange)) {
-					player.sendMessage(ChatColor.BLUE + "The water begins to ripple...");
+					if (!mPhase3) {
+						player.sendMessage(ChatColor.BLUE + "The water begins to ripple...");
+					} else {
+						player.sendMessage(ChatColor.DARK_BLUE + "The water begins to ripple...");
+					}
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color red");
 				for (Player player : Utils.playersInRange(loc, mRange)) {
-					player.sendMessage(ChatColor.RED + "Your blood begins to shiver slightly...");
+					if (!mPhase3) {
+						player.sendMessage(ChatColor.RED + "Your blood begins to shiver slightly...");
+					} else {
+						player.sendMessage(ChatColor.DARK_RED + "Your blood begins to shiver slightly...");
+					}
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color yellow");
 				for (Player player : Utils.playersInRange(loc, mRange)) {
-					player.sendMessage(ChatColor.YELLOW + "You feel the temperature rise significantly...");
+					if (!mPhase3) {
+						player.sendMessage(ChatColor.YELLOW + "You feel the temperature rise significantly...");
+					} else {
+						player.sendMessage(ChatColor.GOLD + "You feel the temperature rise significantly...");
+					}
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color green");
 				for (Player player : Utils.playersInRange(loc, mRange)) {
-					player.sendMessage(ChatColor.GREEN + "The ground begins to vibrate...");
+					if (!mPhase3) {
+						player.sendMessage(ChatColor.GREEN + "The ground begins to vibrate...");
+					} else {
+						player.sendMessage(ChatColor.DARK_GREEN + "The ground begins to vibrate...");
+					}
 				}
 			}
+			List<Player> players = Utils.playersInRange(loc, mRange);
+			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
 				int t = 0;
-				List<Player> players = Utils.playersInRange(loc, mRange);
 				Location p1 = point.getLocation().add(4, 6, 4);
 				Location p2 = point.getLocation().add(-4, 6, -4);
 				Location p3 = point.getLocation().add(4, 6, -4);

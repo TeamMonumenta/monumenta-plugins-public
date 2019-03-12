@@ -55,7 +55,7 @@ public class SpellArachnopocolypse extends Spell {
 			@Override
 			public void run() {
 				List<Player> players = Utils.playersInRange(mBoss.getLocation(), mDetectRange);
-
+				players.removeIf(p -> p.getLocation().getY() >= 61);
 				int amount = 10 + (5 * (players.size()));
 				if (players.size() == 1) {
 					amount = 18;

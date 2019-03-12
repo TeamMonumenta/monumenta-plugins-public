@@ -109,6 +109,7 @@ public class SpellKaulsJudgement extends Spell {
 
 		}.runTaskLater(mPlugin, 20 * 55);
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");
 		}

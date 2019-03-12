@@ -73,6 +73,7 @@ public class SpellRaiseJungle extends Spell {
 			loc.setY(mY);
 		}
 		List<Player> players = Utils.playersInRange(loc, mDetectRange);
+		players.removeIf(p -> p.getLocation().getY() >= 61);
 		int num = 0;
 		if (players.size() == 1) {
 			num = 4;
@@ -93,7 +94,7 @@ public class SpellRaiseJungle extends Spell {
 					double x = rand.nextDouble(-mSummonRange, mSummonRange);
 					double z = rand.nextDouble(-mSummonRange, mSummonRange);
 					Location sLoc = loc.clone().add(x, 0.25, z);
-					while (sLoc.getBlock().getType().isSolid()) {
+					while (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()) {
 						x = rand.nextDouble(-mSummonRange, mSummonRange);
 						z = rand.nextDouble(-mSummonRange, mSummonRange);
 						sLoc = loc.clone().add(x, 0.25, z);

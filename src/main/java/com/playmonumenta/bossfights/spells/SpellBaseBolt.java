@@ -224,7 +224,7 @@ public class SpellBaseBolt extends Spell {
 	@Override
 	public int duration() {
 		if (Utils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
-			return mDelay + (20 * 8);
+			return mDelay + (20 * 5);
 		} else {
 			return 1;
 		}

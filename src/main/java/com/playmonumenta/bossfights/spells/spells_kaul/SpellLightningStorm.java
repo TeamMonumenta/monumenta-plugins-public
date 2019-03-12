@@ -52,7 +52,7 @@ public class SpellLightningStorm extends Spell {
 		if (t <= 0) {
 			t = 6;
 			if (mHeight == null) {
-				for (Player player : Utils.playersInRange(mBoss.getLocation(), mRange)) {
+				for (Player player : Utils.playersInRange(mHeight.getLocation(), mRange)) {
 					if (!player.isOnGround()) {
 						Location loc = player.getLocation();
 						if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid()) {
@@ -61,7 +61,7 @@ public class SpellLightningStorm extends Spell {
 					}
 				}
 			} else {
-				for (Player player : Utils.playersInRange(mBoss.getLocation(), mRange)) {
+				for (Player player : Utils.playersInRange(mHeight.getLocation(), mRange)) {
 					Location loc = player.getLocation();
 					if (loc.getY() - mHeight.getLocation().getY() >= 5) {
 						lightning(player);

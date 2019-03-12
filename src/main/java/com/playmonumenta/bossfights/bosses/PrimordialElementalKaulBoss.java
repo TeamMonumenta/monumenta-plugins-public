@@ -1,7 +1,9 @@
 package com.playmonumenta.bossfights.bosses;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -22,12 +24,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.BossBarManager;
+import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
 import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseBolt;
 import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
+import com.playmonumenta.bossfights.spells.SpellBlockBreak;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellEarthenRupture;
@@ -141,6 +145,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
+			new SpellBlockBreak(mBoss),
 			new SpellBaseParticleAura(boss, 1,
 				(LivingEntity mBoss) -> {
 					world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
@@ -153,6 +158,12 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 														       || b.getLocation().getBlock().getType() == Material.WATER),
 			new SpellPurgeNegatives(mBoss, 20 * 5)
 		);
+
+		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		events.put(50, mBoss -> {
+			super.forceCastSpell(SpellRaiseJungle.class);
+		});
+
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, null);
 

@@ -170,6 +170,7 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, false)));
 
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+
 		SpellManager phase3Spells = new SpellManager(
 		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
@@ -177,26 +178,43 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, true)));
 
+		SpellManager phase4Spells = new SpellManager(
+			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true),
+			                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
+			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
+			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
+
+		SpellPlayerAction action = new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
+			Vector loc = player.getLocation().toVector();
+			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
+				if (player.getLocation().getY() >= 61) {
+					return;
+				}
+				double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.2);
+				if (newHealth <= 0) {
+					player.damage(100, mBoss);
+				} else {
+					player.setHealth(newHealth);
+					player.damage(1);
+					Utils.KnockAway(mSpawnLoc, player, -2.5f, 0.85f);
+				}
+			}
+		});
+
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, detectionRange, 20 * 18, 3),
+			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 18, 3),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 6),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER),
-			new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
-				Vector loc = player.getLocation().toVector();
-				if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 2));
-				}
-			})
+										 || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
@@ -205,20 +223,14 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, detectionRange, 20 * 12, 3),
+			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 12, 3),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER),
-			new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
-				Vector loc = player.getLocation().toVector();
-				if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 2));
-				}
-			})
+										 || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
@@ -233,20 +245,14 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, detectionRange, 20 * 10, 2),
+			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 10, 2),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER),
-			new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
-				Vector loc = player.getLocation().toVector();
-				if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 2));
-				}
-			})
+										 || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
@@ -261,27 +267,25 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, detectionRange, 20 * 6, 2),
+			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 6, 2),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
 										 b -> b.getLocation().getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
 										 || b.getLocation().getBlock().getType() == Material.LAVA
-										 || b.getLocation().getBlock().getType() == Material.WATER),
-			new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
-				Vector loc = player.getLocation().toVector();
-				if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 2));
-				}
-			})
+										 || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			if (players.size() == 1) {
-				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"HOW BOLD FOR ONLY YOU TO COME TRY TO STRIKE ME DOWN. YOU WILL REGRET IT.\",\"color\":\"dark_green\"}]");
+				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"BOLD FOR ONLY YOU TO COME TRY TO STRIKE THE JUNGLE DOWN. YOU WILL REGRET IT.\",\"color\":\"dark_green\"}]");
 			}
+		});
+
+		events.put(75, mBoss -> {
+			forceCastSpell(SpellArachnopocolypse.class);
 		});
 
 		// Phase 2
@@ -338,10 +342,8 @@ public class Kaul extends BossAbilityGroup {
 									public void run() {
 										t++;
 										radius = t;
-										world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0),
-										                    30, 6, 5, 6, 0);
-										world.spawnParticle(Particle.SMOKE_NORMAL, mHeight.getLocation().add(0, 3, 0),
-										                    40, 6, 5, 6, 0.1);
+										world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
+										world.spawnParticle(Particle.SMOKE_NORMAL, mHeight.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
 										for (int i = 0; i < 36; i++) {
 											double radian1 = Math.toRadians(rotation + (10 * i));
 											loc.add(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
@@ -394,7 +396,12 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"DO NOT TRY TO STOP ME. THIS WORLD WILL PAY FOR ITS SINS.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOUR ERRADICATION IS FUTILE. THE JUNGLE WILL DEVOUR YOU.\",\"color\":\"dark_green\"}]");
+		});
+
+		// Forcecast Raise Jungle
+		events.put(60, mBoss -> {
+			super.forceCastSpell(SpellRaiseJungle.class);
 		});
 
 		// Phase 2.5
@@ -467,7 +474,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I GROW WEARY OF THIS. PRIMODIAL, END THESE FOOLS. DO NOT FAIL ME.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I GROW WEARY OF THIS. PRIMODIAL, END THESE MORTALS. DO NOT FAIL ME.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -521,17 +528,17 @@ public class Kaul extends BossAbilityGroup {
 									loc.add(dir.clone().multiply(0.35));
 									if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 										world.spawnParticle(Particle.FALLING_DUST, loc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, loc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
+										world.spawnParticle(Particle.BLOCK_DUST, loc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.4, 0.4, 0.4, 0.1);
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
-										world.spawnParticle(Particle.REDSTONE, loc, 18, 0.4, 0.4, 0.4, RED_COLOR);
+										world.spawnParticle(Particle.REDSTONE, loc, 15, 0.4, 0.4, 0.4, RED_COLOR);
 										world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData());
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
-										world.spawnParticle(Particle.FLAME, loc, 10, 0.4, 0.4, 0.4, 0.1);
-										world.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 0.4, 0.4, 0.4, 0);
+										world.spawnParticle(Particle.FLAME, loc, 10, 0.3, 0.3, 0.3, 0.1);
+										world.spawnParticle(Particle.SMOKE_LARGE, loc, 3, 0.4, 0.4, 0.4, 0);
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
 										world.spawnParticle(Particle.FALLING_DUST, loc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, loc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
+										world.spawnParticle(Particle.BLOCK_DUST, loc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
 										world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.4, 0.4, 0.4, 0.1);
 									}
 									if (loc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || loc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
@@ -618,7 +625,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! I WILL NOT ALLOW THIS. YOU WILL PAY FOR YOUR TRANSGRESSIONS. THIS PLACE WILL BE YOUR GRAVE!\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! I WILL NOT ALLOW THIS. YOU WILL PAY FOR YOUR TRANSGRESSIONS. MY SHRINE WILL BE YOUR GRAVE!\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -673,16 +680,25 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN TO ME. HELP ME REMOVE THESE PESTS FROM MY SIGHT.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN TO THE JUNGLE. HELP ME REMOVE THESE PESTS FROM MY SIGHT.\",\"color\":\"dark_green\"}]");
 		});
 
 		events.put(10, mBoss -> {
-			changePhase(phase3Spells, phase4PassiveSpells, null);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I WILL NOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]");
+			changePhase(phase4Spells, phase4PassiveSpells, null);
+			forceCastSpell(SpellVolcanicDemise.class);
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I CANNOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
-		constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar, (20 * 32) + 1);
+		//Construct the boss with a delay to prevent the passives from going off during the dialogue
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				constructBoss(plugin, identityTag, mBoss, phase1Spells, passiveSpells, detectionRange, bossBar, 20 * 10);
+			}
+
+		}.runTaskLater(mPlugin, (20 * 10) + 1);
 	}
 
 	private void knockback(Plugin plugin, double r) {
@@ -838,23 +854,18 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void death() {
-		String[] dio = new String[] { "Enough! I... Concede...",
-		                              "I underestimated you mortals. Your strength together rivals that of my own. The Jungle honors you.",
-		                              "However, do not think this victory will make me forget this worlds' crimes against the Jungle. Awaken me again, and true wrath will incur.",
-		                              "Now... Leave this place... For I... must sleep...",
-		                            };
+		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+		if (players.size() <= 0) {
+			return;
+		}
+		String[] dio = new String[] {
+			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
+			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
+			"NOW... THE JUNGLE... MUST SLEEP...",
+		};
 		defeated = true;
 		knockback(mPlugin, 10);
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
 
-		if (players.size() == 1) {
-			dio = new String[] { "Enough! I... Concede...",
-			                     "You are strong... To be defeated by such a small mortal such as you...",
-			                     "I never thought I would encounter a single being who could defeat me. You have proven me wrong.",
-			                     "However, do not think this victory will make me forget this worlds' crimes against the Jungle. Awaken me again, and true wrath will incur.",
-			                     "Now... Leave this place... For I... must sleep...",
-			                   };
-		}
 		for (Player player : players) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
@@ -991,12 +1002,9 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 				String[] dio = new String[] {
-					"Why... Why do come here...?",
-					"You mortals dare to walk into my grounds? After what has transpired to my home? To my soul?",
-					"The Tlaxans have betrayed me. The Soulspeaker drew energy from me, from my jungle. They used me to fuel their petty conflicts.",
-					"And now, you insects come here to try and set things straight by putting me down? You expect me to let this go so easily?",
-					"I will not go back until I see your homes destroyed, until those Tlaxans go extinct, until I have my retribution.",
-					"So, since you are so arrogant, do you think you can take on the wrath of the Jungle? Of a god?"
+					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
+					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?",
+					"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.",
 				};
 
 				new BukkitRunnable() {
@@ -1015,7 +1023,7 @@ public class Kaul extends BossAbilityGroup {
 						}
 						t++;
 
-						if (t >= (20 * 30)) {
+						if (t >= (20 * 10)) {
 							this.cancel();
 							mBoss.setAI(true);
 							mBoss.setSilent(false);
