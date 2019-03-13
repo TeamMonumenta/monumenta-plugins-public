@@ -21,6 +21,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
@@ -339,7 +340,8 @@ public class EntityListener implements Listener {
 			Entity entity = event.getEntity();
 
 			// Only items and players can activate tripwires
-			if (entity instanceof Item || entity instanceof Player) {
+			// Also pigs, for the pig quest
+			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig) {
 				return;
 			}
 
