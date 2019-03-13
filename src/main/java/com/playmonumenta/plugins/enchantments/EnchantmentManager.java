@@ -48,6 +48,7 @@ public class EnchantmentManager {
 		init.add(new Gilded());
 		init.add(new Festive());
 		init.add(new Clucking());
+		init.add(new Oinking());
 		init.add(new Stylish());
 		init.add(new Hope());
 		init.add(new Frost());
