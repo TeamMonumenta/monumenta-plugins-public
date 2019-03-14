@@ -25,6 +25,9 @@ public class DailyReset {
 					// Remove the tag that prevents players from beating Azacor more than once per day
 					player.removeScoreboardTag("am_antiartifact");
 
+					// Remove the tag that prevents players from beating Kaul more than once per day
+					player.removeScoreboardTag("kaul_daily_artifact");
+
 					/* Reset the player's access to the Patreon shrine (if applicable) */
 					int Patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 					int ShrinePower = (Patreon >= 20) ? 2 : ((Patreon >= 10) ? 1 : 0);
