@@ -127,7 +127,7 @@ public class PlayerListener implements Listener {
 		}.runTaskLater(mPlugin, 20);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerQuitEvent(PlayerQuitEvent event) {
 		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
 			event.setQuitMessage("");

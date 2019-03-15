@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -44,6 +46,28 @@ public class GenericCommand {
 		CommandPermission perms = CommandPermission.fromString(permission);
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+
+		/* No-argument variant which just is the sender (if they are a player) */
+		CommandAPI.getInstance().register(command,
+		                                  perms,
+		                                  arguments,
+		                                  (sender, args) -> {
+											  if (sender instanceof Player) {
+												  exec.run(sender, (Player)sender);
+											  } else if (sender instanceof ProxiedCommandSender) {
+												  ProxiedCommandSender s = (ProxiedCommandSender)sender;
+												  if (s.getCallee() instanceof Player) {
+													  exec.run(sender, (Player)s.getCallee());
+												  } else {
+													  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
+												  }
+											  } else {
+												  CommandAPI.fail(ChatColor.RED + "This command must be run by/as a player!");
+											  }
+		                                  }
+		);
+
+		/* Variant with player selector as arguments */
 		arguments.put("players", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS));
 		CommandAPI.getInstance().register(command,
 		                                  perms,

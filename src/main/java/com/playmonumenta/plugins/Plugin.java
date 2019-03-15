@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.commands.IncrementDaily;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
+import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.commands.TransferScores;
 import com.playmonumenta.plugins.commands.TransferServer;
@@ -141,6 +142,9 @@ public class Plugin extends JavaPlugin {
 
 		//  Load info.
 		reloadMonumentaConfig(null);
+
+		// This is both a command and an event listener
+		manager.registerEvents(new Spectate(this), this);
 
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
