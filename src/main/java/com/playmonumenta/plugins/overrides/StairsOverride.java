@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class StairsOverride extends BaseOverride {
 	@Override
-	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if ((block.getBlockData() instanceof Stairs) && (item == null || item.getType().equals(Material.AIR))) {
 			LocationType zone = plugin.mSafeZoneManager.getLocationType(player);
 			if (zone == LocationType.Capital || zone == LocationType.SafeZone)  {
@@ -28,7 +28,7 @@ public class StairsOverride extends BaseOverride {
 				loc.add(dir.multiply(0.1));
 				loc.setDirection(data.getFacing().getOppositeFace().getDirection());
 
-				sitOnLocation(plugin, player, loc);
+				sitOnLocation(plugin, player, loc, block);
 				return false;
 			}
 		}
@@ -36,7 +36,7 @@ public class StairsOverride extends BaseOverride {
 	}
 
 	/* TODO: This needs to track all armor stands and remove them when the plugin is stopped! */
-	protected static void sitOnLocation(Plugin plugin, Player player, Location loc) {
+	protected static void sitOnLocation(Plugin plugin, Player player, Location loc, Block block) {
 		Location pLoc = player.getLocation();
 
 		ArmorStand stand = (ArmorStand) player.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
@@ -50,8 +50,7 @@ public class StairsOverride extends BaseOverride {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-
-				if (!stand.isValid() || !stand.getPassengers().contains(player) || loc.getBlock().getType() == Material.AIR || !player.isValid()) {
+				if (!stand.isValid() || !stand.getPassengers().contains(player) || block.getType() == Material.AIR || !player.isValid()) {
 					this.cancel();
 					stand.remove();
 					if (!player.isSleeping()) {

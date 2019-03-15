@@ -81,9 +81,9 @@ public class ManaLance extends Ability {
 					if (hasSpellShock) {
 						Spellshock.addStaticToMob(mob, mPlayer);
 					}
-					if (!EntityUtils.isBoss(mob) && !((mob instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)mob))) {
-						mob.addPotionEffect(
-						    new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+					if (!EntityUtils.isBoss(mob) || (AbilityManager.getManager().isPvPEnabled(mPlayer) && (mob instanceof Player)
+					                                 && AbilityManager.getManager().isPvPEnabled((Player)mob))) {
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
 					}
 					iter.remove();
 					mobs.remove(mob);

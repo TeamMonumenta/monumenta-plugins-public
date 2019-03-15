@@ -4,7 +4,9 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -33,33 +35,30 @@ public class PvP extends Ability {
 			event.setReviveHealth(player.getMaxHealth());
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
+			player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
+			mWorld.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData());
 			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
 			PotionUtils.clearNegatives(mPlugin, player);
 			ItemStack[] inv = player.getInventory().getContents();
-			ItemStack[] armor = player.getInventory().getArmorContents();
+			for (ItemStack item : inv) {
+				if (item != null && item.getType().getMaxDurability() > 0) {
+					item.setDurability((short) 0);
+				}
+				if (item != null) {
+					mWorld.dropItemNaturally(player.getLocation(), item);
+				}
+			}
+			player.getInventory().clear();
 			new BukkitRunnable() {
-				Location loc = player.getLocation();
 				@Override
 				public void run() {
-					player.teleport(loc);
-					for (ItemStack item : inv) {
-						if (item != null && item.getType().getMaxDurability() > 0) {
-							item.setDurability((short) 0);
-						}
-					}
-					for (ItemStack item : armor) {
-						if (item != null && item.getType().getMaxDurability() > 0) {
-							item.setDurability((short) 0);
-						}
-					}
+					player.teleport(mWorld.getSpawnLocation());
 					player.setGameMode(GameMode.SURVIVAL);
-					player.getInventory().setContents(inv);
-					player.getInventory().setArmorContents(armor);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
 
 				}
 
-			}.runTaskLater(mPlugin, 20 * 2);
+			}.runTaskLater(mPlugin, 20 * 3);
 		}
 	}
 

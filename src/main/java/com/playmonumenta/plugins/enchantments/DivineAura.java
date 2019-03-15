@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class DivineAura implements BaseEnchantment {
-	private static String PROPERTY_NAME = ChatColor.AQUA + "Divine Aura";
+	private static String PROPERTY_NAME = ChatColor.GRAY + "Divine Aura";
 	private Random rand = new Random();
 	/* This is shared by all instances */
 	private static int staticTicks = 0;

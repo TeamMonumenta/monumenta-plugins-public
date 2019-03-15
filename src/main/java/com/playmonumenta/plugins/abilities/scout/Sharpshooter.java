@@ -30,39 +30,57 @@ public class Sharpshooter extends Ability {
 	}
 
 	private int sharpshot = 0;
-	private int t = 0;
+	private boolean volley = false;
+
+	@Override
+	public boolean PlayerShotArrowEvent(Arrow arrow) {
+		if (!arrow.hasMetadata("Volley")) {
+			volley = false;
+		}
+		return true;
+	}
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (!arrow.isCritical()) {
+			return true;
+		}
 		int sharpshooter = getAbilityScore();
 		int time = sharpshooter == 1 ? 20 * 12 : 20 * 15;
 		if (sharpshot <= 0) {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have begun to stack Sharpshooter!");
 			new BukkitRunnable() {
-
+				int t = 0;
 				@Override
 				public void run() {
 					t++;
 
-					if (t >= time || mPlayer.isDead()) {
-						this.cancel();
-						sharpshot = 0;
+					if (t >= 20 * 4) {
+						sharpshot--;
 						t = 0;
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your Sharpshooter stacks have expired");
+						if (sharpshot <= 0) {
+							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your Sharpshooter stacks have expired");
+						}
 					}
 				}
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		int max = sharpshooter == 1 ? 5 : 8;
-		if (sharpshot < max) {
-			if (sharpshooter > 1) {
-				sharpshot += 2;
-			} else if (sharpshooter > 0) {
-				sharpshot++;
+		if (!volley) {
+			if (arrow.hasMetadata("Volley")) {
+				volley = true;
+			} else {
+				volley = false;
+			}
+			int max = sharpshooter == 1 ? 5 : 8;
+			if (sharpshot < max) {
+				if (sharpshooter > 1) {
+					sharpshot += 2;
+				} else if (sharpshooter > 0) {
+					sharpshot++;
+				}
 			}
 		}
-		t = 0;
 		event.setDamage(event.getDamage() + sharpshot);
 		return true;
 	}
