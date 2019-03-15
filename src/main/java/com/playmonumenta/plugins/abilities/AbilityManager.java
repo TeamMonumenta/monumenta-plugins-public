@@ -77,6 +77,10 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
+import com.playmonumenta.plugins.abilities.other.PatreonGreen;
+import com.playmonumenta.plugins.abilities.other.PatreonPurple;
+import com.playmonumenta.plugins.abilities.other.PatreonRed;
+import com.playmonumenta.plugins.abilities.other.PatreonWhite;
 import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
@@ -300,7 +304,11 @@ public class AbilityManager {
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
 
 		                          // All other non-class abilities
-		                          new PvP(mPlugin, mWorld, mRandom, null)
+		                          new PvP(mPlugin, mWorld, mRandom, null),
+		                          new PatreonWhite(mPlugin, mWorld, mRandom, null),
+		                          new PatreonGreen(mPlugin, mWorld, mRandom, null),
+		                          new PatreonPurple(mPlugin, mWorld, mRandom, null),
+		                          new PatreonRed(mPlugin, mWorld, mRandom, null)
 		                      );
 	}
 
