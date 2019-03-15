@@ -74,9 +74,7 @@ public class SpellBlockBreak extends Spell {
 				block.setType(Material.AIR);
 			}
 			if (badBlockList.size() > 0) {
-				loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 3f, 0.6f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 3f, 0.6f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3f, 0.8f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
 				Location particleLoc = loc.add(new Location(loc.getWorld(), -0.5f, 0f, 0.5f));
 				particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, particleLoc, 10, 1, 1, 1, 0.03);
 			}
