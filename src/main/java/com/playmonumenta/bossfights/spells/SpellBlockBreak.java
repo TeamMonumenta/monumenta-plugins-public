@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.loot.Lootable;
 
 public class SpellBlockBreak extends Spell {
 	private Entity mLauncher;
@@ -51,9 +52,11 @@ public class SpellBlockBreak extends Spell {
 				testloc.setY(loc.getY() + (double) y);
 				for (int z = -1; z <= 1; z++) {
 					testloc.setZ(loc.getZ() + (double) z);
-					Material material = testloc.getBlock().getType();
+					Block block = testloc.getBlock();
+					Material material = block.getType();
 					if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
-						(material.isSolid() || material.equals(Material.COBWEB))) {
+						(material.isSolid() || material.equals(Material.COBWEB)) &&
+						(!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
 						badBlockList.add(testloc.getBlock());
 					}
 				}
