@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +28,8 @@ public class PvP extends Ability {
 
 	public PvP(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
+
+		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
 	}
 
 	@Override
