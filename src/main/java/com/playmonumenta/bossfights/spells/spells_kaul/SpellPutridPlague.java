@@ -52,7 +52,7 @@ public class SpellPutridPlague extends Spell {
 
 	@Override
 	public void run() {
-		double damage = mPhase3 ? 30 : 24;
+		double damage = mPhase3 ? 20 : 14;
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10, 0f);
