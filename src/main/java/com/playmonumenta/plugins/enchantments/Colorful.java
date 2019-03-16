@@ -44,7 +44,7 @@ public class Colorful implements BaseEnchantment {
 
 	@Override
 	public int getLevelFromItem(ItemStack item) {
-		if (item.getItemMeta() instanceof LeatherArmorMeta) {
+		if (item != null && item.getItemMeta() != null && item.getItemMeta() instanceof LeatherArmorMeta) {
 			return InventoryUtils.getCustomEnchantLevel(item, getProperty());
 		}
 		return 0;
