@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.other;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -33,6 +34,7 @@ public class PvP extends Ability {
 		Player player = mPlayer;
 		if (player.getKiller() != null) {
 			event.setReviveHealth(player.getMaxHealth());
+			Bukkit.broadcastMessage(event.getDeathMessage());
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
 			player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
