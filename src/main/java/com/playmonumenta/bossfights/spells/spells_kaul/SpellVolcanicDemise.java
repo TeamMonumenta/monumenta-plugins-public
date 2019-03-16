@@ -79,14 +79,14 @@ public class SpellVolcanicDemise extends Spell {
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
-									rainMeteor(player.getLocation(), players, 20);
+									rainMeteor(player.getLocation(), players, 10);
 								}
 							}
 							for (int j = 0; j < 4; j++) {
 								rainMeteor(mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange)), players, 40);
 							}
 
-							if (i >= 20) {
+							if (i >= 25) {
 								this.cancel();
 							}
 						}
@@ -127,7 +127,7 @@ public class SpellVolcanicDemise extends Spell {
 						Utils.KnockAway(loc, player, 0.5f, 0.65f);
 					}
 					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
-						if (random.nextBoolean() && random.nextBoolean()) {
+						if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) {
 							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 								block.setType(Material.NETHERRACK);
 							} else if (block.getType() == Material.NETHERRACK) {

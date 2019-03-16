@@ -82,7 +82,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 					player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
 					player.getWorld().spawnParticle(Particle.BLOCK_DUST, player.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
-					player.damage(16, boss);
+					player.damage(25, boss);
 					Utils.KnockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
 				},
 				// Attack particles

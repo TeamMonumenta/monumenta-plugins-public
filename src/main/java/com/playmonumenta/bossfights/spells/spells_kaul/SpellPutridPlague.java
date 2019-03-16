@@ -52,7 +52,7 @@ public class SpellPutridPlague extends Spell {
 
 	@Override
 	public void run() {
-		double damage = mPhase3 ? 20 : 14;
+		double damage = mPhase3 ? 30 : 24;
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10, 0f);
@@ -132,7 +132,9 @@ public class SpellPutridPlague extends Spell {
 						this.cancel();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");
 						List<Player> safe = Utils.playersInRange(point.getLocation(), 8);
-						for (Player player : players) {
+						List<Player> ps = Utils.playersInRange(loc, mRange);
+						ps.removeIf(p -> p.getLocation().getY() >= 61);
+						for (Player player : ps) {
 							if (!safe.contains(player)) {
 								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
 								world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);

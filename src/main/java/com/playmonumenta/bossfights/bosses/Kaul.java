@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -184,19 +185,41 @@ public class Kaul extends BossAbilityGroup {
 			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
 			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
+		List<UUID> hit = new ArrayList<UUID>();
+
+		List<UUID> cd = new ArrayList<UUID>();
 		SpellPlayerAction action = new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
 			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
-				if (player.getLocation().getY() >= 61) {
+				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
-				double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.2);
+				double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
 				if (newHealth <= 0) {
 					player.damage(100, mBoss);
 				} else {
 					player.setHealth(newHealth);
-					player.damage(1);
+					player.damage(1, mBoss);
 					Utils.KnockAway(mSpawnLoc, player, -2.5f, 0.85f);
+					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
+					world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15);
+					cd.add(player.getUniqueId());
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+							cd.remove(player.getUniqueId());
+						}
+
+					}.runTaskLater(mPlugin, 10);
+				}
+				if (player.getLocation().getBlock().isLiquid()) {
+					if (!hit.contains(player.getUniqueId())) {
+						hit.add(player.getUniqueId());
+						player.sendMessage(ChatColor.AQUA + "That hurt! It seems like the water is extremely corrosive. Best to stay out of it.");
+					}
+				} else if (!loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
+					player.sendMessage(ChatColor.AQUA + "You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.");
 				}
 			}
 		});
@@ -280,7 +303,9 @@ public class Kaul extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			if (players.size() == 1) {
-				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"BOLD FOR ONLY YOU TO COME TRY TO STRIKE THE JUNGLE DOWN. YOU WILL REGRET IT.\",\"color\":\"dark_green\"}]");
+				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USUPRER!\",\"color\":\"dark_green\"}]");
+			} else {
+				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.\",\"color\":\"dark_green\"}]");
 			}
 		});
 
@@ -396,7 +421,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOUR ERRADICATION IS FUTILE. THE JUNGLE WILL DEVOUR YOU.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
 		});
 
 		// Forcecast Raise Jungle
@@ -474,7 +499,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I GROW WEARY OF THIS. PRIMODIAL, END THESE MORTALS. DO NOT FAIL ME.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -625,7 +650,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! I WILL NOT ALLOW THIS. YOU WILL PAY FOR YOUR TRANSGRESSIONS. MY SHRINE WILL BE YOUR GRAVE!\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -680,13 +705,13 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN TO THE JUNGLE. HELP ME REMOVE THESE PESTS FROM MY SIGHT.\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
 		});
 
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			forceCastSpell(SpellVolcanicDemise.class);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"NO! HOW IS THIS POSSIBLE!? I CANNOT ALLOW DISEASES LIKE YOU TO STAY ALIVE!\",\"color\":\"dark_green\"}]");
+			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -1004,7 +1029,6 @@ public class Kaul extends BossAbilityGroup {
 				String[] dio = new String[] {
 					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
 					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?",
-					"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.",
 				};
 
 				new BukkitRunnable() {
@@ -1017,13 +1041,15 @@ public class Kaul extends BossAbilityGroup {
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3, 0f);
 						}
 
-						if (t % (20 * 5) == 0) {
-							Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
-							index++;
+						if (t % (20 * 4) == 0) {
+							if (index < dio.length) {
+								Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+								index++;
+							}
 						}
 						t++;
 
-						if (t >= (20 * 10)) {
+						if (t >= (20 * 8)) {
 							this.cancel();
 							mBoss.setAI(true);
 							mBoss.setSilent(false);

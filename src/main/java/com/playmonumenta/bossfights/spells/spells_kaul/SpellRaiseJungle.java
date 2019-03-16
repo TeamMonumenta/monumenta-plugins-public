@@ -41,7 +41,7 @@ public class SpellRaiseJungle extends Spell {
 	private int mSummonTime;
 	private double mY;
 	private List<UUID> summoned = new ArrayList<UUID>();
-	private final String elemental = "{CustomName:\"{\\\"text\\\":\\\"Earth Elemental\\\"}\",Health:60.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:coarse_dirt\",Count:1b,tag:{Enchantments:[{lvl:6s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:6302698651954335388L,UUIDLeast:-8389639952570264411L,Amount:14.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:-1762668789229140628L,UUIDLeast:-8025770187519780738L,Amount:0.385d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:60.0d,Name:\"generic.maxHealth\"}]}";
+	private final String elemental = "{CustomName:\"{\\\"text\\\":\\\"Earth Elemental\\\"}\",Health:80.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:coarse_dirt\",Count:1b,tag:{Enchantments:[{lvl:6s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:6302698651954335388L,UUIDLeast:-8389639952570264411L,Amount:14.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:-1762668789229140628L,UUIDLeast:-8025770187519780738L,Amount:0.385d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:80.0d,Name:\"generic.maxHealth\"}]}";
 
 	private int mCooldown;
 	private boolean onCooldown = false;
@@ -165,7 +165,7 @@ public class SpellRaiseJungle extends Spell {
 							t++;
 							if (t % 5 == 0) {
 								for (Player player : players) {
-									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
+									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 0.75f, 0.5f);
 								}
 							}
 
