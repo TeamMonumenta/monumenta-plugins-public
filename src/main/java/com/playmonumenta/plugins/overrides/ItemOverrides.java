@@ -218,25 +218,6 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_FERN, flowerOverride);
 		mItems.put(Material.POTTED_DEAD_BUSH, flowerOverride);
 		mItems.put(Material.POTTED_CACTUS, flowerOverride);
-
-		BaseOverride StairsOverride = new StairsOverride();
-		mItems.put(Material.OAK_STAIRS, StairsOverride);
-		mItems.put(Material.SPRUCE_STAIRS, StairsOverride);
-		mItems.put(Material.BIRCH_STAIRS, StairsOverride);
-		mItems.put(Material.JUNGLE_STAIRS, StairsOverride);
-		mItems.put(Material.ACACIA_STAIRS, StairsOverride);
-		mItems.put(Material.DARK_OAK_STAIRS, StairsOverride);
-		mItems.put(Material.SANDSTONE_STAIRS, StairsOverride);
-		mItems.put(Material.RED_SANDSTONE_STAIRS, StairsOverride);
-		mItems.put(Material.COBBLESTONE_STAIRS, StairsOverride);
-		mItems.put(Material.BRICK_STAIRS, StairsOverride);
-		mItems.put(Material.STONE_BRICK_STAIRS, StairsOverride);
-		mItems.put(Material.NETHER_BRICK_STAIRS, StairsOverride);
-		mItems.put(Material.QUARTZ_STAIRS, StairsOverride);
-		mItems.put(Material.PURPUR_STAIRS, StairsOverride);
-		mItems.put(Material.PRISMARINE_STAIRS, StairsOverride);
-		mItems.put(Material.PRISMARINE_BRICK_STAIRS, StairsOverride);
-		mItems.put(Material.DARK_PRISMARINE_STAIRS, StairsOverride);
 	}
 
 	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
