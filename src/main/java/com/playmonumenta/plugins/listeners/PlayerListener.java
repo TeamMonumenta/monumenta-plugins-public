@@ -314,7 +314,7 @@ public class PlayerListener implements Listener {
 			if (event.getWhoClicked() instanceof Player) {
 				Player player = (Player)event.getWhoClicked();
 				Inventory inventory = event.getClickedInventory();
-				if (inventory instanceof PlayerInventory) {
+				if (inventory == null || inventory instanceof PlayerInventory) {
 					// Don't sort player inventories until support is added
 					// to prevent sorting hotbar / armor slots
 					return;
