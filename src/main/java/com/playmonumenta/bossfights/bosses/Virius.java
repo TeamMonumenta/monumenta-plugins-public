@@ -74,7 +74,7 @@ public class Virius extends BossAbilityGroup {
 		                       })
 		));
 
-		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
+		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
 	}

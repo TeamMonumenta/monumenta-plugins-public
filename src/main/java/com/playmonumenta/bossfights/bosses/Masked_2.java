@@ -59,7 +59,7 @@ public class Masked_2 extends BossAbilityGroup {
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getY() < 157)
 		);
 
-		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
+		BossBarManager bossBar = new BossBarManager(plugin, mBoss, detectionRange, BarColor.RED, BarStyle.SOLID, null);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
 	}

@@ -33,6 +33,7 @@ public abstract class BossAbilityGroup {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private String mIdentityTag;
 	private BossBarManager mBossBar;
 	private SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
@@ -66,6 +67,7 @@ public abstract class BossAbilityGroup {
 	                          List<Spell> passiveSpells, int detectionRange, BossBarManager bossBar, long spellDelay) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mIdentityTag = identityTag;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
@@ -157,11 +159,17 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void forceCastSpell(Class<?> spell) {
-		mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
-		Spell sp = mActiveSpells.getLastCastedSpell();
-		if (sp != null) {
-			SpellCastEvent event = new SpellCastEvent(mBoss, sp);
-			Bukkit.getPluginManager().callEvent(event);
+		if (mActiveSpells != null) {
+			mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
+			Spell sp = mActiveSpells.getLastCastedSpell();
+			if (sp != null) {
+				SpellCastEvent event = new SpellCastEvent(mBoss, sp);
+				Bukkit.getPluginManager().callEvent(event);
+			} else {
+				mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but boss does not have this spell!");
+			}
+		} else {
+			mPlugin.getLogger().severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() + "' but there are no active spells!");
 		}
 	}
 

@@ -20,7 +20,7 @@ public class GenericBoss extends BossAbilityGroup {
 	public GenericBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
+		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
 
 		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, bossBar);
 	}

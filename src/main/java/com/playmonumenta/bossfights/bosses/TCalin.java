@@ -254,8 +254,7 @@ public class TCalin extends BossAbilityGroup {
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]");
 		});
 
-		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10,
-		                                            events);
+		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
 	}

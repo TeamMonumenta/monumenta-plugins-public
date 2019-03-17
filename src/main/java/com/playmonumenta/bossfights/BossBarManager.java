@@ -16,13 +16,15 @@ public class BossBarManager {
 	public interface BossHealthAction {
 		void run(LivingEntity boss);
 	}
-	private LivingEntity mBoss;
-	private int mRange;
-	private Map<Integer, BossHealthAction> mEvents;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
+	private final Map<Integer, BossHealthAction> mEvents;
+	private final BossBar mBar;
 	private int mEventCursor;
-	private BossBar mBar;
 
-	public BossBarManager(LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction>events) {
+	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction>events) {
+		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
@@ -71,7 +73,13 @@ public class BossBarManager {
 			mEventCursor--;
 		}
 
-		mBar.setProgress(progress);
+		if (progress > 1.0f || progress < 0f) {
+			mPlugin.getLogger().severe("Boss '" + mBoss.getCustomName() + "' has invalid health " +
+			                           Double.toString(mBoss.getHealth()) + " out of max " +
+									   Double.toString(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue()));
+		} else {
+			mBar.setProgress(progress);
+		}
 	}
 
 	public void remove() {
