@@ -164,27 +164,10 @@ public class SpellKaulsJudgement extends Spell {
 							world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0);
 
 							if (player.isDead() || t >= time) {
-								player.setInvulnerable(true);
 								if (player.isDead()) {
 									player.spigot().respawn();
-									new BukkitRunnable() {
-
-										@Override
-										public void run() {
-											player.setInvulnerable(false);
-										}
-
-									}.runTaskLater(mPlugin, 20 * 6);
-								} else {
-									new BukkitRunnable() {
-
-										@Override
-										public void run() {
-											player.setInvulnerable(false);
-										}
-
-									}.runTaskLater(mPlugin, 20 * 3);
 								}
+								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 4 * 20, 4));
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
 								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
@@ -216,7 +199,6 @@ public class SpellKaulsJudgement extends Spell {
 
 							if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
 								this.cancel();
-								player.setInvulnerable(true);
 								player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
