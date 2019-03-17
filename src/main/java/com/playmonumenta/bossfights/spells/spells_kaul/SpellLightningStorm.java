@@ -77,15 +77,15 @@ public class SpellLightningStorm extends Spell {
 		Location loc = player.getLocation();
 		for (int i = 0; i < 10; i++) {
 			strike.subtract(0, 1, 0);
-			world.spawnParticle(Particle.REDSTONE, strike, 20, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
-			world.spawnParticle(Particle.REDSTONE, strike, 20, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
+			world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
+			world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
 		}
-		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 0, 0, 0, 0.25);
-		world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25);
+		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.25);
+		world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175);
+		world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
-		double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
+		double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.3);
 
 		if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			// Kill the player, but allow totems to trigger

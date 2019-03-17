@@ -98,6 +98,9 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 			new SpellEarthenRupture(plugin, mBoss),
 			new SpellBaseBolt(plugin, mBoss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
 				(Entity entity, int tick) -> {
+					if (entity.getLocation().getY() > 61) {
+						return;
+					}
 					float t = tick / 15;
 					world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
 					world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
@@ -108,6 +111,9 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				},
 
 				(Entity entity) -> {
+					if (entity.getLocation().getY() > 61) {
+						return;
+					}
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
 					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
 					0.2, 0.2);
@@ -116,6 +122,9 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				},
 
 				(Location loc) -> {
+					if (loc.getY() > 61) {
+						return;
+					}
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
 					Material.STONE.createBlockData());
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
@@ -133,6 +142,9 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				},
 
 				(Player player, Location loc, boolean blocked) -> {
+					if (player.getLocation().getY() > 61 || loc.getY() > 61) {
+						return;
+					}
 					if (!blocked) {
 						player.damage(22, mBoss);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));

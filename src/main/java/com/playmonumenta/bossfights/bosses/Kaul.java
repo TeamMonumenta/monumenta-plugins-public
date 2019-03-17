@@ -713,7 +713,7 @@ public class Kaul extends BossAbilityGroup {
 			forceCastSpell(SpellVolcanicDemise.class);
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
 		});
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		//Construct the boss with a delay to prevent the passives from going off during the dialogue
 		new BukkitRunnable() {

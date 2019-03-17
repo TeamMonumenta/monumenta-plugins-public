@@ -105,7 +105,7 @@ public class SpellVolcanicDemise extends Spell {
 			Location loc = mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange));
 			@Override
 			public void run() {
-				y -= 2;
+				y -= 1;
 				for (Player player : players) {
 					if (player.getLocation().distance(loc) < 15) {
 						for (double t = 10; t > 0; t -= 0.5) {

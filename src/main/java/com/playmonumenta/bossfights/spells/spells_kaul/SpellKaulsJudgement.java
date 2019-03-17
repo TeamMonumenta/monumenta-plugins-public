@@ -134,7 +134,7 @@ public class SpellKaulsJudgement extends Spell {
 	}
 
 	public void judge(Player player) {
-		int time = mPhase3 ? 20 * 45 : 20 * 48;
+		int time = mPhase3 ? 20 * 50 : 20 * 53;
 		new BukkitRunnable() {
 			World world = player.getWorld();
 			Location loc = player.getLocation();
@@ -217,19 +217,12 @@ public class SpellKaulsJudgement extends Spell {
 							if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
 								this.cancel();
 								player.setInvulnerable(true);
-								new BukkitRunnable() {
-
-									@Override
-									public void run() {
-										player.setInvulnerable(false);
-									}
-
-								}.runTaskLater(mPlugin, 20 * 3);
 								player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
 								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 6 * 20, 4));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 30, 0));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 30, 0));
 							}
