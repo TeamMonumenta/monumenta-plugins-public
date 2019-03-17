@@ -29,7 +29,9 @@ public class PvP extends Ability {
 	public PvP(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 
-		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
+		if (player != null) {
+			player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
+		}
 	}
 
 	@Override
