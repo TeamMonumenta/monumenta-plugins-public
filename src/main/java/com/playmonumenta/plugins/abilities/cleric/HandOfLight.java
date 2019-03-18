@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -17,6 +18,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -52,7 +55,7 @@ public class HandOfLight extends Ability {
 			// If the source player was included (because PvP is on), heal them
 			if ((playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
 			     && !p.getScoreboardTags().contains("disable_class")
-				 && !AbilityManager.getManager().isPvPEnabled(mPlayer))
+			     && !AbilityManager.getManager().isPvPEnabled(mPlayer))
 			    || p.equals(mPlayer)) {
 
 				PlayerUtils.healPlayer(p, healAmount);
@@ -77,11 +80,6 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		// Must be sneaking
-		if (!mPlayer.isSneaking()) {
-			return false;
-		}
-
 		// Must be holding a shield
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
@@ -92,11 +90,24 @@ public class HandOfLight extends Ability {
 
 		// Must not match conditions for cleansing rain
 		Ability cleansing = AbilityManager.getManager().getPlayerAbility(mPlayer, CleansingRain.class);
-		if (cleansing != null && cleansing.runCheck()) {
+		if (cleansing != null && (cleansing.runCheck() || mPlayer.getLocation().getPitch() >= 50)) {
 			return false;
 		}
 
-		return mPlayer.getLocation().getPitch() > -50 && mPlayer.getLocation().getPitch() < 50;
+		// Must not match conditions for luminous infusion
+		Ability li = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
+		if (li != null && mPlayer.getLocation().getPitch() <= -50) {
+			return false;
+		}
+
+		// Must not match conditions for enchanted prayer
+		Ability ep = AbilityManager.getManager().getPlayerAbility(mPlayer, EnchantedPrayer.class);
+		if (ep != null && mPlayer.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+			return false;
+		}
+
+		// Must be sneaking
+		return mPlayer.isSneaking();
 	}
 
 }

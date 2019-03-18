@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -102,7 +104,7 @@ public class EnchantedPrayer extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.getVelocity().getY() > 0;
+		return mPlayer.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR;
 	}
 
 	/*
