@@ -90,6 +90,9 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			new SpellEarthenRupture(plugin, mBoss),
 			new SpellBaseBolt(plugin, mBoss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
 				(Entity entity, int tick) -> {
+					if (entity.getLocation().getY() > 60) {
+						return;
+					}
 					float t = tick / 15;
 					world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
 					world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
@@ -108,6 +111,9 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 				},
 
 				(Location loc) -> {
+					if (loc.getY() > 60) {
+						return;
+					}
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
 					Material.STONE.createBlockData());
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
@@ -125,6 +131,9 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 				},
 
 				(Player player, Location loc, boolean blocked) -> {
+					if ((player != null && player.getLocation().getY() > 60) || (loc != null && loc.getY() > 60)) {
+						return;
+					}
 					if (!blocked) {
 						player.damage(22, mBoss);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
