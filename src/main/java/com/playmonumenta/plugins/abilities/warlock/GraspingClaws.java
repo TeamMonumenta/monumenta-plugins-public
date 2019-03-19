@@ -77,4 +77,7 @@ public class GraspingClaws extends Ability {
 		return mPlayer.isSneaking();
 	}
 
+	public boolean onCooldown() {
+		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+	}
 }
