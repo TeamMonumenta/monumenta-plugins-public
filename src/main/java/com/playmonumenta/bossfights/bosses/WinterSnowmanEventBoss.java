@@ -1,7 +1,5 @@
 package com.playmonumenta.bossfights.bosses;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,15 +17,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.bossfights.utils.Utils;
 
 public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
 	public static final String identityTag = "boss_winter_snowman";
 	public static final int detectionRange = 50;
-
-	private static java.lang.reflect.Method cachedHandleMethod = null;
-	private static java.lang.reflect.Method cachedGetAbsorpMethod = null;
-	private static java.lang.reflect.Method cachedSetAbsorpMethod = null;
 
 	private final LivingEntity mBoss;
 	private final Plugin mPlugin;
@@ -72,30 +67,9 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				float absorp;
-
-				try {
-					// Get player's absorp via reflection
-					// Cache reflection results for performance
-					if (cachedHandleMethod == null) {
-						cachedHandleMethod = player.getClass().getMethod("getHandle");
-					}
-					Object handle = cachedHandleMethod.invoke(player);
-
-					if (cachedGetAbsorpMethod == null) {
-						cachedGetAbsorpMethod = handle.getClass().getMethod("getAbsorptionHearts");
-					}
-					if (cachedSetAbsorpMethod == null) {
-						cachedSetAbsorpMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
-					}
-					absorp = (Float)cachedGetAbsorpMethod.invoke(handle);
-					absorp -= 2;
-					cachedSetAbsorpMethod.invoke(handle, Math.max(0f, absorp));
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					mPlugin.getLogger().severe("Failed to process arena snowball hitting player!");
-					e.printStackTrace();
-					return;
-				}
+				float absorp = Utils.getAbsorp(player);
+				absorp -= 2;
+				Utils.setAbsorp(player, absorp);
 
 				Location loc = player.getLocation().add(0, 1.4, 0);
 				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);
