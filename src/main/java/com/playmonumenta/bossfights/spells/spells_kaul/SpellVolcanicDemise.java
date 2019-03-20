@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.spells.Spell;
@@ -86,6 +87,11 @@ public class SpellVolcanicDemise extends Spell {
 								rainMeteor(mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange)), players, 40);
 							}
 
+							//Target one random player. Have a meteor rain nearby them.
+							Player rPlayer = players.get(random.nextInt(players.size()));
+							Location loc = rPlayer.getLocation();
+							rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 40);
+
 							if (i >= 25) {
 								this.cancel();
 							}
@@ -122,8 +128,15 @@ public class SpellVolcanicDemise extends Spell {
 					world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175, null, true);
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-					for (Player player : Utils.playersInRange(loc, 4)) {
-						player.damage(42, mBoss);
+					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
+					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
+					for (Player player : Utils.playersInRange(loc, 6)) {
+						BoundingBox pBox = player.getBoundingBox();
+						if (pBox.overlaps(death)) {
+							player.damage(100, mBoss);
+						} else if (pBox.overlaps(box)) {
+							player.damage(42, mBoss);
+						}
 						Utils.KnockAway(loc, player, 0.5f, 0.65f);
 					}
 					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {

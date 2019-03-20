@@ -1,5 +1,6 @@
 package com.playmonumenta.bossfights.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -227,5 +228,49 @@ public class Utils {
 			blocks.add(currentBlock);
 		}
 		return blocks;
+	}
+
+	private static java.lang.reflect.Method cachedHandleMethod = null;
+	private static java.lang.reflect.Method cachedGetAbsorpMethod = null;
+	private static java.lang.reflect.Method cachedSetAbsorpMethod = null;
+	public static float getAbsorp(Player player) {
+		try {
+			// Get player's absorp via reflection
+			// Cache reflection results for performance
+			if (cachedHandleMethod == null) {
+				cachedHandleMethod = player.getClass().getMethod("getHandle");
+			}
+			Object handle = cachedHandleMethod.invoke(player);
+
+			if (cachedGetAbsorpMethod == null) {
+				cachedGetAbsorpMethod = handle.getClass().getMethod("getAbsorptionHearts");
+			}
+			if (cachedSetAbsorpMethod == null) {
+				cachedSetAbsorpMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
+			}
+			return (Float)cachedGetAbsorpMethod.invoke(handle);
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			/* If error, return 0 rather than making caller handle the error */
+			return 0;
+		}
+	}
+
+	public static void setAbsorp(Player player, float value) {
+		try {
+			// Get player's absorp via reflection
+			// Cache reflection results for performance
+			if (cachedHandleMethod == null) {
+				cachedHandleMethod = player.getClass().getMethod("getHandle");
+			}
+			Object handle = cachedHandleMethod.invoke(player);
+
+			if (cachedSetAbsorpMethod == null) {
+				cachedSetAbsorpMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
+			}
+			cachedSetAbsorpMethod.invoke(handle, Math.max(0f, value));
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 	}
 }

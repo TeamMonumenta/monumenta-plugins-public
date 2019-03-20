@@ -15,6 +15,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -85,13 +86,27 @@ public class SpellLightningStorm extends Spell {
 		world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
-		double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.3);
 
-		if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+		double toTake = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
+		float absorp = Utils.getAbsorp(player);
+		double adjustedHealth = (player.getHealth() + absorp) - toTake;
+
+		if (adjustedHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			// Kill the player, but allow totems to trigger
 			player.damage(100, mBoss);
 		} else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			player.setHealth(newHealth);
+			if (absorp > 0) {
+				if (absorp - toTake > 0) {
+					Utils.setAbsorp(player, (float) (absorp - toTake));
+					toTake = 0;
+				} else {
+					Utils.setAbsorp(player, 0f);
+					toTake -= absorp;
+				}
+			}
+			if (toTake > 0) {
+				player.setHealth(player.getHealth() - toTake);
+			}
 			player.damage(1, mBoss);
 		}
 		if (!players.contains(player)) {
