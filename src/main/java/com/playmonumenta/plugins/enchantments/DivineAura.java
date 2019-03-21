@@ -104,6 +104,9 @@ public class DivineAura implements BaseEnchantment {
 
 	@Override
 	public int getLevelFromItem(ItemStack item, Player player) {
+		if (getLevelFromItem(item) == 0) {
+			return 0;
+		}
 		if (player.getScoreboardTags().contains(TAG_TO_DISABLE)) {
 			return 1000;
 		}
