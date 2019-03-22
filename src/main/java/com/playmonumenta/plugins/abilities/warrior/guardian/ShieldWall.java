@@ -38,10 +38,16 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  */
 public class ShieldWall extends Ability {
 
+	private static final int SHIELD_WALL_1_DURATION = 8 * 30;
+	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
+	private static final int SHIELD_WALL_DAMAGE = 6;
+	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
+	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
+
 	public ShieldWall(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "ShieldWall";
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 20;
+		mInfo.cooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.linkedSpell = Spells.SHIELD_WALL;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
@@ -53,7 +59,7 @@ public class ShieldWall extends Ability {
 			return false;
 		}
 
-		int time = getAbilityScore() == 1 ? 20 * 8 : 20 * 10;
+		int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
 		boolean knockback = getAbilityScore() == 1 ? false : true;
 		new BukkitRunnable() {
 			int t = 0;
@@ -113,11 +119,14 @@ public class ShieldWall extends Ability {
 										mWorld.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f);
 									}
 								}
-							} else if (knockback && EntityUtils.isHostileMob(e)) {
+							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
-								MovementUtils.KnockAway(loc, le, 0.3f);
-								mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
-								mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+								EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
+								if (knockback) {
+									MovementUtils.KnockAway(loc, le, 0.3f);
+									mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
+									mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+								}
 							}
 						}
 					}
