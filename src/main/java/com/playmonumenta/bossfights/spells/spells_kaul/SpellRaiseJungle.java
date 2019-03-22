@@ -157,32 +157,31 @@ public class SpellRaiseJungle extends Spell {
 
 						}.runTaskTimer(mPlugin, 0, 1);
 					}
-
-					new BukkitRunnable() {
-						int t = 0;
-						@Override
-						public void run() {
-							t++;
-							if (t % 5 == 0) {
-								for (Player player : players) {
-									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 0.75f, 0.5f);
-								}
-							}
-
-							if (mSummonTime <= t && !summoned.isEmpty()) {
-								for (Player player : players) {
-									player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
-								}
-								this.cancel();
-							}
-
-							if (summoned.isEmpty()) {
-								this.cancel();
+				}
+				new BukkitRunnable() {
+					int t = 0;
+					@Override
+					public void run() {
+						t++;
+						if (t % 5 == 0) {
+							for (Player player : players) {
+								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1f, 0.5f);
 							}
 						}
 
-					}.runTaskTimer(mPlugin, 0, 1);
-				}
+						if (mSummonTime <= t && !summoned.isEmpty()) {
+							for (Player player : players) {
+								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+							}
+							this.cancel();
+						}
+
+						if (summoned.isEmpty()) {
+							this.cancel();
+						}
+					}
+
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
 		}.runTaskLater(mPlugin, 20);
