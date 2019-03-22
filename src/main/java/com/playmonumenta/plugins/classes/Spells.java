@@ -89,7 +89,7 @@ public enum Spells {
 	BLASPHEMY("Blasphemous Aura"),
 	SOUL_REND("Soul Rend"),
 	CONSUMING_FLAMES("Consuming Flames"),
-	GRASPING_CLAW("Grasping Claw"),
+	GRASPING_CLAWS("Grasping Claws"),
 
 	//--Reaper
 	HUNGERING_VORTEX("Hungering Vortex"),

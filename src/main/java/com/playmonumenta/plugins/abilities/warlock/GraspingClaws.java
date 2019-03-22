@@ -33,7 +33,7 @@ public class GraspingClaws extends Ability {
 	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "GraspingClaws";
-		mInfo.linkedSpell = Spells.GRASPING_CLAW;
+		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
 		mInfo.cooldown = GRASPING_CLAWS_COOLDOWN;
 		mInfo.ignoreCooldown = true;
 	}
@@ -41,7 +41,7 @@ public class GraspingClaws extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAW)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS)) {
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.PORTAL);
 			shot = arrow;
 			// Put Grasping Claws on cooldown
