@@ -31,19 +31,29 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Bodyguard: Blocking while looking directly at another player
- * makes you charge to him (max range: 15 blocks, immune to
+ * makes you charge to them (max range: 15 blocks, immune to
  * knockback and damage). Upon arriving, you knock back all
  * nearby mobs (radius: 4 blocks). Both you and the other player
- * gain + 4 / + 8 armor and regen I/II for 8 s. At lvl 2, mobs
- * are also stunned for 3 s. Cooldown: 45 / 35s
+ * gain + 4 / + 5 armor and regen I/II for 8 s. At lvl 2, mobs
+ * are also stunned for 3 s. Cooldown: 30s
  */
 public class Bodyguard extends Ability {
+
+	private static final int BODYGUARD_COOLDOWN = 30 * 20;
+	private static final int BODYGUARD_RANGE = 15;
+	private static final int BODYGUARD_RADIUS = 4;
+	private static final int BODYGUARD_1_ARMOR = 4;
+	private static final int BODYGUARD_2_ARMOR = 5;
+	private static final int BODYGUARD_1_REGEN_LVL = 0;
+	private static final int BODYGUARD_2_REGEN_LVL = 1;
+	private static final int BODYGUARD_BUFF_DURATION = 8 * 20;
+	private static final int BODYGUARD_STUN_DURATION = 3 * 20;
 
 	public Bodyguard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.linkedSpell = Spells.BODYGUARD;
-		mInfo.cooldown = 20 * 30;
+		mInfo.cooldown = BODYGUARD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
@@ -52,7 +62,7 @@ public class Bodyguard extends Ability {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
 		Location oLoc = mPlayer.getLocation();
 		Vector dir = oLoc.getDirection();
-		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer.getEyeLocation(), 15);
+		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer.getEyeLocation(), BODYGUARD_RANGE);
 		players.remove(mPlayer);
 		for (int i = 0; i < 15; i++) {
 			box.shift(dir);
@@ -95,15 +105,15 @@ public class Bodyguard extends Ability {
 					mWorld.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 					mWorld.playSound(tloc, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.9f);
 					int bodyguard = getAbilityScore();
-					double armor = bodyguard == 1 ? 4 : 8;
-					int amp = bodyguard == 1 ? 0 : 1;
+					double armor = bodyguard == 1 ? BODYGUARD_1_ARMOR : BODYGUARD_2_ARMOR;
+					int amp = bodyguard == 1 ? BODYGUARD_1_REGEN_LVL : BODYGUARD_2_REGEN_LVL;
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 					                                 new PotionEffect(PotionEffectType.REGENERATION,
-					                                                  20 * 8,
+					                                                  BODYGUARD_BUFF_DURATION,
 					                                                  amp, false, true));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 					                                 new PotionEffect(PotionEffectType.REGENERATION,
-					                                                  20 * 8,
+					                                                  BODYGUARD_BUFF_DURATION,
 					                                                  amp, false, true));
 					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
@@ -115,11 +125,11 @@ public class Bodyguard extends Ability {
 							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 						}
 
-					}.runTaskLater(mPlugin, 20 * 8);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 4)) {
+					}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), BODYGUARD_RADIUS)) {
 						MovementUtils.KnockAway(player, mob, 0.45f);
 						if (bodyguard > 1) {
-							EntityUtils.applyStun(mPlugin, 20 * 3, mob);
+							EntityUtils.applyStun(mPlugin, BODYGUARD_STUN_DURATION, mob);
 						}
 					}
 					return true;

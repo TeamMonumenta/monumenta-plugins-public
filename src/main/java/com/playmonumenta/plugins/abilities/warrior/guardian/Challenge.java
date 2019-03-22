@@ -29,25 +29,33 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 /*
  * Challenge: Shifting while left-clicking makes all enemies
  * within 12 blocks target you. You gain Absorption I (2 hearts)
- * / III (6 hearts) and one armor toughness per affected mob
- * (max: 8) for 10 s. Cooldown: 30 / 25 s
+ * / II (4 hearts) and one armor toughness per affected mob
+ * (max: 8) for 10 s. Cooldown: 30 / 20 s
  */
 public class Challenge extends Ability {
+
+	private static final int CHALLENGE_RANGE = 12;
+	private static final int CHALLENGE_1_ABS_LVL = 0;
+	private static final int CHALLENGE_2_ABS_LVL = 1;
+	private static final int CHALLENGE_TOUGHNESS_MAX = 8;
+	private static final int CHALLENGE_DURATION = 10 * 20;
+	private static final int CHALLENGE_1_COOLDOWN = 30 * 20;
+	private static final int CHALLENGE_2_COOLDOWN = 20 * 20;
 
 	public Challenge(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Challenge";
-		mInfo.cooldown = 20 * 20;
+		mInfo.cooldown = getAbilityScore() == 1 ? CHALLENGE_1_COOLDOWN : CHALLENGE_2_COOLDOWN;
 		mInfo.linkedSpell = Spells.CHELLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
 	public boolean cast() {
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 12, mPlayer);
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
 		int increase = mobs.size();
-		if (increase > 8) {
-			increase = 8;
+		if (increase > CHALLENGE_TOUGHNESS_MAX) {
+			increase = CHALLENGE_TOUGHNESS_MAX;
 		}
 		mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(increase);
 		new BukkitRunnable() {
@@ -57,11 +65,11 @@ public class Challenge extends Ability {
 				mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
 			}
 
-		}.runTaskLater(mPlugin, 20 * 10);
-		int amp = getAbilityScore() == 1 ? 0 : 2;
+		}.runTaskLater(mPlugin, CHALLENGE_DURATION);
+		int amp = getAbilityScore() == 1 ? CHALLENGE_1_ABS_LVL : CHALLENGE_2_ABS_LVL;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.ABSORPTION,
-		                                                  20 * 10,
+		                                                  CHALLENGE_DURATION,
 		                                                  amp, false, true));
 		for (LivingEntity mob : mobs) {
 			if (mob instanceof Mob) {
