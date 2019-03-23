@@ -87,7 +87,7 @@ public class SpellLightningStorm extends Spell {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 
-		double toTake = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
+		double toTake = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.3);
 		float absorp = Utils.getAbsorp(player);
 		double adjustedHealth = (player.getHealth() + absorp) - toTake;
 
