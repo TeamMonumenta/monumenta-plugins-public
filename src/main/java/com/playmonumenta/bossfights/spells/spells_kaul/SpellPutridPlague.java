@@ -128,6 +128,15 @@ public class SpellPutridPlague extends Spell {
 					world.spawnParticle(Particle.SPELL_INSTANT, p3, 30, 0.45, 6, 0.45, 0, null, true);
 					world.spawnParticle(Particle.SPELL_INSTANT, p4, 30, 0.45, 6, 0.45, 0, null, true);
 					world.spawnParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7, 0, null, true);
+
+					Location cLoc = point.getLocation();
+					for (double rotation = 0; rotation < 360; rotation += 6) {
+						double radian = Math.toRadians(rotation);
+						cLoc.add(Math.cos(radian) * 7, 0, Math.sin(radian) * 7);
+						world.spawnParticle(Particle.SPELL_INSTANT, cLoc, 1, 0, 0, 0, 0, null, true);
+						cLoc.subtract(Math.cos(radian) * 7, 0, Math.sin(radian) * 7);
+					}
+
 					if (t >= mTime) {
 						this.cancel();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");

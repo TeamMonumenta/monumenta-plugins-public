@@ -180,6 +180,7 @@ public class SpellGroundSurge extends Spell {
 														world.spawnParticle(Particle.FLAME, _bLoc, 50, 0, 0, 0, 0.25);
 														world.playSound(_bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
 														hits++;
+														j = 0;
 														if (hits < players.size() && hits <= 2) {
 															int attempts = 0;
 															_tPlayer = players.get(random.nextInt(players.size()));
