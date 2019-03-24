@@ -41,12 +41,14 @@ public class SpellPutridPlague extends Spell {
 	private Random rand = new Random();
 	private boolean mPhase3;
 	private int mTime;
+	private Location mCenter;
 
-	public SpellPutridPlague(Plugin plugin, LivingEntity boss, double range, boolean phase3) {
+	public SpellPutridPlague(Plugin plugin, LivingEntity boss, double range, boolean phase3, Location center) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mPhase3 = phase3;
+		mCenter = center;
 		mTime = (int)(mPhase3 ? 20 * 7.5 : 20 * 9);
 	}
 
@@ -105,7 +107,7 @@ public class SpellPutridPlague extends Spell {
 					}
 				}
 			}
-			List<Player> players = Utils.playersInRange(loc, mRange);
+			List<Player> players = Utils.playersInRange(mCenter, mRange);
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
 				int t = 0;
@@ -141,7 +143,7 @@ public class SpellPutridPlague extends Spell {
 						this.cancel();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");
 						List<Player> safe = Utils.playersInRange(point.getLocation(), 8);
-						List<Player> ps = Utils.playersInRange(loc, mRange);
+						List<Player> ps = Utils.playersInRange(mCenter, mRange);
 						ps.removeIf(p -> p.getLocation().getY() >= 61);
 						for (Player player : ps) {
 							if (!safe.contains(player)) {

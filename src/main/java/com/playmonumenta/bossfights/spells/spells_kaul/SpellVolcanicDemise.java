@@ -134,10 +134,11 @@ public class SpellVolcanicDemise extends Spell {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							player.damage(100, mBoss);
+							Utils.KnockAway(loc, player, 0.5f, 0.65f);
 						} else if (pBox.overlaps(box)) {
 							player.damage(42, mBoss);
+							Utils.KnockAway(loc, player, 0.5f, 0.65f);
 						}
-						Utils.KnockAway(loc, player, 0.5f, 0.65f);
 					}
 					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
 						if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) {

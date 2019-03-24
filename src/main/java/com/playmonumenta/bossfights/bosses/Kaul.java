@@ -159,12 +159,12 @@ public class Kaul extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(
 		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mHeight.getLocation().getY()),
-		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false),
+		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mHeight.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
 		                  new SpellArachnopocolypse(mPlugin, mBoss, mHeight.getLocation(), detectionRange)));
 
 		SpellManager phase2Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mHeight.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
 		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mHeight.getLocation().getY()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
@@ -173,14 +173,14 @@ public class Kaul extends BossAbilityGroup {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
 
 		SpellManager phase3Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mHeight.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
 		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, true)));
 
 		SpellManager phase4Spells = new SpellManager(
-			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true),
+			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mHeight.getLocation()),
 			                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
 			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
 			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
