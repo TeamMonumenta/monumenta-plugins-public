@@ -81,8 +81,10 @@ import com.playmonumenta.bossfights.bosses.TpBehindBoss;
 import com.playmonumenta.bossfights.bosses.TsunamiChargerBoss;
 import com.playmonumenta.bossfights.bosses.UnstableBoss;
 import com.playmonumenta.bossfights.bosses.Virius;
+import com.playmonumenta.bossfights.bosses.VolatileBoss;
 import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
 import com.playmonumenta.bossfights.bosses.WinterSnowmanEventBoss;
+import com.playmonumenta.bossfights.bosses.WitherHitBoss;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 
 public class BossManager implements Listener {
@@ -154,6 +156,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(PrimordialElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new PrimordialElementalKaulBoss(p, e));
 		mStatelessBosses.put(ImmortalElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalElementalKaulBoss(p, e));
 		mStatelessBosses.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new CyanSummonBoss(p, e));
+		mStatelessBosses.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> new WitherHitBoss(p, e));
+		mStatelessBosses.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> new VolatileBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -224,6 +228,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TCalin.identityTag, (Plugin p, LivingEntity e) -> TCalin.deserialize(p, e));
 		mBossDeserializers.put(CrownbearerBoss.identityTag, (Plugin p, LivingEntity e) -> CrownbearerBoss.deserialize(p, e));
 		mBossDeserializers.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> CyanSummonBoss.deserialize(p, e));
+		mBossDeserializers.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> WitherHitBoss.deserialize(p, e));
+		mBossDeserializers.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> VolatileBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
