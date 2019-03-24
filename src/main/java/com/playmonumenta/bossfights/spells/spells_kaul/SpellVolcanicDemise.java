@@ -130,7 +130,7 @@ public class SpellVolcanicDemise extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
-					for (Player player : Utils.playersInRange(loc, 6)) {
+					for (Player player : Utils.playersInRange(loc, 4)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							player.damage(100, mBoss);
