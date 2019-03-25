@@ -36,11 +36,11 @@ public class Resurrection implements BaseEnchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		if (player.getHealth() - event.getFinalDamage() <= 0) {
+			player.setHealth(2);
 			event.setDamage(1);
 			for (PotionEffect effect : player.getActivePotionEffects()) {
 				player.removePotionEffect(effect.getType());
 			}
-			player.setHealth(2);
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 40, 0, true, true));
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 20 * 45, 1, true, true));
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.ABSORPTION, 20 * 5, 1, true, true));

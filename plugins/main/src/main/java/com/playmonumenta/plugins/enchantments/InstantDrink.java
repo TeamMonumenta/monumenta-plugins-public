@@ -9,7 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -66,8 +68,13 @@ public class InstantDrink implements BaseEnchantment {
 					world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1);
 				}
 
-				item.setAmount(item.getAmount() - 1);
-				player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+				//Wait, this is illegal for a potion to have.
+				if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+					event.setUseItemInHand(Result.DENY);
+				} else {
+					item.setAmount(item.getAmount() - 1);
+					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+				}
 			}
 		}
 	}

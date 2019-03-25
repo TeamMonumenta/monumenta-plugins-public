@@ -31,7 +31,7 @@ public class Sapper implements BaseEnchantment {
 	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) {
 		if (InventoryUtils.isPickaxeItem(item) && event.getBlock().getType() == Material.SPAWNER) {
 			PlayerUtils.healPlayer(player, level);
-			player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 5, 0.25, 0.45, 0.25, 0.1);
+			player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1);
 		}
 	}
 

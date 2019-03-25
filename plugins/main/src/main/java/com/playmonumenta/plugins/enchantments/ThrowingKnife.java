@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
@@ -41,7 +42,9 @@ public class ThrowingKnife implements BaseEnchantment {
 			ItemStack item = event.getItem();
 			if (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW) {
 				if (player.getCooldown(item.getType()) <= 0) {
-					item.setAmount(item.getAmount() - 1);
+					if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+						item.setAmount(item.getAmount() - 1);
+					}
 					player.setCooldown(item.getType(), (int)(20 * 0.75));
 					Location loc = player.getLocation();
 					Vector dir = loc.getDirection();
