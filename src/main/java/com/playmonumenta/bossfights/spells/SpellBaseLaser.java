@@ -1,16 +1,16 @@
 package com.playmonumenta.bossfights.spells;
 
-import com.playmonumenta.bossfights.utils.Utils;
-
 import java.util.List;
 import java.util.SplittableRandom;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellBaseLaser extends Spell {
 	@FunctionalInterface
@@ -52,6 +52,7 @@ public class SpellBaseLaser extends Spell {
 	private final int mNumTicks;
 	private final boolean mStopWhenBlocked;
 	private final boolean mSingleTarget;
+	private final int mCooldown;
 	private final TickAction mTickAction;
 	private final ParticleAction mParticleAction;
 	private final FinishAction mFinishAction;
@@ -70,12 +71,18 @@ public class SpellBaseLaser extends Spell {
 	 */
 	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
 	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
+		this(plugin, boss, range, numTicks, stopWhenBlocked, singleTarget, 160, tickAction, particleAction, finishAction); //Default Laser
+	}
+
+	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget, int cooldown,
+	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mNumTicks = numTicks;
 		mStopWhenBlocked = stopWhenBlocked;
 		mSingleTarget = singleTarget;
+		mCooldown = cooldown;
 		mTickAction = tickAction;
 		mParticleAction = particleAction;
 		mFinishAction = finishAction;
@@ -99,7 +106,7 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public int duration() {
-		return 160; // 8 seconds
+		return mCooldown;
 	}
 
 	private void launch(Player target) {
