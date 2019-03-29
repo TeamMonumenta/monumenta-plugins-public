@@ -65,7 +65,7 @@ public enum Spells {
 
 	//--Hierophant
 	HALLOWED_BEAM("Hallowed Beam"),
-	INCENSED_THURIBLE("Incensed Thurible"),
+	THURIBLE_PROCESSION("Thurible Procession"),
 	ENCHANTED_PRAYER("Enchanted Prayer"),
 
 	//Scout

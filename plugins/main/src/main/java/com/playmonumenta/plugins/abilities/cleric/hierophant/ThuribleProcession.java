@@ -48,7 +48,7 @@ public class ThuribleProcession extends Ability {
 		mInfo.scoreboardId = "Thurible";
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.cooldown = 20 * 10;
-		mInfo.linkedSpell = Spells.INCENSED_THURIBLE;
+		mInfo.linkedSpell = Spells.THURIBLE_PROCESSION;
 	}
 
 	@Override
