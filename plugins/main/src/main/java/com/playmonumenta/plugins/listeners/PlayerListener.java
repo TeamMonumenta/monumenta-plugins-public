@@ -886,7 +886,7 @@ public class PlayerListener implements Listener {
 				() -> {
 					AbilityManager.getManager().PlayerExtendedSneakEvent(player);
 					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
-				}, 40);
+				}, 20);
 
 			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
 		} else {
