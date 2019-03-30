@@ -39,7 +39,6 @@ public class SpellGroundSurge extends Spell {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
-		Player target = (Player)((Mob) mBoss).getTarget();
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		new BukkitRunnable() {
@@ -126,8 +125,13 @@ public class SpellGroundSurge extends Spell {
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
 										world.spawnParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25);
 										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+
 										// Send surges to all other players now.
-										Player rPlayer = players.get(random.nextInt(players.size()));
+										if (players.size() <= 1) {
+											break;
+										}
+										// Find a random other player that is not equal to the current target
+										Player rPlayer = target;
 										while (rPlayer.getUniqueId().equals(target.getUniqueId())) {
 											rPlayer = players.get(random.nextInt(players.size()));
 										}
