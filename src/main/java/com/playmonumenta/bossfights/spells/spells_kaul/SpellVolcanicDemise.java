@@ -58,6 +58,7 @@ public class SpellVolcanicDemise extends Spell {
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
 		}
+
 		new BukkitRunnable() {
 			int t = 0;
 			@Override
@@ -87,10 +88,12 @@ public class SpellVolcanicDemise extends Spell {
 								rainMeteor(mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange)), players, 40);
 							}
 
-							//Target one random player. Have a meteor rain nearby them.
-							Player rPlayer = players.get(random.nextInt(players.size()));
-							Location loc = rPlayer.getLocation();
-							rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 40);
+							// Target one random player. Have a meteor rain nearby them.
+							if (players.size() >= 1) {
+								Player rPlayer = players.get(random.nextInt(players.size()));
+								Location loc = rPlayer.getLocation();
+								rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 30);
+							}
 
 							if (i >= 25) {
 								this.cancel();
@@ -104,11 +107,11 @@ public class SpellVolcanicDemise extends Spell {
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
-	private void rainMeteor(Location loc, List<Player> players, double spawnY) {
-		World world = loc.getWorld();
+	private void rainMeteor(Location mLoc, List<Player> players, double spawnY) {
+		World world = mLoc.getWorld();
 		new BukkitRunnable() {
 			double y = spawnY;
-			Location loc = mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange));
+			Location loc = mLoc.clone();
 			@Override
 			public void run() {
 				y -= 1;
