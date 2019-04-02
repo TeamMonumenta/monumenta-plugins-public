@@ -27,27 +27,15 @@ public class SpellFluffingDeath extends Spell {
 	private ThreadLocalRandom rand = ThreadLocalRandom.current();
 	private Random random = new Random();
 
-	private boolean mCooldown;
-
 	public SpellFluffingDeath(Plugin plugin, LivingEntity boss, int range, Location startLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mStartLoc = startLoc;
-		mCooldown = false;
 	}
 
 	@Override
 	public void run() {
-		mCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, 20 * 20);
 		World world = mBoss.getWorld();
 		teleport(mStartLoc);
 		List<Player> players = Utils.playersInRange(mStartLoc, mRange);
@@ -141,7 +129,6 @@ public class SpellFluffingDeath extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 15;
 	}
 

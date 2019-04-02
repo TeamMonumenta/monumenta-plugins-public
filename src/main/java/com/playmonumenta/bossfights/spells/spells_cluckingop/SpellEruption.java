@@ -94,8 +94,6 @@ public class SpellEruption extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 5;
 	}
-
 }

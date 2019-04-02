@@ -32,11 +32,12 @@ public class SpellFluffPools extends Spell {
 	@Override
 	public void run() {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
-		List<Player> targets = new ArrayList<Player>();
+		List<Player> targets;
 		if (players.size() <= 3) {
 			targets = players;
 		} else {
 			//Too lazy to do a random
+			targets = new ArrayList<Player>(3);
 			targets.add(players.get(0));
 			targets.add(players.get(1));
 			targets.add(players.get(2));
@@ -84,7 +85,6 @@ public class SpellFluffPools extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 12;
 	}
 
