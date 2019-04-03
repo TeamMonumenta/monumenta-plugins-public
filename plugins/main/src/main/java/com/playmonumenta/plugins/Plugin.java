@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
+import com.playmonumenta.plugins.commands.RedeemVoteRewards;
 import com.playmonumenta.plugins.commands.ReforgeHeldItem;
 import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
@@ -38,7 +39,6 @@ import com.playmonumenta.plugins.commands.TransferServer;
 import com.playmonumenta.plugins.commands.UpdateApartments;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
-import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.listeners.EntityListener;
@@ -125,6 +125,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
+		RedeemVoteRewards.register(this);
 
 		mHttpManager = new HttpManager(this);
 		try {
@@ -270,11 +271,6 @@ public class Plugin extends JavaPlugin {
 		// Provide placeholder API replacements if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
 			new PlaceholderAPIIntegration(this).register();
-		}
-
-		// Get voting events if Votifier is present
-		if (Bukkit.getPluginManager().isPluginEnabled("Votifier")) {
-			manager.registerEvents(new VotifierIntegration(this), this);
 		}
 
 		// Register luckperms commands if LuckPerms is present

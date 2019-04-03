@@ -5,6 +5,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -17,15 +20,13 @@ import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
 import com.playmonumenta.plugins.packets.BungeeCommandPacket;
 import com.playmonumenta.plugins.packets.BungeeErrorPacket;
 import com.playmonumenta.plugins.packets.BungeeGetServerListPacket;
+import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
+import com.playmonumenta.plugins.packets.BungeeHandshakePacket;
+import com.playmonumenta.plugins.packets.BungeeHeartbeatPacket;
+import com.playmonumenta.plugins.packets.BungeeSendPlayerPacket;
 import com.playmonumenta.plugins.packets.ShardCommandPacket;
 import com.playmonumenta.plugins.packets.ShardErrorPacket;
-import com.playmonumenta.plugins.packets.BungeeHeartbeatPacket;
-import com.playmonumenta.plugins.packets.BungeeHandshakePacket;
-import com.playmonumenta.plugins.packets.BungeeSendPlayerPacket;
 import com.playmonumenta.plugins.packets.ShardTransferPlayerDataPacket;
-
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 public class SocketManager {
 	private String mName;
@@ -198,6 +199,9 @@ public class SocketManager {
 									break;
 								case ShardTransferPlayerDataPacket.PacketOperation:
 									ShardTransferPlayerDataPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeGetVotesUnclaimedPacket.PacketOperation:
+									BungeeGetVotesUnclaimedPacket.handlePacket(mPlugin, compiled);
 									break;
 								default:
 									mPlugin.getLogger().warning(mName + " received unknown packet: " + op);

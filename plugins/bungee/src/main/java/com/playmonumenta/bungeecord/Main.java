@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import com.playmonumenta.bungeecord.commands.Vote;
 import com.playmonumenta.bungeecord.listeners.EventListener;
+import com.playmonumenta.bungeecord.listeners.NameListener;
 import com.playmonumenta.bungeecord.network.SocketManager;
 import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
+import com.playmonumenta.bungeecord.voting.VoteManager;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -18,6 +21,7 @@ public class Main extends Plugin {
 	private Configuration mConfig = null;
 	private int mSocketPort = 0;
 	private Level mLogLevel = Level.INFO;
+	private VoteManager mVoteManager = null;
 
 	public String mDefaultServer = null;
 
@@ -30,10 +34,33 @@ public class Main extends Plugin {
 		SocketManager socketManager = new SocketManager(this, mSocketPort);
 		socketManager.start();
 
+		if (!mConfig.contains("voting")) {
+			getLogger().warning("No 'voting' section in config file - disabling voting features");
+		} else {
+			try {
+				mVoteManager = new VoteManager(this, mConfig.getSection("voting"));
+				manager.registerCommand(this, new Vote(mVoteManager));
+				manager.registerListener(this, mVoteManager);
+			} catch (IllegalArgumentException ex) {
+				getLogger().log(Level.WARNING, "Failed to initialize voting system:", ex);
+			}
+		}
+
+		/* Create and register a new name listener, which is self contained */
+		new NameListener(this);
+
 		manager.registerListener(this, new EventListener(this));
 
 		getProxy().setReconnectHandler(new MonumentaReconnectHandler(mDefaultServer));
 	}
+
+	@Override
+    public void onDisable() {
+		if (mVoteManager != null) {
+			mVoteManager.unload();
+			mVoteManager = null;
+		}
+    }
 
 	private void _loadConfig() {
 		// Create data directory if it doesn't exist

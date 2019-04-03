@@ -39,6 +39,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 				}
 			}
 		} catch (Exception ex) {
+			/* TODO: Change this to a fatal error that prevents bungee from starting */
 			file.renameTo(new File("locations.yml.old"));
 			ProxyServer.getInstance().getLogger().log(Level.WARNING,
 					"Could not load reconnect locations, resetting them");
@@ -50,7 +51,6 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 	}
 
 	@Override
-    @SuppressWarnings("deprecation")
 	public ServerInfo getServer(ProxiedPlayer player) {
 		lock.readLock().lock();
 

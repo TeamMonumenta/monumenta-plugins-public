@@ -14,6 +14,7 @@ import com.playmonumenta.bungeecord.packets.BroadcastCommandPacket;
 import com.playmonumenta.bungeecord.packets.BungeeCommandPacket;
 import com.playmonumenta.bungeecord.packets.BungeeErrorPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetServerListPacket;
+import com.playmonumenta.bungeecord.packets.BungeeGetVotesUnclaimedPacket;
 import com.playmonumenta.bungeecord.packets.BungeeHandshakePacket;
 import com.playmonumenta.bungeecord.packets.BungeeHeartbeatPacket;
 import com.playmonumenta.bungeecord.packets.BungeeSendPlayerPacket;
@@ -107,6 +108,8 @@ public class SocketManager {
 					ShardCommandPacket.handlePacket(this, client, packet);
 				} else if (op.equals(ShardTransferPlayerDataPacket.PacketOperation)) {
 					ShardTransferPlayerDataPacket.handlePacket(this, client, packet);
+				} else if (op.equals(BungeeGetVotesUnclaimedPacket.PacketOperation)) {
+					BungeeGetVotesUnclaimedPacket.handlePacket(this, client, packet);
 				} else {
 					mMain.getLogger().warning("Bungee received unknown packet: " + op);
 				}
