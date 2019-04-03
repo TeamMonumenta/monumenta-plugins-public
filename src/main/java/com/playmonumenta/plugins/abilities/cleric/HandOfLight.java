@@ -90,13 +90,13 @@ public class HandOfLight extends Ability {
 
 		// Must not match conditions for cleansing rain
 		Ability cleansing = AbilityManager.getManager().getPlayerAbility(mPlayer, CleansingRain.class);
-		if (cleansing != null && (cleansing.runCheck() || mPlayer.getLocation().getPitch() >= 50)) {
+		if (cleansing != null && (cleansing.runCheck() || mPlayer.getLocation().getPitch() <= -50)) {
 			return false;
 		}
 
 		// Must not match conditions for luminous infusion
 		Ability li = AbilityManager.getManager().getPlayerAbility(mPlayer, LuminousInfusion.class);
-		if (li != null && mPlayer.getLocation().getPitch() <= -50) {
+		if (li != null && mPlayer.getLocation().getPitch() >= 50) {
 			return false;
 		}
 

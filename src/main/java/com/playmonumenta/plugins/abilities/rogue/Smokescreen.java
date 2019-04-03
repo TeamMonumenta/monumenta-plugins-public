@@ -66,7 +66,7 @@ public class Smokescreen extends Ability {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
-				return true;
+				return mPlayer.getLocation().getPitch() >= 50;
 			}
 		}
 		return false;

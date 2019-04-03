@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,49 +21,55 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Cloak & Dagger: When you kill an enemy, you cloak
+ * Cloak & Dagger: When you kill an enemy while sneaking, you cloak
  *  yourself in Invisibility for 5 s, automatically
  *  making enemies un-target you, and preventing them
  *  from targeting you while invisible (dealing any
  *  damage cancels this effect). Your next sword attack
- *  after coming out of stealth deals 2 / 4 extra damage
- *  per s you have been invisible. At Level 2, you gain
- *  Speed II during the effect. Cooldown: 20 s
+ *  after coming out of stealth deals 8 / 16 extra
+ *  damage. At Level 2, you gain Speed II during the
+ *  effect. Cooldown: 20 s
  */
+
 public class CloakAndDagger extends Ability {
+
+	private static final int CLOAK_COOLDOWN = 20 * 20;
+	private static final int CLOAK_DURATION = 20 * 5;
+	private static final int CLOAK_1_DAMAGE = 8;
+	private static final int CLOAK_2_DAMAGE = 16;
 
 	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "CloakAndDagger";
-		mInfo.cooldown = 20 * 20;
+		mInfo.cooldown = CLOAK_COOLDOWN;
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.ignoreCooldown = true;
 	}
 
 	private boolean active = false;
 	private int mTickAttacked = 0;
-	private int time = 0;
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mTickAttacked == mPlayer.getTicksLived())
-			return true;
-		if (active) {
+		if (active && mTickAttacked != mPlayer.getTicksLived()) {
 			active = false;
+			mPlayer.removePotionEffect(PotionEffectType.SPEED);
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
-			double damage = getAbilityScore() == 1 ? 2 : 4;
-			event.setDamage(event.getDamage() + (damage * time));
-			time = 0;
+			int damage = getAbilityScore() == 1 ? CLOAK_1_DAMAGE : CLOAK_2_DAMAGE;
+			event.setDamage(event.getDamage() + damage);
 		}
 		return true;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.CLOAK_AND_DAGGER)) {
+		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.CLOAK_AND_DAGGER) ||
+		    !mPlayer.isSneaking() || !InventoryUtils.isSwordItem(mHand) || !InventoryUtils.isSwordItem(oHand)) {
 			return;
 		}
 
@@ -70,6 +77,9 @@ public class CloakAndDagger extends Ability {
 		active = true;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 		                                 new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 0, false, true));
+		if (getAbilityScore() > 1) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 20 * 5, 0, false, true));
+		}
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
@@ -86,12 +96,8 @@ public class CloakAndDagger extends Ability {
 			int t = 0;
 			@Override
 			public void run() {
-				if (t % 20 == 0) {
-					time++;
-				}
-				if (t >= 20 * 5 || !active) {
+				if (t >= CLOAK_DURATION || !active) {
 					this.cancel();
-					time = 0;
 					active = false;
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 					mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
@@ -112,5 +118,4 @@ public class CloakAndDagger extends Ability {
 			event.setTarget(null);
 		}
 	}
-
 }
