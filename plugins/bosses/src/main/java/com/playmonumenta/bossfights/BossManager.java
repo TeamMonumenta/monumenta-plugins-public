@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,6 +33,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
 import com.playmonumenta.bossfights.bosses.AuraLargeHungerBoss;
 import com.playmonumenta.bossfights.bosses.AuraLargeSlownessBoss;
@@ -412,6 +414,18 @@ public class BossManager implements Listener {
 		Boss b = mBosses.get(boss.getUniqueId());
 		if (b != null) {
 			b.bossCastAbility(event);
+		}
+	}
+
+	@EventHandler
+	public void EntityPathfindEvent(EntityPathfindEvent event) {
+		if (event.getEntity() instanceof Creature) {
+			Creature entity = (Creature) event.getEntity();
+
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.bossPathfind(event);
+			}
 		}
 	}
 

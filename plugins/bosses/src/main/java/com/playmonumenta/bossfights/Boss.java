@@ -9,6 +9,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
 import com.playmonumenta.bossfights.spells.Spell;
 
@@ -168,6 +169,12 @@ public class Boss {
 					actives.bossCastAbility(event);
 				}
 			}
+		}
+	}
+
+	public void bossPathfind(EntityPathfindEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossPathfind(event);
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossManager;
 import com.playmonumenta.bossfights.SpellCastEvent;
@@ -229,6 +230,8 @@ public abstract class BossAbilityGroup {
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {};
 
 	public void bossCastAbility(SpellCastEvent event) {};
+
+	public void bossPathfind(EntityPathfindEvent event) {};
 
 	/*
 	 * Called only the first time the boss is summoned into the world

@@ -1,0 +1,5 @@
+name: MonumentaNMS
+main: com.playmonumenta.nms.Plugin
+depend: [CommandAPI, Monumenta-Plugins, Monumenta_Bossfights]
+version: dev
+api-version: 1.13

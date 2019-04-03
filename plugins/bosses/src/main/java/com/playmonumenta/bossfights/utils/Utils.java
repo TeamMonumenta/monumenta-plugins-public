@@ -1,5 +1,6 @@
 package com.playmonumenta.bossfights.utils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -272,5 +273,23 @@ public class Utils {
 		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static Object getPrivateField(String fieldName, Class clazz, Object object) {
+		Field field;
+		Object o = null;
+
+		try {
+			field = clazz.getDeclaredField(fieldName);
+
+			field.setAccessible(true);
+
+			o = field.get(object);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		return o;
 	}
 }
