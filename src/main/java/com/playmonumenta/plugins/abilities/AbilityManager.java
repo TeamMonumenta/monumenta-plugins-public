@@ -77,6 +77,7 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
+import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.PatreonGreen;
 import com.playmonumenta.plugins.abilities.other.PatreonPurple;
 import com.playmonumenta.plugins.abilities.other.PatreonRed;
@@ -161,6 +162,9 @@ public class AbilityManager {
 		mManager = this;
 
 		mReferenceAbilities = Arrays.asList(
+								  // ALL (CLUCKING POTIONS)
+								  new CluckingPotions(mPlugin, mWorld, mRandom, null),
+
 		                          // MAGE
 		                          new ArcaneStrike(mPlugin, mWorld, mRandom, null),
 		                          new ElementalArrows(mPlugin, mWorld, mRandom, null),

@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CreateGuild;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
+import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.Effect;
 import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
@@ -99,6 +100,7 @@ public class Plugin extends JavaPlugin {
 		HopeifyHeldItem.register();
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
+		DeCluckifyHeldItem.register();
 		DebugInfo.register(this);
 		RefreshClass.register(this);
 		Effect.register(this);
