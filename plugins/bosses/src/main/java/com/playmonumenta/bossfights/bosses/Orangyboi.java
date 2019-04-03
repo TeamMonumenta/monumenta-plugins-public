@@ -2,15 +2,15 @@ package com.playmonumenta.bossfights.bosses;
 
 import java.util.Arrays;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellGenericCharge;
 import com.playmonumenta.bossfights.utils.SerializationUtils;

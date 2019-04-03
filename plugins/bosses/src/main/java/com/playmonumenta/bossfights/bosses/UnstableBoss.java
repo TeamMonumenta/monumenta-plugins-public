@@ -3,8 +3,7 @@ package com.playmonumenta.bossfights.bosses;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-
-import com.playmonumenta.bossfights.Plugin;
+import org.bukkit.plugin.Plugin;
 
 public class UnstableBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_unstable";

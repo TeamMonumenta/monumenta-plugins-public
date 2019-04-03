@@ -7,10 +7,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 

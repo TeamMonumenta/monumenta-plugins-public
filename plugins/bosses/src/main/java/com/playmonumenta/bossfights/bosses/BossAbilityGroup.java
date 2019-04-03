@@ -12,10 +12,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.bossfights.BossManager;
 import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
@@ -119,9 +120,12 @@ public abstract class BossAbilityGroup {
 					}
 				}
 				if (bossCheck) {
-					mPlugin.getLogger().log(Level.WARNING,
-					                        "Boss is missing but still registered as an active boss. Unloading...");
-					mPlugin.mBossManager.unload(mBoss);
+					mPlugin.getLogger().warning("Boss is missing but still registered as an active boss. Unloading...");
+					BossManager mgr = BossManager.getInstance();
+					if (mgr != null) {
+						BossManager.getInstance().unload(mBoss);
+					}
+					// Just in case for some reason the boss is no longer registered with the manager...
 					unload();
 					return;
 				}

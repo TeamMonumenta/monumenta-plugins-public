@@ -4,10 +4,9 @@ import java.util.Random;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.playmonumenta.bossfights.Plugin;
 
 public class DebuffHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_debuffhit";

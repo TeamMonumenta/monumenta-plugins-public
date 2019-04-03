@@ -3,21 +3,21 @@ package com.playmonumenta.bossfights.bosses;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.SpellBlockBreak;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellMaskedShadowGlade;

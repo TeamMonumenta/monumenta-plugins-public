@@ -29,6 +29,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,7 +37,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;

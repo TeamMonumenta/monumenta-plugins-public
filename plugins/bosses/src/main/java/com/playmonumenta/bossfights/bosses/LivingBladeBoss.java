@@ -6,8 +6,8 @@ import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
 import com.playmonumenta.bossfights.spells.SpellProjectileDeflection;

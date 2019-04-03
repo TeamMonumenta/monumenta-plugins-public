@@ -15,8 +15,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public class WinterSnowmanEventBoss extends BossAbilityGroup {

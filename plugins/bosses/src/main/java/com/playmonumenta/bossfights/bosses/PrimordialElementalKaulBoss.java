@@ -20,12 +20,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;

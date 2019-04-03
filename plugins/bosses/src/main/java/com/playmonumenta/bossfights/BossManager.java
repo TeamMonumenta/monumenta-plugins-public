@@ -29,6 +29,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.bossfights.bosses.AuraLargeFatigueBoss;
@@ -113,6 +114,11 @@ public class BossManager implements Listener {
 	/********************************************************************************
 	 * Static Fields
 	 *******************************************************************************/
+
+	/*
+	 * Holds a static reference to the most recently instantiated boss manager
+	 */
+	static BossManager mInstance = null;
 
 	static final Map<String, StatelessBossConstructor> mStatelessBosses;
 	static final Map<String, StatefulBossConstructor> mStatefulBosses;
@@ -245,6 +251,7 @@ public class BossManager implements Listener {
 	private final Map<UUID, Boss> mBosses;
 
 	public BossManager(Plugin plugin) {
+		mInstance = this;
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
@@ -417,6 +424,25 @@ public class BossManager implements Listener {
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
 
+	}
+
+	/********************************************************************************
+	 * Static public methods
+	 *******************************************************************************/
+	public static BossManager getInstance() {
+		return mInstance;
+	}
+
+	public static void registerStatelessBoss(String identityTag, StatelessBossConstructor fn) {
+		mStatelessBosses.put(identityTag, fn);
+	}
+
+	public static void registerStatefulBoss(String identityTag, StatefulBossConstructor fn) {
+		mStatefulBosses.put(identityTag, fn);
+	}
+
+	public static void registerBossDeserializer(String identityTag, BossDeserializer fn) {
+		mBossDeserializers.put(identityTag, fn);
 	}
 
 	/********************************************************************************

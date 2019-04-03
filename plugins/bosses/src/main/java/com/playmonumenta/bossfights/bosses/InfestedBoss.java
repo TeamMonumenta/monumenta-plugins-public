@@ -1,18 +1,18 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellRunAction;
-import com.playmonumenta.bossfights.spells.SpellDelayedAction;
-
 import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.spells.SpellDelayedAction;
+import com.playmonumenta.bossfights.spells.SpellRunAction;
 
 public class InfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_infested";

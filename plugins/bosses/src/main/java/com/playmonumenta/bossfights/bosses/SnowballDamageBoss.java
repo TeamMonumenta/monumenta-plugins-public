@@ -5,8 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.ProjectileHitEvent;
-
-import com.playmonumenta.bossfights.Plugin;
+import org.bukkit.plugin.Plugin;
 
 
 public class SnowballDamageBoss extends BossAbilityGroup {

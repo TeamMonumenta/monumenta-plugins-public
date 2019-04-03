@@ -3,9 +3,9 @@ package com.playmonumenta.bossfights.bosses;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.Plugin;
 
 public class GenericBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generic";

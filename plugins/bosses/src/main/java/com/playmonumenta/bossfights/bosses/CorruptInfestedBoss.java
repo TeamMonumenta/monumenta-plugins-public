@@ -8,8 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellDelayedAction;
 import com.playmonumenta.bossfights.spells.SpellRunAction;

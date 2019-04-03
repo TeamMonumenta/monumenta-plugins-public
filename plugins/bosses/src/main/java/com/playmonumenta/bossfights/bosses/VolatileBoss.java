@@ -4,8 +4,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import com.playmonumenta.bossfights.Plugin;
+import org.bukkit.plugin.Plugin;
 
 public class VolatileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_volatile";

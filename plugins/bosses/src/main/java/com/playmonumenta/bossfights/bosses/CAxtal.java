@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,10 +14,10 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;

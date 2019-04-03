@@ -1,12 +1,12 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
-
 import java.util.Arrays;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
 
 public class TpBehindBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehind";

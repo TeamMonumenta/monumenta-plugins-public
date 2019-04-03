@@ -1,18 +1,18 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellBaseAura;
-
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.spells.SpellBaseAura;
 
 public class AuraSmallWeaknessBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_weakness";

@@ -6,8 +6,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
-import com.playmonumenta.bossfights.Plugin;
+import org.bukkit.plugin.Plugin;
 
 public class DamageReducedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_damage_reduced";

@@ -1,15 +1,15 @@
 package com.playmonumenta.bossfights.bosses;
 
-import com.playmonumenta.bossfights.Plugin;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellFireball;
-
 import java.util.Arrays;
 
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.SpellFireball;
 
 public class FireballBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_fireball";

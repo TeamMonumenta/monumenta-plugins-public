@@ -1,13 +1,13 @@
 package com.playmonumenta.bossfights.bosses;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.Plugin;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellMobEffect;
 
