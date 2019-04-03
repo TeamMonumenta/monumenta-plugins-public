@@ -1,5 +1,5 @@
 name: Monumenta_Bossfights
 main: com.playmonumenta.bossfights.Plugin
-depend: [CommandAPI]
+depend: [CommandAPI, Monumenta-Plugins]
 version: dev
 api-version: 1.13
