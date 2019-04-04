@@ -78,6 +78,7 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbil
 import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.MeteorStrike;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
+import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.abilities.other.PatreonGreen;
 import com.playmonumenta.plugins.abilities.other.PatreonPurple;
 import com.playmonumenta.plugins.abilities.other.PatreonRed;
@@ -308,6 +309,7 @@ public class AbilityManager {
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
 
 		                          // All other non-class abilities
+		                          new EvasionEnchant(mPlugin, mWorld, mRandom, null),
 		                          new PvP(mPlugin, mWorld, mRandom, null),
 		                          new PatreonWhite(mPlugin, mWorld, mRandom, null),
 		                          new PatreonGreen(mPlugin, mWorld, mRandom, null),

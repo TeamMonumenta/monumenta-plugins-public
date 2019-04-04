@@ -84,6 +84,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
+import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -932,5 +933,11 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
 		mPlugin.mTrackingManager.mPlayers.onBlockBreak(mPlugin, player, event, item);
+	}
+
+	@EventHandler
+	public void EvasionEvent(EvasionEvent event) {
+		Player player = event.getPlayer();
+		mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
 	}
 }

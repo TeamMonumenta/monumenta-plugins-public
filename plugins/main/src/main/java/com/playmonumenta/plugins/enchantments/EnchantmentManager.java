@@ -11,6 +11,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.evasions.Evasion;
+import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
+import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
 
 public class EnchantmentManager {
 	/* NOTE:
@@ -75,6 +78,9 @@ public class EnchantmentManager {
 		init.add(new InstantDrink());
 		init.add(new DivineAura());
 		init.add(new JunglesNourishment());
+		init.add(new Evasion());
+		init.add(new MeleeEvasion());
+		init.add(new SecondWind());
 
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {

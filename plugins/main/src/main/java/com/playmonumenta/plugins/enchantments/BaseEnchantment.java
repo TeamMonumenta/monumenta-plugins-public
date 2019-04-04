@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -85,6 +86,10 @@ public interface BaseEnchantment {
 	default public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
 
 	default public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) { }
+
+	default public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) { }
+
+	default public void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) { }
 
 	default public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) { }
 

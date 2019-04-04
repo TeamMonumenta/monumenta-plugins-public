@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 
@@ -154,6 +155,24 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.onHurt(plugin, player, level, event);
+		}
+	}
+
+	public void onHurtByEntity(Plugin plugin, Player player, EntityDamageByEntityEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onHurtByEntity(plugin, player, level, event);
+		}
+	}
+
+	public void onEvade(Plugin plugin, Player player, EvasionEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onEvade(plugin, player, level, event);
 		}
 	}
 

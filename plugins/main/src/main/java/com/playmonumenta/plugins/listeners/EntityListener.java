@@ -177,6 +177,7 @@ public class EntityListener implements Listener {
 			}
 
 			if (damager instanceof LivingEntity) {
+				mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
 				if (!mAbilities.PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
