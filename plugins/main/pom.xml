@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.playmonumenta</groupId>
-    <artifactId>monumenta-plugins</artifactId>
+    <artifactId>monumenta-main</artifactId>
     <version>dev</version>
 
     <properties>
@@ -97,7 +97,7 @@
     </dependencies>
 
     <build>
-        <finalName>Monumenta-Plugins_1.13.2_${project.version}_${maven.build.timestamp}</finalName>
+        <finalName>MonumentaMain_1.13.2_${project.version}_${maven.build.timestamp}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
