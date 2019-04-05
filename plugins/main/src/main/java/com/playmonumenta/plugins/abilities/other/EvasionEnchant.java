@@ -34,21 +34,20 @@ public class EvasionEnchant extends Ability {
 
 	private double evade(Player player, double damage) {
 		double changedDamage = damage;
+		Location loc = player.getLocation().add(0, 1, 0);
 		if (chance >= 200) {
 			chance -= 200;
 			changedDamage *= 0.25;
-			Location loc = player.getLocation();
 			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
-			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.5f);
+			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
 			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
 		} else if (chance >= 100) {
 			chance -= 100;
 			changedDamage *= 0.5;
-			Location loc = player.getLocation();
 			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
-			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.5f);
+			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
 		}

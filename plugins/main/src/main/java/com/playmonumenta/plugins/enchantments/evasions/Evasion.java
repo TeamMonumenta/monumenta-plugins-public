@@ -23,7 +23,7 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.ARMOR);
+		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
 
 	@Override
