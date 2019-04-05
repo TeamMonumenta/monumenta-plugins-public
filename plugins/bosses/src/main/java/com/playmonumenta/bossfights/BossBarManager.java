@@ -58,7 +58,7 @@ public class BossBarManager {
 		}
 
 		double progress = mBoss.getHealth() / mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-		if ((progress * 100) > 99 && mEventCursor >= 99) {
+		if (mEvents != null && (progress * 100) > 99 && mEventCursor >= 99) {
 			BossHealthAction event = mEvents.get(mEventCursor);
 			if (event != null) {
 				event.run(mBoss);
