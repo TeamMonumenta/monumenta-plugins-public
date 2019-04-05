@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 
 public class PlayerInventory {
 	/*
@@ -58,7 +57,7 @@ public class PlayerInventory {
 
 		// Clear the current map and update it with current properties
 		mCurrentProperties.clear();
-		EnchantmentManager.getItemProperties(mCurrentProperties, player);
+		plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, player);
 
 		// Remove properties from the player that were removed
 		for (BaseEnchantment property : mPreviousProperties.keySet()) {

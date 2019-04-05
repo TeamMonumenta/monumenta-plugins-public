@@ -19,9 +19,9 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CreateGuild;
+import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
-import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.Effect;
 import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.commands.TransferScores;
 import com.playmonumenta.plugins.commands.TransferServer;
 import com.playmonumenta.plugins.commands.UpdateApartments;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
@@ -65,6 +66,7 @@ public class Plugin extends JavaPlugin {
 	int mPeriodicTimer = -1;
 
 	public ServerProperties mServerProperties = new ServerProperties();
+	public EnchantmentManager mEnchantmentManager = new EnchantmentManager();
 	private FileConfiguration mConfig;
 	private File mConfigFile;
 	public int mDailyQuestVersion = 0;
@@ -114,6 +116,7 @@ public class Plugin extends JavaPlugin {
 
 		mSafeZoneManager = new SafeZoneManager(this);
 		mServerProperties.load(this, null);
+		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 
 		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
@@ -264,6 +267,7 @@ public class Plugin extends JavaPlugin {
 		mDailyQuestVersion = mConfig.getInt("daily_version");
 
 		mServerProperties.load(this, sender);
+		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 	}
 
 	private void _saveConfig() {

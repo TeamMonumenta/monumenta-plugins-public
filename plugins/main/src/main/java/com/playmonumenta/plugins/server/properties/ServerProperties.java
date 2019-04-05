@@ -32,6 +32,7 @@ public class ServerProperties {
 	private boolean mKeepLowTierInventory = false;
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
+	public Set<String> mForbiddenItemLore = new HashSet<>();
 
 	public EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 
@@ -106,6 +107,7 @@ public class ServerProperties {
 					mKeepLowTierInventory      = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 
 					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mForbiddenItemLore         = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
 					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
 

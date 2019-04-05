@@ -22,7 +22,9 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -32,6 +34,7 @@ import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -200,16 +203,13 @@ public class PlayerTracking implements EntityTracking {
 
 							if (mode == GameMode.SURVIVAL && !neededMat) {
 								player.setGameMode(GameMode.ADVENTURE);
-
 							} else if (mode == GameMode.ADVENTURE && neededMat
 							           && loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
 							           && ScoreboardUtils.getScoreboardValue(player, "Apartment") == 0) {
 								player.setGameMode(GameMode.SURVIVAL);
 							}
-						} else {
-							if (mode == GameMode.SURVIVAL) {
-								player.setGameMode(GameMode.ADVENTURE);
-							}
+						} else if (mode == GameMode.SURVIVAL) {
+							player.setGameMode(GameMode.ADVENTURE);
 						}
 					}
 				}
@@ -227,10 +227,8 @@ public class PlayerTracking implements EntityTracking {
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
 						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
 					}
-				} else {
-					if (mode == GameMode.ADVENTURE) {
-						player.setGameMode(GameMode.SURVIVAL);
-					}
+				} else if (mode == GameMode.ADVENTURE) {
+					player.setGameMode(GameMode.SURVIVAL);
 				}
 			}
 

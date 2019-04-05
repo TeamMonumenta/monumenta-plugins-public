@@ -63,7 +63,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
@@ -652,7 +651,7 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void ItemSpawnEvent(ItemSpawnEvent event) {
-		EnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
+		mPlugin.mEnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
 	}
 
 	@EventHandler

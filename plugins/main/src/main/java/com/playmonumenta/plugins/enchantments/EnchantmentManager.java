@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -31,18 +32,21 @@ public class EnchantmentManager {
 	}
 
 	/*
-	 * Keep a static map of which properties apply to which slots
+	 * Keep a map of which properties apply to which slots
 	 * This can dramatically reduce the number of checks done when looking through player inventories.
 	 * Most items only apply to armor or mainhand, and we don't need to check every single item in the
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
-	private static Map<ItemSlot, List<BaseEnchantment>> mProperties
-	                                                 = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
-	private static List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
+	private final Map<ItemSlot, List<BaseEnchantment>> mProperties = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
+	private final List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
 
-	//  Static list of Item Properties.
-	static {
-		List<BaseEnchantment> init = new ArrayList<BaseEnchantment>();
+	public void load(Collection<String> forbiddenItemLore) {
+		mProperties.clear();
+		mSpawnedProperties.clear();
+
+		final List<BaseEnchantment> init = new ArrayList<BaseEnchantment>();
+
+		// Passive enchantments
 		init.add(new Regeneration());
 		init.add(new MainhandRegeneration());
 		init.add(new Darksight());
@@ -58,9 +62,13 @@ public class EnchantmentManager {
 		init.add(new Frost());
 		init.add(new Intuition());
 		init.add(new LifeDrain());
+		init.add(new Evasion());
+		init.add(new MeleeEvasion());
+		init.add(new Resurrection());
+		init.add(new DivineAura());
+		init.add(new SecondWind());
 
-		init.add(new CurseOfCorruption());
-
+		// Active enchantments
 		init.add(new Chaotic());
 		init.add(new IceAspect());
 		init.add(new Slayer());
@@ -71,16 +79,21 @@ public class EnchantmentManager {
 		init.add(new Decay());
 		init.add(new Sapper());
 		init.add(new Multitool());
-		init.add(new Resurrection());
 		init.add(new HexEater());
 		init.add(new ThrowingKnife());
 		init.add(new Current());
 		init.add(new InstantDrink());
-		init.add(new DivineAura());
 		init.add(new JunglesNourishment());
-		init.add(new Evasion());
-		init.add(new MeleeEvasion());
-		init.add(new SecondWind());
+
+		// Curses
+		init.add(new CurseOfCorruption());
+
+		// Forbidden items (dynamically set based on server config)
+		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {
+			for (String str : forbiddenItemLore) {
+				init.add(new ForbiddenItem(str));
+			}
+		}
 
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {
@@ -124,7 +137,7 @@ public class EnchantmentManager {
 	 *
 	 * NOTE: propertyMap should already be clear'ed and the properties removed from the player
 	 */
-	public static void getItemProperties(Map<BaseEnchantment, Integer>propertyMap, Player player) {
+	public void getItemProperties(Map<BaseEnchantment, Integer>propertyMap, Player player) {
 		final PlayerInventory inv = player.getInventory();
 
 		/* Step over the slots for which we have item properties */
@@ -160,7 +173,7 @@ public class EnchantmentManager {
 	/*
 	 * Check if the newly spawned item entity matches any of the spawned item properties
 	 */
-	public static void ItemSpawnEvent(Plugin plugin, Item item) {
+	public void ItemSpawnEvent(Plugin plugin, Item item) {
 		if (item != null) {
 			ItemStack stack = item.getItemStack();
 			if (stack != null) {
