@@ -109,13 +109,21 @@ public class SpellVolcanicDemise extends Spell {
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
-	private void rainMeteor(Location mLoc, List<Player> players, double spawnY) {
-		World world = mLoc.getWorld();
+	private void rainMeteor(Location locInput, List<Player> players, double spawnY) {
+		if (locInput.distance(mCenter) > 50 || locInput.getY() >= 55) {
+			// Somehow tried to spawn a meteor too far away from the center point
+			return;
+		}
+
 		new BukkitRunnable() {
 			double y = spawnY;
-			Location loc = mLoc.clone();
+			Location loc = locInput.clone();
+			World world = locInput.getWorld();
+
 			@Override
 			public void run() {
+				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
+
 				y -= 1;
 				for (Player player : players) {
 					if (player.getLocation().distance(loc) < 15) {
