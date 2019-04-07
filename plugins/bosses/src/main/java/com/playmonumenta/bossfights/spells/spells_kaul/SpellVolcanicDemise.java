@@ -78,6 +78,8 @@ public class SpellVolcanicDemise extends Spell {
 						@Override
 						public void run() {
 							i++;
+							List<Player> players = Utils.playersInRange(mCenter, 50);
+							players.removeIf(p -> p.getLocation().getY() >= 61);
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
