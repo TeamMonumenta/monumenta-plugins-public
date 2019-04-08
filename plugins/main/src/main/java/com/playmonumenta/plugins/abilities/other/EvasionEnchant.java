@@ -15,18 +15,20 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 
 public class EvasionEnchant extends Ability {
-
 	public double chance = 0;
+	private int mLastActivationTick = 0;
 
 	public EvasionEnchant(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
 
+	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 		return true;
 	}
 
+	@Override
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 		return true;
@@ -38,19 +40,31 @@ public class EvasionEnchant extends Ability {
 		if (chance >= 200) {
 			chance -= 200;
 			changedDamage *= 0.25;
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
-			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
-			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 40, 0.25, 0.45, 0.25, 0.1);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.5f, 1.5f);
+				mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 2f);
+			} else {
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
+				mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
 		} else if (chance >= 100) {
 			chance -= 100;
 			changedDamage *= 0.5;
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
-			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
+			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 40, 0.25, 0.45, 0.25, 0.1);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.5f, 1.5f);
+			} else {
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);
+			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
 		}
+		mLastActivationTick = player.getTicksLived();
 		return changedDamage;
 	}
 
