@@ -56,7 +56,7 @@ public class InfestedBoss extends BossAbilityGroup {
 		                           loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc.clone().add(0, -1, 0), 50, 0.6, 0.6, 0.6, 0);
 		                           //TODO: Raise location up to avoid spawning in blocks?
 		                           for (int i = 0; i < 4; i++) {
-		                               Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:silverfish " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Maggot\\\"}\",Health:16.0f,Attributes:[{Base:16.0d,Name:\"generic.maxHealth\"}],ActiveEffects:[{Ambient:1b,ShowIcon:1b,ShowParticles:1b,Duration:72000,Id:5b,Amplifier:1b}]}");
+		                               Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:silverfish " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Maggot\\\"}\",Health:12.0f,Attributes:[{Base:12.0d,Name:\"generic.maxHealth\"}],ActiveEffects:[{Ambient:1b,ShowIcon:1b,ShowParticles:1b,Duration:72000,Id:5b,Amplifier:1b}]}");
 		                           }
 		                       }).run();
 	}
