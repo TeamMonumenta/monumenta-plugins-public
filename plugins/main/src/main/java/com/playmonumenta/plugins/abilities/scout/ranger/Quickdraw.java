@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -35,7 +36,7 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_1_COOLDOWN = 10 * 20;
 	private static final int QUICKDRAW_2_COOLDOWN = 8 * 20;
 	private static final int QUICKDRAW_1_DAMAGE = 12;
-	private static final int QUICKDRAW_2_DAMAGE = 15;
+	private static final int QUICKDRAW_2_DAMAGE = 20;
 	private static final int QUICKDRAW_SLOWNESS_DURATION = 2;
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 
@@ -64,6 +65,10 @@ public class Quickdraw extends Ability {
 		BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
 		if (bm != null) {
 			damage += bm.getBonusDamage();
+		}
+		Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
+		if (bm != null) {
+			damage += ss.getSharpshot();
 		}
 		arrow.setMetadata("Quickdraw", new FixedMetadataValue(mPlugin, damage));
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);

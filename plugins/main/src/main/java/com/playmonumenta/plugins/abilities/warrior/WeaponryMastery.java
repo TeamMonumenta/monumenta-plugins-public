@@ -16,9 +16,9 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class WeaponryMastery extends Ability {
 
-	private static final int WEAPON_MASTERY_AXE_1_DAMAGE = 2;
-	private static final int WEAPON_MASTERY_AXE_2_DAMAGE = 4;
-	private static final int WEAPON_MASTERY_SWORD_2_DAMAGE = 1;
+	private static final double WEAPON_MASTERY_AXE_1_DAMAGE = 2;
+	private static final double WEAPON_MASTERY_AXE_2_DAMAGE = 4;
+	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 1.5;
 
 	public WeaponryMastery(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -28,19 +28,16 @@ public class WeaponryMastery extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		int weaponMastery = getAbilityScore();
-		// The extra damage that will be applied to the hit damagee at the end of this function
-		double extraDamage = 0;
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
-		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
-			extraDamage += (weaponMastery == 1) ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
+		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 2) {
+			event.setDamage(event.getDamage() + WEAPON_MASTERY_AXE_2_DAMAGE);
+		} else if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
+			event.setDamage(event.getDamage() + WEAPON_MASTERY_AXE_1_DAMAGE);
 		} else if (InventoryUtils.isSwordItem(mainHand) && weaponMastery >= 2) {
-			extraDamage += WEAPON_MASTERY_SWORD_2_DAMAGE;
+			event.setDamage(event.getDamage() + WEAPON_MASTERY_SWORD_2_DAMAGE);
 		}
 
-		if (extraDamage > 0) {
-			event.setDamage(event.getDamage() + extraDamage);
-		}
 		return true;
 	}
 

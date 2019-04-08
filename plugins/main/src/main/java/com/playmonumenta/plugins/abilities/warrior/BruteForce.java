@@ -22,7 +22,7 @@ public class BruteForce extends Ability {
 
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final Integer BRUTE_FORCE_1_DAMAGE = 2;
-	private static final Integer BRUTE_FORCE_2_DAMAGE = 4;
+	private static final Integer BRUTE_FORCE_2_DAMAGE = 5;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
 
 	public BruteForce(Plugin plugin, World world, Random random, Player player) {
