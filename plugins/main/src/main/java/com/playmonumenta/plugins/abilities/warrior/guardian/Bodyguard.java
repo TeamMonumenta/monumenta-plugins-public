@@ -40,7 +40,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class Bodyguard extends Ability {
 
 	private static final int BODYGUARD_COOLDOWN = 30 * 20;
-	private static final int BODYGUARD_RANGE = 15;
+	private static final int BODYGUARD_RANGE = 25;
 	private static final int BODYGUARD_RADIUS = 4;
 	private static final int BODYGUARD_1_ARMOR = 4;
 	private static final int BODYGUARD_2_ARMOR = 5;

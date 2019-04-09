@@ -462,6 +462,9 @@ public class EntityUtils {
 			double rotation = 0;
 			@Override
 			public void run() {
+				if (mob.isDead()) {
+					this.cancel();
+				}
 				t++;
 				rotation += 20;
 

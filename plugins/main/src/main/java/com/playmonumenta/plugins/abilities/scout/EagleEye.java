@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class EagleEye extends Ability {
 
@@ -25,7 +26,6 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; // 20%
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
 	private static final int EAGLE_EYE_RADIUS = 20;
-	private static final double EAGLE_EYE_DOT_ANGLE = 0.33;
 
 	public EagleEye(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -77,7 +77,10 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking();
+		if (!InventoryUtils.isPickaxeItem(mPlayer.getInventory().getItemInMainHand())) {
+			return mPlayer.isSneaking();
+		}
+		return false;
 	}
 
 }

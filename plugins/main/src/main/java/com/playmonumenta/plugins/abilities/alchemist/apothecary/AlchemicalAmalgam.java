@@ -31,10 +31,14 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * blocks of it regeneration II/III and Resistance I and giving
  * enemies slowness I/II and Weakness I for 4 seconds. The projectile
  * on collision with terrain heals allies within 5 blocks of it
- * for 2 / 4 hp. CD: 30s
+ * for 2 / 4 hp and deals 10 damage to mobs. CD: 30s
  */
 public class AlchemicalAmalgam extends Ability {
 
+	private static final int ALCHEMICAL_1_SLOWNESS_AMPLIFIER = 1;
+	private static final int ALCHEMICAL_2_SLOWNESS_AMPLIFIER = 2;
+	private static final int ALCHEMICAL_DAMAGE = 10;
+	private static final double ALCHEMICAL_EXPLOSION_RADIUS = 5;
 	private static final Particle.DustOptions ALCHEMICAL_LIGHT_COLOR = new Particle.DustOptions(
 	    Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions ALCHEMICAL_DARK_COLOR = new Particle.DustOptions(
@@ -60,6 +64,7 @@ public class AlchemicalAmalgam extends Ability {
 			Vector dir = loc.getDirection();
 			int t = 0;
 			int amp = getAbilityScore() == 1 ? 1 : 2;
+			int slownessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_SLOWNESS_AMPLIFIER : ALCHEMICAL_2_SLOWNESS_AMPLIFIER;
 			double heal = getAbilityScore() == 1 ? 2 : 4;
 			@Override
 			public void run() {
@@ -77,7 +82,7 @@ public class AlchemicalAmalgam extends Ability {
 				}
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5, mPlayer)) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, amp - 1));
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
 				}
 				if (t >= 20 * 6 || loc.getBlock().getType().isSolid()) {
@@ -85,8 +90,11 @@ public class AlchemicalAmalgam extends Ability {
 					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 150, 0.1, 0.1, 0.1, 0.2);
 					mPlayer.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
 					mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
-					for (Player p : PlayerUtils.getNearbyPlayers(loc, 5)) {
+					for (Player p : PlayerUtils.getNearbyPlayers(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
 						PlayerUtils.healPlayer(p, heal);
+					}
+					for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ALCHEMICAL_EXPLOSION_RADIUS)) {
+						EntityUtils.damageEntity(mPlugin, le, ALCHEMICAL_DAMAGE, mPlayer);;
 					}
 				}
 			}

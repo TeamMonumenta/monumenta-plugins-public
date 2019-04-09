@@ -29,12 +29,17 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * Fractal Enervation: Sprint right-click fires a dark magic beam
  * (max range: 9), afflicting the first enemy it hits with an
  * unnatural weakness that lasts 12s. The beam then instantly
- * spreads to all enemies in a 3-block radius, and then from them,
- * and so on. Affected enemies suffer from Vulnerability I / II
- * and all debuffs on the enemies increase by 1 effect level.
+ * spreads to all enemies in a 3 / 4-block radius, and then from them,
+ * and so on. All debuffs on the enemies increase by 1 effect level.
+ * Each enemy hit is dealt 4 / 7 damage.
  * Cooldown: 16s / 13s
  */
 public class FractalEnervation extends Ability {
+
+	private static final int FRACTAL_1_DAMAGE = 4;
+	private static final int FRACTAL_2_DAMAGE = 7;
+	private static final int FRACTAL_1_CHAIN_RANGE = 3 + 1; // The +1 accounts for the mob's nonzero hitbox so that the distance between 2 mobs is approx 3 still
+	private static final int FRACTAL_2_CHAIN_RANGE = 4 + 1;
 
 	public FractalEnervation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -53,7 +58,7 @@ public class FractalEnervation extends Ability {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.7, 0.7, 0.7);
 		Vector dir = mPlayer.getEyeLocation().getDirection();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 9, mPlayer);
-		int level = getAbilityScore() == 1 ? 1 : 3;
+		int chainRange = getAbilityScore() == 1 ? FRACTAL_1_CHAIN_RANGE : FRACTAL_2_CHAIN_RANGE;
 		int range = 9;
 		boolean cancel = false;
 		for (int i = 0; i < range; i++) {
@@ -75,13 +80,14 @@ public class FractalEnervation extends Ability {
 							mob.addPotionEffect(
 							    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 						}
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 5, level));
+						int damage = getAbilityScore() == 1 ? FRACTAL_1_DAMAGE : FRACTAL_2_DAMAGE;
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 40, 0.25, 0.45, 0.25, 0.15);
 						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 20, 0.25, 0.45, 0.25, 0);
 						i = 0;
 						LivingEntity nextMob = null;
 						double dist = 100;
-						for (LivingEntity next : EntityUtils.getNearbyMobs(mob.getLocation(), 4, mPlayer)) {
+						for (LivingEntity next : EntityUtils.getNearbyMobs(mob.getLocation(), chainRange, mPlayer)) {
 							if (next.getLocation().distance(loc) < dist && !next.getUniqueId().equals(mob.getUniqueId())
 							    && !hit.contains(next)) {
 								nextMob = next;
@@ -92,7 +98,7 @@ public class FractalEnervation extends Ability {
 							Vector to = LocationUtils
 							            .getDirectionTo(nextMob.getLocation().add(0, nextMob.getHeight() / 2, 0), loc);
 							dir = to;
-							range = 4;
+							range = chainRange;
 						} else {
 							cancel = true;
 						}

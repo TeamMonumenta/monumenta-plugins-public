@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -29,17 +30,18 @@ public class HungeringVortex extends Ability {
 	private static final int HUNGERING_VORTEX_DURATION = 8 * 20;
 	private static final int HUNGERING_VORTEX_COOLDOWN = 18 * 20;
 	private static final int HUNGERING_VORTEX_RADIUS = 7;
-	private static final int HUNGERING_VORTEX_1_WEAKNESS_AMPLIFIER = 0;
-	private static final int HUNGERING_VORTEX_2_WEAKNESS_AMPLIFIER = 1;
+	private static final int HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER = 0;
+	private static final int HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER = 1;
 	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 0.5;
 	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 1;
 
 	/*
 	 * Hungering Vortex: Shift + right click looking down pulls
 	 * all mobs in a 7-block radius towards you, afflicting them
-	 * with Weakness I / II for 8 s and increasing your melee
+	 * with Slowness I / II for 8 s and increasing your melee
 	 * damage by 0.5 / 1 for each affected enemy, up to a maximum
-	 * of 4 / 8 for 8s. Cooldown: 18 s
+	 * of 4 / 8 for 8s. All affected enemies change target to you.
+	 * Cooldown: 18 s
 	 */
 
 	public HungeringVortex(Plugin plugin, World world, Random random, Player player) {
@@ -53,7 +55,7 @@ public class HungeringVortex extends Ability {
 	@Override
 	public boolean cast() {
 		int vortex = getAbilityScore();
-		int weakness = vortex == 1 ? HUNGERING_VORTEX_1_WEAKNESS_AMPLIFIER : HUNGERING_VORTEX_2_WEAKNESS_AMPLIFIER;
+		int weakness = vortex == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1, 1.25f);
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 0.75f);
 		Location loc = mPlayer.getLocation();
@@ -88,8 +90,11 @@ public class HungeringVortex extends Ability {
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, HUNGERING_VORTEX_DURATION, weakness));
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, weakness));
 			MovementUtils.PullTowards(mPlayer, mob, velocity);
+			if (mob instanceof Mob) {
+				((Mob)mob).setTarget(mPlayer);
+			}
 		}
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
