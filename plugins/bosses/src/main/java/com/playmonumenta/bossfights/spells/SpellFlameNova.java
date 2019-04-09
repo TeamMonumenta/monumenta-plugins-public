@@ -35,7 +35,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {
-					player.damage(16.0f);
+					player.damage(11.0f);
 					player.setFireTicks(80);
 				}
 			}
