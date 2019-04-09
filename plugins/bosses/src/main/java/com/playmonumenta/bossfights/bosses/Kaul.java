@@ -25,6 +25,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EntityEquipment;
@@ -694,7 +695,9 @@ public class Kaul extends BossAbilityGroup {
 
 								if (mBoss.isDead() || !mBoss.isValid() || defeated) {
 									this.cancel();
-									miniboss.setHealth(0);
+									if (!miniboss.isDead()) {
+										miniboss.setHealth(0);
+									}
 								}
 							}
 
@@ -906,6 +909,11 @@ public class Kaul extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		Random rand = new Random();
+		for (Entity ent : mSpawnLoc.getNearbyLivingEntities(detectionRange)) {
+			if (!ent.getUniqueId().equals(mBoss.getUniqueId()) && ent instanceof WitherSkeleton && !ent.isDead()) {
+				ent.remove();
+			}
+		}
 		new BukkitRunnable() {
 			Location loc = mHeight.getLocation().subtract(0, 0.5, 0);
 			double rotation = 0;
