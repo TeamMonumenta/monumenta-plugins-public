@@ -45,13 +45,16 @@ public class ScoutPassive extends Ability {
 
 					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 
-					int arrowSlot = -1;
+					final int arrowSlot;
 					if (firstArrow == -1 && firstTippedArrow > -1) {
 						arrowSlot = firstTippedArrow;
 					} else if (firstArrow > - 1 && firstTippedArrow == -1) {
 						arrowSlot = firstArrow;
-					} else {
+					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
 						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else {
+						/* Player shot their last arrow - abort here */
+						return true;
 					}
 
 					ItemStack arrowStack = playerInv.getItem(arrowSlot);
