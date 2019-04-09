@@ -28,7 +28,7 @@ public class AuraSmallHungerBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 12, 7, 12, 20, Particle.FALLING_DUST, Material.MELON.createBlockData(),
+			new SpellBaseAura(mBoss, 12, 7, 12, 10, Particle.FALLING_DUST, Material.MELON.createBlockData(),
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 1, true, true));
 			                  })

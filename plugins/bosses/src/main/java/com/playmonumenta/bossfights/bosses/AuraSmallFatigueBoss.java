@@ -28,7 +28,7 @@ public class AuraSmallFatigueBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST, Material.SAND.createBlockData(),
+			new SpellBaseAura(mBoss, 8, 5, 8, 5, Particle.FALLING_DUST, Material.SAND.createBlockData(),
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 60, 1, true, true));
 			                  })

@@ -28,7 +28,7 @@ public class AuraSmallSlownessBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST, Material.ANVIL.createBlockData(),
+			new SpellBaseAura(mBoss, 8, 5, 8, 5, Particle.FALLING_DUST, Material.ANVIL.createBlockData(),
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1, true, true));
 			                  })

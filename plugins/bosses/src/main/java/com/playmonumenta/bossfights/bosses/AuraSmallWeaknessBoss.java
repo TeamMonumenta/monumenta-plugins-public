@@ -28,7 +28,7 @@ public class AuraSmallWeaknessBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST, Material.REDSTONE_BLOCK.createBlockData(),
+			new SpellBaseAura(mBoss, 8, 5, 8, 5, Particle.FALLING_DUST, Material.REDSTONE_BLOCK.createBlockData(),
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 1, true, true));
 			                  })
