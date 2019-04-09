@@ -28,11 +28,11 @@ public class PulseLaserBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
+			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 240,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {
-		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
-		                           boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
+		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 0.8f, 0.5f + ((float)ticks / 80f) * 1.5f);
+		                           boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 0.8f, 0.5f + ((float)ticks / 80f) * 1.5f);
 		                           if (ticks == 0) {
 		                               boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4), true);
 		                           }
@@ -44,7 +44,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 		                       },
 		                       // Damage generated at the end of the attack
 		                       (Player player, Location loc, boolean blocked) -> {
-		                           loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
+		                           loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 		                           loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
 		                           if (!blocked) {
 		                               player.damage(12f);

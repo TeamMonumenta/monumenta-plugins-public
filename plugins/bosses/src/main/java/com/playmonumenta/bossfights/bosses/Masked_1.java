@@ -53,7 +53,7 @@ public class Masked_1 extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, 40, 120, true, false,
+			new SpellBaseLaser(plugin, boss, 40, 120, true, false, 160,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {
 		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);

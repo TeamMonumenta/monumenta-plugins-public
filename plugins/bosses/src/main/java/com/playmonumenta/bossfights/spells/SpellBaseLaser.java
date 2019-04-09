@@ -65,15 +65,11 @@ public class SpellBaseLaser extends Spell {
 	 * @param numTicks        Total duration of the spell
 	 * @param stopWhenBlocked Whether the spell should abort if line of sight is broken
 	 * @param singleTarget    Target random player (true) or all players (false)
+	 * @param cooldown        How often this spell can be cast
 	 * @param tickAction      Called once every two ticks for targeted player(s)
 	 * @param particleAction  Called many times per tick to generate particles for laser
 	 * @param finishAction    Called when the spell numTicks have elapsed
 	 */
-	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget,
-	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
-		this(plugin, boss, range, numTicks, stopWhenBlocked, singleTarget, 160, tickAction, particleAction, finishAction); //Default Laser
-	}
-
 	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget, int cooldown,
 	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
 		mPlugin = plugin;

@@ -50,7 +50,7 @@ public class Virius extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellChangeFloor(plugin, mBoss, mSpawnLoc, detectionRange, 3, Material.MAGMA_BLOCK, 800),
-			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
+			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {
 		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);

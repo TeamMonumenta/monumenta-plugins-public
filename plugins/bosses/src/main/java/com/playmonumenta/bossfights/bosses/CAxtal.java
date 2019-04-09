@@ -61,7 +61,7 @@ public class CAxtal extends BossAbilityGroup {
 			new SpellAxtalMeleeMinions(plugin, mBoss, 10, 3, 3, 20, 12),
 			new SpellTpBehindRandomPlayer(plugin, mBoss, 160),
 			new SpellAxtalTntThrow(plugin, mBoss, 5, 15),
-			new SpellBaseLaser(plugin, boss, 60, 140, false, true,
+			new SpellBaseLaser(plugin, boss, 60, 140, false, true, 160,
 			                   // Tick action per player
 			                   (Player player, int ticks, boolean blocked) -> {
 			                       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 100f) * 1.5f);

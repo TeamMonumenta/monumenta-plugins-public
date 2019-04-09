@@ -67,7 +67,7 @@ public class AzacorNormal extends BossAbilityGroup {
 			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
 			                      loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.4, 0.4, 0.4, 0);
 			                  }),
-			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false,
+			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 			                   // Tick action per player
 			                   (Player player, int ticks, boolean blocked) -> {
 			                       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
