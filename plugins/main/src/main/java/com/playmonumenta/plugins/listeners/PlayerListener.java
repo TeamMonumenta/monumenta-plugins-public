@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.listeners;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -41,7 +40,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -238,27 +236,6 @@ public class PlayerListener implements Listener {
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void AsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-		Player player = event.getPlayer();
-		Location playerLoc = player.getLocation();
-		int guild = ScoreboardUtils.getScoreboardValue(player, "Guild");
-
-		Iterator<Player> iter = event.getRecipients().iterator();
-		while (iter.hasNext()) {
-			Player receiver = iter.next();
-			int receiverGuild = ScoreboardUtils.getScoreboardValue(receiver, "Guild");
-
-			if (guild == 0 || guild != receiverGuild) {
-				int chatDistance = ScoreboardUtils.getScoreboardValue(receiver, "chatDistance");
-
-				if (chatDistance != 0 && (playerLoc.distance(receiver.getLocation()) > chatDistance)) {
-					iter.remove();
-				}
-			}
 		}
 	}
 
