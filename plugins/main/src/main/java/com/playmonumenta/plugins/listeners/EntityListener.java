@@ -217,8 +217,6 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-
 			//  Make sure to not trigger class abilities off Throrns.
 			if (event.getCause() != DamageCause.THORNS) {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
@@ -228,7 +226,10 @@ public class EntityListener implements Listener {
 					}
 
 					// Apply any damage modifications that items they have may apply.
-					mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
+					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
+					}
 
 					mAbilities.modifyDamage(player, event);
 
