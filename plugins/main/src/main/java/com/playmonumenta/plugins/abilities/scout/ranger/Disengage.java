@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -47,7 +49,14 @@ public class Disengage extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
+		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
+		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
+			return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
+			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() &&
+			       !inMainHand.getType().isEdible() && inMainHand.getType() != Material.TRIDENT;
+		}
+		return false;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -10,8 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -41,10 +40,7 @@ public class LuminousInfusion extends Ability {
 	private static final int LUMINOUS_INFUSION_UNDEAD_DAMAGE = 10;
 	private static final int LUMINOUS_INFUSION_1_PASSIVE_DAMAGE = 2;
 	private static final int LUMINOUS_INFUSION_2_PASSIVE_DAMAGE = 5;
-	private static final int LUMINOUS_INFUSION_SLOWNESS_DURATION = 3 * 20;
-	private static final int LUMINOUS_INFUSION_WEAKNESS_DURATION = 3 * 20;
-	private static final int LUMINOUS_INFUSION_SLOWNESS_LEVEL = 4;
-	private static final int LUMINOUS_INFUSION_WEAKNESS_LEVEL = 4;
+	private static final int LUMINOUS_INFUSION_STUN_DURATION = 3 * 20;
 	private static final int LUMINOUS_INFUSION_MAX_DURATION = 15 * 20;
 	private static final int LUMINOUS_INFUSION_1_COOLDOWN = 25 * 20;
 	private static final int LUMINOUS_INFUSION_2_COOLDOWN = 18 * 20;
@@ -134,11 +130,14 @@ public class LuminousInfusion extends Ability {
 					@Override
 					public void run() {
 						if (le.isDead()) {
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS)) {
+							List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS);
+							for (LivingEntity e : affected) {
+								// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
+								float volume = 0.85f / (float) Math.sqrt(affected.size());
 								EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
 								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
 								mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-								mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.85f, 1.1f);
+								mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, volume, 1.1f);
 							}
 						}
 					}
@@ -147,11 +146,8 @@ public class LuminousInfusion extends Ability {
 			} else {
 				// Active damage to non-undead
 				if ((!EntityUtils.isElite(le) && !EntityUtils.isBoss(le))
-						|| ((le instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)le))) {
-					le.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, LUMINOUS_INFUSION_WEAKNESS_DURATION,
-					                                    LUMINOUS_INFUSION_WEAKNESS_LEVEL, true, false));
-					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, LUMINOUS_INFUSION_SLOWNESS_DURATION,
-					                                    LUMINOUS_INFUSION_SLOWNESS_LEVEL, true, false));
+				    || ((le instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)le))) {
+					EntityUtils.applyStun(mPlugin, LUMINOUS_INFUSION_STUN_DURATION, le);
 				}
 			}
 		}

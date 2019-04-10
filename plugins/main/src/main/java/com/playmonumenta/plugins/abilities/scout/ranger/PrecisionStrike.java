@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -33,7 +35,7 @@ public class PrecisionStrike extends Ability {
 
 	private static final double PRECISION_STRIKE_Y_VELOCITY_MULTIPLIER = 0.5;
 	private static final double PRECISION_STRIKE_Y_VELOCITY_BONUS = 0.4;
-	private static final double PRECISION_STRIKE_ACTIVATION_RADIUS = 1;
+	private static final double PRECISION_STRIKE_ACTIVATION_RADIUS = 2;
 	private static final int PRECISION_STRIKE_1_DAMAGE = 6;
 	private static final int PRECISION_STRIKE_2_DAMAGE = 10;
 	private static final double PRECISION_STRIKE_STUN_RADIUS = 3;
@@ -42,6 +44,8 @@ public class PrecisionStrike extends Ability {
 	private static final int PRECISION_STRIKE_1_VULNERABILITY_LEVEL = 3;
 	private static final int PRECISION_STRIKE_2_VULNERABILITY_LEVEL = 5;
 	private static final int PRECISION_STRIKE_COOLDOWN = 6 * 20;
+
+	private LivingEntity hitMob;
 
 	public PrecisionStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -55,7 +59,14 @@ public class PrecisionStrike extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSprinting() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
+		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
+		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
+			return mPlayer.isSprinting() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
+			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() &&
+			       !inMainHand.getType().isEdible() && inMainHand.getType() != Material.TRIDENT;
+		}
+		return false;
 	}
 
 	@Override
@@ -85,27 +96,25 @@ public class PrecisionStrike extends Ability {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+					hitMob = le;
 					le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
-
 					if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 						EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 					}
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+					mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 
+					if (getAbilityScore() == 2) {
+						for (LivingEntity e : EntityUtils.getNearbyMobs(hitMob.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
+							EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, e);
+						}
+					}
 					this.cancel();
 					break;
 				}
 			}
 		}.runTaskTimer(mPlugin, 1, 1);
-
-		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
-		if (getAbilityScore() == 2) {
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
-				EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
-			}
-		}
-
 		putOnCooldown();
 
 		return true;

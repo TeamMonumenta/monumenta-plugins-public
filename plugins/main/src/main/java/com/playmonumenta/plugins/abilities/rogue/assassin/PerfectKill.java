@@ -32,7 +32,7 @@ public class PerfectKill extends Ability {
 	private static final int PERFECT_DAMAGE_BONUS_DURATION = 20 * 5;
 	private static final int HADOUKEN_LASER = 9001;
 
-	private boolean active = true;
+	private boolean active = false;
 
 	public PerfectKill(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -48,7 +48,7 @@ public class PerfectKill extends Ability {
 			event.setDamage(event.getDamage() + PERFECT_DAMAGE_BONUS);
 		}
 
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.PERFECT_KILL)) {
+		if (mPlayer.isSprinting() && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.PERFECT_KILL)) {
 			LivingEntity le = (LivingEntity) event.getEntity();
 			if (!EntityUtils.isBoss(le) && !EntityUtils.isElite(le)) {
 				//Setting health does not count for a kill. Deal damage beyond god-level tiers
@@ -60,12 +60,17 @@ public class PerfectKill extends Ability {
 				if (getAbilityScore() > 1) {
 					active = true;
 					new BukkitRunnable() {
+						int t = 0;
 						@Override
 						public void run() {
-							active = false;
-							this.cancel();
+							t++;
+							mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 1, 0.3, 0.35, 0.3, 0);
+							if (t > PERFECT_DAMAGE_BONUS_DURATION) {
+								active = false;
+								this.cancel();
+							}
 						}
-					}.runTaskLater(mPlugin, PERFECT_DAMAGE_BONUS_DURATION);
+					}.runTaskTimer(mPlugin, 0, 1);
 				}
 
 				putOnCooldown();
@@ -78,7 +83,7 @@ public class PerfectKill extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSprinting() && InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
+		return InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
 	}
 
 }

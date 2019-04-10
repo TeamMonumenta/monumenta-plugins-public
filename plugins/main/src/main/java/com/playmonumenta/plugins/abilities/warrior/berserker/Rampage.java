@@ -31,8 +31,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 */
 public class Rampage extends Ability {
 
-	private static final int RAMPAGE_1_KILL_TIMER = 3 * 20; //ticks
-	private static final int RAMPAGE_2_KILL_TIMER = 5 * 20; //ticks
+	private static final int RAMPAGE_1_KILL_TIMER = 5 * 20; //ticks
+	private static final int RAMPAGE_2_KILL_TIMER = 6 * 20; //ticks
 	private static final int RAMPAGE_KILL_THRESHOLD = 4;
 	private static final int RAMPAGE_KILL_LIMIT = 24;
 	private static final int RAMPAGE_2_REGEN_THRESHOLD = 5;
@@ -94,7 +94,7 @@ public class Rampage extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		int rampageDamage = 0;
 		if (rampageKillStreak > 0) {
-			rampageDamage = (int)(rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
+			rampageDamage = rampageKillStreak / RAMPAGE_KILL_THRESHOLD;
 		}
 		event.setDamage(event.getDamage() + rampageDamage);
 		return true;

@@ -102,7 +102,7 @@ public class DaggerThrow extends Ability {
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-				return true;
+				return mPlayer.getLocation().getPitch() > -50;
 			}
 		}
 		return false;

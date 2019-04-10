@@ -51,7 +51,7 @@ public class EvasionEnchant extends Ability {
 			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
-		} else if (chance >= 100) {
+		} else if (chance >= 100 || chance >= 50 && mPlayer.getHealth() <= damage) {
 			chance -= 100;
 			changedDamage *= 0.5;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
