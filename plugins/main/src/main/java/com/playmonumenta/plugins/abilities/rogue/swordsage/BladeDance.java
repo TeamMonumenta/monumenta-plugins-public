@@ -28,17 +28,27 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 public class BladeDance extends Ability {
 
 	/*
-	 * Blade Dance: Sprint Right Click to begin a blade dance.
-	 * For 2 seconds, you are entirely unstoppable (you cannot
-	 * take damage or be inflicted with negative debuffs but
-	 * still take knockback) and unable to attack. After 2 seconds,
-	 * end the dance with a finishing spin, dealing 18 damage to
-	 * enemies within 4 blocks. At level 2, you get Speed 2 while
-	 * dancing and the damage is increased to 25. Cooldown: 40
-	 * seconds
+	 * Blade Dance: Sprint Right Click while looking down to begin a blade dance. For
+	 * 2 seconds, you are entirely unstoppable (you cannot take
+	 * damage or be inflicted with negative debuffs but still take
+	 * knockback) and unable to attack. After 2 seconds, your next
+	 * attack within 4 seconds deals 9/12 damage + 1/1.5 damage
+	 * per block traveled during the dance in a 4 block radius
+	 * around you. At level 2 you gain speed 2 during the dance
+	 * and the base and scaling damage is increased.
+	 * Cooldown: 40 seconds
 	 */
 
+	private static final int DANCE_1_BASE_DAMAGE = 9;
+	private static final int DANCE_2_BASE_DAMAGE = 12;
+	private static final double DANCE_1_SCALING_DAMAGE = 1;
+	private static final double DANCE_2_SCALING_DAMAGE = 1.5;
+	private static final int DANCE_ACTIVATION_PERIOD = 20 * 4;
+	private static final int DANCE_RADIUS = 4;
+
 	private boolean mActive = false;
+	private boolean mTriggerActive = false;
+	private double extraDamage = 0;
 
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -62,16 +72,14 @@ public class BladeDance extends Ability {
 			return false;
 		}
 
-		if (mPlayer.isSprinting()) {
+		if (mPlayer.isSprinting() && mPlayer.getLocation().getPitch() > 50) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
 				mPlayer.setInvulnerable(true);
 				mActive = true;
-				int bladeDance = getAbilityScore();
-				double damage = bladeDance == 1 ? 9 : 12;
-				if (bladeDance >= 2) {
+				if (getAbilityScore() >= 2) {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED,
 					                                 20 * 2, 1, true, false));
 				}
@@ -80,13 +88,13 @@ public class BladeDance extends Ability {
 					float pitch = 0;
 					Location loc = mPlayer.getLocation();
 					double y = loc.getY();
-					double extraDamage = 0;
 					@Override
 					public void run() {
 						i += 2;
 						Location checkLoc = mPlayer.getLocation();
 						checkLoc.setY(y);
-						extraDamage += checkLoc.distance(loc);
+						double multiplier = getAbilityScore() == 1 ? DANCE_1_SCALING_DAMAGE : DANCE_2_SCALING_DAMAGE;
+						extraDamage += checkLoc.distance(loc) * multiplier;
 						loc = mPlayer.getLocation();
 						loc.setY(y);
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
@@ -126,49 +134,17 @@ public class BladeDance extends Ability {
 						if (i >= 40) {
 							mPlayer.setInvulnerable(false);
 							mActive = false;
+							mTriggerActive = true;
 							this.cancel();
 
-							//Ultra flash
 							new BukkitRunnable() {
-								double rotation = 0;
-								Location loc = mPlayer.getLocation();
-								double radius = 0;
-								double y = 2.5;
-								double yminus = 0.35;
-
 								@Override
 								public void run() {
-
-									radius += 1;
-									for (int i = 0; i < 15; i += 1) {
-										rotation += 24;
-										double radian1 = Math.toRadians(rotation);
-										loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-										mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
-										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
-										loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-
-									}
-									y -= y * yminus;
-									yminus += 0.02;
-									if (yminus >= 1) {
-										yminus = 1;
-									}
-									if (radius >= 7) {
-										this.cancel();
-									}
-
+									mTriggerActive = false;
+									extraDamage = 0;
+									this.cancel();
 								}
-
-							}.runTaskTimer(mPlugin, 0, 1);
-							mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-							mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
-							mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 150, 0, 0, 0, 0.25);
-							mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 70, 0, 0, 0, 0.25);
-							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
-							for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 4, mPlayer)) {
-								EntityUtils.damageEntity(mPlugin, le, damage + extraDamage, mPlayer);
-							}
+							}.runTaskLater(mPlugin, DANCE_ACTIVATION_PERIOD);
 						}
 					}
 				}.runTaskTimer(mPlugin, 0, 2);
@@ -182,6 +158,44 @@ public class BladeDance extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mActive) {
 			return false;
+		} else if (mTriggerActive) {
+			int damage = getAbilityScore() == 1 ? DANCE_1_BASE_DAMAGE : DANCE_2_BASE_DAMAGE;
+			new BukkitRunnable() {
+				double rotation = 0;
+				Location loc = mPlayer.getLocation();
+				double radius = 0;
+				double y = 2.5;
+				double yminus = 0.35;
+				@Override
+				public void run() {
+					radius += 1;
+					for (int i = 0; i < 15; i += 1) {
+						rotation += 24;
+						double radian1 = Math.toRadians(rotation);
+						loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
+						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
+						loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					}
+					y -= y * yminus;
+					yminus += 0.02;
+					if (yminus >= 1) {
+						yminus = 1;
+					}
+					if (radius >= 7) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
+			mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 150, 0, 0, 0, 0.25);
+			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 70, 0, 0, 0, 0.25);
+			mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 150, 4, 4, 4, 0);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS, mPlayer)) {
+				EntityUtils.damageEntity(mPlugin, le, damage + extraDamage, mPlayer);
+			}
+			extraDamage = 0;
 		}
 		return true;
 	}

@@ -10,8 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -20,7 +18,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -29,20 +26,18 @@ public class DarkPact extends Ability {
 	private static final int DARK_PACT_DURATION = 20 * 10;
 	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1.75;
-	private static final int DARK_PACT_WEAKNESS_AMPLIFIER = 1;
-	private static final int DARK_PACT_WEAKNESS_DURATION = 20 * 10;
-
 
 	/*
-	 * Dark Pact: Sprint + left-click to greatly amplify your
+	 * Dark Pact: Sprint + left-click with a scythe to greatly amplify your
 	 * power for 10 s, making your skills and melee attacks deal
 	 * 50% / 75% more damage. At lvl 2, your scythe attacks also
-	 * cleave, dealing AoE damage in front of you. When this
-	 *  buff expires, you suffer from Weakness II for 10 s.
+	 * cleave, dealing AoE damage in front of you. While this
+	 * ability is active, you cannot heal health.
 	 *  Cooldown: 30 s
 	 */
 
 	private boolean active = false;
+
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "DarkPact";
@@ -68,19 +63,22 @@ public class DarkPact extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1.25f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.75f);
 		new BukkitRunnable() {
+			double oldHealth = mPlayer.getHealth();
 			int t = 0;
 			@Override
 			public void run() {
 				t++;
 				mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 1, 0.25, 0.35, 0.25, 0);
+				if (mPlayer.getHealth() > oldHealth) {
+					mPlayer.setHealth(oldHealth);
+				} else if (mPlayer.getHealth() < oldHealth) {
+					oldHealth = mPlayer.getHealth();
+				}
 				if (t >= DARK_PACT_DURATION || mPlayer.isDead()) {
 					this.cancel();
 					active = false;
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 0.75f);
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-					                                 new PotionEffect(PotionEffectType.WEAKNESS, DARK_PACT_WEAKNESS_DURATION,
-					                                                  DARK_PACT_WEAKNESS_AMPLIFIER, true, true));
 				}
 			}
 

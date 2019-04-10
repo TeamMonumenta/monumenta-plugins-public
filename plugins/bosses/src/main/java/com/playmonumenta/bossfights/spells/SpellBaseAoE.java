@@ -143,11 +143,11 @@ public class SpellBaseAoE extends Spell {
 							}
 						}
 
-					} .runTaskTimer(mPlugin, 0, 1);
+					}.runTaskTimer(mPlugin, 0, 1);
 				}
 			}
 
-		} .runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1);
 
 	}
 

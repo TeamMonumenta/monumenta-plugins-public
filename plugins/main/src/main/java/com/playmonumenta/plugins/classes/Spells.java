@@ -76,6 +76,7 @@ public enum Spells {
 
 	//--Camper/Sniper
 	ENCHANTED_ARROW("Enchanted Arrow"),
+	SPLIT_ARROW("Split Arrow"),
 
 	//--Ranger
 	QUICKDRAW("Quickdraw"),
@@ -108,6 +109,7 @@ public enum Spells {
 	//--Core Abilites
 	RIPOSTE("Riposte"),
 	DEFENSIVE_LINE("Defensive Line"),
+	COUNTER_STRIKE("Counter Strike"),
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),

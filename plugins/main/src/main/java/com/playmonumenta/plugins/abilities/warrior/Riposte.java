@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -30,6 +31,8 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
 	private static final double RIPOSTE_SQRADIUS = 6.25;    //radius = 2.5, this is it squared
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
+
+	private boolean triggered = false;
 
 	public Riposte(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -59,6 +62,16 @@ public class Riposte extends Ability {
 						}
 					}
 
+					// Give a value to Counter Strike to detect if Riposte has triggered
+					triggered = true;
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							triggered = false;
+							this.cancel();
+						}
+					}.runTaskLater(mPlugin, 2);
+
 					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 					mWorld.spawnParticle(Particle.SWEEP_ATTACK, (mPlayer.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
 					mWorld.spawnParticle(Particle.CRIT_MAGIC, (mPlayer.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
@@ -68,5 +81,9 @@ public class Riposte extends Ability {
 			}
 		}
 		return true;
+	}
+
+	public boolean hasTriggered() {
+		return triggered;
 	}
 }

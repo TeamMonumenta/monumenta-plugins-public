@@ -24,15 +24,23 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Blizzard extends Ability {
 
 	/*
-	 * Blizzard: Create an aura of ice and snow in a range of 4 that lasts 10s
+	 * Blizzard: Shift right click with a wand while looking up to
+	 * create an aura of ice and snow in a range of 4 that lasts 10s
 	 * (similar to Rains) each enemy that enters the aura gets slowness 1, 2 after
-	 * 3s and 6s freezes them (except bosses) and take 4/6 damage for second.
+	 * 3s and 6s freezes them (except bosses) and take 4 / 6 damage per second.
+	 * Puts out players on fire within range.
 	 * Cooldown: 28 s / 24 s
 	 */
+
+	private static final int BLIZZARD_1_RADIUS = 5;
+	private static final int BLIZZARD_2_RADIUS = 6;
+	private static final int BLIZZARD_1_DAMAGE = 4;
+	private static final int BLIZZARD_2_DAMAGE = 6;
 
 	public Blizzard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -48,16 +56,20 @@ public class Blizzard extends Ability {
 	public boolean cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-		double damage = getAbilityScore() == 1 ? 4 : 6;
+		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
+		double radius = getAbilityScore() == 1 ? BLIZZARD_1_RADIUS : BLIZZARD_2_RADIUS;
 		new BukkitRunnable() {
 			int t = 0;
 
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation();
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, 4, mPlayer);
+				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
 				t++;
 				if (t % 10 == 0) {
+					for (Player p : PlayerUtils.getNearbyPlayers(loc, radius)) {
+						p.setFireTicks(-10);
+					}
 					for (LivingEntity mob : mobs) {
 						if (!affected.containsKey(mob.getUniqueId())) {
 							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 0, false, true));
@@ -69,14 +81,14 @@ public class Blizzard extends Ability {
 								PotionEffect effect = mob.getPotionEffect(PotionEffectType.SLOW);
 								amp = effect.getAmplifier();
 							}
-							if (duration >= 6) {
+							if (duration >= 12) {
+								if (!EntityUtils.isBoss(mob) && !EntityUtils.isFrozen(mob)) {
+									EntityUtils.applyFreeze(mPlugin, 20 * 5, mob);
+								}
+							} else if (duration >= 6) {
 								if (amp < 1) {
 									mob.removePotionEffect(PotionEffectType.SLOW);
 									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
-								}
-							} else if (duration >= 12) {
-								if (!EntityUtils.isBoss(mob) && !EntityUtils.isFrozen(mob)) {
-									EntityUtils.applyFreeze(mPlugin, 20 * 5, mob);
 								}
 							}
 							affected.put(mob.getUniqueId(), duration + 1);
