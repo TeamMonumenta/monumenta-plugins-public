@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -10,9 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -21,7 +18,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -34,16 +30,19 @@ public class DeathsTouch extends Ability {
 
 	/*
 	 * Death’s Touch: Sprint + right-click marks the enemy
-	 * you are looking at as the reaper’s next victim. If
-	 * you kill that enemy with a scythe, you reap its soul,
-	 * granting you 15 / 20 s of lvl 1 buffs contrary to the
+	 * you are looking at as the reaper’s next victim.
+	 * The player that kills the mob reaps its soul,
+	 * granting them 15 / 20 s of lvl 1 buffs contrary to the
 	 * debuffs affecting it (Weakness -> Strength, Slowness ->
 	 * Speed, On Fire -> Fire Resistance, Wither / Poison ->
 	 * Regeneration, Mining Fatigue -> Haste, Blindness ->
 	 * Night Vision). Cooldown: 30 / 20 s
 	 */
 
+	// Although we now track the mob buffs on kill with metadata,
+	// We still need this variable to easily apply particle effects
 	private LivingEntity target = null;
+
 	public DeathsTouch(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
@@ -56,27 +55,6 @@ public class DeathsTouch extends Ability {
 		 * and manage cooldown itself
 		 */
 		mInfo.ignoreCooldown = true;
-	}
-
-	private static List<PotionEffectType> getOppositeEffects(LivingEntity e) {
-		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
-		for (PotionEffect effect : e.getActivePotionEffects()) {
-			if (effect.getType().equals(PotionEffectType.WEAKNESS)) {
-				types.add(PotionEffectType.INCREASE_DAMAGE);
-			} else if (effect.getType().equals(PotionEffectType.SLOW)) {
-				types.add(PotionEffectType.SPEED);
-			} else if (effect.getType().equals(PotionEffectType.WITHER) || effect.getType().equals(PotionEffectType.POISON)) {
-				types.add(PotionEffectType.REGENERATION);
-			} else if (effect.getType().equals(PotionEffectType.SLOW_DIGGING)) {
-				types.add(PotionEffectType.FAST_DIGGING);
-			} else if (effect.getType().equals(PotionEffectType.BLINDNESS)) {
-				types.add(PotionEffectType.NIGHT_VISION);
-			}
-		}
-		if (e.getFireTicks() > 0) {
-			types.add(PotionEffectType.FIRE_RESISTANCE);
-		}
-		return types;
 	}
 
 	@Override
@@ -99,6 +77,8 @@ public class DeathsTouch extends Ability {
 			for (LivingEntity mob : mobsInRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					target = mob;
+					int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
+					mob.setMetadata("DeathsTouchBuffDuration", new FixedMetadataValue(mPlugin, duration));
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 1, 1f);
 
 					new BukkitRunnable() {
@@ -109,11 +89,12 @@ public class DeathsTouch extends Ability {
 						@Override
 						public void run() {
 							t++;
-							mPlayer.spawnParticle(Particle.SPELL_MOB, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
-							mPlayer.spawnParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
-							if (t >= runnableDuration || target == null || target.isDead()) {
+							mPlayer.spawnParticle(Particle.SPELL_MOB, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
+							mPlayer.spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
+							if (t >= runnableDuration || target.isDead()) {
 								this.cancel();
 								target = null;
+								target.removeMetadata("DeathsTouchBuffDuration", mPlugin);
 							}
 						}
 
@@ -130,16 +111,6 @@ public class DeathsTouch extends Ability {
 		return false;
 	}
 
-	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (target != null && event.getEntity().getUniqueId().equals(target.getUniqueId())) {
-			List<PotionEffectType> effects = getOppositeEffects(event.getEntity());
-			int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
-			for (PotionEffectType effect : effects) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(effect, duration, 0, true, true));
-			}
-			target = null;
-		}
-	}
+	// The buffs will be applied in the DeathsTouchNonReaper ability for all players
 
 }

@@ -96,8 +96,14 @@ public class HeavenlyBoon extends Ability {
 	@Override
 	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
 	                                           PotionSplashEvent event) {
-		if (PotionUtils.hasNegativeEffects(potion.getItem())) {
-			// This potion is bad - don't do anything with it
+		boolean hasPositiveEffects = false;
+		for (PotionEffect effect : PotionUtils.getEffects(potion.getItem())) {
+			if (PotionUtils.hasPositiveEffects(effect.getType())) {
+				hasPositiveEffects = true;
+				break;
+			}
+		}
+		if (PotionUtils.hasNegativeEffects(potion.getItem()) && !hasPositiveEffects) {
 			return true;
 		}
 

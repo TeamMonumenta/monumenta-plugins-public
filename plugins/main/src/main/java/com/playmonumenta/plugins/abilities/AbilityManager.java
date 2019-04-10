@@ -108,6 +108,7 @@ import com.playmonumenta.plugins.abilities.scout.Swiftness;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Disengage;
 import com.playmonumenta.plugins.abilities.scout.ranger.PrecisionStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
@@ -121,6 +122,7 @@ import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouchNonReaper;
 import com.playmonumenta.plugins.abilities.warlock.reaper.HungeringVortex;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.EerieEminence;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
@@ -217,6 +219,7 @@ public class AbilityManager {
 		                          new EagleEye(mPlugin, mWorld, mRandom, null),
 		                          new ScoutPassive(mPlugin, mWorld, mRandom, null),
 		                          new SwiftCuts(mPlugin, mWorld, mRandom, null),
+		                          new Sharpshooter(mPlugin, mWorld, mRandom, null),
 
 		                          //RANGER
 		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
@@ -226,7 +229,7 @@ public class AbilityManager {
 		                          //HUNTER
 		                          new EnchantedShot(mPlugin, mWorld, mRandom, null),
 		                          new PinningShot(mPlugin, mWorld, mRandom, null),
-		                          new Sharpshooter(mPlugin, mWorld, mRandom, null),
+		                          new SplitArrow(mPlugin, mWorld, mRandom, null),
 
 		                          // WARRIOR
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
@@ -280,6 +283,7 @@ public class AbilityManager {
 		                          new DarkPact(mPlugin, mWorld, mRandom, null),
 		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
 		                          new HungeringVortex(mPlugin, mWorld, mRandom, null),
+		                          new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
 
 		                          //TENEBRIST
 		                          new EerieEminence(mPlugin, mWorld, mRandom, null),

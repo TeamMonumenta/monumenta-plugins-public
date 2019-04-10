@@ -46,6 +46,7 @@ public class Quickdraw extends Ability {
 		mInfo.scoreboardId = "Quickdraw";
 		mInfo.cooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
@@ -56,29 +57,32 @@ public class Quickdraw extends Ability {
 
 	@Override
 	public boolean cast() {
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.25f);
-		mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 10, 0, 0, 0, 0.2f);
-		Arrow arrow = mPlayer.launchProjectile(Arrow.class);
-		arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		arrow.setVelocity(arrow.getVelocity().multiply(2.25));
-		int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
-		BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
-		if (bm != null) {
-			damage += bm.getBonusDamage();
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.25f);
+			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 10, 0, 0, 0, 0.2f);
+			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			arrow.setVelocity(arrow.getVelocity().multiply(2.25));
+			arrow.setMetadata("QuickdrawDamage", new FixedMetadataValue(mPlugin, 0));
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 		}
-		Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
-		if (bm != null) {
-			damage += ss.getSharpshot();
-		}
-		arrow.setMetadata("Quickdraw", new FixedMetadataValue(mPlugin, damage));
-		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 
 		return true;
 	}
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (arrow.hasMetadata("Quickdraw")) {
+		if (arrow.hasMetadata("QuickdrawDamage")) {
+			int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
+			BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
+			if (bm != null) {
+				damage += bm.getBonusDamage();
+			}
+			Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
+			if (ss != null) {
+				damage += ss.getSharpshot();
+			}
+			event.setDamage(damage);
 			le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
 		}
 		return true;
