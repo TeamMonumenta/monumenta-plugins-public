@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -17,11 +18,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks
@@ -86,25 +91,20 @@ public class ChestOverride extends BaseOverride {
 			ChestUtils.chestScalingLuck(plugin, player, block);
 		}
 
-		if (player == null || player.getGameMode() != GameMode.SPECTATOR) {
+		if (player == null) {
+			return true;
+		} else if (player.getGameMode() != GameMode.SPECTATOR) {
+			check_nerf_chest(block, player);
 			return true;
 		}
 
+		/* Only spectating players get to here */
 		BlockState state = block.getState();
 		if (state instanceof Chest) {
 			Chest chest = (Chest)state;
-			Inventory inv = chest.getBlockInventory();
-			ItemStack[] items = inv.getContents();
-
-			int count = 0;
-			for (ItemStack it : items) {
-				if (it != null) {
-					count++;
-				}
-			}
-
-			if (count == 0) {
-				player.sendMessage(ChatColor.GOLD + "This chest is empty or has a loot table!");
+			LootTable table = chest.getLootTable();
+			if (table != null) {
+				player.sendMessage(ChatColor.GOLD + "This chest has loot table: " + table.getKey().toString());
 				return false;
 			}
 		}
@@ -117,21 +117,31 @@ public class ChestOverride extends BaseOverride {
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		if (!command_chest(block)) {
 			return false;
-		}
-		if ((player.getGameMode() == GameMode.CREATIVE) || _breakable(block)) {
+		} else if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else {
+		} else if (!_breakable(block)) {
 			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
+			return false;
 		}
-		return false;
+
+		check_nerf_chest(block, player);
+
+		return true;
 	}
 
 	@Override
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
 		if (!command_chest(block)) {
 			return false;
+		} else if (!_breakable(block)) {
+			return false;
 		}
-		return _breakable(block);
+
+		for (Player player : PlayerUtils.getNearbyPlayers(block.getLocation(), 30)) {
+			check_nerf_chest(block, player);
+		}
+
+		return true;
 	}
 
 	protected static boolean _breakable(Block block) {
@@ -183,5 +193,94 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 		return true;
+	}
+
+	/*
+	 * TODO: Make this more general and add it to server properties
+	 *
+	 * R2 anti-rush loot table capping mechanism
+	 *
+	 * If Lime = 0 cap overworld loot at t2. If Lime =1+ cap overworld loot at t3, if any other dungeon is also complete remove the cap.
+	 */
+	private static void check_nerf_chest(Block block, Player player) {
+		if (block == null || player == null) {
+			return;
+		}
+
+		BlockState state = block.getState();
+		if (state instanceof Chest) {
+			Chest chest = (Chest)state;
+
+			LootTable table = chest.getLootTable();
+			if (table != null) {
+				final NamespacedKey origNamedKey = table.getKey();
+				final String namespace = origNamedKey.getNamespace();
+				final String key = origNamedKey.getKey();
+				final String keyPrefix;
+				final String keySuffix;
+				final int origLevel;
+				try {
+					/*
+					 * Current tables affected by this:
+					 * "monumenta:loot2/overworld/level_3_vbeach"
+					 * "monumenta:loot2/overworld/level_4_vbeach"
+					 * "monumenta:loot2/overworld/level_5_vbeach"
+					 * "monumenta:loot2/overworld/level_2_vbeach"
+					 * "monumenta:loot2/overworld/level_2_tfrost"
+					 * "monumenta:loot2/overworld/level_3_tfrost"
+					 * "monumenta:loot2/overworld/level_4_tfrost"
+					 * "monumenta:loot2/overworld/level_5_tfrost"
+					 * "monumenta:loot2/overworld/level_2_dcanyon"
+					 * "monumenta:loot2/overworld/level_3_dcanyon"
+					 * "monumenta:loot2/overworld/level_4_dcanyon"
+					 * "monumenta:loot2/overworld/level_5_dcanyon"
+					*/
+					if (key.startsWith("loot2/overworld/level_")) {
+						origLevel = CommandUtils.parseIntFromString(null, key.substring("loot2/overworld/level_".length()).substring(0, 1));
+						keyPrefix = "loot2/overworld/level_";
+					} else if (key.startsWith("r2/world/tiered_chests/level_")) {
+						origLevel = CommandUtils.parseIntFromString(null, key.substring("r2/world/tiered_chests/level_".length()).substring(0, 1));
+						keyPrefix = "r2/world/tiered_chests/level_";
+					} else {
+						// Nothing to do - not an adjustable table
+						return;
+					}
+					keySuffix = key.substring(keyPrefix.length() + 1);
+				} catch (Exception e) {
+					// Nothing to do - can't parse
+					return;
+				}
+
+				if (ScoreboardUtils.getScoreboardValue(player, "Pink") > 0
+					|| ScoreboardUtils.getScoreboardValue(player, "Gray") > 0
+					|| ScoreboardUtils.getScoreboardValue(player, "Cyan") > 0) {
+					// Nothing to do - player has met the prereqs
+					return;
+				}
+
+				final int level;
+				if (ScoreboardUtils.getScoreboardValue(player, "Lime") == 0) {
+					level = Math.min(origLevel, 2);
+				} else {
+					level = Math.min(origLevel, 3);
+				}
+
+				if (level != origLevel) {
+					// Level was capped!
+					player.sendMessage(ChatColor.RED + "Loot in this chest will improve when you are higher level");
+
+					final NamespacedKey newNamedKey = new NamespacedKey(namespace, keyPrefix + Integer.toString(level) + keySuffix);
+					if (player.getGameMode().equals(GameMode.CREATIVE) && player.isOp()) {
+						player.sendMessage(ChatColor.GOLD + "Original: " + origNamedKey.toString());
+						player.sendMessage(ChatColor.GOLD + "Adjusted: " + newNamedKey.toString());
+						player.sendMessage(ChatColor.GOLD + "This info is only shown to creative mode operators");
+					}
+
+					LootTable newTable = Bukkit.getLootTable(newNamedKey);
+					chest.setLootTable(newTable);
+					chest.update();
+				}
+			}
+		}
 	}
 }
