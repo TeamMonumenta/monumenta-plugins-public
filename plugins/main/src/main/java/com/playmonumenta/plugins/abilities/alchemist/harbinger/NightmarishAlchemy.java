@@ -42,7 +42,7 @@ public class NightmarishAlchemy extends Ability {
 				int damage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 				float chance = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_CONFUSION_CHANCE : NIGHTMARISH_ALCHEMY_2_CONFUSION_CHANCE;
 				for (LivingEntity entity : affectedEntities) {
-					if (EntityUtils.isHostileMob(entity)) {
+					if (EntityUtils.isHostileMob(entity) && entity instanceof Creature) {
 						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
 						if (!EntityUtils.isBoss(entity) && mRandom.nextFloat() < chance) {
 							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(entity.getLocation(), NIGHTMARISH_ALCHEMY_CONFUSION_RANGE);

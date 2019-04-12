@@ -14,7 +14,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -30,7 +29,8 @@ public class CounterStrike extends Ability {
 	private static final int COUNTER_STRIKE_2_DAMAGE = 12;
 	private static final float COUNTER_STRIKE_RADIUS = 5.0f;
 
-	private boolean active = false;
+	private boolean mActive = false;
+	private int mRiposteTriggeredTick = 0;
 
 	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -56,19 +56,19 @@ public class CounterStrike extends Ability {
 			}
 		}
 
-		// Need to wait a tick so that Riposte will set its trigger values first
+		// Need to wait a tick so that Riposte has a chance to activate first
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.COUNTER_STRIKE)) {
-					Riposte rp = (Riposte) AbilityManager.getManager().getPlayerAbility(mPlayer, Riposte.class);
-					if (mPlayer.isBlocking() || rp != null && rp.hasTriggered()) {
+					// Counterstrike becomes active when player is hit while blocking OR if hit and riposte has triggered in the last 5 ticks
+					if (mPlayer.isBlocking() || (mPlayer.getTicksLived() - mRiposteTriggeredTick < 5)) {
 						mPlayer.spawnParticle(Particle.CRIT, mPlayer.getLocation(), 10, 0, 0, 0, 1);
-						active = true;
+						mActive = true;
 						new BukkitRunnable() {
 							@Override
 							public void run() {
-								active = false;
+								mActive = false;
 								this.cancel();
 							}
 						}.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
@@ -83,7 +83,7 @@ public class CounterStrike extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active) {
+		if (mActive) {
 			ParticleUtils.explodingConeEffect(mPlugin, mPlayer, COUNTER_STRIKE_DISTANCE, Particle.SWEEP_ATTACK, 1, Particle.SWEEP_ATTACK, 0, COUNTER_STRIKE_DOT_ANGLE);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
 			LivingEntity damagee = (LivingEntity) event.getEntity();
@@ -111,4 +111,7 @@ public class CounterStrike extends Ability {
 		return true;
 	}
 
+	protected void riposteTriggered() {
+		mRiposteTriggeredTick = mPlayer.getTicksLived();
+	}
 }
