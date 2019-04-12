@@ -86,14 +86,7 @@ public class WindWalk extends Ability {
 				mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 2, 0.25, 0.45, 0.25, 0.15);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 4, 0, 0, 0, 0.8);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), WIND_WALK_RADIUS)) {
-					boolean cancel = false;
-					for (LivingEntity le : mobsAlreadyHit) {
-						if (mob.getUniqueId() == le.getUniqueId()) {
-							cancel = true;
-							break;
-						}
-					}
-					if (!cancel) {
+					if (!mobsAlreadyHit.contains(mob)) {
 						if (EntityUtils.isElite(mob)) {
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation(), 1, 0, 0, 0, 0);
 							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation(), 20, 0, 0, 0, 0.4);
