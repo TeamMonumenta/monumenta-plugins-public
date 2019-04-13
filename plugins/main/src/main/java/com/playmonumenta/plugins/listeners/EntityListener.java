@@ -32,6 +32,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -538,12 +539,39 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	// Entity Explode Event
 	// Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void EntityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
 		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getLocation());
+		if (zone != LocationType.None) {
+			event.setCancelled(true);
+			return;
+		}
+
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+
+			// If any block damaged by an explosion is with a safezone, cancel the explosion
+			if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// If this block is "unbreakable" than we want to remove it from the list.
+			if (mPlugin.mServerProperties.mUnbreakableBlocks.contains(block.getType()) ||
+			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
+				iter.remove();
+			}
+		}
+	}
+
+	// Cancel explosions in safezones
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void BlockExplodeEvent(BlockExplodeEvent event) {
+		// Cancel the event immediately if within a safezone
+		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getBlock().getLocation());
 		if (zone != LocationType.None) {
 			event.setCancelled(true);
 			return;
