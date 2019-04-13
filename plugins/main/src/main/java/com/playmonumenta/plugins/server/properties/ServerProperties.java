@@ -30,6 +30,7 @@ public class ServerProperties {
 	private int mPlotSurvivalMinHeight = 256;
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
+	private boolean mClassSpecializationsEnabled = false;
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	public Set<String> mForbiddenItemLore = new HashSet<>();
@@ -68,6 +69,10 @@ public class ServerProperties {
 		return mKeepLowTierInventory;
 	}
 
+	public boolean getClassSpecializationsEnabled() {
+		return mClassSpecializationsEnabled;
+	}
+
 	public void load(Plugin plugin, CommandSender sender) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
@@ -97,19 +102,20 @@ public class ServerProperties {
 				//  Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled         = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled       = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled       = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
-					mIsTownWorld               = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled   = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
-					mPlotSurvivalMinHeight     = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mIsSleepingEnabled         = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
-					mKeepLowTierInventory      = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
+					mDailyResetEnabled           = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled         = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled         = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld                 = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled     = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight       = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mIsSleepingEnabled           = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mKeepLowTierInventory        = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
+					mClassSpecializationsEnabled = _getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 
-					mAllowedTransferTargets    = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
-					mForbiddenItemLore         = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
+					mAllowedTransferTargets      = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mForbiddenItemLore           = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
-					mUnbreakableBlocks         = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
+					mUnbreakableBlocks           = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
 
 					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
 

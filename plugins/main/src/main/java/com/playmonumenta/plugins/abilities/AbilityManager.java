@@ -165,10 +165,10 @@ public class AbilityManager {
 		mManager = this;
 
 		mReferenceAbilities = Arrays.asList(
-								  // ALL (CLUCKING POTIONS)
-								  new CluckingPotions(mPlugin, mWorld, mRandom, null),
+		                          // ALL (CLUCKING POTIONS)
+		                          new CluckingPotions(mPlugin, mWorld, mRandom, null),
 
-		                          // MAGE
+		                          /********** MAGE **********/
 		                          new ArcaneStrike(mPlugin, mWorld, mRandom, null),
 		                          new ElementalArrows(mPlugin, mWorld, mRandom, null),
 		                          new FrostNova(mPlugin, mWorld, mRandom, null),
@@ -178,18 +178,7 @@ public class AbilityManager {
 		                          new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                          new Spellshock(mPlugin, mWorld, mRandom, null),
 
-		                          // ELEMENTALIST
-		                          new FrostRay(mPlugin, mWorld, mRandom, null),
-		                          new MeteorStrike(mPlugin, mWorld, mRandom, null),
-		                          new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
-		                          new Blizzard(mPlugin, mWorld, mRandom, null),
-
-		                          // MAGE SWORDSMAN
-		                          new FlashSword(mPlugin, mWorld, mRandom, null),
-		                          new Overload(mPlugin, mWorld, mRandom, null),
-		                          new SagesInsight(mPlugin, mWorld, mRandom, null),
-
-		                          // ROGUE
+		                          /********** ROGUE **********/
 		                          new AdvancingShadows(mPlugin, mWorld, mRandom, null),
 		                          new ByMyBlade(mPlugin, mWorld, mRandom, null),
 		                          new DaggerThrow(mPlugin, mWorld, mRandom, null),
@@ -199,19 +188,7 @@ public class AbilityManager {
 		                          new Smokescreen(mPlugin, mWorld, mRandom, null),
 		                          new ViciousCombos(mPlugin, mWorld, mRandom, null),
 
-		                          // ROGUE -- SWORDSAGE
-
-		                          new WindWalk(mPlugin, mWorld, mRandom, null),
-		                          new BladeDance(mPlugin, mWorld, mRandom, null),
-		                          new DeadlyRonde(mPlugin, mWorld, mRandom, null),
-
-		                          // ROGUE -- ASSASSIN
-
-		                          new PerfectKill(mPlugin, mWorld, mRandom, null),
-		                          new CoupDeGrace(mPlugin, mWorld, mRandom, null),
-		                          new CloakAndDagger(mPlugin, mWorld, mRandom, null),
-
-		                          // SCOUT
+		                          /********** SCOUT **********/
 		                          new Agility(mPlugin, mWorld, mRandom, null),
 		                          new BowMastery(mPlugin, mWorld, mRandom, null),
 		                          new Volley(mPlugin, mWorld, mRandom, null),
@@ -221,17 +198,7 @@ public class AbilityManager {
 		                          new SwiftCuts(mPlugin, mWorld, mRandom, null),
 		                          new Sharpshooter(mPlugin, mWorld, mRandom, null),
 
-		                          //RANGER
-		                          new Quickdraw(mPlugin, mWorld, mRandom, null),
-		                          new Disengage(mPlugin, mWorld, mRandom, null),
-		                          new PrecisionStrike(mPlugin, mWorld, mRandom, null),
-
-		                          //HUNTER
-		                          new EnchantedShot(mPlugin, mWorld, mRandom, null),
-		                          new PinningShot(mPlugin, mWorld, mRandom, null),
-		                          new SplitArrow(mPlugin, mWorld, mRandom, null),
-
-		                          // WARRIOR
+		                          /********** WARRIOR **********/
 		                          new BruteForce(mPlugin, mWorld, mRandom, null),
 		                          new CounterStrike(mPlugin, mWorld, mRandom, null),
 		                          new DefensiveLine(mPlugin, mWorld, mRandom, null),
@@ -240,17 +207,8 @@ public class AbilityManager {
 		                          new Toughness(mPlugin, mWorld, mRandom, null),
 		                          new WarriorPassive(mPlugin, mWorld, mRandom, null),
 		                          new WeaponryMastery(mPlugin, mWorld, mRandom, null),
-		                          // BERSERKER
-		                          new MeteorSlam(mPlugin, mWorld, mRandom, null),
-		                          new GrowingRage(mPlugin, mWorld, mRandom, null),
-		                          new Rampage(mPlugin, mWorld, mRandom, null),
 
-		                          //GUARDIAN
-		                          new ShieldWall(mPlugin, mWorld, mRandom, null),
-		                          new Challenge(mPlugin, mWorld, mRandom, null),
-		                          new Bodyguard(mPlugin, mWorld, mRandom, null),
-
-		                          // CLERIC
+		                          /********** CLERIC **********/
 		                          new Celestial(mPlugin, mWorld, mRandom, null),
 		                          new CleansingRain(mPlugin, mWorld, mRandom, null),
 		                          new HandOfLight(mPlugin, mWorld, mRandom, null),
@@ -259,17 +217,8 @@ public class AbilityManager {
 		                          new HeavenlyBoon(mPlugin, mWorld, mRandom, null),
 		                          new Rejuvenation(mPlugin, mWorld, mRandom, null),
 		                          new Sanctified(mPlugin, mWorld, mRandom, null),
-		                          // PALADIN
-		                          new HolyJavelin(mPlugin, mWorld, mRandom, null),
-		                          new ChoirBells(mPlugin, mWorld, mRandom, null),
-		                          new LuminousInfusion(mPlugin, mWorld, mRandom, null),
 
-		                          // HIEROPHANT
-		                          new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
-		                          new HallowedBeam(mPlugin, mWorld, mRandom, null),
-		                          new ThuribleProcession(mPlugin, mWorld, mRandom, null),
-
-		                          //WARLOCK
+		                          /********** WARLOCK **********/
 		                          new AmplifyingHex(mPlugin, mWorld, mRandom, null),
 		                          new BlasphemousAura(mPlugin, mWorld, mRandom, null),
 		                          new ConsumingFlames(mPlugin, mWorld, mRandom, null),
@@ -279,18 +228,7 @@ public class AbilityManager {
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
 		                          new Harvester(mPlugin, mWorld, mRandom, null),
 
-		                          //REAPER
-		                          new DarkPact(mPlugin, mWorld, mRandom, null),
-		                          new DeathsTouch(mPlugin, mWorld, mRandom, null),
-		                          new HungeringVortex(mPlugin, mWorld, mRandom, null),
-		                          new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
-
-		                          //TENEBRIST
-		                          new EerieEminence(mPlugin, mWorld, mRandom, null),
-		                          new FractalEnervation(mPlugin, mWorld, mRandom, null),
-		                          new WitheringGaze(mPlugin, mWorld, mRandom, null),
-
-		                          // ALCHEMIST
+		                          /********** ALCHEMIST **********/
 		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),
 		                          new UnstableArrows(mPlugin, mWorld, mRandom, null),
 		                          new PowerInjection(mPlugin, mWorld, mRandom, null),
@@ -299,15 +237,6 @@ public class AbilityManager {
 		                          new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
 		                          new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
 		                          new AlchemistPotions(mPlugin, mWorld, mRandom, null),
-		                          // HARBINGER
-		                          new AdrenalSerum(mPlugin, mWorld, mRandom, null),
-		                          new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
-		                          new PurpleHaze(mPlugin, mWorld, mRandom, null),
-
-		                          // APOTHECARY
-		                          new Beozar(mPlugin, mWorld, mRandom, null),
-		                          new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
-		                          new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
 
 		                          // ALL PLAYERS (but technically for Alchemist)
 		                          new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
@@ -320,6 +249,89 @@ public class AbilityManager {
 		                          new PatreonPurple(mPlugin, mWorld, mRandom, null),
 		                          new PatreonRed(mPlugin, mWorld, mRandom, null)
 		                      );
+
+		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
+			mReferenceAbilities.addAll(Arrays.asList(
+			                               /********** MAGE **********/
+			                               // ELEMENTALIST
+			                               new FrostRay(mPlugin, mWorld, mRandom, null),
+			                               new MeteorStrike(mPlugin, mWorld, mRandom, null),
+			                               new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
+			                               new Blizzard(mPlugin, mWorld, mRandom, null),
+
+			                               // MAGE SWORDSMAN
+			                               new FlashSword(mPlugin, mWorld, mRandom, null),
+			                               new Overload(mPlugin, mWorld, mRandom, null),
+			                               new SagesInsight(mPlugin, mWorld, mRandom, null),
+
+			                               /********** ROGUE **********/
+			                               // SWORDSAGE
+			                               new WindWalk(mPlugin, mWorld, mRandom, null),
+			                               new BladeDance(mPlugin, mWorld, mRandom, null),
+			                               new DeadlyRonde(mPlugin, mWorld, mRandom, null),
+
+			                               // ASSASSIN
+			                               new PerfectKill(mPlugin, mWorld, mRandom, null),
+			                               new CoupDeGrace(mPlugin, mWorld, mRandom, null),
+			                               new CloakAndDagger(mPlugin, mWorld, mRandom, null),
+
+			                               /********** SCOUT **********/
+			                               // RANGER
+			                               new Quickdraw(mPlugin, mWorld, mRandom, null),
+			                               new Disengage(mPlugin, mWorld, mRandom, null),
+			                               new PrecisionStrike(mPlugin, mWorld, mRandom, null),
+
+			                               // HUNTER
+			                               new EnchantedShot(mPlugin, mWorld, mRandom, null),
+			                               new PinningShot(mPlugin, mWorld, mRandom, null),
+			                               new SplitArrow(mPlugin, mWorld, mRandom, null),
+
+			                               /********** WARRIOR **********/
+			                               // BERSERKER
+			                               new MeteorSlam(mPlugin, mWorld, mRandom, null),
+			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
+			                               new Rampage(mPlugin, mWorld, mRandom, null),
+
+			                               // GUARDIAN
+			                               new ShieldWall(mPlugin, mWorld, mRandom, null),
+			                               new Challenge(mPlugin, mWorld, mRandom, null),
+			                               new Bodyguard(mPlugin, mWorld, mRandom, null),
+
+			                               /********** CLERIC **********/
+			                               // PALADIN
+			                               new HolyJavelin(mPlugin, mWorld, mRandom, null),
+			                               new ChoirBells(mPlugin, mWorld, mRandom, null),
+			                               new LuminousInfusion(mPlugin, mWorld, mRandom, null),
+
+			                               // HIEROPHANT
+			                               new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
+			                               new HallowedBeam(mPlugin, mWorld, mRandom, null),
+			                               new ThuribleProcession(mPlugin, mWorld, mRandom, null),
+
+			                               /********** WARLOCK **********/
+			                               // REAPER
+			                               new DarkPact(mPlugin, mWorld, mRandom, null),
+			                               new DeathsTouch(mPlugin, mWorld, mRandom, null),
+			                               new HungeringVortex(mPlugin, mWorld, mRandom, null),
+			                               new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
+
+			                               // TENEBRIST
+			                               new EerieEminence(mPlugin, mWorld, mRandom, null),
+			                               new FractalEnervation(mPlugin, mWorld, mRandom, null),
+			                               new WitheringGaze(mPlugin, mWorld, mRandom, null),
+
+			                               /********** ALCHEMIST **********/
+			                               // HARBINGER
+			                               new AdrenalSerum(mPlugin, mWorld, mRandom, null),
+			                               new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
+			                               new PurpleHaze(mPlugin, mWorld, mRandom, null),
+
+			                               // APOTHECARY
+			                               new Beozar(mPlugin, mWorld, mRandom, null),
+			                               new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
+			                               new InvigoratingOdor(mPlugin, mWorld, mRandom, null)
+			                           ));
+		}
 	}
 
 	public static AbilityManager getManager() {
