@@ -443,7 +443,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		if (!event.getKeepInventory() && mPlugin.mServerProperties.getKeepLowTierInventory()) {
+		if (!event.getKeepInventory()) {
 			/* Monumenta-custom keep inventory
 			 *
 			 * Keep armor and hotbar items if they meet some conditions (_isKeptItemOnDeath)
@@ -465,7 +465,9 @@ public class PlayerListener implements Listener {
 				if (item != null) {
 					if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) != 0) {
 						inv.clear(slotId);
-					} else if (_isKeptItemOnDeath(item) && (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
+					} else if (mPlugin.mServerProperties.getKeepLowTierInventory() &&
+					           _isKeptItemOnDeath(item) &&
+							   (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
 						// Good matching item that does not have curse of binding - will be kept on death
 						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
 						if (meta == null || !(meta instanceof Damageable)) {
