@@ -7,7 +7,7 @@ for x in main bosses nms; do
 	./upload-build.sh
 	ret=$?
 	if [[ $ret -ne 0 ]]; then
-		echo "Build Failed!" >2
+		echo "Build Failed!" >&2
 		exit $ret
 	fi
 done

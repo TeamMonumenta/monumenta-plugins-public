@@ -7,7 +7,7 @@ for x in main bosses nms; do
 	./compile.sh
 	ret=$?
 	if [[ $ret -ne 0 ]]; then
-		echo "Build Failed!" >2
+		echo "Upload Failed!" >&2
 		exit $ret
 	fi
 done
