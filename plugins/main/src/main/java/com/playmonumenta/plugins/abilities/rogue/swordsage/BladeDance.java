@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class BladeDance extends Ability {
 
@@ -135,16 +136,26 @@ public class BladeDance extends Ability {
 							mPlayer.setInvulnerable(false);
 							mActive = false;
 							mTriggerActive = true;
-							this.cancel();
-
+							mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1f);
+							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Blade Dance Damage: " + (int)(extraDamage + (getAbilityScore() == 1 ? DANCE_1_BASE_DAMAGE : DANCE_2_BASE_DAMAGE)));
 							new BukkitRunnable() {
+								int t = 0;
 								@Override
 								public void run() {
-									mTriggerActive = false;
-									extraDamage = 0;
-									this.cancel();
+									t += 2;
+									mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 1, 0), 5, 0.5, 0.4, 0.5, 0);
+									mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation().add(0, 1, 0), 4, 0.5, 0.4, 0.5, 0);
+									if (!mTriggerActive) {
+										this.cancel();
+									} else if (t >= DANCE_ACTIVATION_PERIOD) {
+										mTriggerActive = false;
+										extraDamage = 0;
+										this.cancel();
+									}
 								}
-							}.runTaskLater(mPlugin, DANCE_ACTIVATION_PERIOD);
+
+							}.runTaskTimer(mPlugin, 0, 2);
+							this.cancel();
 						}
 					}
 				}.runTaskTimer(mPlugin, 0, 2);
@@ -196,6 +207,7 @@ public class BladeDance extends Ability {
 				EntityUtils.damageEntity(mPlugin, le, damage + extraDamage, mPlayer);
 			}
 			extraDamage = 0;
+			mTriggerActive = false;
 		}
 		return true;
 	}

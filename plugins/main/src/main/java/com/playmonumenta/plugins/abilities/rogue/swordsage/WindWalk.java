@@ -83,19 +83,18 @@ public class WindWalk extends Ability {
 			List<LivingEntity> mobsAlreadyHit = new ArrayList<LivingEntity>();
 			@Override
 			public void run() {
-				mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 2, 0.25, 0.45, 0.25, 0.15);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 4, 0, 0, 0, 0.8);
+				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), WIND_WALK_RADIUS)) {
 					if (!mobsAlreadyHit.contains(mob)) {
 						if (EntityUtils.isElite(mob)) {
-							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation(), 1, 0, 0, 0, 0);
-							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation(), 20, 0, 0, 0, 0.4);
-							mWorld.playSound(mob.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1f);
+							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
+							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
+							mWorld.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 0.75f);
 							EntityUtils.applyStun(mPlugin, duration, mob);
 						} else if (!EntityUtils.isBoss(mob)) {
-							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation(), 4, 0, 0, 0, 0.15);
-							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation(), 20, 0, 0, 0, 0.4);
-							mWorld.playSound(mob.getLocation(), Sound.ENTITY_ARROW_SHOOT, 0.5f, 1f);
+							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
+							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
+							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 							mob.setVelocity(mob.getVelocity().setY(0.5));
 							mob.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, duration, 0, true, false));
 							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, duration + 20 * 3, 0, true, false));

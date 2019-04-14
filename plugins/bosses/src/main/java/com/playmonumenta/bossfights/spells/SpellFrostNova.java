@@ -22,7 +22,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.SNOWBALL, loc, 2, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -32,7 +32,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.2);
+				world.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.2);
 				world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
 			},
 			(Location loc) -> {

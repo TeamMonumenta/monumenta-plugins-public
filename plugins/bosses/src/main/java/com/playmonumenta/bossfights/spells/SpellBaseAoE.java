@@ -4,7 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /*
@@ -89,24 +92,23 @@ public class SpellBaseAoE extends Spell {
 
 	@Override
 	public void run() {
-		Location origLoc = mLauncher.getLocation();
 
 		World world = mLauncher.getWorld();
+		if (!mCanMoveWhileCasting) {
+			((LivingEntity) mLauncher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
+		}
 		new BukkitRunnable() {
 			float j = 0;
 			double radius = mRadius;
 
 			@Override
 			public void run() {
-				Location loc;
+				Location loc = mLauncher.getLocation();
 
-				if (mCanMoveWhileCasting) {
-					loc = mLauncher.getLocation();
-				} else {
-					mLauncher.teleport(origLoc);
-					loc = origLoc.clone();
+				if (mLauncher.isDead() || !mLauncher.isValid()) {
+					this.cancel();
+					return;
 				}
-
 				j++;
 				mChargeAuraAction.run(loc.clone().add(0, 1, 0));
 				if (j <= (mDuration - 5)) {

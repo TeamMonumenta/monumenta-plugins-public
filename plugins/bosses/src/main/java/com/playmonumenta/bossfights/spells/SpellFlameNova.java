@@ -30,7 +30,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.FLAME, loc, 3, 0.1, 0.1, 0.1, 0.3);
+				world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.3);
 				world.spawnParticle(Particle.LAVA, loc, 1, 0.25, 0.25, 0.25, 0);
 			},
 			(Location loc) -> {

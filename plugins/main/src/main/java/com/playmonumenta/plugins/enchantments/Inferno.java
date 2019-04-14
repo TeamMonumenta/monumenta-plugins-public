@@ -53,8 +53,8 @@ public class Inferno implements BaseEnchantment {
 			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
 
 			if (mainHandLevel > 0 && offHandLevel > 0
-				&& player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
-				&& player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
+			    && player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
+			    && player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
 				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
 				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
 			}
@@ -122,7 +122,7 @@ public class Inferno implements BaseEnchantment {
 		if (!sTaggedMobs.isEmpty()) {
 			Integer infernoValue = sTaggedMobs.get(mob);
 			if (infernoValue != null) {
-				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 3, 0.2, 0.6, 0.2, 1);
+				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 				event.setDamage(event.getDamage() + infernoValue);
 			}
 		}
