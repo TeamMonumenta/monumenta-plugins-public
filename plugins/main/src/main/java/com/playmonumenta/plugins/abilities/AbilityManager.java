@@ -164,7 +164,8 @@ public class AbilityManager {
 		mRandom = random;
 		mManager = this;
 
-		mReferenceAbilities = Arrays.asList(
+		mReferenceAbilities = new ArrayList<Ability>();
+		mReferenceAbilities.addAll(Arrays.asList(
 		                          // ALL (CLUCKING POTIONS)
 		                          new CluckingPotions(mPlugin, mWorld, mRandom, null),
 
@@ -248,7 +249,7 @@ public class AbilityManager {
 		                          new PatreonGreen(mPlugin, mWorld, mRandom, null),
 		                          new PatreonPurple(mPlugin, mWorld, mRandom, null),
 		                          new PatreonRed(mPlugin, mWorld, mRandom, null)
-		                      );
+		                      ));
 
 		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(Arrays.asList(
