@@ -14,7 +14,7 @@ import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
 import com.playmonumenta.bossfights.spells.Spell;
 
 public class Boss {
-	List<BossAbilityGroup> mAbilities;
+	private final List<BossAbilityGroup> mAbilities;
 
 	public Boss(BossAbilityGroup ability) {
 		mAbilities = new ArrayList<BossAbilityGroup>(5);

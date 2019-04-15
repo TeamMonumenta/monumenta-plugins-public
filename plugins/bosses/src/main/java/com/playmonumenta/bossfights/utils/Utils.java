@@ -126,6 +126,22 @@ public class Utils {
 		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
 	}
 
+	/*
+	 * TODO: This is really janky - it *probably* returns the correct entity... but it might not
+	 */
+	public static Entity summonEntityAt(Location loc, String id, String nbt) throws Exception {
+		String cmd = "summon " + id + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+
+		List<Entity> entities = new ArrayList<Entity>(loc.getNearbyEntities(1f, 1f, 1f));
+		if (entities.size() <= 0) {
+			throw new Exception("Summoned mob but no mob appeared - " + cmd);
+		}
+
+		entities.sort((left, right) -> left.getLocation().distance(loc) >= right.getLocation().distance(loc) ? 1 : -1);
+		return entities.get(0);
+	}
+
 	public static List<Player> getNearbyPlayers(Location loc, double radius) {
 		List<Player> players = new ArrayList<Player>(Bukkit.getOnlinePlayers().size());
 

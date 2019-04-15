@@ -1,5 +1,6 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -31,8 +32,13 @@ public abstract class Spell implements Cloneable {
 	 * and then remove them from mActiveRunnables when they are finished
 	 */
 	public void cancel() {
-		for (BukkitRunnable runnable : mActiveRunnables) {
-			runnable.cancel();
+		Iterator<BukkitRunnable> iterator = mActiveRunnables.iterator();
+		while (iterator.hasNext()) {
+			BukkitRunnable runnable = iterator.next();
+			if (!runnable.isCancelled()) {
+				runnable.cancel();
+			}
+			iterator.remove();
 		}
 	}
 

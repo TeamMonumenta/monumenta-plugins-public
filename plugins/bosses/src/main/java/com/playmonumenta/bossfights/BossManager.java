@@ -12,8 +12,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -24,12 +26,14 @@ import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -90,7 +94,13 @@ import com.playmonumenta.bossfights.bosses.VolatileBoss;
 import com.playmonumenta.bossfights.bosses.WeaponSwitchBoss;
 import com.playmonumenta.bossfights.bosses.WinterSnowmanEventBoss;
 import com.playmonumenta.bossfights.bosses.WitherHitBoss;
+import com.playmonumenta.bossfights.bosses.gray.GrayBookSummoner;
+import com.playmonumenta.bossfights.bosses.gray.GrayDemonSummoner;
+import com.playmonumenta.bossfights.bosses.gray.GrayGolemSummoner;
+import com.playmonumenta.bossfights.bosses.gray.GrayScarabSummoner;
+import com.playmonumenta.bossfights.bosses.gray.GraySummoned;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class BossManager implements Listener {
 
@@ -169,6 +179,11 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new CyanSummonBoss(p, e));
 		mStatelessBosses.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> new WitherHitBoss(p, e));
 		mStatelessBosses.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> new VolatileBoss(p, e));
+		mStatelessBosses.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayDemonSummoner(p, e));
+		mStatelessBosses.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayGolemSummoner(p, e));
+		mStatelessBosses.put(GrayScarabSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayScarabSummoner(p, e));
+		mStatelessBosses.put(GrayBookSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayBookSummoner(p, e));
+		mStatelessBosses.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> new GraySummoned(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -244,6 +259,11 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> WitherHitBoss.deserialize(p, e));
 		mBossDeserializers.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> VolatileBoss.deserialize(p, e));
 		mBossDeserializers.put(RabbitGodBoss.identityTag, (Plugin p, LivingEntity e) -> RabbitGodBoss.deserialize(p, e));
+		mBossDeserializers.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayDemonSummoner.deserialize(p, e));
+		mBossDeserializers.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayGolemSummoner.deserialize(p, e));
+		mBossDeserializers.put(GrayScarabSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayScarabSummoner.deserialize(p, e));
+		mBossDeserializers.put(GrayBookSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayBookSummoner.deserialize(p, e));
+		mBossDeserializers.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> GraySummoned.deserialize(p, e));
 	}
 
 	/********************************************************************************
@@ -438,6 +458,22 @@ public class BossManager implements Listener {
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
 
+	}
+
+	/* Another weird one - used for exorcism potion */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void LingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
+		LingeringPotion potEntity = event.getEntity();
+		if (InventoryUtils.testForItemWithLore(potEntity.getItem(), "Exorcism")) {
+			AreaEffectCloud cloud = event.getAreaEffectCloud();
+			if (event.getAreaEffectCloud() != null) {
+				cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
+				cloud.setDurationOnUse(0);
+				cloud.setRadiusOnUse(0);
+				cloud.setRadiusOnUse(0);
+				cloud.setRadiusPerTick(-0.004f);
+			}
+		}
 	}
 
 	/********************************************************************************
