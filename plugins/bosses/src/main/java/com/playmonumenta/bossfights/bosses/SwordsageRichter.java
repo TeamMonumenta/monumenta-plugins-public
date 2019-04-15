@@ -64,6 +64,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mBoss.setRemoveWhenFarAway(false);
 		World world = mSpawnLoc.getWorld();
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(

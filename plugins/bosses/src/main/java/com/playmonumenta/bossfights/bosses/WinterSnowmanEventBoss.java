@@ -34,6 +34,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public WinterSnowmanEventBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		mBoss = boss;
 		mPlugin = plugin;
+		mBoss.setRemoveWhenFarAway(false);
 
 		if (!(boss instanceof Snowman)) {
 			throw new Exception("boss_winter_snowman only works on snowmen!");

@@ -69,6 +69,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 		phase2 = false;
+		mBoss.setRemoveWhenFarAway(false);
 		World world = mBoss.getWorld();
 
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 25, 10, false, 12, 6,

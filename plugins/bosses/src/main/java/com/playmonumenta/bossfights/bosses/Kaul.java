@@ -148,6 +148,7 @@ public class Kaul extends BossAbilityGroup {
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mBoss.setRemoveWhenFarAway(false);
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		for (Entity e : boss.getWorld().getEntities()) {

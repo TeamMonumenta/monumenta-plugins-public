@@ -19,6 +19,7 @@ public class GenericBoss extends BossAbilityGroup {
 
 	public GenericBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
+		mBoss.setRemoveWhenFarAway(false);
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SOLID, null);
 

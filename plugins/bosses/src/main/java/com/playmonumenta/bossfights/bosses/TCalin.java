@@ -55,6 +55,7 @@ public class TCalin extends BossAbilityGroup {
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mBoss.setRemoveWhenFarAway(false);
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, true,

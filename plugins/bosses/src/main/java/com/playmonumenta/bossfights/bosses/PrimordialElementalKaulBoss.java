@@ -69,6 +69,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 
 	public PrimordialElementalKaulBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
+		mBoss.setRemoveWhenFarAway(false);
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
 		int bossTargetHp = 0;

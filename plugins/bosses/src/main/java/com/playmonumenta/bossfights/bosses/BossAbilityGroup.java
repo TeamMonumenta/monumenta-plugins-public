@@ -74,7 +74,6 @@ public abstract class BossAbilityGroup {
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 
-		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag(identityTag);
 
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

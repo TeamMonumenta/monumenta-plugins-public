@@ -60,6 +60,7 @@ public class Azacor extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.setRemoveWhenFarAway(false);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellChangeFloor(plugin, mBoss, spawnLoc, 24, 3, Material.LAVA, 400),
 			new SpellFireball(plugin, boss, detectionRange, 40, 1, 160, 2.0f, true, false,

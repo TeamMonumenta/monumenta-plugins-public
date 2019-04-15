@@ -58,6 +58,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		mEndLoc = endLoc;
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
+		mBoss.setRemoveWhenFarAway(false);
 
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25,
 			(Player player) -> {

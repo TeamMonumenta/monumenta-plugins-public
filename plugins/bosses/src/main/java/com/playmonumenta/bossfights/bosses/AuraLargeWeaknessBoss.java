@@ -34,6 +34,7 @@ public class AuraLargeWeaknessBoss extends BossAbilityGroup {
 			                  })
 		);
 
+		mBoss.setRemoveWhenFarAway(false);
 		super.constructBoss(plugin, identityTag, mBoss, null, passiveSpells, detectionRange, null);
 	}
 }

@@ -20,6 +20,7 @@ public class CyanSummonBoss extends BossAbilityGroup {
 
 	public CyanSummonBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
+		mBoss.setRemoveWhenFarAway(false);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 		                                                 new SpellCyanSummon(plugin, mBoss)

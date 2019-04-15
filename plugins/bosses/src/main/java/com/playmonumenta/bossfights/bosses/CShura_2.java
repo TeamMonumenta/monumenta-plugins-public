@@ -55,6 +55,7 @@ public class CShura_2 extends BossAbilityGroup {
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
+		mBoss.setRemoveWhenFarAway(false);
 
 		mBoss.addScoreboardTag("Boss");
 
