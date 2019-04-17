@@ -40,6 +40,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -918,5 +919,11 @@ public class PlayerListener implements Listener {
 	public void EvasionEvent(EvasionEvent event) {
 		Player player = event.getPlayer();
 		mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
+	}
+
+	@EventHandler
+	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
+		Player player = event.getPlayer();
+		AbilityManager.getManager().PlayerAnimationEvent(player, event);
 	}
 }

@@ -9,7 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -40,11 +40,11 @@ public class BladeDance extends Ability {
 	 * Cooldown: 40 seconds
 	 */
 
-	private static final int DANCE_1_BASE_DAMAGE = 9;
-	private static final int DANCE_2_BASE_DAMAGE = 12;
-	private static final double DANCE_1_SCALING_DAMAGE = 1;
-	private static final double DANCE_2_SCALING_DAMAGE = 1.5;
-	private static final int DANCE_ACTIVATION_PERIOD = 20 * 4;
+	private static final int DANCE_1_BASE_DAMAGE = 12;
+	private static final int DANCE_2_BASE_DAMAGE = 16;
+	private static final double DANCE_1_SCALING_DAMAGE = 0.75;
+	private static final double DANCE_2_SCALING_DAMAGE = 1;
+	private static final int DANCE_ACTIVATION_PERIOD = 20 * 5;
 	private static final int DANCE_RADIUS = 4;
 
 	private boolean mActive = false;
@@ -166,9 +166,9 @@ public class BladeDance extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
 		if (mActive) {
-			return false;
+			return;
 		} else if (mTriggerActive) {
 			int damage = getAbilityScore() == 1 ? DANCE_1_BASE_DAMAGE : DANCE_2_BASE_DAMAGE;
 			new BukkitRunnable() {
@@ -209,6 +209,5 @@ public class BladeDance extends Ability {
 			extraDamage = 0;
 			mTriggerActive = false;
 		}
-		return true;
 	}
 }

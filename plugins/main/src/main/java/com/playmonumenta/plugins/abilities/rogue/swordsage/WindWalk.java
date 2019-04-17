@@ -37,11 +37,11 @@ public class WindWalk extends Ability {
 	 */
 
 	private static final int WIND_WALK_COOLDOWN = 20 * 25;
-	private static final int WIND_WALK_1_DURATION = 20 * 3;
-	private static final int WIND_WALK_2_DURATION = 20 * 5;
+	private static final int WIND_WALK_1_DURATION = 20 * 2;
+	private static final int WIND_WALK_2_DURATION = 20 * 4;
 	private static final int WIND_WALK_VULNERABILITY_DURATION_INCREASE = 20 * 3;
 	private static final int WIND_WALK_VULNERABILITY_AMPLIFIER = 5;
-	private static final int WIND_WALK_RADIUS = 4;
+	private static final int WIND_WALK_RADIUS = 3;
 	private static final double WIND_WALK_Y_VELOCITY = 0.2;
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;

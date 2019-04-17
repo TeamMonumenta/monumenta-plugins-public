@@ -27,6 +27,8 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
@@ -653,6 +655,14 @@ public class AbilityManager {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
 				abil.PlayerDeathEvent(event);
+			}
+		}
+	}
+
+	public void PlayerAnimationEvent(Player player, PlayerAnimationEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast() && event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
+				abil.PlayerAnimationEvent(event);
 			}
 		}
 	}

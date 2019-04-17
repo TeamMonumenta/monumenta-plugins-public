@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
@@ -177,6 +178,8 @@ public abstract class Ability {
 	public void PotionApplyEvent(PotionEffectApplyEvent event) { }
 
 	public void PlayerDeathEvent(PlayerDeathEvent event) { }
+
+	public void PlayerAnimationEvent(PlayerAnimationEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 
