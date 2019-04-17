@@ -8,7 +8,10 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -21,7 +24,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
 * Sneak right click (without a bow) to leap backwards 6 ish blocks from your
-* position, with a bit of vertical velocity as well. Enemies within melee range
+* position, with a bit of vertical velocity as well. Blocks fallen during
+* this period are halved for the purposes of fall damage calculations. Enemies within melee range
 * of you previous position are stunned for 4 seconds (does not work on elites
 * and bosses) (Cooldown: 12 seconds) At Level 2, you deal 10 damage.
 */
@@ -36,6 +40,8 @@ public class Disengage extends Ability {
 	private static final int DISENGAGE_2_DAMAGE = 12;
 	private static final int DISENGAGE_1_COOLDOWN = 12 * 20;
 	private static final int DISENGAGE_2_COOLDOWN = 10 * 20;
+
+	private boolean falling = false;
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -53,8 +59,8 @@ public class Disengage extends Ability {
 		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
 			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
 			return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
-			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() &&
-			       !inMainHand.getType().isEdible() && inMainHand.getType() != Material.TRIDENT;
+			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() && !inMainHand.getType().isEdible()
+			       && inMainHand.getType() != Material.TRIDENT && inMainHand.getType() != Material.COMPASS;
 		}
 		return false;
 	}
@@ -79,7 +85,27 @@ public class Disengage extends Ability {
 		double xVelocity = dir.getX() * DISENGAGE_VELOCITY_MULTIPLIER;
 		double zVelocity = dir.getZ() * DISENGAGE_VELOCITY_MULTIPLIER;
 		mPlayer.setVelocity(new Vector(-xVelocity, DISENGAGE_Y_VELOCITY, -zVelocity));
+
+		falling = true;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mPlayer.isOnGround()) {
+					falling = false;
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+
 		putOnCooldown();
 		return true;
 	}
+
+	@Override
+	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
+		if (falling && event.getCause() == DamageCause.FALL) {
+			event.setDamage(event.getDamage() / 2);
+		}
+		return true;
+	}
+
 }

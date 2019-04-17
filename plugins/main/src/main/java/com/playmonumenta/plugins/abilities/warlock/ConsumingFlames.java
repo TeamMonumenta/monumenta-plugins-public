@@ -66,7 +66,8 @@ public class ConsumingFlames extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return mPlayer.isSneaking() && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())
+		       && mPlayer.getLocation().getPitch() < 50;
 	}
 
 }

@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * When you kill an enemy they give off a noxious cloud, dealing 4/8 damage and
- * 6/12s of Weakness to all targets within 3 blocks. Mobs dying from this cloud
+ * 6/12s of Weakness to all targets within 5 blocks. Mobs dying from this cloud
  * can also trigger Purple Haze.
  */
 

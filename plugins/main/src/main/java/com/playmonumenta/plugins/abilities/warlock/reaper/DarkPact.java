@@ -22,18 +22,18 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class DarkPact extends Ability {
-	private static final int DARK_PACT_COOLDOWN = 20 * 30;
+	private static final int DARK_PACT_COOLDOWN = 20 * 10;
 	private static final int DARK_PACT_DURATION = 20 * 10;
-	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1.5;
-	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1.75;
+	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.6;
+	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 1.0;
 
 	/*
 	 * Dark Pact: Sprint + left-click with a scythe to greatly amplify your
 	 * power for 10 s, making your skills and melee attacks deal
-	 * 50% / 75% more damage. At lvl 2, your scythe attacks also
+	 * 60% / 100% more damage. At lvl 2, your scythe attacks also
 	 * cleave, dealing AoE damage in front of you. While this
 	 * ability is active, you cannot heal health.
-	 *  Cooldown: 30 s
+	 *  Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
 	 */
 
 	private boolean active = false;

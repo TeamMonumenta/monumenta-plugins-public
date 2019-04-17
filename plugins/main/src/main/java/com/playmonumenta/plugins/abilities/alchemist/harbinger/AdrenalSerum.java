@@ -24,9 +24,9 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Crouch while throwing an Alchemist Potion and you'll instead consume 4
- * potions and buff yourself. You gain 20s of Regen I, Strength I, Speed I, but
- * when the effect ends you take 2 hearts of damage (bypasses armor but can't
- * kill the player). At level 2 you also gain Resistance I and Haste I (Cooldown
+ * potions and buff yourself. You gain 20s of Regen II, Strength I, Speed I, but
+ * when the effect ends you take 4 damage (bypasses armor but can't
+ * kill the player). At level 2 you also gain Resistance I and Haste II (Cooldown
  * 30s)
  *
  * TODO: Particle effects need flair
@@ -34,8 +34,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class AdrenalSerum extends Ability {
 	private static final int ADRENAL_SERUM_COOLDOWN = 30 * 20;
-	private static final int ADRENAL_SERUM_DURATION = 20 * 20;
-	private static final int ADRENAL_SERUM_POTIONS_CONSUMED = 4;
+	private static final int ADRENAL_SERUM_DURATION = 15 * 20;
+	private static final int ADRENAL_SERUM_POTIONS_CONSUMED = 1;
 	private static final double ADRENAL_SERUM_DAMAGE = 4;
 	private static final Particle.DustOptions ADRENAL_SERUM_COLOR = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 
@@ -95,11 +95,11 @@ public class AdrenalSerum extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1f, 1.15f);
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ADRENAL_SERUM_DURATION, 0, true, true));
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, ADRENAL_SERUM_DURATION, 0, true, true));
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, ADRENAL_SERUM_DURATION, 1, true, true));
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADRENAL_SERUM_DURATION, 0, true, true));
 		if (getAbilityScore() == 2) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ADRENAL_SERUM_DURATION, 0, true, true));
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, ADRENAL_SERUM_DURATION, 0, true, true));
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, ADRENAL_SERUM_DURATION, 1, true, true));
 		}
 
 		new BukkitRunnable() {
@@ -112,9 +112,9 @@ public class AdrenalSerum extends Ability {
 
 				if (t > ADRENAL_SERUM_DURATION) {
 					if (mPlayer.getHealth() > ADRENAL_SERUM_DAMAGE + 1) {
-						mPlayer.damage(ADRENAL_SERUM_DAMAGE);
+						mPlayer.setHealth(mPlayer.getHealth() - ADRENAL_SERUM_DAMAGE);
 					} else {
-						mPlayer.damage(mPlayer.getHealth() - 1);
+						mPlayer.setHealth(1);
 					}
 					this.cancel();
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);

@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * blocks of it regeneration II/III and Resistance I and giving
  * enemies slowness I/II and Weakness I for 4 seconds. The projectile
  * on collision with terrain heals allies within 5 blocks of it
- * for 2 / 4 hp and deals 10 damage to mobs. CD: 30s
+ * for 2 / 4 hp and, at level 2, deals 10 damage to mobs. CD: 30s
  */
 public class AlchemicalAmalgam extends Ability {
 
@@ -93,8 +93,10 @@ public class AlchemicalAmalgam extends Ability {
 					for (Player p : PlayerUtils.getNearbyPlayers(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
 						PlayerUtils.healPlayer(p, heal);
 					}
-					for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ALCHEMICAL_EXPLOSION_RADIUS)) {
-						EntityUtils.damageEntity(mPlugin, le, ALCHEMICAL_DAMAGE, mPlayer);;
+					if (getAbilityScore() > 1) {
+						for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ALCHEMICAL_EXPLOSION_RADIUS)) {
+							EntityUtils.damageEntity(mPlugin, le, ALCHEMICAL_DAMAGE, mPlayer);;
+						}
 					}
 				}
 			}

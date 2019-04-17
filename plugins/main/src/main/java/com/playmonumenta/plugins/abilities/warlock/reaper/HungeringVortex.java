@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -32,6 +33,9 @@ public class HungeringVortex extends Ability {
 	private static final int HUNGERING_VORTEX_RADIUS = 7;
 	private static final int HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER = 0;
 	private static final int HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER = 1;
+	private static final int HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER = 0;
+	private static final int HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER = 1;
+	private static final int HUNGERING_VORTEX_RESISTANCE_DURATION = 20 * 4;
 	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 0.5;
 	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 1;
 
@@ -41,6 +45,7 @@ public class HungeringVortex extends Ability {
 	 * with Slowness I / II for 8 s and increasing your melee
 	 * damage by 0.5 / 1 for each affected enemy, up to a maximum
 	 * of 4 / 8 for 8s. All affected enemies change target to you.
+	 * Gives Resistance I / II on activation for 4 seconds.
 	 * Cooldown: 18 s
 	 */
 
@@ -55,16 +60,32 @@ public class HungeringVortex extends Ability {
 	@Override
 	public boolean cast() {
 		int vortex = getAbilityScore();
-		int weakness = vortex == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1, 1.25f);
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 0.75f);
-		Location loc = mPlayer.getLocation();
-		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 200, 3.5, 3.5, 3.5, 1);
-		float velocity = loc.getBlock().isLiquid() ? 0.2f : 0.3f;
-		/*
-		 * Creates a fast-spiraling helix.
-		 */
+		int slowness = vortex == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
+		float velocity = mPlayer.getLocation().getBlock().isLiquid() ? 0.2f : 0.3f;
+
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), HUNGERING_VORTEX_RADIUS, mPlayer);
+		for (LivingEntity mob : mobs) {
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, slowness));
+			MovementUtils.PullTowards(mPlayer, mob, velocity);
+			if (mob instanceof Mob) {
+				((Mob)mob).setTarget(mPlayer);
+			}
+		}
+
+		// Cancel ability particles and cooldown if nothing is targeted
+		if (mobs == null || mobs.size() == 0) {
+			return true;
+		}
+
+		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.8f, 1.25f);
+		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.8f, 0.75f);
+		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 200, 3.5, 3.5, 3.5, 1);
+		int amplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER : HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER;
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, HUNGERING_VORTEX_RESISTANCE_DURATION, amplifier, true, true));
+
+		// Creates a fast-spiraling helix.
 		new BukkitRunnable() {
+			Location loc = mPlayer.getLocation();
 			double rotation = 0;
 			double radius = HUNGERING_VORTEX_RADIUS;
 
@@ -87,15 +108,6 @@ public class HungeringVortex extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, HUNGERING_VORTEX_RADIUS, mPlayer);
-		for (LivingEntity mob : mobs) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, weakness));
-			MovementUtils.PullTowards(mPlayer, mob, velocity);
-			if (mob instanceof Mob) {
-				((Mob)mob).setTarget(mPlayer);
-			}
-		}
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
 		double extra_dam = mobs.size() * damageInc;

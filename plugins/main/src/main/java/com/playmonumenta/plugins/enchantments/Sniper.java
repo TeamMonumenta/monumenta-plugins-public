@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Sniper implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Sniper";
-	private static final int DISTANCE = 8;
+	private static final int DISTANCE = 16;
 	private static final int DAMAGE_PER_LEVEL = 2;
 	private static final String LEVEL_METAKEY = "SniperLevelMetakey";
 	private static final String LOCATION_METAKEY = "SniperLocationMetakey";
@@ -48,8 +48,8 @@ public class Sniper implements BaseEnchantment {
 			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
 
 			if (mainHandLevel > 0 && offHandLevel > 0
-				&& player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
-				&& player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
+			    && player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
+			    && player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
 				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
 				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
 			}

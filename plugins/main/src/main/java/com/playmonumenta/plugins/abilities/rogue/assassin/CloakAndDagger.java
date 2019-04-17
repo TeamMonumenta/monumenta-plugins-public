@@ -91,6 +91,7 @@ public class CloakAndDagger extends Ability {
 					ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 					if (t >= 20 * cloakOnActivation || !active || !InventoryUtils.isSwordItem(mHand)) {
 						if (active) {
+							mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							                                 new PotionEffect(PotionEffectType.SLOW_DIGGING, CLOAK_PENALTY_DURATION, 1, false, true));
 						}

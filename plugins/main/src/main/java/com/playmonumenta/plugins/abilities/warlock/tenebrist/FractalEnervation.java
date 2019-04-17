@@ -27,17 +27,17 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Fractal Enervation: Sprint right-click fires a dark magic beam
- * (max range: 9), afflicting the first enemy it hits with an
- * unnatural weakness that lasts 12s. The beam then instantly
+ * (max range: 9), afflicting all enemies it hits with blindness that
+ * lasts 12s. The beam then instantly
  * spreads to all enemies in a 3 / 4-block radius, and then from them,
  * and so on. All debuffs on the enemies increase by 1 effect level.
- * Each enemy hit is dealt 4 / 7 damage.
+ * At level 2, each enemy hit is dealt 5 damage.
  * Cooldown: 16s / 13s
  */
 public class FractalEnervation extends Ability {
 
-	private static final int FRACTAL_1_DAMAGE = 4;
-	private static final int FRACTAL_2_DAMAGE = 7;
+	private static final int FRACTAL_DAMAGE = 5;
+	private static final int FRACTAL_BLINDNESS_DURATION = 20 * 12;
 	private static final int FRACTAL_1_CHAIN_RANGE = 3 + 1; // The +1 accounts for the mob's nonzero hitbox so that the distance between 2 mobs is approx 3 still
 	private static final int FRACTAL_2_CHAIN_RANGE = 4 + 1;
 
@@ -80,8 +80,10 @@ public class FractalEnervation extends Ability {
 							mob.addPotionEffect(
 							    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 						}
-						int damage = getAbilityScore() == 1 ? FRACTAL_1_DAMAGE : FRACTAL_2_DAMAGE;
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						mob.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, FRACTAL_BLINDNESS_DURATION, 0));
+						if (getAbilityScore() > 1) {
+							EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer);
+						}
 						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 40, 0.25, 0.45, 0.25, 0.15);
 						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 20, 0.25, 0.45, 0.25, 0);
 						i = 0;

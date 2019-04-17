@@ -60,7 +60,6 @@ public class ShieldWall extends Ability {
 		}
 
 		int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-		boolean knockback = getAbilityScore() == 1 ? false : true;
 		new BukkitRunnable() {
 			int t = 0;
 			boolean active = false;
@@ -122,7 +121,7 @@ public class ShieldWall extends Ability {
 							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
 								EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
-								if (knockback) {
+								if (getAbilityScore() > 1) {
 									MovementUtils.KnockAway(loc, le, 0.3f);
 									mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 									mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);

@@ -61,7 +61,8 @@ public class SplitArrow extends Ability {
 		}
 
 		if (nearestMob != null) {
-			nearestMob.getWorld().spawnParticle(Particle.CRIT, nearestMob.getEyeLocation(), 30, 0, 0, 0, 0.4);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, nearestMob.getEyeLocation(), 20, 0.3f, 0.3f, 0.3f);
+			mWorld.spawnParticle(Particle.CRIT, nearestMob.getEyeLocation(), 20, 0, 0, 0, 0.3);
 			EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer);
 			MovementUtils.KnockAway(damagee, nearestMob, 0.15f);
 			putOnCooldown();

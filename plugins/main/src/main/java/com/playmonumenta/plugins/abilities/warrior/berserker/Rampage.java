@@ -2,10 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.Random;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -14,7 +11,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -38,76 +34,64 @@ public class Rampage extends Ability {
 	private static final int RAMPAGE_2_REGEN_THRESHOLD = 5;
 
 	private int rampageKillStreak = 0;
-	private int rampageDuration = 0;
 	private int rampageArmorBuff = 0;
+	private int rampageKillStreakTime;
+
+	private int timeToNextDecrement = 0;
 
 	public Rampage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Rampage";
+		rampageKillStreakTime = getAbilityScore() == 1 ? RAMPAGE_1_KILL_TIMER : RAMPAGE_2_KILL_TIMER;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		timeToNextDecrement = 0;
 		if (rampageKillStreak < RAMPAGE_KILL_LIMIT) {
-			Location loc = mPlayer.getLocation();
 			rampageKillStreak++;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak: " + rampageKillStreak);
-			if (rampageKillStreak % RAMPAGE_KILL_THRESHOLD == 0) {
-				rampageArmorBuff++;
-				AttributeInstance attarmor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-				attarmor.setBaseValue(attarmor.getBaseValue() + 1);
-				mWorld.playSound(loc, Sound.ITEM_ARMOR_EQUIP_IRON, 2, 0);
-			}
-			if (rampageKillStreak == RAMPAGE_2_REGEN_THRESHOLD) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 1000000, 0, true, false));
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 25, .25, 1, .25, 1);
-			}
-			if (rampageKillStreak == (RAMPAGE_2_REGEN_THRESHOLD * 2)) {
-				mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 1000000, 1, true, false));
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 20, .25, 1, .25, 1);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 20, .25, 1, .25, 1);
-			}
 		} else {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak Maxed Out!");
-		}
-		boolean run = rampageDuration <= 0;
-		int rampage = getAbilityScore();
-		rampageDuration = rampage == 1 ? RAMPAGE_1_KILL_TIMER : RAMPAGE_2_KILL_TIMER;
-		if (run) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					rampageDuration--;
-					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, Material.RED_CONCRETE.createBlockData());
-					if (rampageDuration <= 0) {
-						this.cancel();
-						deactivateRampage();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		int rampageDamage = 0;
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (rampageKillStreak > 0) {
-			rampageDamage = rampageKillStreak / RAMPAGE_KILL_THRESHOLD;
+			timeToNextDecrement += 5;
+			if (timeToNextDecrement >= rampageKillStreakTime) {
+				timeToNextDecrement = 0;
+				rampageKillStreak--;
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak: " + rampageKillStreak);
+			}
 		}
-		event.setDamage(event.getDamage() + rampageDamage);
+
+		// Apply regen buffs at thresholds
+		if (getAbilityScore() > 1) {
+			if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD * 2) {
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 1, true, false));
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+			} else if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD) {
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 0, true, false));
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+			}
+		}
+
+		// Update armor attribute if it has changed
+		if (rampageKillStreak / RAMPAGE_KILL_THRESHOLD != rampageArmorBuff) {
+			AttributeInstance attarmor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+			attarmor.setBaseValue(attarmor.getBaseValue() - rampageArmorBuff + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
+			rampageArmorBuff = rampageKillStreak / RAMPAGE_KILL_THRESHOLD;
+		}
+	}
+
+	// Increase damage
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		event.setDamage(event.getDamage() + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
 		return true;
 	}
 
-	private void deactivateRampage() {
-		AttributeInstance attarmor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-		if (attarmor.getBaseValue() - rampageArmorBuff > 0) {
-			attarmor.setBaseValue(attarmor.getBaseValue() - rampageArmorBuff);
-		} else {
-			attarmor.setBaseValue(0);
-		}
-		mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.REGENERATION);
-		rampageKillStreak = 0;
-	}
 }

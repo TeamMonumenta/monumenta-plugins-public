@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
-* Left Clicking with a bow instantly fires a fast arrow that deals 12 damage + any
+* Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 12 damage + any
 * other bonuses from skills and inflicts Slowness 3 for 2 seconds (Cooldown: 10
 * seconds). Level 2 decreases the cooldown to 8 seconds and increases the arrow
 * damage to 15 + effects.
@@ -52,7 +52,7 @@ public class Quickdraw extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return InventoryUtils.isBowItem(inMainHand);
+		return InventoryUtils.isBowItem(inMainHand) && !mPlayer.isSneaking();
 	}
 
 	@Override

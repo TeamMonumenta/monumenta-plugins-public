@@ -37,11 +37,11 @@ public class HallowedBeam extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (arrow.isCritical()) {
-			arrow.remove();
-			Player player = mPlayer;
-			LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
-			if (e != null && EntityUtils.isUndead(e)) {
+		Player player = mPlayer;
+		LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
+		if (e != null && EntityUtils.isUndead(e)) {
+			if (arrow.isCritical()) {
+				arrow.remove();
 				player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.85f);
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.9f);
 				Location loc = player.getEyeLocation();
@@ -73,7 +73,6 @@ public class HallowedBeam extends Ability {
 
 				}
 				putOnCooldown();
-				return true;
 			}
 		}
 		return true;

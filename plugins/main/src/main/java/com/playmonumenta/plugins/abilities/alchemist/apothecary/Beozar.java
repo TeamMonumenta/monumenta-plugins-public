@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,23 +18,32 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Bezoar: Every 5/3 mob kills the enemy drops a Bezoar
- * on the ground that lingers for 4/6 seconds. Any player
- * walking over the stone consumes it, healing 4/6 HP and
- * ending non-infinite Poison and Wither..
+ * Bezoar: When the Apothercary kills an enemy, if 5/3 enemies
+ * have died since the last drop, the enemy drops a Bezoar on the ground
+ * that lingers for 4/6 seconds. Any player walking over
+ * the stone consumes it, healing 4/6 HP and ending
+ * non-infinite Poison and Wither. If a mob walks over
+ * the stone, it explodes in a 3 block radius for 4/6 damage.
  */
 
 public class Beozar extends Ability {
 
+	private static final int BEZOAR_1_DAMAGE = 4;
+	private static final int BEZOAR_2_DAMAGE = 6;
+	private static final int BEZOAR_DAMAGE_RADIUS = 3;
+
+	private int kills = 0;
+
 	public Beozar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
+		// This is spelled incorrectly in both scoreboards and half the code, I am now big sad
 		mInfo.scoreboardId = "Beozar";
 	}
 
-	int kills = 0;
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int per = getAbilityScore() == 1 ? 5 : 3;
@@ -68,6 +78,16 @@ public class Beozar extends Ability {
 							mWorld.spawnParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F);
 							break;
 						}
+						if (EntityUtils.getNearbyMobs(item.getLocation(), 1.5) != null && EntityUtils.getNearbyMobs(item.getLocation(), 1.5).size() != 0) {
+							item.remove();
+							this.cancel();
+							mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.75f);
+							mWorld.spawnParticle(Particle.EXPLOSION_HUGE, item.getLocation(), 1, 0, 0, 0, 0);
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), BEZOAR_DAMAGE_RADIUS)) {
+								int damage = getAbilityScore() == 1 ? BEZOAR_1_DAMAGE : BEZOAR_2_DAMAGE;
+								EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+							}
+						}
 					}
 					if (t >= duration || item.isDead() || item == null) {
 						this.cancel();
@@ -77,6 +97,10 @@ public class Beozar extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
+	}
+
+	public void incrementKills() {
+		kills++;
 	}
 
 }

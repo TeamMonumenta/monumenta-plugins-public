@@ -65,7 +65,7 @@ public class DeathsTouch extends Ability {
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
-		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1, 0.25f);
+		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.5f, 0.25f);
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
 		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE, mPlayer);
@@ -79,7 +79,7 @@ public class DeathsTouch extends Ability {
 					target = mob;
 					int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
 					mob.setMetadata("DeathsTouchBuffDuration", new FixedMetadataValue(mPlugin, duration));
-					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 1, 1f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.5f, 1f);
 
 					new BukkitRunnable() {
 						int runnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
@@ -106,8 +106,6 @@ public class DeathsTouch extends Ability {
 				}
 			}
 		}
-		putOnCooldown();
-		// Didn't find a mob - Due to lack of skill possessed by the caster, put it on cooldown
 		return false;
 	}
 

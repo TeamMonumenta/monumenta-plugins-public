@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
  * magic in the direction the player faces that freezes all enemies
  * in it’s path (bosses are given slowness 3) and gives wither III
- * for 6/10 seconds. 40/30 second cooldown.
+ * for 6/10 seconds. 30/20 second cooldown.
  */
 public class WitheringGaze extends Ability {
 
@@ -38,7 +38,7 @@ public class WitheringGaze extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 40 : 20 * 30;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 20;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
