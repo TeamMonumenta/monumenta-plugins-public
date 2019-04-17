@@ -292,19 +292,15 @@ public class Utils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Object getPrivateField(String fieldName, Class clazz, Object object) {
+	public static Object getPrivateField(String fieldName, Class clazz, Object object) throws NoSuchFieldException, IllegalAccessException {
 		Field field;
 		Object o = null;
 
-		try {
-			field = clazz.getDeclaredField(fieldName);
+		field = clazz.getDeclaredField(fieldName);
 
-			field.setAccessible(true);
+		field.setAccessible(true);
 
-			o = field.get(object);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
+		o = field.get(object);
 
 		return o;
 	}

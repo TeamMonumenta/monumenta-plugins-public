@@ -74,13 +74,13 @@ public class Wanderer extends BossAbilityGroup {
 						if (((CraftEntity) mBoss).getHandle() instanceof EntityInsentient && ((CraftEntity) mBoss).getHandle() instanceof EntityCreature) {
 							EntityInsentient ei = (EntityInsentient) ((CraftEntity) mBoss).getHandle();
 							EntityCreature ec = (EntityCreature) ((CraftEntity) mBoss).getHandle();
-							Set goalB = (Set) Utils.getPrivateField("b", PathfinderGoalSelector.class, ei.goalSelector);
+							Set<?> goalB = (Set<?>) Utils.getPrivateField("b", PathfinderGoalSelector.class, ei.goalSelector);
 							goalB.clear();
-							Set goalC = (Set) Utils.getPrivateField("c", PathfinderGoalSelector.class, ei.goalSelector);
+							Set<?> goalC = (Set<?>) Utils.getPrivateField("c", PathfinderGoalSelector.class, ei.goalSelector);
 							goalC.clear();
-							Set targetB = (Set) Utils.getPrivateField("b", PathfinderGoalSelector.class, ei.targetSelector);
+							Set<?> targetB = (Set<?>) Utils.getPrivateField("b", PathfinderGoalSelector.class, ei.targetSelector);
 							targetB.clear();
-							Set targetC = (Set) Utils.getPrivateField("c", PathfinderGoalSelector.class, ei.targetSelector);
+							Set<?> targetC = (Set<?>) Utils.getPrivateField("c", PathfinderGoalSelector.class, ei.targetSelector);
 							targetC.clear();
 
 							ei.goalSelector.a(0, new PathfinderGoalFloat(ec));
