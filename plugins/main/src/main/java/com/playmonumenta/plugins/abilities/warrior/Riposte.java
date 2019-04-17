@@ -41,36 +41,38 @@ public class Riposte extends Ability {
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damager = (LivingEntity) event.getDamager();
-		if ((mPlayer.getLocation()).distanceSquared(damager.getLocation()) < RIPOSTE_SQRADIUS) {
-			if (!(damager instanceof Creeper)) {
-				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-				MovementUtils.KnockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
+		if (event.getFinalDamage() > 0) { //don't activate if the player wouldn't take damage
+			LivingEntity damager = (LivingEntity) event.getDamager();
+			if ((mPlayer.getLocation()).distanceSquared(damager.getLocation()) < RIPOSTE_SQRADIUS) {
+				if (!(damager instanceof Creeper)) {
+					ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+					MovementUtils.KnockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
-				if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
-					if (getAbilityScore() > 1) {
-						if (InventoryUtils.isSwordItem(mainHand)) {
-							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.APPLIED_POTION,
-							                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
-							                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
-						} else if (InventoryUtils.isAxeItem(mainHand)) {
-							if (!EntityUtils.isBoss(damager)) {
-								damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
+					if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
+						if (getAbilityScore() > 1) {
+							if (InventoryUtils.isSwordItem(mainHand)) {
+								mPlugin.mPotionManager.addPotion(mPlayer, PotionID.APPLIED_POTION,
+								                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, RIPOSTE_SWORD_DURATION,
+								                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
+							} else if (InventoryUtils.isAxeItem(mainHand)) {
+								if (!EntityUtils.isBoss(damager)) {
+									damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
+								}
 							}
 						}
-					}
 
-					// Give a value to Counter Strike to detect if Riposte has triggered
-					CounterStrike cs = (CounterStrike)AbilityManager.getManager().getPlayerAbility(mPlayer, CounterStrike.class);
-					if (cs != null) {
-						cs.riposteTriggered();
-					}
+						// Give a value to Counter Strike to detect if Riposte has triggered
+						CounterStrike cs = (CounterStrike)AbilityManager.getManager().getPlayerAbility(mPlayer, CounterStrike.class);
+						if (cs != null) {
+							cs.riposteTriggered();
+						}
 
-					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
-					mWorld.spawnParticle(Particle.SWEEP_ATTACK, (mPlayer.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, (mPlayer.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
-					putOnCooldown();
-					return false;
+						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, (mPlayer.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
+						mWorld.spawnParticle(Particle.CRIT_MAGIC, (mPlayer.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);
+						putOnCooldown();
+						return false;
+					}
 				}
 			}
 		}

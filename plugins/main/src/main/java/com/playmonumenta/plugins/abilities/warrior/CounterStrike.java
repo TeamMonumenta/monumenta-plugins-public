@@ -104,7 +104,7 @@ public class CounterStrike extends Ability {
 					}
 				}
 			}
-
+			mActive = false;
 			putOnCooldown();
 		}
 
