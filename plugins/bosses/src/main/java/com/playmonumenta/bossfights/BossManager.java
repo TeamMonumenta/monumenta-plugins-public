@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -79,6 +80,7 @@ import com.playmonumenta.bossfights.bosses.LivingBladeBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
 import com.playmonumenta.bossfights.bosses.Masked_2;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
+import com.playmonumenta.bossfights.bosses.PlayerDamageOnlyBoss;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
 import com.playmonumenta.bossfights.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
@@ -179,6 +181,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new CyanSummonBoss(p, e));
 		mStatelessBosses.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> new WitherHitBoss(p, e));
 		mStatelessBosses.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> new VolatileBoss(p, e));
+		mStatelessBosses.put(PlayerDamageOnlyBoss.identityTag, (Plugin p, LivingEntity e) -> new PlayerDamageOnlyBoss(p, e));
 		mStatelessBosses.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayDemonSummoner(p, e));
 		mStatelessBosses.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayGolemSummoner(p, e));
 		mStatelessBosses.put(GrayScarabSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayScarabSummoner(p, e));
@@ -258,6 +261,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> CyanSummonBoss.deserialize(p, e));
 		mBossDeserializers.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> WitherHitBoss.deserialize(p, e));
 		mBossDeserializers.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> VolatileBoss.deserialize(p, e));
+		mBossDeserializers.put(PlayerDamageOnlyBoss.identityTag, (Plugin p, LivingEntity e) -> PlayerDamageOnlyBoss.deserialize(p, e));
 		mBossDeserializers.put(RabbitGodBoss.identityTag, (Plugin p, LivingEntity e) -> RabbitGodBoss.deserialize(p, e));
 		mBossDeserializers.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayDemonSummoner.deserialize(p, e));
 		mBossDeserializers.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayGolemSummoner.deserialize(p, e));
@@ -424,6 +428,14 @@ public class BossManager implements Listener {
 			if (boss != null) {
 				// May cancel the event
 				boss.bossDamagedEntity(event);
+			}
+
+			if (damager instanceof EvokerFangs) {
+				boss = mBosses.get(((EvokerFangs)damager).getOwner().getUniqueId());
+				if (boss != null) {
+					// May cancel the event
+					boss.bossDamagedEntity(event);
+				}
 			}
 		}
 	}
