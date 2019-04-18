@@ -86,9 +86,7 @@ public class ArcaneStrike extends Ability {
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.isWandItem(mainHand)) {
-			if (!MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}

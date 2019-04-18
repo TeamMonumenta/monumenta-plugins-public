@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -46,14 +47,16 @@ public class Blizzard extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Blizzard";
 		mInfo.linkedSpell = Spells.BLIZZARD;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 28 : 20 * 24;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 18 : 20 * 14;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	private Map<UUID, Integer> affected = new HashMap<UUID, Integer>();
+	private boolean mActive = false;
 
 	@Override
 	public boolean cast() {
+		mActive = true;
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
@@ -98,7 +101,7 @@ public class Blizzard extends Ability {
 
 				if (t % 20 == 0) {
 					for (LivingEntity mob : mobs) {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE);
+						Spellshock.spellDamageMob(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE);
 					}
 				}
 
@@ -108,11 +111,12 @@ public class Blizzard extends Ability {
 				if (t >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
 					this.cancel();
 					affected.clear();
+					putOnCooldown();
+					mActive = false;
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-		putOnCooldown();
 		return true;
 	}
 
@@ -120,7 +124,7 @@ public class Blizzard extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
+		return !mActive && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
 	}
 
 }

@@ -16,7 +16,9 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -71,7 +73,7 @@ public class FlashSword extends Ability {
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
 						mob.setNoDamageTicks(0);
-						EntityUtils.damageEntity(mPlugin, mob, damageMult, player);
+						Spellshock.spellDamageMob(mPlugin, mob, damageMult, player, MagicType.ARCANE);
 						if (t >= FSWORD_SWINGS) {
 							MovementUtils.KnockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
 						}

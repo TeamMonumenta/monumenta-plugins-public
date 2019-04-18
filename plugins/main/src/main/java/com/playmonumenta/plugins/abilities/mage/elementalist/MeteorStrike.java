@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -34,6 +35,9 @@ public class MeteorStrike extends Ability {
 	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
 	private static final double METEOR_STRIKE_RADIUS = 5;
 
+	private BukkitRunnable mRunnable = null;
+	private int mLeftClicks = 0;
+
 	public MeteorStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.METEOR_STRIKE;
@@ -51,6 +55,24 @@ public class MeteorStrike extends Ability {
 
 	@Override
 	public boolean cast() {
+		mLeftClicks++;
+		if (mRunnable == null) {
+			mRunnable = new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					if (mRunnable != null) {
+						mLeftClicks = 0;
+						mRunnable = null;
+					}
+				}
+
+			};
+			mRunnable.runTaskLater(mPlugin, 20);
+		}
+		if (mLeftClicks < 3) {
+			return false;
+		}
 		Location loc = mPlayer.getEyeLocation();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
 		mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
@@ -67,6 +89,8 @@ public class MeteorStrike extends Ability {
 			}
 		}
 
+		mLeftClicks = 0;
+		mRunnable = null;
 		putOnCooldown();
 		return true;
 	}
@@ -92,9 +116,9 @@ public class MeteorStrike extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, METEOR_STRIKE_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									EntityUtils.damageEntity(mPlugin, e, damage * 0.75, player, MagicType.FIRE);
+									Spellshock.spellDamageMob(mPlugin, e, (float) (damage * 0.75), player, MagicType.FIRE);
 								} else {
-									EntityUtils.damageEntity(mPlugin, e, damage, player, MagicType.FIRE);
+									Spellshock.spellDamageMob(mPlugin, e, (float) damage, player, MagicType.FIRE);
 								}
 								e.setFireTicks(METEOR_STRIKE_FIRE_DURATION);
 

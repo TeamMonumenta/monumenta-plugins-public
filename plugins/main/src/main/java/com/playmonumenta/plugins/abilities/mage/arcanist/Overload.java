@@ -30,7 +30,7 @@ public class Overload extends Ability {
 		if (cds != null) {
 			if (cds.size() > 0) {
 				int mult = cds.size();
-				double dmg = getAbilityScore() == 1 ? 1.5 : 2.5;
+				double dmg = getAbilityScore() == 1 ? 1.5 : 3;
 				if (event.getDamaged() instanceof Player) {
 					dmg *= 0.5;
 				}

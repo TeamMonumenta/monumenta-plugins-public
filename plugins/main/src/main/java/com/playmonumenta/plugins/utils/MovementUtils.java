@@ -14,9 +14,12 @@ public class MovementUtils {
 	public static void KnockAway(Location loc, LivingEntity target, float speed) {
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().multiply(speed);
 		dir.setY(0.5f);
-		dir.multiply(1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue());
+		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		if (mult > 0) {
+			dir.multiply(mult);
 
-		target.setVelocity(dir);
+			target.setVelocity(dir);
+		}
 	}
 
 	public static void PullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
@@ -24,8 +27,11 @@ public class MovementUtils {
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
 		}
-		dir.multiply(1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue());
+		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		if (mult > 0) {
+			dir.multiply(mult);
 
-		target.setVelocity(dir);
+			target.setVelocity(dir);
+		}
 	}
 }

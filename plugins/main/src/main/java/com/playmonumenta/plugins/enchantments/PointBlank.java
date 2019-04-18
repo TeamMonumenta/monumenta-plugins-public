@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -75,7 +76,9 @@ public class PointBlank implements BaseEnchantment {
 				event.setDamage(event.getDamage() + level * DAMAGE_PER_LEVEL);
 
 				// TODO: Fix this shitty particle! Maybe add sound?
-				target.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
+				target.getWorld().spawnParticle(Particle.SMOKE_NORMAL, target.getEyeLocation(), 30, 0, 0, 0, 0.25);
+				target.getWorld().spawnParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
+				target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1, 0.75f);
 			}
 		}
 	}
