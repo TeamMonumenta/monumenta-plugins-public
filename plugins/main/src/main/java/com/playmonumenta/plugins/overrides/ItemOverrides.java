@@ -184,6 +184,8 @@ public class ItemOverrides {
 
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
 		mItems.put(Material.ANVIL, new AnvilOverride());
+		mItems.put(Material.CHIPPED_ANVIL, new AnvilOverride());
+		mItems.put(Material.DAMAGED_ANVIL, new AnvilOverride());
 		mItems.put(Material.ENCHANTING_TABLE, new EnchantmentTableOverride());
 		mItems.put(Material.GOLDEN_APPLE, new GoldenAppleOverride());
 		mItems.put(Material.ENDER_CHEST, new EnderChestOverride());
