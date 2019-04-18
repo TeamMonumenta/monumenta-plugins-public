@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -67,9 +68,8 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 								public void cancel() {
 									super.cancel();
 									if (mTicks < SUMMON_TIME) {
-										//TODO: Better sound/particle
 										summonLoc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, summonLoc, 2, 0.3, 0.3, 0.3, 0);
-										summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1f, 0.5f);
+										summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 0.5f, 0.5f);
 										mob.damage(1000);
 									}
 								}
@@ -88,7 +88,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					return null;
 				},
 				() -> {
-					//TODO: Sound
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.0f, 1.0f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mTicks = 0;
 

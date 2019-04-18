@@ -6,6 +6,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -67,7 +68,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 					return runnable;
 				},
 				() -> {
-					//TODO: Sound
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.0f, 1.0f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mTicks = 0;
 
