@@ -59,7 +59,7 @@ public class Rampage extends Ability {
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (rampageKillStreak > 0) {
-			timeToNextDecrement += 5;
+			timeToNextDecrement += ticks;
 			if (timeToNextDecrement >= rampageKillStreakTime) {
 				timeToNextDecrement = 0;
 				rampageKillStreak--;

@@ -41,7 +41,8 @@ public class Disengage extends Ability {
 	private static final int DISENGAGE_1_COOLDOWN = 12 * 20;
 	private static final int DISENGAGE_2_COOLDOWN = 10 * 20;
 
-	private boolean falling = false;
+	private boolean mStillInAir = false;
+	private int mLandedTick = 0;
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -86,15 +87,17 @@ public class Disengage extends Ability {
 		double zVelocity = dir.getZ() * DISENGAGE_VELOCITY_MULTIPLIER;
 		mPlayer.setVelocity(new Vector(-xVelocity, DISENGAGE_Y_VELOCITY, -zVelocity));
 
-		falling = true;
+		mStillInAir = true;
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (mPlayer.isOnGround()) {
-					falling = false;
+					mStillInAir = false;
+					mLandedTick = mPlayer.getTicksLived();
+					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 2, 1); // Don't run immediately - wait for player to be in the air
 
 		putOnCooldown();
 		return true;
@@ -102,10 +105,11 @@ public class Disengage extends Ability {
 
 	@Override
 	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
-		if (falling && event.getCause() == DamageCause.FALL) {
+		/* Reduce falling damage if player is still falling or they landed very recently */
+		if (event.getCause().equals(DamageCause.FALL)
+		    && (mStillInAir || ((mPlayer.getTicksLived() - mLandedTick) < 5))) {
 			event.setDamage(event.getDamage() / 2);
 		}
 		return true;
 	}
-
 }
