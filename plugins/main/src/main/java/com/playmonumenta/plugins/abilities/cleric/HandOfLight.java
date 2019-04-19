@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -102,7 +101,7 @@ public class HandOfLight extends Ability {
 
 		// Must not match conditions for enchanted prayer
 		Ability ep = AbilityManager.getManager().getPlayerAbility(mPlayer, EnchantedPrayer.class);
-		if (ep != null && mPlayer.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+		if (ep != null && !mPlayer.isOnGround()) {
 			return false;
 		}
 

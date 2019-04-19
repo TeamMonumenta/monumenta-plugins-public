@@ -16,7 +16,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -68,9 +70,12 @@ public class DaggerThrow extends Ability {
 					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
+				Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
+				int ppDuration = pp.getBonus(mInfo.linkedSpell);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1, mPlayer)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
+					EntityUtils.applyStun(mPlugin, ppDuration, mob);
 
 					hit = true;
 				}

@@ -3,11 +3,9 @@ package com.playmonumenta.plugins.abilities.cleric.hierophant;
 import java.util.Random;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -21,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Enchanted Prayer: Jump and right-click to enchant the
+ * Enchanted Prayer: Jump and shift right-click to enchant the
  * weapons of all players in a 15-block radius (including
  * yourself) with holy magic, making their next melee attack
  * release light energy. The amplified attack deals additional
@@ -104,7 +102,7 @@ public class EnchantedPrayer extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR;
+		return mPlayer.isSneaking() && !mPlayer.isOnGround();
 	}
 
 	/*

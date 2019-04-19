@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -65,6 +67,13 @@ public class EscapeDeath extends Ability {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER,
 			                                                  ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
+		}
+
+		Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
+		int ppDuration = pp.getBonus(mInfo.linkedSpell);
+		if (ppDuration != 0) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+			                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ppDuration, 4, true, false));
 		}
 
 		Location loc = mPlayer.getLocation();

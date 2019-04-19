@@ -91,7 +91,7 @@ public class Spellshock extends Ability {
 								if (spellShock > 1) {
 									spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator, null);
 								} else {
-									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator);
+									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator, MagicType.NONE, false);
 								}
 
 								nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
@@ -163,7 +163,7 @@ public class Spellshock extends Ability {
 					if (spellShock > 1) {
 						spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
 					} else {
-						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
+						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type, false);
 					}
 
 					nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,

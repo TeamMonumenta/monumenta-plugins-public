@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
@@ -86,6 +87,14 @@ public class AdvancingShadows extends Ability {
 					if (mob != entity) {
 						MovementUtils.KnockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 					}
+				}
+			}
+			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
+			int ppDamage = pp.getBonus(mInfo.linkedSpell);
+			if (ppDamage != 0) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
+				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+					EntityUtils.damageEntity(mPlugin, mob, ppDamage, mPlayer);
 				}
 			}
 

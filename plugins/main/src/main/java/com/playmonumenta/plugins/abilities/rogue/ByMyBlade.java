@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -52,8 +54,11 @@ public class ByMyBlade extends Ability {
 
 
 			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
-			if (damagee instanceof Player)
+			if (damagee instanceof Player) {
 				extraDamage = BY_MY_BLADE_DAMAGE_1;
+			}
+			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
+			extraDamage += pp.getBonus(mInfo.linkedSpell);
 			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, mPlayer);
 
 			Location loc = damagee.getLocation();
@@ -65,9 +70,9 @@ public class ByMyBlade extends Ability {
 				if (damagee instanceof Player) {
 					MovementUtils.KnockAway(mPlayer, damagee, 0.3f);
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-                            new PotionEffect(PotionEffectType.SPEED,
-                                             BY_MY_BLADE_HASTE_DURATION,
-                                             0, false, true));
+					                                 new PotionEffect(PotionEffectType.SPEED,
+					                                                  BY_MY_BLADE_HASTE_DURATION,
+					                                                  0, false, true));
 				}
 			}
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);

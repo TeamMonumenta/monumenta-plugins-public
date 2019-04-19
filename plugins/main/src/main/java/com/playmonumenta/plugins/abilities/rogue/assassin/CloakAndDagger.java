@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,6 +44,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class CloakAndDagger extends Ability {
 
+	private static final String CLOAK_METADATA = "CloakAndDaggerPlayerIsInvisible";
 	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 2.5;
 	private static final int CLOAK_1_MAX_STACKS = 8;
@@ -84,6 +86,7 @@ public class CloakAndDagger extends Ability {
 					}
 				}
 			}
+			mPlayer.setMetadata(CLOAK_METADATA, new FixedMetadataValue(mPlugin, null));
 			new BukkitRunnable() {
 				int t = 0;
 				@Override
@@ -95,6 +98,7 @@ public class CloakAndDagger extends Ability {
 							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							                                 new PotionEffect(PotionEffectType.SLOW_DIGGING, CLOAK_PENALTY_DURATION, 1, false, true));
 						}
+						mPlayer.removeMetadata(CLOAK_METADATA, mPlugin);
 						this.cancel();
 						active = false;
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
@@ -135,7 +139,7 @@ public class CloakAndDagger extends Ability {
 				if (cloak <= maxStacks - 3) {
 					cloak += 3;
 				} else {
-					cloak = 12;
+					cloak = maxStacks;
 				}
 			} else {
 				cloak++;

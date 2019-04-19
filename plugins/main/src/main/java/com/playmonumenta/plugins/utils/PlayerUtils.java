@@ -96,7 +96,8 @@ public class PlayerUtils {
 		List<Player> players = new ArrayList<Player>();
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (loc.distance(player.getLocation()) <= radius && player.getGameMode() != GameMode.SPECTATOR) {
+			if (loc.distance(player.getLocation()) <= radius && player.getGameMode() != GameMode.SPECTATOR
+			    && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 				players.add(player);
 			}
 		}

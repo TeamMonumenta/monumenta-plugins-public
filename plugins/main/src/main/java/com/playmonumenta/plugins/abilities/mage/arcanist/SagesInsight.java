@@ -4,25 +4,25 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.FrostNova;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
+import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Sage's Insight: All your melee wand hits do an additional
- * 1/2 damage and whenever you cast a spell, reduce the
- * cooldown of all other spells by 0.75. At level 2, taking
- * damage reduces the cooldown of your spells by 1.5 seconds
- * as well.
+ * Sage's Insight: Whenever you cast a spell, reduce the
+ * cooldown of all other spells by 5% / 10%.
  */
 public class SagesInsight extends Ability {
 
-	private static final int ARCANIST_1_COOLDOWN_REDUCTION = 15;
-	private static final int ARCANIST_2_COOLDOWN_REDUCTION = 30;
-	private static final double ARCANIST_DAMAGE = 0.5;
+	private static final double ARCANIST_1_COOLDOWN_REDUCTION_PERCENT = 0.05;
+	private static final double ARCANIST_2_COOLDOWN_REDUCTION_PERCENT = 0.10;
 
 	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -31,23 +31,23 @@ public class SagesInsight extends Ability {
 
 	@Override
 	public boolean AbilityCastEvent(AbilityCastEvent event) {
-		mPlugin.mTimers.UpdateCooldowns(mPlayer, ARCANIST_1_COOLDOWN_REDUCTION);
-		return true;
-	}
+		Ability[] abilities = {
+			AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneStrike.class),
+			AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class),
+			AbilityManager.getManager().getPlayerAbility(mPlayer, FrostNova.class),
+			AbilityManager.getManager().getPlayerAbility(mPlayer, MagmaShield.class),
+			AbilityManager.getManager().getPlayerAbility(mPlayer, PrismaticShield.class),
+			AbilityManager.getManager().getPlayerAbility(mPlayer, FlashSword.class)
+		};
 
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand())) {
-			event.setDamage(event.getDamage() + ARCANIST_DAMAGE);
+		double cooldownReductionPercent = getAbilityScore() == 1 ? ARCANIST_1_COOLDOWN_REDUCTION_PERCENT : ARCANIST_2_COOLDOWN_REDUCTION_PERCENT;
+		for (int i = 0; i < abilities.length; i++) {
+			if (abilities[i] != null) {
+				int cooldownReduction = (int)(abilities[i].getInfo().cooldown * cooldownReductionPercent);
+				mPlugin.mTimers.UpdateCooldown(mPlayer, abilities[i].getInfo().linkedSpell, cooldownReduction);
+			}
 		}
 		return true;
 	}
 
-	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (getAbilityScore() > 1) {
-			mPlugin.mTimers.UpdateCooldowns(mPlayer, ARCANIST_2_COOLDOWN_REDUCTION);
-		}
-		return true;
-	}
 }

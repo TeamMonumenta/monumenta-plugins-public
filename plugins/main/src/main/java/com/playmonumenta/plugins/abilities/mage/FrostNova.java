@@ -50,11 +50,10 @@ public class FrostNova extends Ability {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
 				} else {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
-					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION, mob);
+					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION / 2, mob);
 				}
-			} else {
-				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 			}
+			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);

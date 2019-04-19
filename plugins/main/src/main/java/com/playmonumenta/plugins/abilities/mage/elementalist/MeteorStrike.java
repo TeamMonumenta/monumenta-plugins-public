@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -22,9 +23,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Sprint left-click makes a meteor fall where the player is looking, dealing
- * 18 / 24 damage in a 5-block radius and setting mobs on fire for 3s.
- * Cooldown 16 / 12 s
+ * Triple left-click without hitting a mob makes a meteor fall where the
+ * player is looking, dealing 18 / 24 damage in a 5-block radius and
+ * setting mobs on fire for 3s. Cooldown 16 / 12 s
  */
 
 public class MeteorStrike extends Ability {
@@ -35,7 +36,6 @@ public class MeteorStrike extends Ability {
 	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
 	private static final double METEOR_STRIKE_RADIUS = 5;
 
-	private BukkitRunnable mRunnable = null;
 	private int mLeftClicks = 0;
 
 	public MeteorStrike(Plugin plugin, World world, Random random, Player player) {
@@ -50,26 +50,22 @@ public class MeteorStrike extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSprinting() && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
+		return InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand);
 	}
 
 	@Override
 	public boolean cast() {
 		mLeftClicks++;
-		if (mRunnable == null) {
-			mRunnable = new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (mRunnable != null) {
-						mLeftClicks = 0;
-						mRunnable = null;
-					}
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mLeftClicks > 0) {
+					mLeftClicks--;
 				}
+				this.cancel();
+			}
+		}.runTaskLater(mPlugin, 20);
 
-			};
-			mRunnable.runTaskLater(mPlugin, 20);
-		}
 		if (mLeftClicks < 3) {
 			return false;
 		}
@@ -90,7 +86,6 @@ public class MeteorStrike extends Ability {
 		}
 
 		mLeftClicks = 0;
-		mRunnable = null;
 		putOnCooldown();
 		return true;
 	}
@@ -116,7 +111,7 @@ public class MeteorStrike extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, METEOR_STRIKE_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									Spellshock.spellDamageMob(mPlugin, e, (float) (damage * 0.75), player, MagicType.FIRE);
+									Spellshock.spellDamageMob(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE);
 								} else {
 									Spellshock.spellDamageMob(mPlugin, e, (float) damage, player, MagicType.FIRE);
 								}
@@ -139,5 +134,13 @@ public class MeteorStrike extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mLeftClicks > 0) {
+			mLeftClicks--;
+		}
+		return true;
 	}
 }

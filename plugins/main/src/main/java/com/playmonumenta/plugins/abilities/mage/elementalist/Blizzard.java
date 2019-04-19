@@ -35,7 +35,7 @@ public class Blizzard extends Ability {
 	 * (similar to Rains) each enemy that enters the aura gets slowness 1, 2 after
 	 * 3s and 6s freezes them (except bosses) and take 4 / 6 damage per second.
 	 * Puts out players on fire within range.
-	 * Cooldown: 28 s / 24 s
+	 * Cooldown: 18 s / 14 s after Blizzard finishes.
 	 */
 
 	private static final int BLIZZARD_1_RADIUS = 5;
@@ -105,9 +105,9 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				mWorld.spawnParticle(Particle.SNOWBALL, loc, 8, 2, 2, 2, 0.1);
-				mWorld.spawnParticle(Particle.CLOUD, loc, 5, 2, 2, 2, 0.05);
-				mWorld.spawnParticle(Particle.CLOUD, loc, 5, 0.1, 0.1, 0.1, 0.15);
+				mWorld.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
+				mWorld.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
+				mWorld.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
 				if (t >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
 					this.cancel();
 					affected.clear();

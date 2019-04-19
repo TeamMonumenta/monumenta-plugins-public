@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
  * Overload: Your spells deal an additional 1.5
  * damage for each other spell already on cooldown.
  * At Level 2, the extra damage is increased to 3.
+ * This effect does not work with Spellshock damage.
  */
 
 public class Overload extends Ability {

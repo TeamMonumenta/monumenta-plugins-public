@@ -27,18 +27,18 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 /*
  * Flash Sword: Sprint left clicking with a wand causes a wave
  * of Arcane blades to cut down all the foes in your path. Each
- * enemy within a 5 block cone takes 3 damage 3 times in rapid
+ * enemy within a 5 block cone takes 4 damage 3 times in rapid
  * succession, being knocked back with the last swipe. At level
- * 2 this abilities damage increases to 5 damage 3 times.
- * (CD: 8 seconds)
+ * 2 this abilities damage increases to 7 damage 3 times.
+ * (CD: 10 seconds)
  */
 public class FlashSword extends Ability {
 
-	private static final int FSWORD_1_DAMAGE = 3;
-	private static final int FSWORD_2_DAMAGE = 5;
+	private static final int FSWORD_1_DAMAGE = 4;
+	private static final int FSWORD_2_DAMAGE = 7;
 	private static final int FSWORD_SWINGS = 3;
 	private static final int FSWORD_RADIUS = 5;
-	private static final int FSWORD_COOLDOWN = 20 * 8;
+	private static final int FSWORD_COOLDOWN = 20 * 10;
 	private static final float FSWORD_KNOCKBACK_SPEED = 0.3f;
 	private static final double FSWORD_DOT_ANGLE = 0.33;
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
