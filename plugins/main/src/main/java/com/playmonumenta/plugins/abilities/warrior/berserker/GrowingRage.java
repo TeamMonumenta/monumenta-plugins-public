@@ -57,34 +57,32 @@ public class GrowingRage extends Ability {
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (!mPlayer.isBlocking()) { //don't activate if the player blocked the attack
-			if (!mPlayer.isDead() && mPlayer.getHealth() > 0) {
-				if (rageCurrentStack < GROWING_RAGE_STACK_LIMIT) {
-					rageCurrentStack++;
-					if (rageCurrentStack == 1) {
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have 1 stack of Rage!");
-					} else {
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have " + rageCurrentStack + " stacks of Rage!");
-					}
+		if (!mPlayer.isDead() && mPlayer.getHealth() > 0) {
+			if (rageCurrentStack < GROWING_RAGE_STACK_LIMIT) {
+				rageCurrentStack++;
+				if (rageCurrentStack == 1) {
+					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have 1 stack of Rage!");
 				} else {
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your " + rageCurrentStack + " stacks of Rage are refreshed!");
+					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have " + rageCurrentStack + " stacks of Rage!");
 				}
-				boolean run = rageDuration <= 0;
-				rageDuration = GROWING_RAGE_DURATION;
-				if (run) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							rageDuration--;
-							if (rageDuration <= 0) {
-								this.cancel();
-								rageCurrentStack = 0;
-								MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your Rage has worn off!");
-							}
+			} else {
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your " + rageCurrentStack + " stacks of Rage are refreshed!");
+			}
+			boolean run = rageDuration <= 0;
+			rageDuration = GROWING_RAGE_DURATION;
+			if (run) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						rageDuration--;
+						if (rageDuration <= 0) {
+							this.cancel();
+							rageCurrentStack = 0;
+							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your Rage has worn off!");
 						}
+					}
 
-					}.runTaskTimer(mPlugin, 0, 1);
-				}
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 		}
 		return true;
