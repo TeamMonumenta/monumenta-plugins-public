@@ -6,11 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellBaseSummon extends Spell {
 	@FunctionalInterface
@@ -46,6 +50,7 @@ public class SpellBaseSummon extends Spell {
 	}
 
 	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private final int mCastTime;
 	private final int mDuration;
 	private final int mSpawnsPerPlayer;
@@ -55,10 +60,11 @@ public class SpellBaseSummon extends Spell {
 	private final SummonerAnimation mAnimation;
 	private final List<Vector> mLocationOffsets;
 
-	public SpellBaseSummon(Plugin plugin, int castTime, int duration, int rangeFromPlayer,
+	public SpellBaseSummon(Plugin plugin, LivingEntity boss, int castTime, int duration, int rangeFromPlayer,
 	                       int spawnsPerPlayer, boolean stopWhenHit, GetTargetPlayers getPlayers,
 	                       SummonMobAt summon, SummonerAnimation animation) {
 		mPlugin = plugin;
+		mBoss = boss;
 		mCastTime = castTime;
 		mDuration = duration;
 		mSpawnsPerPlayer = spawnsPerPlayer;
@@ -141,6 +147,21 @@ public class SpellBaseSummon extends Spell {
 
 	public int duration() {
 		return mDuration;
+	}
+
+	@Override
+	public boolean canRun() {
+		if (((mBoss instanceof Mob) && (((Mob)mBoss).getTarget() instanceof Player))) {
+			return true;
+		}
+
+		for (Player player : mGetPlayers.run()) {
+			if (Utils.hasLineOfSight(player, mBoss)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

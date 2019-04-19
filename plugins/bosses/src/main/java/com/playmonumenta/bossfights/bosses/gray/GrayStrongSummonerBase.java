@@ -1,6 +1,8 @@
 package com.playmonumenta.bossfights.bosses.gray;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -9,6 +11,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,8 +21,8 @@ import com.playmonumenta.bossfights.spells.SpellBaseSummon;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
-	private static final int SUMMON_TIME = 300;
-	private static final int TIME_BETWEEN_CASTS = 800;
+	private static final int SUMMON_TIME = 200;
+	private static final int TIME_BETWEEN_CASTS = 700;
 	private static final int SUMMON_TICK_PERIOD = 1;
 	private static final int PLAYER_RADIUS = 7;
 	private static final int SPAWNS_PER_PLAYER = 3;
@@ -30,11 +33,34 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
+			new SpellBaseSummon(plugin, boss, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
 				() -> {
-					// Run on all nearby players
-					//TODO: Logarithmic instead?
-					return Utils.playersInRange(boss.getLocation(), 20);
+					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
+					List <Player> targets = Utils.playersInRange(boss.getLocation(), 20);
+					Collections.shuffle(targets);
+					switch(targets.size()) {
+					case 0:
+					case 1:
+					case 2:
+						return targets;
+					case 3:
+					case 4:
+						targets.remove(0);
+						return targets;
+					case 5:
+					case 6:
+						targets.remove(0);
+						targets.remove(0);
+						return targets;
+					case 7:
+					case 8:
+						targets.remove(0);
+						targets.remove(0);
+						targets.remove(0);
+						return targets;
+					default:
+						return targets.subList(0, 5);
+					}
 				},
 				(summonLoc, player) -> {
 					try {
@@ -88,7 +114,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					return null;
 				},
 				() -> {
-					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.0f, 1.0f);
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.5f, 1.0f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mTicks = 0;
 
