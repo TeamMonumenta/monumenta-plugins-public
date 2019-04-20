@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DeathsTouch extends Ability {
 	private static final int DEATHS_TOUCH_1_COOLDOWN = 30 * 20;
@@ -104,6 +105,12 @@ public class DeathsTouch extends Ability {
 					putOnCooldown();
 					return true;
 				}
+			}
+		}
+		if (mInfo.linkedSpell != null) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 20 * 5);
+				PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.linkedSpell);
 			}
 		}
 		return false;
