@@ -1,13 +1,16 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
@@ -114,18 +117,40 @@ public class SpellBaseLaser extends Spell {
 				Location launLoc = mBoss.getLocation().add(0, 1.6f, 0);
 				Location tarLoc = target.getEyeLocation();
 				Location endLoc = launLoc;
+				BoundingBox box = BoundingBox.of(endLoc, 0.5, 0.5, 0.5);
 
 				Vector baseVect = new Vector(tarLoc.getX() - launLoc.getX(), tarLoc.getY() - launLoc.getY(), tarLoc.getZ() - launLoc.getZ());
 				baseVect = baseVect.normalize().multiply(0.5);
 
 				boolean blocked = false;
 				for (int i = 0; i < 200; i++) {
-					endLoc.add(baseVect);
+					box.shift(baseVect);
+					endLoc = box.getCenter().toLocation(mBoss.getWorld());
 
 					if (mParticleAction != null && mRandom.nextInt(3) == 0) {
 						mParticleAction.run(endLoc);
 					}
+					List<Block> blocks = new ArrayList<Block>();
+					for (int x = -1; x < 1; x++) {
+						for (int y = -1; y < 1; y++) {
+							for (int z = -1; z < 1; z++) {
+								blocks.add(endLoc.clone().add(x, y, z).getBlock());
+							}
+						}
+					}
 
+					boolean cancel = false;
+					for (Block block : blocks) {
+						if (block.getBoundingBox().overlaps(box)) {
+							cancel = true;
+							break;
+						}
+					}
+
+					if (cancel) {
+						blocked = true;
+						break;
+					}
 					if (endLoc.getBlock().getType().isSolid()) {
 						blocked = true;
 						break;
