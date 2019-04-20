@@ -8,12 +8,20 @@ import org.bukkit.util.Vector;
 
 public class MovementUtils {
 	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed) {
-		KnockAway(awayFromEntity.getLocation(), target, speed);
+		KnockAway(awayFromEntity.getLocation(), target, speed, 0.5f);
+	}
+
+	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed, float y) {
+		KnockAway(awayFromEntity.getLocation(), target, speed, y);
 	}
 
 	public static void KnockAway(Location loc, LivingEntity target, float speed) {
+		KnockAway(loc, target, speed, 0.5f);
+	}
+
+	public static void KnockAway(Location loc, LivingEntity target, float speed, float y) {
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().multiply(speed);
-		dir.setY(0.5f);
+		dir.setY(y);
 		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
 		if (mult > 0) {
 			dir.multiply(mult);

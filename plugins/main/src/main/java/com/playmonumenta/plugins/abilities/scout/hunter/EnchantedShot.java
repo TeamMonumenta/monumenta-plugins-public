@@ -53,30 +53,27 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public boolean cast() {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW) && InventoryUtils.isBowItem(mainHand)) {
-			Player player = mPlayer;
-			active = true;
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
-			new BukkitRunnable() {
-				int t = 0;
-				@Override
-				public void run() {
-					t++;
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
-					if (!active || t >= 20 * 5) {
-						if (t >= 20 * 5) {
-							mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW);
+		if (!active) {
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			if (InventoryUtils.isBowItem(mainHand)) {
+				Player player = mPlayer;
+				active = true;
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
+				new BukkitRunnable() {
+					int t = 0;
+					@Override
+					public void run() {
+						t++;
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
+						if (!active || t >= 20 * 5) {
+							active = false;
+							this.cancel();
 						}
-						active = false;
-						// For some reason this is going on cooldown after casting even though I never
-						// called putOnCooldown(), so this is here as a janky fix
-						this.cancel();
 					}
-				}
-			}.runTaskTimer(mPlugin, 0, 1);
+				}.runTaskTimer(mPlugin, 0, 1);
+			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override

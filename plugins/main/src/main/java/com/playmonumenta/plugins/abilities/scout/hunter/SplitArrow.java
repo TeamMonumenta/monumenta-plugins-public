@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import java.util.Random;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -16,6 +19,7 @@ import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 /*
@@ -61,10 +65,21 @@ public class SplitArrow extends Ability {
 		}
 
 		if (nearestMob != null) {
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, nearestMob.getEyeLocation(), 20, 0.3f, 0.3f, 0.3f);
-			mWorld.spawnParticle(Particle.CRIT, nearestMob.getEyeLocation(), 20, 0, 0, 0, 0.3);
+			Location loc = damagee.getEyeLocation();
+			Location eye = nearestMob.getEyeLocation();
+			Vector dir = LocationUtils.getDirectionTo(eye, loc);
+			for (int i = 0; i < 50; i++) {
+				loc.add(dir.clone().multiply(0.1));
+				mWorld.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0);
+				if (loc.distance(eye) < 0.4) {
+					break;
+				}
+			}
+			mWorld.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
+			mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 			EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer);
-			MovementUtils.KnockAway(damagee, nearestMob, 0.15f);
+			MovementUtils.KnockAway(damagee, nearestMob, 0.125f, 0.35f);
 			putOnCooldown();
 		}
 
