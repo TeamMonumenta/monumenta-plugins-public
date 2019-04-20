@@ -53,7 +53,7 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public boolean cast() {
-		if (!active) {
+		if (!active && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isBowItem(mainHand)) {
 				Player player = mPlayer;
