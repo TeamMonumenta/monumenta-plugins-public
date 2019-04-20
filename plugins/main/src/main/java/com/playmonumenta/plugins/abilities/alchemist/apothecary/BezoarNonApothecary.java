@@ -27,7 +27,7 @@ public class BezoarNonApothecary extends Ability {
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, 12, false)) {
-			Beozar bz = (Beozar) AbilityManager.getManager().getPlayerAbility(player, Beozar.class);
+			Bezoar bz = (Bezoar) AbilityManager.getManager().getPlayerAbility(player, Bezoar.class);
 			if (bz != null) {
 				bz.incrementKills();
 			}

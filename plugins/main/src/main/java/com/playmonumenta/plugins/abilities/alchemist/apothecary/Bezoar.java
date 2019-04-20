@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * the stone, it explodes in a 3 block radius for 4/6 damage.
  */
 
-public class Beozar extends Ability {
+public class Bezoar extends Ability {
 
 	private static final int BEZOAR_1_DAMAGE = 4;
 	private static final int BEZOAR_2_DAMAGE = 6;
@@ -38,10 +38,10 @@ public class Beozar extends Ability {
 
 	private int kills = 0;
 
-	public Beozar(Plugin plugin, World world, Random random, Player player) {
+	public Bezoar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		// This is spelled incorrectly in both scoreboards and half the code, I am now big sad
-		mInfo.scoreboardId = "Beozar";
+		mInfo.scoreboardId = "Bezoar";
 	}
 
 	@Override
