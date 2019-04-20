@@ -1,13 +1,16 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
@@ -182,7 +185,9 @@ public class SpellBaseCharge extends Spell {
 
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
+		BoundingBox box = BoundingBox.of(endLoc, 1, 1, 1);
 		for (int i = 0; i < 200; i++) {
+			box.shift(baseVect);
 			endLoc.add(baseVect);
 			endLoc1.add(baseVect);
 
@@ -190,6 +195,21 @@ public class SpellBaseCharge extends Spell {
 				particle.run(endLoc);
 			}
 
+			List<Block> blocks = new ArrayList<Block>();
+			for (int x = -1; x < 1; x++) {
+				for (int y = -1; y < 1; y++) {
+					for (int z = -1; z < 1; z++) {
+						blocks.add(endLoc.clone().add(x, y, z).getBlock());
+					}
+				}
+			}
+
+			for (Block block : blocks) {
+				if (block.getBoundingBox().overlaps(box)) {
+					cancel = true;
+					break;
+				}
+			}
 			if (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid()) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
 				endLoc.subtract(baseVect.multiply(1));

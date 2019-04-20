@@ -106,7 +106,7 @@ public class IronTincture extends Ability {
 				}
 
 				tinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN) {
+				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
 					tincture.remove();
 					this.cancel();
 

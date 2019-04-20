@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -137,6 +138,13 @@ public class SpellRaiseJungle extends Spell {
 									ele.setHealth(0);
 									this.cancel();
 									return;
+								}
+
+								if (raised) {
+									Block block = ele.getLocation().getBlock();
+									if (block.getType().isSolid() || block.isLiquid()) {
+										Utils.KnockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
+									}
 								}
 
 								if (ele.isDead() || !ele.isValid() || ele == null) {

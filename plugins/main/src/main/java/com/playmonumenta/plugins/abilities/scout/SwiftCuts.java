@@ -57,7 +57,7 @@ public class SwiftCuts extends Ability {
 						public void run() {
 							t++;
 							world.spawnParticle(Particle.FALLING_DUST, ent.getLocation().add(0, 1, 0), 1, 0.35, 0.45, 0.35, Material.GRAVEL.createBlockData());
-							if (!marked.contains(ent) || t >= 20 * 3) {
+							if (!marked.contains(ent) || t >= 20 * 3 || ent.isDead() || !ent.isValid()) {
 								this.cancel();
 								marked.remove(ent);
 							}

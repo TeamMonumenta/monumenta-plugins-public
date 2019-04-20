@@ -6,11 +6,13 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -144,6 +146,10 @@ public class SpellKaulsJudgement extends Spell {
 				t++;
 				world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
 				world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
+				if (player.isDead()) {
+					this.cancel();
+					return;
+				}
 				if (t >= 20 * 2) {
 					this.cancel();
 					player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
@@ -180,11 +186,26 @@ public class SpellKaulsJudgement extends Spell {
 										world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
 										world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
 										world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
-										double health = player.getHealth() - (player.getMaxHealth() - 10);
-										if (health <= 0) {
+										double toTake = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - 10);
+										float absorp = Utils.getAbsorp(player);
+										double adjustedHealth = (player.getHealth() + absorp) - toTake;
+										if (adjustedHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+											// Kill the player, but allow totems to trigger
 											player.damage(100, mBoss);
-										} else {
-											player.setHealth(health);
+										} else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+											if (absorp > 0) {
+												if (absorp - toTake > 0) {
+													Utils.setAbsorp(player, (float) (absorp - toTake));
+													toTake = 0;
+												} else {
+													Utils.setAbsorp(player, 0f);
+													toTake -= absorp;
+												}
+											}
+											if (toTake > 0) {
+												player.setHealth(player.getHealth() - toTake);
+											}
+											player.damage(1, mBoss);
 										}
 										player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 2));

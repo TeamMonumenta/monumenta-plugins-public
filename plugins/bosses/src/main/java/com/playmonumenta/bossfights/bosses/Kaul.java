@@ -159,6 +159,23 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+					if (player.isSleeping()) {
+						player.damage(22, mBoss);
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
+						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
+					}
+				}
+				if (defeated || mBoss.isDead() || !mBoss.isValid()) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 5);
 		SpellManager phase1Spells = new SpellManager(
 		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mHeight.getLocation().getY()),
 		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mHeight.getLocation()),

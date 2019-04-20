@@ -150,7 +150,9 @@ public class SpellVolcanicDemise extends Spell {
 							Utils.KnockAway(loc, player, 0.5f, 0.65f);
 						} else if (pBox.overlaps(box)) {
 							player.damage(42, mBoss);
-							Utils.KnockAway(loc, player, 0.5f, 0.65f);
+							if (!player.isBlocking()) {
+								Utils.KnockAway(loc, player, 0.5f, 0.65f);
+							}
 						}
 					}
 					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
