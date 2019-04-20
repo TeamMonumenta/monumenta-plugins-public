@@ -3,6 +3,7 @@ package com.playmonumenta.bossfights.bosses;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -19,6 +20,7 @@ public class AuraLargeWeaknessBoss extends BossAbilityGroup {
 	public static final int detectionRange = 45;
 
 	LivingEntity mBoss;
+	private static final Particle.DustOptions WEAKNESS_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2f);
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AuraLargeWeaknessBoss(plugin, boss);
@@ -28,7 +30,7 @@ public class AuraLargeWeaknessBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellBaseAura(mBoss, 35, 20, 35, 10, Particle.FALLING_DUST, Material.REDSTONE_BLOCK.createBlockData(),
+			new SpellBaseAura(mBoss, 35, 20, 35, 20, Particle.REDSTONE, WEAKNESS_COLOR,
 			                  (Player player) -> {
 			                      player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, true, true));
 			                  })
