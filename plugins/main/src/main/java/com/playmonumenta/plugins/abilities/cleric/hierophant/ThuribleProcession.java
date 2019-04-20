@@ -72,14 +72,13 @@ public class ThuribleProcession extends Ability {
 			@Override
 			public void run() {
 				if (rightClicks > 0) {
-					rightClicks--;
+					rightClicks = 0;
 				}
 				this.cancel();
 			}
 		}.runTaskLater(mPlugin, 20);
 
-		if (rightClicks >= 3) {
-			// This probably isn't necessary, but it ensures that rightClicks never gets too high for some reason
+		if (rightClicks >= 2) {
 			rightClicks = 0;
 			float speed = getAbilityScore() == 1 ? THURIBLE_1_WALK_SPEED : THURIBLE_2_WALK_SPEED;
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
