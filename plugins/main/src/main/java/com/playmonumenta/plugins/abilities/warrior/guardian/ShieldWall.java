@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,41 +53,39 @@ public class ShieldWall extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
-	private boolean mPrimed = false;
+	private int mRightClicks = 0;
 	@Override
 	public boolean cast() {
-		if (mPrimed) {
+
+		mRightClicks++;
+		if (mRightClicks == 1) {
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					mRightClicks = 0;
+				}
+
+			}.runTaskLater(mPlugin, 20);
 			return false;
 		}
 
-		int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-		new BukkitRunnable() {
-			int t = 0;
-			boolean active = false;
-			Location loc = mPlayer.getLocation();
-			List<BoundingBox> boxes = new ArrayList<BoundingBox>();
-			boolean hitboxes = false;
+		if (mRightClicks >= 2) {
+			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
+			boolean knockback = getAbilityScore() == 1 ? false : true;
+			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
+			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
+			putOnCooldown();
+			new BukkitRunnable() {
+				int t = 0;
+				Location loc = mPlayer.getLocation();
+				List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+				boolean hitboxes = false;
 
-			@Override
-			public void run() {
-				t++;
-
-				if (!mPlayer.isHandRaised() && !mPlayer.isBlocking() && !active) {
-					mPrimed = true;
-				}
-
-				if (mPrimed && !active) {
-					if (mPlayer.isHandRaised() || mPlayer.isBlocking()) {
-						active = true;
-						mPrimed = false;
-						t = 0;
-						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
-						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
-						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
-						putOnCooldown();
-					}
-				}
-				if (active) {
+				@Override
+				public void run() {
+					t++;
 					Vector vec;
 					for (int y = 0; y < 5; y++) {
 						for (double degree = 0; degree < 180; degree += 10) {
@@ -120,28 +119,26 @@ public class ShieldWall extends Ability {
 								}
 							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
+								Vector v = le.getVelocity();
 								EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
-								if (getAbilityScore() > 1) {
+								if (knockback) {
 									MovementUtils.KnockAway(loc, le, 0.3f);
 									mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 									mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+								} else {
+									le.setVelocity(v);
 								}
 							}
 						}
 					}
-				}
-				if (t >= time) {
-					this.cancel();
-					boxes.clear();
+					if (t >= time) {
+						this.cancel();
+						boxes.clear();
+					}
 				}
 
-				if (t > 5 && !active) {
-					this.cancel();
-					mPrimed = false;
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
 		return true;
 	}
 
