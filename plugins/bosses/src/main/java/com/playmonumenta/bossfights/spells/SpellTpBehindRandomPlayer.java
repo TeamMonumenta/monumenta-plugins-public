@@ -12,13 +12,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class SpellTpBehindRandomPlayer extends Spell {
+	private static final int MAX_RANGE = 80;
+	private static final int TP_DELAY = 50;
+
 	private final com.playmonumenta.plugins.Plugin mMainPlugin;
 	private final Plugin mPlugin;
 	private final Entity mLauncher;
@@ -66,10 +69,13 @@ public class SpellTpBehindRandomPlayer extends Spell {
 	}
 
 	private void launch(Player target) {
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable teleport = new Runnable() {
+		new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (target.getLocation().distance(mLauncher.getLocation()) > MAX_RANGE) {
+					return;
+				}
+
 				Location newloc = target.getLocation();
 				World world = mLauncher.getWorld();
 				Vector vect = newloc.getDirection().multiply(-3.0f);
@@ -84,23 +90,25 @@ public class SpellTpBehindRandomPlayer extends Spell {
 					((Mob)mLauncher).setTarget(target);
 				}
 			}
-		};
-		scheduler.scheduleSyncDelayedTask(mPlugin, teleport, 50);
+		}.runTaskLater(mPlugin, TP_DELAY);
 	}
 
 	private void animation(Player target) {
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
 
-		Runnable particle = new Runnable() {
+		new BukkitRunnable() {
+			int mTicks = 0;
+
 			@Override
 			public void run() {
+				mTicks++;
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
 				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
+
+				if (mTicks > TP_DELAY) {
+					this.cancel();
+				}
 			}
-		};
-		for (int i = 0; i < 50; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, particle, i);
-		}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }
