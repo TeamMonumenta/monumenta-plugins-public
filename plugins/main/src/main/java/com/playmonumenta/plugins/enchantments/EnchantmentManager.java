@@ -48,7 +48,6 @@ public class EnchantmentManager {
 
 		// Passive enchantments
 		init.add(new Regeneration());
-		init.add(new MainhandRegeneration());
 		init.add(new Darksight());
 		init.add(new Radiant());
 		init.add(new Gills());
@@ -154,7 +153,7 @@ public class EnchantmentManager {
 						 * If this particular property applies levels,
 						 * add them to the running count
 						 */
-						int level = property.getLevelFromItem(item, player);
+						int level = property.getLevelFromItem(item, player, slot);
 						if (level > 0) {
 							Integer currentLevel = propertyMap.get(property);
 							if (currentLevel != null) {

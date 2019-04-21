@@ -54,6 +54,16 @@ public interface BaseEnchantment {
 	}
 
 	/*
+	 * Computes what level the given item is for this particular ItemProperty.
+	 * If the item does not have this property, it should return 0
+	 * This variant is useful for regeneration
+	 */
+	default public int getLevelFromItem(ItemStack item, Player player, ItemSlot slot) {
+		// By default ignore the slot
+		return getLevelFromItem(item, player);
+	}
+
+	/*
 	 * applyProperty will be called every time the player changes their inventory
 	 * and the player matches this ItemProperty
 	 */

@@ -160,7 +160,7 @@ public class PotionManager {
 
 		for (PotionEffect type : player.getActivePotionEffects()) {
 			/*
-			 * Assume that any potions greater than one hour were not
+			 * Assume that any potions greater than 30 minutes were not
 			 * potions the player drank - and clear them from the player
 			 */
 			if (type.getDuration() < Constants.THIRTY_MINUTES) {

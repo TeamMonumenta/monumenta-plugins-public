@@ -274,9 +274,7 @@ public class PotionUtils {
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
 				PotionEffect effect = player.getPotionEffect(type);
-				if (effect.getDuration() < 20 * 120) {
-					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
-				}
+				plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
 			}
 		}
 	}
