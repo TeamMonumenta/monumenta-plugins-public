@@ -16,14 +16,22 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 
 public class SpellTpBehindRandomPlayer extends Spell {
-	private Plugin mPlugin;
-	private Entity mLauncher;
-	private int mDuration;
-	private Random mRand = new Random();
+	private final com.playmonumenta.plugins.Plugin mMainPlugin;
+	private final Plugin mPlugin;
+	private final Entity mLauncher;
+	private final int mDuration;
+	private final Random mRand = new Random();
 
 	public SpellTpBehindRandomPlayer(Plugin plugin, Entity launcher, int duration) {
+		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaMain")) {
+			mMainPlugin = com.playmonumenta.plugins.Plugin.getInstance();
+		} else {
+			mMainPlugin = null;
+		}
+
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mDuration = duration;
@@ -32,10 +40,23 @@ public class SpellTpBehindRandomPlayer extends Spell {
 	@Override
 	public void run() {
 		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 80);
-		if (!players.isEmpty()) {
+		while (!players.isEmpty()) {
 			Player target = players.get(mRand.nextInt(players.size()));
-			launch(target);
-			animation(target);
+
+			if (mMainPlugin != null) {
+				/* Do not teleport to players in safezones */
+				LocationType zone = mMainPlugin.mSafeZoneManager.getLocationType(target);
+				if (zone.equals(LocationType.Capital) || zone.equals(LocationType.SafeZone)) {
+					/* This player is in a safe area - don't tp to them */
+					players.remove(target);
+				} else {
+					launch(target);
+					animation(target);
+				}
+			} else {
+				launch(target);
+				animation(target);
+			}
 		}
 	}
 
