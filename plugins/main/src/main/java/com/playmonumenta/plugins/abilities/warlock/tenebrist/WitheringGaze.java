@@ -48,6 +48,8 @@ public class WitheringGaze extends Ability {
 		Location loc = player.getLocation().add(0, 0.15, 0);
 		Vector direction = loc.getDirection().setY(0).normalize();
 		int duration = getAbilityScore() == 1 ? 20 * 6 : 20 * 10;
+		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
+		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		new BukkitRunnable() {
 			double t = 0;
 			double damagerange = 1.15;
@@ -88,7 +90,6 @@ public class WitheringGaze extends Ability {
 				}
 
 				damagerange += 1;
-				player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.85f, 0.4f);
 				loc.add(direction.clone().multiply(0.75));
 				if (loc.getBlock().getType().isSolid()) {
 					this.cancel();

@@ -131,8 +131,9 @@ public class ThuribleProcession extends Ability {
 						this.cancel();
 						putOnCooldown();
 						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
-						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 40, 0, 0, 0, 1);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 40, 2, 0.4f, 2, 0);
+						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1);
 					}
 
 					// Cancel if player stops blocking
