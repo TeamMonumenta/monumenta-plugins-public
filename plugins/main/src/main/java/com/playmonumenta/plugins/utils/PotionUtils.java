@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -274,7 +275,9 @@ public class PotionUtils {
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
 				PotionEffect effect = player.getPotionEffect(type);
-				plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
+					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+				}
 			}
 		}
 	}
