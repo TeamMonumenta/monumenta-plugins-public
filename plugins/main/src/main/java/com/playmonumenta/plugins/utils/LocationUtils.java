@@ -88,7 +88,7 @@ public class LocationUtils {
 		return false;
 	}
 
-	public static boolean isValidBoatLocation(Location loc) {
+	public static boolean isLocationInWater(Location loc) {
 		Block block = loc.getBlock();
 		if (block.isLiquid() || containsWater(block)) {
 			return true;
@@ -99,6 +99,14 @@ public class LocationUtils {
 			return true;
 		}
 
+		return false;
+	}
+
+	public static boolean isValidBoatLocation(Location loc) {
+		if (isLocationInWater(loc)) {
+			return true;
+		}
+
 		/*
 		 * Check up to 50 blocks underneath the location. Stop when
 		 * a non-air block is hit. If it's a liquid, this is allowed, otherwise it's not
@@ -106,7 +114,7 @@ public class LocationUtils {
 		loc = loc.clone();
 		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
 			loc.setY(i);
-			block = loc.getBlock();
+			Block block = loc.getBlock();
 			if (block.isLiquid() || containsWater(block)) {
 				return true;
 			} else if (!block.isEmpty()) {
