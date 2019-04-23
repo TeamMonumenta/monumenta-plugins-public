@@ -42,6 +42,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -56,6 +57,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
@@ -382,6 +384,19 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void EntityResurrectEvent(EntityResurrectEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof Player) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mPlugin.mAbilityManager.updatePlayerAbilities((Player)entity);
+				}
+			}.runTaskLater(mPlugin, 1);
 		}
 	}
 
