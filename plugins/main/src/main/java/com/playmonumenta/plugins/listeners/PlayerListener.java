@@ -175,10 +175,6 @@ public class PlayerListener implements Listener {
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 			}
-		} else if (action == Action.PHYSICAL) {
-			if (!mPlugin.mItemOverrides.physicsInteraction(mPlugin, player, action, item, block)) {
-				event.setCancelled(true);
-			}
 		}
 	}
 

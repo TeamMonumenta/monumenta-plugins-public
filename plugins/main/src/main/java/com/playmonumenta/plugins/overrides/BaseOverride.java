@@ -28,10 +28,6 @@ public class BaseOverride {
 		return true;
 	}
 
-	public boolean physicsInteraction(Plugin plugin, Player player, Block block) {
-		return true;
-	}
-
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
 		return true;
 	}

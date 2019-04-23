@@ -269,14 +269,6 @@ public class ItemOverrides {
 		return (override != null) ? override.rightClickEntityInteraction(plugin, player, clickedEntity, itemInHand) : true;
 	}
 
-	public boolean physicsInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-	                                  Block block) {
-		Material blockType = (block != null) ? block.getType() : Material.AIR;
-		BaseOverride override = mItems.get(blockType);
-
-		return (override != null) ? override.physicsInteraction(plugin, player, block) : true;
-	}
-
 	// Returns eventCancelled = true if disallowed, otherwise false
 	@SuppressWarnings({"unused"})
 	private boolean _safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {

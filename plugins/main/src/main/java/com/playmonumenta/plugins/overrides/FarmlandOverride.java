@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 
 public class FarmlandOverride extends BaseOverride {
 	@Override
-	public boolean physicsInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockChangeInteraction(Plugin plugin, Block block) {
 		return false;
 	}
 }
