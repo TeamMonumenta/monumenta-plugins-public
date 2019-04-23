@@ -29,6 +29,7 @@ import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -701,6 +702,9 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void EntityChangeBlockEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
+		if (event.getEntity() instanceof Wither) {
+			event.setCancelled(true);
+		}
 	}
 
 	@EventHandler
