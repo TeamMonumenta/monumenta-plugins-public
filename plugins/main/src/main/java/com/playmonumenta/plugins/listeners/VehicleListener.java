@@ -37,7 +37,8 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
 
-		if (!(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None) {
+		if (!(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None
+			&& !vehicle.getType().equals(entity.getType())) {
 			/*
 			 * Vehicles are removed if they:
 			 *
