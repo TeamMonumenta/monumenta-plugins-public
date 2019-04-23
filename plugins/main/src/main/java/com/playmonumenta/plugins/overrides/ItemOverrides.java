@@ -197,6 +197,7 @@ public class ItemOverrides {
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
+		mItems.put(Material.BONE, new BoneOverride());
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);
