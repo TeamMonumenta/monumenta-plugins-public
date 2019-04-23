@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -129,11 +130,12 @@ public class Utils {
 	/*
 	 * TODO: This is really janky - it *probably* returns the correct entity... but it might not
 	 */
-	public static Entity summonEntityAt(Location loc, String id, String nbt) throws Exception {
-		String cmd = "summon " + id + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
+	public static Entity summonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
+		String cmd = "summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
 		List<Entity> entities = new ArrayList<Entity>(loc.getNearbyEntities(1f, 1f, 1f));
+		entities.removeIf(e -> !e.getType().equals(type));
 		if (entities.size() <= 0) {
 			throw new Exception("Summoned mob but no mob appeared - " + cmd);
 		}

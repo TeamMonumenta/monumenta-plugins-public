@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -73,18 +74,17 @@ public class SpellAxtalTntThrow extends Spell {
 			public void run() {
 				List<Player> plist = Utils.playersInRange(mLauncher.getLocation(), 100);
 				Player Target = plist.get(mRand.nextInt(plist.size()));
-				Location SLoc = mLauncher.getLocation();
-				SLoc.setY(SLoc.getY() + 1.7f);
-				/* TODO: Should summon these entities directly */
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + SLoc.getX() + " " + SLoc.getY() + " " + SLoc.getZ() + " {Fuse:50}");
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon falling_block " + SLoc.getX() + " " + SLoc.getY() + " " + SLoc.getZ() + " {Block:leaves,Data:3,Time:1}");
-				List<Entity> tnt = mLauncher.getNearbyEntities(0.2, 2.5, 0.2);
-				Location pLoc = Target.getLocation();
-				Location tLoc = tnt.get(0).getLocation();
-				Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-				vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
-				tnt.get(0).setVelocity(vect);
-				tnt.get(1).setVelocity(vect);
+				Location sLoc = mLauncher.getLocation();
+				try {
+					Entity tnt = Utils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
+					Location pLoc = Target.getLocation();
+					Location tLoc = tnt.getLocation();
+					Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
+					vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
+					tnt.setVelocity(vect);
+				} catch (Exception e) {
+					mPlugin.getLogger().warning("Summoned TNT but could not find TNT entity");
+				}
 			}
 		};
 		for (int i = 0; i < mCount; i++) {

@@ -10,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -30,7 +31,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int SPAWNS_PER_PLAYER = 8;
 	private static final Random mRand = new Random();
 
-	GraySwarmSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, String mobType, String mobNBT) throws Exception {
+	GraySwarmSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, EntityType mobType, String mobNBT) throws Exception {
 		if (!(boss instanceof Mob)) {
 			throw new Exception("gray boss tags only work on mobs!");
 		}

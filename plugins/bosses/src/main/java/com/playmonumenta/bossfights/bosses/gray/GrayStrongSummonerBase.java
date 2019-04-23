@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -27,7 +28,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 	private static final int PLAYER_RADIUS = 7;
 	private static final int SPAWNS_PER_PLAYER = 3;
 
-	GrayStrongSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, String mobType, String mobNBT) throws Exception {
+	GrayStrongSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, EntityType mobType, String mobNBT) throws Exception {
 		if (!(boss instanceof Mob)) {
 			throw new Exception("gray boss tags only work on mobs!");
 		}

@@ -1,5 +1,6 @@
 package com.playmonumenta.bossfights.bosses.gray;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -15,6 +16,6 @@ public class GrayGolemSummoner extends GrayStrongSummonerBase {
 	}
 
 	public GrayGolemSummoner(Plugin plugin, LivingEntity boss) throws Exception {
-		super(plugin, boss, identityTag, detectionRange, "minecraft:husk", nbt);
+		super(plugin, boss, identityTag, detectionRange, EntityType.HUSK, nbt);
 	}
 }
