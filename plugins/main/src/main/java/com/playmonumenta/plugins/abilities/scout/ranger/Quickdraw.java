@@ -68,7 +68,7 @@ public class Quickdraw extends Ability {
 				arrow.setFireTicks(20 * 15);
 			}
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(arrow.getVelocity().multiply(2.25));
+			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
 			arrow.setMetadata("QuickdrawDamage", new FixedMetadataValue(mPlugin, 0));
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 		}
