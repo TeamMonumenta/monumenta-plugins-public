@@ -80,7 +80,7 @@ public class Sniper implements BaseEnchantment {
 				target.getWorld().spawnParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 30, 0, 0, 0, 0.65);
 				if (proj.getShooter() instanceof Player) {
 					Player player = (Player) proj.getShooter();
-					player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 0.5f);
+					player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
 				}
 			}
 		}

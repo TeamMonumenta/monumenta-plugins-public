@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.scout;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -52,6 +54,8 @@ public class Volley extends Ability {
 			return true;
 		}
 
+		//Start the cooldown first so we don't cause an infinite loop of Volleys
+		putOnCooldown();
 		List<Projectile> projectiles;
 		int volley = getAbilityScore();
 		int numArrows = (volley == 1) ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT;
@@ -77,6 +81,7 @@ public class Volley extends Ability {
 		for (Projectile proj : projectiles) {
 			Arrow _arrow = (Arrow)proj;
 
+
 			proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
 
 			// If the base arrow's potion data is still stored, apply it to the new arrows
@@ -90,7 +95,9 @@ public class Volley extends Ability {
 
 			mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
 
-			//TODO: Call PlayerShotArrowEvent with all these new arrows
+			//Fire: How stupid of me. I completely forgot we can call Bukkit Events on our OWN
+			ProjectileLaunchEvent event = new ProjectileLaunchEvent(_arrow);
+			Bukkit.getPluginManager().callEvent(event);
 		}
 
 		//  I hate this so much, you don't even know... [Rock]
@@ -98,7 +105,7 @@ public class Volley extends Ability {
 		jankWorkAround.setY(-15);
 		arrow.teleport(jankWorkAround);
 
-		putOnCooldown();
+
 		return true;
 	}
 
