@@ -5,6 +5,7 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.LivingEntity;
@@ -58,9 +59,14 @@ public class Quickdraw extends Ability {
 	@Override
 	public boolean cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.25f);
-			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 10, 0, 0, 0, 0.2f);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
+			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
 			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
+			ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
+				arrow.setFireTicks(20 * 15);
+			}
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(arrow.getVelocity().multiply(2.25));
 			arrow.setMetadata("QuickdrawDamage", new FixedMetadataValue(mPlugin, 0));
