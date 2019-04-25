@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Enchanted Arrow: Left click will prime an enchanted arrow.
+ * Enchanted Arrow: Left click while not sneaking will prime an enchanted arrow.
  * If the next arrow is fired within 5 seconds, the ability goes on cooldown and
  * the arrow will instantaneously travel in a straight line for 30
  * blocks until hitting a block, piercing through all targets,
@@ -129,6 +129,10 @@ public class EnchantedShot extends Ability {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean runCheck() {
+		return !mPlayer.isSneaking();
 	}
 
 }
