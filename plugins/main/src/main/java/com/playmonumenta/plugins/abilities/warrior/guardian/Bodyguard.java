@@ -64,7 +64,7 @@ public class Bodyguard extends Ability {
 		Vector dir = oLoc.getDirection();
 		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer.getEyeLocation(), BODYGUARD_RANGE);
 		players.remove(mPlayer);
-		for (int i = 0; i < 15; i++) {
+		for (int i = 0; i < BODYGUARD_RANGE; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(mWorld);
 			if (bLoc.getBlock().getType().isSolid()) {
