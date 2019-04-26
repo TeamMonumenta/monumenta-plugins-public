@@ -114,7 +114,7 @@ public class SpellBaseAoE extends Spell {
 				if (j <= (mDuration - 5)) {
 					world.playSound(mLauncher.getLocation(), mChargeSound, 1.5f, 0.25f + (j / 100));
 				}
-				for (double i = 0; i < 360; i += 12) {
+				for (double i = 0; i < 360; i += 15) {
 					double radian1 = Math.toRadians(i);
 					loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
 					mChargeCircleAction.run(loc);
