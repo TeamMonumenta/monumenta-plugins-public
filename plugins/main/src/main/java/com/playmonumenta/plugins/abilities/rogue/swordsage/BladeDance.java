@@ -92,10 +92,16 @@ public class BladeDance extends Ability {
 					@Override
 					public void run() {
 						i += 2;
-						Location checkLoc = mPlayer.getLocation();
-						checkLoc.setY(y);
-						double multiplier = getAbilityScore() == 1 ? DANCE_1_SCALING_DAMAGE : DANCE_2_SCALING_DAMAGE;
-						extraDamage += checkLoc.distance(loc) * multiplier;
+						if (!mPlayer.isRiptiding()) {
+							Location checkLoc = mPlayer.getLocation();
+							checkLoc.setY(y);
+							double multiplier = getAbilityScore() == 1 ? DANCE_1_SCALING_DAMAGE : DANCE_2_SCALING_DAMAGE;
+							if (checkLoc.distance(loc) * multiplier >= 20) {
+								extraDamage += 3;
+							} else {
+								extraDamage += checkLoc.distance(loc) * multiplier;
+							}
+						}
 						loc = mPlayer.getLocation();
 						loc.setY(y);
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
