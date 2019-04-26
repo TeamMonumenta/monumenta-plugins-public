@@ -31,9 +31,9 @@ public class GraySummoned extends BossAbilityGroup {
 		if (event.getEntity() != null && event.getEntity().hasMetadata("MonumentaBossesGrayExorcism")) {
 			ProjectileSource source = event.getEntity().getSource();
 			if (source != null && source instanceof Entity) {
-				mBoss.damage(9, (Entity)source);
+				mBoss.damage(15, (Entity)source);
 			} else {
-				mBoss.damage(9);
+				mBoss.damage(15);
 
 			}
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));

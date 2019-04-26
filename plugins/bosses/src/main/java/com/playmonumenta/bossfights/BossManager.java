@@ -480,8 +480,8 @@ public class BossManager implements Listener {
 			AreaEffectCloud cloud = event.getAreaEffectCloud();
 			if (event.getAreaEffectCloud() != null) {
 				cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
+				cloud.setRadius(8.0f);
 				cloud.setDurationOnUse(0);
-				cloud.setRadiusOnUse(0);
 				cloud.setRadiusOnUse(0);
 				cloud.setRadiusPerTick(-0.004f);
 			}
