@@ -55,10 +55,12 @@ public class SpellTpBehindRandomPlayer extends Spell {
 				} else {
 					launch(target);
 					animation(target);
+					break;
 				}
 			} else {
 				launch(target);
 				animation(target);
+				break;
 			}
 		}
 	}
