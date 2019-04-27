@@ -71,11 +71,17 @@ public class DaggerThrow extends Ability {
 				}
 
 				Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-				int ppDuration = pp.getBonus(mInfo.linkedSpell);
+				int ppDuration = 0;
+				if (pp != null) {
+					ppDuration = pp.getBonus(mInfo.linkedSpell);
+				}
+
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1, mPlayer)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
-					EntityUtils.applyStun(mPlugin, ppDuration, mob);
+					if (ppDuration > 0) {
+						EntityUtils.applyStun(mPlugin, ppDuration, mob);
+					}
 
 					hit = true;
 				}

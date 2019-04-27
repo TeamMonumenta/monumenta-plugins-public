@@ -58,7 +58,9 @@ public class ByMyBlade extends Ability {
 				extraDamage = BY_MY_BLADE_DAMAGE_1;
 			}
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-			extraDamage += pp.getBonus(mInfo.linkedSpell);
+			if (pp != null) {
+				extraDamage += pp.getBonus(mInfo.linkedSpell);
+			}
 			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, mPlayer);
 
 			Location loc = damagee.getLocation();

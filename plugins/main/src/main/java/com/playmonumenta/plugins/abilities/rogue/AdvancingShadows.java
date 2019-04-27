@@ -90,11 +90,13 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-			int ppDamage = pp.getBonus(mInfo.linkedSpell);
-			if (ppDamage != 0) {
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, ppDamage, mPlayer);
+			if (pp != null) {
+				int ppDamage = pp.getBonus(mInfo.linkedSpell);
+				if (ppDamage != 0) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
+																	  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+						EntityUtils.damageEntity(mPlugin, mob, ppDamage, mPlayer);
+					}
 				}
 			}
 

@@ -70,10 +70,12 @@ public class EscapeDeath extends Ability {
 		}
 
 		Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-		int ppDuration = pp.getBonus(mInfo.linkedSpell);
-		if (ppDuration != 0) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ppDuration, 4, true, false));
+		if (pp != null) {
+			int ppDuration = pp.getBonus(mInfo.linkedSpell);
+			if (ppDuration != 0) {
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+												 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ppDuration, 4, true, false));
+			}
 		}
 
 		Location loc = mPlayer.getLocation();

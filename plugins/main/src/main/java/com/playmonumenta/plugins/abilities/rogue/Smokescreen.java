@@ -54,7 +54,10 @@ public class Smokescreen extends Ability {
 			                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
 
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-			int ppDuration = pp.getBonus(mInfo.linkedSpell);
+			int ppDuration = 0;
+			if (pp != null) {
+				ppDuration = pp.getBonus(mInfo.linkedSpell);
+			}
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION + ppDuration, weaknessLevel, false, true));
 			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION + ppDuration, slownessLevel, false, true));
 
