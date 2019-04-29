@@ -24,7 +24,7 @@ public enum Spells {
 
 	//--Elementalist Spec.
 
-	METEOR_STRIKE("Meteor Strike"),
+	STARFALL("Starfall"),
 	ELEMENTAL_SPIRIT("Elemental Spirit"),
 	FROST_RAY("Frost Ray"),
 

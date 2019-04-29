@@ -28,21 +28,21 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  * setting mobs on fire for 3s. Cooldown 16 / 12 s
  */
 
-public class MeteorStrike extends Ability {
-	private static final int METEOR_STRIKE_1_COOLDOWN = 16 * 20;
-	private static final int METEOR_STRIKE_2_COOLDOWN = 12 * 20;
-	private static final int METEOR_STRIKE_1_DAMAGE = 18;
-	private static final int METEOR_STRIKE_2_DAMAGE = 26;
-	private static final int METEOR_STRIKE_FIRE_DURATION = 3 * 20;
-	private static final double METEOR_STRIKE_RADIUS = 5;
+public class Starfall extends Ability {
+	private static final int STARFALL_1_COOLDOWN = 16 * 20;
+	private static final int STARFALL_2_COOLDOWN = 12 * 20;
+	private static final int STARFALL_1_DAMAGE = 18;
+	private static final int STARFALL_2_DAMAGE = 26;
+	private static final int STARFALL_FIRE_DURATION = 3 * 20;
+	private static final double STARFALL_RADIUS = 5;
 
 	private int mLeftClicks = 0;
 
-	public MeteorStrike(Plugin plugin, World world, Random random, Player player) {
+	public Starfall(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.linkedSpell = Spells.METEOR_STRIKE;
-		mInfo.scoreboardId = "MeteorStrike";
-		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_STRIKE_1_COOLDOWN : METEOR_STRIKE_2_COOLDOWN;
+		mInfo.linkedSpell = Spells.STARFALL;
+		mInfo.scoreboardId = "Starfall";
+		mInfo.cooldown = getAbilityScore() == 1 ? STARFALL_1_COOLDOWN : STARFALL_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
@@ -91,7 +91,7 @@ public class MeteorStrike extends Ability {
 	}
 
 	private void launchMeteor(final Player player, final Location loc) {
-		double damage = getAbilityScore() == 1 ? METEOR_STRIKE_1_DAMAGE : METEOR_STRIKE_2_DAMAGE;
+		double damage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
 		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
 		new BukkitRunnable() {
@@ -109,13 +109,13 @@ public class MeteorStrike extends Ability {
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F);
 							this.cancel();
 
-							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, METEOR_STRIKE_RADIUS, mPlayer)) {
+							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
 									Spellshock.spellDamageMob(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE);
 								} else {
 									Spellshock.spellDamageMob(mPlugin, e, (float) damage, player, MagicType.FIRE);
 								}
-								e.setFireTicks(METEOR_STRIKE_FIRE_DURATION);
+								e.setFireTicks(STARFALL_FIRE_DURATION);
 
 								Vector v = e.getLocation().toVector().subtract(loc.toVector()).normalize();
 								v.add(new Vector(0, 0.2, 0));

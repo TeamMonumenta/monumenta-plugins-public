@@ -49,7 +49,7 @@ public class Preparation extends Ability {
 
 	public Preparation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.scoreboardId = "PerfectKill";
+		mInfo.scoreboardId = "Preparation";
 		mInfo.linkedSpell = Spells.PREPARATION;
 		mInfo.cooldown = getAbilityScore() == 1 ? PREPARATION_1_COOLDOWN : PREPARATION_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
