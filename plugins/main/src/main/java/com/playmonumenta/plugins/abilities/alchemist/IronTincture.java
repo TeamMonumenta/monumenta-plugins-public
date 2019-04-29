@@ -73,9 +73,6 @@ public class IronTincture extends Ability {
 
 			@Override
 			public void run() {
-				if (tincture.isDead() || tincture == null) {
-					this.cancel();
-				}
 				mWorld.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
 
 				for (Player p : PlayerUtils.getNearbyPlayers(tincture.getLocation(), 1)) {
@@ -102,11 +99,11 @@ public class IronTincture extends Ability {
 					mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 
 					this.cancel();
-					break;
+					return;
 				}
 
 				tinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
+				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || tincture == null || !tincture.isValid() || tincture.isDead()) {
 					tincture.remove();
 					this.cancel();
 
