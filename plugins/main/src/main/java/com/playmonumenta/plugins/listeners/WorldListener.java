@@ -171,14 +171,16 @@ public class WorldListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void BlockFormEvent(BlockFormEvent event) {
-		Block block = event.getBlock();
-		Material blockType = (block != null) ? block.getType() : Material.AIR;
+		Location blockLocation = event.getBlock().getLocation();
+		Material blockType = event.getNewState().getType();
+		if (blockType == null) {
+			blockType = Material.AIR;
+		}
 
 		if (blockType.equals(Material.SNOW) ||
 		    blockType.equals(Material.ICE)) {
-			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(block.getLocation());
-			if (locType.equals(LocationType.Capital) ||
-			    locType.equals(LocationType.SafeZone)) {
+			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(blockLocation);
+			if (!locType.equals(LocationType.None)) {
 				event.setCancelled(true);
 				return;
 			}
