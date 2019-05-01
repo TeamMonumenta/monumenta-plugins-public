@@ -8,7 +8,6 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -53,35 +52,38 @@ public class CluckingPotions extends Ability {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
 					entity.getLocation().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-					if (entity.getType() == EntityType.PLAYER) {
+					if (entity instanceof Player) {
 						Player player = (Player) entity;
-						ItemStack[] armor = player.getInventory().getArmorContents();
 						List<ItemStack> cluckingCandidates = new ArrayList<>();
-						for (int i = 0; i < armor.length; i++) {
-							if (armor[i] != null) {
-								cluckingCandidates.add(armor[i]);
+						for (ItemStack armor : player.getInventory().getArmorContents()) {
+							if (armor != null) {
+								cluckingCandidates.add(armor);
 							}
 						}
 
-						if (!cluckingCandidates.isEmpty()) {
-							ItemStack item = cluckingCandidates.get(mRandom.nextInt(cluckingCandidates.size()));
+						while (!cluckingCandidates.isEmpty()) {
+							int idx = mRandom.nextInt(cluckingCandidates.size());
+							ItemStack item = cluckingCandidates.get(idx);
+							cluckingCandidates.remove(idx);
+
 							ItemMeta meta = item.getItemMeta();
 							List<String> lore = meta.getLore();
 
-							List<String> newLore = new ArrayList<>();
-							boolean hasClucking = false;
+							List<String> newLore = new ArrayList<String>();
 							for (String loreEntry : lore) {
-								if (loreEntry.contains(ChatColor.GRAY + "Clucking")) {
-									hasClucking = true;
-								} else {
-									newLore.add(loreEntry);
+								if (loreEntry.contains("Clucking")) {
+									// Already has clucking, don't touch this item
+									continue;
 								}
+
+								newLore.add(loreEntry);
 							}
-							if (!hasClucking) {
-								newLore.add(ChatColor.GRAY + "Clucking");
-							}
+
+							// This is an item without clucking - success!
+							newLore.add(ChatColor.GRAY + "Clucking");
 							meta.setLore(newLore);
 							item.setItemMeta(meta);
+							break;
 						}
 					}
 				}
