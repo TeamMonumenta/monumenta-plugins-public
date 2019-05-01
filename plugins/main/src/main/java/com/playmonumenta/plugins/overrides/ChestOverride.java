@@ -83,7 +83,7 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		if (!command_chest(block)) {
+		if (!player.getGameMode().equals(GameMode.SPECTATOR) && !command_chest(block)) {
 			return false;
 		}
 
