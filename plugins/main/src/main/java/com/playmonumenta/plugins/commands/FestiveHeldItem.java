@@ -15,6 +15,6 @@ public class FestiveHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
-		CommandUtils.enchantify(sender, player, "King's Valley", "Festive", "Decorated by");
+		CommandUtils.enchantify(sender, player, "Festive", "Decorated by");
 	}
 }

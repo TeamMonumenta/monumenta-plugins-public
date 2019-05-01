@@ -15,6 +15,6 @@ public class HopeifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
-		CommandUtils.enchantify(sender, player, "King's Valley", "Hope", "Infused by");
+		CommandUtils.enchantify(sender, player, "Hope", "Infused by");
 	}
 }

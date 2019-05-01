@@ -136,34 +136,33 @@ public class CommandUtils {
 		}
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment) throws CommandSyntaxException {
-		enchantify(sender, player, region, enchantment, null);
+	public static void enchantify(CommandSender sender, Player player, String enchantment) throws CommandSyntaxException {
+		enchantify(sender, player, enchantment, null);
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix) throws CommandSyntaxException {
-		enchantify(sender, player, region, enchantment, ownerPrefix, false);
+	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws CommandSyntaxException {
+		enchantify(sender, player, enchantment, ownerPrefix, false);
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String region, String enchantment, String ownerPrefix, boolean duplicateItem) throws CommandSyntaxException {
+	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix, boolean duplicateItem) throws CommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
-			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
+			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
-			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
+			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
 		List<String> lore = meta.getLore();
 		if (lore == null || lore.isEmpty()) {
-			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
+			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
 		List<String> newLore = new ArrayList<>();
 		boolean enchantmentFound = false;
 		boolean nameAdded = (ownerPrefix == null);
-		boolean regionFound = false;
 		for (String loreEntry : lore) {
 			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
 				if (duplicateItem) {
@@ -173,23 +172,22 @@ public class CommandUtils {
 				}
 			}
 
-			if (loreEntry.contains(region)) {
-				regionFound = true;
-			}
-
 			String loreStripped = ChatColor.stripColor(loreEntry).trim();
 			if (loreStripped.contains("Ephemeral Corridors") ||
 			    loreStripped.contains("King's Valley : Epic") ||
 			    loreStripped.contains("King's Valley : Artifact") ||
 			    loreStripped.contains("King's Valley : Enhanced Rare") ||
-			    loreStripped.contains("King's Valley : Enhanced Uncommon")) {
+			    loreStripped.contains("King's Valley : Enhanced Uncommon") ||
+			    loreStripped.contains("Celsian Isles : Epic") ||
+			    loreStripped.contains("Celsian Isles : Artifact")) {
 				duplicateItem = false;
 			}
 
-			if (!enchantmentFound && (loreEntry.contains(region) ||
-			                          loreEntry.contains("Armor") ||
-			                          loreEntry.contains("Magic Wand") ||
-			                          ChatColor.stripColor(loreEntry).trim().isEmpty())) {
+			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
+			                          loreStripped.contains("Celsian Isles :") ||
+			                          loreStripped.contains("Armor") ||
+			                          loreStripped.contains("Magic Wand") ||
+			                          loreStripped.isEmpty())) {
 				newLore.add(ChatColor.GRAY + enchantment);
 				enchantmentFound = true;
 			}
@@ -204,10 +202,6 @@ public class CommandUtils {
 
 		if (!nameAdded) {
 			newLore.add(ownerPrefix + " " + player.getName());
-		}
-
-		if (!regionFound) {
-			CommandAPI.fail("Player must have a " + region + " item in their main hand!");
 		}
 
 		ItemStack dupe = null;

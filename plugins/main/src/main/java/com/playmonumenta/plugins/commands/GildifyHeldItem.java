@@ -15,6 +15,6 @@ public class GildifyHeldItem extends GenericCommand {
 	}
 
 	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
-		CommandUtils.enchantify(sender, player, "King's Valley", "Gilded", "Gilded by", true);
+		CommandUtils.enchantify(sender, player, "Gilded", "Gilded by", true);
 	}
 }
