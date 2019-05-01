@@ -69,6 +69,25 @@ public class Spellshock extends Ability {
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			// SpellShock task to process tagged mobs
 			mRunnable = new BukkitRunnable() {
+				/*
+				 * If the player has level 2 spellshock (which chain hits), spellDamageMob() is called
+				 * on nearby mobs. The problem is, that also triggers spellshock which can remove them
+				 * from mSpellShockedMobs. This causes a concurrent modification exception, since that
+				 * removes random other elements during iteration
+				 *
+				 * To work around this, instead of calling spellDamageMob() immediately while iterating,
+				 * instead these mobs are put on this list and then it is iterated after processing
+				 * the mSpellShockedMobs.
+				 *
+				 * Note: Mobs in mShockedPending can be both mobs with spellshock or mobs without it -
+				 * it is a collection of mobs that were hit by the spell shock flare, which might or
+				 * might not actually have static on them
+				 *
+				 * This mapping is UUID of mob hit by static discharging on nearby mobs, and the player
+				 * that originally put that static there (to attribute the damage)
+				 */
+				private final Map<LivingEntity, Player>mShockedPending = new HashMap<LivingEntity, Player>();
+
 				@Override
 				public void run() {
 					/* Iterators are needed here so you can remove during iteration if needed */
@@ -89,7 +108,11 @@ public class Spellshock extends Ability {
 							world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
 							for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
 								if (spellShock > 1) {
-									spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_DEATH_DAMAGE, shocked.initiator, null);
+									/*
+									 * This might chain if calling spellDamageMob() directly - so defer that until after
+									 * this iteration is complete
+									 */
+									mShockedPending.put(nearbyMob, shocked.initiator);
 								} else {
 									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator, MagicType.NONE, false);
 								}
@@ -108,6 +131,11 @@ public class Spellshock extends Ability {
 							continue;
 						}
 					}
+
+					for (Map.Entry<LivingEntity, Player> pending : mShockedPending.entrySet()) {
+						spellDamageMob(plugin, pending.getKey(), SPELL_SHOCK_DEATH_DAMAGE, pending.getValue(), null);
+					}
+					mShockedPending.clear();
 				}
 			};
 
