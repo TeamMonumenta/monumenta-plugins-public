@@ -27,6 +27,8 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 	private static final int SUMMON_TICK_PERIOD = 1;
 	private static final int PLAYER_RADIUS = 7;
 	private static final int SPAWNS_PER_PLAYER = 3;
+	private static final int PLAYER_RANGE = 32;
+	private static final int MAX_NEARBY_SUMMONS = 15;
 
 	GrayStrongSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, EntityType mobType, String mobNBT) throws Exception {
 		if (!(boss instanceof Mob)) {
@@ -34,10 +36,10 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSummon(plugin, boss, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
+			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
 				() -> {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
-					List <Player> targets = Utils.playersInRange(boss.getLocation(), 20);
+					List <Player> targets = Utils.playersInRange(boss.getLocation(), PLAYER_RANGE);
 					Collections.shuffle(targets);
 					switch(targets.size()) {
 					case 0:
@@ -138,6 +140,28 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					runnable.runTaskTimer(plugin, 1, 1);
 
 					return runnable;
+				},
+				() -> {
+					List<Entity> nearbyEntities = boss.getNearbyEntities(PLAYER_RANGE, PLAYER_RANGE, PLAYER_RANGE);
+
+					if (nearbyEntities.stream().filter(
+							e -> e.getScoreboardTags().contains(GraySummoned.identityTag)
+						).count() > MAX_NEARBY_SUMMONS) {
+						return false;
+
+					}
+
+					if (((boss instanceof Mob) && (((Mob)boss).getTarget() instanceof Player))) {
+						return true;
+					}
+
+					for (Player player : Utils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
+						if (Utils.hasLineOfSight(player, boss)) {
+							return true;
+						}
+					}
+
+					return false;
 				}
 			)
 		));
