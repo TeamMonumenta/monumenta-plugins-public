@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -56,6 +57,9 @@ public class Blizzard extends Ability {
 
 	@Override
 	public boolean cast() {
+		if (mActive) {
+			return false;
+		}
 		mActive = true;
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
@@ -101,7 +105,9 @@ public class Blizzard extends Ability {
 
 				if (t % 20 == 0) {
 					for (LivingEntity mob : mobs) {
+						Vector v = mob.getVelocity();
 						Spellshock.spellDamageMob(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE);
+						mob.setVelocity(v);
 					}
 				}
 

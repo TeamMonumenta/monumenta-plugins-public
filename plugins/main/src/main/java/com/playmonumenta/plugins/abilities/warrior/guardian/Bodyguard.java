@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -141,9 +142,13 @@ public class Bodyguard extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
+		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+			return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
+		}
+		return false;
 	}
 
 }

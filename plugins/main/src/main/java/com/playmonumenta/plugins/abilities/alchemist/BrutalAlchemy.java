@@ -44,4 +44,8 @@ public class BrutalAlchemy extends Ability {
 		}
 		return true;
 	}
+
+	public int getDamage() {
+		return getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
+	}
 }

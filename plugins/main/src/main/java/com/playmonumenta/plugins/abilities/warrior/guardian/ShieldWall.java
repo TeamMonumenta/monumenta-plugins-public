@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
@@ -38,6 +39,8 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * Cooldown: 30/20 seconds
  */
 public class ShieldWall extends Ability {
+
+	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ShieldWallTickRightClicked";
 
 	private static final int SHIELD_WALL_1_DURATION = 8 * 30;
 	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
@@ -54,20 +57,33 @@ public class ShieldWall extends Ability {
 	}
 
 	private int mRightClicks = 0;
+
 	@Override
 	public boolean cast() {
+		// Prevent two right clicks being registered from one action (e.g. blocking)
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
+			mRightClicks++;
 
-		mRightClicks++;
-		if (mRightClicks == 1) {
+			// This timer makes sure that the player actually blocked instead of some other right click interaction
 			new BukkitRunnable() {
-
 				@Override
 				public void run() {
-					mRightClicks = 0;
+					if (!mPlayer.isHandRaised() && mRightClicks > 0) {
+						mRightClicks--;
+					}
+					this.cancel();
 				}
+			}.runTaskLater(mPlugin, 1);
 
-			}.runTaskLater(mPlugin, 20);
-			return false;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mRightClicks > 0) {
+						mRightClicks --;
+					}
+					this.cancel();
+				}
+			}.runTaskLater(mPlugin, 5);
 		}
 
 		if (mRightClicks >= 2) {
@@ -146,7 +162,7 @@ public class ShieldWall extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
+		return mHand.getType() != Material.BOW && (mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD);
 	}
 
 }

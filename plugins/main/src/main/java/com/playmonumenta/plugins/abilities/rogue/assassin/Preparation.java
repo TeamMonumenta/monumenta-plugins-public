@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Preparation: Right click twice while looking up to make
@@ -28,6 +29,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  */
 
 public class Preparation extends Ability {
+
+	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "PreparationTickRightClicked";
 
 	private static final int PREPARATION_1_COOLDOWN = 20 * 30;
 	private static final int PREPARATION_2_COOLDOWN = 20 * 20;
@@ -57,15 +60,18 @@ public class Preparation extends Ability {
 
 	@Override
 	public boolean cast() {
-		mRightClicks++;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mRightClicks > 0) {
-					mRightClicks--;
+		// Prevent two right clicks being registered from one action (e.g. blocking)
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
+			mRightClicks++;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mRightClicks > 0) {
+						mRightClicks--;
+					}
 				}
-			}
-		}.runTaskLater(mPlugin, 5);
+			}.runTaskLater(mPlugin, 5);
+		}
 
 		if (mRightClicks < 2) {
 			return false;
@@ -95,7 +101,7 @@ public class Preparation extends Ability {
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.getLocation().getPitch() < -50 && InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
+		return mPlayer.getLocation().getPitch() < -50 && !mPlayer.isSneaking() && InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
 	}
 
 	public int getBonus(Spells spell) {

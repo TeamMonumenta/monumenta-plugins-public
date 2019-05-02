@@ -10,6 +10,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -22,6 +24,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class DarkPact extends Ability {
+
 	private static final int DARK_PACT_COOLDOWN = 20 * 10;
 	private static final int DARK_PACT_DURATION = 20 * 10;
 	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.6;
@@ -36,6 +39,8 @@ public class DarkPact extends Ability {
 	 *  Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
 	 */
 
+	private float mSaturation = 0;
+	private double mHealth = 0;
 	private boolean active = false;
 
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
@@ -60,24 +65,32 @@ public class DarkPact extends Ability {
 
 		active = true;
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 1.25f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.75f, 1.25f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.75f);
+		mHealth = mPlayer.getHealth();
+		mSaturation = mPlayer.getSaturation();
 		new BukkitRunnable() {
-			double oldHealth = mPlayer.getHealth();
 			int t = 0;
 			@Override
 			public void run() {
 				t++;
 				mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 1, 0.25, 0.35, 0.25, 0);
-				if (mPlayer.getHealth() > oldHealth) {
-					mPlayer.setHealth(oldHealth);
-				} else if (mPlayer.getHealth() < oldHealth) {
-					oldHealth = mPlayer.getHealth();
+
+				// Prevent player from losing saturation to healing during Dark Pact
+				if (mSaturation < mPlayer.getSaturation()) {
+					mSaturation = mPlayer.getSaturation();
+				}
+				mPlayer.setSaturation(mSaturation);
+
+				if (mHealth < mPlayer.getHealth()) {
+					mPlayer.setHealth(mHealth);
+				} else {
+					mHealth = mPlayer.getHealth();
 				}
 				if (t >= DARK_PACT_DURATION || mPlayer.isDead()) {
 					this.cancel();
 					active = false;
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 0.75f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.75f, 0.75f);
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
 				}
 			}
@@ -116,14 +129,6 @@ public class DarkPact extends Ability {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (active) {
-			double percent = getAbilityScore() == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
-			event.setDamage(event.getDamage() * percent);
-		}
 	}
 
 }

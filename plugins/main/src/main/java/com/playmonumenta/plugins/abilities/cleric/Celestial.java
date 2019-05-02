@@ -29,6 +29,7 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_RADIUS = 12;
 	private static final String CELESTIAL_1_TAGNAME = "Celestial_1";
 	private static final String CELESTIAL_2_TAGNAME = "Celestial_2";
+	private static final String CELESTIAL_MULTIPLE_TAGNAME = "CelestialAlreadyHasBuff";
 	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
@@ -37,7 +38,7 @@ public class Celestial extends Ability {
 		mInfo.linkedSpell = Spells.CELESTIAL_BLESSING;
 		mInfo.scoreboardId = "Celestial";
 		mInfo.cooldown = CELESTIAL_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK_AIR;
 	}
 
 	@Override
@@ -51,17 +52,21 @@ public class Celestial extends Ability {
 		List<Player> affectedPlayers = PlayerUtils.getNearbyPlayers(mPlayer, CELESTIAL_RADIUS, true);
 
 		// Don't buff players that have their class disabled
-		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class")
-				|| p.hasMetadata(CELESTIAL_1_TAGNAME)
-				|| p.hasMetadata(CELESTIAL_2_TAGNAME));
+		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
-			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
-			Location loc = p.getLocation();
-			world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
-			world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
+			// This workaround means that up to two Celestial Blessing clerics can use this ability without interfering with the other
+			// Does not solve anything for 3+ clerics using the ability at the same time, but this would be a rare edge case
+			if (!p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME) && (p.hasMetadata(CELESTIAL_1_TAGNAME) || p.hasMetadata(CELESTIAL_2_TAGNAME))) {
+				p.setMetadata(CELESTIAL_MULTIPLE_TAGNAME, new FixedMetadataValue(mPlugin, 0));
+			} else if (!p.hasMetadata(CELESTIAL_1_TAGNAME) && !p.hasMetadata(CELESTIAL_2_TAGNAME)) {
+				p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
+				p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
+				Location loc = p.getLocation();
+				world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
+				world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
+			}
 		}
 
 		// Run a task later to remove the metadata tag after time has elapsed
@@ -69,9 +74,14 @@ public class Celestial extends Ability {
 			@Override
 			public void run() {
 				for (Player p : affectedPlayers) {
-					p.removeMetadata(tagName, mPlugin);
-					p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
+					if (p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME)) {
+						p.removeMetadata(CELESTIAL_MULTIPLE_TAGNAME, mPlugin);
+					} else {
+						p.removeMetadata(tagName, mPlugin);
+						p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
+					}
 				}
+				this.cancel();
 			}
 		}.runTaskLater(mPlugin, duration);
 
@@ -80,7 +90,7 @@ public class Celestial extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+		if (mPlayer.isOnGround()) {
 			return mPlayer.isSneaking();
 		}
 		return false;

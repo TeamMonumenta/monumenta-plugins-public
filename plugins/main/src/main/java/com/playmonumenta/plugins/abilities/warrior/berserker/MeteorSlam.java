@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -22,18 +23,22 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
  * fall damage and does +2.5/3 for block fallen extra damage to all mobs
- * within 3/5 blocks. Left clicking twice in quick succession
+ * within 3/5 blocks. Right clicking the air twice in quick succession
  * grants you 4s of Jump Boost 4/5. (The jump boost has cooldown 10/7s)
  */
 
 public class MeteorSlam extends Ability {
+
+	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickRightClicked";
 
 	private static final double METEOR_SLAM_1_DAMAGE_LOW = 3;
 	private static final double METEOR_SLAM_2_DAMAGE_LOW = 4;
@@ -55,7 +60,7 @@ public class MeteorSlam extends Ability {
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 		mInfo.ignoreCooldown = true;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -98,24 +103,36 @@ public class MeteorSlam extends Ability {
 		return true;
 	}
 
-	private int mLeftClicks = 0;
+	private int mRightClicks = 0;
 
 	@Override
 	public boolean cast() {
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
+		if (locType == LocationType.Capital || locType == LocationType.SafeZone ||
+				InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) ||
+				InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock() ||
+				inMainHand.getType().isEdible()) {
+			return false;
+		}
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) { //cooldown check because of the ignore cooldown flag
-			mLeftClicks++;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (mLeftClicks > 0) {
-						mLeftClicks--;
+			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
+				mRightClicks++;
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (mRightClicks > 0) {
+							mRightClicks--;
+						}
+						this.cancel();
 					}
-					this.cancel();
-				}
-			}.runTaskLater(mPlugin, 20);
-			if (mLeftClicks < 2) {
+				}.runTaskLater(mPlugin, 5);
+			}
+			if (mRightClicks < 2) {
 				return false;
 			}
+			mRightClicks = 0;
 			int meteorSlam = getAbilityScore();
 			int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
 			int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;

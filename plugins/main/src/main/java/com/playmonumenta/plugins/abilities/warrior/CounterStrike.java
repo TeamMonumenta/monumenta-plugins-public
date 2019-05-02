@@ -56,7 +56,7 @@ public class CounterStrike extends Ability {
 			}
 		}
 
-		// Need to wait a tick so that Riposte has a chance to activate first
+		// Need to wait a few ticks so that Riposte has a chance to activate first, accounting for some lag
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -76,7 +76,7 @@ public class CounterStrike extends Ability {
 				}
 				this.cancel();
 			}
-		}.runTaskLater(mPlugin, 1);
+		}.runTaskLater(mPlugin, 3);
 
 		return true;
 	}

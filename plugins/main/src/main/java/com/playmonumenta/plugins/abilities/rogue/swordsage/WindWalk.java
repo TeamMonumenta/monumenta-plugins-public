@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -105,7 +105,7 @@ public class WindWalk extends Ability {
 						mobsAlreadyHit.add(mob);
 					}
 				}
-				if (mPlayer.isOnGround()) {
+				if (mPlayer.isOnGround() || mPlayer.getLocation().getBlock().getType() == Material.WATER || mPlayer.getLocation().getBlock().getType() == Material.LAVA) {
 					this.cancel();
 				}
 			}
@@ -126,14 +126,6 @@ public class WindWalk extends Ability {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mLeftClicks > 0) {
-			mLeftClicks--;
-		}
-		return true;
 	}
 
 }

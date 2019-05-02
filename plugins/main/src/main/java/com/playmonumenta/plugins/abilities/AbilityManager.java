@@ -622,6 +622,18 @@ public class AbilityManager {
 							abil.cast();
 						}
 					}
+				} else if (info.trigger == AbilityTrigger.LEFT_CLICK_AIR) {
+					if (action == Action.LEFT_CLICK_AIR) {
+						if (abil.runCheck() && !abil.isOnCooldown()) {
+							abil.cast();
+						}
+					}
+				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK_AIR) {
+					if (action == Action.RIGHT_CLICK_AIR) {
+						if (abil.runCheck() && !abil.isOnCooldown()) {
+							abil.cast();
+						}
+					}
 				}
 			}
 		}

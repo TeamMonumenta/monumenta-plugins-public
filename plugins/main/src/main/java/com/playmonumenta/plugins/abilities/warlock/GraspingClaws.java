@@ -41,7 +41,7 @@ public class GraspingClaws extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS)) {
+		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS) && mPlayer.isSneaking()) {
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.PORTAL);
 			shot = arrow;
 			// Put Grasping Claws on cooldown
@@ -70,11 +70,6 @@ public class GraspingClaws extends Ability {
 				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 			}
 		}
-	}
-
-	@Override
-	public boolean runCheck() {
-		return mPlayer.isSneaking();
 	}
 
 	public boolean onCooldown() {

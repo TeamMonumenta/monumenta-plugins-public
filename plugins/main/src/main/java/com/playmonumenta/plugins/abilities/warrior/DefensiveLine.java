@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -41,29 +42,39 @@ public class DefensiveLine extends Ability {
 
 	@Override
 	public boolean cast() {
-		for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
-			// Don't buff players that have their class disabled
-			if (target.getScoreboardTags().contains("disable_class")) {
-				continue;
-			}
+		// This timer makes sure that the player actually blocked instead of some other right click interaction
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mPlayer.isHandRaised()) {
+					for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
+						// Don't buff players that have their class disabled
+						if (target.getScoreboardTags().contains("disable_class")) {
+							continue;
+						}
+	
+						Location loc = target.getLocation();
+	
+						target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
+						mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
+						                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
+						                                                  DEFENSIVE_LINE_DURATION,
+						                                                  1, true, true));
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
+							MovementUtils.KnockAway(target, mob, 0.25f);
+							if (getAbilityScore() > 1) {
+								mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
+							}
+						}
+					}
 
-			Location loc = target.getLocation();
-
-			target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
-			mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
-			                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
-			                                                  DEFENSIVE_LINE_DURATION,
-			                                                  1, true, true));
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
-				MovementUtils.KnockAway(target, mob, 0.25f);
-				if (getAbilityScore() > 1) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
+					ParticleUtils.explodingSphereEffect(mPlugin, mPlayer, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
+					putOnCooldown();
 				}
+				this.cancel();
 			}
-		}
+		}.runTaskLater(mPlugin, 1);
 
-		ParticleUtils.explodingSphereEffect(mPlugin, mPlayer, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
-		putOnCooldown();
 		return true;
 	}
 

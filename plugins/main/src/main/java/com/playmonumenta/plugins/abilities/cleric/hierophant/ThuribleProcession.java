@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -40,6 +41,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  */
 public class ThuribleProcession extends Ability {
 
+	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "ThuribleTickRightClicked";
+
 	private static final Particle.DustOptions THURIBLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 175), 1.0f);
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 	private static final float THURIBLE_1_WALK_SPEED = 0.8f;
@@ -55,7 +58,7 @@ public class ThuribleProcession extends Ability {
 	private static final int THURIBLE_2_RADIUS = 30;
 
 	private Location mLastLocation;
-	private int rightClicks = 0;
+	private int mRightClicks = 0;
 
 	public ThuribleProcession(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -67,19 +70,34 @@ public class ThuribleProcession extends Ability {
 
 	@Override
 	public boolean cast() {
-		rightClicks++;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (rightClicks > 0) {
-					rightClicks = 0;
-				}
-				this.cancel();
-			}
-		}.runTaskLater(mPlugin, 20);
+		// Prevent two right clicks being registered from one action (e.g. blocking)
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
+			mRightClicks++;
 
-		if (rightClicks >= 2) {
-			rightClicks = 0;
+			// This timer makes sure that the player actually blocked instead of some other right click interaction
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!mPlayer.isHandRaised() && mRightClicks > 0) {
+						mRightClicks--;
+					}
+					this.cancel();
+				}
+			}.runTaskLater(mPlugin, 1);
+
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mRightClicks > 0) {
+						mRightClicks--;
+					}
+					this.cancel();
+				}
+			}.runTaskLater(mPlugin, 5);
+		}
+
+		if (mRightClicks >= 2) {
+			mRightClicks = 0;
 			float speed = getAbilityScore() == 1 ? THURIBLE_1_WALK_SPEED : THURIBLE_2_WALK_SPEED;
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
 			new BukkitRunnable() {
