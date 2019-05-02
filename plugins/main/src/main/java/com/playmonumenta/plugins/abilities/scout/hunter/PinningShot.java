@@ -22,12 +22,12 @@ import com.playmonumenta.plugins.abilities.Ability;
  * pins it for 5 seconds, rendering it immobile. Shooting
  * a pinned enemy removes the pin. At level 2, pin
  * duration is increased to 10 seconds and shooting a
- * pinned enemy increases arrow damage by 30% (stacks
- * with vulnerability).
+ * pinned enemy increases the base arrow damage by 50%.
  */
 public class PinningShot extends Ability {
 
 	private static final double PINNING_SHOT_DAMAGE_MULTIPLIER = 1.3;
+
 	public PinningShot(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "PinningShot";
@@ -35,21 +35,15 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (damagee.hasMetadata("PinningShotEnemyIsPinned")) {
-			damagee.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
-			damagee.removePotionEffect(PotionEffectType.SLOW);
+		// Thw metadata for a pinned enemy is removed in the ScoutPassive class where damage is calculated
+		if (!damagee.hasMetadata("PinningShotEnemyHasBeenPinned")) {
+			damagee.setMetadata("PinningShotEnemyHasBeenPinned", new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
+			// For some reason setting the multiplier value for the metadata here isn't working when I tested it using values
+			// instead of null, messier workaround is to just have the public method return the Pinning Shot damage multiplier
+			double multiplier = getAbilityScore() == 1 ? 1 : PINNING_SHOT_DAMAGE_MULTIPLIER;
+			damagee.setMetadata("PinningShotEnemyIsPinned", new FixedMetadataValue(mPlugin, multiplier));
 			mWorld.playSound(damagee.getLocation(), Sound.BLOCK_SLIME_BLOCK_PLACE, 1, 0.5f);
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, arrow.getLocation(), 8, 0, 0, 0, 0.2);
-			if (getAbilityScore() > 1) {
-				event.setDamage(event.getDamage() * PINNING_SHOT_DAMAGE_MULTIPLIER);
-			}
-		}
-		if (!damagee.hasMetadata("PinningShotEnemyHasBeenPinned")) {
-			damagee.setMetadata("PinningShotEnemyHasBeenPinned", new FixedMetadataValue(mPlugin, null));
-			damagee.setMetadata("PinningShotEnemyIsPinned", new FixedMetadataValue(mPlugin, null));
-			mWorld.playSound(damagee.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
-			mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
 
 			int duration = getAbilityScore() == 1 ? 20 * 5 : 20 * 10;
 			if (damagee instanceof Player) {

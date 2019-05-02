@@ -5,13 +5,12 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class BowMastery extends Ability {
 
@@ -24,22 +23,17 @@ public class BowMastery extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		int bowMastery = getAbilityScore();
-		if (arrow.isCritical()) {
-			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-			EntityUtils.damageEntity(mPlugin, damagee, bonusDamage, mPlayer);
-		}
-		return true;
-	}
-
-	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
+		double bonusDamage = getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "BowMasteryBonusDamageRegistrationTick")) {
+			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, bonusDamage);
+		}
 		return true;
 	}
 
 	public int getBonusDamage() {
 		return getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
 	}
+
 }

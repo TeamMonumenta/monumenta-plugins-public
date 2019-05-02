@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -45,14 +46,7 @@ public class SplitArrow extends Ability {
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		double damage = getAbilityScore() == 1 ? SPLIT_ARROW_1_DAMAGE : SPLIT_ARROW_2_DAMAGE;
-		BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
-		if (bm != null) {
-			damage += bm.getBonusDamage();
-		}
-		Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
-		if (ss != null) {
-			damage += ss.getSharpshot();
-		}
+		damage += AbilityUtils.getArrowBonusDamage(arrow);
 
 		LivingEntity nearestMob = null;
 		double closestDistance = SPLIT_ARROW_CHAIN_RANGE + 1;

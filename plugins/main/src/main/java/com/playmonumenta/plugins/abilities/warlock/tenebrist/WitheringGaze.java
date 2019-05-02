@@ -45,7 +45,7 @@ public class WitheringGaze extends Ability {
 	@Override
 	public boolean cast() {
 		Player player = mPlayer;
-		Location loc = player.getLocation().add(0, 0.15, 0);
+		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by halfslabs
 		Vector direction = loc.getDirection().setY(0).normalize();
 		int duration = getAbilityScore() == 1 ? 20 * 6 : 20 * 10;
 		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
@@ -72,7 +72,7 @@ public class WitheringGaze extends Ability {
 				}
 				r += 0.55;
 
-				for (Entity e : player.getNearbyEntities(damagerange, 2.25, damagerange)) {
+				for (Entity e : player.getNearbyEntities(damagerange, damagerange * 2, damagerange)) {
 					if (EntityUtils.isHostileMob(e)) {
 						Vector eVec = e.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
 						if (direction.dot(eVec) > 0.4) {
@@ -101,6 +101,8 @@ public class WitheringGaze extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		putOnCooldown();
 		return true;
 	}
 

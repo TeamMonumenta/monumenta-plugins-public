@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -11,6 +12,8 @@ import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -23,13 +26,14 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
 * Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 12 damage + any
 * other bonuses from skills and inflicts Slowness 3 for 2 seconds (Cooldown: 10
 * seconds). Level 2 decreases the cooldown to 8 seconds and increases the arrow
-* damage to 15 + effects.
+* damage to 20 + effects.
 */
 
 public class Quickdraw extends Ability {
@@ -53,7 +57,7 @@ public class Quickdraw extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return InventoryUtils.isBowItem(inMainHand) && !mPlayer.isSneaking();
+		return InventoryUtils.isBowItem(inMainHand);
 	}
 
 	@Override
@@ -68,29 +72,36 @@ public class Quickdraw extends Ability {
 				arrow.setFireTicks(20 * 15);
 			}
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
-			arrow.setMetadata("QuickdrawDamage", new FixedMetadataValue(mPlugin, 0));
+			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(3.0));
+			arrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
+
+			double baseDamage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
+			AbilityUtils.setArrowBaseDamage(mPlugin, arrow, baseDamage);
+
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
+			ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
+			Bukkit.getPluginManager().callEvent(eventLaunch);
+			putOnCooldown();
 		}
 
 		return true;
 	}
 
 	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		// Cast even if you hit a mob with your bow
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			cast();
+		}
+		return true;
+	}
+
+	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity le, EntityDamageByEntityEvent event) {
-		if (arrow.hasMetadata("QuickdrawDamage")) {
-			int damage = getAbilityScore() == 1 ? QUICKDRAW_1_DAMAGE : QUICKDRAW_2_DAMAGE;
-			BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
-			if (bm != null) {
-				damage += bm.getBonusDamage();
-			}
-			Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
-			if (ss != null) {
-				damage += ss.getSharpshot();
-			}
-			event.setDamage(damage);
+		if (arrow.hasMetadata("ArrowQuickdraw")) {
 			le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
 		}
 		return true;
 	}
+
 }

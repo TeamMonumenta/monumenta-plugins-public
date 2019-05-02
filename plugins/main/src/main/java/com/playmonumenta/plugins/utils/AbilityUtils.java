@@ -6,25 +6,68 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
+import com.playmonumenta.plugins.Plugin;
+
 public class AbilityUtils {
 
-	private static final int BOW_MASTER_1_DAMAGE = 3;
-	private static final int BOW_MASTER_2_DAMAGE = 6;
+	private static final String ARROW_BASE_DAMAGE_METAKEY = "ArrowBaseDamageFromAbilities"; // For Quickdraw
+	private static final String ARROW_BONUS_DAMAGE_METAKEY = "ArrowBonusDamageFromAbilities"; // For Bow Mastery and Sharpshooter
+	private static final String ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY = "ArrowVelocityDamageMultiplier"; // Multiplier based on arrow speed
+	private static final String ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY = "ArrowFinalDamageMultiplier"; // For Volley and Pinning Shot
+	// This value obtained from testing; in reality, a fully charged shot outputs an arrow with a velocity between 2.95 and 3.05
+	private static final float ARROW_MAX_VELOCITY = 2.9f;
 
-	public static int getBowMasteryDamage(Player player) {
-		int bowMastery = ScoreboardUtils.getScoreboardValue(player, "BowMastery");
-		if (bowMastery > 0) {
-			int bonusDamage = bowMastery == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-			return bonusDamage;
+	public static double getArrowFinalDamageMultiplier(Arrow arrow) {
+		if (arrow.hasMetadata(ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY)) {
+			return arrow.getMetadata(ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY).get(0).asDouble();
+		}
+		return 1;
+	}
+
+	public static void multiplyArrowFinalDamageMultiplier(Plugin plugin, Arrow arrow, double multiplier) {
+		arrow.setMetadata(ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY, new FixedMetadataValue(plugin, getArrowFinalDamageMultiplier(arrow) * multiplier));
+	}
+
+	public static double getArrowVelocityDamageMultiplier(Arrow arrow) {
+		if (arrow.hasMetadata(ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY)) {
+			return arrow.getMetadata(ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY).get(0).asDouble();
+		}
+		return 1;
+	}
+
+	public static void setArrowVelocityDamageMultiplier(Plugin plugin, Arrow arrow) {
+		arrow.setMetadata(ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY, new FixedMetadataValue(plugin, Math.min(1, arrow.getVelocity().length() / ARROW_MAX_VELOCITY)));
+	}
+
+	public static double getArrowBonusDamage(Arrow arrow) {
+		if (arrow.hasMetadata(ARROW_BONUS_DAMAGE_METAKEY)) {
+			return arrow.getMetadata(ARROW_BONUS_DAMAGE_METAKEY).get(0).asDouble();
 		}
 		return 0;
+	}
+
+	public static void addArrowBonusDamage(Plugin plugin, Arrow arrow, double damage) {
+		arrow.setMetadata(ARROW_BONUS_DAMAGE_METAKEY, new FixedMetadataValue(plugin, getArrowBonusDamage(arrow) + damage));
+	}
+
+	public static double getArrowBaseDamage(Arrow arrow) {
+		if (arrow.hasMetadata(ARROW_BASE_DAMAGE_METAKEY)) {
+			return arrow.getMetadata(ARROW_BASE_DAMAGE_METAKEY).get(0).asDouble();
+		}
+		return 0;
+	}
+
+	public static void setArrowBaseDamage(Plugin plugin, Arrow arrow, double damage) {
+		arrow.setMetadata(ARROW_BASE_DAMAGE_METAKEY, new FixedMetadataValue(plugin, damage));
 	}
 
 	private static ItemStack getAlchemistPotion() {

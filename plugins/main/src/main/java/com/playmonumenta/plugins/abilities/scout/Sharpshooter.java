@@ -11,7 +11,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Sharpshooter: Each successful, fully charged arrow hit increases your arrow
@@ -36,50 +38,41 @@ public class Sharpshooter extends Ability {
 
 	private int sharpshot = 0;
 	private int t = 0;
-	private boolean volley = false;
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (!arrow.hasMetadata("Volley")) {
-			volley = false;
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "SharpshooterBonusDamageRegistrationTick")) {
+			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, sharpshot);
 		}
 		return true;
 	}
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (!arrow.isCritical()) {
-			return true;
-		}
+		// Only increment sharpshot if the arrow is critical and not from volley
+		if (arrow.isCritical() && !arrow.hasMetadata("Volley")) {
+			t = 0;
 
-		t = 0;
+			if (sharpshot <= 0) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						t++;
 
-		if (sharpshot <= 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					t++;
+						if (t >= SHARPSHOOTER_DECAY_TIMER) {
+							t = 0;
+							sharpshot--;
+							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + sharpshot);
+						}
 
-					if (t >= SHARPSHOOTER_DECAY_TIMER) {
-						t = 0;
-						sharpshot--;
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + sharpshot);
+						if (sharpshot <= 0) {
+							this.cancel();
+						}
 					}
 
-					if (sharpshot <= 0) {
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
-		}
-
-		if (!volley) {
-			if (arrow.hasMetadata("Volley")) {
-				volley = true;
-			} else {
-				volley = false;
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
+
 			int max = getAbilityScore() == 1 ? SHARPSHOOTER_1_MAX_BONUS : SHARPSHOOTER_2_MAX_BONUS;
 			int increment = getAbilityScore() == 1 ? SHARPSHOOTER_1_INCREMENT : SHARPSHOOTER_2_INCREMENT;
 			sharpshot += increment;
@@ -89,9 +82,6 @@ public class Sharpshooter extends Ability {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + sharpshot);
 		}
 
-		if (sharpshot > 0) {
-			event.setDamage(event.getDamage() + sharpshot);
-		}
 		return true;
 	}
 

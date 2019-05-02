@@ -37,7 +37,9 @@ public class AmplifyingHex extends Ability {
 	                                                          PotionEffectType.WEAKNESS,
 	                                                          PotionEffectType.SLOW_DIGGING,
 	                                                          PotionEffectType.POISON,
-	                                                          PotionEffectType.UNLUCK
+	                                                          PotionEffectType.UNLUCK,
+	                                                          PotionEffectType.BLINDNESS,
+	                                                          PotionEffectType.HUNGER
 	                                                      );
 
 	public AmplifyingHex(Plugin plugin, World world, Random random, Player player) {
