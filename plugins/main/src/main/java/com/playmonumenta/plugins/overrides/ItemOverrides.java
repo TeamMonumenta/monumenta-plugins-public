@@ -192,12 +192,15 @@ public class ItemOverrides {
 		mItems.put(Material.FARMLAND, new FarmlandOverride());
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());
 		mItems.put(Material.FIREWORK_ROCKET, new FireworkOverride());
-		mItems.put(Material.SPAWNER, new MobSpawnerOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
+
+		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
+		mItems.put(Material.SPAWNER, unbreakableOverride);
+		mItems.put(Material.SLIME_BLOCK, unbreakableOverride);
 
 		BaseOverride flowerOverride = new FlowerPotOverride();
 		mItems.put(Material.FLOWER_POT, flowerOverride);

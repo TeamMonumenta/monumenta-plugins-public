@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-public class MobSpawnerOverride extends BaseOverride {
+public class UnbreakableOnBedrockOverride extends BaseOverride {
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		if ((player.getGameMode() == GameMode.CREATIVE) || _breakable(block)) {
