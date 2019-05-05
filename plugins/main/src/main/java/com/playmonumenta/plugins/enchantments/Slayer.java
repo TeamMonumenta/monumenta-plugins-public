@@ -9,6 +9,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Endermite;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Witch;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -29,7 +30,7 @@ public class Slayer implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (target instanceof Creeper || target instanceof Blaze || target instanceof Enderman || target instanceof Endermite) {
+		if (target instanceof Creeper || target instanceof Blaze || target instanceof Enderman || target instanceof Endermite || target instanceof Witch) {
 			event.setDamage(event.getDamage() + 2.5 * level);
 		}
 	}
