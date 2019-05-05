@@ -159,7 +159,7 @@ public class Utils {
 	/*
 	 * Uses the charge mechanic to detect if a player has line of sight to a location (usually boss.getEyeLocation())
 	 */
-	public static boolean hasLineOfSight(Player player, LivingEntity target) {
+	public static boolean hasLineOfSight(Player player, Entity target) {
 		return SpellBaseCharge.doCharge(player, target, player.getEyeLocation(), Arrays.asList(player), null, null, null, null, false, false);
 	}
 

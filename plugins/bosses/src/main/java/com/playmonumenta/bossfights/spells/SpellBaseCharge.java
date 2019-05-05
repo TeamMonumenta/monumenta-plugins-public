@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -168,9 +169,14 @@ public class SpellBaseCharge extends Spell {
 	 * @param teleboss Boolean indicating whether the boss should actually be teleported to the end
 	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(Player target, LivingEntity charger, Location targetLoc, List<Player> validTargets, StartAction start,
+	public static boolean doCharge(Player target, Entity charger, Location targetLoc, List<Player> validTargets, StartAction start,
 	                               ParticleAction particle, HitPlayerAction hitPlayer, EndAction end, boolean teleBoss, boolean stopOnFirstHit) {
-		Location launLoc = charger.getEyeLocation();
+		final Location launLoc;
+		if (charger instanceof LivingEntity) {
+			launLoc = ((LivingEntity)charger).getEyeLocation();
+		} else {
+			launLoc = charger.getLocation();
+		}
 
 		/* Test locations that are iterated in the loop */
 		Location endLoc = launLoc.clone();

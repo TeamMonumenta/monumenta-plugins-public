@@ -1,6 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.SplittableRandom;
 
@@ -93,7 +94,13 @@ public class SpellBaseLaser extends Spell {
 		if (!players.isEmpty()) {
 			if (mSingleTarget) {
 				// Single target chooses a random player within range
-				launch(players.get(mRandom.nextInt(players.size())));
+				Collections.shuffle(players);
+				for (Player player : players) {
+					if (Utils.hasLineOfSight(player, mBoss)) {
+						launch(player);
+						return;
+					}
+				}
 			} else {
 				// Otherwise target all players within range
 				for (Player player : players) {
@@ -101,6 +108,19 @@ public class SpellBaseLaser extends Spell {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean canRun() {
+		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		if (!players.isEmpty()) {
+			for (Player player : players) {
+				if (Utils.hasLineOfSight(player, mBoss)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override

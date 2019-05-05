@@ -101,7 +101,9 @@ public class Bodyguard extends Ability {
 
 					putOnCooldown();
 					mWorld.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
-					mPlayer.teleport(player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0));
+					if (mPlayer.getLocation().distance(player.getLocation()) > 1) {
+						mPlayer.teleport(player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0));
+					}
 					Location tloc = player.getLocation().clone().subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
 					mWorld.playSound(tloc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 					mWorld.playSound(tloc, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.9f);
@@ -116,14 +118,15 @@ public class Bodyguard extends Ability {
 					                                 new PotionEffect(PotionEffectType.REGENERATION,
 					                                                  BODYGUARD_BUFF_DURATION,
 					                                                  amp, false, true));
-					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
-					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+
+					mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
+					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + armor);
 					new BukkitRunnable() {
 
 						@Override
 						public void run() {
-							mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
-							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
+							mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
+							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - armor);
 						}
 
 					}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
