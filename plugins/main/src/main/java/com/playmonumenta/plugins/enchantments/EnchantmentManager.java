@@ -71,6 +71,7 @@ public class EnchantmentManager {
 		init.add(new Chaotic());
 		init.add(new IceAspect());
 		init.add(new Slayer());
+		init.add(new Duelist());
 		init.add(new Thunder());
 		init.add(new Inferno());
 		init.add(new Sniper());

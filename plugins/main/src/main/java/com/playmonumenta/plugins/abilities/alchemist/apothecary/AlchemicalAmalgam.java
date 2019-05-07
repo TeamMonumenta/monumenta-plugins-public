@@ -102,6 +102,8 @@ public class AlchemicalAmalgam extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
+
+		putOnCooldown();
 		return true;
 	}
 

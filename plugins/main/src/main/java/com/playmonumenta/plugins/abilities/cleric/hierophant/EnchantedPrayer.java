@@ -33,12 +33,14 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  */
 public class EnchantedPrayer extends Ability {
 
+	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 18;
+
 	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "EPrayer";
 		mInfo.linkedSpell = Spells.ENCHANTED_PRAYER;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.cooldown = 20 * 18;
+		mInfo.cooldown = ENCHANTED_PRAYER_COOLDOWN;
 	}
 
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
@@ -89,7 +91,7 @@ public class EnchantedPrayer extends Ability {
 						this.cancel();
 					}
 
-					if (t >= 20 * 8 || p.isDead() || !p.isOnline() || p == null) {
+					if (t >= ENCHANTED_PRAYER_COOLDOWN || p.isDead() || !p.isOnline() || p == null) {
 						this.cancel();
 						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
 					}

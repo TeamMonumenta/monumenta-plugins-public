@@ -610,9 +610,7 @@ public class AbilityManager {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
 					if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
-							if (abil.cast()) {
-								abil.putOnCooldown();
-							}
+							abil.cast();
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {

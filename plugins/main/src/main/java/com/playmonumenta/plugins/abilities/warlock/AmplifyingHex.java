@@ -73,6 +73,8 @@ public class AmplifyingHex extends Ability {
 				}
 			}
 		}
+
+		putOnCooldown();
 		return true;
 	}
 

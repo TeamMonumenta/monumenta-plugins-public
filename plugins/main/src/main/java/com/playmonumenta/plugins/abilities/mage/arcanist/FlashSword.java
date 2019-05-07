@@ -72,10 +72,13 @@ public class FlashSword extends Ability {
 					                     .normalize();
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
+						Vector velocity = mob.getVelocity();
 						mob.setNoDamageTicks(0);
 						Spellshock.spellDamageMob(mPlugin, mob, damageMult, player, MagicType.ARCANE);
 						if (t >= FSWORD_SWINGS) {
 							MovementUtils.KnockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
+						} else {
+							mob.setVelocity(velocity);
 						}
 					}
 				}
@@ -83,8 +86,8 @@ public class FlashSword extends Ability {
 				if (t >= FSWORD_SWINGS) {
 					pitch = 1.45f;
 				}
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 0.8f);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1.0f, pitch);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.75f, pitch);
 				Location loc = player.getLocation();
 				new BukkitRunnable() {
 					final int i = sw;

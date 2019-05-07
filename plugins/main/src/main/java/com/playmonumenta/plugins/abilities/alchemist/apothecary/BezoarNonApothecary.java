@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class BezoarNonApothecary extends Ability {
 
-	// Increments nearby Apothecary bezoar counters
+	// Increments nearby Apothecary bezoar counters and drops bezoar when applicable
 
 	public BezoarNonApothecary(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -30,6 +30,9 @@ public class BezoarNonApothecary extends Ability {
 			Bezoar bz = (Bezoar) AbilityManager.getManager().getPlayerAbility(player, Bezoar.class);
 			if (bz != null) {
 				bz.incrementKills();
+				if (bz.shouldDrop()) {
+					bz.dropBezoar(event, shouldGenDrops);
+				}
 			}
 		}
 	}

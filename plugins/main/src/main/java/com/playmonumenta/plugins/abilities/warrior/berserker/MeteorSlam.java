@@ -49,7 +49,7 @@ public class MeteorSlam extends Ability {
 	private static final double METEOR_SLAM_ANGLE = 70;
 	private static final int METEOR_SLAM_1_EFFECT_LVL = 3;
 	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
-	private static final int METEOR_SLAM_DURATION = 2 * 20;
+	private static final int METEOR_SLAM_DURATION = 4 * 20;
 	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
 	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
 
