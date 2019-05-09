@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -83,6 +84,11 @@ public class ScoutPassive extends Ability {
 	// Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		// Workaround to stop PVP with bow skills
+		if (damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
+			return true;
+		}
+
 		if (arrow.hasMetadata("ArrowQuickdraw")) {
 			event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
 		}
@@ -99,6 +105,7 @@ public class ScoutPassive extends Ability {
 			damagee.removePotionEffect(PotionEffectType.SLOW);
 		}
 		event.setDamage(event.getDamage() * multiplier + bonusDamage);
+
 		return true;
 	}
 

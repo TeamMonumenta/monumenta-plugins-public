@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.NetworkUtils;
 
 public class Celestial extends Ability {
 
@@ -85,6 +86,7 @@ public class Celestial extends Ability {
 			}
 		}.runTaskLater(mPlugin, duration);
 
+		putOnCooldown();
 		return true;
 	}
 

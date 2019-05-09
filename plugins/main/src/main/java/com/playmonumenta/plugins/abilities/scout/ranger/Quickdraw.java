@@ -42,7 +42,7 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_2_COOLDOWN = 8 * 20;
 	private static final int QUICKDRAW_1_DAMAGE = 12;
 	private static final int QUICKDRAW_2_DAMAGE = 20;
-	private static final int QUICKDRAW_SLOWNESS_DURATION = 2;
+	private static final int QUICKDRAW_SLOWNESS_DURATION = 20 * 2;
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 
 	public Quickdraw(Plugin plugin, World world, Random random, Player player) {
