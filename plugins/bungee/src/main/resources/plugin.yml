@@ -1,4 +1,5 @@
 name: Monumenta-Bungee
 main: com.playmonumenta.bungeecord.Main
 version: 1.0
-author: Rockenroll4life
+author: Combustible
+softdepend: [SuperVanish, PremiumVanish, BungeeTabListPlus, LuckPerms]
