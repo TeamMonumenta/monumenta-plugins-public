@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BrutalAlchemy extends Ability {
 	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 3;
@@ -37,15 +38,11 @@ public class BrutalAlchemy extends Ability {
 						int damage = (brutalAlchemy == 1) ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
 						int duration = (brutalAlchemy == 1) ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
 						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
-						entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, 1, false, true));
+						PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.WITHER, duration, 1, false, true));
 					}
 				}
 			}
 		}
 		return true;
-	}
-
-	public int getDamage() {
-		return getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
 	}
 }

@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -46,23 +47,21 @@ public class Challenge extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Challenge";
 		mInfo.cooldown = getAbilityScore() == 1 ? CHALLENGE_1_COOLDOWN : CHALLENGE_2_COOLDOWN;
-		mInfo.linkedSpell = Spells.CHELLENGE;
+		mInfo.linkedSpell = Spells.CHALLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
-		int increase = mobs.size();
-		if (increase > CHALLENGE_TOUGHNESS_MAX) {
-			increase = CHALLENGE_TOUGHNESS_MAX;
-		}
-		mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(increase);
+		int increase = Math.min(CHALLENGE_TOUGHNESS_MAX, mobs.size());
+		AttributeInstance toughness = mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
+		toughness.setBaseValue(toughness.getBaseValue() + increase);
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
+				toughness.setBaseValue(toughness.getBaseValue() - increase);
 			}
 
 		}.runTaskLater(mPlugin, CHALLENGE_DURATION);
@@ -87,7 +86,6 @@ public class Challenge extends Ability {
 		mWorld.spawnParticle(Particle.CRIT, mPlayer.getLocation().add(0, 1.25, 0), 300, 0, 0, 0, 1);
 		mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 1.25, 0), 300, 0, 0, 0, 1);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

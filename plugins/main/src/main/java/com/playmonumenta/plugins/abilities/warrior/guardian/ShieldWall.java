@@ -15,6 +15,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -59,7 +61,7 @@ public class ShieldWall extends Ability {
 	private int mRightClicks = 0;
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		// Prevent two right clicks being registered from one action (e.g. blocking)
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;
@@ -97,6 +99,8 @@ public class ShieldWall extends Ability {
 				int t = 0;
 				Location loc = mPlayer.getLocation();
 				List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+				List<LivingEntity> mobsAlreadyHit = new ArrayList<LivingEntity>();
+				List<LivingEntity> mobsHitThisTick = new ArrayList<LivingEntity>();
 				boolean hitboxes = false;
 
 				@Override
@@ -111,7 +115,9 @@ public class ShieldWall extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+							if (t % 4 == 0) {
+								mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+							}
 							if (!hitboxes) {
 								boxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
 								                         l.clone().add(0.6, 5, 0.6)));
@@ -135,18 +141,50 @@ public class ShieldWall extends Ability {
 								}
 							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
-								Vector v = le.getVelocity();
-								EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
-								if (knockback) {
-									MovementUtils.KnockAway(loc, le, 0.3f);
-									mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
-									mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
-								} else {
-									le.setVelocity(v);
+								// Stores mobs hit this tick
+								mobsHitThisTick.add(le);
+								// This list does not update to the mobs hit this tick until after everything runs
+								if (!mobsAlreadyHit.contains(le)) {
+									mobsAlreadyHit.add(le);
+									Vector v = le.getVelocity();
+									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
+									if (knockback) {
+										MovementUtils.KnockAway(loc, le, 0.3f);
+										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
+										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
+									} else {
+										le.setVelocity(v);
+									}
+								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()){
+									if (knockback) {
+										/*
+										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
+										 * 
+										 * If a mob collides with shield wall halfway through its invulnerability period, assume it
+										 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
+										 * halting mobs with stunlock damage, minus the insane damage part.
+										 * 
+										 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
+										 * after they leave shield wall hitbox.
+										 */
+										le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
+									}
 								}
 							}
 						}
 					}
+					/*
+					 * Compare the two lists of mobs and only remove from the
+					 * actual hit tracker if the mob isn't detected as hit this
+					 * tick, meaning it is no longer in the shield wall hitbox
+					 * and is thus eligible for another hit.
+					 */
+					for (LivingEntity mob : mobsAlreadyHit) {
+						if (!mobsHitThisTick.contains(mob)) {
+							mobsAlreadyHit.remove(mob);
+						}
+					}
+					mobsHitThisTick.clear();
 					if (t >= time) {
 						this.cancel();
 						boxes.clear();
@@ -155,7 +193,6 @@ public class ShieldWall extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		return true;
 	}
 
 	@Override

@@ -46,6 +46,7 @@ import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Bezoar;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.BezoarNonApothecary;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
@@ -77,7 +78,6 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
-import com.playmonumenta.plugins.abilities.mage.elementalist.FrostRay;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
@@ -147,6 +147,8 @@ import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NetworkUtils;
 
 public class AbilityManager {
 	private static AbilityManager mManager = null;
@@ -167,6 +169,15 @@ public class AbilityManager {
 		mManager = this;
 
 		mReferenceAbilities = new ArrayList<Ability>();
+		// Damage multiplying skills must come before damage bonus skills
+
+		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
+			mReferenceAbilities.addAll(Arrays.asList(
+										   new GrowingRage(mPlugin, mWorld, mRandom, null),
+										   new DarkPact(mPlugin, mWorld, mRandom, null)
+									   ));
+		}
+
 		mReferenceAbilities.addAll(Arrays.asList(
 		                          // ALL (CLUCKING POTIONS)
 		                          new CluckingPotions(mPlugin, mWorld, mRandom, null),
@@ -227,9 +238,9 @@ public class AbilityManager {
 		                          new ConsumingFlames(mPlugin, mWorld, mRandom, null),
 		                          new CursedWound(mPlugin, mWorld, mRandom, null),
 		                          new GraspingClaws(mPlugin, mWorld, mRandom, null),
-		                          new SoulRend(mPlugin, mWorld, mRandom, null),
 		                          new WarlockPassive(mPlugin, mWorld, mRandom, null),
 		                          new Harvester(mPlugin, mWorld, mRandom, null),
+		                          new SoulRend(mPlugin, mWorld, mRandom, null),
 
 		                          /********** ALCHEMIST **********/
 		                          new BasiliskPoison(mPlugin, mWorld, mRandom, null),
@@ -257,7 +268,6 @@ public class AbilityManager {
 			mReferenceAbilities.addAll(Arrays.asList(
 			                               /********** MAGE **********/
 			                               // ELEMENTALIST
-			                               new FrostRay(mPlugin, mWorld, mRandom, null),
 			                               new Starfall(mPlugin, mWorld, mRandom, null),
 			                               new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
 			                               new Blizzard(mPlugin, mWorld, mRandom, null),
@@ -292,7 +302,6 @@ public class AbilityManager {
 			                               /********** WARRIOR **********/
 			                               // BERSERKER
 			                               new MeteorSlam(mPlugin, mWorld, mRandom, null),
-			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
 			                               new Rampage(mPlugin, mWorld, mRandom, null),
 
 			                               // GUARDIAN
@@ -313,7 +322,6 @@ public class AbilityManager {
 
 			                               /********** WARLOCK **********/
 			                               // REAPER
-			                               new DarkPact(mPlugin, mWorld, mRandom, null),
 			                               new DeathsTouch(mPlugin, mWorld, mRandom, null),
 			                               new HungeringVortex(mPlugin, mWorld, mRandom, null),
 			                               new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
@@ -332,7 +340,8 @@ public class AbilityManager {
 			                               // APOTHECARY
 			                               new Bezoar(mPlugin, mWorld, mRandom, null),
 			                               new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
-			                               new InvigoratingOdor(mPlugin, mWorld, mRandom, null)
+			                               new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
+										   new BezoarNonApothecary(mPlugin, mWorld, mRandom, null)
 			                           ));
 		}
 	}
@@ -408,15 +417,6 @@ public class AbilityManager {
 		return gson.toJson(object);
 	}
 
-	/**
-	 * Called whenever a player deals damage.
-	 *
-	 * All classes that modify player damage should register in this function
-	 */
-	public void modifyDamage(Player player, EntityDamageByEntityEvent event) {
-		Celestial.modifyDamage(player, event);
-	}
-
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
@@ -432,8 +432,16 @@ public class AbilityManager {
 	}
 
 	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+		// Use the counter instead of scoreboard name because some "abilities" do not have a scoreboard
+		int i = 0;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			i++;
 			if (abil.canCast()) {
+				// Do not allow any skills with no cooldown to apply damage more than once
+				if ((abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
+						&& !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
+					return true;
+				}
 				if (!abil.LivingEntityDamagedByPlayerEvent(event)) {
 					return false;
 				}

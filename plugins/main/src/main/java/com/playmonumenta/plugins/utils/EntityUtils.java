@@ -330,8 +330,10 @@ public class EntityUtils {
 				Bukkit.getPluginManager().callEvent(event);
 				damage = event.getDamage();
 			}
+			if (target.getNoDamageTicks() == target.getMaximumNoDamageTicks()) {
+				target.setNoDamageTicks(0);
+			}
 			if (damager != null) {
-				MetadataUtils.checkOnceThisTick(plugin, damager, Constants.ENTITY_DAMAGE_NONCE_METAKEY);
 				target.damage(damage, damager);
 			} else {
 				target.damage(damage);

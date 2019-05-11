@@ -52,7 +52,7 @@ public class EnchantedShot extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (!active && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isBowItem(mainHand)) {
@@ -73,13 +73,13 @@ public class EnchantedShot extends Ability {
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
 		}
-		return false;
 	}
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (active) {
 			arrow.remove();
+			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			active = false;
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.65, 0.65, 0.65);
 			double damage = getAbilityScore() == 1 ? ENCHANTED_1_DAMAGE : ENCHANTED_2_DAMAGE;
@@ -112,6 +112,9 @@ public class EnchantedShot extends Ability {
 					if (mob.getBoundingBox().overlaps(box)) {
 						if (mob instanceof Player) {
 							damage *= 0.75;
+						}
+						if (mob.hasMetadata("PinningShotEnemyIsPinned")) {
+							damage *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
 						}
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 						/* Prevent mob from being hit twice in one shot */

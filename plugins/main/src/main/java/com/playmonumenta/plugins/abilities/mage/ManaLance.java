@@ -47,7 +47,7 @@ public class ManaLance extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int manaLance = getAbilityScore();
 
 		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
@@ -93,7 +93,6 @@ public class ManaLance extends Ability {
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MANA_LANCE);
 		putOnCooldown();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
-		return true;
 	}
 
 	@Override

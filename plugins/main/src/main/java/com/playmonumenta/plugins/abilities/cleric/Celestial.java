@@ -42,7 +42,7 @@ public class Celestial extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int celestial = getAbilityScore();
 
 		World world = mPlayer.getWorld();
@@ -86,7 +86,6 @@ public class Celestial extends Ability {
 		}.runTaskLater(mPlugin, duration);
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

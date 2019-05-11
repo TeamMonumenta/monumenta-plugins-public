@@ -32,7 +32,7 @@ public class DivineJustice extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damagee = (LivingEntity)event.getEntity();
 		if (!event.getCause().equals(DamageCause.PROJECTILE) && EntityUtils.isUndead(damagee)) {
-			EntityUtils.damageEntity(mPlugin, damagee, DIVINE_JUSTICE_DAMAGE, mPlayer);
+			event.setDamage(event.getDamage() + DIVINE_JUSTICE_DAMAGE);
 
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_CRIT_HEAL);
 

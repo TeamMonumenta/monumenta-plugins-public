@@ -37,7 +37,7 @@ public class ConsumingFlames extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		Player player = mPlayer;
 		Location loc = player.getLocation();
 		World world = player.getWorld();
@@ -61,7 +61,6 @@ public class ConsumingFlames extends Ability {
 		}
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

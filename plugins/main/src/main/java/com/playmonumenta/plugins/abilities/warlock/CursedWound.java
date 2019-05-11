@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -32,20 +33,23 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damagee = (LivingEntity) event.getEntity();
-		int cursedWound = getAbilityScore();
-		if (EntityUtils.isHostileMob(damagee)) {
-			mPlayer.getWorld().spawnParticle(Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
-			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
-			int damageMult = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
-			EntityUtils.damageEntity(mPlugin, damagee, damageMult, mPlayer);
-		}
-
-		if (cursedWound > 1 && PlayerUtils.isCritical(mPlayer)) {
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			LivingEntity damagee = (LivingEntity) event.getEntity();
+			int cursedWound = getAbilityScore();
+			if (EntityUtils.isHostileMob(damagee)) {
+				mPlayer.getWorld().spawnParticle(Particle.LAVA, damagee.getLocation().add(0, 1, 0), 4, 0.15, 0.15, 0.15, 0.0);
+				PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
+				int damage = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
+				event.setDamage(event.getDamage() + damage);
+			}
+	
+			if (cursedWound > 1 && PlayerUtils.isCritical(mPlayer)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));
+				}
 			}
 		}
+
 		return true;
 	}
 

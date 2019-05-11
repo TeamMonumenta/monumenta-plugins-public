@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.Random;
 
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +13,10 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.NetworkUtils;
 
 public class WeaponryMastery extends Ability {
 
@@ -30,11 +34,10 @@ public class WeaponryMastery extends Ability {
 		int weaponMastery = getAbilityScore();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
-		if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 2) {
-			event.setDamage(event.getDamage() + WEAPON_MASTERY_AXE_2_DAMAGE);
-		} else if (InventoryUtils.isAxeItem(mainHand) && weaponMastery >= 1) {
-			event.setDamage(event.getDamage() + WEAPON_MASTERY_AXE_1_DAMAGE);
-		} else if (InventoryUtils.isSwordItem(mainHand) && weaponMastery >= 2) {
+		if (InventoryUtils.isAxeItem(mainHand)) {
+			double damage = weaponMastery == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
+			event.setDamage(event.getDamage() + damage);
+		} else if (InventoryUtils.isSwordItem(mainHand) && weaponMastery > 1) {
 			event.setDamage(event.getDamage() + WEAPON_MASTERY_SWORD_2_DAMAGE);
 		}
 

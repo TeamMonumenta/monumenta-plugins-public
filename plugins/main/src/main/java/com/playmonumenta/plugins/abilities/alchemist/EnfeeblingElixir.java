@@ -14,8 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EnfeeblingElixir extends Ability {
 	private static final int ENFEEBLING_COOLDOWN = 20 * 20;
@@ -46,14 +48,13 @@ public class EnfeeblingElixir extends Ability {
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
 					MovementUtils.KnockAway(damagee, mob, kbSpeed);
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
+					PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
 				}
 
-				MovementUtils.KnockAway(mPlayer, damagee, kbSpeed);
-				damagee.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
-
-				mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
-				mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+						new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+						new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
 
 				mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation(), 100, 2, 1.5, 2, 0);
 				mWorld.playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);

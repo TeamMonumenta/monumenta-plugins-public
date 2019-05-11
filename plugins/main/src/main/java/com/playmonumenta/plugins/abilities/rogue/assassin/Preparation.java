@@ -59,7 +59,7 @@ public class Preparation extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		// Prevent two right clicks being registered from one action (e.g. blocking)
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;
@@ -74,7 +74,7 @@ public class Preparation extends Ability {
 		}
 
 		if (mRightClicks < 2) {
-			return false;
+			return;
 		}
 		mRightClicks = 0;
 
@@ -94,7 +94,6 @@ public class Preparation extends Ability {
 		}.runTaskLater(mPlugin, PREPARATION_ACTIVATION_PERIOD);
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

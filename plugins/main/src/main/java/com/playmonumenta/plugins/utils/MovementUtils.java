@@ -6,6 +6,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 public class MovementUtils {
 	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed) {
 		KnockAway(awayFromEntity.getLocation(), target, speed, 0.5f);
@@ -20,6 +22,9 @@ public class MovementUtils {
 	}
 
 	public static void KnockAway(Location loc, LivingEntity target, float speed, float y) {
+		if (EntityUtils.isBoss(target)) {
+			speed /= 2;
+		}
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().multiply(speed);
 		dir.setY(y);
 		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
@@ -31,6 +36,9 @@ public class MovementUtils {
 	}
 
 	public static void PullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
+		if (EntityUtils.isBoss(target)) {
+			return;
+		}
 		Vector dir = target.getLocation().subtract(awayFromEntity.getLocation().toVector()).toVector().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);

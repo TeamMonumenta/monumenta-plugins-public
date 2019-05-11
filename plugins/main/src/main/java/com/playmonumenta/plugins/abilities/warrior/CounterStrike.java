@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -89,11 +90,7 @@ public class CounterStrike extends Ability {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			int damage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
-			if (PlayerUtils.isCritical(mPlayer)) {
-				event.setDamage(event.getDamage() + damage);
-			} else {
-				event.setDamage(event.getDamage() + damage);
-			}
+			event.setDamage(event.getDamage() + damage);
 
 			Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_DISTANCE, mPlayer)) {
@@ -111,7 +108,20 @@ public class CounterStrike extends Ability {
 		return true;
 	}
 
-	protected void riposteTriggered() {
-		mRiposteTriggeredTick = mPlayer.getTicksLived();
+	@Override
+	public boolean AbilityCastEvent(AbilityCastEvent event) {
+		if (event.getAbility() == Spells.RIPOSTE) {
+			mActive = true;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mActive = false;
+					this.cancel();
+				}
+			}.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
+		}
+
+		return true;
 	}
+
 }

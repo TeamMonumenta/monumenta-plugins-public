@@ -294,9 +294,19 @@ public class PotionUtils {
 	}
 
 	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
-		PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
-		Bukkit.getPluginManager().callEvent(event);
-		applied.addPotionEffect(event.getEffect());
+		if (applied.hasPotionEffect(effect.getType())) {
+			if (applied.getPotionEffect(effect.getType()).getAmplifier() < effect.getAmplifier()
+					|| applied.getPotionEffect(effect.getType()).getAmplifier() == effect.getAmplifier()
+					&& applied.getPotionEffect(effect.getType()).getDuration() < effect.getDuration()) {
+				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
+				Bukkit.getPluginManager().callEvent(event);
+				applied.addPotionEffect(event.getEffect());
+			}
+		} else {
+			PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
+			Bukkit.getPluginManager().callEvent(event);
+			applied.addPotionEffect(event.getEffect());
+		}
 	}
 
 	public static List<PotionEffectType> getNegativeEffects(LivingEntity le) {

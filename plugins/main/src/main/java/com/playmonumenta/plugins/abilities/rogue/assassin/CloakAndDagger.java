@@ -66,7 +66,7 @@ public class CloakAndDagger extends Ability {
 	private int cloakOnActivation = 0;
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (!active && cloak >= CLOAK_MIN_STACKS && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50) {
 			cloakOnActivation = cloak;
 			cloak = 0;
@@ -110,7 +110,6 @@ public class CloakAndDagger extends Ability {
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		return true;
 	}
 
 	@Override

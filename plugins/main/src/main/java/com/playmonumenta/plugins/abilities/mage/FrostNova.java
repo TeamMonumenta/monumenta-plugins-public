@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class FrostNova extends Ability {
 
@@ -39,7 +40,7 @@ public class FrostNova extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int frostNova = getAbilityScore();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
@@ -53,7 +54,7 @@ public class FrostNova extends Ability {
 					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION / 2, mob);
 				}
 			}
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
@@ -75,7 +76,6 @@ public class FrostNova extends Ability {
 		mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
 		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

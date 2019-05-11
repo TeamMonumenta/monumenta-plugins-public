@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Pinning Shot: The first arrow shot at a non-boss mob
@@ -49,7 +50,7 @@ public class PinningShot extends Ability {
 			if (damagee instanceof Player) {
 				duration *= 0.5;
 			}
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 6));
+			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, duration, 6));
 
 			new BukkitRunnable() {
 				@Override

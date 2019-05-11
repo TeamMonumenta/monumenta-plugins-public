@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class GruesomeAlchemy extends Ability {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
@@ -33,9 +34,9 @@ public class GruesomeAlchemy extends Ability {
 				int gruesomeAlchemy = getAbilityScore();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_SLOW, false, true));
+						PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_SLOW, false, true));
 						if (gruesomeAlchemy > 1) {
-							entity.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
+							PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
 						}
 					}
 				}

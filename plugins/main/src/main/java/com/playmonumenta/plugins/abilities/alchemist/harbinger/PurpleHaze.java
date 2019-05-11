@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * When you kill an enemy they give off a noxious cloud, dealing 4/8 damage and
@@ -41,7 +42,7 @@ public class PurpleHaze extends Ability {
 		int duration = purpleHaze == 1 ? PURPLE_HAZE_1_WEAKNESS_DURATION : PURPLE_HAZE_2_WEAKNESS_DURATION;
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(event.getEntity().getLocation(), PURPLE_HAZE_RADIUS)) {
 			EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, 0, true, false));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, duration, 0, true, false));
 		}
 	}
 }

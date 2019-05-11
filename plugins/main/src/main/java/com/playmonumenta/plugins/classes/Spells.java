@@ -12,21 +12,10 @@ public enum Spells {
 	ARCANE_STRIKE("Arcane Strike"),
 	ELEMENTAL_ARROWS("Elemental Arrows"),
 
-	//--Pyromancer Spec
-	INFERNO("Inferno"),
-	ASHEN_HEART("Ashen Heart"),
-
-	//--Cyromancer Spec.
-
-	BLIZZARD("Blizzard"),
-	COLD_WAVE("Cold Wave"),
-	FROZEN_HEART("Frozen Heart"),
-
 	//--Elementalist Spec.
-
+	BLIZZARD("Blizzard"),
 	STARFALL("Starfall"),
 	ELEMENTAL_SPIRIT("Elemental Spirit"),
-	FROST_RAY("Frost Ray"),
 
 	//--Arcanist Spec.
 	FSWORD("Flash Sword"),
@@ -98,9 +87,6 @@ public enum Spells {
 	DARK_PACT("Dark Pact"),
 
 	//--Tenebrist
-	HYPNOTIC_RAGE("Hypnotic Rage"),
-	SABLE_SPHERE("Sable Sphere"),
-	BLACK_CLOUDS("Black Clouds"),
 	FRACTAL_ENERVATION("Fractal Enervation"),
 	WITHERING_GAZE("Withering Gaze"),
 
@@ -116,14 +102,11 @@ public enum Spells {
 
 	//--Guardian
 	SHIELD_WALL("Shield Wall"),
-	CHELLENGE("Challenge"),
+	CHALLENGE("Challenge"),
 	BODYGUARD("Bodyguard"),
 
 	//Alchemist
 	POWER_INJECTION("Power Injection"),
-	GRUESOME_ALCHEMY("Gruesome Alchemy"),
-	PUTRID_FUMES("Putrid Fumes"),
-	CAUSTIC_BLADE("Caustic Blade"),
 	IRON_TINCTURE("Iron Tincture"),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
 	UNSTABLE_ARROWS("Unstable Arrows"),

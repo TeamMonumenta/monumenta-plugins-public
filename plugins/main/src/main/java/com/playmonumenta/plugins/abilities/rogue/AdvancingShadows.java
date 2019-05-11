@@ -50,7 +50,7 @@ public class AdvancingShadows extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 
 		LivingEntity entity = target;
 		if (entity != null) {
@@ -105,9 +105,7 @@ public class AdvancingShadows extends Ability {
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
 			target = null;
 			putOnCooldown();
-			return true;
 		}
-		return false;
 	}
 
 	@Override

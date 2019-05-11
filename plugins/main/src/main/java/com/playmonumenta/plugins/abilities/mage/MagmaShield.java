@@ -40,7 +40,7 @@ public class MagmaShield extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int magmaShield = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS, mPlayer)) {
@@ -67,7 +67,6 @@ public class MagmaShield extends Ability {
 
 		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MAGMA_SHIELD);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

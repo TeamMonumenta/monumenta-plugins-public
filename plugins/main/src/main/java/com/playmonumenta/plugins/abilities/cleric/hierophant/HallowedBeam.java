@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Hallowed Beam: Level 1 – Firing a fully-drawn bow while sneaking,
@@ -27,6 +28,9 @@ import com.playmonumenta.plugins.utils.LocationUtils;
  * 5-block radius, and giving slowness 4 to all enemies.
  */
 public class HallowedBeam extends Ability {
+
+	private static final double HALLOWED_DAMAGE_DIRECT = 42;
+	private static final double HALLOWED_DAMAGE_EXPLOSION = 20;
 
 	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -56,7 +60,7 @@ public class HallowedBeam extends Ability {
 						break;
 					}
 				}
-				EntityUtils.damageEntity(mPlugin, e, 42, player);
+				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player);
 				Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
 				mWorld.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
@@ -66,9 +70,9 @@ public class HallowedBeam extends Ability {
 					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
 					for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, 5)) {
 						if (EntityUtils.isUndead(le)) {
-							EntityUtils.damageEntity(mPlugin, le, 22, player);
+							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player);
 						}
-						le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
+						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 					}
 
 				}

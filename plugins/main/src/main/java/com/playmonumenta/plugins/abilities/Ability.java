@@ -48,11 +48,8 @@ public abstract class Ability {
 	 * This is used when the ability is casted manually when its
 	 * AbilityTrigger (Right Click/Left Click), along with whatever
 	 * runCheck() may contain, is correct.
-	 * @return if the player managed to cast the spell successfully.
 	 */
-	public boolean cast() {
-		return true;
-	}
+	public void cast() { }
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.

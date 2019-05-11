@@ -69,7 +69,7 @@ public class ThuribleProcession extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		// Prevent two right clicks being registered from one action (e.g. blocking)
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;
@@ -172,7 +172,6 @@ public class ThuribleProcession extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		return true;
 	}
 
 	@Override

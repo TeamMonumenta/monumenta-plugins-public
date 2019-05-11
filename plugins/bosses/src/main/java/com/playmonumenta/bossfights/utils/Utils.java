@@ -33,9 +33,8 @@ public class Utils {
 		List<Player> out = new ArrayList<Player>();
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-			if (player.getLocation().distance(loc) < range &&
-			    player.getGameMode() != GameMode.SPECTATOR &&
-			    player.getHealth() > 0) {
+			if (player.getLocation().distance(loc) < range && player.getGameMode() != GameMode.SPECTATOR
+					&& player.getHealth() > 0 && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 				out.add(player);
 			}
 		}

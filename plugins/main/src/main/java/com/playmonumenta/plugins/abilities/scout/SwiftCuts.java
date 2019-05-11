@@ -21,9 +21,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
- * -[Swift Cuts Level 1] : On melee hit the target is marked.
+ * [Swift Cuts Level 1] : On melee hit the target is marked.
  * When the target is hit again they take an additional 2 damage,
  * remove the mark, and get 10% Vulnerability for 2 seconds.
  * Targets can only be marked each again after 3s
@@ -32,6 +33,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
  * Vulnerability is increased to 20%
  */
 public class SwiftCuts extends Ability {
+
+	private static final double SWIFT_CUTS_1_DAMAGE = 2;
+	private static final double SWIFT_CUTS_2_DAMAGE = 4;
 
 	public SwiftCuts(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -77,25 +81,25 @@ public class SwiftCuts extends Ability {
 					}.runTaskLater(mPlugin, 20 * 3);
 					ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
 					world.spawnParticle(Particle.SWEEP_ATTACK, ent.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.001);
-					double damage = getAbilityScore() == 1 ? 3 : 4;
-					EntityUtils.damageEntity(mPlugin, ent, damage, mPlayer);
+					double damage = getAbilityScore() == 1 ? SWIFT_CUTS_1_DAMAGE : SWIFT_CUTS_2_DAMAGE;
+					event.setDamage(event.getDamage() + damage);
 					if (getAbilityScore() > 1 && !activated) {
 						activated = true;
-						mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() + 0.01);
+						mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() + 0.1);
 						mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.01);
 						new BukkitRunnable() {
 
 							@Override
 							public void run() {
 								activated = false;
-								mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() - 0.01);
+								mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() - 0.1);
 								mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.01);
 							}
 
 						}.runTaskLater(mPlugin, 20 * 3);
 					}
 
-					ent.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, amp));
+					PotionUtils.applyPotion(mPlayer, ent, new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, amp));
 				}
 			}
 		}

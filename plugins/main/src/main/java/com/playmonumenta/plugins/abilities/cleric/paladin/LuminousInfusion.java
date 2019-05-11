@@ -26,21 +26,18 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 /*
 * All attacks against undead deal +2/5 damage. Sneak and right-click while
 * looking at the ground to charge your weapon with holy light for 15 seconds.
-* Your next swing stuns non undead for 3s (slowness V weakness V) or deals +10
-* damage to undead, and if it kills the undead, it explodes, dealing 10 damage
+* Your next swing to an undead explodes with holy light, dealing 10 damage
 * to all mobs within 4 blocks. Cooldown 25/18s
 */
 
 public class LuminousInfusion extends Ability {
 
 	private static final String LUMINOUS_INFUSION_EXPIRATION_MESSAGE = "The light from your hands fades...";
-	private static final int LUMINOUS_INFUSION_ACTIVATION_ANGLE = 75;
 	private static final double LUMINOUS_INFUSION_RADIUS = 4;
 	private static final int LUMINOUS_INFUSION_EXPLOSION_DAMAGE = 10;
 	private static final int LUMINOUS_INFUSION_UNDEAD_DAMAGE = 10;
 	private static final int LUMINOUS_INFUSION_1_PASSIVE_DAMAGE = 2;
 	private static final int LUMINOUS_INFUSION_2_PASSIVE_DAMAGE = 5;
-	private static final int LUMINOUS_INFUSION_STUN_DURATION = 3 * 20;
 	private static final int LUMINOUS_INFUSION_MAX_DURATION = 15 * 20;
 	private static final int LUMINOUS_INFUSION_1_COOLDOWN = 25 * 20;
 	private static final int LUMINOUS_INFUSION_2_COOLDOWN = 18 * 20;
@@ -64,17 +61,17 @@ public class LuminousInfusion extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			// On cooldown - can't cast it again yet
-			return false;
+			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (inMainHand == null || !mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand)
-		    || mPlayer.getLocation().getPitch() < LUMINOUS_INFUSION_ACTIVATION_ANGLE) {
+		    || mPlayer.getLocation().getPitch() < 50) {
 			// Conditions not met - can't cast
-			return false;
+			return;
 		}
 
 		// Cast conditions met
@@ -102,8 +99,6 @@ public class LuminousInfusion extends Ability {
 		}.runTaskTimer(mPlugin, 1, 1);
 
 		putOnCooldown();
-
-		return true;
 	}
 
 	@Override
@@ -116,41 +111,22 @@ public class LuminousInfusion extends Ability {
 			event.setDamage(event.getDamage() + damage);
 		}
 
-		if (mActive) {
+		if (mActive && EntityUtils.isUndead(le)) {
 			mActive = false;
-			if (EntityUtils.isUndead(le)) {
-				// Active damage to undead
-				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
-
-				new BukkitRunnable() {
-					// Need to get this when launching runnable, before the mob
-					// has died
-					Location loc = le.getLocation();
-
-					@Override
-					public void run() {
-						if (le.isDead()) {
-							List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS);
-							for (LivingEntity e : affected) {
-								// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
-								float volume = 0.85f / (float) Math.sqrt(affected.size());
-								EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
-								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-								mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-								mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, volume, 1.1f);
-							}
-						}
-					}
-
-				}.runTaskLater(mPlugin, 1);
-			} else {
-				// Active damage to non-undead
-				if ((!EntityUtils.isElite(le) && !EntityUtils.isBoss(le))
-				    || ((le instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)le))) {
-					EntityUtils.applyStun(mPlugin, LUMINOUS_INFUSION_STUN_DURATION, le);
-				}
+			Location loc = le.getLocation();
+			// Active damage to undead
+			event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
+			List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, le);
+			for (LivingEntity e : affected) {
+				// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
+				float volume = 0.85f / (float) Math.sqrt(affected.size());
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
+				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
+				mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+				mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, volume, 1.1f);
 			}
 		}
+
 		return true;
 	}
 }

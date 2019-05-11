@@ -20,9 +20,13 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DeathsTouch extends Ability {
+
+	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "DeathsTouchTickRightClicked";
+
 	private static final int DEATHS_TOUCH_1_COOLDOWN = 30 * 20;
 	private static final int DEATHS_TOUCH_2_COOLDOWN = 20 * 20;
 	private static final int DEATHS_TOUCH_1_BUFF_DURATION = 15 * 20;
@@ -43,6 +47,7 @@ public class DeathsTouch extends Ability {
 	// Although we now track the mob buffs on kill with metadata,
 	// We still need this variable to easily apply particle effects
 	private LivingEntity target = null;
+	private int mRightClicks = 0;
 
 	public DeathsTouch(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -50,19 +55,31 @@ public class DeathsTouch extends Ability {
 		mInfo.scoreboardId = "DeathsTouch";
 		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-
-		/*
-		 * NOTE! Because this skill has two events it needs to bypass the automatic cooldown check
-		 * and manage cooldown itself
-		 */
-		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
-	public boolean cast() {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
-			return false;
+	public boolean runCheck() {
+		return InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+	}
+
+	@Override
+	public void cast() {
+		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
+			mRightClicks++;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mRightClicks > 0) {
+						mRightClicks--;
+					}
+					this.cancel();
+				}
+			}.runTaskLater(mPlugin, 5);
 		}
+		if (mRightClicks < 2) {
+			return;
+		}
+		mRightClicks = 0;
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
@@ -103,7 +120,6 @@ public class DeathsTouch extends Ability {
 
 					// This loop only runs at most once!
 					putOnCooldown();
-					return true;
 				}
 			}
 		}
@@ -113,7 +129,6 @@ public class DeathsTouch extends Ability {
 				PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.linkedSpell);
 			}
 		}
-		return false;
 	}
 
 	// The buffs will be applied in the DeathsTouchNonReaper ability for all players

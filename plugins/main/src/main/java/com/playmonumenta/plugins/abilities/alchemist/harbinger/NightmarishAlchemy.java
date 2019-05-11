@@ -15,22 +15,23 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
- * Your Alchemist Potions deal +3/6 damage and have a 10%/20%
- * chance of causing mobs to attack nearby mobs for 4 seconds.
+ * Your Alchemist Potions deal +3/7 damage and have a 20%
+ * chance of causing mobs to attack nearby mobs for 8 seconds.
+ * If you splash 5 or more mobs, at least 1 is guaranteed to be
+ * confused.
  */
 
 public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_1_DAMAGE = 3;
-	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 6;
-	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 4;
-	private static final float NIGHTMARISH_ALCHEMY_1_CONFUSION_CHANCE = 0.1f;
-	private static final float NIGHTMARISH_ALCHEMY_2_CONFUSION_CHANCE = 0.2f;
+	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 7;
+	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 8;
+	private static final float NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE = 0.2f;
 	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_RANGE = 8;
+
+	private boolean guaranteedApplicationApplied = false;
 
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -39,18 +40,24 @@ public class NightmarishAlchemy extends Ability {
 
 	@Override
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
+		guaranteedApplicationApplied = false;
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				int damage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
-				BrutalAlchemy ba = (BrutalAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-				if (ba != null) {
-					damage += ba.getDamage();
-				}
-				float chance = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_CONFUSION_CHANCE : NIGHTMARISH_ALCHEMY_2_CONFUSION_CHANCE;
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity) && entity instanceof Creature) {
 						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
-						if (!EntityUtils.isBoss(entity) && mRandom.nextFloat() < chance) {
+						boolean confuse = false;
+						if (!EntityUtils.isBoss(entity)) {
+							if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE) {
+								confuse = true;
+							} else if (!guaranteedApplicationApplied && affectedEntities.size() >= 5) {
+								confuse = true;
+								guaranteedApplicationApplied = true;
+							}
+						}
+
+						if (confuse) {
 							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(entity.getLocation(), NIGHTMARISH_ALCHEMY_CONFUSION_RANGE);
 							for (LivingEntity mob : mobs) {
 								if (mob.getUniqueId() != entity.getUniqueId()) {
@@ -62,6 +69,7 @@ public class NightmarishAlchemy extends Ability {
 										}
 									}.runTaskLater(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION);
 								}
+								break;
 							}
 						}
 					}

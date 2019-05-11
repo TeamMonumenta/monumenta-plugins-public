@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DeadlyRonde extends Ability {
 	private static final int RONDE_2_SLOWNESS_AMPLIFIER = 1;
@@ -91,9 +92,10 @@ public class DeadlyRonde extends Ability {
 					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 25, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
 				}
 
-				if (!event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntity() instanceof LivingEntity) {
+				if (getAbilityScore() > 1 && event.getCause() == DamageCause.ENTITY_ATTACK
+						&& event.getEntity() instanceof LivingEntity) {
 					LivingEntity le = (LivingEntity)event.getEntity();
-					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RONDE_2_SLOWNESS_DURATION, RONDE_2_SLOWNESS_AMPLIFIER, true, false));
+					PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, RONDE_2_SLOWNESS_DURATION, RONDE_2_SLOWNESS_AMPLIFIER, true, false));
 					mWorld.spawnParticle(Particle.FALLING_DUST, ent.getLocation().add(0, 1, 0), 10, 0.25, 0.45, 0.25, 0.25, Material.GRAVEL.createBlockData());
 				}
 			}

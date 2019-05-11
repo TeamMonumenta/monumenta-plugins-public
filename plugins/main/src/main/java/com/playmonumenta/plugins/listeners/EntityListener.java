@@ -64,6 +64,7 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
@@ -223,23 +224,24 @@ public class EntityListener implements Listener {
 			//  Make sure to not trigger class abilities off Throrns.
 			if (event.getCause() != DamageCause.THORNS) {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (!MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.ENTITY_DAMAGE_NONCE_METAKEY)) {
-						// This damage was just added by the player's class - don't process class effects again
-						return;
-					}
-
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
 					}
+				}
 
-					mAbilities.modifyDamage(player, event);
-
-					if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
-						event.setCancelled(true);
+				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+						Celestial.modifyDamage(player, event);
 					}
+				}
 
+				if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
+					event.setCancelled(true);
+				}
+
+				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}

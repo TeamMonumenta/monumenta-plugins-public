@@ -21,27 +21,25 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.scout.BowMastery;
-import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
-* Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 12 damage + any
+* Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 15 damage + any
 * other bonuses from skills and inflicts Slowness 3 for 2 seconds (Cooldown: 10
 * seconds). Level 2 decreases the cooldown to 8 seconds and increases the arrow
-* damage to 20 + effects.
+* damage to 24 + effects.
 */
 
 public class Quickdraw extends Ability {
 
 	private static final int QUICKDRAW_1_COOLDOWN = 10 * 20;
 	private static final int QUICKDRAW_2_COOLDOWN = 8 * 20;
-	private static final int QUICKDRAW_1_DAMAGE = 12;
-	private static final int QUICKDRAW_2_DAMAGE = 20;
+	private static final int QUICKDRAW_1_DAMAGE = 15;
+	private static final int QUICKDRAW_2_DAMAGE = 24;
 	private static final int QUICKDRAW_SLOWNESS_DURATION = 20 * 2;
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 
@@ -61,7 +59,7 @@ public class Quickdraw extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
 			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
@@ -83,8 +81,6 @@ public class Quickdraw extends Ability {
 			Bukkit.getPluginManager().callEvent(eventLaunch);
 			putOnCooldown();
 		}
-
-		return true;
 	}
 
 	@Override
@@ -99,7 +95,7 @@ public class Quickdraw extends Ability {
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity le, EntityDamageByEntityEvent event) {
 		if (arrow.hasMetadata("ArrowQuickdraw")) {
-			le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
+			PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
 		}
 		return true;
 	}

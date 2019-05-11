@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DaggerThrow extends Ability {
 
@@ -43,7 +44,7 @@ public class DaggerThrow extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int daggerThrow = getAbilityScore();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -78,7 +79,7 @@ public class DaggerThrow extends Ability {
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1, mPlayer)) {
 					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
 					if (ppDuration > 0) {
 						EntityUtils.applyStun(mPlugin, ppDuration, mob);
 					}
@@ -103,7 +104,6 @@ public class DaggerThrow extends Ability {
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

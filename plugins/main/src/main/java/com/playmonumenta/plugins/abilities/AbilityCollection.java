@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.abilities;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonObject;
 
 public class AbilityCollection {
-	private Map<Class<?>, Ability> mAbilities = new HashMap<Class<?>, Ability>();
+	private Map<Class<?>, Ability> mAbilities = new LinkedHashMap<Class<?>, Ability>();
 
 	public AbilityCollection(List<Ability> abilities) {
 		for (Ability ability : abilities) {

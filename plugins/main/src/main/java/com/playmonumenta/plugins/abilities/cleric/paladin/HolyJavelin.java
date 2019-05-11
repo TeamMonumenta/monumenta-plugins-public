@@ -55,7 +55,7 @@ public class HolyJavelin extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
 		int holyJavelin = getAbilityScore();
@@ -96,6 +96,5 @@ public class HolyJavelin extends Ability {
 		}
 
 		putOnCooldown();
-		return true;
 	}
 }

@@ -47,6 +47,9 @@ public class SplitArrow extends Ability {
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		double damage = getAbilityScore() == 1 ? SPLIT_ARROW_1_DAMAGE : SPLIT_ARROW_2_DAMAGE;
 		damage += AbilityUtils.getArrowBonusDamage(arrow);
+		if (damagee.hasMetadata("PinningShotEnemyIsPinned")) {
+			damage *= damagee.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
+		}
 
 		LivingEntity nearestMob = null;
 		double closestDistance = SPLIT_ARROW_CHAIN_RANGE + 1;

@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
 * Sprint right click (without a bow) to execute a fast dash that launches the
@@ -70,7 +71,7 @@ public class PrecisionStrike extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
 		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
@@ -99,7 +100,7 @@ public class PrecisionStrike extends Ability {
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					hitMob = le;
-					le.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
+					PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
 					if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 						EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 					}
@@ -118,7 +119,5 @@ public class PrecisionStrike extends Ability {
 			}
 		}.runTaskTimer(mPlugin, 1, 1);
 		putOnCooldown();
-
-		return true;
 	}
 }

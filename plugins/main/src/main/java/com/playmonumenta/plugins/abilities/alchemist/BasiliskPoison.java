@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BasiliskPoison extends Ability {
 	private static final int BASILISK_POISON_1_EFFECT_LVL = 1;
@@ -37,7 +38,7 @@ public class BasiliskPoison extends Ability {
 		int basiliskPoison = getAbilityScore();
 		int effectLvl = basiliskPoison == 1 ? BASILISK_POISON_1_EFFECT_LVL : BASILISK_POISON_2_EFFECT_LVL;
 		int duration = basiliskPoison == 1 ? BASILISK_POISON_1_DURATION : BASILISK_POISON_2_DURATION;
-		entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
+		PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.WITHER, duration, effectLvl, false, true));
 	}
 
 	@Override

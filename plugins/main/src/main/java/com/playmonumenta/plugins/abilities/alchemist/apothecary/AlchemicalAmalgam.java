@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Alchemical Amalgam: Shift - left clicking with a bow in hand
@@ -53,7 +54,7 @@ public class AlchemicalAmalgam extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 1.25f);
@@ -82,8 +83,8 @@ public class AlchemicalAmalgam extends Ability {
 				}
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5, mPlayer)) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
 				}
 				if (t >= 20 * 6 || loc.getBlock().getType().isSolid()) {
 					this.cancel();
@@ -104,7 +105,6 @@ public class AlchemicalAmalgam extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

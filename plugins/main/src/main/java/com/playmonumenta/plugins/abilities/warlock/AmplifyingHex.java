@@ -51,7 +51,7 @@ public class AmplifyingHex extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		Player player = mPlayer;
 		ParticleUtils.explodingConeEffect(mPlugin, player, AMPLIFYING_RADIUS, Particle.DRAGON_BREATH, 0.6f, Particle.SMOKE_NORMAL, 0.4f, AMPLIFYING_DOT_ANGLE);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 1.6f);
@@ -75,7 +75,6 @@ public class AmplifyingHex extends Ability {
 		}
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

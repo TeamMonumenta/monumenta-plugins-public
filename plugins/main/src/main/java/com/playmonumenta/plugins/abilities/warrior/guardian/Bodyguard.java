@@ -59,7 +59,7 @@ public class Bodyguard extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
 		Location oLoc = mPlayer.getLocation();
 		Vector dir = oLoc.getDirection();
@@ -136,11 +136,9 @@ public class Bodyguard extends Ability {
 							EntityUtils.applyStun(mPlugin, BODYGUARD_STUN_DURATION, mob);
 						}
 					}
-					return true;
 				}
 			}
 		}
-		return true;
 	}
 
 	@Override

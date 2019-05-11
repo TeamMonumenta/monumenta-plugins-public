@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Blizzard extends Ability {
 
@@ -56,9 +57,9 @@ public class Blizzard extends Ability {
 	private boolean mActive = false;
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (mActive) {
-			return false;
+			return;
 		}
 		mActive = true;
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
@@ -79,7 +80,7 @@ public class Blizzard extends Ability {
 					}
 					for (LivingEntity mob : mobs) {
 						if (!affected.containsKey(mob.getUniqueId())) {
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 0, false, true));
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 0, false, true));
 							affected.put(mob.getUniqueId(), 1);
 						} else {
 							int duration = affected.get(mob.getUniqueId());
@@ -93,10 +94,7 @@ public class Blizzard extends Ability {
 									EntityUtils.applyFreeze(mPlugin, 20 * 5, mob);
 								}
 							} else if (duration >= 6) {
-								if (amp < 1) {
-									mob.removePotionEffect(PotionEffectType.SLOW);
-									mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
-								}
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
 							}
 							affected.put(mob.getUniqueId(), duration + 1);
 						}
@@ -123,7 +121,6 @@ public class Blizzard extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-		return true;
 	}
 
 	@Override

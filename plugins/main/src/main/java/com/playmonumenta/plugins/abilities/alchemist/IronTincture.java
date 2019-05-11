@@ -51,7 +51,7 @@ public class IronTincture extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int ironTincture = getAbilityScore();
 		Location loc = mPlayer.getLocation().add(0, 1.8, 0);
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
@@ -113,6 +113,5 @@ public class IronTincture extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, IRON_TINCTURE_TICK_PERIOD);
-		return true;
 	}
 }

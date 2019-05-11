@@ -53,7 +53,7 @@ public class FlashSword extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int flashSword = getAbilityScore();
 		Player player = mPlayer;
 		putOnCooldown();
@@ -154,7 +154,6 @@ public class FlashSword extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 7);
-		return true;
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Sanctified extends Ability {
 
@@ -55,7 +56,7 @@ public class Sanctified extends Ability {
 				mPlayer.getWorld().spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 5, 0.35, 0.35, 0.35, 0.001);
 
 				if (sanctified > 1) {
-					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
+					PotionUtils.applyPotion(mPlayer, damager, new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
 				}
 			}
 		}

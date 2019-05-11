@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Smokescreen extends Ability {
 
@@ -41,7 +42,7 @@ public class Smokescreen extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int smokeScreen = getAbilityScore();
 		Location loc = mPlayer.getLocation();
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
@@ -58,14 +59,13 @@ public class Smokescreen extends Ability {
 			if (pp != null) {
 				ppDuration = pp.getBonus(mInfo.linkedSpell);
 			}
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION + ppDuration, weaknessLevel, false, true));
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION + ppDuration, slownessLevel, false, true));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION + ppDuration, weaknessLevel, false, true));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION + ppDuration, slownessLevel, false, true));
 
 
 			mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
 		}
 		putOnCooldown();
-		return true;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class Smokescreen extends Ability {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
-				return mPlayer.getLocation().getPitch() >= 50;
+				return true;
 			}
 		}
 		return false;

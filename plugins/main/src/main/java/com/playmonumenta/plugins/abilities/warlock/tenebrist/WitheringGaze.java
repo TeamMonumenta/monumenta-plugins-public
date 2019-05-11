@@ -43,7 +43,7 @@ public class WitheringGaze extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		Player player = mPlayer;
 		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by halfslabs
 		Vector direction = loc.getDirection().setY(0).normalize();
@@ -103,7 +103,6 @@ public class WitheringGaze extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

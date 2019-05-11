@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Spellshock extends Ability {
@@ -194,7 +195,7 @@ public class Spellshock extends Ability {
 						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type, false);
 					}
 
-					nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+					PotionUtils.applyPotion(player, nearbyMob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 					                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}
@@ -203,9 +204,9 @@ public class Spellshock extends Ability {
 
 			// Make sure to apply vulnerability after damage
 			if (!EntityUtils.isBoss(mob) && !(mob instanceof Player)) {
-				mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, SPELL_SHOCK_STAGGER_DURATION, 10, true, false));
+				EntityUtils.applyStun(plugin, SPELL_SHOCK_STAGGER_DURATION, mob);
 			}
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
+			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
 			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 		}
 

@@ -10,8 +10,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -58,15 +56,15 @@ public class DarkPact extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
-			return false;
+			return;
 		}
 
 		active = true;
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.75f, 1.25f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.75f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.25f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.5f);
 		mHealth = mPlayer.getHealth();
 		mSaturation = mPlayer.getSaturation();
 		new BukkitRunnable() {
@@ -90,29 +88,29 @@ public class DarkPact extends Ability {
 				if (t >= DARK_PACT_DURATION || mPlayer.isDead()) {
 					this.cancel();
 					active = false;
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.75f, 0.75f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 0.75f);
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active) {
+		if (active && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			// Melee attacks only
-			if (!event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			if (event.getCause() != DamageCause.ENTITY_ATTACK) {
 				return true;
 			}
 
 			int level = getAbilityScore();
 			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 			if (event.getEntity() instanceof Player) {
-				percent = level == 1 ? 0.25 : 0.5;
+				percent = level == 1 ? 1.25 : 1.5;
 			}
+
 			event.setDamage(event.getDamage() * percent);
 			if (level > 1 && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 				Location loc = mPlayer.getLocation().add(0, 1.35, 0);
@@ -122,7 +120,7 @@ public class DarkPact extends Ability {
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 1.5)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(loc.toVector()).normalize();
-					if (dir.dot(toMobVector) > 0.6) {
+					if (mob != event.getEntity() && dir.dot(toMobVector) > 0.6) {
 						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false);
 					}
 				}

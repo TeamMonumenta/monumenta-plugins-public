@@ -61,12 +61,6 @@ public class Riposte extends Ability {
 							}
 						}
 
-						// Give a value to Counter Strike to detect if Riposte has triggered
-						CounterStrike cs = (CounterStrike)AbilityManager.getManager().getPlayerAbility(mPlayer, CounterStrike.class);
-						if (cs != null) {
-							cs.riposteTriggered();
-						}
-
 						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1.5f);
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, (mPlayer.getLocation()).add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.001);
 						mWorld.spawnParticle(Particle.CRIT_MAGIC, (mPlayer.getLocation()).add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.001);

@@ -39,7 +39,7 @@ public class HandOfLight extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 	@Override
-	public boolean cast() {
+	public void cast() {
 		int healing = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
@@ -74,7 +74,6 @@ public class HandOfLight extends Ability {
 
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, HEALING_RADIUS, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, HEALING_DOT_ANGLE);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

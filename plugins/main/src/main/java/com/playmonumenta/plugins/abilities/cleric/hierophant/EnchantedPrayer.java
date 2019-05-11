@@ -46,7 +46,7 @@ public class EnchantedPrayer extends Ability {
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
 		new BukkitRunnable() {
@@ -99,7 +99,6 @@ public class EnchantedPrayer extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		return true;
 	}
 
 	@Override

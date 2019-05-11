@@ -68,9 +68,9 @@ public class BladeDance extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.BLADE_DANCE)) {
-			return false;
+			return;
 		}
 
 		if (mPlayer.isSprinting() && mPlayer.getLocation().getPitch() > 50) {
@@ -168,7 +168,6 @@ public class BladeDance extends Ability {
 				putOnCooldown();
 			}
 		}
-		return true;
 	}
 
 	@Override

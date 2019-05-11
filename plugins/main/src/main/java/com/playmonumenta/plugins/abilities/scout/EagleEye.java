@@ -17,12 +17,13 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EagleEye extends Ability {
 
 	private static final int EAGLE_EYE_EFFECT_LVL = 0;
 	private static final int EAGLE_EYE_DURATION = 10 * 20;
-	private static final int EAGLE_EYE_COOLDOWN = 24 * 20; // Was 30
+	private static final int EAGLE_EYE_COOLDOWN = 24 * 20;
 	private static final int EAGLE_EYE_1_VULN_LEVEL = 3; // 20%
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
 	private static final int EAGLE_EYE_RADIUS = 20;
@@ -30,13 +31,13 @@ public class EagleEye extends Ability {
 	public EagleEye(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
-		mInfo.scoreboardId = "Tinkering";
+		mInfo.scoreboardId = "Tinkering"; // lmao
 		mInfo.cooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		Player player = mPlayer;
 		int eagleEye = getAbilityScore();
 		World world = player.getWorld();
@@ -47,11 +48,12 @@ public class EagleEye extends Ability {
 				continue;
 			}
 
-			mob.addPotionEffect(
-			    new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
+			PotionUtils.applyPotion(mPlayer, mob,
+					new PotionEffect(PotionEffectType.GLOWING, EAGLE_EYE_DURATION, EAGLE_EYE_EFFECT_LVL, true, false));
 
 			int eagleLevel = (eagleEye == 1) ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL;
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
+			PotionUtils.applyPotion(mPlayer, mob,
+					new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
 			new BukkitRunnable() {
 				int t = 0;
@@ -74,7 +76,6 @@ public class EagleEye extends Ability {
 		}
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

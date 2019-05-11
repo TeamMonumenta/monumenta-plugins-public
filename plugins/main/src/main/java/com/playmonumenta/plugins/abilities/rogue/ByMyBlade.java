@@ -61,7 +61,7 @@ public class ByMyBlade extends Ability {
 			if (pp != null) {
 				extraDamage += pp.getBonus(mInfo.linkedSpell);
 			}
-			EntityUtils.damageEntity(mPlugin, damagee, extraDamage, mPlayer);
+			event.setDamage(event.getDamage() + extraDamage);
 
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);

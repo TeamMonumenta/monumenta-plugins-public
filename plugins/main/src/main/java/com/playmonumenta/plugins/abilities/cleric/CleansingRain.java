@@ -41,7 +41,7 @@ public class CleansingRain extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
 
@@ -74,8 +74,6 @@ public class CleansingRain extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD);
-
-		return true;
 	}
 
 	@Override

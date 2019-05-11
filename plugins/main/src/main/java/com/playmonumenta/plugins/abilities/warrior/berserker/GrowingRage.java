@@ -4,32 +4,31 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 
-/* Growing Rage: Getting hit by an attack increases the damage from
- * your attacks and skills by 10% / 15% for 5 s. This buff
- * can stack up to three times, with the cooldown refreshing
- * every time you are hit. At lvl 2, the effect of this
- * buff is doubled when you are below 40% health.
+/* Growing Rage: Passively gain +20% / +40% damage on
+ * non-ability based melee damage. Every 2 hearts you fall
+ * below max health, gain 1 armor and lose 5% off your
+ * damage bonus. Armor capped at 5 / 10.
  */
 
 public class GrowingRage extends Ability {
 
 	private static final double GROWING_RAGE_1_DAMAGE_PERCENT = 0.1;
-	private static final double GROWING_RAGE_2_DAMAGE_PERCENT = 0.15;
-	private static final int GROWING_RAGE_DURATION = 4 * 20; //ticks
-	private static final int GROWING_RAGE_STACK_LIMIT = 3;
-	private static final double GROWING_RAGE_2_TRIGGER_HEALTH_PERCENT = 0.4;
+	private static final double GROWING_RAGE_2_DAMAGE_PERCENT = 0.3;
+	private static final int GROWING_RAGE_1_MAX_ARMOR = 5;
+	private static final int GROWING_RAGE_2_MAX_ARMOR = 10;
+	private static final double GROWING_RAGE_HEALTH_THRESHOLD = 4;
 
-	private int rageCurrentStack = 0;
-	private int rageDuration = 0;
+	private int mHealthThreshold = 0;
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -37,54 +36,25 @@ public class GrowingRage extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		int rage = getAbilityScore();
-		LivingEntity damagee = (LivingEntity) event.getEntity();
-		double rageDamage = rageCurrentStack * (rage == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT) * event.getDamage();
-		if (damagee instanceof Player) {
-			rageDamage *= 0.5;
-		}
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		if (mPlayer.getHealth() > 0 && mPlayer.getHealth() <= GROWING_RAGE_2_TRIGGER_HEALTH_PERCENT * maxHealth) {
-			rageDamage = rageDamage * 2;
-			if (damagee instanceof Player) {
-				rageDamage *= 0.75;
-			}
+		double maxArmor = getAbilityScore() == 1 ? GROWING_RAGE_1_MAX_ARMOR : GROWING_RAGE_2_MAX_ARMOR;
+		int healthThreshold = (int) Math.min(maxArmor, (int)((maxHealth - mPlayer.getHealth()) / GROWING_RAGE_HEALTH_THRESHOLD));
+		if (healthThreshold != mHealthThreshold) {
+			AttributeInstance attarmor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+			attarmor.setBaseValue(attarmor.getBaseValue() - mHealthThreshold + healthThreshold);
+			mHealthThreshold = healthThreshold;
 		}
-		event.setDamage(event.getDamage() + rageDamage);
-		return true;
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (!mPlayer.isDead() && mPlayer.getHealth() > 0) {
-			if (rageCurrentStack < GROWING_RAGE_STACK_LIMIT) {
-				rageCurrentStack++;
-				if (rageCurrentStack == 1) {
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have 1 stack of Rage!");
-				} else {
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "You have " + rageCurrentStack + " stacks of Rage!");
-				}
-			} else {
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your " + rageCurrentStack + " stacks of Rage are refreshed!");
-			}
-			boolean run = rageDuration <= 0;
-			rageDuration = GROWING_RAGE_DURATION;
-			if (run) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						rageDuration--;
-						if (rageDuration <= 0) {
-							this.cancel();
-							rageCurrentStack = 0;
-							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Your Rage has worn off!");
-						}
-					}
-
-				}.runTaskTimer(mPlugin, 0, 1);
-			}
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			double damageMultiplier = getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT;
+			event.setDamage(event.getDamage() * damageMultiplier);
 		}
+
 		return true;
 	}
+
 }

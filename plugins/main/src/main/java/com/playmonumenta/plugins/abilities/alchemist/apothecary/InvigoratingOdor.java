@@ -19,10 +19,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 /*
  * Invigorating Odor: Alchemist potions give Speed 1 and
  * Regeneration 1 (0:10) on allies they hit, also your alch
- * pots deal +2/3 damage. At level 2, they also provide Resistance
+ * pots deal +2/4 damage. At level 2, they also provide Resistance
  * 1 for 10 seconds.
  */
 public class InvigoratingOdor extends Ability {
+
+	private static final int INVIGORATING_1_DAMAGE = 2;
+	private static final int INVIGORATING_2_DAMAGE = 4;
 
 	public InvigoratingOdor(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -43,7 +46,7 @@ public class InvigoratingOdor extends Ability {
 							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
 						}
 					} else if (EntityUtils.isHostileMob(le)) {
-						EntityUtils.damageEntity(mPlugin, le, getAbilityScore() == 1 ? 2 : 3, mPlayer);
+						EntityUtils.damageEntity(mPlugin, le, getAbilityScore() == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE, mPlayer);
 					}
 				}
 			}

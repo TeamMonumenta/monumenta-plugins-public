@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 * position, with a bit of vertical velocity as well. Blocks fallen during
 * this period are halved for the purposes of fall damage calculations. Enemies within melee range
 * of you previous position are stunned for 4 seconds (does not work on elites
-* and bosses) (Cooldown: 12 seconds) At Level 2, you deal 10 damage.
+* and bosses) (Cooldown: 12 seconds) At Level 2, you deal 12 damage.
 */
 
 public class Disengage extends Ability {
@@ -67,7 +67,7 @@ public class Disengage extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS, mPlayer)) {
 			if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
@@ -100,7 +100,6 @@ public class Disengage extends Ability {
 		}.runTaskTimer(mPlugin, 2, 1); // Don't run immediately - wait for player to be in the air
 
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

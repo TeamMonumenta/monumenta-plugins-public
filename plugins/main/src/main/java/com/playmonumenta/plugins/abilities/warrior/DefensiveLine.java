@@ -41,7 +41,7 @@ public class DefensiveLine extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		// This timer makes sure that the player actually blocked instead of some other right click interaction
 		new BukkitRunnable() {
 			@Override
@@ -74,8 +74,6 @@ public class DefensiveLine extends Ability {
 				this.cancel();
 			}
 		}.runTaskLater(mPlugin, 1);
-
-		return true;
 	}
 
 	@Override

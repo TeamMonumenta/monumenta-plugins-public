@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class WindWalk extends Ability {
 
@@ -57,7 +58,7 @@ public class WindWalk extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mLeftClicks++;
 		new BukkitRunnable() {
 			@Override
@@ -69,7 +70,7 @@ public class WindWalk extends Ability {
 			}
 		}.runTaskLater(mPlugin, 20);
 		if (mLeftClicks < 3) {
-			return false;
+			return;
 		}
 		int duration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
@@ -96,10 +97,10 @@ public class WindWalk extends Ability {
 							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
 							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 							mob.setVelocity(mob.getVelocity().setY(0.5));
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, duration, 0, true, false));
-							mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, duration + 20 * 3, 0, true, false));
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, duration, 0, true, false));
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration + 20 * 3, 0, true, false));
 							if (getAbilityScore() > 1) {
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, duration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
 							}
 						}
 						mobsAlreadyHit.add(mob);
@@ -112,7 +113,6 @@ public class WindWalk extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -23,8 +24,8 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Crouch while throwing an Alchemist Potion and you'll instead consume 4
- * potions and buff yourself. You gain 20s of Regen II, Strength I, Speed I, but
+ * Crouch while throwing an Alchemist Potion and you'll instead consume the
+ * potion and buff yourself. You gain 20s of Regen II, Strength I, Speed I, but
  * when the effect ends you take 4 damage (bypasses armor but can't
  * kill the player). At level 2 you also gain Resistance I and Haste II (Cooldown
  * 30s)
@@ -35,7 +36,6 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 public class AdrenalSerum extends Ability {
 	private static final int ADRENAL_SERUM_COOLDOWN = 30 * 20;
 	private static final int ADRENAL_SERUM_DURATION = 15 * 20;
-	private static final int ADRENAL_SERUM_POTIONS_CONSUMED = 1;
 	private static final double ADRENAL_SERUM_DAMAGE = 4;
 	private static final Particle.DustOptions ADRENAL_SERUM_COLOR = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 
@@ -51,46 +51,13 @@ public class AdrenalSerum extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.testForItemWithName(inMainHand, "Alchemist's Potion")) {
-			Inventory inv = mPlayer.getInventory();
-			ItemStack firstFoundPotStack = null;
-			int potCount = 0;
-			for (ItemStack item : inv.getContents()) {
-				if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-					if (firstFoundPotStack == null) {
-						firstFoundPotStack = item;
-					}
-					potCount += item.getAmount();
-				}
-			}
-			return potCount > ADRENAL_SERUM_POTIONS_CONSUMED && mPlayer.isSneaking();
+			return mPlayer.isSneaking();
 		}
 		return false;
 	}
 
 	@Override
-	public boolean cast() {
-		Inventory inv = mPlayer.getInventory();
-		int amountConsumed = 0;
-		for (ItemStack item : inv.getContents()) {
-			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-				if (amountConsumed >= ADRENAL_SERUM_POTIONS_CONSUMED) {
-					break;
-				}
-				if (item.getAmount() >= ADRENAL_SERUM_POTIONS_CONSUMED) {
-					item.setAmount(item.getAmount() - ADRENAL_SERUM_POTIONS_CONSUMED);
-					break;
-				} else {
-					for (int i = 0; i < item.getAmount(); i++) {
-						item.setAmount(item.getAmount() - 1);
-						amountConsumed++;
-						if (item.getAmount() <= 0 || amountConsumed >= ADRENAL_SERUM_POTIONS_CONSUMED) {
-							break;
-						}
-					}
-				}
-			}
-		}
-
+	public void cast() {
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1f, 1.15f);
@@ -124,8 +91,14 @@ public class AdrenalSerum extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
 
+	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+		// This is sufficient because we are already checking conditions in runCheck()
+		potion.remove();
 		putOnCooldown();
+		// Consumes a potion
 		return true;
 	}
+
 }

@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
 * Right-Clicking while sprinting causes the Paladin to become the target of any
@@ -50,7 +51,7 @@ public class ChoirBells extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 10, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
 		Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
@@ -59,15 +60,14 @@ public class ChoirBells extends Ability {
 				Vector toMobDirection = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 				if (playerDirection.dot(toMobDirection) > CHOIR_BELLS_CONICAL_THRESHOLD) {
 					((Mob)mob).setTarget(mPlayer);
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, CHOIR_BELLS_SLOWNESS_DURATION, CHOIR_BELLS_SLOWNESS_LEVEL, true, false));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, CHOIR_BELLS_SLOWNESS_DURATION, CHOIR_BELLS_SLOWNESS_LEVEL, true, false));
 					if (getAbilityScore() == 2) {
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, CHOIR_BELLS_VULNERABILITY_DURATION, CHOIR_BELLS_VULNERABILITY_LEVEL, true, false));
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, CHOIR_BELLS_VULNERABILITY_DURATION, CHOIR_BELLS_VULNERABILITY_LEVEL, true, false));
 					}
 				}
 			}
 		}
 
 		putOnCooldown();
-		return true;
 	}
 }

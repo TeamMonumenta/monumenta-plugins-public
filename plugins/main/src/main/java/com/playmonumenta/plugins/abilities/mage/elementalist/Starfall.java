@@ -54,7 +54,7 @@ public class Starfall extends Ability {
 	}
 
 	@Override
-	public boolean cast() {
+	public void cast() {
 		mLeftClicks++;
 		new BukkitRunnable() {
 			@Override
@@ -67,7 +67,7 @@ public class Starfall extends Ability {
 		}.runTaskLater(mPlugin, 20);
 
 		if (mLeftClicks < 3) {
-			return false;
+			return;
 		}
 		Location loc = mPlayer.getEyeLocation();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
@@ -87,7 +87,6 @@ public class Starfall extends Ability {
 
 		mLeftClicks = 0;
 		putOnCooldown();
-		return true;
 	}
 
 	private void launchMeteor(final Player player, final Location loc) {
@@ -134,13 +133,5 @@ public class Starfall extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
-	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mLeftClicks > 0) {
-			mLeftClicks--;
-		}
-		return true;
 	}
 }

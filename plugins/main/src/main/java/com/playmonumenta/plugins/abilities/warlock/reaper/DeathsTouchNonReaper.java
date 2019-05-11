@@ -41,8 +41,6 @@ public class DeathsTouchNonReaper extends Ability {
 				types.add(PotionEffectType.REGENERATION);
 			} else if (effect.getType().equals(PotionEffectType.SLOW_DIGGING)) {
 				types.add(PotionEffectType.FAST_DIGGING);
-			} else if (effect.getType().equals(PotionEffectType.BLINDNESS)) {
-				types.add(PotionEffectType.NIGHT_VISION);
 			}
 		}
 		if (e.getFireTicks() > 0) {

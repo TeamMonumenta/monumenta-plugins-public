@@ -9,10 +9,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -26,8 +30,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class HungeringVortex extends Ability {
+
+	private static final String HUNGERING_VORTEX_METAKEY = "HungeringVortexDamageBonusActiveMetakey";
+
 	private static final int HUNGERING_VORTEX_DURATION = 8 * 20;
 	private static final int HUNGERING_VORTEX_COOLDOWN = 18 * 20;
 	private static final int HUNGERING_VORTEX_RADIUS = 7;
@@ -43,9 +51,9 @@ public class HungeringVortex extends Ability {
 	 * Hungering Vortex: Shift + right click looking down pulls
 	 * all mobs in a 7-block radius towards you, afflicting them
 	 * with Slowness I / II for 8 s and increasing your melee
-	 * damage by 0.5 / 1 for each affected enemy, up to a maximum
-	 * of 4 / 8 for 8s. All affected enemies change target to you.
-	 * Gives Resistance I / II on activation for 4 seconds.
+	 * damage by 0.5 / 1 for each initially affected enemy, up
+	 * to a maximum of 4 / 8 for 8s. All affected enemies change
+	 * target to you. Gives Resistance I / II on activation for 4 seconds.
 	 * Cooldown: 18 s
 	 */
 
@@ -55,18 +63,31 @@ public class HungeringVortex extends Ability {
 		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
 		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
-	public boolean cast() {
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+			event.setDamage(event.getDamage() + mPlayer.getMetadata(HUNGERING_VORTEX_METAKEY).get(0).asDouble());
+		}
+		return true;
+	}
+
+	@Override
+	public void cast() {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.HUNGERING_VORTEX)
+				|| !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
+			return;
+		}
+
 		int vortex = getAbilityScore();
 		int slowness = vortex == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
-		float velocity = mPlayer.getLocation().getBlock().isLiquid() ? 0.2f : 0.3f;
+		float velocity = mPlayer.getLocation().getBlock().isLiquid() ? 0.04f : 0.055f;
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), HUNGERING_VORTEX_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, slowness));
-			MovementUtils.PullTowards(mPlayer, mob, velocity);
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, slowness));
 			if (mob instanceof Mob) {
 				((Mob)mob).setTarget(mPlayer);
 			}
@@ -74,7 +95,7 @@ public class HungeringVortex extends Ability {
 
 		// Cancel ability particles and cooldown if nothing is targeted
 		if (mobs == null || mobs.size() == 0) {
-			return true;
+			return;
 		}
 
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.8f, 1.25f);
@@ -82,6 +103,25 @@ public class HungeringVortex extends Ability {
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 200, 3.5, 3.5, 3.5, 1);
 		int amplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER : HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER;
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, HUNGERING_VORTEX_RESISTANCE_DURATION, amplifier, true, true));
+
+		// Gradual pull on mobs
+		new BukkitRunnable() {
+			int t = 0;
+			@Override
+			public void run() {
+				t += 2;
+				for (LivingEntity mob : mobs) {
+					MovementUtils.PullTowards(mPlayer, mob, velocity);
+					// This means MovementUtils is being screwy and I'm too lazy to change MovementUtils
+					if (mob.getVelocity().getY() > 0.4) {
+						mob.setVelocity(mob.getVelocity().setY(-0.1));
+					}
+				}
+				if (t > HUNGERING_VORTEX_RESISTANCE_DURATION) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		// Creates a fast-spiraling helix.
 		new BukkitRunnable() {
@@ -110,37 +150,29 @@ public class HungeringVortex extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
-		double extra_dam = mobs.size() * damageInc;
-		if (extra_dam > 4 * vortex) {
-			extra_dam = 4 * vortex;
-		}
+		double extra_dam = Math.min(8, mobs.size()) * damageInc;
 
-		//Fire Note: I'd recommend we find some sort of workaround this. I'm always iffy on changing player Attributes.
-		//The reason for that is because we may end up screwing up their attributes and forget to reset them.
-		mPlayer.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1 + extra_dam);
+		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extra_dam));
 		new BukkitRunnable() {
 			int t = 0;
 			@Override
 			public void run() {
-				t++;
-				if (t >= HUNGERING_VORTEX_DURATION || mPlayer.isDead()) {
-					this.cancel();
-					mPlayer.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
+				if (mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {
+					mPlayer.removeMetadata(HUNGERING_VORTEX_METAKEY, mPlugin);
 					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "The power of your Vortex fades away...");
 				}
+				this.cancel();
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskLater(mPlugin, HUNGERING_VORTEX_DURATION);
 		putOnCooldown();
-		return true;
 	}
 
 	@Override
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > 50 &&
-		       (mainHand == null || mainHand.getType() != Material.BOW) &&
+		return (mainHand == null || mainHand.getType() != Material.BOW) &&
 		       (offHand == null || offHand.getType() != Material.BOW) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 
 	}
