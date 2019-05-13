@@ -31,6 +31,7 @@ import com.playmonumenta.bossfights.spells.SpellChangeFloor;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellFireball;
 import com.playmonumenta.bossfights.spells.SpellMinionResist;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -88,14 +89,7 @@ public class AzacorNormal extends BossAbilityGroup {
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 
 			                       if (!blocked) {
-			                           double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()*0.75);
-
-			                           if (newHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			                               // Kill the player, but allow totems to trigger
-			                               player.damage(100);
-			                           } else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-			                               player.setHealth(newHealth);
-			                           }
+			                           DamageUtils.damagePercent(mBoss, player, 0.74);
 			                       } else {
 			                           Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0}");
 			                       }

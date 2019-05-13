@@ -38,7 +38,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellCastEvent;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
@@ -55,6 +55,7 @@ import com.playmonumenta.bossfights.spells.spells_kaul.SpellLightningStrike;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellPutridPlague;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellRaiseJungle;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellVolcanicDemise;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -164,7 +165,7 @@ public class Kaul extends BossAbilityGroup {
 			public void run() {
 				for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
 					if (player.isSleeping()) {
-						player.damage(22, mBoss);
+						DamageUtils.damage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);

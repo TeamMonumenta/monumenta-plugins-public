@@ -11,7 +11,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.SpellCastEvent;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 
 public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();

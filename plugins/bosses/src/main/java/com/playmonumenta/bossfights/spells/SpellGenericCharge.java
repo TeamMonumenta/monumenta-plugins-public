@@ -8,6 +8,9 @@ import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.bossfights.utils.DamageUtils;
+
 import org.bukkit.Sound;
 
 public class SpellGenericCharge extends SpellBaseCharge {
@@ -32,7 +35,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      (Player player) -> {
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-		          player.damage(damage, boss);
+		          DamageUtils.damage(boss, player, damage);
 		      },
 		      // Attack particles
 		      (Location loc) -> {

@@ -101,6 +101,7 @@ import com.playmonumenta.bossfights.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.bossfights.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.bossfights.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.bossfights.bosses.gray.GraySummoned;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 

@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionType;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class PotionUtils {

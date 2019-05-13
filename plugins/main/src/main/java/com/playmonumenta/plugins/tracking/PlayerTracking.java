@@ -22,19 +22,17 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.EvasionEvent;
+import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -159,6 +157,14 @@ public class PlayerTracking implements EntityTracking {
 		if (manager != null) {
 
 			manager.onConsume(plugin, player, event);
+		}
+	}
+
+	public void onBossDamage(Plugin plugin, Player player, BossAbilityDamageEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+
+			manager.onBossDamage(plugin, player, event);
 		}
 	}
 

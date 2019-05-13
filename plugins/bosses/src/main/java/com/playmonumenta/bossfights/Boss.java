@@ -11,6 +11,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.spells.Spell;
 
 public class Boss {

@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.classes.magic;
+package com.playmonumenta.plugins.events;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -7,6 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class CustomDamageEvent extends Event implements Cancellable {
 

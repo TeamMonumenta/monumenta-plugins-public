@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.Evasion;
 import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
@@ -63,6 +64,7 @@ public class EnchantmentManager {
 		init.add(new LifeDrain());
 		init.add(new Evasion());
 		init.add(new MeleeEvasion());
+		init.add(new AbilityEvasion());
 		init.add(new Resurrection());
 		init.add(new DivineAura());
 		init.add(new SecondWind());

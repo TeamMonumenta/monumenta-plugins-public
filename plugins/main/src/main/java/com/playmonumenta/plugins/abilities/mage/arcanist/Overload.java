@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 /*
  * Overload: Your spells deal an additional 1.5

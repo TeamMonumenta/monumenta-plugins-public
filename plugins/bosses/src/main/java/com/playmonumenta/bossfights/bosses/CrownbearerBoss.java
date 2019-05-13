@@ -27,6 +27,7 @@ import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseCharge;
 import com.playmonumenta.bossfights.spells.SpellDelayedAction;
 import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -80,7 +81,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 			// Attack hit a player
 			(Player player) -> {
 				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-				player.damage(14, boss);
+				DamageUtils.damage(mBoss, player, 14);
 			},
 			// Attack particles
 			(Location loc) -> {
@@ -112,7 +113,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 			// Attack hit a player
 			(Player player) -> {
 				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-				player.damage(7, boss);
+				DamageUtils.damage(mBoss, player, 7);
 			},
 			// Attack particles
 			(Location loc) -> {
@@ -145,7 +146,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 2f);
 				for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
-					player.damage(16, mBoss);
+					DamageUtils.damage(mBoss, player, 16);
 					Utils.KnockAway(mBoss.getLocation(), player, 0.2f);
 				}
 			}

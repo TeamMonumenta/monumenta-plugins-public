@@ -20,8 +20,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseBolt;
 import com.playmonumenta.bossfights.spells.SpellBaseCharge;
@@ -30,6 +30,7 @@ import com.playmonumenta.bossfights.spells.SpellBlockBreak;
 import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellEarthenRupture;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public class ImmortalElementalKaulBoss extends BossAbilityGroup {
@@ -84,7 +85,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 					player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
 					player.getWorld().spawnParticle(Particle.BLOCK_DUST, player.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
-					player.damage(25, boss);
+					DamageUtils.damage(mBoss, player, 25);
 					Utils.KnockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
 				},
 				// Attack particles
@@ -145,12 +146,12 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 						return;
 					}
 					if (!blocked) {
-						player.damage(22, mBoss);
+						DamageUtils.damage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 					} else {
 						for (Player p : Utils.playersInRange(loc, 2.5)) {
-							p.damage(16, mBoss);
+							DamageUtils.damage(mBoss, player, 16);
 							Utils.KnockAway(loc, p, 0.3f);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));

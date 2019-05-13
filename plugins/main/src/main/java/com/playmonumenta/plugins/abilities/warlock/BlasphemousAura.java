@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
 import com.playmonumenta.plugins.abilities.warlock.reaper.HungeringVortex;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*

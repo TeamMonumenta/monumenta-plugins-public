@@ -9,6 +9,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.bossfights.utils.DamageUtils;
+
 public class SpellTsunamiCharge extends SpellBaseCharge {
 	public SpellTsunamiCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
 		super(plugin, boss, range, 25,
@@ -30,7 +32,7 @@ public class SpellTsunamiCharge extends SpellBaseCharge {
 		      // Attack hit a player
 		      (Player player) -> {
 		          player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, player.getLocation(), 80, 1, 1, 1, 0);
-		          player.damage(damage, boss);
+		          DamageUtils.damage(boss, player, damage);
 		      },
 		      // Attack particles
 		      (Location loc) -> {

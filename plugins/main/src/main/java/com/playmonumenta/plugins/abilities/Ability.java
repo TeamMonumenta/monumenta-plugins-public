@@ -22,9 +22,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -177,6 +178,8 @@ public abstract class Ability {
 	public void PlayerDeathEvent(PlayerDeathEvent event) { }
 
 	public void PlayerAnimationEvent(PlayerAnimationEvent event) { }
+
+	public void PlayerDamagedByBossEvent(BossAbilityDamageEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

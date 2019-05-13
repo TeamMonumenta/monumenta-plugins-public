@@ -8,6 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellFlameNova extends SpellBaseAoE {
@@ -35,7 +36,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {
-					player.damage(11.0f);
+					DamageUtils.damage(null, player, 11);
 					player.setFireTicks(80);
 				}
 			}

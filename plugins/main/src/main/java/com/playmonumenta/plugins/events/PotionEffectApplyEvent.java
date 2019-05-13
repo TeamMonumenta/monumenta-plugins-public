@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.classes.magic;
+package com.playmonumenta.plugins.events;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

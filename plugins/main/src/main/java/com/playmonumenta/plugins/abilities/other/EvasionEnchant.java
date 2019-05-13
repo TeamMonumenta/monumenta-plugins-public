@@ -12,7 +12,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.magic.EvasionEvent;
+import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.events.EvasionEvent;
 
 public class EvasionEnchant extends Ability {
 	public double chance = 0;
@@ -32,6 +33,11 @@ public class EvasionEnchant extends Ability {
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 		return true;
+	}
+
+	@Override
+	public void PlayerDamagedByBossEvent(BossAbilityDamageEvent event) {
+		event.setDamage(evade(mPlayer, event.getDamage()));
 	}
 
 	private double evade(Player player, double damage) {

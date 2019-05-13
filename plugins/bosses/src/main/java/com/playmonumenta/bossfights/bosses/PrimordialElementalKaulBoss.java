@@ -26,7 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellCastEvent;
+import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseBolt;
@@ -36,6 +36,7 @@ import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellEarthenRupture;
 import com.playmonumenta.bossfights.spells.spells_kaul.SpellRaiseJungle;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 /*
@@ -136,12 +137,12 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 						return;
 					}
 					if (!blocked) {
-						player.damage(22, mBoss);
+						DamageUtils.damage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 					} else {
 						for (Player p : Utils.playersInRange(loc, 2.5)) {
-							p.damage(16, mBoss);
+							DamageUtils.damage(mBoss, p, 16);
 							Utils.KnockAway(loc, p, 0.3f);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));

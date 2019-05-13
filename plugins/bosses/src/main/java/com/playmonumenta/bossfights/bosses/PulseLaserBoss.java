@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseLaser;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 
 public class PulseLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pulselaser";
@@ -47,7 +48,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 		                           loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 		                           loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 		                           if (!blocked) {
-		                               player.damage(12f);
+		                               DamageUtils.damage(null, player, 12);
 		                           }
 		                       })
 		));

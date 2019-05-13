@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 
@@ -110,28 +111,7 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : Utils.playersInRange(loc, 3)) {
-						double toTake = (p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
-						float absorp = Utils.getAbsorp(p);
-						double adjustedHealth = (p.getHealth() + absorp) - toTake;
-
-						if (adjustedHealth <= 0 && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR) {
-							// Kill the player, but allow totems to trigger
-							p.damage(100, mBoss);
-						} else if (p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR) {
-							if (absorp > 0) {
-								if (absorp - toTake > 0) {
-									Utils.setAbsorp(p, (float) (absorp - toTake));
-									toTake = 0;
-								} else {
-									Utils.setAbsorp(p, 0f);
-									toTake -= absorp;
-								}
-							}
-							if (toTake > 0) {
-								p.setHealth(p.getHealth() - toTake);
-							}
-							p.damage(1, mBoss);
-						}
+						DamageUtils.damagePercent(mBoss, p, 0.4);
 					}
 				}
 			}

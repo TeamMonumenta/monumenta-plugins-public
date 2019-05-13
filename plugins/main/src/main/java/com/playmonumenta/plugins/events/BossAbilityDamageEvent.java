@@ -1,29 +1,38 @@
-package com.playmonumenta.bossfights;
+package com.playmonumenta.plugins.events;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.playmonumenta.bossfights.spells.Spell;
-
-public class SpellCastEvent extends Event implements Cancellable {
+public class BossAbilityDamageEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 	private boolean isCancelled;
 	private LivingEntity mBoss;
-	private Spell mSpell;
+	private LivingEntity mDamaged;
+	private double mDamage;
 
-	public SpellCastEvent(LivingEntity boss, Spell spell) {
+	public BossAbilityDamageEvent(LivingEntity boss, LivingEntity damaged, double damage) {
 		mBoss = boss;
-		mSpell = spell;
+		mDamaged = damaged;
+		mDamage = damage;
 	}
 
 	public LivingEntity getBoss() {
 		return mBoss;
 	}
 
-	public Spell getSpell() {
-		return mSpell;
+	public LivingEntity getDamaged() {
+		return mDamaged;
+	}
+
+	public void setDamage(double damage) {
+		mDamage = damage;
+	}
+
+	public double getDamage() {
+		return mDamage;
 	}
 
 	@Override

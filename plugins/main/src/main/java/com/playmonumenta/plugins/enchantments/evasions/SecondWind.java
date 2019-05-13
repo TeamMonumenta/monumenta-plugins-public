@@ -6,9 +6,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.magic.EvasionEvent;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SecondWind implements BaseEnchantment {

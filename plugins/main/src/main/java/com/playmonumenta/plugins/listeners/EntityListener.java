@@ -66,12 +66,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
-import com.playmonumenta.plugins.classes.magic.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -732,4 +733,14 @@ public class EntityListener implements Listener {
 			event.getDismounted().remove();
 		}
 	}
+
+	@EventHandler
+	public void BossAbilityDamageEvent(BossAbilityDamageEvent event) {
+		if (event.getDamaged() instanceof Player) {
+			Player player = (Player) event.getDamaged();
+			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
+			mAbilities.BossAbilityDamageEvent(player, event);
+		}
+	}
+
 }

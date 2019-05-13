@@ -19,6 +19,7 @@ import com.playmonumenta.bossfights.BossBarManager;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.SpellChangeFloor;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -70,7 +71,7 @@ public class Virius extends BossAbilityGroup {
 		                           loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 		                           loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
 		                           if (!blocked) {
-		                               player.damage(16f);
+		                               DamageUtils.damage(null, player, 16);
 		                           }
 		                       })
 		));

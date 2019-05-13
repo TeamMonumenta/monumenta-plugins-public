@@ -21,6 +21,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellGroundSurge extends Spell {
@@ -119,7 +120,7 @@ public class SpellGroundSurge extends Spell {
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(box)) {
 										this.cancel();
-										player.damage(20, mBoss);
+										DamageUtils.damage(mBoss, player, 20);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 										Utils.KnockAway(mBoss.getLocation(), player, 0.3f, 1.25f);
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
@@ -177,7 +178,7 @@ public class SpellGroundSurge extends Spell {
 															&& !_player.getUniqueId().equals(player.getUniqueId())
 															&& !hit.contains(_player.getUniqueId())) {
 														hit.add(_player.getUniqueId());
-														_player.damage(18, mBoss);
+														DamageUtils.damage(mBoss, _player, 18);
 														_player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														Utils.KnockAway(mBoss.getLocation(), _player, 0.175f, 0.85f);
 														world.spawnParticle(Particle.SMOKE_LARGE, _bLoc, 10, 0, 0, 0, 0.2);

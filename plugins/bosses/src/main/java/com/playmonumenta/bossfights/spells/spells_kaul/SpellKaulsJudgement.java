@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 /*
@@ -186,27 +187,7 @@ public class SpellKaulsJudgement extends Spell {
 										world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
 										world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
 										world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
-										double toTake = (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - 10);
-										float absorp = Utils.getAbsorp(player);
-										double adjustedHealth = (player.getHealth() + absorp) - toTake;
-										if (adjustedHealth <= 0 && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-											// Kill the player, but allow totems to trigger
-											player.damage(100, mBoss);
-										} else if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
-											if (absorp > 0) {
-												if (absorp - toTake > 0) {
-													Utils.setAbsorp(player, (float) (absorp - toTake));
-													toTake = 0;
-												} else {
-													Utils.setAbsorp(player, 0f);
-													toTake -= absorp;
-												}
-											}
-											if (toTake > 0) {
-												player.setHealth(player.getHealth() - toTake);
-											}
-											player.damage(1, mBoss);
-										}
+										DamageUtils.damageFlat(mBoss, player, 10);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 30, 1));
