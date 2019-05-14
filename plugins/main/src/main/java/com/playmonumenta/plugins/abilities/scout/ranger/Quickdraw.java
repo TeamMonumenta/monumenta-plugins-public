@@ -64,8 +64,8 @@ public class Quickdraw extends Ability {
 	public void cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
-			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6f);
 			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 			ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
@@ -99,6 +99,8 @@ public class Quickdraw extends Ability {
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity le, EntityDamageByEntityEvent event) {
 		if (arrow.hasMetadata("ArrowQuickdraw")) {
 			PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
+			mWorld.spawnParticle(Particle.CRIT, arrow.getLocation(), 20, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, arrow.getLocation(), 20, 0, 0, 0, 0.6f);
 		}
 		return true;
 	}

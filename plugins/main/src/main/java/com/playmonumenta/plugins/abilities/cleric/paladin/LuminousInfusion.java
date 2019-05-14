@@ -115,14 +115,13 @@ public class LuminousInfusion extends Ability {
 			Location loc = le.getLocation();
 			// Active damage to undead
 			event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
+			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
+			mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1.1f);
 			List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, le);
 			for (LivingEntity e : affected) {
 				// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
-				float volume = 0.85f / (float) Math.sqrt(affected.size());
 				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-				mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-				mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, volume, 1.1f);
 			}
 		}
 

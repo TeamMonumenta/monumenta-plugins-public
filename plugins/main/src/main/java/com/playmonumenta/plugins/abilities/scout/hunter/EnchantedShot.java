@@ -116,6 +116,7 @@ public class EnchantedShot extends Ability {
 						if (mob.hasMetadata("PinningShotEnemyIsPinned")) {
 							damage *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
 						}
+						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, bLoc, 20, 0.1, 0.1, 0.1, 0.15);
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
