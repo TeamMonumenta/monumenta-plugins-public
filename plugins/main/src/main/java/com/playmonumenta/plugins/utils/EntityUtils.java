@@ -104,11 +104,10 @@ public class EntityUtils {
 			FreezeObject obj = FreezeObject.getHandle(mob);
 			if (obj != null) {
 				obj.setRemainingDuration(ticks);
-				return;
 			}
+		} else {
+			new FreezeObject(plugin, ticks, mob);
 		}
-
-		new FreezeObject(plugin, ticks, mob);
 	}
 
 	public static boolean isFrozen(LivingEntity mob) {
