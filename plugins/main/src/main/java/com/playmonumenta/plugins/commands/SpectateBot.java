@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -30,14 +31,19 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 
 public class SpectateBot extends GenericCommand implements Listener {
 	public static final int MAX_RADIUS = 17;
+	public static final int MIN_RADIUS = 4;
+	public static final double DISTANCE_VELOCITY = 0.05;
 	public static final int TICK_PERIOD = 1;
+	public static final int DISTANCE_VELOCITY_ADJUST_PERIOD = 20;
 
 	private static class SpectateContext {
 		public final double yawVelocity = 0.1;
 		public final double pitchVelocity = 0.05;
 
+		public double distanceVelocity = 0;
 		public double yaw = 0;
 		public double pitch = 180;
+		public double distance = MAX_RADIUS;
 		public Player target = null;
 		public Location lastTargetLoc;
 		public final Player spectator;
@@ -77,11 +83,11 @@ public class SpectateBot extends GenericCommand implements Listener {
 		return players.get(0);
 	}
 
-	private static Location computeLoc(double yaw, double pitch, Location targetLoc) {
+	private static Location computeLoc(double distance, double yaw, double pitch, Location targetLoc) {
 		Location cameraLoc = targetLoc.clone();
-		cameraLoc = cameraLoc.add(MAX_RADIUS * -Math.sin(yaw*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)),
-								  MAX_RADIUS * -Math.sin((pitch)*(Math.PI/180)),
-								  -MAX_RADIUS * Math.cos((yaw)*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)));
+		cameraLoc = cameraLoc.add(distance * -Math.sin(yaw*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)),
+								  distance * -Math.sin((pitch)*(Math.PI/180)),
+								  -distance * Math.cos((yaw)*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)));
 		return cameraLoc;
 	}
 
@@ -94,6 +100,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 
 			if (mRunnable == null) {
 				mRunnable = new BukkitRunnable() {
+					int mTicks = 0;
 
 					@Override
 					public void run() {
@@ -114,10 +121,11 @@ public class SpectateBot extends GenericCommand implements Listener {
 							}
 
 							/* Rolling average target location - 49 parts previous location, 1 part new location */
-							Location targetLoc = ctx.lastTargetLoc.multiply(49.0d).add(ctx.target.getLocation()).multiply(0.02d);
+							Location targetRawLoc = ctx.target.getLocation();
+							Location targetLoc = ctx.lastTargetLoc.multiply(49.0d).add(targetRawLoc).multiply(0.02d);
 
 							/* Compute the camera aiming location */
-							Location cameraLoc = computeLoc(ctx.yaw, ctx.pitch, targetLoc);
+							Location cameraLoc = computeLoc(ctx.distance, ctx.yaw, ctx.pitch, targetLoc);
 
 							/* Compute where the camera should look */
 							Vector lookVect = targetLoc.toVector().subtract(cameraLoc.toVector()).normalize();
@@ -130,10 +138,29 @@ public class SpectateBot extends GenericCommand implements Listener {
 							ctx.yaw += ctx.yawVelocity;
 							ctx.pitch += ctx.pitchVelocity;
 
+							/* Adjust forward/outer zoom velocity every second */
+							if (mTicks >= DISTANCE_VELOCITY_ADJUST_PERIOD) {
+								mTicks = 0;
+								if (LocationUtils.hasLosToLocation(targetRawLoc, cameraLoc)) {
+									ctx.distanceVelocity = DISTANCE_VELOCITY;
+								} else {
+									ctx.distanceVelocity = -DISTANCE_VELOCITY;
+								}
+							}
+							ctx.distance += ctx.distanceVelocity;
+							if (ctx.distance > MAX_RADIUS) {
+								ctx.distance = MAX_RADIUS;
+							} else if (ctx.distance < MIN_RADIUS) {
+								ctx.distance = MIN_RADIUS;
+							}
+
 							/* Adjust the player's velocity towards the next location to try to reduce screen jitter */
-							Location nextCameraLoc = computeLoc(ctx.yaw, ctx.pitch, targetLoc);
+							Location nextCameraLoc = computeLoc(ctx.distance, ctx.yaw, ctx.pitch, targetLoc);
+
 							ctx.spectator.setVelocity(nextCameraLoc.toVector().subtract(cameraLoc.toVector()).multiply(10.0d * TICK_PERIOD / 20.0d));
 						}
+
+						mTicks++;
 
 						/* Cancel this runnable if there is nothing to do */
 						if (mSpectators.isEmpty()) {

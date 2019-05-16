@@ -7,6 +7,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
 public class LocationUtils {
@@ -123,5 +124,23 @@ public class LocationUtils {
 		}
 
 		return false;
+	}
+
+	public static boolean hasLosToLocation(Location fromLocation, Location toLocation) {
+		int range = (int)fromLocation.distance(toLocation) + 1;
+		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
+
+		BlockIterator bi = new BlockIterator(fromLocation.getWorld(), fromLocation.toVector(), direction, 0, range);
+
+		while (bi.hasNext()) {
+			Block b = bi.next();
+
+			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
+			if (LocationUtils.isLosBlockingBlock(b.getType())) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
