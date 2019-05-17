@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class DarkPact extends Ability {
 
@@ -98,14 +99,12 @@ public class DarkPact extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
-			// Melee attacks only
-			if (event.getCause() != DamageCause.ENTITY_ATTACK) {
-				return true;
-			}
-
+		// Melee attacks with scythes only
+		if (active && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && event.getCause() == DamageCause.ENTITY_ATTACK
+		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
 			int level = getAbilityScore();
 			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
+
 			if (event.getEntity() instanceof Player) {
 				percent = level == 1 ? 1.25 : 1.5;
 			}

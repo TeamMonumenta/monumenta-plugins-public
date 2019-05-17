@@ -48,10 +48,7 @@ public class ManaLance extends Ability {
 
 	@Override
 	public void cast() {
-		int manaLance = getAbilityScore();
-
-		int extraDamage = manaLance == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
-		boolean hasSpellShock = AbilityManager.getManager().getPlayerAbility(mPlayer, Spellshock.class) != null;
+		int extraDamage = getAbilityScore() == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
@@ -77,20 +74,17 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
-					if (hasSpellShock) {
-						Spellshock.addStaticToMob(mob, mPlayer);
-					}
+					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
 					if (!EntityUtils.isBoss(mob) || (AbilityManager.getManager().isPvPEnabled(mPlayer) && (mob instanceof Player)
 					                                 && AbilityManager.getManager().isPvPEnabled((Player)mob))) {
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, MANA_LANCE_STAGGER_DURATION, 10, true, false));
+						EntityUtils.applyStun(mPlugin, MANA_LANCE_STAGGER_DURATION, mob);
 					}
 					iter.remove();
 					mobs.remove(mob);
 				}
 			}
 		}
-		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MANA_LANCE);
+
 		putOnCooldown();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 	}

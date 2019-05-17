@@ -120,8 +120,7 @@ public class FractalEnervation extends Ability {
 							}
 						}
 						if (nextMob != null) {
-							Vector to = LocationUtils
-							            .getDirectionTo(nextMob.getLocation().add(0, nextMob.getHeight() / 2, 0), loc);
+							Vector to = LocationUtils.getDirectionTo(nextMob.getLocation().add(0, nextMob.getHeight() / 2, 0), loc);
 							dir = to;
 							range = chainRange;
 						} else {

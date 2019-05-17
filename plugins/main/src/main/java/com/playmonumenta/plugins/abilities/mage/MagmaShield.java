@@ -41,31 +41,26 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public void cast() {
-		int magmaShield = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS, mPlayer)) {
-			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0)
-			                     .normalize();
+			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
 				float kb = (mob instanceof Player) ? 0.3f : MAGMA_SHIELD_KNOCKBACK_SPEED;
 				MovementUtils.KnockAway(mPlayer, mob, kb);
 				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
 
-				int extraDamage = magmaShield == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
+				int extraDamage = getAbilityScore() == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
 				if (mob instanceof Player && extraDamage > 10) {
 					extraDamage = 10;
 				}
-				Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
+				EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
 			}
 		}
 
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA,
 		                                  0.25f, MAGMA_SHIELD_DOT_ANGLE);
-
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
-
-		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.MAGMA_SHIELD);
 		putOnCooldown();
 	}
 

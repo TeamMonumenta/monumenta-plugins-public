@@ -20,6 +20,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
@@ -47,7 +49,8 @@ public class SwiftCuts extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
 			LivingEntity ent = (LivingEntity) event.getEntity();
 			if (!cooldown.contains(ent)) {
 				World world = ent.getWorld();

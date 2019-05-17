@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Color;
@@ -21,139 +24,158 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
+/*
+ * LEVEL 1: Hitting an enemy with a spell inflicts “static” for 6 seconds. If an enemy
+ * with static is hit by another spell, a spellshock centered on the enemy deals 3
+ * damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on
+ * enemies with static. An enemy can only be hit by a spellshock once per tick.
+ *
+ * LEVEL 2: Damage is increased to 5 and enemies are stunned for 0.5 seconds.
+ * Additionally, gain speed 1 for 6 seconds whenever a spellshock is triggered.
+ */
 public class Spellshock extends Ability {
-	public static class SpellShockedMob {
-		public LivingEntity mob;
-		public int ticksLeft;
-		public Player initiator;
-		public boolean triggered = false;
 
-		public SpellShockedMob(LivingEntity inMob, int ticks, Player inInitiator) {
-			mob = inMob;
-			ticksLeft = ticks;
-			initiator = inInitiator;
+	public static class SpellShockedMob {
+		public boolean triggered = false;
+		public Player triggeredBy;
+		public LivingEntity mob;
+		public int ticksLeft = SPELL_SHOCK_DURATION;
+
+		public SpellShockedMob(LivingEntity mob) {
+			this.mob = mob;
 		}
 	}
 
 	private static final int SPELL_SHOCK_DURATION = 6 * 20;
-	private static final int SPELL_SHOCK_TEST_PERIOD = 2;
-	private static final int SPELL_SHOCK_DEATH_RADIUS = 3;
-	private static final int SPELL_SHOCK_DEATH_DAMAGE = 4;
-	private static final int SPELL_SHOCK_SPELL_RADIUS = 4;
-	private static final int SPELL_SHOCK_SPELL_DAMAGE = 4;
-	private static final int SPELL_SHOCK_SPEED_DURATION = 20 * 6;
-	private static final int SPELL_SHOCK_SPEED_AMPLIFIER = 0;
-	private static final int SPELL_SHOCK_STAGGER_DURATION = (int)(0.6 * 20);
-	private static final int SPELL_SHOCK_VULN_DURATION = 4 * 20;
-	private static final int SPELL_SHOCK_VULN_AMPLIFIER = 3; // 20%
-	private static final String SPELL_SHOCK_SCOREBOARD = "SpellShock";
+	private static final int SPELL_SHOCK_RADIUS = 3;
+	private static final int SPELL_SHOCK_1_DAMAGE = 3;
+	private static final int SPELL_SHOCK_2_DAMAGE = 5;
+	private static final int SPELL_SHOCK_STUN_DURATION = 10;
 	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
-	private static final Map<UUID, SpellShockedMob>mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
+	private static Map<UUID, SpellShockedMob> mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
+	private static List<LivingEntity> mPendingStaticMobs = new ArrayList<LivingEntity>();
 	private static BukkitRunnable mRunnable = null;
 
 	public Spellshock(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		mInfo.scoreboardId = SPELL_SHOCK_SCOREBOARD;
-
+		mInfo.scoreboardId = "SpellShock";
 		/*
 		 * Only one runnable ever exists for spellshock - it is a global list, not tied to any individual players
 		 * At least one player must be a mage for this to start running. Once started, it runs forever.
 		 */
 		if (mRunnable == null || mRunnable.isCancelled()) {
-			// SpellShock task to process tagged mobs
 			mRunnable = new BukkitRunnable() {
-				/*
-				 * If the player has level 2 spellshock (which chain hits), spellDamageMob() is called
-				 * on nearby mobs. The problem is, that also triggers spellshock which can remove them
-				 * from mSpellShockedMobs. This causes a concurrent modification exception, since that
-				 * removes random other elements during iteration
-				 *
-				 * To work around this, instead of calling spellDamageMob() immediately while iterating,
-				 * instead these mobs are put on this list and then it is iterated after processing
-				 * the mSpellShockedMobs.
-				 *
-				 * Note: Mobs in mShockedPending can be both mobs with spellshock or mobs without it -
-				 * it is a collection of mobs that were hit by the spell shock flare, which might or
-				 * might not actually have static on them
-				 *
-				 * This mapping is UUID of mob hit by static discharging on nearby mobs, and the player
-				 * that originally put that static there (to attribute the damage)
-				 */
-				private final Map<LivingEntity, Player>mShockedPending = new HashMap<LivingEntity, Player>();
-
+				int t = 0;
 				@Override
 				public void run() {
-					/* Iterators are needed here so you can remove during iteration if needed */
-					Iterator<Map.Entry<UUID, SpellShockedMob>>it = mSpellShockedMobs.entrySet().iterator();
-					while (it.hasNext()) {
-						Map.Entry<UUID, SpellShockedMob> entry = it.next();
-						SpellShockedMob shocked = entry.getValue();
+					// Particles and time tracking on static duration
+					t++;
+					for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
+						SpellShockedMob e = entry.getValue();
+						Location loc = e.mob.getLocation();
+						if (t % 4 == 0) {
+							loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.2, 0.6, 0.2, 1);
+							loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
+						}
+						e.ticksLeft--;
+						if (e.ticksLeft <= 0 || e.mob.isDead()) {
+							mSpellShockedMobs.remove(entry.getKey());
+						}
+					}
 
-						Location loc = shocked.mob.getLocation().add(0, 1, 0);
-						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1);
-						mWorld.spawnParticle(Particle.REDSTONE, loc, 4, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
-
-						if (!shocked.triggered && (shocked.mob.isDead() || shocked.mob.getHealth() <= 0)) {
-							// Mob has died - trigger effects
-							int spellShock = ScoreboardUtils.getScoreboardValue(shocked.initiator, SPELL_SHOCK_SCOREBOARD);
-							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 1, 1, 1, 0.001);
-							mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 100, 1, 1, 1, 0.25);
-							world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
-							for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_DEATH_RADIUS)) {
-								if (spellShock > 1) {
-									/*
-									 * This might chain if calling spellDamageMob() directly - so defer that until after
-									 * this iteration is complete
-									 */
-									mShockedPending.put(nearbyMob, shocked.initiator);
-								} else {
-									EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, shocked.initiator, MagicType.NONE, false);
+					// Do at most 10 loops to get all the mobs caught in the spellshock chain
+					Map<LivingEntity, Player> pendingDamageMobs = new HashMap<LivingEntity, Player>();
+					Set<UUID> triggeredMobs = new HashSet<UUID>();
+					boolean continueLooping;
+					for (int i = 0; i < 10; i++) {
+						continueLooping = false;
+						for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
+							SpellShockedMob e = entry.getValue();
+							if (e.triggered) {
+								triggeredMobs.add(entry.getKey());
+								runTriggerParticles(e.mob.getLocation().add(0, 1, 0));
+								// Apply speed I for 6 seconds if player has level 2 spellshock
+								if (ScoreboardUtils.getScoreboardValue(e.triggeredBy, "SpellShock") > 1) {
+									plugin.mPotionManager.addPotion(e.triggeredBy, PotionID.ABILITY_SELF,
+									                                new PotionEffect(PotionEffectType.SPEED, SPELL_SHOCK_DURATION, 0));
 								}
-
-								nearbyMob.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-								                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+								for (LivingEntity le : EntityUtils.getNearbyMobs(e.mob.getLocation(), SPELL_SHOCK_RADIUS)) {
+									// Add nearby mobs to the damage queue
+									pendingDamageMobs.put(le, e.triggeredBy);
+									// If the mob has static and hasn't been triggered, trigger it and do another loop later
+									if (mSpellShockedMobs.containsKey(le.getUniqueId()) && !triggeredMobs.contains(le.getUniqueId())) {
+										mSpellShockedMobs.get(le.getUniqueId()).triggered = true;
+										continueLooping = true;
+									}
+								}
 							}
-
-							it.remove();
-							continue;
 						}
-
-						shocked.ticksLeft -= SPELL_SHOCK_TEST_PERIOD;
-						if (shocked.ticksLeft <= 0) {
-							it.remove();
-							continue;
+						if (!continueLooping) {
+							break;
 						}
 					}
 
-					for (Map.Entry<LivingEntity, Player> pending : mShockedPending.entrySet()) {
-						spellDamageMob(plugin, pending.getKey(), SPELL_SHOCK_DEATH_DAMAGE, pending.getValue(), null);
+					// Damage the mobs all at once to prevent repeat damage applications
+					for (Map.Entry<LivingEntity, Player> entry : pendingDamageMobs.entrySet()) {
+						LivingEntity damagee = entry.getKey();
+						Player damager = entry.getValue();
+						int abilityScore = ScoreboardUtils.getScoreboardValue(damager, "SpellShock");
+						double damage = abilityScore == 1 ? SPELL_SHOCK_1_DAMAGE : SPELL_SHOCK_2_DAMAGE;
+						// Since spellshock damage is applied on the tick after, EntityUtils.damageEntity()
+						// will not see it as intentional damage stacking, so iFrames need to be set manually
+						damagee.setNoDamageTicks(0);
+						EntityUtils.damageEntity(plugin, damagee, damage, damager, null, false /* do not register CustomDamageEvent */);
+						if (abilityScore > 1) {
+							EntityUtils.applyStun(plugin, SPELL_SHOCK_STUN_DURATION, damagee);
+						}
 					}
-					mShockedPending.clear();
+
+					// Only put pending static mobs into the actual map if they weren't damaged by spellshock
+					for (LivingEntity mob : mPendingStaticMobs) {
+						if (!pendingDamageMobs.containsKey(mob.getUniqueId())) {
+							mSpellShockedMobs.put(mob.getUniqueId(), new SpellShockedMob(mob));
+						}
+					}
+					mPendingStaticMobs.clear();
+
+					// Remove static from triggered mobs because for some reason, you can trigger
+					// and apply static with the same spell.
+					mSpellShockedMobs.keySet().removeAll(triggeredMobs);
 				}
 			};
-
-			mRunnable.runTaskTimer(plugin, 1, SPELL_SHOCK_TEST_PERIOD);
+			mRunnable.runTaskTimer(plugin, 0, 1);
 		}
 	}
 
-
-	public static void addStaticToMob(LivingEntity mob, Player player) {
-		mSpellShockedMobs.put(mob.getUniqueId(),
-		                      new SpellShockedMob(mob, SPELL_SHOCK_DURATION, player));
+	@Override
+	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+		LivingEntity mob = event.getDamaged();
+		// If the mob has static, trigger it
+		if (mSpellShockedMobs.containsKey(mob.getUniqueId())) {
+			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
+			e.triggeredBy = mPlayer;
+			e.triggered = true;
+			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword
+		} else if (!mPendingStaticMobs.contains(mob) && event.getSpell() != Spells.BLIZZARD && event.getSpell() != Spells.FSWORD) {
+			mPendingStaticMobs.add(mob);
+		}
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
-			addStaticToMob((LivingEntity)event.getEntity(), mPlayer);
+		LivingEntity mob = (LivingEntity) event.getEntity();
+		if (!mPendingStaticMobs.contains(mob) && event.getCause() == DamageCause.ENTITY_ATTACK
+		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+			mPendingStaticMobs.add(mob);
 		}
 		return true;
 	}
@@ -163,56 +185,13 @@ public class Spellshock extends Ability {
 		return InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
-	public static void spellDamageMob(Plugin plugin, LivingEntity mob, float dmg, Player player, MagicType type) {
-		SpellShockedMob shocked = mSpellShockedMobs.get(mob.getUniqueId());
-		if (shocked != null) {
-			// Hit a shocked mob with a real spell - extra damage
-
-			int spellShock = ScoreboardUtils.getScoreboardValue(player, SPELL_SHOCK_SCOREBOARD);
-			if (spellShock > 1 && (!mob.isDead() || mob.getHealth() > 0)) {
-				plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF,
-				                                new PotionEffect(PotionEffectType.SPEED,
-				                                                 SPELL_SHOCK_SPEED_DURATION,
-				                                                 SPELL_SHOCK_SPEED_AMPLIFIER, true, true));
-			}
-
-			// Consume the "charge"
-			mSpellShockedMobs.remove(mob.getUniqueId());
-			shocked.triggered = true;
-			Location loc = shocked.mob.getLocation().add(0, 1, 0);
-			World world = loc.getWorld();
-			world.spawnParticle(Particle.SPELL_WITCH, loc, 100, 1, 1, 1, 0.001);
-			world.spawnParticle(Particle.CRIT_MAGIC, loc, 75, 1, 1, 1, 0.25);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.5f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 2.0f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 1.0f, 1.5f);
-			for (LivingEntity nearbyMob : EntityUtils.getNearbyMobs(shocked.mob.getLocation(), SPELL_SHOCK_SPELL_RADIUS, player)) {
-				// Only damage hostile mobs and specifically not the mob originally hit
-				if (nearbyMob != mob) {
-					if (spellShock > 1) {
-						spellDamageMob(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type);
-					} else {
-						EntityUtils.damageEntity(plugin, nearbyMob, SPELL_SHOCK_SPELL_DAMAGE, player, type, false);
-					}
-
-					PotionUtils.applyPotion(player, nearbyMob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-					                                                            SPELL_SHOCK_VULN_AMPLIFIER, false, true));
-				}
-			}
-
-			dmg += SPELL_SHOCK_SPELL_DAMAGE;
-
-			// Make sure to apply vulnerability after damage
-			if (!EntityUtils.isBoss(mob) && !(mob instanceof Player)) {
-				EntityUtils.applyStun(plugin, SPELL_SHOCK_STAGGER_DURATION, mob);
-			}
-			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-			                                                      SPELL_SHOCK_VULN_AMPLIFIER, false, true));
-		}
-
-		// Apply damage to the hit mob all in one shot
-		if (dmg > 0) {
-			EntityUtils.damageEntity(plugin, mob, dmg, player, type);
-		}
+	public static void runTriggerParticles(Location loc) {
+		World world = loc.getWorld();
+		world.spawnParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
 	}
+
 }

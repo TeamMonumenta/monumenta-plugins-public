@@ -31,7 +31,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NetworkUtils;
 
 /*
  * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
@@ -130,9 +129,6 @@ public class MeteorSlam extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)
 		    && event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1) {
-			try {
-				NetworkUtils.broadcastCommand(mPlugin, "tellraw Rubiks_Creeper [\"\",{\"text\":\"Active Trigger" + mPlayer.getTicksLived() + "\",\"bold\":true}]");
-			} catch (Exception e) {}
 			double damage = getSlamDamage(mPlayer, getAbilityScore(), mPlayer.getFallDistance());
 			event.setDamage(event.getDamage() + damage);
 			LivingEntity damagee = (LivingEntity) event.getEntity();

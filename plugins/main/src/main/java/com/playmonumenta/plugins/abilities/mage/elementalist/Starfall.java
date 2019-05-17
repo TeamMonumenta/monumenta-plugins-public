@@ -15,7 +15,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -109,9 +108,9 @@ public class Starfall extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									Spellshock.spellDamageMob(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE);
+									EntityUtils.damageEntity(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE);
 								} else {
-									Spellshock.spellDamageMob(mPlugin, e, (float) damage, player, MagicType.FIRE);
+									EntityUtils.damageEntity(mPlugin, e, (float) damage, player, MagicType.FIRE);
 								}
 								e.setFireTicks(STARFALL_FIRE_DURATION);
 

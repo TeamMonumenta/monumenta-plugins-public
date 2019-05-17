@@ -300,12 +300,16 @@ public class PotionUtils {
 			    && applied.getPotionEffect(effect.getType()).getDuration() < effect.getDuration()) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
-				applied.addPotionEffect(event.getEffect());
+				if (!event.isCancelled()) {
+					applied.addPotionEffect(event.getEffect());
+				}
 			}
 		} else {
 			PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 			Bukkit.getPluginManager().callEvent(event);
-			applied.addPotionEffect(event.getEffect());
+			if (!event.isCancelled()) {
+				applied.addPotionEffect(event.getEffect());
+			}
 		}
 	}
 

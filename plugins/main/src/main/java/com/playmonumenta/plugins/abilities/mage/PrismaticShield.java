@@ -65,7 +65,7 @@ public class PrismaticShield extends Ability {
 		float prisDamage = prismatic == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
-			Spellshock.spellDamageMob(mPlugin, mob, prisDamage, mPlayer, MagicType.ARCANE);
+			EntityUtils.damageEntity(mPlugin, mob, prisDamage, mPlayer, MagicType.ARCANE);
 			MovementUtils.KnockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 
@@ -76,7 +76,6 @@ public class PrismaticShield extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
 
-		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.PRISMATIC_SHIELD);
 		putOnCooldown();
 		return true;
 	}

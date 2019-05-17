@@ -104,7 +104,7 @@ public class Blizzard extends Ability {
 				if (t % 20 == 0) {
 					for (LivingEntity mob : mobs) {
 						Vector v = mob.getVelocity();
-						Spellshock.spellDamageMob(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE);
+						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
 						mob.setVelocity(v);
 					}
 				}

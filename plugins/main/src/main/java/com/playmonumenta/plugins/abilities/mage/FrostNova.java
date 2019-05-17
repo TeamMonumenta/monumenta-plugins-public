@@ -44,7 +44,7 @@ public class FrostNova extends Ability {
 		int frostNova = getAbilityScore();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-			Spellshock.spellDamageMob(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
+			EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
 			int amp = (mob instanceof Player) ? FROST_NOVA_EFFECT_LVL - 1 : FROST_NOVA_EFFECT_LVL;
 			if (frostNova > 1) {
 				if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
@@ -68,12 +68,9 @@ public class FrostNova extends Ability {
 			}
 		}
 
-		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.FROST_NOVA);
-		mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.FROST_NOVA, FROST_NOVA_COOLDOWN);
-
-		Location loc = mPlayer.getLocation();
-		mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc.add(0, 1, 0), 400, 4, 1, 4, 0.001);
-		mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 200, 4, 1, 4, 0.001);
+		Location loc = mPlayer.getLocation().add(0, 1, 0);
+		mWorld.spawnParticle(Particle.SNOW_SHOVEL, loc, 400, 4, 1, 4, 0.001);
+		mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 200, 4, 1, 4, 0.001);
 		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
 		putOnCooldown();
 	}

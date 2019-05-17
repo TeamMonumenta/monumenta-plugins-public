@@ -215,13 +215,13 @@ public class EntityListener implements Listener {
 				}
 			}
 
-			/* Don't let the player interact with the world when transferring */
+			// Don't let the player interact with the world when transferring
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
 				event.setCancelled(true);
 				return;
 			}
 
-			//  Make sure to not trigger class abilities off Throrns.
+			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
@@ -232,7 +232,8 @@ public class EntityListener implements Listener {
 				}
 
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
+							&& MetadataUtils.checkOnceThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
 						Celestial.modifyDamage(player, event);
 					}
 				}
@@ -242,7 +243,8 @@ public class EntityListener implements Listener {
 				}
 
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
+							&& MetadataUtils.checkOnceThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
 						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}
 				}

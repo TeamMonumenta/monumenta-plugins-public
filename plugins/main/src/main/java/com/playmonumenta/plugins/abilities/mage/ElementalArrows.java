@@ -19,12 +19,15 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ElementalArrows extends Ability {
-	private static final int ELEMENTAL_ARROWS_ICE_DURATION = 8 * 20;
-	private static final int ELEMENTAL_ARROWS_ICE_EFFECT_LVL = 1;
-	private static final int ELEMENTAL_ARROWS_FIRE_DURATION = 5 * 20;
-	private static final double ELEMENTAL_ARROWS_RADIUS = 4.0;
+
+	private static final int ELEMENTAL_ARROWS_1_DAMAGE = 1;
+	private static final int ELEMENTAL_ARROWS_2_DAMAGE = 3;
+	private static final int ELEMENTAL_ARROWS_BONUS_DAMAGE = 8;
+	private static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
+	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
 	public ElementalArrows(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -35,32 +38,35 @@ public class ElementalArrows extends Ability {
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		int elementalArrows = getAbilityScore();
-		if (elementalArrows > 0) {
-			if (arrow.hasMetadata("FireArrow")) {
-				if (elementalArrows == 1) {
-					damagee.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-					Spellshock.spellDamageMob(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 1, mPlayer, MagicType.FIRE);
-				} else if (elementalArrows == 2) {
-					Spellshock.spellDamageMob(mPlugin, damagee, (damagee instanceof Stray) ? 8 : 2, mPlayer, MagicType.FIRE);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, mPlayer)) {
-						if (mob != damagee) {
-							mob.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-							Spellshock.spellDamageMob(mPlugin, mob, 4, mPlayer, MagicType.FIRE);
-						}
-					}
-				}
-			} else if (arrow.hasMetadata("IceArrow")) {
-				if (elementalArrows == 1) {
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-					Spellshock.spellDamageMob(mPlugin, damagee, 0, mPlayer, MagicType.ICE);
-				} else if (elementalArrows == 2) {
-					Spellshock.spellDamageMob(mPlugin, damagee, 1, mPlayer, MagicType.ICE);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, mPlayer)) {
-						mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_ICE_DURATION, ELEMENTAL_ARROWS_ICE_EFFECT_LVL, false, true));
-						Spellshock.spellDamageMob(mPlugin, mob, (damagee instanceof Blaze) ? 8 : 4, mPlayer, MagicType.ICE);
-					}
+		int damage = elementalArrows == 1 ? ELEMENTAL_ARROWS_1_DAMAGE : ELEMENTAL_ARROWS_2_DAMAGE;
+		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
+			if (elementalArrows > 1) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE);
+					mob.setFireTicks(ELEMENTAL_ARROWS_DURATION);
 				}
 			}
+			if (damagee instanceof Stray) {
+				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
+			}
+			damage += event.getDamage();
+			event.setDamage(0);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE);
+			damagee.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
+			if (elementalArrows > 1) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE);
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
+				}
+			}
+			if (damagee instanceof Blaze) {
+				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
+			}
+			damage += event.getDamage();
+			event.setDamage(0);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE);
+			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 		}
 
 		return true;
@@ -68,19 +74,14 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		int elementalArrows = getAbilityScore();
-		if (elementalArrows > 0) {
-			if (mPlayer.isSneaking()) {
-				//  If sneaking, Ice Arrow
-				arrow.setFireTicks(0);
-				arrow.setMetadata("IceArrow", new FixedMetadataValue(mPlugin, 0));
-				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
-			} else {
-				//  else Fire Arrow
-				arrow.setFireTicks(ELEMENTAL_ARROWS_FIRE_DURATION);
-				arrow.setMetadata("FireArrow", new FixedMetadataValue(mPlugin, 0));
-				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
-			}
+		if (mPlayer.isSneaking()) {
+			arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+			arrow.setFireTicks(0);
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SNOW_SHOVEL);
+		} else {
+			arrow.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+			arrow.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
 		}
 
 		return true;

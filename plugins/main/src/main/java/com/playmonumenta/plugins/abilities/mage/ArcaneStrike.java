@@ -52,11 +52,8 @@ public class ArcaneStrike extends Ability {
 
 			// Arcane strike extra fire damage
 			// Check if (the mob is burning AND was not set on fire this tick) OR the mob has slowness
-			//
-
-			if (arcaneStrike > 0 && ((mob.getFireTicks() > 0 &&
-			                          MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) ||
-			                         mob.hasPotionEffect(PotionEffectType.SLOW))) {
+			if (mob.hasPotionEffect(PotionEffectType.SLOW) || mob.getFireTicks() > 0 &&
+					MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) {
 				if (mob instanceof Player) {
 					dmg += 2;
 				} else {
@@ -65,11 +62,6 @@ public class ArcaneStrike extends Ability {
 			}
 
 			EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
-
-			// Don't apply spellshock to the mob you hit - that will be done directly via spellshock
-			if (damagee != mob && hasSpellShock) {
-				Spellshock.addStaticToMob(mob, mPlayer);
-			}
 		}
 
 		Location loc = damagee.getLocation();
@@ -77,7 +69,6 @@ public class ArcaneStrike extends Ability {
 		mWorld.spawnParticle(Particle.SPELL_WITCH, loc.add(0, 1, 0), 200, 2.5, 1, 2.5, 0.001);
 		mWorld.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.5f, 1.5f);
 
-		PlayerUtils.callAbilityCastEvent(mPlayer, Spells.ARCANE_STRIKE);
 		putOnCooldown();
 		return true;
 	}

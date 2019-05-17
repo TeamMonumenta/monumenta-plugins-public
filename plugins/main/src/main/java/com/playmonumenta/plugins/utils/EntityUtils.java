@@ -43,10 +43,14 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.CustomDamageEvent;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 
 public class EntityUtils {
+
+	public static final String PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY = "DealtCustomDamageWithEntityUtilsTick";
+
 	public static boolean isUndead(LivingEntity mob) {
 		EntityType type = mob.getType();
 		return type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER || type == EntityType.PIG_ZOMBIE || type == EntityType.HUSK ||
@@ -321,11 +325,16 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent) {
+		damageEntity(plugin, target, damage, damager, magicType, callEvent, null);
+	}
+
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell) {
 		damage = damage * vulnerabilityMult(target);
 
 		if (!target.isDead() && !target.isInvulnerable()) {
 			if (callEvent) {
 				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
+				event.setSpell(spell);
 				Bukkit.getPluginManager().callEvent(event);
 				damage = event.getDamage();
 			}
@@ -333,6 +342,9 @@ public class EntityUtils {
 				target.setNoDamageTicks(0);
 			}
 			if (damager != null) {
+				// This is a janky workaround check to differentiate player damage from spell damage
+				// The actual check for this happens inside LivingEntityDamagedByPlayerEvent events in ability files
+				MetadataUtils.checkOnceThisTick(plugin, damager, PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY);
 				target.damage(damage, damager);
 			} else {
 				target.damage(damage);
