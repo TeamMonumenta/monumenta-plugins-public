@@ -19,28 +19,7 @@ public class DailyReset {
 					ScoreboardUtils.setScoreboardValue(player, "DailyQuest", 0);
 
 					if (ScoreboardUtils.getScoreboardValue(player, "TP_Farr") >= 1) {
-						player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The king's bounty has changed! Perhaps you should seek out the Herald...");
-					}
-
-					// Remove the tag that prevents players from beating Azacor more than once per day
-					player.removeScoreboardTag("am_antiartifact");
-
-					// Remove the tag that prevents players from beating Kaul more than once per day
-					player.removeScoreboardTag("kaul_daily_artifact");
-
-					/* Reset the player's access to the Patreon shrine (if applicable) */
-					int Patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
-					int ShrinePower = (Patreon >= 20) ? 2 : ((Patreon >= 10) ? 1 : 0);
-					ScoreboardUtils.setScoreboardValue(player, "ShrinePower", ShrinePower);
-
-					if (ShrinePower >= 1) {
-						player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "Your ability to activate the Sierhaven shrine has been restored");
-						if (ShrinePower == 1) {
-							player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine once each day");
-						} else {
-							player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine twice (or two effects) each day");
-						}
-						player.sendMessage(ChatColor.DARK_AQUA + "Thank you for supporting the server!");
+						player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The chains of fate have realigned. Perhaps you should ask the fortune teller for new wisdom...");
 					}
 				}
 			}
