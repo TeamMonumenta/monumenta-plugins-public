@@ -93,7 +93,7 @@ public class DeadlyRonde extends Ability {
 				}
 
 				if (getAbilityScore() > 1 && event.getCause() == DamageCause.ENTITY_ATTACK
-						&& event.getEntity() instanceof LivingEntity) {
+				    && event.getEntity() instanceof LivingEntity) {
 					LivingEntity le = (LivingEntity)event.getEntity();
 					PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, RONDE_2_SLOWNESS_DURATION, RONDE_2_SLOWNESS_AMPLIFIER, true, false));
 					mWorld.spawnParticle(Particle.FALLING_DUST, ent.getLocation().add(0, 1, 0), 10, 0.25, 0.45, 0.25, 0.25, Material.GRAVEL.createBlockData());

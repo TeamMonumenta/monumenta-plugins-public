@@ -6,8 +6,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-
 public class MovementUtils {
 	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed) {
 		KnockAway(awayFromEntity.getLocation(), target, speed, 0.5f);

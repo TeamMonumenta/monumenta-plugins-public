@@ -94,7 +94,7 @@ public class AdvancingShadows extends Ability {
 				int ppDamage = pp.getBonus(mInfo.linkedSpell);
 				if (ppDamage != 0) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-																	  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+					                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
 						EntityUtils.damageEntity(mPlugin, mob, ppDamage, mPlayer);
 					}
 				}

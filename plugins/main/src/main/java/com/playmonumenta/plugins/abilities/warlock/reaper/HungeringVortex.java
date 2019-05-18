@@ -8,8 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -77,7 +75,7 @@ public class HungeringVortex extends Ability {
 	@Override
 	public void cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.HUNGERING_VORTEX)
-				|| !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
+		    || !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
 			return;
 		}
 

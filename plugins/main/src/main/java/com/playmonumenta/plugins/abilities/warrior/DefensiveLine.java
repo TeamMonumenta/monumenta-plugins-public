@@ -52,9 +52,9 @@ public class DefensiveLine extends Ability {
 						if (target.getScoreboardTags().contains("disable_class")) {
 							continue;
 						}
-	
+
 						Location loc = target.getLocation();
-	
+
 						target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
 						mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
 						                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,

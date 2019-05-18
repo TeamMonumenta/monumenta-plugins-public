@@ -7,16 +7,13 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -132,7 +129,7 @@ public class MeteorSlam extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)
-				&& event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1) {
+		    && event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1) {
 			try {
 				NetworkUtils.broadcastCommand(mPlugin, "tellraw Rubiks_Creeper [\"\",{\"text\":\"Active Trigger" + mPlayer.getTicksLived() + "\",\"bold\":true}]");
 			} catch (Exception e) {}
@@ -156,9 +153,9 @@ public class MeteorSlam extends Ability {
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
 		if (locType == LocationType.Capital || locType == LocationType.SafeZone ||
-				InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) ||
-				InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock() ||
-				inMainHand.getType().isEdible()) {
+		    InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) ||
+		    InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock() ||
+		    inMainHand.getType().isEdible()) {
 			return;
 		}
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) { //cooldown check because of the ignore cooldown flag

@@ -196,7 +196,7 @@ public class Spellshock extends Ability {
 					}
 
 					PotionUtils.applyPotion(player, nearbyMob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-					                                           SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+					                                                            SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 				}
 			}
 
@@ -207,7 +207,7 @@ public class Spellshock extends Ability {
 				EntityUtils.applyStun(plugin, SPELL_SHOCK_STAGGER_DURATION, mob);
 			}
 			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.UNLUCK, SPELL_SHOCK_VULN_DURATION,
-			                                     SPELL_SHOCK_VULN_AMPLIFIER, false, true));
+			                                                      SPELL_SHOCK_VULN_AMPLIFIER, false, true));
 		}
 
 		// Apply damage to the hit mob all in one shot

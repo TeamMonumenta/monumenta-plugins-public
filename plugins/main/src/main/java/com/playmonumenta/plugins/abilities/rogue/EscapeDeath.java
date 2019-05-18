@@ -53,9 +53,9 @@ public class EscapeDeath extends Ability {
 		int escapeDeath = getAbilityScore();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ESCAPE_DEATH_RANGE, mPlayer)) {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-			                                     ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
+			                                                       ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
-			                                     ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
+			                                                       ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
 		}
 
 		if (escapeDeath > 1) {
@@ -75,7 +75,7 @@ public class EscapeDeath extends Ability {
 			int ppDuration = pp.getBonus(mInfo.linkedSpell);
 			if (ppDuration != 0) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-												 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ppDuration, 4, true, false));
+				                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, ppDuration, 4, true, false));
 			}
 		}
 

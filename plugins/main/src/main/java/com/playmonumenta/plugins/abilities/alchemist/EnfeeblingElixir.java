@@ -52,9 +52,9 @@ public class EnfeeblingElixir extends Ability {
 				}
 
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-						new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
+				                                 new PotionEffect(PotionEffectType.SPEED, duration, enfeeblingElixir - 1));
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-						new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
+				                                 new PotionEffect(PotionEffectType.JUMP, duration, ENFEEBLING_JUMP_LEVEL));
 
 				mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation(), 100, 2, 1.5, 2, 0);
 				mWorld.playSound(damagee.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);

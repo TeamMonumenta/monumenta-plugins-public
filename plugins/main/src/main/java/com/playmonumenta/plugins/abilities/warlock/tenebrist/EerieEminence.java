@@ -12,11 +12,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
-import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Eerie Eminence: Provides a debuff aura around the player with a radius of 6 / 8 depending
@@ -70,7 +69,7 @@ public class EerieEminence extends Ability {
 		if (getAbilityScore() > 1) {
 			for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, false)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-						new PotionEffect(buff, EERIE_EFFECT_LINGER_DURATION, 0, true, false));
+				                                 new PotionEffect(buff, EERIE_EFFECT_LINGER_DURATION, 0, true, false));
 			}
 		}
 	}

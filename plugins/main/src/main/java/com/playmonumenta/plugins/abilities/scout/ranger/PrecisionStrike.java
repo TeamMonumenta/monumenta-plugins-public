@@ -90,8 +90,8 @@ public class PrecisionStrike extends Ability {
 			public void run() {
 				mTicks++;
 				if (mPlayer.isOnGround() || mPlayer.getLocation().getBlock().getType() == Material.WATER
-						|| mPlayer.getLocation().getBlock().getType() == Material.LAVA
-						|| mTicks >= PRECISION_STRIKE_COOLDOWN || !mPlayer.isOnline()) {
+				    || mPlayer.getLocation().getBlock().getType() == Material.LAVA
+				    || mTicks >= PRECISION_STRIKE_COOLDOWN || !mPlayer.isOnline()) {
 					this.cancel();
 					return;
 				}

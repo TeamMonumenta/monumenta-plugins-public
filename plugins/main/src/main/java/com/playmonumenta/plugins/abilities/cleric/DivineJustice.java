@@ -48,9 +48,9 @@ public class DivineJustice extends Ability {
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		if (getAbilityScore() > 1
-				&& killedEntity.getLastDamageCause() != null
-				&& !killedEntity.getLastDamageCause().getCause().equals(DamageCause.PROJECTILE)
-				&& EntityUtils.isUndead(killedEntity)) {
+		    && killedEntity.getLastDamageCause() != null
+		    && !killedEntity.getLastDamageCause().getCause().equals(DamageCause.PROJECTILE)
+		    && EntityUtils.isUndead(killedEntity)) {
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_HEAL);
 
 			World world = mPlayer.getWorld();

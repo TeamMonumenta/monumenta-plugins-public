@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class CounterStrike extends Ability {
 

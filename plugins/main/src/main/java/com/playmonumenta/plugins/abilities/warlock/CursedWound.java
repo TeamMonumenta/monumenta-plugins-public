@@ -42,7 +42,7 @@ public class CursedWound extends Ability {
 				int damage = (cursedWound == 1) ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
 				event.setDamage(event.getDamage() + damage);
 			}
-	
+
 			if (cursedWound > 1 && PlayerUtils.isCritical(mPlayer)) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), CURSED_WOUND_RADIUS, mPlayer)) {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, true, false));

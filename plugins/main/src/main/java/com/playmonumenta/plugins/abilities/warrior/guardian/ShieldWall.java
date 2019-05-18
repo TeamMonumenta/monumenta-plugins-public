@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -155,15 +154,15 @@ public class ShieldWall extends Ability {
 									} else {
 										le.setVelocity(v);
 									}
-								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()){
+								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
 									if (knockback) {
 										/*
 										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
-										 * 
+										 *
 										 * If a mob collides with shield wall halfway through its invulnerability period, assume it
 										 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
 										 * halting mobs with stunlock damage, minus the insane damage part.
-										 * 
+										 *
 										 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
 										 * after they leave shield wall hitbox.
 										 */
