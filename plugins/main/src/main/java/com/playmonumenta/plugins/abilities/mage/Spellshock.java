@@ -74,29 +74,13 @@ public class Spellshock extends Ability {
 		 */
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			mRunnable = new BukkitRunnable() {
-				int t = 0;
 				@Override
 				public void run() {
-					// Particles and time tracking on static duration
-					t++;
-					for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
-						SpellShockedMob e = entry.getValue();
-						Location loc = e.mob.getLocation();
-						if (t % 4 == 0) {
-							loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.2, 0.6, 0.2, 1);
-							loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
-						}
-						e.ticksLeft--;
-						if (e.ticksLeft <= 0 || e.mob.isDead()) {
-							mSpellShockedMobs.remove(entry.getKey());
-						}
-					}
-
 					// Do at most 10 loops to get all the mobs caught in the spellshock chain
 					Map<LivingEntity, Player> pendingDamageMobs = new HashMap<LivingEntity, Player>();
-					Set<UUID> triggeredMobs = new HashSet<UUID>();
 					boolean continueLooping;
 					for (int i = 0; i < 10; i++) {
+						Set<UUID> triggeredMobs = new HashSet<UUID>();
 						continueLooping = false;
 						for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
 							SpellShockedMob e = entry.getValue();
@@ -112,13 +96,16 @@ public class Spellshock extends Ability {
 									// Add nearby mobs to the damage queue
 									pendingDamageMobs.put(le, e.triggeredBy);
 									// If the mob has static and hasn't been triggered, trigger it and do another loop later
-									if (mSpellShockedMobs.containsKey(le.getUniqueId()) && !triggeredMobs.contains(le.getUniqueId())) {
-										mSpellShockedMobs.get(le.getUniqueId()).triggered = true;
+									UUID leUniqueId = le.getUniqueId();
+									if (mSpellShockedMobs.containsKey(leUniqueId) && !triggeredMobs.contains(leUniqueId)) {
+										mSpellShockedMobs.get(leUniqueId).triggered = true;
+										mSpellShockedMobs.get(leUniqueId).triggeredBy = e.triggeredBy;
 										continueLooping = true;
 									}
 								}
 							}
 						}
+						mSpellShockedMobs.keySet().removeAll(triggeredMobs);
 						if (!continueLooping) {
 							break;
 						}
@@ -130,7 +117,7 @@ public class Spellshock extends Ability {
 						Player damager = entry.getValue();
 						int abilityScore = ScoreboardUtils.getScoreboardValue(damager, "SpellShock");
 						double damage = abilityScore == 1 ? SPELL_SHOCK_1_DAMAGE : SPELL_SHOCK_2_DAMAGE;
-						// Since spellshock damage is applied on the tick after, EntityUtils.damageEntity()
+						// Since spellshock damage is applied on the tick after initial spell damage, EntityUtils.damageEntity()
 						// will not see it as intentional damage stacking, so iFrames need to be set manually
 						damagee.setNoDamageTicks(0);
 						EntityUtils.damageEntity(plugin, damagee, damage, damager, null, false /* do not register CustomDamageEvent */);
@@ -139,7 +126,9 @@ public class Spellshock extends Ability {
 						}
 					}
 
-					// Only put pending static mobs into the actual map if they weren't damaged by spellshock
+					// Only put pending static mobs into the actual map if they weren't damaged by spellshock - this
+					// prevents you from doing something like static'ing half the mobs in a group at any given time,
+					// which would allow you to trigger spellshock on every spellcast
 					for (LivingEntity mob : mPendingStaticMobs) {
 						if (!pendingDamageMobs.containsKey(mob.getUniqueId())) {
 							mSpellShockedMobs.put(mob.getUniqueId(), new SpellShockedMob(mob));
@@ -147,9 +136,21 @@ public class Spellshock extends Ability {
 					}
 					mPendingStaticMobs.clear();
 
-					// Remove static from triggered mobs because for some reason, you can trigger
-					// and apply static with the same spell.
-					mSpellShockedMobs.keySet().removeAll(triggeredMobs);
+
+					// Particles and time tracking on static duration, at the end so that a mob with static that gets
+					// killed by a spell gets its static triggered first
+					Set<UUID> expiredMobs = new HashSet<UUID>();
+					for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
+						SpellShockedMob e = entry.getValue();
+						Location loc = e.mob.getLocation();
+						loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0.2, 0.6, 0.2, 1);
+						loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
+						e.ticksLeft--;
+						if (e.ticksLeft <= 0 || e.mob.isDead()) {
+							expiredMobs.add(entry.getKey());
+						}
+					}
+					mSpellShockedMobs.keySet().removeAll(expiredMobs);
 				}
 			};
 			mRunnable.runTaskTimer(plugin, 0, 1);
@@ -165,6 +166,8 @@ public class Spellshock extends Ability {
 			e.triggeredBy = mPlayer;
 			e.triggered = true;
 			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword
+			// The check for these two specific spells is the only reason why we need to have the CustomDamageEvent
+			// check instead of just lumping it all in with EntityDamageByEntityEvent
 		} else if (!mPendingStaticMobs.contains(mob) && event.getSpell() != Spells.BLIZZARD && event.getSpell() != Spells.FSWORD) {
 			mPendingStaticMobs.add(mob);
 		}
@@ -174,7 +177,7 @@ public class Spellshock extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity mob = (LivingEntity) event.getEntity();
 		if (!mPendingStaticMobs.contains(mob) && event.getCause() == DamageCause.ENTITY_ATTACK
-		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			mPendingStaticMobs.add(mob);
 		}
 		return true;

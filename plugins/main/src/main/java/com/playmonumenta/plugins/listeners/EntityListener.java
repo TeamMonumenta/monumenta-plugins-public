@@ -201,7 +201,7 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
-			if (event.isCancelled() || damagee instanceof ArmorStand || damagee.isInvulnerable()) {
+			if (event.isCancelled()) {
 				return;
 			}
 		}
@@ -233,7 +233,7 @@ public class EntityListener implements Listener {
 
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-							&& MetadataUtils.checkOnceThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 						Celestial.modifyDamage(player, event);
 					}
 				}
@@ -244,7 +244,7 @@ public class EntityListener implements Listener {
 
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-							&& MetadataUtils.checkOnceThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}
 				}

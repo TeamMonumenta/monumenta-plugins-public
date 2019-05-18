@@ -30,10 +30,10 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
-* Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 15 damage + any
+* Left Clicking with a bow while not sneaking instantly fires a fast arrow that deals 12 damage + any
 * other bonuses from skills and inflicts Slowness 3 for 2 seconds (Cooldown: 10
 * seconds). Level 2 decreases the cooldown to 8 seconds and increases the arrow
-* damage to 24 + effects.
+* damage to 20 + effects.
 */
 
 public class Quickdraw extends Ability {
@@ -64,8 +64,8 @@ public class Quickdraw extends Ability {
 	public void cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.4f);
-			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6f);
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
+			mWorld.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f);
 			Arrow arrow = mPlayer.launchProjectile(Arrow.class);
 			ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
@@ -89,7 +89,7 @@ public class Quickdraw extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		// Cast even if you hit a mob with your bow
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK) && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)
-				&& MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			cast();
 		}
 		return true;
@@ -99,8 +99,6 @@ public class Quickdraw extends Ability {
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity le, EntityDamageByEntityEvent event) {
 		if (arrow.hasMetadata("ArrowQuickdraw")) {
 			PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, QUICKDRAW_SLOWNESS_DURATION, QUICKDRAW_SLOWNESS_LEVEL, true, false));
-			mWorld.spawnParticle(Particle.CRIT, arrow.getLocation(), 20, 0, 0, 0, 0.6f);
-			mWorld.spawnParticle(Particle.CRIT_MAGIC, arrow.getLocation(), 20, 0, 0, 0, 0.6f);
 		}
 		return true;
 	}

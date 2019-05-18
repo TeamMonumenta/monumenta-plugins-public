@@ -178,11 +178,13 @@ public class ShieldWall extends Ability {
 					 * tick, meaning it is no longer in the shield wall hitbox
 					 * and is thus eligible for another hit.
 					 */
+					List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<LivingEntity>();
 					for (LivingEntity mob : mobsAlreadyHit) {
-						if (!mobsHitThisTick.contains(mob)) {
-							mobsAlreadyHit.remove(mob);
+						if (mobsHitThisTick.contains(mob)) {
+							mobsAlreadyHitAdjusted.add(mob);
 						}
 					}
+					mobsAlreadyHit = mobsAlreadyHitAdjusted;
 					mobsHitThisTick.clear();
 					if (t >= time) {
 						this.cancel();

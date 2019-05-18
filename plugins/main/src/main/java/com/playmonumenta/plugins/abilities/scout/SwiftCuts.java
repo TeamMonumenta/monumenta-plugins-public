@@ -50,7 +50,7 @@ public class SwiftCuts extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK
-		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			LivingEntity ent = (LivingEntity) event.getEntity();
 			if (!cooldown.contains(ent)) {
 				World world = ent.getWorld();

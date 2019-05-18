@@ -25,18 +25,12 @@ public class MetadataUtils {
 	 * be executed.
 	 */
 	public static boolean checkOnceThisTick(Plugin plugin, Entity entity, String metakey) {
-		return checkOnceThisTick(plugin, entity, metakey, true);
-	}
-
-	public static boolean checkOnceThisTick(Plugin plugin, Entity entity, String metakey, boolean update) {
 		if (entity.hasMetadata(metakey)
 		    && entity.getMetadata(metakey).get(0).asInt() == entity.getTicksLived()) {
 			return false;
 		}
 
-		if (update) {
-			entity.setMetadata(metakey, new FixedMetadataValue(plugin, entity.getTicksLived()));
-		}
+		entity.setMetadata(metakey, new FixedMetadataValue(plugin, entity.getTicksLived()));
 		return true;
 	}
 

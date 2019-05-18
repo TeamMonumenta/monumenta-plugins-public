@@ -101,7 +101,7 @@ public class DarkPact extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		// Melee attacks with scythes only
 		if (active && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && event.getCause() == DamageCause.ENTITY_ATTACK
-		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, false)) {
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			int level = getAbilityScore();
 			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 

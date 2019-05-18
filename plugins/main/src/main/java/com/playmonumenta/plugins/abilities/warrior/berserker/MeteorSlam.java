@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -75,7 +77,7 @@ public class MeteorSlam extends Ability {
 	private static final double METEOR_SLAM_2_RADIUS = 5.0;
 	private static final int METEOR_SLAM_1_EFFECT_LVL = 3;
 	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
-	private static final int METEOR_SLAM_DURATION = 4 * 20;
+	private static final int METEOR_SLAM_DURATION = 2 * 20;
 	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
 	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
 	private static final double METEOR_SLAM_FALL_THRESHOLD = 3;
@@ -101,6 +103,7 @@ public class MeteorSlam extends Ability {
 				int t = 0;
 				@Override
 				public void run() {
+					Set<UUID> playersWithoutAbility = new HashSet<UUID>();
 					for (Map.Entry<UUID, PlayerWithMeteorSlam> entry : mPlayersWithMeteorSlam.entrySet()) {
 						PlayerWithMeteorSlam p = entry.getValue();
 
@@ -116,9 +119,10 @@ public class MeteorSlam extends Ability {
 						}
 
 						if (AbilityManager.getManager().getPlayerAbility(p.playerMS, MeteorSlam.class) == null) {
-							mPlayersWithMeteorSlam.remove(p.playerMS.getUniqueId());
+							playersWithoutAbility.add(entry.getKey());
 						}
 					}
+					mPlayersWithMeteorSlam.keySet().removeAll(playersWithoutAbility);
 				}
 			};
 			mFallTimer.runTaskTimer(mPlugin, 0, 1);
