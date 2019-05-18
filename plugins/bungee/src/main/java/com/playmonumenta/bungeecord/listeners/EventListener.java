@@ -7,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.utils.PacketUtils;
 
-import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 
 import fr.rhaz.socket4mc.Bungee.BungeeSocketHandshakeEvent;
@@ -31,7 +29,6 @@ import net.md_5.bungee.event.EventPriority;
 
 public class EventListener implements Listener {
 	final boolean mVanishEnabled;
-	final boolean mBungeeTabListPresent;
 
 	final Main mMain;
 
@@ -44,13 +41,6 @@ public class EventListener implements Listener {
 
 		PluginManager mgr = mMain.getProxy().getPluginManager();
 
-		if (mgr.getPlugin("BungeeTabListPlus") != null) {
-			mMain.getLogger().info("Vanish support enabled - BungeeTabListPlus plugin detected");
-			mBungeeTabListPresent = true;
-		} else {
-			mMain.getLogger().info("Vanish support disabled - no plugin detected");
-			mBungeeTabListPresent = false;
-		}
 		if (mgr.getPlugin("PremiumVanish") != null) {
 			mMain.getLogger().info("Vanish support enabled - PremiumVanish plugin detected");
 			mVanishEnabled = true;
@@ -116,10 +106,10 @@ public class EventListener implements Listener {
 		                mVanishEnabled && BungeeVanishAPI.isInvisible(event.getPlayer()));
     }
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW)
     public void playerDisconnectEvent(PlayerDisconnectEvent event) {
 		_joinLeaveEvent(event.getPlayer(), " left the game",
-		                mBungeeTabListPresent && BungeeTabListPlusAPI.isHidden(event.getPlayer()));
+		                mVanishEnabled && BungeeVanishAPI.isInvisible(event.getPlayer()));
     }
 
 	// Every time a bungee server shard connects, add its socket to the list
