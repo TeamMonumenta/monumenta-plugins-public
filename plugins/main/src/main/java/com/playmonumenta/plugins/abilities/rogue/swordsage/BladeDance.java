@@ -104,7 +104,8 @@ public class BladeDance extends Ability {
 						}
 						loc = mPlayer.getLocation();
 						loc.setY(y);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 10, 4, 4, 4, 0);
+						mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation(), 15, 4, 4, 4, 0);
+						mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 12, 4, 4, 4, 0);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
 						pitch += 0.2;
 						new BukkitRunnable() {

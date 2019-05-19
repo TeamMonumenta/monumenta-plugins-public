@@ -3,6 +3,7 @@ package com.playmonumenta.bossfights.spells;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -20,25 +21,28 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      },
 		      // Warning particles
 		      (Location loc) -> {
-		          loc.getWorld().spawnParticle(Particle.END_ROD, loc, 1, 1, 1, 1, 0);
+		          loc.getWorld().spawnParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0);
 		      },
 		      // Charge attack sound/particles at boss location
 		      (Player player) -> {
-		          boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0);
+		          boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
 		      },
 		      // Attack hit a player
 		      (Player player) -> {
-		          player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, player.getLocation(), 80, 1, 1, 1, 0);
+		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
+		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
 		          player.damage(damage, boss);
 		      },
 		      // Attack particles
 		      (Location loc) -> {
-		          loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0);
+		          loc.getWorld().spawnParticle(Particle.FLAME, loc, 4, 0.5, 0.5, 0.5, 0.075);
+		          loc.getWorld().spawnParticle(Particle.CRIT, loc, 8, 0.5, 0.5, 0.5, 0.75);
 		      },
 		      // Ending particles on boss
 		      () -> {
-		          boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 200, 2, 2, 2, 0);
+		          boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
+		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
 		      });
 	}
 }

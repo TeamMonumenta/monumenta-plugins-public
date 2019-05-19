@@ -58,7 +58,9 @@ public class AdvancingShadows extends Ability {
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
 			Location loc = mPlayer.getLocation();
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
-				loc.add(dir);
+				loc.add(dir.clone().multiply(0.3333));
+				mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 4, 0.3, 0.5, 0.3, 1.0);
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.3, 0.5, 0.3, 0.025);
 				if (loc.distance(entity.getLocation()) < ADVANCING_SHADOWS_OFFSET) {
 					double multiplier = ADVANCING_SHADOWS_OFFSET - loc.distance(entity.getLocation());
 					loc.subtract(dir.clone().multiply(multiplier));
@@ -71,9 +73,9 @@ public class AdvancingShadows extends Ability {
 			while (loc.getBlock().getType().isSolid()) {
 				loc.subtract(dir.clone().multiply(1.15));
 			}
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 
 			mPlayer.teleport(loc);
 
@@ -100,9 +102,9 @@ public class AdvancingShadows extends Ability {
 				}
 			}
 
-			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0, 0.5, 0, 1.0);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0, 0.5, 0, 0.05);
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.5f);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
 			target = null;
 			putOnCooldown();
 		}

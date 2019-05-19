@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -42,12 +43,33 @@ public class ConsumingFlames extends Ability {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 		int consumingFlames = getAbilityScore();
-
-		world.spawnParticle(Particle.FLAME, loc.add(0, 1, 0), 60, 1.75, 0.75, 1.75, 0.0);
-		world.playSound(loc, Sound.ENTITY_MAGMA_CUBE_SQUISH, 1.0f, 0.66f);
-
-		boolean effect = false;
 		int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
+
+		new BukkitRunnable() {
+			double r = 0;
+			Location loc = mPlayer.getLocation();
+			@Override
+			public void run() {
+				r += 1.25;
+				for (double j = 0; j < 360; j += 18) {
+					double radian1 = Math.toRadians(j);
+					loc.add(Math.cos(radian1) * r, 0.15, Math.sin(radian1) * r);
+					mWorld.spawnParticle(Particle.FLAME, loc, 2, 0, 0, 0, 0.125);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 3, 0, 0, 0, 0.15);
+					loc.subtract(Math.cos(radian1) * r, 0.15, Math.sin(radian1) * r);
+				}
+
+				if (r >= radius + 1) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
+		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
+		boolean effect = false;
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius, mPlayer)) {
 			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
 			mob.setFireTicks(CONSUMING_FLAMES_DURATION);

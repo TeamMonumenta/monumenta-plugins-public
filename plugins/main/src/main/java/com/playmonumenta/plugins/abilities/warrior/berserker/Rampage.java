@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.Random;
 
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -39,6 +42,9 @@ public class Rampage extends Ability {
 
 	private int timeToNextDecrement = 0;
 
+	private static final Particle.DustOptions RAMPAGE_COLOR_1 = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
+	private static final Particle.DustOptions RAMPAGE_COLOR_2 = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
+
 	public Rampage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Rampage";
@@ -54,6 +60,8 @@ public class Rampage extends Ability {
 		} else {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak Maxed Out!");
 		}
+		float pitch = (float)(((float) rampageKillStreak) / 11);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, 0.5f, pitch);
 	}
 
 	@Override
@@ -69,13 +77,14 @@ public class Rampage extends Ability {
 
 		// Apply regen buffs at thresholds
 		if (getAbilityScore() > 1) {
+			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD * 2) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 1, true, false));
-				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, .4, 0.45, .4, RAMPAGE_COLOR_1);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, .4, 0.45, .4, RAMPAGE_COLOR_2);
 			} else if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 0, true, false));
-				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 5, .4, 0.45, .4, RAMPAGE_COLOR_2);
 			}
 		}
 

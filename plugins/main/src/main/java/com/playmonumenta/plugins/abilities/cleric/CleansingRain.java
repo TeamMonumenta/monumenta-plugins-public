@@ -26,7 +26,7 @@ public class CleansingRain extends Ability {
 	private static final int CLEANSING_RESIST_LEVEL = 0;
 	private static final int CLEANSING_STRENGTH_LEVEL = 0;
 	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
-	private static final int CLEANSING_APPLY_PERIOD = 8;
+	private static final int CLEANSING_APPLY_PERIOD = 1;
 	private static final int CLEANSING_RADIUS = 4;
 	private static final int CLEANSING_1_COOLDOWN = 45 * 20;
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
@@ -52,8 +52,9 @@ public class CleansingRain extends Ability {
 			int mTicks = 0;
 			@Override
 			public void run() {
-				mPlayer.getWorld().spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 150, 2.5, 2, 2.5, 0.001);
-				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 20, 2, 1.5, 2, 0.001);
+				mPlayer.getWorld().spawnParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 4, 0), 5, 2.5, 0.35, 2.5, 0);
+				mPlayer.getWorld().spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
+				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
 
 				for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, CLEANSING_RADIUS, true)) {
 					PotionUtils.clearNegatives(mPlugin, player);

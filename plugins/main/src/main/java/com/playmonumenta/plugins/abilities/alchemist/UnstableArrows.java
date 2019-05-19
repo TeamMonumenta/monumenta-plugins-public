@@ -52,19 +52,21 @@ public class UnstableArrows extends Ability {
 				int mTicks = 0;
 				@Override
 				public void run() {
-					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.3, 0.3, 0.3, 0.001);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.5, 0.5, 0.5, 0.001);
+					mWorld.spawnParticle(Particle.FLAME, loc, 3, 0.3, 0.3, 0.3, 0.05);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.075);
 					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.5f,
 					                 ((UNSTABLE_ARROWS_DURATION / 2.0f) + mTicks) / (2.0f * UNSTABLE_ARROWS_DURATION));
 
 					mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
 					if (mTicks > UNSTABLE_ARROWS_DURATION) {
 						arrow.remove();
-						Location explodeLoc = loc.add(0, 1.2, 0);
-						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.7f, 1.0f);
-						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.9f, 1.0f);
+						Location explodeLoc = loc;
+						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0f);
+						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1.25f);
 
-						mWorld.spawnParticle(Particle.EXPLOSION_HUGE, explodeLoc, 3, 0.02, 0.02, 0.02, 0.001);
+						mWorld.spawnParticle(Particle.FLAME, explodeLoc, 115, 0.02, 0.02, 0.02, 0.2);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, explodeLoc, 40, 0.02, 0.02, 0.02, 0.35);
+						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, explodeLoc, 40, 0.02, 0.02, 0.02, 0.35);
 						BasiliskPoison bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
 						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
@@ -89,6 +91,7 @@ public class UnstableArrows extends Ability {
 		if (mPlayer.isSneaking()) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);
 			mUnstableArrow = arrow;
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FLAME);
 		}
 
 		return true;

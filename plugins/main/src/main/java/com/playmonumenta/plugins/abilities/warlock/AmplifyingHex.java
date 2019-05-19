@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -19,7 +21,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class AmplifyingHex extends Ability {
 
@@ -53,8 +55,37 @@ public class AmplifyingHex extends Ability {
 	@Override
 	public void cast() {
 		Player player = mPlayer;
-		ParticleUtils.explodingConeEffect(mPlugin, player, AMPLIFYING_RADIUS, Particle.DRAGON_BREATH, 0.6f, Particle.SMOKE_NORMAL, 0.4f, AMPLIFYING_DOT_ANGLE);
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 1.6f);
+		new BukkitRunnable() {
+			Location loc = mPlayer.getLocation();
+			double radius = 0.5;
+
+			@Override
+			public void run() {
+				if (radius == 0.5) {
+					loc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
+				}
+				Vector vec;
+				radius += 1.25;
+				for (double degree = 30; degree <= 150; degree += 10) {
+					double radian1 = Math.toRadians(degree);
+					vec = new Vector(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
+					vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
+					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+					Location l = loc.clone().clone().add(0, 0.15, 0).add(vec);
+					mWorld.spawnParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1);
+				}
+
+				if (radius >= AMPLIFYING_RADIUS + 1) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
 
 		Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), AMPLIFYING_RADIUS, mPlayer)) {

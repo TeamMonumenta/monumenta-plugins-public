@@ -191,7 +191,7 @@ public class SpellBaseCharge extends Spell {
 
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
-		BoundingBox box = BoundingBox.of(endLoc, 1, 1, 1);
+		BoundingBox box = BoundingBox.of(endLoc, 0.15, 0.15, 0.15);
 		for (int i = 0; i < 200; i++) {
 			box.shift(baseVect);
 			endLoc.add(baseVect);
@@ -271,7 +271,7 @@ public class SpellBaseCharge extends Spell {
 					return;
 				}
 				if (mTicks == 0) {
-					targetLoc = mTarget.getLocation().add(0, 1.25f, 0);
+					targetLoc = mTarget.getEyeLocation();
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
 					}

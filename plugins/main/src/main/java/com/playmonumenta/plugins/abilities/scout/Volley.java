@@ -6,13 +6,12 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TippedArrow;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -21,11 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Volley extends Ability {
 
@@ -59,7 +56,13 @@ public class Volley extends Ability {
 
 		//Start the cooldown first so we don't cause an infinite loop of Volleys
 		putOnCooldown();
-
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
+		Location eye = mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection());
+		mWorld.spawnParticle(Particle.CRIT, eye, 35, 0, 0, 0, 0.7f);
+		mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 35, 0, 0, 0, 0.7f);
+		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eye, 15, 0, 0, 0, 0.15f);
 		// This needs to be run 1 tick later so that Bow Mastery, Sharpshooter, and Quickdraw can set their metadata on the original arrow
 		new BukkitRunnable() {
 			@Override

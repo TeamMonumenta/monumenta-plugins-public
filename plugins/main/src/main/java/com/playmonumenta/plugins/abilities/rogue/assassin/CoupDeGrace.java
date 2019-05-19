@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -44,9 +46,12 @@ public class CoupDeGrace extends Ability {
 			double threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
 			if (le.getHealth() - event.getFinalDamage() < maxHealth * threshold) {
 				event.setDamage(event.getDamage() + 9001);
-				mWorld.spawnParticle(Particle.CRIT, le.getLocation().add(0, le.getHeight() / 2, 0), 35, 0, 0, 0, 1);
+				mWorld.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
+				mWorld.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.65f, 1.5f);
+				mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
 				if (getAbilityScore() > 1) {
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, le.getLocation().add(0, le.getHeight() / 2, 0), 25, 0, 0, 0, 1);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
+					mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8, mPlayer)) {
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, COUP_2_INTIMIDATION_DURATION, 0, false, true));
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, COUP_2_INTIMIDATION_DURATION, 0, false, true));

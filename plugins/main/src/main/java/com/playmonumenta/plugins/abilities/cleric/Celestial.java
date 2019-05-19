@@ -62,26 +62,47 @@ public class Celestial extends Ability {
 				p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
 				p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 				Location loc = p.getLocation();
-				world.spawnParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 100, 2.0, 0.75, 2.0, 0.001);
-				world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.4f, 1.5f);
+				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
+				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
+				world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1);
+				world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.75f);
+				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.75f, 1.25f);
+				world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 0.75f, 1.1f);
 			}
 		}
 
-		// Run a task later to remove the metadata tag after time has elapsed
+
 		new BukkitRunnable() {
+			int t = 0;
 			@Override
 			public void run() {
+				t += 2;
 				for (Player p : affectedPlayers) {
-					if (p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME)) {
-						p.removeMetadata(CELESTIAL_MULTIPLE_TAGNAME, mPlugin);
-					} else {
-						p.removeMetadata(tagName, mPlugin);
-						p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
-					}
+					Location loc = p.getLocation();
+					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 1, 0.25, 0.25, 0.25, 0.1);
+					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.1);
 				}
-				this.cancel();
+
+				if (t >= duration) {
+					for (Player p : affectedPlayers) {
+						if (p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME)) {
+							p.removeMetadata(CELESTIAL_MULTIPLE_TAGNAME, mPlugin);
+						} else {
+							p.removeMetadata(tagName, mPlugin);
+							p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
+						}
+						Location loc = p.getLocation();
+						world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);
+						world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
+						world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
+						world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0.1);
+					}
+					this.cancel();
+				}
 			}
-		}.runTaskLater(mPlugin, duration);
+
+		}.runTaskTimer(mPlugin, 0, 2);
 
 		putOnCooldown();
 	}

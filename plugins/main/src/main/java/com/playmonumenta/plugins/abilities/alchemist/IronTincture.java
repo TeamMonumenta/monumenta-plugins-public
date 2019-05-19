@@ -82,20 +82,21 @@ public class IronTincture extends Ability {
 					}
 
 					mWorld.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-					mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 250, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
+					mWorld.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
+					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
 					tincture.remove();
 
 					p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
 
 					if (p != mPlayer) {
 						mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
-						mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
+						spawnHelix(mPlayer);
 						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 					}
 					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
 					putOnCooldown();
 
-					mWorld.spawnParticle(Particle.LAVA, p.getLocation().add(0, 1, 0), 15, 1.0, 1.0, 1.0, 0.001);
+					spawnHelix(p);
 					mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 
 					this.cancel();
@@ -113,5 +114,33 @@ public class IronTincture extends Ability {
 			}
 
 		}.runTaskTimer(mPlugin, 0, IRON_TINCTURE_TICK_PERIOD);
+	}
+
+	private void spawnHelix(Player player) {
+		mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
+		new BukkitRunnable() {
+			double rotation = 0;
+			double y = 0.15;
+			double radius = 1.15;
+			@Override
+			public void run() {
+				Location loc = player.getLocation();
+				rotation += 15;
+				y += 0.2;
+				for (int i = 0; i < 4; i++) {
+					double degree = Math.toRadians(rotation + (i * 90));
+					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					mWorld.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.05);
+					mWorld.spawnParticle(Particle.SPELL, loc, 1, 0.1, 0.1, 0.1, 0);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.1, 0.1, 0.1, 0);
+					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+				}
+
+				if (y >= 1.8) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }

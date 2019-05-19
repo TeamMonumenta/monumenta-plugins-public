@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.Random;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,7 +20,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 		super(plugin, launcher, radius, 80, 0, false, Sound.ENTITY_SNOWBALL_THROW,
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.CLOUD, loc, 15, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
+				world.spawnParticle(Particle.CLOUD, loc, 7, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();

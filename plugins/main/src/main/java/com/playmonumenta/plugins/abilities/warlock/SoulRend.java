@@ -39,21 +39,26 @@ public class SoulRend extends Ability {
 			double heal = (soulRend == 1) ? 2 : 4;
 			double soulHealValue = damage * 0.2;
 
-			Location loc = mPlayer.getLocation();
+			Location loc = damagee.getLocation();
 			World world = mPlayer.getWorld();
-
-			if (soulRend == 1) {
-				world.spawnParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);
-			} else if (soulRend == 2) {
-				world.spawnParticle(Particle.DAMAGE_INDICATOR, loc.add(0, 1, 0), 60, 2.0, 0.75, 2.0, 0.0);
+			if (soulRend == 0) {
+				world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 10, 0.75, 0.5, 0.75, 0.0);
+				world.spawnParticle(Particle.SPELL_MOB, loc.clone().add(0, 1, 0), 18, 0.75, 0.5, 0.75, 0.0);
+				world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 7, 0.75, 0.5, 0.75, 0.0);
+			} else {
+				world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 75, 3.5, 1.5, 3.5, 0.0);
+				world.spawnParticle(Particle.SPELL_MOB, loc.clone().add(0, 1, 0), 95, 3.5, 1.5, 3.5, 0.0);
+				world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 45, 3.5, 1.5, 3.5, 0.0);
 			}
 
-			world.playSound(loc, Sound.ENTITY_MAGMA_CUBE_SQUISH, 1.0f, 0.66f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.2f);
+
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.65f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.0f, 1.15f);
 
 			for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, SOUL_REND_RADIUS, true)) {
 				// If this is us or we're allowing anyone to get it.
 				if (p == mPlayer || soulRend > 1) {
+					world.spawnParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
 					PlayerUtils.healPlayer(p, heal + soulHealValue);
 				}
 			}

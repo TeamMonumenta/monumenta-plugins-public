@@ -2,12 +2,14 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.Random;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -18,8 +20,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class MagmaShield extends Ability {
 
@@ -57,10 +58,38 @@ public class MagmaShield extends Ability {
 			}
 		}
 
-		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, MAGMA_SHIELD_RADIUS, Particle.FLAME, 0.75f, Particle.LAVA,
-		                                  0.25f, MAGMA_SHIELD_DOT_ANGLE);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 0.5f, 1.5f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.25f, 1.0f);
+		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1);
+		new BukkitRunnable() {
+			Location loc = mPlayer.getLocation();
+			double radius = 0;
+
+			@Override
+			public void run() {
+				if (radius == 0) {
+					loc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
+				}
+				Vector vec;
+				radius += 1.25;
+				for (double degree = 30; degree <= 150; degree += 10) {
+					double radian1 = Math.toRadians(degree);
+					vec = new Vector(Math.cos(radian1) * radius, 0.125, Math.sin(radian1) * radius);
+					vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
+					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+					Location l = loc.clone().add(0, 0.1, 0).add(vec);
+					mWorld.spawnParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
+				}
+
+				if (radius >= MAGMA_SHIELD_RADIUS + 1) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
 		putOnCooldown();
 	}
 

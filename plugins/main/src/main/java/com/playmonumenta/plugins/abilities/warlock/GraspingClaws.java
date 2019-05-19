@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -42,7 +43,7 @@ public class GraspingClaws extends Ability {
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS) && mPlayer.isSneaking()) {
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.PORTAL);
+			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
 			shot = arrow;
 			// Put Grasping Claws on cooldown
 			putOnCooldown();
@@ -57,9 +58,12 @@ public class GraspingClaws extends Ability {
 			Location loc = arrow.getLocation();
 			World world = arrow.getWorld();
 
-			world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.8f);
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1, 0), 200, 3, 3, 3, 0.0);
-			world.spawnParticle(Particle.DRAGON_BREATH, loc, 75, 1, 1, 1, 0.0);
+			world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1.25f, 1.25f);
+			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, 0.65f);
+			world.spawnParticle(Particle.PORTAL, loc, 300, 2, 2, 2, 0.25);
+			world.spawnParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125);
+			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
+
 
 			int damage = (getAbilityScore() == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 

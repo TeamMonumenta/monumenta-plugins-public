@@ -38,7 +38,10 @@ public class DivineJustice extends Ability {
 
 			World world = mPlayer.getWorld();
 			Location loc = damagee.getLocation();
-			world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.5, 0.5, 0.001);
+			world.spawnParticle(Particle.END_ROD, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 5,
+			                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0.065);
+			world.spawnParticle(Particle.FLAME, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
+			                    (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0.05);
 			world.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
 		}
 		return true;
@@ -55,8 +58,10 @@ public class DivineJustice extends Ability {
 
 			World world = mPlayer.getWorld();
 			Location loc = killedEntity.getLocation();
-			world.spawnParticle(Particle.CRIT_MAGIC, loc.add(0, 1, 0), 20, 0.25, 0.25, 0.25, 0.001);
-			mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 1.5f);
+			world.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 16, 0.4, 0.4, 0.4, 1);
+			world.spawnParticle(Particle.END_ROD, killedEntity.getLocation().add(0, killedEntity.getHeight() / 2, 0), 5,
+			                    (killedEntity.getWidth() / 2) + 0.1, killedEntity.getHeight() / 3, (killedEntity.getWidth() / 2) + 0.1, 0.125);
+			world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.65f, 1.5f);
 		}
 	}
 

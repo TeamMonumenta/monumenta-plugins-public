@@ -45,7 +45,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 		                       // Damage generated at the end of the attack
 		                       (Player player, Location loc, boolean blocked) -> {
 		                           loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
-		                           loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
+		                           loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 		                           if (!blocked) {
 		                               player.damage(12f);
 		                           }

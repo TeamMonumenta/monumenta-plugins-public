@@ -16,7 +16,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 		super(plugin, launcher, radius, time, 0, false, Sound.BLOCK_FIRE_AMBIENT,
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.LAVA, loc, 3, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
+				world.spawnParticle(Particle.LAVA, loc, 1, ((double) radius) / 2, ((double) radius) / 2, ((double) radius) / 2, 0.05);
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -31,7 +31,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.3);
-				world.spawnParticle(Particle.LAVA, loc, 1, 0.25, 0.25, 0.25, 0);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.1);
 			},
 			(Location loc) -> {
 				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {

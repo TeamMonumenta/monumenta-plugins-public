@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Alchemical Amalgam: Shift - left clicking with a bow in hand
@@ -67,12 +68,33 @@ public class AlchemicalAmalgam extends Ability {
 			int amp = getAbilityScore() == 1 ? 1 : 2;
 			int slownessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_SLOWNESS_AMPLIFIER : ALCHEMICAL_2_SLOWNESS_AMPLIFIER;
 			double heal = getAbilityScore() == 1 ? 2 : 4;
+
+			double degree = 0;
 			@Override
 			public void run() {
 				loc.add(dir.clone().multiply(0.3));
 				t++;
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.25, 0.25, 0.25, ALCHEMICAL_LIGHT_COLOR);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.25, 0.25, 0.25, ALCHEMICAL_DARK_COLOR);
+				degree += 12;
+				Vector vec;
+				for (int i = 0; i < 2; i++) {
+					double radian1 = Math.toRadians(degree + (i * 180));
+					vec = new Vector(Math.cos(radian1) * 0.325, 0, Math.sin(radian1) * 0.325);
+					vec = VectorUtils.rotateXAxis(vec, -loc.getPitch() + 90);
+					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+					Location l = loc.clone().add(vec);
+					if (i == 0) {
+						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_LIGHT_COLOR);
+						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_DARK_COLOR);
+					} else {
+						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_LIGHT_COLOR);
+						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_DARK_COLOR);
+					}
+				}
+
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.35, 0.35, 0.35, 1);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.35, 0.35, 0.35, 1);
+
 				for (Player p : PlayerUtils.getNearbyPlayers(loc, 5)) {
 					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
 					                                 new PotionEffect(PotionEffectType.REGENERATION, 20 * 3,
@@ -88,9 +110,10 @@ public class AlchemicalAmalgam extends Ability {
 				}
 				if (t >= 20 * 6 || loc.getBlock().getType().isSolid()) {
 					this.cancel();
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 150, 0.1, 0.1, 0.1, 0.2);
+					mWorld.spawnParticle(Particle.SQUID_INK, loc, 20, 0.1, 0.1, 0.1, 0.35);
+					mWorld.spawnParticle(Particle.SPIT, loc, 40, 0.1, 0.1, 0.1, 0.3);
 					mPlayer.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
-					mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 1.75f);
+					mWorld.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 1, 1.25f);
 					for (Player p : PlayerUtils.getNearbyPlayers(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
 						PlayerUtils.healPlayer(p, heal);
 					}

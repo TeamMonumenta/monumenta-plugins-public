@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -17,7 +18,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class CounterStrike extends Ability {
 
@@ -45,10 +47,12 @@ public class CounterStrike extends Ability {
 		//  If we're not going to succeed in our Random we probably don't want to attempt to grab the scoreboard value anyways.
 		if (mRandom.nextFloat() < 0.15f) {
 			int counterStrike = getAbilityScore();
-			Location loc = mPlayer.getLocation();
-			mPlayer.spawnParticle(Particle.SWEEP_ATTACK, loc.getX(), loc.getY() + 1.5D, loc.getZ(), 20, 1.5D, 1.5D, 1.5D);
-			mPlayer.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
-
+			Entity damager = event.getDamager();
+			Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
+			Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
+			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
+			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
 			double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
@@ -84,8 +88,35 @@ public class CounterStrike extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mActive) {
-			ParticleUtils.explodingConeEffect(mPlugin, mPlayer, COUNTER_STRIKE_DISTANCE, Particle.SWEEP_ATTACK, 1, Particle.SWEEP_ATTACK, 0, COUNTER_STRIKE_DOT_ANGLE);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.5f, 0.7f);
+			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
+			new BukkitRunnable() {
+				double d = 30;
+				@Override
+				public void run() {
+					Vector vec;
+					for (double r = 1; r < 5; r += 0.5) {
+						for (double degree = d; degree <= d + 60; degree += 8) {
+							double radian1 = Math.toRadians(degree);
+							vec = new Vector(Math.cos(radian1) * r, 0.75, Math.sin(radian1) * r);
+							vec = VectorUtils.rotateZAxis(vec, 20);
+							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch() + 20);
+							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+							Location l = loc.clone().add(vec);
+							mWorld.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025);
+							mWorld.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
+						}
+					}
+					d += 60;
+					if (d >= 150) {
+						this.cancel();
+					}
+				}
+
+			}.runTaskTimer(mPlugin, 0, 1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.7f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1f, 1.25f);
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			int damage = getAbilityScore() == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 

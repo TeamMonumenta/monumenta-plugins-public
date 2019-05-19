@@ -8,7 +8,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -79,19 +78,32 @@ public class Preparation extends Ability {
 		mRightClicks = 0;
 
 		mActive = true;
-		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-		mWorld.spawnParticle(Particle.ENCHANTMENT_TABLE, mPlayer.getLocation().add(new Vector(0, 2, 0)), 50, 0.5f, 0, 0.5f, 0);
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1.25f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.75f);
+		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 60, 0.35, 0.4, 0.35, 1);
+		mWorld.spawnParticle(Particle.SWEEP_ATTACK, mPlayer.getLocation().add(0, 1, 0), 7, 0.5, 0.5, 0.5, 1);
 		new BukkitRunnable() {
+			int t = 0;
 			@Override
 			public void run() {
-				if (mActive == true) {
-					mActive = false;
-					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), Spells.PREPARATION);
-					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2, 1);
+				t++;
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 1, 0.4, 0.4, 0.4, 0);
+				mWorld.spawnParticle(Particle.TOWN_AURA, mPlayer.getLocation().add(0, 1, 0), 7, 0.35, 0.4, 0.35, 1);
+				mWorld.spawnParticle(Particle.PORTAL, mPlayer.getLocation().add(0, 1, 0), 6, 0.35, 0.4, 0.35, 0.1);
+				if (t >= PREPARATION_ACTIVATION_PERIOD) {
+					if (mActive) {
+						mActive = false;
+						mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 50, 0.4, 0.4, 0.4, 1);
+						mWorld.spawnParticle(Particle.SPELL_MOB, mPlayer.getLocation().add(0, 1, 0), 50, 0.4, 0.4, 0.4, 0);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 7, 0.5, 0.5, 0.5, 0);
+						mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), Spells.PREPARATION);
+						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 0.75f);
+						mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.7f);
+					}
+					this.cancel();
 				}
-				this.cancel();
 			}
-		}.runTaskLater(mPlugin, PREPARATION_ACTIVATION_PERIOD);
+		}.runTaskTimer(mPlugin, 0, 1);
 
 		putOnCooldown();
 	}

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 import java.util.Random;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -57,7 +58,32 @@ public class AdrenalSerum extends Ability {
 
 	@Override
 	public void cast() {
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 30, 0.75f, 0.25f, 0.75f, 0.5f); //Rudimentary effects
+		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.45, 0.45, 0.45, 0.025);
+		new BukkitRunnable() {
+			double rotation = 0;
+			double y = 0.15;
+			double radius = 1;
+			@Override
+			public void run() {
+				Location loc = mPlayer.getLocation();
+				rotation += 17;
+				y += 0.2;
+				for (int i = 0; i < 3; i++) {
+					double degree = Math.toRadians(rotation + (i * 120));
+					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.025);
+					mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, ADRENAL_SERUM_COLOR);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0.1, 0.1, 0.1, 0);
+					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+				}
+
+				if (y >= 1.8) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1f, 1.15f);
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, ADRENAL_SERUM_DURATION, 0, true, true));
@@ -83,9 +109,33 @@ public class AdrenalSerum extends Ability {
 						mPlayer.setHealth(1);
 					}
 					this.cancel();
-					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1);
-					BlockData fallingDustData = Material.NETHER_WART_BLOCK.createBlockData();
-					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, fallingDustData);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1.1f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1.25f);
+					BlockData fallingDustData = Material.RED_NETHER_BRICKS.createBlockData();
+					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 45, 0.4, 0.45, 0.24, fallingDustData);
+					new BukkitRunnable() {
+						double rotation = 0;
+						double y = 1.9;
+						double radius = 1;
+						@Override
+						public void run() {
+							Location loc = mPlayer.getLocation();
+							rotation += 17;
+							y -= 0.2;
+							for (int i = 0; i < 3; i++) {
+								double degree = Math.toRadians(rotation + (i * 120));
+								loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+								mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, ADRENAL_SERUM_COLOR);
+								mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0.1, 0.1, 0.1, 0);
+								loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+							}
+
+							if (y <= 0) {
+								this.cancel();
+							}
+						}
+
+					}.runTaskTimer(mPlugin, 0, 1);
 				}
 			}
 

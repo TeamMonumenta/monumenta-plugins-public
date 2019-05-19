@@ -82,16 +82,11 @@ public class EscapeDeath extends Ability {
 		Location loc = mPlayer.getLocation();
 		loc.add(0, 1, 0);
 
-		double offset = escapeDeath == 1 ? 1 : ESCAPE_DEATH_RANGE;
-		int particles = escapeDeath == 1 ? 30 : 500;
+		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25);
+		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3);
 
-		mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, particles, offset, offset, offset, 0.001);
-
-		if (escapeDeath > 1) {
-			mWorld.spawnParticle(Particle.CLOUD, loc, particles, offset, offset, offset, 0.001);
-		}
-
-		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.5f);
+		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
+		mWorld.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
 
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Escape Death has been activated");
 		putOnCooldown();

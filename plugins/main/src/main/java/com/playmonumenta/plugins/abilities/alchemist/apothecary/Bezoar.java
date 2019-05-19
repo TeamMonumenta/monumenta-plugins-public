@@ -82,8 +82,11 @@ public class Bezoar extends Ability {
 						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 						mWorld.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
-						mWorld.spawnParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData());
-						mWorld.spawnParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F);
+						mWorld.spawnParticle(Particle.BLOCK_CRACK, item.getLocation().add(0, 0.35, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData());
+						mWorld.spawnParticle(Particle.TOTEM, item.getLocation().add(0, 0.35, 0), 30, 0, 0, 0, 0.5F);
+						mWorld.spawnParticle(Particle.TOTEM, mPlayer.getLocation().add(0, 1, 0), 40, 0.1, 0.1, 0.1, 0.35F);
+						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 45, 0.1, 0.4, 0.1, 0.35F);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 30, 0.1, 0.4, 0.1, 0.35F);
 						break;
 					}
 				}
@@ -91,8 +94,11 @@ public class Bezoar extends Ability {
 					if (EntityUtils.getNearbyMobs(item.getLocation(), 1.5) != null && EntityUtils.getNearbyMobs(item.getLocation(), 1.5).size() != 0) {
 						item.remove();
 						this.cancel();
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.75f);
-						mWorld.spawnParticle(Particle.EXPLOSION_HUGE, item.getLocation(), 1, 0, 0, 0, 0);
+						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
+						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 1f);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1.5f);
+						mWorld.spawnParticle(Particle.TOTEM, item.getLocation().add(0, 0.35, 0), 125, 0, 0, 0, 0.85F);
+						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, item.getLocation().add(0, 0.35, 0), 50, 0, 0, 0, 0.3F);
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), BEZOAR_DAMAGE_RADIUS)) {
 							int damage = getAbilityScore() == 1 ? BEZOAR_1_DAMAGE : BEZOAR_2_DAMAGE;
 							EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);

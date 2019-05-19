@@ -36,12 +36,15 @@ public class EagleEye extends Ability {
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
+
 	@Override
 	public void cast() {
 		Player player = mPlayer;
 		int eagleEye = getAbilityScore();
 		World world = player.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.5f, 1.25f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.25f);
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), EAGLE_EYE_RADIUS, mPlayer)) {
 			// Don't apply vulnerability to arena mobs
 			if (mob.getScoreboardTags().contains("arena_mob")) {
@@ -71,8 +74,8 @@ public class EagleEye extends Ability {
 				}
 
 			}.runTaskTimer(mPlugin, 0, 1);
+			world.playSound(mob.getLocation(), Sound.ENTITY_PARROT_IMITATE_SHULKER, 0.4f, 0.7f);
 			world.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-			world.playSound(player.getLocation(), Sound.ENTITY_PARROT_IMITATE_SHULKER, 0.4f, 1.7f);
 		}
 
 		putOnCooldown();

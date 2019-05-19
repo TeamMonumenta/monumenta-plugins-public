@@ -21,7 +21,6 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DefensiveLine extends Ability {
@@ -47,6 +46,9 @@ public class DefensiveLine extends Ability {
 			@Override
 			public void run() {
 				if (mPlayer.isHandRaised()) {
+					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
+					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
 					for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
 						// Don't buff players that have their class disabled
 						if (target.getScoreboardTags().contains("disable_class")) {
@@ -54,8 +56,29 @@ public class DefensiveLine extends Ability {
 						}
 
 						Location loc = target.getLocation();
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25);
+						new BukkitRunnable() {
+							double r = 1.25;
+							double y = 0.15;
+							@Override
+							public void run() {
+								Location loc = target.getLocation();
+								y += 0.2;
+								for (double j = 0; j < 360; j += 18) {
+									double radian1 = Math.toRadians(j);
+									loc.add(Math.cos(radian1) * r, y, Math.sin(radian1) * r);
+									mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
+									mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
+									loc.subtract(Math.cos(radian1) * r, y, Math.sin(radian1) * r);
+								}
 
-						target.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 0.4f, 1.0f);
+								if (y >= 1.8) {
+									this.cancel();
+								}
+							}
+
+						}.runTaskTimer(mPlugin, 0, 1);
+
 						mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
 						                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
 						                                                  DEFENSIVE_LINE_DURATION,
@@ -68,7 +91,6 @@ public class DefensiveLine extends Ability {
 						}
 					}
 
-					ParticleUtils.explodingSphereEffect(mPlugin, mPlayer, DEFENSIVE_LINE_RADIUS, Particle.FIREWORKS_SPARK, 1.0f, Particle.CRIT, 1.0f);
 					putOnCooldown();
 				}
 				this.cancel();

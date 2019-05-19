@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
@@ -32,6 +34,9 @@ public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_RANGE = 8;
 
 	private boolean guaranteedApplicationApplied = false;
+
+	private static final Particle.DustOptions NIGHTMARISH_CONFUSION_COLOR = new Particle.DustOptions(
+	    Color.fromRGB(62, 0, 102), 1.0f);
 
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -63,11 +68,26 @@ public class NightmarishAlchemy extends Ability {
 								if (mob.getUniqueId() != entity.getUniqueId()) {
 									((Creature) entity).setTarget(mob);
 									new BukkitRunnable() {
+										int t = 0;
+										double rotation = 0;
+
 										@Override
 										public void run() {
-											((Creature) entity).setTarget(null);
+											t++;
+											rotation += 20;
+
+											double radian1 = Math.toRadians(rotation);
+											Location l = mob.getLocation();
+											l.add(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
+											mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, NIGHTMARISH_CONFUSION_COLOR);
+											l.subtract(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
+
+											if (t >= NIGHTMARISH_ALCHEMY_CONFUSION_DURATION) {
+												this.cancel();
+												((Creature) entity).setTarget(null);
+											}
 										}
-									}.runTaskLater(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION);
+									}.runTaskTimer(mPlugin, 0, 1);
 								}
 								break;
 							}
@@ -75,7 +95,7 @@ public class NightmarishAlchemy extends Ability {
 					}
 				}
 			}
-			mWorld.spawnParticle(Particle.SPELL_WITCH, potion.getLocation(), 40, 1, 0, 1, 1);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, potion.getLocation(), 50, 1, 0, 1, 1);
 		}
 
 		return true;
