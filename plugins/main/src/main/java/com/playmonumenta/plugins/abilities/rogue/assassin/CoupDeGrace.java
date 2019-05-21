@@ -42,7 +42,7 @@ public class CoupDeGrace extends Ability {
 		double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		if (!EntityUtils.isBoss(le)) {
 			double threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
-			if (le.getHealth() - event.getDamage() < maxHealth * threshold) {
+			if (le.getHealth() - event.getFinalDamage() < maxHealth * threshold) {
 				event.setDamage(event.getDamage() + 9001);
 				mWorld.spawnParticle(Particle.CRIT, le.getLocation().add(0, le.getHeight() / 2, 0), 35, 0, 0, 0, 1);
 				if (getAbilityScore() > 1) {

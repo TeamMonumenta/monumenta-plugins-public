@@ -181,6 +181,17 @@ public class AbilityManager {
 		                               // ALL (CLUCKING POTIONS)
 		                               new CluckingPotions(mPlugin, mWorld, mRandom, null),
 
+		                               // ALL PLAYERS (but technically for Alchemist)
+		                               new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
+
+		                               // All other non-class abilities
+		                               new EvasionEnchant(mPlugin, mWorld, mRandom, null),
+		                               new PvP(mPlugin, mWorld, mRandom, null),
+		                               new PatreonWhite(mPlugin, mWorld, mRandom, null),
+		                               new PatreonGreen(mPlugin, mWorld, mRandom, null),
+		                               new PatreonPurple(mPlugin, mWorld, mRandom, null),
+		                               new PatreonRed(mPlugin, mWorld, mRandom, null),
+
 		                               /********** MAGE **********/
 		                               new ArcaneStrike(mPlugin, mWorld, mRandom, null),
 		                               new ElementalArrows(mPlugin, mWorld, mRandom, null),
@@ -188,7 +199,6 @@ public class AbilityManager {
 		                               new MagePassive(mPlugin, mWorld, mRandom, null),
 		                               new MagmaShield(mPlugin, mWorld, mRandom, null),
 		                               new ManaLance(mPlugin, mWorld, mRandom, null),
-		                               new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                               new Spellshock(mPlugin, mWorld, mRandom, null),
 
 		                               /********** ROGUE **********/
@@ -196,7 +206,6 @@ public class AbilityManager {
 		                               new ByMyBlade(mPlugin, mWorld, mRandom, null),
 		                               new DaggerThrow(mPlugin, mWorld, mRandom, null),
 		                               new Dodging(mPlugin, mWorld, mRandom, null),
-		                               new EscapeDeath(mPlugin, mWorld, mRandom, null),
 		                               new RoguePassive(mPlugin, mWorld, mRandom, null),
 		                               new Smokescreen(mPlugin, mWorld, mRandom, null),
 		                               new ViciousCombos(mPlugin, mWorld, mRandom, null),
@@ -249,18 +258,7 @@ public class AbilityManager {
 		                               new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
 		                               new BrutalAlchemy(mPlugin, mWorld, mRandom, null),
 		                               new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
-		                               new AlchemistPotions(mPlugin, mWorld, mRandom, null),
-
-		                               // ALL PLAYERS (but technically for Alchemist)
-		                               new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
-
-		                               // All other non-class abilities
-		                               new EvasionEnchant(mPlugin, mWorld, mRandom, null),
-		                               new PvP(mPlugin, mWorld, mRandom, null),
-		                               new PatreonWhite(mPlugin, mWorld, mRandom, null),
-		                               new PatreonGreen(mPlugin, mWorld, mRandom, null),
-		                               new PatreonPurple(mPlugin, mWorld, mRandom, null),
-		                               new PatreonRed(mPlugin, mWorld, mRandom, null)
+		                               new AlchemistPotions(mPlugin, mWorld, mRandom, null)
 		                           ));
 
 		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
@@ -284,8 +282,8 @@ public class AbilityManager {
 
 			                               // ASSASSIN
 			                               new Preparation(mPlugin, mWorld, mRandom, null),
-			                               new CoupDeGrace(mPlugin, mWorld, mRandom, null),
 			                               new CloakAndDagger(mPlugin, mWorld, mRandom, null),
+			                               new CoupDeGrace(mPlugin, mWorld, mRandom, null),
 
 			                               /********** SCOUT **********/
 			                               // RANGER
@@ -343,6 +341,12 @@ public class AbilityManager {
 			                               new BezoarNonApothecary(mPlugin, mWorld, mRandom, null)
 			                           ));
 		}
+
+		// These abilities should trigger after all event damage is calculated
+		mReferenceAbilities.addAll(Arrays.asList(
+									   new PrismaticShield(mPlugin, mWorld, mRandom, null),
+		                               new EscapeDeath(mPlugin, mWorld, mRandom, null)
+		                           ));
 	}
 
 	public static AbilityManager getManager() {
