@@ -38,9 +38,9 @@
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>parallelblock-public</id>
-            <name>ParallelBlock Public Repository</name>
-            <url>https://repo.parallelblock.com/repository/maven-public/</url>
+            <id>nuvotifier</id>
+            <name>NuVotifier Repo</name>
+            <url>https://dl.bintray.com/nuvotifier/maven/</url>
         </repository>
         <repository>
             <id>jorelali</id>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.vexsoftware</groupId>
             <artifactId>nuvotifier-universal</artifactId>
-            <version>2.3.7</version>
+            <version>2.3.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
