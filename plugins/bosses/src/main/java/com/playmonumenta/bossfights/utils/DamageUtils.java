@@ -16,11 +16,15 @@ public class DamageUtils {
 		if (boss != null) {
 			BossAbilityDamageEvent event = new BossAbilityDamageEvent(boss, target, damage);
 			Bukkit.getPluginManager().callEvent(event);
-			target.damage(event.getDamage(), boss);
+			if (!event.isCancelled()) {
+				target.damage(event.getDamage(), boss);
+			}
 		} else {
 			BossAbilityDamageEvent event = new BossAbilityDamageEvent(boss, target, damage);
 			Bukkit.getPluginManager().callEvent(event);
-			target.damage(event.getDamage());
+			if (!event.isCancelled()) {
+				target.damage(event.getDamage());
+			}
 		}
 	}
 
@@ -64,27 +68,29 @@ public class DamageUtils {
 		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * percentHealth);
 		BossAbilityDamageEvent event = new BossAbilityDamageEvent(boss, target, toTake);
 		Bukkit.getPluginManager().callEvent(event);
-		toTake = event.getDamage();
-		float absorp = getAbsorp(target);
-		double adjustedHealth = (target.getHealth() + absorp) - toTake;
+		if (!event.isCancelled()) {
+			toTake = event.getDamage();
+			float absorp = getAbsorp(target);
+			double adjustedHealth = (target.getHealth() + absorp) - toTake;
 
-		if (adjustedHealth <= 0) {
-			// Kill the player, but allow totems to trigger
-			target.damage(100, boss);
-		} else {
-			if (absorp > 0) {
-				if (absorp - toTake > 0) {
-					setAbsorp(target, (float) (absorp - toTake));
-					toTake = 0;
-				} else {
-					setAbsorp(target, 0f);
-					toTake -= absorp;
+			if (adjustedHealth <= 0) {
+				// Kill the player, but allow totems to trigger
+				target.damage(100, boss);
+			} else {
+				if (absorp > 0) {
+					if (absorp - toTake > 0) {
+						setAbsorp(target, (float) (absorp - toTake));
+						toTake = 0;
+					} else {
+						setAbsorp(target, 0f);
+						toTake -= absorp;
+					}
 				}
+				if (toTake > 0) {
+					target.setHealth(target.getHealth() - toTake);
+				}
+				target.damage(1, boss);
 			}
-			if (toTake > 0) {
-				target.setHealth(target.getHealth() - toTake);
-			}
-			target.damage(1, boss);
 		}
 	}
 
@@ -98,27 +104,29 @@ public class DamageUtils {
 		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * health);
 		BossAbilityDamageEvent event = new BossAbilityDamageEvent(boss, target, toTake);
 		Bukkit.getPluginManager().callEvent(event);
-		toTake = event.getDamage();
-		float absorp = getAbsorp(target);
-		double adjustedHealth = (target.getHealth() + absorp) - toTake;
+		if (!event.isCancelled()) {
+			toTake = event.getDamage();
+			float absorp = getAbsorp(target);
+			double adjustedHealth = (target.getHealth() + absorp) - toTake;
 
-		if (adjustedHealth <= 0) {
-			// Kill the player, but allow totems to trigger
-			target.damage(100, boss);
-		} else {
-			if (absorp > 0) {
-				if (absorp - toTake > 0) {
-					setAbsorp(target, (float) (absorp - toTake));
-					toTake = 0;
-				} else {
-					setAbsorp(target, 0f);
-					toTake -= absorp;
+			if (adjustedHealth <= 0) {
+				// Kill the player, but allow totems to trigger
+				target.damage(100, boss);
+			} else {
+				if (absorp > 0) {
+					if (absorp - toTake > 0) {
+						setAbsorp(target, (float) (absorp - toTake));
+						toTake = 0;
+					} else {
+						setAbsorp(target, 0f);
+						toTake -= absorp;
+					}
 				}
+				if (toTake > 0) {
+					target.setHealth(target.getHealth() - toTake);
+				}
+				target.damage(1, boss);
 			}
-			if (toTake > 0) {
-				target.setHealth(target.getHealth() - toTake);
-			}
-			target.damage(1, boss);
 		}
 	}
 

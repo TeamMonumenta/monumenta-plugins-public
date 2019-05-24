@@ -81,7 +81,9 @@ public class Quickdraw extends Ability {
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 			ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 			Bukkit.getPluginManager().callEvent(eventLaunch);
-			putOnCooldown();
+			if (!eventLaunch.isCancelled()) {
+				putOnCooldown();
+			}
 		}
 	}
 

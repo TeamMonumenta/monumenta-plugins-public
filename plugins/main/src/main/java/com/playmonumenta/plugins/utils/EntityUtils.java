@@ -336,6 +336,9 @@ public class EntityUtils {
 				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
 				event.setSpell(spell);
 				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCancelled()) {
+					return;
+				}
 				damage = event.getDamage();
 			}
 			if (target.getNoDamageTicks() == target.getMaximumNoDamageTicks()) {
