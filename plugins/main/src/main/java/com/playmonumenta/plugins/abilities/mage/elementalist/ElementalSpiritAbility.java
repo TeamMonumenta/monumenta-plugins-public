@@ -65,7 +65,7 @@ public class ElementalSpiritAbility extends Ability {
 								mWorld.spawnParticle(Particle.SNOWBALL, loc, 1, 0, 0, 0, 0);
 
 								if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritAbility.class) == null ||
-									!mPlayer.isOnline() || mPlayer == null || spirit == null ||
+									!mPlayer.isOnline() || mPlayer == null || spirit == null || mPlayer.isDead() ||
 									mPlugin.mTimers.isAbilityOnCooldown(player.getUniqueId(), Spells.ELEMENTAL_SPIRIT)) {
 									this.cancel();
 									spirit = null;
