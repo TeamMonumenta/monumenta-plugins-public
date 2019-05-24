@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -103,8 +105,10 @@ public class MeteorSlam extends Ability {
 				int t = 0;
 				@Override
 				public void run() {
-					Set<UUID> playersWithoutAbility = new HashSet<UUID>();
-					for (Map.Entry<UUID, PlayerWithMeteorSlam> entry : mPlayersWithMeteorSlam.entrySet()) {
+					Iterator<Entry<UUID, PlayerWithMeteorSlam>> iter = mPlayersWithMeteorSlam.entrySet().iterator();
+
+					while (iter.hasNext()) {
+						Map.Entry<UUID, PlayerWithMeteorSlam> entry = iter.next();
 						PlayerWithMeteorSlam p = entry.getValue();
 
 						p.updateCanTrigger();
@@ -119,10 +123,9 @@ public class MeteorSlam extends Ability {
 						}
 
 						if (AbilityManager.getManager().getPlayerAbility(p.playerMS, MeteorSlam.class) == null) {
-							playersWithoutAbility.add(entry.getKey());
+							iter.remove();
 						}
 					}
-					mPlayersWithMeteorSlam.keySet().removeAll(playersWithoutAbility);
 				}
 			};
 			mFallTimer.runTaskTimer(mPlugin, 0, 1);

@@ -201,7 +201,7 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 			}
 			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
-			if (event.isCancelled()) {
+			if (event.isCancelled() || damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
 			}
 		}
