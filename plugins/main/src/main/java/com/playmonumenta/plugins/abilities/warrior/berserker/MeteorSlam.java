@@ -82,7 +82,6 @@ public class MeteorSlam extends Ability {
 	private static final int METEOR_SLAM_DURATION = 2 * 20;
 	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
 	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
-	private static final double METEOR_SLAM_FALL_THRESHOLD = 3;
 
 	// We can't use PeriodicTrigger since the trigger intervals are too long
 	private static BukkitRunnable mFallTimer;
@@ -102,7 +101,6 @@ public class MeteorSlam extends Ability {
 		// One timer runs for all players and tracks the passive aspect of this ability
 		if (mFallTimer == null || mFallTimer.isCancelled()) {
 			mFallTimer = new BukkitRunnable() {
-				int t = 0;
 				@Override
 				public void run() {
 					Iterator<Entry<UUID, PlayerWithMeteorSlam>> iter = mPlayersWithMeteorSlam.entrySet().iterator();

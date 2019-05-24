@@ -16,6 +16,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -705,6 +706,10 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+		if (event.getEntity() instanceof Creature && event.getEntity().hasMetadata(EntityUtils.MOB_IS_STUNNED_METAKEY)) {
+			event.setCancelled(true);
+			return;
+		}
 		if (event.getTarget() instanceof Player) {
 			Player player = (Player) event.getTarget();
 			mAbilities.EntityTargetLivingEntityEvent(player, event);

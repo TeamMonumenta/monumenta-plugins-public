@@ -43,12 +43,12 @@ public class EvasionEnchant extends Ability {
 	private double evade(Player player, double damage) {
 		double changedDamage = damage;
 		Location loc = player.getLocation().add(0, 1, 0);
-		if (chance >= 200) {
+		if (chance >= 200 || chance >= 100 && mPlayer.getHealth() <= damage / 2) {
 			chance -= 200;
 			changedDamage *= 0.25;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 40, 0.25, 0.45, 0.25, 0.1);
-				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.5f, 1.5f);
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.2f, 1.5f);
 				mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 2f);
 			} else {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
@@ -61,8 +61,8 @@ public class EvasionEnchant extends Ability {
 			chance -= 100;
 			changedDamage *= 0.5;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 40, 0.25, 0.45, 0.25, 0.1);
-				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.5f, 1.5f);
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);
+				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.2f, 1.5f);
 			} else {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 80, 0.25, 0.45, 0.25, 0.1);
 				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.5f);

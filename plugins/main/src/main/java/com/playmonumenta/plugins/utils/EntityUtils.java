@@ -50,6 +50,7 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 public class EntityUtils {
 
 	public static final String PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY = "DealtCustomDamageWithEntityUtilsTick";
+	public static final String MOB_IS_STUNNED_METAKEY = "MobIsStunnedByEntityUtils";
 
 	public static boolean isUndead(LivingEntity mob) {
 		EntityType type = mob.getType();
@@ -394,8 +395,13 @@ public class EntityUtils {
 			return;
 		}
 
+		if (mob instanceof Creature) {
+			((Creature) mob).setTarget(null);
+		}
 		mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ticks, 8, false, true));
 		mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, ticks, 8, false, true));
+		mob.setMetadata(MOB_IS_STUNNED_METAKEY, new FixedMetadataValue(plugin, null));
+
 		new BukkitRunnable() {
 			int t = 0;
 			double rotation = 0;
@@ -415,13 +421,10 @@ public class EntityUtils {
 				}
 				l.subtract(Math.cos(radian1) * 0.5, mob.getHeight(), Math.sin(radian1) * 0.5);
 
-				if (mob instanceof Creature) {
-					Creature c = (Creature) mob;
-					if (c.getTarget() != null) {
-						c.setTarget(null);
-					}
-				}
 				if (t >= ticks) {
+					if (mob.hasMetadata(MOB_IS_STUNNED_METAKEY)) {
+						mob.removeMetadata(MOB_IS_STUNNED_METAKEY, plugin);
+					}
 					this.cancel();
 				}
 			}

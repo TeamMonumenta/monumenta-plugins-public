@@ -42,6 +42,40 @@ public class ItemUtils {
 			Material.DIAMOND_LEGGINGS
 		);
 
+	public static final Set<Material> wearable = EnumSet.of(
+			Material.LEATHER_BOOTS,
+			Material.LEATHER_CHESTPLATE,
+			Material.LEATHER_HELMET,
+			Material.LEATHER_LEGGINGS,
+
+			Material.CHAINMAIL_BOOTS,
+			Material.CHAINMAIL_CHESTPLATE,
+			Material.CHAINMAIL_HELMET,
+			Material.CHAINMAIL_LEGGINGS,
+
+			Material.GOLDEN_BOOTS,
+			Material.GOLDEN_CHESTPLATE,
+			Material.GOLDEN_HELMET,
+			Material.GOLDEN_LEGGINGS,
+
+			Material.IRON_BOOTS,
+			Material.IRON_CHESTPLATE,
+			Material.IRON_HELMET,
+			Material.IRON_LEGGINGS,
+
+			Material.DIAMOND_BOOTS,
+			Material.DIAMOND_CHESTPLATE,
+			Material.DIAMOND_HELMET,
+			Material.DIAMOND_LEGGINGS,
+
+			Material.PUMPKIN,
+			Material.CREEPER_HEAD,
+			Material.SKELETON_SKULL,
+			Material.WITHER_SKELETON_SKULL,
+			Material.ZOMBIE_HEAD,
+			Material.PLAYER_HEAD
+		);
+
 	// List of materials that trees can replace when they grow
 	public static final Set<Material> allowedTreeReplaceMaterials = EnumSet.of(
 			Material.AIR,
@@ -107,8 +141,12 @@ public class ItemUtils {
 		potion.setItemMeta(meta);
 	}
 
-	public static boolean isArmorItem(Material item) {
-		return armors.contains(item);
+	public static boolean isArmorItem(Material mat) {
+		return armors.contains(mat);
+	}
+
+	public static boolean isWearable(Material mat) {
+		return wearable.contains(mat);
 	}
 
 	public static boolean isAllowedTreeReplace(Material item) {

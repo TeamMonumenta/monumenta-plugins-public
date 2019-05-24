@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.Evasion;
 import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class EnchantmentManager {
 	/* NOTE:
@@ -154,10 +155,11 @@ public class EnchantmentManager {
 					for (BaseEnchantment property : slotProperties) {
 						/*
 						 * If this particular property applies levels,
-						 * add them to the running count
+						 * add them to the running count UNLESS it is an
+						 * evasion armor piece in the offhand
 						 */
 						int level = property.getLevelFromItem(item, player, slot);
-						if (level > 0) {
+						if (level > 0 && (slot != ItemSlot.OFFHAND || !ItemUtils.isWearable(item.getType()))) {
 							Integer currentLevel = propertyMap.get(property);
 							if (currentLevel != null) {
 								currentLevel += level;

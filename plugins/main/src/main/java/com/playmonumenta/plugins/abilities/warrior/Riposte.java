@@ -30,7 +30,6 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
 	private static final int RIPOSTE_SWORD_DURATION = 5 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
-	private static final int RIPOSTE_AXE_EFFECT_LEVEL = 6;
 	private static final double RIPOSTE_MELEE_THRESHOLD = 2;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
@@ -61,9 +60,7 @@ public class Riposte extends Ability {
 							                                                  RIPOSTE_SWORD_EFFECT_LEVEL, true, true));
 						} else if (InventoryUtils.isAxeItem(mainHand)) {
 							if (!EntityUtils.isBoss(damager)) {
-								// Potentially change this to stun for consistency? Ability description currently says "immobilize."
-								// Changing this to stun would technically be a buff, so waiting on executive decision before changing.
-								damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, RIPOSTE_AXE_DURATION, RIPOSTE_AXE_EFFECT_LEVEL, true, false));
+								EntityUtils.applyStun(mPlugin, RIPOSTE_AXE_DURATION, damager);
 							}
 						}
 					}

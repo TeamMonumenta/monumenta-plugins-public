@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 public class MeleeEvasion implements BaseEnchantment {
 
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Melee Evasion";
+	private static final int EVASION_MELEE_THRESHOLD = 2;
 
 	@Override
 	public String getProperty() {
@@ -30,7 +31,8 @@ public class MeleeEvasion implements BaseEnchantment {
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 		//Add the extra location distance check because mob ability count as ENTITY_ATTACK for some reason.
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getDamager().getLocation().distance(player.getLocation()) < 2) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+			&& event.getDamager().getBoundingBox().expand(EVASION_MELEE_THRESHOLD).contains(event.getEntity().getLocation().toVector())) {
 			EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 			evasion.chance += (16 * level);
 		}
