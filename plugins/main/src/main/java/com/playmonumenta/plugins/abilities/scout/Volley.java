@@ -59,10 +59,6 @@ public class Volley extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
-		Location eye = mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection());
-		mWorld.spawnParticle(Particle.CRIT, eye, 35, 0, 0, 0, 0.7f);
-		mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 35, 0, 0, 0, 0.7f);
-		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eye, 15, 0, 0, 0, 0.15f);
 		// This needs to be run 1 tick later so that Bow Mastery, Sharpshooter, and Quickdraw can set their metadata on the original arrow
 		new BukkitRunnable() {
 			@Override
