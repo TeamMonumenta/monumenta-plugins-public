@@ -44,7 +44,7 @@ public class ForbiddenItem implements BaseEnchantment {
 		GameMode playerMode = player.getGameMode();
 		LocationType playerLocType = plugin.mSafeZoneManager.getLocationType(player);
 		if ((playerMode.equals(GameMode.SURVIVAL) && !playerLocType.equals(LocationType.Capital))
-			|| (playerMode.equals(GameMode.ADVENTURE) && playerLocType.equals(LocationType.AdventureZone))) {
+		    || (playerMode.equals(GameMode.ADVENTURE) && playerLocType.equals(LocationType.AdventureZone))) {
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);

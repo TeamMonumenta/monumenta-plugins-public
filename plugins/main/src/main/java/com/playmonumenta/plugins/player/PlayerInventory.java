@@ -58,7 +58,11 @@ public class PlayerInventory {
 
 		// Clear the current map and update it with current properties
 		mCurrentProperties.clear();
-		plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, player);
+		try {
+			plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, player);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// Remove properties from the player that were removed
 		for (BaseEnchantment property : mPreviousProperties.keySet()) {

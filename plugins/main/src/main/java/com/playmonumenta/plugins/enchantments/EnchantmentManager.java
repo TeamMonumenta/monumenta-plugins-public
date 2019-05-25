@@ -151,22 +151,24 @@ public class EnchantmentManager {
 			if (slotProperties != null && !(slotProperties.isEmpty())) {
 				/* Step over the item(s) the player has in that slot */
 				for (ItemStack item : _getItems(inv, slot)) {
-					/* Step over the properties that apply to that slot */
-					for (BaseEnchantment property : slotProperties) {
-						/*
-						 * If this particular property applies levels,
-						 * add them to the running count UNLESS it is an
-						 * evasion armor piece in the offhand
-						 */
-						int level = property.getLevelFromItem(item, player, slot);
-						if (level > 0 && (slot != ItemSlot.OFFHAND || !ItemUtils.isWearable(item.getType()))) {
-							Integer currentLevel = propertyMap.get(property);
-							if (currentLevel != null) {
-								currentLevel += level;
-							} else {
-								currentLevel = level;
+					if (item != null) {
+						/* Step over the properties that apply to that slot */
+						for (BaseEnchantment property : slotProperties) {
+							/*
+							 * If this particular property applies levels,
+							 * add them to the running count UNLESS it is an
+							 * evasion armor piece in the offhand
+							 */
+							int level = property.getLevelFromItem(item, player, slot);
+							if (level > 0 && (slot != ItemSlot.OFFHAND || !ItemUtils.isWearable(item.getType()))) {
+								Integer currentLevel = propertyMap.get(property);
+								if (currentLevel != null) {
+									currentLevel += level;
+								} else {
+									currentLevel = level;
+								}
+								propertyMap.put(property, currentLevel);
 							}
-							propertyMap.put(property, currentLevel);
 						}
 					}
 				}
