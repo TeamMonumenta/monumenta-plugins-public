@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -66,7 +67,8 @@ public class HungeringVortex extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			event.setDamage(event.getDamage() + mPlayer.getMetadata(HUNGERING_VORTEX_METAKEY).get(0).asDouble());
 		}
 		return true;
@@ -109,10 +111,13 @@ public class HungeringVortex extends Ability {
 			public void run() {
 				t += 2;
 				for (LivingEntity mob : mobs) {
-					MovementUtils.PullTowards(mPlayer, mob, velocity);
-					// This means MovementUtils is being screwy and I'm too lazy to change MovementUtils
-					if (mob.getVelocity().getY() > 0.4) {
-						mob.setVelocity(mob.getVelocity().setY(-0.1));
+					// Release suction on hit mobs for half a second
+					if (mob.getNoDamageTicks() > mob.getMaximumNoDamageTicks() - 10) {
+						MovementUtils.PullTowards(mPlayer, mob, velocity);
+						// This means MovementUtils is being screwy and I'm too lazy to change MovementUtils
+						if (mob.getVelocity().getY() > 0.4) {
+							mob.setVelocity(mob.getVelocity().setY(-0.1));
+						}
 					}
 				}
 				if (t > HUNGERING_VORTEX_RESISTANCE_DURATION) {

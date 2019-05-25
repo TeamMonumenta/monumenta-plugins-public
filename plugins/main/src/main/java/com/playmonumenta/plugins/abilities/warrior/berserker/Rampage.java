@@ -11,6 +11,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,7 +19,9 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /* Rampage: Killing an enemy starts a kill streak. If
  * you kill another mob within 8/10 seconds, the streak
@@ -99,7 +102,11 @@ public class Rampage extends Ability {
 	// Increase damage
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			event.setDamage(event.getDamage() + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
+		}
+
 		return true;
 	}
 

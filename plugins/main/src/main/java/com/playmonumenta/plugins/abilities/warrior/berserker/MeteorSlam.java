@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -132,8 +130,9 @@ public class MeteorSlam extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)
-		    && event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)
+		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			double damage = getSlamDamage(mPlayer, getAbilityScore(), mPlayer.getFallDistance());
 			event.setDamage(event.getDamage() + damage);
 			LivingEntity damagee = (LivingEntity) event.getEntity();

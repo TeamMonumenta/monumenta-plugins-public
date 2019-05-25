@@ -20,8 +20,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DeadlyRonde extends Ability {
@@ -78,7 +80,8 @@ public class DeadlyRonde extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (activeRunnable != null) {
+		if (activeRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isSwordItem(mainHand)) {
 				Entity ent = event.getEntity();

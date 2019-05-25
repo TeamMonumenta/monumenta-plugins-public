@@ -139,7 +139,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			MetadataUtils.checkOnceThisTick(mPlugin, combuster,
+			MetadataUtils.checkOnceThisTick(mPlugin, combustee,
 			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
 
 		}
@@ -228,7 +228,8 @@ public class EntityListener implements Listener {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
+						&& !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
 					}
 				}
@@ -718,8 +719,16 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
-		if (event.getApplier() instanceof Player) {
-			Player player = (Player) event.getApplier();
+		LivingEntity applied = (LivingEntity) event.getApplied();
+		LivingEntity applier = (LivingEntity) event.getApplier();
+
+		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
+			&& event.getEffect().getType() == PotionEffectType.SLOW) {
+			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
+		}
+
+		if (applier instanceof Player) {
+			Player player = (Player) applier;
 			mAbilities.PotionEffectApplyEvent(player, event);
 		}
 	}

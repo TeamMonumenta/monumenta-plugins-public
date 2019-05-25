@@ -5,12 +5,15 @@ import java.util.Random;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Agility extends Ability {
 
@@ -19,15 +22,21 @@ public class Agility extends Ability {
 	private static final int AGILITY_1_DAMAGE_BONUS = 1;
 	private static final int AGILITY_2_DAMAGE_BONUS = 2;
 
+	private final int damageBonus;
+
 	public Agility(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Agility";
+		damageBonus = getAbilityScore() == 1 ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		int extraDamage = (getAbilityScore() == 1) ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
-		event.setDamage(event.getDamage() + extraDamage);
+		if (event.getCause() ==  DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			event.setDamage(event.getDamage() + damageBonus);
+		}
+
 		return true;
 	}
 

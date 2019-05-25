@@ -33,7 +33,7 @@ public class HolyJavelin extends Ability {
 	private static final double HOLY_JAVELIN_RADIUS = 0.65;
 	private static final int HOLY_JAVELIN_RANGE = 12;
 	private static final int HOLY_JAVELIN_1_UNDEAD_DAMAGE = 10;
-	private static final int HOLY_JAVELIN_2_UNDEAD_DAMAGE = 15;
+	private static final int HOLY_JAVELIN_2_UNDEAD_DAMAGE = 20;
 	private static final int HOLY_JAVELIN_1_DAMAGE = 5;
 	private static final int HOLY_JAVELIN_2_DAMAGE = 10;
 	private static final int HOLY_JAVELIN_FIRE_DURATION = 5 * 20;

@@ -11,6 +11,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /* Growing Rage: Passively gain +20% / +40% damage on
  * non-ability based melee damage. Every 2 hearts you fall
@@ -26,11 +28,13 @@ public class GrowingRage extends Ability {
 	private static final int GROWING_RAGE_2_MAX_ARMOR = 10;
 	private static final double GROWING_RAGE_HEALTH_THRESHOLD = 4;
 
+	private final double damagePercent;
 	private int mHealthThreshold = 0;
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "GrowingRage";
+		damagePercent = 1 + getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT;
 	}
 
 	@Override
@@ -47,9 +51,9 @@ public class GrowingRage extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			double damageMultiplier = getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT;
-			event.setDamage(event.getDamage() * damageMultiplier);
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			event.setDamage(event.getDamage() * damagePercent);
 		}
 
 		return true;

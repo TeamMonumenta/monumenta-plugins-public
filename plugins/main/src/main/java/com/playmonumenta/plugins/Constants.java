@@ -42,6 +42,7 @@ public class Constants {
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";
 	public static final String ENTITY_DAMAGE_NONCE_METAKEY = "MonumentaEntityDamageNonce";
 	public static final String ENTITY_COMBUST_NONCE_METAKEY = "MonumentaEntityCombustNonce";
+	public static final String ENTITY_SLOWED_NONCE_METAKEY = "MonumentaEntitySlowedNonce";
 	public static final String ANVIL_CONFIRMATION_METAKEY = "MonumentaAnvilConfirmation";
 	public static final String PLAYER_SNEAKING_TASK_METAKEY = "MonumentaPlayerSneaking";
 	public static final String PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY = "MonumentaPlayerChestSort";

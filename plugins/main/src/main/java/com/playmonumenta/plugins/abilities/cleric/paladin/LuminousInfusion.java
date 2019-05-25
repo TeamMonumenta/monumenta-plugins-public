@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -41,6 +43,8 @@ public class LuminousInfusion extends Ability {
 	private static final int LUMINOUS_INFUSION_1_COOLDOWN = 25 * 20;
 	private static final int LUMINOUS_INFUSION_2_COOLDOWN = 18 * 20;
 
+	private final int damageBonus;
+
 	private boolean mActive = false;
 
 	public LuminousInfusion(Plugin plugin, World world, Random random, Player player) {
@@ -49,6 +53,7 @@ public class LuminousInfusion extends Ability {
 		mInfo.scoreboardId = "LuminousInfusion";
 		mInfo.cooldown = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_COOLDOWN : LUMINOUS_INFUSION_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		damageBonus = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
 
 		/*
 		 * NOTE! Because LuminousInfusion has two events (cast and damage), we
@@ -102,26 +107,31 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		LivingEntity le = (LivingEntity) event.getEntity();
-		if (EntityUtils.isUndead(le)) {
-			// Passive damage to undead from every hit, regardless of active
-			int damage = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE
-			             : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
-			event.setDamage(event.getDamage() + damage);
-		}
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			LivingEntity le = (LivingEntity) event.getEntity();
+			if (EntityUtils.isUndead(le)
+			    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+				// Passive damage to undead from every melee hit, regardless of active
+				event.setDamage(event.getDamage() + damageBonus);
+			}
 
-		if (mActive && EntityUtils.isUndead(le)) {
-			mActive = false;
-			Location loc = le.getLocation();
-			// Active damage to undead
-			event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-			mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1.1f);
-			List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, le);
-			for (LivingEntity e : affected) {
-				// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
+			if (mActive && EntityUtils.isUndead(le)) {
+				mActive = false;
+				Location loc = le.getLocation();
+				// Active damage to undead
+				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
+				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
+				mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+				mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
+				List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, le);
+				for (LivingEntity e : affected) {
+					// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
+					double volume = 0.6 / Math.sqrt(affected.size());
+					mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
+					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
+					mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
+					EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
+				}
 			}
 		}
 

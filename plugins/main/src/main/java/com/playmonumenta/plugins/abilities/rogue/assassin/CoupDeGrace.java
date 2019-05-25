@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
@@ -33,32 +35,38 @@ public class CoupDeGrace extends Ability {
 	private static final double COUP_2_THRESHOLD = 0.25;
 	private static final int COUP_2_INTIMIDATION_DURATION = 20 * 8;
 
+	private final double threshold;
+
 	public CoupDeGrace(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "CoupDeGrace";
+		threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		LivingEntity le = (LivingEntity) event.getEntity();
-		double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		if (!EntityUtils.isBoss(le)) {
-			double threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
-			if (le.getHealth() - event.getFinalDamage() < maxHealth * threshold) {
-				event.setDamage(event.getDamage() + 9001);
-				mWorld.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
-				mWorld.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.65f, 1.5f);
-				mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
-				if (getAbilityScore() > 1) {
-					mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
-					mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8, mPlayer)) {
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, COUP_2_INTIMIDATION_DURATION, 0, false, true));
-						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, COUP_2_INTIMIDATION_DURATION, 0, false, true));
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			LivingEntity le = (LivingEntity) event.getEntity();
+			double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			if (!EntityUtils.isBoss(le)) {
+				if (le.getHealth() - event.getFinalDamage() < maxHealth * threshold) {
+					event.setDamage(event.getDamage() + 9001);
+					mWorld.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
+					mWorld.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.65f, 1.5f);
+					mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData());
+					if (getAbilityScore() > 1) {
+						mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
+						mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8, mPlayer)) {
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, COUP_2_INTIMIDATION_DURATION, 0, false, true));
+							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, COUP_2_INTIMIDATION_DURATION, 0, false, true));
+						}
 					}
 				}
 			}
 		}
+
 		return true;
 	}
 

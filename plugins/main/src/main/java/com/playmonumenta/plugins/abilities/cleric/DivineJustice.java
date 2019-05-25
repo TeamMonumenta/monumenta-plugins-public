@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineJustice extends Ability {
@@ -31,7 +32,8 @@ public class DivineJustice extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damagee = (LivingEntity)event.getEntity();
-		if (!event.getCause().equals(DamageCause.PROJECTILE) && EntityUtils.isUndead(damagee)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isUndead(damagee)
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			event.setDamage(event.getDamage() + DIVINE_JUSTICE_DAMAGE);
 
 			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_CRIT_HEAL);

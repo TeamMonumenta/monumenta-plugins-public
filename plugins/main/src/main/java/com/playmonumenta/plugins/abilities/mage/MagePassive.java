@@ -4,14 +4,16 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class MagePassive extends Ability {
@@ -29,16 +31,12 @@ public class MagePassive extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		//  Make sure only players trigger this.
-		if (event.getDamager() instanceof Player) {
-			Entity damagee = event.getEntity();
+		Entity damagee = event.getEntity();
 
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (InventoryUtils.isWandItem(mainHand)) {
-				if (damagee instanceof LivingEntity) {
-					event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
-				}
-			}
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && InventoryUtils.isWandItem(mainHand)
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
 		}
 		return true;
 	}

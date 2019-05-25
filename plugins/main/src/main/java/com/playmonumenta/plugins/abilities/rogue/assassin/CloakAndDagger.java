@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Cloak & Dagger: Every time you kill a normal mob by any means,
@@ -121,7 +123,8 @@ public class CloakAndDagger extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active && mTickAttacked != mPlayer.getTicksLived()) {
+		if (active && mTickAttacked != mPlayer.getTicksLived() && event.getCause() == DamageCause.ENTITY_ATTACK
+		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			active = false;
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
 			double multiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
@@ -135,11 +138,7 @@ public class CloakAndDagger extends Ability {
 		int maxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		if (cloak < maxStacks) {
 			if (EntityUtils.isElite(event.getEntity())) {
-				if (cloak <= maxStacks - 3) {
-					cloak += 3;
-				} else {
-					cloak = maxStacks;
-				}
+				cloak = Math.min(maxStacks, cloak + 3);
 			} else {
 				cloak++;
 			}
