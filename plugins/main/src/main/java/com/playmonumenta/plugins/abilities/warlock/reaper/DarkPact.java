@@ -57,7 +57,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void cast() {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) || active) {
 			return;
 		}
 
