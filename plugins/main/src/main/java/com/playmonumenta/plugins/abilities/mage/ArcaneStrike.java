@@ -59,10 +59,10 @@ public class ArcaneStrike extends Ability {
 				int dmg = damageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
-				if (mob.hasPotionEffect(PotionEffectType.SLOW)
-				    && MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY)
-				    || mob.getFireTicks() > 0
-				    && MetadataUtils.checkOnceThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY)) {
+				if ((mob.hasPotionEffect(PotionEffectType.SLOW)
+				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
+				    || (mob.getFireTicks() > 0
+				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					if (mob instanceof Player) {
 						dmg += 2;
 					} else {
