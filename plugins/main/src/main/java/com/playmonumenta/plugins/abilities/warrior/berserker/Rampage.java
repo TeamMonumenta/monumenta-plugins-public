@@ -2,10 +2,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 
 import java.util.Random;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -23,20 +20,20 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
-/* Rampage: Killing an enemy starts a kill streak. If
- * you kill another mob within 8/10 seconds, the streak
- * continues and your kill count increases. Every 3 kills,
- * you are granted 1 armor point and +1 damage. This caps
- * at 15 kills (+5 in stats). At level 2, earn regen 1
- * after 5 kills and regen 2 after 10 kills. When the
- * streak ends, stat modifiers reset.
-*/
+/*
+ * Rampage: Killing an enemy starts a kill streak.
+ * Gain 1 stack per kill, capped at 10 / 16. Stacks falloff one at a time after 8 / 10 seconds.
+ * Every 2 stacks, +1 armor and +1 damage. At level 2, gain regen 1 at 5 stacks and regen 2 at 10 stacks.
+ * When the streak ends, stat modifiers reset.
+ */
+
 public class Rampage extends Ability {
 
 	private static final int RAMPAGE_1_KILL_TIMER = 8 * 20; //ticks
 	private static final int RAMPAGE_2_KILL_TIMER = 10 * 20; //ticks
-	private static final int RAMPAGE_KILL_THRESHOLD = 3;
-	private static final int RAMPAGE_KILL_LIMIT = 15;
+	private static final int RAMPAGE_KILL_THRESHOLD = 2;
+	private static final int RAMPAGE_1_KILL_LIMIT = 10;
+	private static final int RAMPAGE_2_KILL_LIMIT = 16;
 	private static final int RAMPAGE_2_REGEN_THRESHOLD = 5;
 
 	private int rampageKillStreak = 0;
@@ -44,9 +41,6 @@ public class Rampage extends Ability {
 	private int rampageKillStreakTime;
 
 	private int timeToNextDecrement = 0;
-
-	private static final Particle.DustOptions RAMPAGE_COLOR_1 = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
-	private static final Particle.DustOptions RAMPAGE_COLOR_2 = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
 	public Rampage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -57,14 +51,12 @@ public class Rampage extends Ability {
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		timeToNextDecrement = 0;
-		if (rampageKillStreak < RAMPAGE_KILL_LIMIT) {
+		if (rampageKillStreak < (getAbilityScore() == 1 ? RAMPAGE_1_KILL_LIMIT : RAMPAGE_2_KILL_LIMIT)) {
 			rampageKillStreak++;
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak: " + rampageKillStreak);
 		} else {
 			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Kill Streak Maxed Out!");
 		}
-		float pitch = (float)(((float) rampageKillStreak) / 11);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, 0.5f, pitch);
 	}
 
 	@Override
@@ -80,14 +72,13 @@ public class Rampage extends Ability {
 
 		// Apply regen buffs at thresholds
 		if (getAbilityScore() > 1) {
-			Location loc = mPlayer.getLocation().add(0, 1, 0);
 			if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD * 2) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 1, true, false));
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, .4, 0.45, .4, RAMPAGE_COLOR_1);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, .4, 0.45, .4, RAMPAGE_COLOR_2);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 1, .25, 1, .25, 0);
 			} else if (rampageKillStreak >= RAMPAGE_2_REGEN_THRESHOLD) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.REGENERATION, 40, 0, true, false));
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 5, .4, 0.45, .4, RAMPAGE_COLOR_2);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 1, .25, 1, .25, 0);
 			}
 		}
 
@@ -111,3 +102,4 @@ public class Rampage extends Ability {
 	}
 
 }
+

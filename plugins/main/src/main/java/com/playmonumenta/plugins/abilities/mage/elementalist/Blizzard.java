@@ -21,7 +21,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -29,27 +28,29 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
+/*
+ * Blizzard: Shift right click with a wand while looking up to
+ * create an aura of ice and snow in a range of 6 / 8 that lasts 10s
+ * (similar to Rains) each enemy that enters the aura gets slowness 1, 2 after
+ * 3s and 6s freezes them (except bosses) and take 2 / 3 damage per second.
+ * Puts out players on fire within range.
+ * Cooldown: 20 s / 15 s after Blizzard finishes.
+ */
+
 public class Blizzard extends Ability {
 
-	/*
-	 * Blizzard: Shift right click with a wand while looking up to
-	 * create an aura of ice and snow in a range of 4 that lasts 10s
-	 * (similar to Rains) each enemy that enters the aura gets slowness 1, 2 after
-	 * 3s and 6s freezes them (except bosses) and take 4 / 6 damage per second.
-	 * Puts out players on fire within range.
-	 * Cooldown: 18 s / 14 s after Blizzard finishes.
-	 */
-
-	private static final int BLIZZARD_1_RADIUS = 5;
-	private static final int BLIZZARD_2_RADIUS = 6;
-	private static final int BLIZZARD_1_DAMAGE = 4;
-	private static final int BLIZZARD_2_DAMAGE = 6;
+	private static final int BLIZZARD_1_RADIUS = 6;
+	private static final int BLIZZARD_2_RADIUS = 8;
+	private static final int BLIZZARD_1_DAMAGE = 2;
+	private static final int BLIZZARD_2_DAMAGE = 3;
+	private static final int BLIZZARD_1_COOLDOWN = 20;
+	private static final int BLIZZARD_2_COOLDOWN = 15;
 
 	public Blizzard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Blizzard";
 		mInfo.linkedSpell = Spells.BLIZZARD;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 18 : 20 * 14;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 

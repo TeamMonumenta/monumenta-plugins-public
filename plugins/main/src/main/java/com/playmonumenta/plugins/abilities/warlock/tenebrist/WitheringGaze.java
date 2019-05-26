@@ -25,20 +25,25 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
-
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
  * magic in the direction the player faces that freezes all enemies
  * in it’s path (bosses are given slowness 3) and gives wither III
  * for 6/10 seconds. 30/20 second cooldown.
  */
+
 public class WitheringGaze extends Ability {
+
+	private static final int WITHERING_GAZE_1_DURATION = 5;
+	private static final int WITHERING_GAZE_2_DURATION = 7;
+	private static final int WITHERING_GAZE_1_COOLDOWN = 30;
+	private static final int WITHERING_GAZE_2_COOLDOWN = 20;
 
 	public WitheringGaze(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 30 : 20 * 20;
+		mInfo.cooldown = getAbilityScore() == 1 ? 20 * WITHERING_GAZE_1_COOLDOWN : 20 * WITHERING_GAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
@@ -47,7 +52,7 @@ public class WitheringGaze extends Ability {
 		Player player = mPlayer;
 		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by halfslabs
 		Vector direction = loc.getDirection().setY(0).normalize();
-		int duration = getAbilityScore() == 1 ? 20 * 6 : 20 * 10;
+		int duration = getAbilityScore() == 1 ? 20 * WITHERING_GAZE_1_DURATION : 20 * WITHERING_GAZE_2_DURATION;
 		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
 		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		new BukkitRunnable() {
