@@ -79,7 +79,7 @@ public class EntityUtils {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
 			LivingEntity target = ((Mob)entity).getTarget();
-			return target != null && target instanceof Player;  //  If a player is the target
+			return target != null && (target instanceof Player || entity.getScoreboardTags().contains("boss_targetplayer"));
 		} else if (entity instanceof Player) {
 			return AbilityManager.getManager().isPvPEnabled((Player)entity);
 		}
