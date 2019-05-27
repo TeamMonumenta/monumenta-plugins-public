@@ -13,6 +13,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -24,6 +26,9 @@ public class SoulRend extends Ability {
 	private static final int SOUL_REND_RADIUS = 7;
 	private static final int SOUL_REND_1_COOLDOWN = 6 * 20;
 	private static final int SOUL_REND_2_COOLDOWN = 5 * 20;
+	private static final int SOUL_REND_1_HEAL = 2;
+	private static final int SOUL_REND_2_HEAL = 4;
+	private static final double SOUL_REND_HEAL_MULTIPLIER = 0.2;
 
 	public SoulRend(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -40,8 +45,8 @@ public class SoulRend extends Ability {
 			double damage = event.getDamage();
 			if (EntityUtils.isHostileMob(damagee)) {
 				int soulRend = getAbilityScore();
-				double heal = (soulRend == 1) ? 2 : 4;
-				double soulHealValue = damage * 0.2;
+				double heal = soulRend == 1 ? SOUL_REND_1_HEAL : SOUL_REND_2_HEAL;
+				heal += damage * SOUL_REND_HEAL_MULTIPLIER;
 
 				Location loc = damagee.getLocation();
 				World world = mPlayer.getWorld();
@@ -59,11 +64,22 @@ public class SoulRend extends Ability {
 				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.65f, 1.5f);
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.0f, 1.15f);
 
-				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, SOUL_REND_RADIUS, true)) {
-					// If this is us or we're allowing anyone to get it.
-					if (p == mPlayer || soulRend > 1) {
-						world.spawnParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
-						PlayerUtils.healPlayer(p, heal + soulHealValue);
+				// If Dark Pact is active, damage nearby mobs - otherwise, skill proceeds as normal
+				DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
+				if (dp != null && dp.isActive()) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SOUL_REND_RADIUS)) {
+						world.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
+						EntityUtils.damageEntity(mPlugin, mob, heal, mPlayer);
+					}
+				} else {
+					if (soulRend > 1) {
+						for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, SOUL_REND_RADIUS, true)) {
+							world.spawnParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
+							PlayerUtils.healPlayer(p, heal);
+						}
+					} else {
+						world.spawnParticle(Particle.DAMAGE_INDICATOR, mPlayer.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
+						PlayerUtils.healPlayer(mPlayer, heal);
 					}
 				}
 

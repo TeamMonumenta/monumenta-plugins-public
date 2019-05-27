@@ -21,16 +21,14 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Crouch while throwing an Alchemist Potion and you'll instead consume the
  * potion and buff yourself. You gain 20s of Regen II, Strength I, Speed I, but
- * when the effect ends you take 4 damage (bypasses armor but can't
- * kill the player). At level 2 you also gain Resistance I and Haste II (Cooldown
- * 30s)
- *
- * TODO: Particle effects need flair
+ * when the effect ends you take 4 damage.
+ * At level 2 you also gain Resistance I and Haste II (Cooldown 30s)
  */
 
 public class AdrenalSerum extends Ability {
@@ -103,11 +101,8 @@ public class AdrenalSerum extends Ability {
 				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, ADRENAL_SERUM_COLOR);
 
 				if (t > ADRENAL_SERUM_DURATION) {
-					if (mPlayer.getHealth() > ADRENAL_SERUM_DAMAGE + 1) {
-						mPlayer.setHealth(mPlayer.getHealth() - ADRENAL_SERUM_DAMAGE);
-					} else {
-						mPlayer.setHealth(1);
-					}
+					EntityUtils.damageEntity(mPlugin, mPlayer, ADRENAL_SERUM_DAMAGE, null);
+
 					this.cancel();
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1, 1.1f);
 					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1.25f);

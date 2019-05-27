@@ -25,18 +25,19 @@ public class DarkPact extends Ability {
 
 	private static final int DARK_PACT_COOLDOWN = 20 * 10;
 	private static final int DARK_PACT_DURATION = 20 * 10;
-	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.6;
-	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 1.0;
+	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.5;
+	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 0.8;
 
 	/*
 	 * Dark Pact: Sprint + left-click with a scythe to greatly amplify your
-	 * power for 10 s, making your skills and melee attacks deal
-	 * 60% / 100% more damage. At lvl 2, your scythe attacks also
-	 * cleave, dealing AoE damage in front of you. While this
-	 * ability is active, you cannot heal health.
-	 *  Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
+	 * power for 10 s, making your skills and melee attacks deal 50% / 80% more
+	 * damage. At lvl 2, your scythe attacks also cleave, dealing 50% AoE
+	 * damage in front of you. While this ability is active, you cannot heal
+	 * health. If Soul Rend is triggered, deal AoE damage instead of AoE heal.
+	 * Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
 	 */
 
+	private BukkitRunnable mPactTimer;
 	private float mSaturation = 0;
 	private double mHealth = 0;
 	private boolean active = false;
@@ -57,7 +58,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void cast() {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) || active) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
@@ -67,7 +68,15 @@ public class DarkPact extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.5f);
 		mHealth = mPlayer.getHealth();
 		mSaturation = mPlayer.getSaturation();
-		new BukkitRunnable() {
+
+		// If the ability is still active, cancel it so it can't set active to false prematurely
+		// This is better than disallowing cast when ability is active because telling a player
+		// "Dark Pact is off Cooldown" and then preventing the ability cast is not ideal
+		if (mPactTimer != null && !mPactTimer.isCancelled()) {
+			mPactTimer.cancel();
+		}
+
+		mPactTimer = new BukkitRunnable() {
 			int t = 0;
 			@Override
 			public void run() {
@@ -92,8 +101,8 @@ public class DarkPact extends Ability {
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
 				}
 			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		mPactTimer.runTaskTimer(mPlugin, 0, 1);
 		putOnCooldown();
 	}
 
@@ -125,6 +134,10 @@ public class DarkPact extends Ability {
 			}
 		}
 		return true;
+	}
+
+	public boolean isActive() {
+		return active;
 	}
 
 }
