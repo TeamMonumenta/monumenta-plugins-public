@@ -33,7 +33,7 @@ public class DarkPact extends Ability {
 	 * power for 10 s, making your skills and melee attacks deal 50% / 80% more
 	 * damage. At lvl 2, your scythe attacks also cleave, dealing 50% AoE
 	 * damage in front of you. While this ability is active, you cannot heal
-	 * health. If Soul Rend is triggered, deal AoE damage instead of AoE heal.
+	 * health. If Soul Rend is triggered, deal half AoE damage instead of AoE heal.
 	 * Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
 	 */
 

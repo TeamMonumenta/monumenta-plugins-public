@@ -69,7 +69,7 @@ public class SoulRend extends Ability {
 				if (dp != null && dp.isActive()) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SOUL_REND_RADIUS)) {
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
-						EntityUtils.damageEntity(mPlugin, mob, heal, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, heal / 2, mPlayer);
 					}
 				} else {
 					if (soulRend > 1) {
