@@ -34,7 +34,7 @@ public class GrowingRage extends Ability {
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "GrowingRage";
-		damagePercent = 1 + getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT;
+		damagePercent = 1 + (getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT);
 	}
 
 	@Override
