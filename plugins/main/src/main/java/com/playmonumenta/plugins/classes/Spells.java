@@ -113,6 +113,7 @@ public enum Spells {
 
 	//Harbinger
 	ADRENAL_SERUM("Adrenal Serum"),
+	PURPLE_HAZE("Purple Haze"),
 
 	//Apothecary
 	ALCHEMICAL_AMALGAM("Alchemical Amalgam");
