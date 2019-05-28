@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 public class Inferno implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
 	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
-	private static final int INFERNO_MAX_LEVEL = 4;
 
 	private static final Map<LivingEntity, Integer> sTaggedMobs = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable sRunnable = null;
@@ -64,9 +63,6 @@ public class Inferno implements BaseEnchantment {
 	}
 
 	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level) {
-		/* Cap inferno level at the maximum */
-		level = level < INFERNO_MAX_LEVEL ? level : INFERNO_MAX_LEVEL;
-
 		/* Record this mob as being inferno tagged */
 		sTaggedMobs.put(target, level);
 

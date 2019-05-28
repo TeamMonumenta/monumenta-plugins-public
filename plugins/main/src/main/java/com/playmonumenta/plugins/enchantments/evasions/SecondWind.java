@@ -22,7 +22,7 @@ public class SecondWind implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND);
+		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND, ItemSlot.MAINHAND);
 	}
 
 	@Override

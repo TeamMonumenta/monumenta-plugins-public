@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Guardian;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -42,7 +43,7 @@ public class Thunder implements BaseEnchantment {
 		if (event.getDamage() >= 4 && rand < level * 0.1) {
 			EntityUtils.applyStun(plugin, 50, target);
 
-			if (target instanceof Guardian) {
+			if (target instanceof Guardian || target instanceof IronGolem) {
 				event.setDamage(event.getDamage() + 1.0);
 			}
 

@@ -157,10 +157,15 @@ public class EnchantmentManager {
 							/*
 							 * If this particular property applies levels,
 							 * add them to the running count UNLESS it is an
-							 * evasion armor piece in the offhand
+							 * evasion or second wind armor piece in hand
 							 */
 							int level = property.getLevelFromItem(item, player, slot);
-							if (level > 0 && (slot != ItemSlot.OFFHAND || !ItemUtils.isWearable(item.getType()))) {
+							if (level > 0) {
+								if ((property instanceof Evasion || property instanceof MeleeEvasion
+									|| property instanceof AbilityEvasion || property instanceof SecondWind)
+									&& (slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
+									continue;
+								}
 								Integer currentLevel = propertyMap.get(property);
 								if (currentLevel != null) {
 									currentLevel += level;

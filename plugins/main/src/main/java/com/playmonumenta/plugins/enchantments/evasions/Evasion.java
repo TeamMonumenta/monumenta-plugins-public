@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 
 public class Evasion implements BaseEnchantment {
 
@@ -23,7 +24,7 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND);
+		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND, ItemSlot.MAINHAND);
 	}
 
 	@Override
@@ -34,5 +35,10 @@ public class Evasion implements BaseEnchantment {
 		}
 	}
 
+	@Override
+	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
+		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
+		evasion.chance += (8 * level);
+	}
 
 }
