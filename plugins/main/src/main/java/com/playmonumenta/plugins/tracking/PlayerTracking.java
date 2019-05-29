@@ -48,6 +48,9 @@ public class PlayerTracking implements EntityTracking {
 	public void addEntity(Entity entity) {
 		Player player = (Player)entity;
 
+		// Add the tag that prevents functions and advancement rewards from being applied to the player
+		player.addScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
+
 		// Initialize the player, either by loading data from disk or from the player
 		PlayerData.initializePlayer(mPlugin, player);
 

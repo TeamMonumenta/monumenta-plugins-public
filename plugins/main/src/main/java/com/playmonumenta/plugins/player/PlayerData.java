@@ -18,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NetworkUtils;
@@ -128,6 +129,9 @@ public class PlayerData {
 
 		//  Add Ender Chest.
 		root.addProperty("ender_chest", InventoryUtils.itemStackArrayToBase64(player.getEnderChest().getContents()));
+
+		// Add Advancements.
+		root.add("advancements", AdvancementUtils.getAsJsonObject(player));
 
 		//  Add Scoreboards and Tags for this player.
 		root.add("scoreboards", ScoreboardUtils.getAsJsonObject(player));
@@ -304,6 +308,9 @@ public class PlayerData {
 				player.getEnderChest().setContents(inv);
 			}
 		}
+
+		// Load Advancements
+		AdvancementUtils.loadFromJsonObject(player, object.getAsJsonObject("advancements"));
 
 		//  Load Scoreboards and Tags
 		ScoreboardUtils.loadFromJsonObject(player, object.getAsJsonObject("scoreboards"));
