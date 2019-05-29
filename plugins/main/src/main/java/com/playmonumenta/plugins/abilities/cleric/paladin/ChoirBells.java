@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -21,9 +22,11 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
-* Right-Clicking while sprinting causes the Paladin to become the target of any
-* undead within a conical area in front of them. Affected Undead are stricken with
-* slowness II (level 1) and 30% Vulnerability (level 2) for 20s. Cooldown 30/20s
+* Left-Clicking while shifted while airborne causes the Paladin
+* to become the target of any undead within a ten-block-long cone
+* in front of them. Affected undead gain slowness 2 for 20s.
+* At level 2 affected undead also gain 30% vulnerability for 20s.
+* Cooldown: 30/20s.
 */
 
 public class ChoirBells extends Ability {
@@ -47,7 +50,7 @@ public class ChoirBells extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && !mPlayer.isOnGround();
+		return (mPlayer.isSneaking() && !mPlayer.isOnGround() && mPlayer.getLocation().getBlock().getType() != Material.LADDER);
 	}
 
 	@Override
