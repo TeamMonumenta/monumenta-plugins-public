@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AnvilOverride extends BaseOverride {
 	final static String REPAIR_OBJECTIVE = "RepairT";
-	final static String ANVIL_USED_METAKEY = "AnvilUsedMetakey";
+
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item,
 	                                          Block block) {
@@ -42,7 +42,7 @@ public class AnvilOverride extends BaseOverride {
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
 		        || (!InventoryUtils.testForItemWithLore(item, "* Irreparable *")
 		            && !InventoryUtils.testForItemWithLore(item, "Curse of Irreparability")))
-		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) && !block.hasMetadata(ANVIL_USED_METAKEY)) {
+		    && block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 
 			item.setDurability((short) 0);
 			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
@@ -59,16 +59,14 @@ public class AnvilOverride extends BaseOverride {
 						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
 						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						block.setType(Material.AIR);
-						block.removeMetadata(ANVIL_USED_METAKEY, plugin);
 					} else {
 						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 					}
 				}
 
 			}.runTaskTimer(plugin, 0, 7);
+			block.setType(Material.AIR);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
-			block.setMetadata(ANVIL_USED_METAKEY, new FixedMetadataValue(plugin, true));
 			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE);
 			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount + 1);
 		} else {
@@ -96,22 +94,5 @@ public class AnvilOverride extends BaseOverride {
 			block.setMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, new FixedMetadataValue(plugin, true));
 		}
 		return false;
-	}
-
-	@Override
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
-		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
-			block.setType(Material.AIR);
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean blockChangeInteraction(Plugin plugin, Block block) {
-		if (block.hasMetadata(ANVIL_USED_METAKEY)) {
-			return false;
-		}
-		return true;
 	}
 }
