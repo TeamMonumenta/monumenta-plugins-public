@@ -50,7 +50,8 @@ public class ChoirBells extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return (mPlayer.isSneaking() && !mPlayer.isOnGround() && mPlayer.getLocation().getBlock().getType() != Material.LADDER);
+		Material blockType = mPlayer.getLocation().getBlock().getType();
+		return (mPlayer.isSneaking() && !mPlayer.isOnGround() && blockType != Material.LADDER && blockType != Material.VINE);
 	}
 
 	@Override
