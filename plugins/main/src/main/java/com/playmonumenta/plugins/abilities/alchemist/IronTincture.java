@@ -126,13 +126,12 @@ public class IronTincture extends Ability {
 			public void run() {
 				Location loc = player.getLocation();
 				rotation += 15;
-				y += 0.2;
-				for (int i = 0; i < 4; i++) {
-					double degree = Math.toRadians(rotation + (i * 90));
+				y += 0.175;
+				for (int i = 0; i < 3; i++) {
+					double degree = Math.toRadians(rotation + (i * 120));
 					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
-					mWorld.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.05);
-					mWorld.spawnParticle(Particle.SPELL, loc, 1, 0.1, 0.1, 0.1, 0);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.1, 0.1, 0.1, 0);
+					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
 					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
 				}
 

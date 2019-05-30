@@ -59,8 +59,10 @@ public class GraspingClaws extends Ability {
 			World world = arrow.getWorld();
 
 			world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1.25f, 1.25f);
+			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 1.25f, 1.45f);
 			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, 0.65f);
-			world.spawnParticle(Particle.PORTAL, loc, 300, 2, 2, 2, 0.25);
+			world.spawnParticle(Particle.PORTAL, loc, 125, 2, 2, 2, 0.25);
+			world.spawnParticle(Particle.PORTAL, loc, 400, 0, 0, 0, 1.45);
 			world.spawnParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125);
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 

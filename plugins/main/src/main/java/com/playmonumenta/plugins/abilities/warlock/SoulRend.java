@@ -61,8 +61,8 @@ public class SoulRend extends Ability {
 				}
 
 
-				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.65f, 1.5f);
-				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.0f, 1.15f);
+				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.4f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.4f, 1.15f);
 
 				// If Dark Pact is active, damage nearby mobs - otherwise, skill proceeds as normal
 				DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
