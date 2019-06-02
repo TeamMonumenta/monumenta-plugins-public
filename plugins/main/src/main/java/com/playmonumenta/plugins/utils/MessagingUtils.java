@@ -31,21 +31,21 @@ public class MessagingUtils {
 
 	public static void sendActionBarMessage(Plugin plugin, Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = new TextComponent(message);
+		TextComponent formattedMessage = new TextComponent(TextComponent.fromLegacyText(message));
 		formattedMessage.setColor(ChatColor.YELLOW);
 		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, formattedMessage);
 	}
 
 	public static void sendAbilityTriggeredMessage(Plugin plugin, Player player, String message) {
-		TextComponent formattedMessage = new TextComponent(message);
+		TextComponent formattedMessage = new TextComponent(TextComponent.fromLegacyText(message));
 		formattedMessage.setColor(ChatColor.RED);
 		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, formattedMessage);
 	}
 
 	public static void sendRawMessage(Player player, String message) {
 		message = translatePlayerName(player, message);
-		TextComponent formattedMessage = new TextComponent(ChatColor.translateAlternateColorCodes('&',
-		                                                   message));
+		message = ChatColor.translateAlternateColorCodes('&',translatePlayerName(player, message));
+		TextComponent formattedMessage = new TextComponent(TextComponent.fromLegacyText(message));
 		player.spigot().sendMessage(formattedMessage);
 	}
 
@@ -53,7 +53,7 @@ public class MessagingUtils {
 		TextComponent formattedMessage;
 		String errorMessage = e.getLocalizedMessage();
 		if (errorMessage != null) {
-			formattedMessage = new TextComponent(errorMessage);
+			formattedMessage = new TextComponent(TextComponent.fromLegacyText(errorMessage));
 		} else {
 			formattedMessage = new
 			TextComponent("An error occured without a set message. Hover for stack trace.");
