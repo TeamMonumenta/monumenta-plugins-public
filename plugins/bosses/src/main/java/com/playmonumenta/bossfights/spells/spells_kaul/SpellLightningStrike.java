@@ -5,15 +5,14 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -81,6 +80,12 @@ public class SpellLightningStrike extends Spell {
 	}
 
 	public void lightning(Player player) {
+		if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+			PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+			if (effect.getAmplifier() >= 5) {
+				return;
+			}
+		}
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1, 1.25f);
 		new BukkitRunnable() {
@@ -111,6 +116,12 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : Utils.playersInRange(loc, 3)) {
+						if (p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+							PotionEffect effect = p.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+							if (effect.getAmplifier() >= 5) {
+								break;
+							}
+						}
 						DamageUtils.damagePercent(mBoss, p, 0.4);
 					}
 				}

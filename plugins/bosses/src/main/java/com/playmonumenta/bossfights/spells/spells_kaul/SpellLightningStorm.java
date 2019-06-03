@@ -6,15 +6,14 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.spells.Spell;
@@ -74,6 +73,12 @@ public class SpellLightningStorm extends Spell {
 	}
 
 	private void lightning(Player player) {
+		if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+			PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+			if (effect.getAmplifier() >= 5) {
+				return;
+			}
+		}
 		World world = player.getWorld();
 		Location strike = player.getLocation().add(0, 10, 0);
 		Location loc = player.getLocation();
