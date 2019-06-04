@@ -40,12 +40,14 @@ public class FractalEnervation extends Ability {
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "FractalTickRightClicked";
 
 	private static final int FRACTAL_INITIAL_RANGE = 9;
-	private static final int FRACTAL_DAMAGE = 5;
+	private static final int FRACTAL_1_DAMAGE = 5;
+	private static final int FRACTAL_2_DAMAGE = 12;
 	private static final int FRACTAL_BLINDNESS_DURATION = 20 * 12;
 	private static final int FRACTAL_1_CHAIN_RANGE = 3 + 1; // The +1 accounts for the mob's nonzero hitbox so that the distance between 2 mobs is approx 3 still
 	private static final int FRACTAL_2_CHAIN_RANGE = 4 + 1;
 
 	private int mRightClicks = 0;
+	private int damageBonus;
 
 	public FractalEnervation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -53,6 +55,7 @@ public class FractalEnervation extends Ability {
 		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 16 : 20 * 13;
+		damageBonus = getAbilityScore() == 1 ? FRACTAL_1_DAMAGE : FRACTAL_2_DAMAGE;
 	}
 
 	private List<LivingEntity> hit = new ArrayList<LivingEntity>();
@@ -137,10 +140,8 @@ public class FractalEnervation extends Ability {
 				mob.addPotionEffect(
 				    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 			}
-			mob.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, FRACTAL_BLINDNESS_DURATION, 0));
-			if (getAbilityScore() > 1) {
-				EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer);
-			}
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.BLINDNESS, FRACTAL_BLINDNESS_DURATION, 0));
+			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
 		}

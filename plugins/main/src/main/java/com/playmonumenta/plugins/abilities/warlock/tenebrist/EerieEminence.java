@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * Consuming Flames -> Weakness I
  * Fractal Enervation -> Mining Fatigue I
  * Withering Gaze -> Wither I
- * At level 2, the aura also gives the opposite buff to other players.
+ * At level 2, the aura also gives the opposite buff to nearby players (including self).
  */
 
 public class EerieEminence extends Ability {
@@ -67,7 +67,7 @@ public class EerieEminence extends Ability {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(debuff, EERIE_EFFECT_LINGER_DURATION, 0));
 		}
 		if (getAbilityScore() > 1) {
-			for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, false)) {
+			for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 				                                 new PotionEffect(buff, EERIE_EFFECT_LINGER_DURATION, 0, true, false));
 			}
