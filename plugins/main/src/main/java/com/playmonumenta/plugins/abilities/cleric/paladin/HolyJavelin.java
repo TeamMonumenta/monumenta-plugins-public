@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -75,14 +76,17 @@ public class HolyJavelin extends Ability {
 			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, HOLY_JAVELIN_COLOR);
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
 
-			for (LivingEntity le : mobs) {
-				if (le.getBoundingBox().overlaps(box)) {
-					if (EntityUtils.isUndead(le)) {
-						EntityUtils.damageEntity(mPlugin, le, damageUndead, mPlayer);
+			Iterator<LivingEntity> iter = mobs.iterator();
+			while (iter.hasNext()) {
+				LivingEntity mob = iter.next();
+				if (mob.getBoundingBox().overlaps(box)) {
+					if (EntityUtils.isUndead(mob)) {
+						EntityUtils.damageEntity(mPlugin, mob, damageUndead, mPlayer);
 					} else {
-						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 					}
-					le.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+					mob.setFireTicks(HOLY_JAVELIN_FIRE_DURATION);
+					iter.remove();
 				}
 			}
 
