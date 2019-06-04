@@ -74,7 +74,7 @@ public class EntityUtils {
 		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear || entity instanceof Phantom) {
 			return true;
 		} else if (entity instanceof Wolf) {
-			return ((Wolf)entity).isAngry();
+			return ((Wolf)entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
 		} else if (entity instanceof Rabbit) {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
