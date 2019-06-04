@@ -22,10 +22,12 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DaggerThrow extends Ability {
 
+	private static final String DAGGER_THROW_MOB_HIT_TICK = "HitByDaggerThrowTick";
 	private static final int DAGGER_THROW_COOLDOWN = 12 * 20;
 	private static final int DAGGER_THROW_RANGE = 8;
 	private static final int DAGGER_THROW_1_DAMAGE = 6;
@@ -53,6 +55,12 @@ public class DaggerThrow extends Ability {
 		double damage = (daggerThrow == 1) ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 		int vulnLevel = (daggerThrow == 1) ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 
+		Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
+		int ppDuration = 0;
+		if (pp != null) {
+			ppDuration = pp.getBonus(mInfo.linkedSpell);
+		}
+
 		// TODO: Upgrade this to raycast code
 		for (int a = -1; a < 2; a++) {
 			double angle = a * 0.463; //25o. Set to 0.524 for 30o or 0.349 for 20o
@@ -71,20 +79,17 @@ public class DaggerThrow extends Ability {
 					mWorld.spawnParticle(Particle.REDSTONE, pLoc, 1, 0.1, 0.1, 0.1, DAGGER_THROW_COLOR);
 				}
 
-				Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-				int ppDuration = 0;
-				if (pp != null) {
-					ppDuration = pp.getBonus(mInfo.linkedSpell);
-				}
-
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, 1, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
-					if (ppDuration > 0) {
-						EntityUtils.applyStun(mPlugin, ppDuration, mob);
+					if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, vulnLevel, true, false));
+						if (ppDuration > 0) {
+							EntityUtils.applyStun(mPlugin, ppDuration, mob);
+						}
 					}
 
 					hit = true;
+					break;
 				}
 
 				if (mLoc.getBlock().getType().isSolid() || hit) {
