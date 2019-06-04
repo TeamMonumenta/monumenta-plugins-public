@@ -51,6 +51,7 @@ public class EntityUtils {
 
 	public static final String PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY = "DealtCustomDamageWithEntityUtilsTick";
 	public static final String MOB_IS_STUNNED_METAKEY = "MobIsStunnedByEntityUtils";
+	public static final String MOB_IS_CONFUSED_METAKEY = "MobIsConfusedByEntityUtils";
 
 	public static boolean isUndead(LivingEntity mob) {
 		EntityType type = mob.getType();
@@ -330,8 +331,6 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell) {
-		damage = damage * vulnerabilityMult(target);
-
 		if (!target.isDead() && !target.isInvulnerable()) {
 			if (callEvent) {
 				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
@@ -431,6 +430,61 @@ public class EntityUtils {
 
 		}.runTaskTimer(plugin, 0, 1);
 	}
+
+	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
+
+	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
+		if (isBoss(mob)) {
+			return;
+		}
+
+		if (mob instanceof Creature) {
+			((Creature) mob).setTarget(null);
+		}
+		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
+		mob.setMetadata(MOB_IS_CONFUSED_METAKEY, new FixedMetadataValue(plugin, null));
+
+		for (LivingEntity targetMob : getNearbyMobs(mob.getLocation(), 8, mob)) {
+			mob.setMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY, new FixedMetadataValue(plugin, null));
+			((Creature) mob).setTarget(targetMob);
+			new BukkitRunnable() {
+				int t = 0;
+				double rotation = 0;
+
+				@Override
+				public void run() {
+					if (mob.isDead()) {
+						this.cancel();
+					}
+					t++;
+					rotation += 20;
+
+					double radian1 = Math.toRadians(rotation);
+					Location l = mob.getLocation();
+					l.add(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
+					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
+					l.subtract(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
+
+					if (((Creature) mob).getTarget() == null) {
+						for (LivingEntity newTargetMob : getNearbyMobs(mob.getLocation(), 8, mob)) {
+							((Creature) mob).setTarget(newTargetMob);
+							break;
+						}
+					}
+
+					if (t >= ticks) {
+						this.cancel();
+						((Creature) mob).setTarget(null);
+						if (mob.hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY)) {
+							mob.removeMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY, plugin);
+						}
+					}
+				}
+			}.runTaskTimer(plugin, 0, 1);
+			break;
+		}
+	}
+
 	public static class FreezeObject {
 		private static final String FREEZE_METAKEY = "MonumentaFreezeMetakey";
 		private static final int TICK_PERIOD = 5;

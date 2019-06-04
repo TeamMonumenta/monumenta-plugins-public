@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -31,12 +32,8 @@ public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 7;
 	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 8;
 	private static final float NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE = 0.2f;
-	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_RANGE = 8;
 
 	private boolean guaranteedApplicationApplied = false;
-
-	private static final Particle.DustOptions NIGHTMARISH_CONFUSION_COLOR = new Particle.DustOptions(
-	    Color.fromRGB(62, 0, 102), 1.0f);
 
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -52,45 +49,12 @@ public class NightmarishAlchemy extends Ability {
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity) && entity instanceof Creature) {
 						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
-						boolean confuse = false;
-						if (!EntityUtils.isBoss(entity)) {
-							if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE) {
-								confuse = true;
-							} else if (!guaranteedApplicationApplied && affectedEntities.size() >= 5) {
-								confuse = true;
-								guaranteedApplicationApplied = true;
-							}
-						}
 
-						if (confuse) {
-							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(entity.getLocation(), NIGHTMARISH_ALCHEMY_CONFUSION_RANGE);
-							for (LivingEntity mob : mobs) {
-								if (mob.getUniqueId() != entity.getUniqueId()) {
-									((Creature) entity).setTarget(mob);
-									new BukkitRunnable() {
-										int t = 0;
-										double rotation = 0;
-
-										@Override
-										public void run() {
-											t++;
-											rotation += 20;
-
-											double radian1 = Math.toRadians(rotation);
-											Location l = mob.getLocation();
-											l.add(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
-											mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, NIGHTMARISH_CONFUSION_COLOR);
-											l.subtract(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
-
-											if (t >= NIGHTMARISH_ALCHEMY_CONFUSION_DURATION) {
-												this.cancel();
-												((Creature) entity).setTarget(null);
-											}
-										}
-									}.runTaskTimer(mPlugin, 0, 1);
-								}
-								break;
-							}
+						if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE) {
+							EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, entity);
+						} else if (!guaranteedApplicationApplied && affectedEntities.size() >= 5) {
+							EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, entity);
+							guaranteedApplicationApplied = true;
 						}
 					}
 				}

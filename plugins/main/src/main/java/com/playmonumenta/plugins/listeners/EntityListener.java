@@ -707,7 +707,8 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-		if (event.getEntity() instanceof Creature && event.getEntity().hasMetadata(EntityUtils.MOB_IS_STUNNED_METAKEY)) {
+		if (event.getEntity() instanceof Creature && (event.getEntity().hasMetadata(EntityUtils.MOB_IS_STUNNED_METAKEY)
+			|| event.getEntity().hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY))) {
 			event.setCancelled(true);
 			return;
 		}
