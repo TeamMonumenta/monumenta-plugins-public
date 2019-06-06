@@ -32,9 +32,10 @@ public class CounterStrike extends Ability {
 	private static final int COUNTER_STRIKE_1_DAMAGE = 6;
 	private static final int COUNTER_STRIKE_2_DAMAGE = 12;
 	private static final float COUNTER_STRIKE_RADIUS = 5.0f;
+	private static final double COUNTER_STRIKE_MELEE_THRESHOLD = 2;
 
+	private BukkitRunnable mActivityTimer;
 	private boolean mActive = false;
-	private int mRiposteTriggeredTick = 0;
 
 	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -46,43 +47,33 @@ public class CounterStrike extends Ability {
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		//  If we're not going to succeed in our Random we probably don't want to attempt to grab the scoreboard value anyways.
-		if (mRandom.nextFloat() < 0.15f) {
-			int counterStrike = getAbilityScore();
-			Entity damager = event.getDamager();
-			Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
-			Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-			mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
-			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
-			double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
+		// Prevent ranged mob abilities from triggering Counter Strike
+		if (event.getEntity().getBoundingBox().expand(COUNTER_STRIKE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-				EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
+			// Passive chance to damage nearby mobs
+			if (mRandom.nextFloat() < 0.15f) {
+				int counterStrike = getAbilityScore();
+				Entity damager = event.getDamager();
+				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));
+				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
+				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001);
+				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
+				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
+	
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
+					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
+				}
+			}
+	
+			// Active trigger if blocking, Riposte check is done separately through AbilityCastEvent
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.COUNTER_STRIKE)) {
+				if (mPlayer.isBlocking()) {
+					mPlayer.spawnParticle(Particle.CRIT, mPlayer.getLocation(), 10, 0, 0, 0, 1);
+					activate();
+				}
 			}
 		}
-
-		// Need to wait a few ticks so that Riposte has a chance to activate first, accounting for some lag
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.COUNTER_STRIKE)) {
-					// Counterstrike becomes active when player is hit while blocking OR if hit and riposte has triggered in the last 5 ticks
-					if (mPlayer.isBlocking() || (mPlayer.getTicksLived() - mRiposteTriggeredTick < 5)) {
-						mPlayer.spawnParticle(Particle.CRIT, mPlayer.getLocation(), 10, 0, 0, 0, 1);
-						mActive = true;
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								mActive = false;
-								this.cancel();
-							}
-						}.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
-					}
-				}
-				this.cancel();
-			}
-		}.runTaskLater(mPlugin, 3);
 
 		return true;
 	}
@@ -144,17 +135,26 @@ public class CounterStrike extends Ability {
 	@Override
 	public boolean AbilityCastEvent(AbilityCastEvent event) {
 		if (event.getAbility() == Spells.RIPOSTE) {
-			mActive = true;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mActive = false;
-					this.cancel();
-				}
-			}.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
+			activate();
 		}
 
 		return true;
+	}
+
+	private void activate() {
+		mActive = true;
+		// Prevent multiple activity timers from overwriting each other
+		if (mActivityTimer != null && !mActivityTimer.isCancelled()) {
+			mActivityTimer.cancel();
+		}
+		mActivityTimer = new BukkitRunnable() {
+			@Override
+			public void run() {
+				mActive = false;
+				this.cancel();
+			}
+		};
+		mActivityTimer.runTaskLater(mPlugin, COUNTER_STRIKE_ACTIVATION_PERIOD);
 	}
 
 }
