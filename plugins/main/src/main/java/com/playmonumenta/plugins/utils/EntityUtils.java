@@ -434,13 +434,11 @@ public class EntityUtils {
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 
 	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob)) {
+		if (isBoss(mob) || !(mob instanceof Creature)) {
 			return;
 		}
 
-		if (mob instanceof Creature) {
-			((Creature) mob).setTarget(null);
-		}
+		((Creature) mob).setTarget(null);
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
 		mob.setMetadata(MOB_IS_CONFUSED_METAKEY, new FixedMetadataValue(plugin, null));
 
