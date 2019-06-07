@@ -20,7 +20,9 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -42,7 +44,8 @@ public class ByMyBlade extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() != DamageCause.PROJECTILE) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			int byMyBlade = getAbilityScore();
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
