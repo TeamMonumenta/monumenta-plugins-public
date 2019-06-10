@@ -80,7 +80,7 @@ public class CloakAndDagger extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 0.1);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 64)) {
 				if (mob instanceof Mob) {
 					Mob m = (Mob) mob;
 					if (m.getTarget() != null && m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
