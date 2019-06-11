@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -36,25 +37,26 @@ public class GraspingClaws extends Ability {
 		mInfo.scoreboardId = "GraspingClaws";
 		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
 		mInfo.cooldown = GRASPING_CLAWS_COOLDOWN;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;
 	}
-	private Arrow shot = null;
+	private Arrow arrow = null;
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public void cast() {
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS) && mPlayer.isSneaking()) {
+			arrow = mPlayer.launchProjectile(Arrow.class);
+			arrow.setDamage(0);
+			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
 			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
-			shot = arrow;
-			// Put Grasping Claws on cooldown
 			putOnCooldown();
 		}
-		return true;
 	}
 
 	@Override
 	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (shot != null && arrow == shot) {
-			shot = null;
+		if (this.arrow != null && this.arrow == arrow) {
+			this.arrow = null;
 			Location loc = arrow.getLocation();
 			World world = arrow.getWorld();
 

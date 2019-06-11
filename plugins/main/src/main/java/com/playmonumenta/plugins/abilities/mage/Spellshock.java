@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -120,10 +121,9 @@ public class Spellshock extends Ability {
 						// Since spellshock damage is applied on the tick after initial spell damage, EntityUtils.damageEntity()
 						// will not see it as intentional damage stacking, so iFrames need to be set manually
 						damagee.setNoDamageTicks(0);
+						Vector velocity = damagee.getVelocity();
 						EntityUtils.damageEntity(plugin, damagee, damage, damager, null, false /* do not register CustomDamageEvent */);
-						if (abilityScore > 1) {
-							EntityUtils.applyStun(plugin, SPELL_SHOCK_STUN_DURATION, damagee);
-						}
+						damagee.setVelocity(velocity);
 					}
 
 					// Only put pending static mobs into the actual map if they weren't damaged by spellshock - this

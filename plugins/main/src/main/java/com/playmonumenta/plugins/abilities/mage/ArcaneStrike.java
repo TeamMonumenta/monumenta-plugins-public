@@ -52,7 +52,8 @@ public class ArcaneStrike extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS, mPlayer)) {
@@ -70,7 +71,9 @@ public class ArcaneStrike extends Ability {
 					}
 				}
 
+				Vector velocity = mob.getVelocity();
 				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+				mob.setVelocity(velocity);
 			}
 
 			Location locD = damagee.getLocation().add(0, 1, 0);

@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -28,9 +29,9 @@ public class FrostNova extends Ability {
 	private static final float FROST_NOVA_RADIUS = 6.0f;
 	private static final int FROST_NOVA_1_DAMAGE = 4;
 	private static final int FROST_NOVA_2_DAMAGE = 8;
-	private static final int FROST_NOVA_EFFECT_LVL = 2;
+	private static final int FROST_NOVA_EFFECT_LVL = 1;
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
-	private static final int FROST_NOVA_DURATION = 8 * 20;
+	private static final int FROST_NOVA_DURATION = 4 * 20;
 
 	public FrostNova(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -45,14 +46,15 @@ public class FrostNova extends Ability {
 		int frostNova = getAbilityScore();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
+			Vector velocity = mob.getVelocity();
 			EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
+			mob.setVelocity(velocity);
 			int amp = (mob instanceof Player) ? FROST_NOVA_EFFECT_LVL - 1 : FROST_NOVA_EFFECT_LVL;
 			if (frostNova > 1) {
 				if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 1, true, false));
 				} else {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
-					EntityUtils.applyFreeze(mPlugin, FROST_NOVA_DURATION / 2, mob);
+					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
 				}
 			}
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));

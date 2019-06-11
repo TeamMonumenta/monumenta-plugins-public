@@ -74,11 +74,9 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
+					Vector velocity = mob.getVelocity();
 					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
-					if (!EntityUtils.isBoss(mob) || (AbilityManager.getManager().isPvPEnabled(mPlayer) && (mob instanceof Player)
-					                                 && AbilityManager.getManager().isPvPEnabled((Player)mob))) {
-						EntityUtils.applyStun(mPlugin, MANA_LANCE_STAGGER_DURATION, mob);
-					}
+					mob.setVelocity(velocity);
 					iter.remove();
 					mobs.remove(mob);
 				}
