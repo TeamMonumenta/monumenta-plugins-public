@@ -124,6 +124,9 @@ public class Spellshock extends Ability {
 						Vector velocity = damagee.getVelocity();
 						EntityUtils.damageEntity(plugin, damagee, damage, damager, null, false /* do not register CustomDamageEvent */);
 						damagee.setVelocity(velocity);
+						if (abilityScore > 1) {
+							EntityUtils.applyStun(plugin, SPELL_SHOCK_STUN_DURATION, damagee);
+						}
 					}
 
 					// Only put pending static mobs into the actual map if they weren't damaged by spellshock - this
@@ -160,15 +163,16 @@ public class Spellshock extends Ability {
 	@Override
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity mob = event.getDamaged();
-		// If the mob has static, trigger it unless the spell is Arcane Strike
+		// If the mob has static, trigger it
 		if (mSpellShockedMobs.containsKey(mob.getUniqueId()) && event.getSpell() != Spells.ARCANE_STRIKE) {
 			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
 			e.triggeredBy = mPlayer;
 			e.triggered = true;
-			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword
+			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword or Elemental Arrows
 			// The check for these specific spells is the only reason why we need to have the CustomDamageEvent
 			// check instead of just lumping it all in with EntityDamageByEntityEvent
-		} else if (!mPendingStaticMobs.contains(mob) && event.getSpell() != Spells.BLIZZARD && event.getSpell() != Spells.FSWORD) {
+		} else if (!mPendingStaticMobs.contains(mob) && event.getSpell() != Spells.BLIZZARD
+			&& event.getSpell() != Spells.ELEMENTAL_ARROWS && event.getSpell() != Spells.FSWORD) {
 			mPendingStaticMobs.add(mob);
 		}
 	}

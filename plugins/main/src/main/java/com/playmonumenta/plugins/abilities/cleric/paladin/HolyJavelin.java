@@ -24,14 +24,14 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
 * Attacking while sprinting throws a spear of light in a 12 block line, dealing
-* 10/15 damage to undead and 5/10 damage to all others, also lights all targets
+* 10/20 damage to undead and 5/10 damage to all others, also lights all targets
 * on fire for 5s. (10s/8s cooldown)
 */
 
 public class HolyJavelin extends Ability {
 
 	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
-	private static final double HOLY_JAVELIN_RADIUS = 0.65;
+	private static final double HOLY_JAVELIN_RADIUS = 0.75;
 	private static final int HOLY_JAVELIN_RANGE = 12;
 	private static final int HOLY_JAVELIN_1_UNDEAD_DAMAGE = 10;
 	private static final int HOLY_JAVELIN_2_UNDEAD_DAMAGE = 20;

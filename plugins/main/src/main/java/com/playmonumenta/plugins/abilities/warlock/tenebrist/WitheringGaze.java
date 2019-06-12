@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
- * magic in the direction the player faces that freezes all enemies
+ * magic in the direction the player faces that gives Slowness 7 to all enemies
  * in it’s path (bosses are given slowness 3) and gives wither III
  * for 6/10 seconds. 30/20 second cooldown.
  */
@@ -36,14 +36,14 @@ public class WitheringGaze extends Ability {
 
 	private static final int WITHERING_GAZE_1_DURATION = 5;
 	private static final int WITHERING_GAZE_2_DURATION = 7;
-	private static final int WITHERING_GAZE_1_COOLDOWN = 30;
-	private static final int WITHERING_GAZE_2_COOLDOWN = 20;
+	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
+	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
 
 	public WitheringGaze(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * WITHERING_GAZE_1_COOLDOWN : 20 * WITHERING_GAZE_2_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
@@ -85,9 +85,7 @@ public class WitheringGaze extends Ability {
 							if (EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
-								if (!EntityUtils.isFrozen(le)) {
-									EntityUtils.applyFreeze(mPlugin, duration, le);
-								}
+								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 6));
 							}
 							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
 						}

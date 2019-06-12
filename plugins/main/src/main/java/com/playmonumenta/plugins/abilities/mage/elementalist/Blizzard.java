@@ -31,9 +31,9 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 /*
  * Blizzard: Shift right click with a wand while looking up to
  * create an aura of ice and snow in a range of 6 / 8 that lasts 10s
- * (similar to Rains) each enemy that enters the aura gets slowness 1, 2 after
- * 3s and 6s freezes them (except bosses) and take 2 / 3 damage per second.
- * Puts out players on fire within range.
+ * (similar to Rains) each enemy that enters the aura gets slowness 1,
+ * slowness 2 after 3 seconds, and slowness 4 after 6 seconds,
+ * and take 2 / 3 damage per second. Puts out players on fire within range.
  * Cooldown: 20 s / 15 s after Blizzard finishes.
  */
 
@@ -91,9 +91,7 @@ public class Blizzard extends Ability {
 								amp = effect.getAmplifier();
 							}
 							if (duration >= 12) {
-								if (!EntityUtils.isBoss(mob) && !EntityUtils.isFrozen(mob)) {
-									EntityUtils.applyFreeze(mPlugin, 20 * 5, mob);
-								}
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 							} else if (duration >= 6) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
 							}

@@ -81,7 +81,7 @@ public class EnchantedShot extends Ability {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			active = false;
-			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.65, 0.65, 0.65);
+			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1.5, 1.5, 1.5);
 			double damage = getAbilityScore() == 1 ? ENCHANTED_1_DAMAGE : ENCHANTED_2_DAMAGE;
 
 			Player player = mPlayer;

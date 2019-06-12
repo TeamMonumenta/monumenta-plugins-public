@@ -100,25 +100,6 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static void applyFreeze(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob)) {
-			return;
-		}
-
-		if (!mob.hasAI()) {
-			FreezeObject obj = FreezeObject.getHandle(mob);
-			if (obj != null) {
-				obj.setRemainingDuration(ticks);
-			}
-		} else {
-			new FreezeObject(plugin, ticks, mob);
-		}
-	}
-
-	public static boolean isFrozen(LivingEntity mob) {
-		return FreezeObject.getHandle(mob) != null;
-	}
-
 	/**
 	 * Gets the entity in the crosshair of the player
 	 * <p>
@@ -482,53 +463,6 @@ public class EntityUtils {
 				}
 			}.runTaskTimer(plugin, 0, 1);
 			break;
-		}
-	}
-
-	public static class FreezeObject {
-		private static final String FREEZE_METAKEY = "MonumentaFreezeMetakey";
-		private static final int TICK_PERIOD = 5;
-		private int mTicksRemaining;
-
-		public FreezeObject(Plugin plugin, int ticks, LivingEntity mob) {
-			mTicksRemaining = ticks;
-
-			mob.setMetadata(FREEZE_METAKEY, new FixedMetadataValue(plugin, this));
-
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mob.setAI(false);
-
-					plugin.mWorld.spawnParticle(Particle.SNOWBALL, mob.getLocation(), 15, 0.25, (float)(mob.getHeight() / 2), 0.25, 0);
-
-					mTicksRemaining -= TICK_PERIOD;
-					if (mTicksRemaining <= 0 || mob.isDead() || mob.hasAI()) {
-						this.cancel();
-						mob.setAI(true);
-						mob.removeMetadata(FREEZE_METAKEY, plugin);
-					}
-				}
-			}.runTaskTimer(plugin, 0, TICK_PERIOD);
-		}
-
-		public int getRemainingDuration() {
-			return mTicksRemaining;
-		}
-
-		public void setRemainingDuration(int ticks) {
-			mTicksRemaining = ticks;
-		}
-
-		public void addDuration(int ticks) {
-			mTicksRemaining += ticks;
-		}
-
-		public static FreezeObject getHandle(LivingEntity mob) {
-			if (mob.hasMetadata(FREEZE_METAKEY)) {
-				return (FreezeObject)mob.getMetadata(FREEZE_METAKEY).get(0).value();
-			}
-			return null;
 		}
 	}
 }

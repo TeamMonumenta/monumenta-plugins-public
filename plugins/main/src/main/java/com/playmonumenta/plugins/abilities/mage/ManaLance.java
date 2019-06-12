@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ManaLance extends Ability {
@@ -74,9 +75,8 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					Vector velocity = mob.getVelocity();
 					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
-					mob.setVelocity(velocity);
+					MovementUtils.knockAwayConstant(mPlayer.getLocation(), mob, 0.25f, 0.25f);
 					iter.remove();
 					mobs.remove(mob);
 				}
