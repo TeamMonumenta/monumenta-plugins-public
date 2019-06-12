@@ -33,6 +33,20 @@ public class MovementUtils {
 		}
 	}
 
+	public static void knockAwayConstant(Location loc, LivingEntity target, float speed, float y) {
+		if (EntityUtils.isBoss(target)) {
+			speed /= 2;
+		}
+		Vector dir = target.getLocation().subtract(loc.toVector()).toVector().normalize().multiply(speed);
+		dir.setY(y);
+		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+		if (mult > 0) {
+			dir.multiply(mult);
+
+			target.setVelocity(dir);
+		}
+	}
+
 	public static void PullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
 		if (EntityUtils.isBoss(target)) {
 			return;
