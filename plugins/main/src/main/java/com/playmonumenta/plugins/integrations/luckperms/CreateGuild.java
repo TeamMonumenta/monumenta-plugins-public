@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.commands;
+package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -22,10 +22,12 @@ import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
 import io.github.jorelali.commandapi.api.arguments.StringArgument;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
 
-public class CreateGuild extends GenericCommand {
+import me.lucko.luckperms.api.LuckPermsApi;
+
+public class CreateGuild {
 
 	@SuppressWarnings("unchecked")
-	public static void register(Plugin plugin) {
+	public static void register(Plugin plugin, LuckPermsApi lp) {
 
 		// createguild <guildname> <guildID> <guild tag>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.createguild");

@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
-import com.playmonumenta.plugins.commands.CreateGuild;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
@@ -38,6 +37,7 @@ import com.playmonumenta.plugins.commands.UpdateApartments;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.MobListener;
@@ -113,7 +113,6 @@ public class Plugin extends JavaPlugin {
 		DeathMsg.register();
 		UpdateApartments.register();
 		TransferScores.register(this);
-		CreateGuild.register(this);
 		MonumentaReload.register(this);
 
 		mHttpManager = new HttpManager(this);
@@ -249,6 +248,11 @@ public class Plugin extends JavaPlugin {
 		// Get voting events if Votifier is present
 		if (Bukkit.getPluginManager().isPluginEnabled("Votifier")) {
 			manager.registerEvents(new VotifierIntegration(this), this);
+		}
+
+		// Register luckperms commands if LuckPerms is present
+		if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
+			new LuckPermsIntegration(this);
 		}
 	}
 
