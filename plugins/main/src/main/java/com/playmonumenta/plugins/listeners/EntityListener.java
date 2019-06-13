@@ -29,6 +29,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
+import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
@@ -67,9 +68,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -269,6 +272,11 @@ public class EntityListener implements Listener {
 			PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+		}
+
+		if (damager instanceof Trident && damagee instanceof LivingEntity) {
+			Slayer.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Duelist.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 		}
 
 		if (damagee instanceof LivingEntity) {
