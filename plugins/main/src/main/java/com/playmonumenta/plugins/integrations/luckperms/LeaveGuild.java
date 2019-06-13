@@ -1,20 +1,26 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
-import io.github.jorelali.commandapi.api.arguments.PlayerArgument;
+import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
+import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 
+import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
+import me.lucko.luckperms.api.Node;
+import me.lucko.luckperms.api.User;
 
 public class LeaveGuild {
 	public static void register(Plugin plugin, LuckPermsApi lp) {
@@ -23,32 +29,44 @@ public class LeaveGuild {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.leaveguild");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("player name", new PlayerArgument());
+		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 
 		CommandAPI.getInstance().register("leaveguild", perms, arguments, (sender, args) -> {
-			run(plugin, sender, (Player) args[0]);
+			run(plugin, lp, sender, (Player) args[0]);
 		});
 	}
 
-	private static void run(Plugin plugin, CommandSender sender, Player player) {
+	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, Player player) throws CommandSyntaxException {
+		// Set scores and permissions
+		ScoreboardUtils.setScoreboardValue(player, "Founder", 0);
 
-		if (ScoreboardUtils.getScoreboardValue(player, "Guild") != 0) {
-			return;
+		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
+			if (userNode.isGroupNode()) {
+				Group group = ((Group)userNode);
+				boolean guildFound = false;
+				String guildName = "";
+				for (Node groupChildNode : group.getNodes().values()) {
+					if (groupChildNode.isMeta()) {
+						Entry<String, String>meta = groupChildNode.getMeta();
+						if (meta.getKey().equals("guildname")) {
+							guildFound = true;
+							break;
+						}
+					}
+				}
+				if (guildFound) {
+					// Remove user from guild
+					User user = lp.getUser(player.getUniqueId());
+					user.unsetPermission(userNode);
+
+					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have left the guild '" + guildName + "'");
+					return;
+				}
+			}
 		}
 
-		// Set scores and permissions
-		ScoreboardUtils.setScoreboardValue(player, "Guild", 0);
-		ScoreboardUtils.setScoreboardValue(player, "Founder", 0);
-		/*
-		 * TODO:
-		 * Turn this pseudocode into something that can actually get a list of all guild perms
-		 *
-		 * for (String guildName : ALL_THE_GUILD_PERMS_THINGS) {
-		 *     Bukkit.dispatchCommand(sender, "lp user " + player.getName() + " parent remove " + guildName);
-		 * }
-		 */
-
-		// Flair
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have left your guild.");
+		String err = ChatColor.RED + "You are not in a guild";
+		player.sendMessage(err);
+		CommandAPI.fail(err);
 	}
 }
