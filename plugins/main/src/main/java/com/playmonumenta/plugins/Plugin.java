@@ -1,16 +1,11 @@
 package com.playmonumenta.plugins;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,7 +22,6 @@ import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
-import com.playmonumenta.plugins.commands.IncrementDaily;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
@@ -50,6 +44,7 @@ import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.safezone.SafeZoneManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CombatLoggingTimers;
 import com.playmonumenta.plugins.timers.CooldownTimers;
@@ -68,9 +63,6 @@ public class Plugin extends JavaPlugin {
 
 	public ServerProperties mServerProperties = new ServerProperties();
 	public EnchantmentManager mEnchantmentManager = new EnchantmentManager();
-	private FileConfiguration mConfig;
-	private File mConfigFile;
-	public int mDailyQuestVersion = 0;
 
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
@@ -110,7 +102,6 @@ public class Plugin extends JavaPlugin {
 		RemoveTags.register();
 		DeathMsg.register();
 		UpdateApartments.register();
-		IncrementDaily.register(this);
 		TransferScores.register(this);
 		CreateGuild.register(this);
 		MonumentaReload.register(this);
@@ -145,6 +136,8 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
+
+		DailyReset.startTimer(this);
 
 		//  Load info.
 		reloadMonumentaConfig(null);
@@ -251,34 +244,9 @@ public class Plugin extends JavaPlugin {
 		return getServer().getPlayer(playerID);
 	}
 
-	public void incrementDailyVersion() {
-		if (mServerProperties.getDailyResetEnabled()) {
-			mDailyQuestVersion++;
-			_saveConfig();
-		}
-	}
-
 	/* Sender will be sent debugging info if non-null */
 	public void reloadMonumentaConfig(CommandSender sender) {
-		if (mConfigFile == null) {
-			mConfigFile = new File(getDataFolder(), "config.yml");
-		}
-
-		mConfig = YamlConfiguration.loadConfiguration(mConfigFile);
-
-		mDailyQuestVersion = mConfig.getInt("daily_version");
-
 		mServerProperties.load(this, sender);
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
-	}
-
-	private void _saveConfig() {
-		mConfig.set("daily_version", mDailyQuestVersion);
-
-		try {
-			mConfig.save(mConfigFile);
-		} catch (IOException ex) {
-			getLogger().log(Level.SEVERE, "Could not save config to " + mConfigFile, ex);
-		}
 	}
 }
