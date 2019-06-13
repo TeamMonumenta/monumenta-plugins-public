@@ -72,6 +72,7 @@ import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
+import com.playmonumenta.plugins.enchantments.Impact;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
@@ -275,6 +276,7 @@ public class EntityListener implements Listener {
 		}
 
 		if (damager instanceof Trident && damagee instanceof LivingEntity) {
+			Impact.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Slayer.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Duelist.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 		}

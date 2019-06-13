@@ -77,6 +77,7 @@ public class EnchantmentManager {
 		init.add(new Duelist());
 		init.add(new Thunder());
 		init.add(new Inferno());
+		init.add(new Impact());
 		init.add(new Sniper());
 		init.add(new PointBlank());
 		init.add(new Decay());

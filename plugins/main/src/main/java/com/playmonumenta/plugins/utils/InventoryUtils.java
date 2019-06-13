@@ -120,6 +120,26 @@ public class InventoryUtils {
 								return 9;
 							} else if (loreEntry.endsWith(" X")) {
 								return 10;
+							} else if (loreEntry.endsWith(" XI")) {
+								return 11;
+							} else if (loreEntry.endsWith(" XII")) {
+								return 12;
+							} else if (loreEntry.endsWith(" XIII")) {
+								return 13;
+							} else if (loreEntry.endsWith(" XIV")) {
+								return 14;
+							} else if (loreEntry.endsWith(" XV")) {
+								return 15;
+							} else if (loreEntry.endsWith(" XVI")) {
+								return 16;
+							} else if (loreEntry.endsWith(" XVII")) {
+								return 17;
+							} else if (loreEntry.endsWith(" XVIII")) {
+								return 18;
+							} else if (loreEntry.endsWith(" IX")) {
+								return 19;
+							} else if (loreEntry.endsWith(" XX")) {
+								return 20;
 							}
 
 							// Default level is 1
