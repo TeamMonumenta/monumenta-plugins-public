@@ -16,8 +16,8 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Impact implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Impact";
-	private static final String LEVEL_METAKEY = "PowerLevelMetakey";
-	private static final double DAMAGE_PER_LEVEL = 2;
+	private static final String LEVEL_METAKEY = "ImpactLevelMetakey";
+	private static final double DAMAGE_PER_LEVEL = 4;
 
 	@Override
 	public String getProperty() {
