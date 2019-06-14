@@ -17,6 +17,7 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -578,6 +579,13 @@ public class EntityListener implements Listener {
 		// Cancel the event immediately if within a safezone
 		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getLocation());
 		if (zone != LocationType.None) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// Cancel the event if from a confused creeper, damage still applies it seems
+		Entity entity = event.getEntity();
+		if (entity instanceof Creeper && entity.hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY)) {
 			event.setCancelled(true);
 			return;
 		}
