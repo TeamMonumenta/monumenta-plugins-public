@@ -14,6 +14,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -60,7 +62,7 @@ public class SpellVolcanicDemise extends Spell {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
 		}
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int t = 0;
 			@Override
 			public void run() {
@@ -72,8 +74,9 @@ public class SpellVolcanicDemise extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
 				if (t >= 20 * 2) {
 					this.cancel();
+					mActiveRunnables.remove(this);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
-					new BukkitRunnable() {
+					BukkitRunnable runnable = new BukkitRunnable() {
 
 						int i = 0;
 						@Override
@@ -100,14 +103,19 @@ public class SpellVolcanicDemise extends Spell {
 
 							if (i >= 25) {
 								this.cancel();
+								mActiveRunnables.remove(this);
 							}
 						}
 
-					}.runTaskTimer(mPlugin, 0, 10);
+					};
+					runnable.runTaskTimer(mPlugin, 0, 10);
+					mActiveRunnables.add(runnable);
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void rainMeteor(Location locInput, List<Player> players, double spawnY) {
@@ -116,7 +124,7 @@ public class SpellVolcanicDemise extends Spell {
 			return;
 		}
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			double y = spawnY;
 			Location loc = locInput.clone();
 			World world = locInput.getWorld();
@@ -139,12 +147,19 @@ public class SpellVolcanicDemise extends Spell {
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
 				if (y <= 0) {
 					this.cancel();
+					mActiveRunnables.remove(this);
 					world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175, null, true);
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
 					for (Player player : Utils.playersInRange(loc, 4)) {
+						if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+							PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+							if (effect.getAmplifier() >= 5) {
+								continue;
+							}
+						}
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							DamageUtils.damage(mBoss, player, 100);
@@ -169,8 +184,9 @@ public class SpellVolcanicDemise extends Spell {
 					}
 				}
 			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override

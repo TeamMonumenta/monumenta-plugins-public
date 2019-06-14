@@ -87,7 +87,10 @@ public class SpellManager {
 	}
 
 	public int forceCastSpell(Class<?> spell) {
-		mLastCasted = null;
+		if (mLastCasted != null) {
+			mLastCasted.cancel();
+			mLastCasted = null;
+		}
 		Spell sp = mReadySpells.get(spell);
 		if (sp != null && sp.canRun()) {
 			sp.run();

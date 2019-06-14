@@ -119,10 +119,12 @@ public class SpellLightningStrike extends Spell {
 						if (p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 							PotionEffect effect = p.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 							if (effect.getAmplifier() >= 5) {
-								break;
+								continue;
 							}
 						}
 						DamageUtils.damagePercent(mBoss, p, 0.4);
+						// Add Resistance 5 for 10 ticks to prevent players getting struck by lightning twice
+						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10, 5, true, false, false));
 					}
 				}
 			}
