@@ -28,6 +28,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ByMyBlade extends Ability {
 
+	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
+	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 	private static final int BY_MY_BLADE_HASTE_1_LVL = 1;
 	private static final int BY_MY_BLADE_HASTE_2_LVL = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
@@ -58,6 +60,14 @@ public class ByMyBlade extends Ability {
 			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
 			if (damagee instanceof Player) {
 				extraDamage = BY_MY_BLADE_DAMAGE_1;
+			}
+			// Since RoguePassive uses a Custom Damage Event, I'll just put the modifier here
+			if (damagee instanceof LivingEntity) {
+				if (EntityUtils.isElite(damagee)) {
+					extraDamage *= PASSIVE_DAMAGE_ELITE_MODIFIER;
+				} else if (EntityUtils.isBoss(damagee)) {
+					extraDamage *= PASSIVE_DAMAGE_BOSS_MODIFIER;
+				}
 			}
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
 			if (pp != null) {
