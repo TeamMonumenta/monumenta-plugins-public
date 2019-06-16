@@ -30,7 +30,7 @@ public class SpellBombToss extends Spell {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		Collections.shuffle(players);
 		for (Player player : players) {
-			if (Utils.hasLineOfSight(player, mBoss)) {
+			if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 				launch(player);
 				break;
 			}

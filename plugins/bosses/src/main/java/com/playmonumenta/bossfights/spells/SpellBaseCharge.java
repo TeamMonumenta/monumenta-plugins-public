@@ -139,7 +139,7 @@ public class SpellBaseCharge extends Spell {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		Collections.shuffle(players);
 		for (Player player : players) {
-			if (Utils.hasLineOfSight(player, mBoss)) {
+			if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 				if (mCharges <= 0 || mRate <= 0) {
 					launch(player, bystanders);
 				} else {
@@ -294,7 +294,7 @@ public class SpellBaseCharge extends Spell {
 						List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 						Collections.shuffle(players);
 						for (Player player : players) {
-							if (Utils.hasLineOfSight(player, mBoss)) {
+							if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 								mTarget = player;
 								targetLoc = mTarget.getLocation().add(0, 1.0f, 0);
 								break;

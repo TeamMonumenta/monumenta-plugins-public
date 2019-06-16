@@ -3,14 +3,10 @@ package com.playmonumenta.bossfights.spells;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -64,7 +60,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 		}
 
 		// Check if current target is still visible
-		if (mLastTarget != null && playerVisible(mLastTarget)) {
+		if (mLastTarget != null && Utils.hasLineOfSight(mBoss.getEyeLocation(), mLastTarget)) {
 			mTicksSinceLastSeen = 0;
 
 			// Make sure that player is still the target
@@ -87,7 +83,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
-					if (playerVisible(player)) {
+					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 						mLastTarget = player;
 						mBoss.setTarget(player);
 						mCooldownRemaining = mCooldown;
@@ -109,18 +105,5 @@ public class SpellTargetVisiblePlayer extends Spell {
 	@Override
 	public int duration() {
 		return PERIOD;
-	}
-
-	private boolean playerVisible(Player player) {
-		Vector direction = player.getEyeLocation().subtract(mBoss.getEyeLocation()).toVector().normalize();
-
-		RayTraceResult result = mBoss.getWorld().rayTrace(mBoss.getEyeLocation(), direction, mDetectionRange,
-		                                                  FluidCollisionMode.NEVER,
-		                                                  true, 0, (Entity e) -> { return e == player; });
-		if (result == null) {
-			return false;
-		}
-
-		return result.getHitEntity() == player;
 	}
 }

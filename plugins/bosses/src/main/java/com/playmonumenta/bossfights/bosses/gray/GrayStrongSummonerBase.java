@@ -156,7 +156,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					}
 
 					for (Player player : Utils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
-						if (Utils.hasLineOfSight(player, boss)) {
+						if (Utils.hasLineOfSight(boss.getEyeLocation(), player)) {
 							return true;
 						}
 					}

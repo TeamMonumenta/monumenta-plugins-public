@@ -1,22 +1,21 @@
 package com.playmonumenta.bossfights.spells;
 
-import com.playmonumenta.bossfights.utils.Utils;
-
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellFireball extends Spell {
 	@FunctionalInterface
@@ -38,8 +37,6 @@ public class SpellFireball extends Spell {
 	private final boolean mSingleTarget;
 	private final LaunchFireballEffect mLaunchEffect;
 	private final int mDuration;
-
-	private final Random mRandom = new Random();
 
 	/**
 	 * @param plugin          Plugin
@@ -91,7 +88,7 @@ public class SpellFireball extends Spell {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(players);
 						for (Player player : players) {
-							if (Utils.hasLineOfSight(player, mBoss)) {
+							if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 								launch(player);
 								break;
 							}

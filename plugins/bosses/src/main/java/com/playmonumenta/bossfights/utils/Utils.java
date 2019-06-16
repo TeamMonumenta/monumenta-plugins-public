@@ -3,10 +3,10 @@ package com.playmonumenta.bossfights.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,9 +17,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.bossfights.spells.SpellBaseCharge;
 
 public class Utils {
 	public static class ArgumentException extends Exception {
@@ -155,11 +154,17 @@ public class Utils {
 		return players;
 	}
 
-	/*
-	 * Uses the charge mechanic to detect if a player has line of sight to a location (usually boss.getEyeLocation())
-	 */
-	public static boolean hasLineOfSight(Player player, Entity target) {
-		return SpellBaseCharge.doCharge(player, target, player.getEyeLocation(), Arrays.asList(player), null, null, null, null, false, false);
+	public static boolean hasLineOfSight(Location sourceLoc, Player target) {
+		return hasLineOfSight(sourceLoc, target, 160); // 10 chunks
+	}
+
+	public static boolean hasLineOfSight(Location sourceLoc, Player target, double maxDistance) {
+		RayTraceResult result = sourceLoc.getWorld().rayTrace(sourceLoc, getDirectionTo(target.getEyeLocation(), sourceLoc), maxDistance,
+		                                                  FluidCollisionMode.NEVER, true, 0, (Entity e) -> { return e == target; });
+		if (result == null) {
+			return false;
+		}
+		return result.getHitEntity() == target;
 	}
 
 	public static Vector getDirectionTo(Location to, Location from) {

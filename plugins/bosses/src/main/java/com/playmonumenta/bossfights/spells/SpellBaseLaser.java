@@ -7,7 +7,7 @@ import java.util.SplittableRandom;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,7 +51,7 @@ public class SpellBaseLaser extends Spell {
 	}
 
 	private final Plugin mPlugin;
-	private final Entity mBoss;
+	private final LivingEntity mBoss;
 	private final int mRange;
 	private final int mNumTicks;
 	private final boolean mStopWhenBlocked;
@@ -74,7 +74,7 @@ public class SpellBaseLaser extends Spell {
 	 * @param particleAction  Called many times per tick to generate particles for laser
 	 * @param finishAction    Called when the spell numTicks have elapsed
 	 */
-	public SpellBaseLaser(Plugin plugin, Entity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget, int cooldown,
+	public SpellBaseLaser(Plugin plugin, LivingEntity boss, int range, int numTicks, boolean stopWhenBlocked, boolean singleTarget, int cooldown,
 	                      TickAction tickAction, ParticleAction particleAction, FinishAction finishAction) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -96,7 +96,7 @@ public class SpellBaseLaser extends Spell {
 				// Single target chooses a random player within range
 				Collections.shuffle(players);
 				for (Player player : players) {
-					if (Utils.hasLineOfSight(player, mBoss)) {
+					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 						launch(player);
 						return;
 					}
@@ -115,7 +115,7 @@ public class SpellBaseLaser extends Spell {
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
-				if (Utils.hasLineOfSight(player, mBoss)) {
+				if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
 					return true;
 				}
 			}
@@ -179,6 +179,12 @@ public class SpellBaseLaser extends Spell {
 					} else if (tarLoc.distance(endLoc) < 0.5) {
 						break;
 					}
+				}
+
+				if (!blocked) {
+					// Really check to make sure it's not blocked
+					// This takes into account block shapes!
+					blocked = Utils.hasLineOfSight(launLoc, target);
 				}
 
 				if (blocked && mStopWhenBlocked) {
