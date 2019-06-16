@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -28,7 +30,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
  * magic in the direction the player faces that gives Slowness 7 to all enemies
- * in it’s path (bosses are given slowness 3) and gives wither III
+ * in its path (bosses are given slowness 3) and gives wither III
  * for 6/10 seconds. 30/20 second cooldown.
  */
 
@@ -88,6 +90,8 @@ public class WitheringGaze extends Ability {
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 6));
 							}
 							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
+							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
+							Bukkit.getPluginManager().callEvent(event);
 						}
 					}
 				}

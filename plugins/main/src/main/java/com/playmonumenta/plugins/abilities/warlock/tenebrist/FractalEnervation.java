@@ -42,7 +42,7 @@ public class FractalEnervation extends Ability {
 	private static final int FRACTAL_INITIAL_RANGE = 9;
 	private static final int FRACTAL_1_DAMAGE = 5;
 	private static final int FRACTAL_2_DAMAGE = 12;
-	private static final int FRACTAL_BLINDNESS_DURATION = 20 * 12;
+	private static final int FRACTAL_FATIGUE_DURATION = 20 * 12;
 	private static final int FRACTAL_1_CHAIN_RANGE = 3 + 1; // The +1 accounts for the mob's nonzero hitbox so that the distance between 2 mobs is approx 3 still
 	private static final int FRACTAL_2_CHAIN_RANGE = 4 + 1;
 
@@ -140,7 +140,7 @@ public class FractalEnervation extends Ability {
 				mob.addPotionEffect(
 				    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 			}
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.BLINDNESS, FRACTAL_BLINDNESS_DURATION, 0));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
 			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
