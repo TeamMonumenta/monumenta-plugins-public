@@ -467,7 +467,7 @@ public class PlayerListener implements Listener {
 							   (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
 						// Good matching item that does not have curse of binding - will be kept on death
 						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-						if (meta == null || !(meta instanceof Damageable)) {
+						if (meta != null && (meta instanceof Damageable)) {
 							// This item can be damaged - remove some durability from it
 							Damageable dMeta = (Damageable)meta;
 							short maxDurability = item.getType().getMaxDurability();
