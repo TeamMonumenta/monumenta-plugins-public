@@ -42,6 +42,7 @@ public class DailyReset {
 				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());
 
 				ScoreboardUtils.setScoreboardValue(player, "DailyQuest", 0);
+				ScoreboardUtils.setScoreboardValue(player, "Daily2Quest", 0);
 
 				if (ScoreboardUtils.getScoreboardValue(player, "TP_Farr") >= 1) {
 					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The king's bounty has changed! Perhaps you should seek out the Herald...");
