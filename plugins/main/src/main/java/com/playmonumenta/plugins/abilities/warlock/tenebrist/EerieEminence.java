@@ -63,13 +63,17 @@ public class EerieEminence extends Ability {
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		double radius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(debuff, EERIE_EFFECT_LINGER_DURATION, 0));
+		if (debuff != null) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(debuff, EERIE_EFFECT_LINGER_DURATION, 0));
+			}
 		}
 		if (getAbilityScore() > 1) {
-			for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-				                                 new PotionEffect(buff, EERIE_EFFECT_LINGER_DURATION, 0, true, false));
+			if (buff != null) {
+				for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
+					                                 new PotionEffect(buff, EERIE_EFFECT_LINGER_DURATION, 0, true, false));
+				}
 			}
 		}
 	}

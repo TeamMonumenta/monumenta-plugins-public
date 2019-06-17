@@ -87,7 +87,7 @@ public class WitheringGaze extends Ability {
 							if (EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
-								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 6));
+								EntityUtils.applyStun(mPlugin, duration, le);
 							}
 							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
 							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
