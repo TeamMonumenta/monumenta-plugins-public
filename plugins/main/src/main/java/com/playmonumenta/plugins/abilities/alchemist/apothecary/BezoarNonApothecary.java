@@ -30,9 +30,6 @@ public class BezoarNonApothecary extends Ability {
 			Bezoar bz = (Bezoar) AbilityManager.getManager().getPlayerAbility(player, Bezoar.class);
 			if (bz != null) {
 				bz.incrementKills();
-				if (bz.shouldDrop()) {
-					bz.dropBezoar(event, shouldGenDrops);
-				}
 			}
 		}
 	}

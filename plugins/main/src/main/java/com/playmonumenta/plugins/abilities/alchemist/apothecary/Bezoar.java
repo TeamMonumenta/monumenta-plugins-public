@@ -1,24 +1,28 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
+import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -32,94 +36,87 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Bezoar extends Ability {
 
-	private static final int BEZOAR_1_FREQUENCY = 5;
-	private static final int BEZOAR_2_FREQUENCY = 3;
-	private static final int BEZOAR_1_DAMAGE = 4;
-	private static final int BEZOAR_2_DAMAGE = 6;
-	private static final int BEZOAR_DAMAGE_RADIUS = 3;
+	private static final int BEZOAR_FREQUENCY = 4;
+	private static final int BEZOAR_1_DAMAGE = 3;
+	private static final int BEZOAR_2_DAMAGE = 5;
+	private static final int BEZOAR_1_HEAL = 3;
+	private static final int BEZOAR_2_HEAL = 5;
+	private static final Particle.DustOptions B_COLOUR = new Particle.DustOptions(Color.fromRGB(165, 214, 102), 1.4f);
 
 	private int mKills = 0;
 	private int mFrequency = 0;
+	private int mBezoarCount = 0;
 
 	public Bezoar(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
-		// This is spelled incorrectly in both scoreboards and half the code, I am now big sad
 		mInfo.scoreboardId = "Bezoar";
-		mFrequency = getAbilityScore() == 1 ? BEZOAR_1_FREQUENCY : BEZOAR_2_FREQUENCY;
+		mFrequency = BEZOAR_FREQUENCY;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		mKills++;
-		if (shouldDrop()) {
-			dropBezoar(event, shouldGenDrops);
+		if (mBezoarCount < 3) {
+			mKills++;
+		}
+		if (mKills == mFrequency && mBezoarCount < 3) {
+			mBezoarCount ++ ;
+			if (mBezoarCount < 3) {
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Bezoars: " + mBezoarCount);
+			} else {
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Max bezoar count reached!");
+			}
+			if (canUse(mPlayer)) {
+				AbilityUtils.addAlchemistPotions(mPlayer, 1);
+			}
+			mKills = 0;
 		}
 	}
 
-	public void dropBezoar(EntityDeathEvent event, boolean shouldGenDrops) {
-		mKills = 0;
-		int duration = getAbilityScore() == 1 ? 20 * 8 : 20 * 10;
-		Location loc = event.getEntity().getLocation().add(0, 0.25, 0);
-		Item item = mWorld.dropItemNaturally(loc, new ItemStack(Material.LIME_CONCRETE));
-		item.setCustomName("Beozar");
-		item.setPickupDelay(Integer.MAX_VALUE);
+	@Override
+	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+		if (InventoryUtils.testForItemWithName(potion.getItem(), "Alchemist's Potion") && mBezoarCount > 0 && mPlayer.isSneaking()) {
+			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
+			potion.setMetadata("BezoarInfused", new FixedMetadataValue(mPlugin, 1));
+			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.TOTEM);
+			mBezoarCount--;
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Bezoars remaining: " + mBezoarCount);
+			Location playerLoc = mPlayer.getLocation();
+			mWorld.playSound(playerLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.7f, 1.5f);
+			mWorld.playSound(playerLoc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, 0.5f, 1.5f);
+		}
+		return true;
+	}
 
-		new BukkitRunnable() {
-			int t = 0;
-			BlockData fallingDustData = Material.LIME_CONCRETE.createBlockData();
-			@Override
-			public void run() {
-				t++;
-
-				mWorld.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, fallingDustData);
-				if (t >= 10) {
-					for (Player p : PlayerUtils.getNearbyPlayers(item.getLocation(), 0.75)) {
-						PlayerUtils.healPlayer(p, duration);
-						p.removePotionEffect(PotionEffectType.WITHER);
-						p.removePotionEffect(PotionEffectType.POISON);
-						item.remove();
-						this.cancel();
-						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						mWorld.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
-						mWorld.spawnParticle(Particle.BLOCK_CRACK, item.getLocation().add(0, 0.35, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData());
-						mWorld.spawnParticle(Particle.TOTEM, item.getLocation().add(0, 0.35, 0), 30, 0, 0, 0, 0.5F);
-						mWorld.spawnParticle(Particle.TOTEM, mPlayer.getLocation().add(0, 1, 0), 40, 0.1, 0.1, 0.1, 0.35F);
-						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 45, 0.1, 0.4, 0.1, 0.35F);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 30, 0.1, 0.4, 0.1, 0.35F);
-						break;
+	@Override
+	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
+		if (potion.hasMetadata("AlchemistPotion") && potion.hasMetadata("BezoarInfused")) {
+			if (affectedEntities != null && !affectedEntities.isEmpty()) {
+				for (LivingEntity entity : affectedEntities) {
+					if (EntityUtils.isHostileMob(entity)) {
+						int damage = (getAbilityScore() == 1) ? BEZOAR_1_DAMAGE : BEZOAR_2_DAMAGE;
+						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
+					} else if (entity instanceof Player) {
+						int heal = (getAbilityScore() == 1) ? BEZOAR_1_HEAL : BEZOAR_2_HEAL;
+						PlayerUtils.healPlayer((Player) entity, heal);
+						((Player) entity).removePotionEffect(PotionEffectType.WITHER);
+						((Player) entity).removePotionEffect(PotionEffectType.POISON);
 					}
-				}
-				if (t >= 40) {
-					if (EntityUtils.getNearbyMobs(item.getLocation(), 1.5) != null && EntityUtils.getNearbyMobs(item.getLocation(), 1.5).size() != 0) {
-						item.remove();
-						this.cancel();
-						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						mWorld.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 1f);
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1.5f);
-						mWorld.spawnParticle(Particle.TOTEM, item.getLocation().add(0, 0.35, 0), 125, 0, 0, 0, 0.85F);
-						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, item.getLocation().add(0, 0.35, 0), 50, 0, 0, 0, 0.3F);
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(item.getLocation(), BEZOAR_DAMAGE_RADIUS)) {
-							int damage = getAbilityScore() == 1 ? BEZOAR_1_DAMAGE : BEZOAR_2_DAMAGE;
-							EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-						}
-					}
-				}
-				if (t >= duration || item.isDead() || item == null) {
-					this.cancel();
-					item.remove();
 				}
 			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
+			Location potionLoc = potion.getLocation();
+			mWorld.spawnParticle(Particle.REDSTONE, potionLoc.add(0, 0.25, 0), 25, 1, 0.5, 1, B_COLOUR);
+			mWorld.spawnParticle(Particle.SPELL_MOB, potionLoc.add(0, 0.25, 0), 25, 1.25, 0.5, 1.25, 0.001);
+			mWorld.spawnParticle(Particle.TOTEM, potionLoc.add(0, 0.2, 0), 30, 0.1, 0.1, 0.1, 0.65);
+			mWorld.playSound(potionLoc, Sound.BLOCK_STONE_BREAK, 0.7f, 0.5f);
+			mWorld.playSound(potionLoc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 0.7f, 1.5f);
+			mWorld.playSound(potionLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.45f, 2f);
+		}
+		return true;
 	}
 
 	public void incrementKills() {
-		mKills++;
+		if (this.mBezoarCount < 3) {
+			mKills++;
+		}
 	}
-
-	public boolean shouldDrop() {
-		return mKills >= mFrequency;
-	}
-
 }
