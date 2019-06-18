@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -80,12 +81,6 @@ public class SpellLightningStrike extends Spell {
 	}
 
 	public void lightning(Player player) {
-		if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-			PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			if (effect.getAmplifier() >= 5) {
-				return;
-			}
-		}
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1, 1.25f);
 		new BukkitRunnable() {
@@ -116,15 +111,21 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : Utils.playersInRange(loc, 3)) {
-						if (p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-							PotionEffect effect = p.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-							if (effect.getAmplifier() >= 5) {
-								continue;
-							}
+						if (p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && p.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) {
+							continue;
 						}
-						DamageUtils.damagePercent(mBoss, p, 0.4);
-						// Add Resistance 5 for 10 ticks to prevent players getting struck by lightning twice
-						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10, 5, true, false, false));
+						if (!p.hasMetadata("MonumentaPlayerStruckByKaulLightning")) {
+							p.setMetadata("MonumentaPlayerStruckByKaulLightning", new FixedMetadataValue(mPlugin, true));
+							DamageUtils.damagePercent(mBoss, p, 0.4);
+							new BukkitRunnable() {
+								@Override
+								public void run() {
+									if (p.hasMetadata("MonumentaPlayerStruckByKaulLightning")) {
+										p.removeMetadata("MonumentaPlayerStruckByKaulLightning", mPlugin);
+									}
+								}
+							}.runTaskLater(mPlugin, 40);
+						}
 					}
 				}
 			}

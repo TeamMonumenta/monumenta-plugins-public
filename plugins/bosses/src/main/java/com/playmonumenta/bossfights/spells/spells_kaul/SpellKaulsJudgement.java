@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -20,7 +21,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
 /*
@@ -172,48 +172,39 @@ public class SpellKaulsJudgement extends Spell {
 								if (player.isDead()) {
 									player.spigot().respawn();
 								}
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * 20, 8));
+								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10 * 20, 8));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 30 * 20, 0));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30 * 20, 1));
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
+								world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
 								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
 								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
+								player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
 								player.removeScoreboardTag(KAULS_JUDGEMENT_TAG);
-								new BukkitRunnable() {
-
-									@Override
-									public void run() {
-										world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
-										world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
-										world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
-										DamageUtils.damageFlat(mBoss, player, 10);
-										player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
-										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 2));
-										player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 30, 1));
-										player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
-									}
-
-								}.runTaskLater(mPlugin, 40);
 								this.cancel();
 								return;
 							}
 
 							if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
-								this.cancel();
-								player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
+								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10 * 20, 8));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
+								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
 								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15 * 20, 8));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 30, 0));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 30, 0));
+								player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
+								this.cancel();
+								return;
 							}
 						}
-
 					}.runTaskTimer(mPlugin, 0, 1);
 				}
 			}
-
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
