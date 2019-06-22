@@ -31,8 +31,8 @@ public class SpellLightningStorm extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
-	private LivingEntity mHeight;
-	private List<Player> players = new ArrayList<Player>();
+	private LivingEntity mCenter;
+	private List<Player> mWarnedPlayers = new ArrayList<Player>();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
@@ -41,7 +41,7 @@ public class SpellLightningStorm extends Spell {
 		mRange = range;
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
-				mHeight = (LivingEntity) e;
+				mCenter = (LivingEntity) e;
 				break;
 			}
 		}
@@ -52,8 +52,8 @@ public class SpellLightningStorm extends Spell {
 		t--;
 		if (t <= 0) {
 			t = 6;
-			if (mHeight == null) {
-				for (Player player : Utils.playersInRange(mHeight.getLocation(), mRange)) {
+			if (mCenter == null) {
+				for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
 					if (!player.isOnGround()) {
 						Location loc = player.getLocation();
 						if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid()) {
@@ -62,9 +62,9 @@ public class SpellLightningStorm extends Spell {
 					}
 				}
 			} else {
-				for (Player player : Utils.playersInRange(mHeight.getLocation(), mRange)) {
+				for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
 					Location loc = player.getLocation();
-					if (loc.getY() - mHeight.getLocation().getY() >= 5) {
+					if (loc.getY() - mCenter.getLocation().getY() >= 5) {
 						lightning(player);
 					}
 				}
@@ -94,8 +94,8 @@ public class SpellLightningStorm extends Spell {
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 
 		DamageUtils.damagePercent(mBoss, player, 0.4);
-		if (!players.contains(player)) {
-			players.add(player);
+		if (!mWarnedPlayers.contains(player)) {
+			mWarnedPlayers.add(player);
 			player.sendMessage(ChatColor.AQUA
 			                   + "That hurt! There must be a lightning storm above you. Staying close to the ground might help to not get struck again.");
 		}

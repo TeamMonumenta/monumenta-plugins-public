@@ -132,7 +132,7 @@ public class Kaul extends BossAbilityGroup {
 	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
-	private LivingEntity mHeight;
+	private LivingEntity mCenter;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -155,7 +155,7 @@ public class Kaul extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
-				mHeight = (LivingEntity) e;
+				mCenter = (LivingEntity) e;
 				break;
 			}
 		}
@@ -178,31 +178,31 @@ public class Kaul extends BossAbilityGroup {
 
 		}.runTaskTimer(mPlugin, 0, 5);
 		SpellManager phase1Spells = new SpellManager(
-		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mHeight.getLocation().getY()),
-		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mHeight.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, mHeight.getLocation(), detectionRange)));
+		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mCenter.getLocation().getY()),
+		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mCenter.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
+		                  new SpellArachnopocolypse(mPlugin, mBoss, mCenter.getLocation(), detectionRange)));
 
 		SpellManager phase2Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mHeight.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
-		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mHeight.getLocation().getY()),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mCenter.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
+		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mCenter.getLocation().getY()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, false)));
 
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
 
 		SpellManager phase3Spells = new SpellManager(
-		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mHeight.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
-		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
+		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
+		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
+		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mCenter.getLocation()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, true)));
 
 		SpellManager phase4Spells = new SpellManager(
-			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mHeight.getLocation()),
-			                  new SpellEarthsWrath(mPlugin, mBoss, mHeight.getLocation().getY()),
-			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mHeight.getLocation()),
+			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
+			                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
+			                  new SpellVolcanicDemise(plugin, mBoss, 40D, mCenter.getLocation()),
 			                  new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
 		List<UUID> hit = new ArrayList<UUID>();
@@ -210,7 +210,7 @@ public class Kaul extends BossAbilityGroup {
 		List<UUID> cd = new ArrayList<UUID>();
 		SpellPlayerAction action = new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
-			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
+			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.getLocation().toVector(), 42)) {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
@@ -238,7 +238,7 @@ public class Kaul extends BossAbilityGroup {
 						hit.add(player.getUniqueId());
 						player.sendMessage(ChatColor.AQUA + "That hurt! It seems like the water is extremely corrosive. Best to stay out of it.");
 					}
-				} else if (!loc.isInSphere(mHeight.getLocation().toVector(), 42)) {
+				} else if (!loc.isInSphere(mCenter.getLocation().toVector(), 42)) {
 					player.sendMessage(ChatColor.AQUA + "You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.");
 				}
 			}
@@ -250,7 +250,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 18, 3),
+			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 18, 3),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 6),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -266,7 +266,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 12, 3),
+			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 12, 3),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 20 * 3),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -288,7 +288,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 10, 2),
+			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 10, 2),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -310,7 +310,7 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.BLUE_WOOL.createBlockData());
 			}),
-			new SpellLightningStrike(plugin, boss, mHeight.getLocation(), detectionRange, 20 * 6, 2),
+			new SpellLightningStrike(plugin, boss, mCenter.getLocation(), detectionRange, 20 * 6, 2),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
@@ -365,7 +365,7 @@ public class Kaul extends BossAbilityGroup {
 								Material.COARSE_DIRT.createBlockData());
 								loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
 							}
-							world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0), 20, 8, 5, 8,
+							world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8,
 							                    0);
 							rotation += 8;
 							radius -= 0.25;
@@ -376,7 +376,7 @@ public class Kaul extends BossAbilityGroup {
 
 							if (radius <= 0) {
 								this.cancel();
-								Location loc = mHeight.getLocation().subtract(0, 0.5, 0);
+								Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
 								changePhase(null, phase2PassiveSpells, null);
 								new BukkitRunnable() {
 									int t = 0;
@@ -387,8 +387,8 @@ public class Kaul extends BossAbilityGroup {
 									public void run() {
 										t++;
 										radius = t;
-										world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
-										world.spawnParticle(Particle.SMOKE_NORMAL, mHeight.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
+										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
+										world.spawnParticle(Particle.SMOKE_NORMAL, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
 										for (int i = 0; i < 36; i++) {
 											double radian1 = Math.toRadians(rotation + (10 * i));
 											loc.add(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
@@ -561,9 +561,9 @@ public class Kaul extends BossAbilityGroup {
 								public void run() {
 									t++;
 									if (t % 2 == 0) {
-										world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
+										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									}
-									world.spawnParticle(Particle.FLAME, mHeight.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
+									world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0);
 									world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0);
 									if (t == 1) {
@@ -597,8 +597,8 @@ public class Kaul extends BossAbilityGroup {
 
 									if (hits >= 4) {
 										this.cancel();
-										world.spawnParticle(Particle.SPELL_WITCH, mHeight.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
-										world.spawnParticle(Particle.FLAME, mHeight.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
+										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
+										world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
 										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
 										changePhase(null, phase3PassiveSpells, null);
@@ -610,7 +610,7 @@ public class Kaul extends BossAbilityGroup {
 
 										Random rand = new Random();
 										new BukkitRunnable() {
-											Location loc = mHeight.getLocation().subtract(0, 0.5, 0);
+											Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
 											double rotation = 0;
 											double radius = 0;
 											int t = 0;
@@ -933,7 +933,7 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 		new BukkitRunnable() {
-			Location loc = mHeight.getLocation().subtract(0, 0.5, 0);
+			Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
 			double rotation = 0;
 			double radius = 0;
 			int t = 0;
