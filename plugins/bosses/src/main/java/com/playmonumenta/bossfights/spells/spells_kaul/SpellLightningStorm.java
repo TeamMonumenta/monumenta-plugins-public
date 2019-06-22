@@ -52,19 +52,14 @@ public class SpellLightningStorm extends Spell {
 		t--;
 		if (t <= 0) {
 			t = 6;
-			if (mCenter == null) {
-				for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
-					if (!player.isOnGround()) {
-						Location loc = player.getLocation();
-						if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid()) {
-							lightning(player);
-						}
+			for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
+				Location loc = player.getLocation();
+				if (player.isOnGround()) {
+					if (loc.getY() - mCenter.getLocation().getY() >= 2) {
+						lightning(player);
 					}
-				}
-			} else {
-				for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
-					Location loc = player.getLocation();
-					if (loc.getY() - mCenter.getLocation().getY() >= 5) {
+				} else {
+					if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid()) {
 						lightning(player);
 					}
 				}
@@ -75,7 +70,7 @@ public class SpellLightningStorm extends Spell {
 	private void lightning(Player player) {
 		if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 			PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			if (effect.getAmplifier() >= 5) {
+			if (effect.getAmplifier() >= 4) {
 				return;
 			}
 		}
