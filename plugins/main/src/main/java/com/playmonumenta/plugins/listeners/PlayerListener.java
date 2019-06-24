@@ -18,6 +18,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -38,8 +39,11 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -64,6 +68,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.BrewerInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -89,12 +94,16 @@ import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -165,6 +174,10 @@ public class PlayerListener implements Listener {
 			if (!mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
 			}
+			if (item != null && !ItemUtils.isArmorItem(item.getType()) && ItemUtils.isItemShattered(item)) {
+				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
+				event.setCancelled(true);
+			}
 		}
 		// Right Click.
 		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
@@ -172,8 +185,52 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 			}
 
+			if (item != null && ItemUtils.isItemShattered(item)) {
+				if (ItemUtils.isArmorItem(item.getType())) {
+					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
+				} else {
+					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
+				}
+				event.setCancelled(true);
+				return;
+			}
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+			}
+			if (block != null &&
+			    GraveUtils.isGrave(block) &&
+			    player.getGameMode() != GameMode.CREATIVE &&
+			    player.getGameMode() != GameMode.SPECTATOR) {
+				Chest grave = (Chest) block.getState();
+				if (GraveUtils.canPlayerOpenGrave(block, player)) {
+					// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
+					Inventory graveInventory = grave.getInventory();
+					PlayerInventory playerInventory = player.getInventory();
+					int itemsMoved = 0;
+					int itemsLeftBehind = 0;
+					for (int i = 0; i < graveInventory.getSize(); i++) {
+						if (graveInventory.getItem(i) != null) {
+							if (playerInventory.firstEmpty() != -1) {
+								// Player has a space in their inventory. Move the item
+								playerInventory.setItem(playerInventory.firstEmpty(), graveInventory.getItem(i));
+								graveInventory.setItem(i, null);
+								itemsMoved++;
+							} else {
+								// Player doesn't have a space in their inventory. Don't move anything
+								itemsLeftBehind++;
+							}
+						}
+					}
+					MessagingUtils.sendActionBarMessage(mPlugin, player, String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind));
+					if (itemsLeftBehind == 0) {
+						block.setType(Material.AIR);
+					}
+					event.setCancelled(true);
+				} else {
+					// Player does not have permission to access this grave.
+					MessagingUtils.sendActionBarMessage(mPlugin, player, "You cannot open " + ChatColor.stripColor(grave.getCustomName()));
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -289,36 +346,88 @@ public class PlayerListener implements Listener {
 			if (event.getWhoClicked() instanceof Player) {
 				Player player = (Player)event.getWhoClicked();
 				Inventory inventory = event.getClickedInventory();
-				if (inventory == null || inventory instanceof PlayerInventory) {
+				if (inventory == null) {
+					return;
+				} else if (inventory instanceof PlayerInventory) {
 					// Don't sort player inventories until support is added
 					// to prevent sorting hotbar / armor slots
-					return;
-				}
-				if (event.getClick() != null &&
-				    event.getClick().equals(ClickType.RIGHT) &&
-				    inventory.getItem(event.getSlot()) == null &&
-				    event.getAction().equals(InventoryAction.NOTHING)) {
 
-					// Player right clicked an empty space and nothing happened
-					// Check if the last thing the player did was also the same thing.
-					// If so, sort the chest
-					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
-						JeffChestSortIntegration.sortInventory(inventory);
-						player.updateInventory();
-						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
-
-						// Just in case we sorted an item on top of where the player was clicking
-						event.setCancelled(true);
-					} else {
-						// Mark the player as having right clicked an empty slot
-						player.setMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, new FixedMetadataValue(mPlugin, 1));
+					// Prevent equipping armor if the armor is shattered
+					// We only need to worry about armor slots if they are visible
+					if (event.getView().getTopInventory().getType() == InventoryType.CRAFTING) {
+						ItemStack item = null;
+						boolean equipping = false;
+						ClickType click = event.getClick();
+						if ((click.equals(ClickType.LEFT) || click.equals(ClickType.RIGHT))) {
+							item = event.getCursor();
+							if (event.getSlotType() == SlotType.ARMOR || event.getSlot() == 40) {
+								equipping = true;
+							}
+						} else if ((click.equals(ClickType.SHIFT_LEFT) || click.equals(ClickType.SHIFT_RIGHT))) {
+							item = event.getCurrentItem();
+							EquipmentSlot targetSlotType = ItemUtils.getEquipmentSlot(item);
+							if ((targetSlotType == EquipmentSlot.FEET && inventory.getItem(36) == null) ||
+							    (targetSlotType == EquipmentSlot.LEGS && inventory.getItem(37) == null) ||
+							    (targetSlotType == EquipmentSlot.CHEST && inventory.getItem(38) == null) ||
+							    (targetSlotType == EquipmentSlot.HEAD && inventory.getItem(39) == null) ||
+							    (targetSlotType == EquipmentSlot.OFF_HAND && inventory.getItem(40) == null)) {
+								equipping = true;
+							}
+						} else if (click.equals(ClickType.NUMBER_KEY)) {
+							item = inventory.getItem(event.getHotbarButton());
+							if (event.getSlotType() == SlotType.ARMOR || event.getSlot() == 40) {
+								equipping = true;
+							}
+						}
+						if (equipping && ItemUtils.isItemShattered(item)) {
+							event.setCancelled(true);
+							MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
+						}
 					}
 				} else {
-					// Player did something else with this inventory - clear the right click metadata if present
-					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
-						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+					if (event.getClick() != null &&
+					    event.getClick().equals(ClickType.RIGHT) &&
+					    inventory.getItem(event.getSlot()) == null &&
+					    event.getAction().equals(InventoryAction.NOTHING)) {
+
+						// Player right clicked an empty space and nothing happened
+						// Check if the last thing the player did was also the same thing.
+						// If so, sort the chest
+						if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+							JeffChestSortIntegration.sortInventory(inventory);
+							player.updateInventory();
+							player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+
+							// Just in case we sorted an item on top of where the player was clicking
+							event.setCancelled(true);
+						} else {
+							// Mark the player as having right clicked an empty slot
+							player.setMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, new FixedMetadataValue(mPlugin, 1));
+						}
+					} else {
+						// Player did something else with this inventory - clear the right click metadata if present
+						if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+							player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+						}
 					}
 				}
+			}
+		}
+	}
+
+	// If an item is being dragged in an inventory
+	@EventHandler(priority = EventPriority.HIGH)
+	public void InventoryDragEvent(InventoryDragEvent event) {
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player) event.getWhoClicked();
+			// Check if the player tried to be sneaky and drag shattered armor into a slot
+			if (ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(5, null)) || // Head  Slot
+			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(6, null)) || // Chest Slot
+			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(7, null)) || // Legs  Slot
+			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(8, null)) || // Feet  Slot
+			    ItemUtils.isItemShattered(event.getNewItems().getOrDefault(45, null))) { // Offhand Slot
+				event.setCancelled(true);
+				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
 			}
 		}
 	}
@@ -364,6 +473,15 @@ public class PlayerListener implements Listener {
 
 			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+		} else if (holder instanceof Chest) {
+			Chest chest = (Chest) holder;
+			// Break empty graves in safe zones automatically when closed
+			if (GraveUtils.isGrave(chest) && ChestUtils.isEmpty(chest)) {
+				LocationType locationType = mPlugin.mSafeZoneManager.getLocationType(chest.getLocation());
+				if (locationType != LocationType.None) {
+					chest.getBlock().breakNaturally();
+				}
+			}
 		}
 	}
 
@@ -393,39 +511,17 @@ public class PlayerListener implements Listener {
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+		if (ItemUtils.isItemShattered(event.getOffHandItem())) {
+			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be repaired before use");
+			event.setCancelled(true);
+		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
 	}
 
-	private boolean _isKeptItemOnDeath(ItemStack item) {
-		if (item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				List<String> lore = meta.getLore();
-				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
-						String stripped = ChatColor.stripColor(loreEntry);
-						if ((stripped.equals("King's Valley : Tier I")) ||
-						    (stripped.equals("King's Valley : Tier II")) ||
-						    (stripped.equals("King's Valley : Tier III")) ||
-						    (stripped.equals("Celsian Isles : Tier I")) ||
-						    (stripped.equals("Celsian Isles : Tier II")) ||
-						    (stripped.equals("Celsian Isles : Tier III"))) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private static final List<Integer> ITEM_SLOTS_TO_PRESERVE =
+	private static final List<Integer> KEEP_EQUIPPED_SLOTS =
 	    Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
-	private static final List<Integer> ITEM_SLOTS_TO_DROP =
-	    Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
 
 	private static final int KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 10;
-	private static final int DROPPED_ITEM_INVULNERABLE_TICKS = 600;
 
 	// The player has died
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -456,75 +552,51 @@ public class PlayerListener implements Listener {
 			List<Item> droppedItems = new ArrayList<Item>();
 
 			PlayerInventory inv = player.getInventory();
-			for (int slotId : ITEM_SLOTS_TO_PRESERVE) {
-				// Potentially kept slot
-				ItemStack item = inv.getItem(slotId);
-				if (item != null) {
-					if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) != 0) {
-						inv.clear(slotId);
-					} else if (mPlugin.mServerProperties.getKeepLowTierInventory() &&
-					           _isKeptItemOnDeath(item) &&
-							   (item.getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0)) {
-						// Good matching item that does not have curse of binding - will be kept on death
-						ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-						if (meta != null && (meta instanceof Damageable)) {
-							// This item can be damaged - remove some durability from it
-							Damageable dMeta = (Damageable)meta;
-							short maxDurability = item.getType().getMaxDurability();
-							int currentDamage = dMeta.getDamage();
-							dMeta.setDamage(Math.min(maxDurability, currentDamage + (maxDurability * KEPT_ITEM_DURABILITY_DAMAGE_PERCENT) / 100));
-
-							// Probably redundant, but can't hurt
-							item.setItemMeta(meta);
-						}
-					} else {
-						// Non-matching item, need to drop it and remove from inventory
-						Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
-
-						// Make the dropped item invulnerable for a short while to prevent double-creepering
-						droppedItem.setInvulnerable(true);
-						droppedItems.add(droppedItem);
-
-						inv.clear(slotId);
-					}
+			for (int slot = 0; slot <= 40; slot++) {
+				ItemStack item = inv.getItem(slot);
+				if (item == null) {
+					continue;
 				}
-			}
-			for (int slotId : ITEM_SLOTS_TO_DROP) {
-				// Regular inventory item - don't check, just drop it
-				ItemStack item = inv.getItem(slotId);
-				if (item != null) {
-					if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) != 0) {
-						inv.clear(slotId);
-					} else {
-						Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
-
-						// Make the dropped item invulnerable for a short while to prevent double-creepering
-						droppedItem.setInvulnerable(true);
-						droppedItems.add(droppedItem);
-
-						inv.clear(slotId);
+				ItemDeathResult result = ItemUtils.getItemDeathResult(item);
+				if (result == ItemDeathResult.DESTROY) {
+					// Item has Curse of Vanishing. It should be deleted
+					inv.clear(slot);
+				} else if (result == ItemDeathResult.KEEP) {
+					// Item is kept with no durability loss
+					// This empty if statement is intentional so it's not included in "else".
+				} else if (result == ItemDeathResult.KEEP_DAMAGED ||
+				           (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
+					// Item is kept on death with a durability loss
+					ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
+					if (meta != null && (meta instanceof Damageable)) {
+						// This item can be damaged - remove some durability from it
+						Damageable dMeta = (Damageable)meta;
+						short maxDurability = item.getType().getMaxDurability();
+						int currentDamage = dMeta.getDamage();
+						dMeta.setDamage(Math.min(maxDurability, currentDamage + (maxDurability * KEPT_ITEM_DURABILITY_DAMAGE_PERCENT) / 100));
+						// Probably redundant, but can't hurt
+						item.setItemMeta(meta);
 					}
+				} else {
+					// Item is dropped, decide what to do with it.
+					Location location = player.getLocation();
+					Item droppedItem = player.getWorld().dropItemNaturally(location, item);
+					if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
+						droppedItem.setInvulnerable(true);
+					}
+					if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER) &&
+					    !player.getScoreboardTags().contains("DisableGraves")) {
+						droppedItem.addScoreboardTag("PlayerDeath");
+						droppedItem.addScoreboardTag(String.format("PlayerDeathLocation;%d;%d;%d", location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+						droppedItem.addScoreboardTag(String.format("PlayerDeathUsername;%s", player.getName()));
+					}
+					droppedItems.add(droppedItem);
+					inv.clear(slot);
 				}
 			}
 
 			if (droppedItems.size() > 0) {
 				player.sendMessage(ChatColor.RED + "Some of your items were dropped! See /deathhelp for info");
-
-				/* Some items were dropped and they were set to invulnerable
-				 *
-				 * Set them to be un-invulnerable 3s later unless it has 'Hope' in lore text!
-				 */
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						for (Item droppedItem : droppedItems) {
-							if (!InventoryUtils.testForItemWithLore(droppedItem.getItemStack(), ChatColor.GRAY + "Hope")) {
-								// This item doesn't have hope - shouldn't be invulnerable anymore
-								droppedItem.setInvulnerable(false);
-							}
-						}
-					}
-				}.runTaskLater(mPlugin, DROPPED_ITEM_INVULNERABLE_TICKS);
 			}
 		}
 
@@ -860,10 +932,10 @@ public class PlayerListener implements Listener {
 			 * If that task fires, trigger the extended sneak event and remove the metadata
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
-				() -> {
-					AbilityManager.getManager().PlayerExtendedSneakEvent(player);
-					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
-				}, 20);
+					() -> {
+						AbilityManager.getManager().PlayerExtendedSneakEvent(player);
+						player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+					}, 20);
 
 			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
 		} else {

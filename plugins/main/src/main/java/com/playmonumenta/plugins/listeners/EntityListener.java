@@ -48,6 +48,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -64,6 +65,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -82,6 +84,9 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GraveUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -229,11 +234,16 @@ public class EntityListener implements Listener {
 
 			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
+				if (ItemUtils.isItemShattered(player.getInventory().getItemInMainHand())) {
+					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
+					event.setCancelled(true);
+					return;
+				}
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-						&& !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
 					}
 				}
@@ -342,6 +352,11 @@ public class EntityListener implements Listener {
 						}
 					}
 				}
+			}
+		} else if (damagee instanceof Item) {
+			if (!damagee.getScoreboardTags().contains("ItemDamageTriggered")) {
+				damagee.addScoreboardTag("ItemDamageTriggered");
+				GraveUtils.destroyItemEntity((Item) damagee);
 			}
 		} else {
 			// Not damaging a player
@@ -725,7 +740,7 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.getEntity() instanceof Creature && (event.getEntity().hasMetadata(EntityUtils.MOB_IS_STUNNED_METAKEY)
-			|| event.getEntity().hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY))) {
+		                                              || event.getEntity().hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY))) {
 			event.setCancelled(true);
 			return;
 		}
@@ -741,7 +756,7 @@ public class EntityListener implements Listener {
 		LivingEntity applier = (LivingEntity) event.getApplier();
 
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
-			&& event.getEffect().getType() == PotionEffectType.SLOW) {
+		    && event.getEffect().getType() == PotionEffectType.SLOW) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);
 		}
 
@@ -772,6 +787,25 @@ public class EntityListener implements Listener {
 			Player player = (Player) event.getDamaged();
 			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
 			mAbilities.BossAbilityDamageEvent(player, event);
+		}
+	}
+
+	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void ItemDespawnEvent(ItemDespawnEvent event) {
+		Item entity = event.getEntity();
+		GraveUtils.destroyItemEntity(entity);
+	}
+
+	// Fires any time any entity is deleted.
+	@EventHandler(priority = EventPriority.HIGH)
+	public void EntityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+		if (event.getEntity() instanceof Item) {
+			// Check if an item entity was destroyed by the void.
+			Item entity = (Item) event.getEntity();
+			if (entity.getLocation().getY() <= -64) {
+				GraveUtils.destroyItemEntity(entity);
+			}
 		}
 	}
 

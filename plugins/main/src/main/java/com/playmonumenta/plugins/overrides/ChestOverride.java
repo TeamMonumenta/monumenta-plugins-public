@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,9 +20,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 
+import net.md_5.bungee.api.ChatColor;
+
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -122,6 +124,18 @@ public class ChestOverride extends BaseOverride {
 		} else if (!_breakable(block)) {
 			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
 			return false;
+		} else if (GraveUtils.isGrave(block)) {
+			if (ChestUtils.isEmpty(block)) {
+				// Remove the custom name from the grave before breaking it.
+				// Players should not be able to obtain graves.
+				Chest chest = (Chest)block.getState();
+				chest.setCustomName(null);
+				chest.update();
+				return true;
+			} else {
+				MessagingUtils.sendActionBarMessage(plugin, player, "You cannot break graves with items inside");
+				return false;
+			}
 		}
 
 		check_nerf_chest(block, player);
@@ -135,6 +149,17 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		} else if (!_breakable(block)) {
 			return false;
+		} else if (GraveUtils.isGrave(block)) {
+			if (ChestUtils.isEmpty(block)) {
+				// Remove the custom name from the grave before breaking it.
+				// Players should not be able to obtain graves.
+				Chest chest = (Chest)block.getState();
+				chest.setCustomName(null);
+				chest.update();
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 		for (Player player : PlayerUtils.getNearbyPlayers(block.getLocation(), 30)) {
@@ -252,8 +277,8 @@ public class ChestOverride extends BaseOverride {
 				}
 
 				if (ScoreboardUtils.getScoreboardValue(player, "Pink") > 0
-					|| ScoreboardUtils.getScoreboardValue(player, "Gray") > 0
-					|| ScoreboardUtils.getScoreboardValue(player, "Cyan") > 0) {
+				    || ScoreboardUtils.getScoreboardValue(player, "Gray") > 0
+				    || ScoreboardUtils.getScoreboardValue(player, "Cyan") > 0) {
 					// Nothing to do - player has met the prereqs
 					return;
 				}

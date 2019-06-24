@@ -4,7 +4,9 @@ import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -64,5 +66,18 @@ public class ChestUtils {
 				}
 			}
 		}
+	}
+
+	public static boolean isEmpty(Block block) {
+		return block.getState() instanceof Chest && isEmpty((Chest)block.getState());
+	}
+
+	public static boolean isEmpty(Chest chest) {
+		for (ItemStack slot : chest.getInventory()) {
+			if (slot != null) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

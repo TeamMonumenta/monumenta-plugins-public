@@ -1,8 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
@@ -142,5 +147,55 @@ public class LocationUtils {
 		}
 
 		return true;
+	}
+
+	// Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
+	public static Location getNearestBlock(Location center, int radius, Material... materials) {
+		int cx = center.getBlockX();
+		int cy = center.getBlockY();
+		int cz = center.getBlockZ();
+		World world = center.getWorld();
+		Location nearest = null;
+		double nearestDistance = Double.MAX_VALUE;
+
+		for (double x = cx - radius; x <= cx + radius; x++) {
+			for (double z = cz - radius; z <= cz + radius; z++) {
+				for (double y = (cy - radius); y <= (cy + radius); y++) {
+					Location loc = new Location(world, x, y, z);
+					double distance = Math.sqrt(((cx - x) * (cx - x)) + ((cz - z) * (cz - z)) + ((cy - y) * (cy - y)));
+					if (distance < nearestDistance) {
+						for (Material material : materials) {
+							if (loc.getBlock().getType() == material) {
+								nearest = loc;
+								nearestDistance = distance;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		return nearest;
+	}
+
+	// Search a cuboid around a Location and return a List of all Chests inside the area
+	public static List<Chest> getNearbyChests(Location center, int radius) {
+		int cx = center.getBlockX();
+		int cy = center.getBlockY();
+		int cz = center.getBlockZ();
+		World world = center.getWorld();
+		List<Chest> chests = new ArrayList<Chest>();
+
+		for (int x = cx - radius; x <= cx + radius; x++) {
+			for (int z = cz - radius; z <= cz + radius; z++) {
+				for (int y = (cy - radius); y < (cy + radius); y++) {
+					Location loc = new Location(world, x, y + 2, z);
+					if (loc.getBlock().getState() instanceof Chest) {
+						chests.add((Chest) loc.getBlock().getState());
+					}
+				}
+			}
+		}
+		return chests;
 	}
 }

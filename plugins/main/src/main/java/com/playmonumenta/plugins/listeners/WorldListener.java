@@ -14,9 +14,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -29,6 +31,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
@@ -162,12 +165,29 @@ public class WorldListener implements Listener {
 	public void BlockDispenseEvent(BlockDispenseEvent event) {
 		Block block = event.getBlock();
 		ItemStack dispensed = event.getItem();
+		if (ItemUtils.isItemShattered(dispensed)) {
+			event.setCancelled(true);
+		}
 
 		if (!mPlugin.mItemOverrides.blockDispenseInteraction(mPlugin, block, dispensed)) {
 			event.setCancelled(true);
 			return;
 		}
 	}
+
+	// Block Dispense Armor Event
+	@EventHandler(priority = EventPriority.HIGH)
+	public void BlockDispenseArmorEvent(BlockDispenseArmorEvent event) {
+		// Cancel dispensers equipping shattered armor to a player
+		if (ItemUtils.isItemShattered(event.getItem())) {
+			if (event.getTargetEntity() instanceof Player) {
+				MessagingUtils.sendActionBarMessage(mPlugin, (Player) event.getTargetEntity(), "Shattered items must be repaired before use");
+			}
+			event.setCancelled(true);
+			return;
+		}
+	}
+
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void BlockFormEvent(BlockFormEvent event) {
