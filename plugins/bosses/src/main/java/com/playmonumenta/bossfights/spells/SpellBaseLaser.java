@@ -184,7 +184,7 @@ public class SpellBaseLaser extends Spell {
 				if (!blocked) {
 					// Really check to make sure it's not blocked
 					// This takes into account block shapes!
-					blocked = Utils.hasLineOfSight(launLoc, target);
+					blocked = !(Utils.hasLineOfSight(launLoc, target));
 				}
 
 				if (blocked && mStopWhenBlocked) {
