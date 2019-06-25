@@ -38,6 +38,7 @@ import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellEruption;
 import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellFluffPools;
 import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellFluffingDeath;
 import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellOmegaLeap;
+import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
 
@@ -122,7 +123,15 @@ public class RabbitGodBoss extends BossAbilityGroup {
 				world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-				player.damage(1, mBoss);
+				if (!blocked) {
+					// Check to see if the player is shielding
+					if (player.isBlocking()) {
+						DamageUtils.damage(mBoss, player, 1);
+						player.setCooldown(Material.SHIELD, 10);
+					} else {
+						DamageUtils.damage(null, player, 1);
+					}
+				}
 			}
 		);
 
