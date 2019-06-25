@@ -22,7 +22,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PulseLaserBoss(plugin, boss);
+		return new FlameLaserBoss(plugin, boss);
 	}
 
 	public FlameLaserBoss(Plugin plugin, LivingEntity boss) {
@@ -32,8 +32,8 @@ public class FlameLaserBoss extends BossAbilityGroup {
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 		                       // Tick action per player
 		                       (Player player, int ticks, boolean blocked) -> {
-		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
-		                           boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + ((float)ticks / 80f) * 1.5f);
+		                           player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+		                           boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
 		                           if (ticks == 0) {
 		                               boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4), true);
 		                           }
