@@ -36,11 +36,12 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
- * fall damage and does +2.5/3 for block fallen extra damage to all mobs
- * within 3/5 blocks. Right clicking the air twice in quick succession
- * grants you 4s of Jump Boost 4/5. (The jump boost has cooldown 10/7s).
+ * fall damage and does +3/4 for every block fallen diminishing returns
+ * also deals the extra damage to all mobs within 3/5 blocks.
+ * Right clicking the air twice in quick succession
+ * grants you 2s of Jump Boost 4/5. (The jump boost has cooldown 7/5s).
  * If you fall more than 3 blocks without hitting an enemy, you still deal
- * damage but take full fall damage.
+ * damage but also take full fall damage.
  */
 
 public class MeteorSlam extends Ability {
@@ -130,7 +131,7 @@ public class MeteorSlam extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1.5
 		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)
 		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 			double damage = getSlamDamage(mPlayer, getAbilityScore(), mPlayer.getFallDistance());
