@@ -50,10 +50,15 @@ public class PotionMap {
 			PotionInfo bestEffect = getBestEffect();
 
 			// If the current "best" negative effect is less than this new one, track it
+			// Make sure the last effect has had a chance to trigger before refreshing it
 			if (bestEffect == null
 			    || bestEffect.amplifier < newPotionInfo.amplifier
-			    || (bestEffect.amplifier == newPotionInfo.amplifier)
-			    && (bestEffect.duration < newPotionInfo.duration)) {
+			    || (bestEffect.amplifier == newPotionInfo.amplifier
+			        && bestEffect.duration < newPotionInfo.duration
+			        && (newPotionInfo.type != PotionEffectType.POISON
+			            || newPotionInfo.duration - bestEffect.duration >= 25 / (bestEffect.amplifier + 1) + 1)
+			        && (newPotionInfo.type != PotionEffectType.WITHER
+			            || newPotionInfo.duration - bestEffect.duration >= 40 / (bestEffect.amplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 
@@ -64,7 +69,10 @@ public class PotionMap {
 		} else {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
-			if (currentInfo == null || currentInfo.duration < newPotionInfo.duration) {
+			if (currentInfo == null
+			    || currentInfo.duration < newPotionInfo.duration
+			    || currentInfo.type != PotionEffectType.REGENERATION
+			    || newPotionInfo.duration - currentInfo.duration >= 50 / (currentInfo.amplifier + 1) + 1) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
