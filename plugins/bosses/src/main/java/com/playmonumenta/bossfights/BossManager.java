@@ -85,6 +85,7 @@ import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
 import com.playmonumenta.bossfights.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
 import com.playmonumenta.bossfights.bosses.RabbitGodBoss;
+import com.playmonumenta.bossfights.bosses.RejuvenationBoss;
 import com.playmonumenta.bossfights.bosses.SnowballDamageBoss;
 import com.playmonumenta.bossfights.bosses.SwordsageRichter;
 import com.playmonumenta.bossfights.bosses.TCalin;
@@ -170,6 +171,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> new IceAspectBoss(p, e));
 		mStatelessBosses.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new TsunamiChargerBoss(p, e));
 		mStatelessBosses.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossBoss(p, e));
+		mStatelessBosses.put(RejuvenationBoss.identityTag, (Plugin p, LivingEntity e) -> new RejuvenationBoss(p, e));
 		mStatelessBosses.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new HandSwapBoss(p, e));
 		mStatelessBosses.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> new UnstableBoss(p, e));
 		mStatelessBosses.put(BerserkerBoss.identityTag, (Plugin p, LivingEntity e) -> new BerserkerBoss(p, e));
@@ -246,6 +248,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CShura_2.identityTag, (Plugin p, LivingEntity e) -> CShura_2.deserialize(p, e));
 		mBossDeserializers.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> TsunamiChargerBoss.deserialize(p, e));
 		mBossDeserializers.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossBoss.deserialize(p, e));
+		mBossDeserializers.put(RejuvenationBoss.identityTag, (Plugin p, LivingEntity e) -> RejuvenationBoss.deserialize(p, e));
 		mBossDeserializers.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> HandSwapBoss.deserialize(p, e));
 		mBossDeserializers.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> UnstableBoss.deserialize(p, e));
 		mBossDeserializers.put(BerserkerBoss.identityTag, (Plugin p, LivingEntity e) -> BerserkerBoss.deserialize(p, e));
