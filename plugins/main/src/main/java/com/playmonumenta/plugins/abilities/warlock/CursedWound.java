@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -15,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -51,6 +53,8 @@ public class CursedWound extends Ability {
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
 				PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
 				event.setDamage(event.getDamage() + damageBonus);
+				CustomDamageEvent customDamageEvent = new CustomDamageEvent(mPlayer, damagee, 0, null);
+				Bukkit.getPluginManager().callEvent(customDamageEvent);
 			}
 
 			if (getAbilityScore() > 1 && PlayerUtils.isCritical(mPlayer)) {
