@@ -17,18 +17,39 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Inferno implements BaseEnchantment {
+
+	public static class InfernoMob {
+		public Player triggeredBy;
+		public int level;
+		public double fireResistantDamage;
+
+		public InfernoMob(Player triggeredBy, int level) {
+			this.triggeredBy = triggeredBy;
+			this.level = level;
+			this.fireResistantDamage = (level + 1) / 2.0;
+		}
+	}
+
+	public static final String SET_FIRE_TICK_METAKEY = "FireSetOnMobTick";
+	public static final String FIRE_TICK_METAKEY = "FireDamagedMobTick";
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
 	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 
-	private static final Map<LivingEntity, Integer> sTaggedMobs = new HashMap<LivingEntity, Integer>();
+	private static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static BukkitRunnable sRunnable = null;
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
+
+	private static final int FIRE_RESISTANT_INFERNO_TICKS = 80;
 
 	@Override
 	public String getProperty() {
@@ -41,43 +62,70 @@ public class Inferno implements BaseEnchantment {
 	}
 
 	@Override
-	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		infernoTagMob(plugin, target, level);
+	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		// This workaround makes sure the custom inferno damage does not re-apply inferno
+		// Regular mobs burning from inferno are removed from the list by an on-fire, not timer basis, so are unaffected
+		if (!sTaggedMobs.containsKey(target)) {
+			infernoTagMob(plugin, target, level, player);
+			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		}
 	}
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
-			int mainHandLevel = this.getLevelFromItem(player.getInventory().getItemInMainHand());
-			int offHandLevel = this.getLevelFromItem(player.getInventory().getItemInOffHand());
-
-			if (mainHandLevel > 0 && offHandLevel > 0
-			    && player.getInventory().getItemInMainHand().getType().equals(Material.BOW)
-			    && player.getInventory().getItemInOffHand().getType().equals(Material.BOW)) {
-				/* If we're trying to cheat by dual-wielding this enchant, subtract the lower of the two levels */
-				level -= mainHandLevel < offHandLevel ? mainHandLevel : offHandLevel;
-			}
-
+			/*
+			 * You can delete this comment after viewing, but there is no longer a check for "cheating" by dual
+			 * wielding inferno because there now exist proper offhands with as high a level of inferno as mainhand
+			 * inferno items, so there is little (if any) benefit to dual wielding mainhand inferno items.
+			 */
 			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
 		}
 	}
 
-	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level) {
+	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player) {
 		/* Record this mob as being inferno tagged */
-		sTaggedMobs.put(target, level);
+		sTaggedMobs.put(target, new InfernoMob(player, level));
 
 		/* Make sure the ticking task is running that periodically validates that a mob is still alive and burning */
 		if (sRunnable == null) {
 			sRunnable = new BukkitRunnable() {
 				public void run() {
-					Iterator<Entry<LivingEntity, Integer>> infernoMobsIter = sTaggedMobs.entrySet().iterator();
+					Iterator<Entry<LivingEntity, InfernoMob>> infernoMobsIter = sTaggedMobs.entrySet().iterator();
 					while (infernoMobsIter.hasNext()) {
-						Entry<LivingEntity, Integer> entry = infernoMobsIter.next();
+						Entry<LivingEntity, InfernoMob> entry = infernoMobsIter.next();
 						LivingEntity mob = entry.getKey();
+						InfernoMob value = entry.getValue();
+						int ticksLived = mob.getTicksLived();
 
-						/* Inferno wears off when the mob despawns, dies, or is extinguished */
-						if (!mob.isValid() || mob.getHealth() < 0 || mob.getFireTicks() <= 0) {
+						/*
+						 * Inferno wears off when the mob despawns, dies, is in water, is extinguished and NOT fire resistant,
+						 * or is fire resistant and has "burned" for 4 seconds.
+						 */
+						// TODO: Better water hitbox registration (not a huge issue because fire resistant mobs near water is a fringe case)
+						if (!mob.isValid() || mob.getHealth() <= 0) {
 							infernoMobsIter.remove();
+						} else if (EntityUtils.isFireResistant(mob)) {
+							if (mob.getLocation().getBlock().getType() == Material.WATER
+								|| ticksLived - mob.getMetadata(SET_FIRE_TICK_METAKEY).get(0).asInt() >= FIRE_RESISTANT_INFERNO_TICKS) {
+								infernoMobsIter.remove();
+							}
+						} else if (mob.getFireTicks() < 20) {
+							// 20 ticks is the default value for how long a mob can be on fire without burning
+							infernoMobsIter.remove();
+						}
+
+						// If the mob hasn't taken a fire tick in the past second, then give it a manual damage tick
+						// This is either caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
+						if (ticksLived - mob.getMetadata(FIRE_TICK_METAKEY).get(0).asInt() > 20) {
+							double damage = EntityUtils.isFireResistant(mob) == true ? value.fireResistantDamage : value.level;
+							mob.setNoDamageTicks(0);
+							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
+							Vector velocity = mob.getVelocity();
+							EntityUtils.damageEntity(plugin, mob, damage, value.triggeredBy);
+							mob.setVelocity(velocity);
+							mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 						}
 					}
 
@@ -89,9 +137,10 @@ public class Inferno implements BaseEnchantment {
 				}
 			};
 
-			sRunnable.runTaskTimer(plugin, 5, 5);
+			sRunnable.runTaskTimer(plugin, 1, 1);
 		}
 	}
+
 
 	/*
 	 * TODO: This needs some kind of better registration than expecting it to be called directly
@@ -103,8 +152,9 @@ public class Inferno implements BaseEnchantment {
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (proj.hasMetadata(LEVEL_METAKEY)) {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-
-			infernoTagMob(plugin, target, level);
+			infernoTagMob(plugin, target, level, (Player) proj.getShooter());
+			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 		}
 	}
 
@@ -116,8 +166,9 @@ public class Inferno implements BaseEnchantment {
 	 */
 	public static void onFireTick(LivingEntity mob, EntityDamageEvent event) {
 		if (!sTaggedMobs.isEmpty()) {
-			Integer infernoValue = sTaggedMobs.get(mob);
+			Integer infernoValue = sTaggedMobs.get(mob).level;
 			if (infernoValue != null) {
+				mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(Plugin.getInstance(), mob.getTicksLived()));
 				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 				event.setDamage(event.getDamage() + infernoValue);
 			}
