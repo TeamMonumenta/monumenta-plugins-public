@@ -55,7 +55,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -136,7 +135,7 @@ public class EntityListener implements Listener {
 		Entity combustee = event.getEntity();
 		Entity combuster = event.getCombuster();
 
-		if (combuster instanceof Player && combustee.getFireTicks() <= 0) {
+		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
 			Player player = (Player)combuster;
 
 			/* Don't let the player interact with the world when transferring */
