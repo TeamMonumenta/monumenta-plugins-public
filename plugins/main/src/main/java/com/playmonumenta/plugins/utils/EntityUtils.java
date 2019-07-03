@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
@@ -21,9 +22,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Phantom;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
@@ -32,6 +35,8 @@ import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -41,10 +46,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 public class EntityUtils {
@@ -86,6 +93,11 @@ public class EntityUtils {
 		}
 
 		return false;
+	}
+
+	public static boolean isFireResistant(LivingEntity mob) {
+		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
+			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -366,6 +378,12 @@ public class EntityUtils {
 			}
 		}
 		return target;
+	}
+
+	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob) {
+		mob.setMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
+		mob.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
+		mob.setFireTicks(ticks);
 	}
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
