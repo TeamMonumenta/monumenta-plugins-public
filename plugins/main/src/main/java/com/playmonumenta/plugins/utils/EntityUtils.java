@@ -381,7 +381,7 @@ public class EntityUtils {
 	}
 
 	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob) {
-		mob.setMetadata(Constants.ENTITY_COMBUST_NONCE_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
+		mob.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 		mob.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 		mob.setFireTicks(ticks);
 	}

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Inferno implements BaseEnchantment {
 
@@ -63,18 +65,21 @@ public class Inferno implements BaseEnchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		// This workaround makes sure the custom inferno damage does not re-apply inferno
-		// Regular mobs burning from inferno are removed from the list by an on-fire, not timer basis, so are unaffected
-		if (!sTaggedMobs.containsKey(target)) {
+		// If the player melee attacks with a fire aspect weapon OR if the mob has the metadata
+		// applied by ability fire, add the mob to inferno tracking
+		if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
+			&& !MetadataUtils.happenedThisTick(plugin, player, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			infernoTagMob(plugin, target, level, player);
 			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
+			infernoTagMob(plugin, target, level, player);
 		}
 	}
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
-		if (ALLOWED_PROJECTILES.contains(proj.getType())) {
+		if (ALLOWED_PROJECTILES.contains(proj.getType()) && proj.getFireTicks() > 0) {
 			/*
 			 * You can delete this comment after viewing, but there is no longer a check for "cheating" by dual
 			 * wielding inferno because there now exist proper offhands with as high a level of inferno as mainhand
