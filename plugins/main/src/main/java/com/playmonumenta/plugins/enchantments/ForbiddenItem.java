@@ -48,7 +48,7 @@ public class ForbiddenItem implements BaseEnchantment {
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
-			MessagingUtils.sendActionBarMessage(plugin, player, ChatColor.stripColor(mPropertyName) + " items can not be used here!");
+			MessagingUtils.sendActionBarMessage(plugin, player, ChatColor.stripColor(mPropertyName).replace(" :", "") + " items can not be used here!");
 		}
 	}
 
