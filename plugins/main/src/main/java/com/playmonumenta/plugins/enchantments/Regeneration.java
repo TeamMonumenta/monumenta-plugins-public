@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -12,10 +16,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Regeneration implements BaseEnchantment {
 	private static String REGEN = ChatColor.GRAY + "Regeneration";
 	private static String MAINHAND_REGEN = ChatColor.GRAY + "Mainhand Regeneration";
+	private static final double BASE_HEAL_RATE = 1.0 / 3 / 4; // Divide by 4 because tick() triggers 4 times a second
+
+	private Map<UUID, Double> mRegenerationTracker = new HashMap<UUID, Double>();
 
 	/*
 	 * This is only used by the default get level from item implementation
@@ -40,13 +48,19 @@ public class Regeneration implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}
 
+	// This seems to trigger 4 times a second despite BaseEnchantment claiming it triggers once a second
 	@Override
-	public void applyProperty(Plugin plugin, Player player, int level) {
-		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.REGENERATION, 1000049, 0, true, false));
-	}
+	public void tick(Plugin plugin, World world, Player player, int level) {
+		if (!mRegenerationTracker.containsKey(player.getUniqueId())) {
+			mRegenerationTracker.put(player.getUniqueId(), 0.0);
+		} else {
+			double newAmount = mRegenerationTracker.get(player.getUniqueId()) + BASE_HEAL_RATE * Math.sqrt(level);
+			if (newAmount >= 1) {
+				PlayerUtils.healPlayer(player, 1);
+				newAmount--;
+			}
 
-	@Override
-	public void removeProperty(Plugin plugin, Player player) {
-		plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.REGENERATION);
+			mRegenerationTracker.put(player.getUniqueId(), newAmount);
+		}
 	}
 }
