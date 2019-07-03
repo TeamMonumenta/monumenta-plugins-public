@@ -52,7 +52,7 @@ public class ElementalArrows extends Ability {
 			damage += event.getDamage();
 			event.setDamage(0);
 			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE);
-			damagee.setFireTicks(ELEMENTAL_ARROWS_DURATION);
+			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, damagee);
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {

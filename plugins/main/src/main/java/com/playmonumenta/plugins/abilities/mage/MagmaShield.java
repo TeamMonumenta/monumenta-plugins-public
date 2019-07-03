@@ -48,7 +48,7 @@ public class MagmaShield extends Ability {
 			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
 				float kb = (mob instanceof Player) ? 0.3f : MAGMA_SHIELD_KNOCKBACK_SPEED;
 				MovementUtils.KnockAway(mPlayer, mob, kb);
-				mob.setFireTicks(MAGMA_SHIELD_FIRE_DURATION);
+				EntityUtils.applyFire(mPlugin, MAGMA_SHIELD_FIRE_DURATION, mob);
 
 				int extraDamage = getAbilityScore() == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
 				if (mob instanceof Player && extraDamage > 10) {

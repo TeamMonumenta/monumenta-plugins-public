@@ -112,7 +112,7 @@ public class Starfall extends Ability {
 								} else {
 									EntityUtils.damageEntity(mPlugin, e, (float) damage, player, MagicType.FIRE);
 								}
-								e.setFireTicks(STARFALL_FIRE_DURATION);
+								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e);
 
 								Vector v = e.getLocation().toVector().subtract(loc.toVector()).normalize();
 								v.add(new Vector(0, 0.2, 0));

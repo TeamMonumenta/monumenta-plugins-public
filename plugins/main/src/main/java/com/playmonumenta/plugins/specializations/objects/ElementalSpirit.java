@@ -99,7 +99,7 @@ public class ElementalSpirit {
 
 					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9, player)) {
 						EntityUtils.damageEntity(Plugin.getInstance(), e, dmg, player);
-						e.setFireTicks(20 * 5);
+						EntityUtils.applyFire(Plugin.getInstance(), 20 * 5, e);
 					}
 					mWorld.spawnParticle(Particle.FLAME, loc, 11, 0.75, 0.75, 0.75, 0.025);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.75, 0.75, 0.75, 0.025);
@@ -190,7 +190,7 @@ public class ElementalSpirit {
 					                         1.25f);
 					EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
 					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3, player)) {
-						e.setFireTicks(20 * 3);
+						EntityUtils.applyFire(Plugin.getInstance(), 20 * 3, e);
 						e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1, false, true));
 					}
 				}
