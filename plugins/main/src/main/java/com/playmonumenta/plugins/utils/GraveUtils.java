@@ -98,47 +98,47 @@ public class GraveUtils {
 
 	// Check if a block is a grave
 	public static boolean isGrave(Block block) {
-		return block.getState() instanceof Chest && isGrave((Chest) block.getState());
+		return block != null && block.getState() instanceof Chest && isGrave((Chest) block.getState());
 	}
 
 	// Check if a chest is a grave
 	public static boolean isGrave(Chest chest) {
-		return chest.getCustomName().toLowerCase().endsWith("'s grave");
+		return chest != null && chest.getCustomName() != null && chest.getCustomName().toLowerCase().endsWith("'s grave");
 	}
 
 	// Check if a block is a player's grave
 	public static boolean isGraveOfPlayer(Block block, Player player) {
-		return block.getState() instanceof Chest && isGraveOfPlayer((Chest)block.getState(), player.getName());
+		return block != null && player != null && block.getState() instanceof Chest && isGraveOfPlayer((Chest)block.getState(), player.getName());
 	}
 
 	// Check if a block is a player's grave via username
 	public static boolean isGraveOfPlayer(Block block, String username) {
-		return block.getState() instanceof Chest && isGraveOfPlayer((Chest)block.getState(), username);
+		return block != null && username != null && block.getState() instanceof Chest && isGraveOfPlayer((Chest)block.getState(), username);
 	}
 
 	// Check if a chest is a player's grave
 	public static boolean isGraveOfPlayer(Chest chest, Player player) {
-		return isGraveOfPlayer(chest, player.getName());
+		return chest != null && player != null && isGraveOfPlayer(chest, player.getName());
 	}
 
 	// Check if a chest is a player's grave via username
 	public static boolean isGraveOfPlayer(Chest chest, String username) {
-		return ChatColor.stripColor(chest.getCustomName()).toLowerCase().equals(username.toLowerCase() + "'s grave");
+		return chest != null && username != null && chest.getCustomName() != null && ChatColor.stripColor(chest.getCustomName()).toLowerCase().equals(username.toLowerCase() + "'s grave");
 	}
 
 	// Check if a player can open a grave. You should run isGrave() first.
 	public static boolean canPlayerOpenGrave(Block block, Player player) {
-		return block.getState() instanceof Chest && canPlayerOpenGrave((Chest)block.getState(), player.getName());
+		return block != null && player != null && block.getState() instanceof Chest && canPlayerOpenGrave((Chest)block.getState(), player.getName());
 	}
 
 	// Check if a player can open a grave. You should run isGrave() first.
 	public static boolean canPlayerOpenGrave(Block block, String username) {
-		return block.getState() instanceof Chest && canPlayerOpenGrave((Chest)block.getState(), username);
+		return block != null && username != null && block.getState() instanceof Chest && canPlayerOpenGrave((Chest)block.getState(), username);
 	}
 
 	// Check if a player can open a grave. You should run isGrave() first.
 	public static boolean canPlayerOpenGrave(Chest chest, Player player) {
-		return canPlayerOpenGrave(chest, player.getName());
+		return chest != null && player != null && canPlayerOpenGrave(chest, player.getName());
 	}
 
 	// Check if a player can open a grave. You should run isGrave() first.
