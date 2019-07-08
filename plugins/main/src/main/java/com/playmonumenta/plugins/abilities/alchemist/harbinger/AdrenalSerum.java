@@ -28,11 +28,11 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  * Crouch while throwing an Alchemist Potion and you'll instead consume the
  * potion and buff yourself. You gain 20s of Regen II, Strength I, Speed I, but
  * when the effect ends you take 4 damage.
- * At level 2 you also gain Resistance I and Haste II (Cooldown 30s)
+ * At level 2 you also gain Resistance I and Haste II (Cooldown 20s)
  */
 
 public class AdrenalSerum extends Ability {
-	private static final int ADRENAL_SERUM_COOLDOWN = 30 * 20;
+	private static final int ADRENAL_SERUM_COOLDOWN = 20 * 20;
 	private static final int ADRENAL_SERUM_DURATION = 15 * 20;
 	private static final double ADRENAL_SERUM_DAMAGE = 4;
 	private static final Particle.DustOptions ADRENAL_SERUM_COLOR = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
@@ -137,6 +137,7 @@ public class AdrenalSerum extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
+	@Override
 	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
 		// This is sufficient because we are already checking conditions in runCheck()
 		potion.remove();

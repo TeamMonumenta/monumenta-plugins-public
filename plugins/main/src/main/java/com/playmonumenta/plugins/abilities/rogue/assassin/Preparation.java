@@ -24,14 +24,14 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
  * Dagger Throw: stuns hit enemies for 1 / 1.5 seconds
  * Smokescreen: Slowness and Weakness duration increased by 5 / 8 seconds
  * Escape Death: Gain 3 / 5 seconds of invulnerability
- * Cooldown: 30 / 20 seconds if you use an ability in the 5 second period.
+ * Cooldown: 20 seconds if you use an ability in the 5 second period.
  */
 
 public class Preparation extends Ability {
 
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "PreparationTickRightClicked";
 
-	private static final int PREPARATION_1_COOLDOWN = 20 * 30;
+	private static final int PREPARATION_1_COOLDOWN = 20 * 20;
 	private static final int PREPARATION_2_COOLDOWN = 20 * 20;
 	private static final int PREPARATION_ACTIVATION_PERIOD = 20 * 5;
 

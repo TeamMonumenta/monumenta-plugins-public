@@ -25,7 +25,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 /*
 * Attacking while sprinting throws a spear of light in a 12 block line, dealing
 * 10/20 damage to undead and 5/10 damage to all others, also lights all targets
-* on fire for 5s. (10s/8s cooldown)
+* on fire for 5s. (7s/7s cooldown)
 */
 
 public class HolyJavelin extends Ability {
@@ -38,7 +38,7 @@ public class HolyJavelin extends Ability {
 	private static final int HOLY_JAVELIN_1_DAMAGE = 5;
 	private static final int HOLY_JAVELIN_2_DAMAGE = 10;
 	private static final int HOLY_JAVELIN_FIRE_DURATION = 5 * 20;
-	private static final int HOLY_JAVELIN_1_COOLDOWN = 10 * 20;
+	private static final int HOLY_JAVELIN_1_COOLDOWN = 7 * 20;
 	private static final int HOLY_JAVELIN_2_COOLDOWN = 8 * 20;
 
 	public HolyJavelin(Plugin plugin, World world, Random random, Player player) {

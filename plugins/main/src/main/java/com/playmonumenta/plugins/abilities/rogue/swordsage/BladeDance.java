@@ -33,16 +33,16 @@ public class BladeDance extends Ability {
 	 * 2 seconds, you are entirely unstoppable (you cannot take
 	 * damage or be inflicted with negative debuffs but still take
 	 * knockback) and unable to attack. After 2 seconds, your next
-	 * attack within 4 seconds deals 9/12 damage + 1/1.5 damage
+	 * attack within 4 seconds deals 10/15 damage + 1/1 damage
 	 * per block traveled during the dance in a 4 block radius
 	 * around you. At level 2 you gain speed 2 during the dance
 	 * and the base and scaling damage is increased.
-	 * Cooldown: 40 seconds
+	 * Cooldown: 30 seconds
 	 */
 
-	private static final int DANCE_1_BASE_DAMAGE = 12;
-	private static final int DANCE_2_BASE_DAMAGE = 16;
-	private static final double DANCE_1_SCALING_DAMAGE = 0.75;
+	private static final int DANCE_1_BASE_DAMAGE = 10;
+	private static final int DANCE_2_BASE_DAMAGE = 15;
+	private static final double DANCE_1_SCALING_DAMAGE = 1;
 	private static final double DANCE_2_SCALING_DAMAGE = 1;
 	private static final int DANCE_ACTIVATION_PERIOD = 20 * 5;
 	private static final int DANCE_RADIUS = 4;
@@ -55,7 +55,7 @@ public class BladeDance extends Ability {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
-		mInfo.cooldown = 20 * 40;
+		mInfo.cooldown = 20 * 30;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*

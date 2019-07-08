@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Cloak & Dagger: Every time you kill a normal mob by any means,
- * you gain a stack of "Cloak". Elite kills give you 3 stacks.
+ * you gain a stack of "Cloak". Elite kills give you 5 stacks.
  * Your current stack of Cloaks is X.
  * Level 1 - Cloak stacks are capped at 8. When you shift right
  * click while looking down with dual wielded swords, stacks set
@@ -138,7 +138,7 @@ public class CloakAndDagger extends Ability {
 		int maxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		if (cloak < maxStacks) {
 			if (EntityUtils.isElite(event.getEntity())) {
-				cloak = Math.min(maxStacks, cloak + 3);
+				cloak = Math.min(maxStacks, cloak + 5);
 			} else {
 				cloak++;
 			}

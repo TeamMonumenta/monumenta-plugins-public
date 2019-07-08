@@ -30,10 +30,11 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * passive buffs, which are applied to all players (except the user)
  * within 20 blocks for as long as the block is held. The Hierophant
  * moves at ~80% normal walking speed when blocking to use this ability.
- * Progression of buffs Speed 1 (2 Seconds of Blocking), Strength 1 (4
- * seconds of blocking), Resistance 1 (6 seconds of blocking). After
- * blocking for 15 seconds, all players (including the Hiero) are given
- * 15 seconds of Speed 1, Resistance 1, and Strength 1.
+ * Progression of buffs Haste 1 (0 Seconds of Blocking), Speed 1
+ * (2 Seconds of Blocking), Strength 1 (4 seconds of blocking),
+ * Resistance 1 (6 seconds of blocking). After blocking for 15 seconds,
+ * all players (including the Hiero) are given 15 seconds
+ * of Haste 1, Speed 1, Resistance 1, and Strength 1.
  * At level 2, the radius is increased to 30 blocks and the Hiero moves
  * at normal walking speed when blocking for the ability. Buffs applied
  * at the end of the procession are increased to 20 seconds, and it only
@@ -47,6 +48,7 @@ public class ThuribleProcession extends Ability {
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 	private static final float THURIBLE_1_WALK_SPEED = 0.8f;
 	private static final float THURIBLE_2_WALK_SPEED = 1.0f;
+	private static final int THURIBLE_THRESHOLD_0 = 20 * 0;
 	private static final int THURIBLE_THRESHOLD_1 = 20 * 2;
 	private static final int THURIBLE_THRESHOLD_2 = 20 * 4;
 	private static final int THURIBLE_THRESHOLD_3 = 20 * 6;
@@ -124,6 +126,9 @@ public class ThuribleProcession extends Ability {
 					// Apply periodic buffs
 					List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, radius, false);
 					for (Player pl : players) {
+						if (t > THURIBLE_THRESHOLD_0) {
+							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, 40, 0, true, true));
+						}
 						if (t > THURIBLE_THRESHOLD_1) {
 							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, 40, 0, true, true));
 						}
@@ -142,6 +147,7 @@ public class ThuribleProcession extends Ability {
 					}
 					if (t >= threshold) {
 						for (Player pl : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
+							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, 0, true, true));
 							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, duration, 0, true, true));
 							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, 0, true, true));
 							mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0, true, true));

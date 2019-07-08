@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -31,14 +32,20 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * causes the apothecary to launch an orb of positive and negative
  * concoctions, this slow moving projectile gives allies within 5
  * blocks of it regeneration II/III and Resistance I and giving
- * enemies slowness I/II and Weakness I for 4 seconds. The projectile
- * on collision with terrain heals allies within 5 blocks of it
- * for 2 / 4 hp and, at level 2, deals 10 damage to mobs. CD: 30s
+ * enemies slowness I/II and Weakness I for 4 seconds. If the
+ * projectile passes through an enemy they will get stunned
+ * for 2 / 4 seconds.The projectile on collision with terrain
+ * heals allies within 5 blocks of it for 2 / 4 hp and,
+ * at level 2, deals 10 damage to mobs. CD: 30s
  */
 public class AlchemicalAmalgam extends Ability {
 
 	private static final int ALCHEMICAL_1_SLOWNESS_AMPLIFIER = 1;
 	private static final int ALCHEMICAL_2_SLOWNESS_AMPLIFIER = 2;
+	private static final int ALCHEMICAL_1_WEAKNESS_AMPLIFIER = 1;
+	private static final int ALCHEMICAL_2_WEAKNESS_AMPLIFIER = 2;
+	private static final int STUN_DURATION_1 = 2 * 20;
+	private static final int STUN_DURATION_2 = 4 * 20;
 	private static final int ALCHEMICAL_DAMAGE = 10;
 	private static final double ALCHEMICAL_EXPLOSION_RADIUS = 5;
 	private static final Particle.DustOptions ALCHEMICAL_LIGHT_COLOR = new Particle.DustOptions(
@@ -67,12 +74,14 @@ public class AlchemicalAmalgam extends Ability {
 			int t = 0;
 			int amp = getAbilityScore() == 1 ? 1 : 2;
 			int slownessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_SLOWNESS_AMPLIFIER : ALCHEMICAL_2_SLOWNESS_AMPLIFIER;
+			int weaknessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_WEAKNESS_AMPLIFIER : ALCHEMICAL_2_WEAKNESS_AMPLIFIER;
+			int stunDuration = getAbilityScore() == 1 ? STUN_DURATION_1 : STUN_DURATION_2;
 			double heal = getAbilityScore() == 1 ? 2 : 4;
 
 			double degree = 0;
 			@Override
 			public void run() {
-				loc.add(dir.clone().multiply(0.3));
+				loc.add(dir.clone().multiply(0.2));
 				t++;
 				degree += 12;
 				Vector vec;
@@ -83,13 +92,8 @@ public class AlchemicalAmalgam extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 					Location l = loc.clone().add(vec);
-					if (i == 0) {
-						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_LIGHT_COLOR);
-						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_DARK_COLOR);
-					} else {
-						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_LIGHT_COLOR);
-						mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_DARK_COLOR);
-					}
+					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_LIGHT_COLOR);
+					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, ALCHEMICAL_DARK_COLOR);
 				}
 
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.35, 0.35, 0.35, 1);
@@ -104,11 +108,14 @@ public class AlchemicalAmalgam extends Ability {
 					                                                  0, true, true));
 				}
 
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.9, mPlayer)) {
+					EntityUtils.applyStun(mPlugin, stunDuration, mob);
+				}
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5, mPlayer)) {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, 0));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, weaknessAmplifier));
 				}
-				if (t >= 20 * 6 || loc.getBlock().getType().isSolid()) {
+				if (t >= 20 * 6 || LocationUtils.collidesWithSolid(loc,loc.getBlock())) {
 					this.cancel();
 					mWorld.spawnParticle(Particle.SQUID_INK, loc, 20, 0.1, 0.1, 0.1, 0.35);
 					mWorld.spawnParticle(Particle.SPIT, loc, 40, 0.1, 0.1, 0.1, 0.3);
@@ -118,7 +125,7 @@ public class AlchemicalAmalgam extends Ability {
 						PlayerUtils.healPlayer(p, heal);
 					}
 					if (getAbilityScore() > 1) {
-						for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ALCHEMICAL_EXPLOSION_RADIUS)) {
+						for (LivingEntity le : EntityUtils.getNearbyMobs(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
 							EntityUtils.damageEntity(mPlugin, le, ALCHEMICAL_DAMAGE, mPlayer);;
 						}
 					}
