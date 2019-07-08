@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * Alchemical Amalgam: Shift - left clicking with a bow in hand
  * causes the apothecary to launch an orb of positive and negative
  * concoctions, this slow moving projectile gives allies within 5
- * blocks of it regeneration II/III and Resistance I and giving
+ * blocks of it 1/2 HP per second and Resistance I and giving
  * enemies slowness I/II and Weakness I for 4 seconds. If the
  * projectile passes through an enemy they will get stunned
  * for 2 / 4 seconds.The projectile on collision with terrain
@@ -46,6 +46,8 @@ public class AlchemicalAmalgam extends Ability {
 	private static final int ALCHEMICAL_2_WEAKNESS_AMPLIFIER = 2;
 	private static final int STUN_DURATION_1 = 2 * 20;
 	private static final int STUN_DURATION_2 = 4 * 20;
+	private static final int HEAL_PER_SECOND_1 = 1;
+	private static final int HEAL_PER_SECOND_2 = 2;
 	private static final int ALCHEMICAL_DAMAGE = 10;
 	private static final double ALCHEMICAL_EXPLOSION_RADIUS = 5;
 	private static final Particle.DustOptions ALCHEMICAL_LIGHT_COLOR = new Particle.DustOptions(
@@ -76,13 +78,13 @@ public class AlchemicalAmalgam extends Ability {
 			int slownessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_SLOWNESS_AMPLIFIER : ALCHEMICAL_2_SLOWNESS_AMPLIFIER;
 			int weaknessAmplifier = getAbilityScore() == 1 ? ALCHEMICAL_1_WEAKNESS_AMPLIFIER : ALCHEMICAL_2_WEAKNESS_AMPLIFIER;
 			int stunDuration = getAbilityScore() == 1 ? STUN_DURATION_1 : STUN_DURATION_2;
+			int healPerSecond = getAbilityScore() == 1 ? HEAL_PER_SECOND_1 : HEAL_PER_SECOND_2;
 			double heal = getAbilityScore() == 1 ? 2 : 4;
 
 			double degree = 0;
 			@Override
 			public void run() {
 				loc.add(dir.clone().multiply(0.2));
-				t++;
 				degree += 12;
 				Vector vec;
 				for (int i = 0; i < 2; i++) {
@@ -100,9 +102,9 @@ public class AlchemicalAmalgam extends Ability {
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.35, 0.35, 0.35, 1);
 
 				for (Player p : PlayerUtils.getNearbyPlayers(loc, 5)) {
-					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
-					                                 new PotionEffect(PotionEffectType.REGENERATION, 20 * 3,
-					                                                  amp, true, true));
+					if (t % 20 == 0) {
+						PlayerUtils.healPlayer(p, healPerSecond);
+					}
 					mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
 					                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3,
 					                                                  0, true, true));
@@ -115,7 +117,7 @@ public class AlchemicalAmalgam extends Ability {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, weaknessAmplifier));
 				}
-				if (t >= 20 * 6 || LocationUtils.collidesWithSolid(loc,loc.getBlock())) {
+				if (t >= 20 * 6 || LocationUtils.collidesWithSolid(loc, loc.getBlock())) {
 					this.cancel();
 					mWorld.spawnParticle(Particle.SQUID_INK, loc, 20, 0.1, 0.1, 0.1, 0.35);
 					mWorld.spawnParticle(Particle.SPIT, loc, 40, 0.1, 0.1, 0.1, 0.3);
@@ -130,6 +132,7 @@ public class AlchemicalAmalgam extends Ability {
 						}
 					}
 				}
+				t++;
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
