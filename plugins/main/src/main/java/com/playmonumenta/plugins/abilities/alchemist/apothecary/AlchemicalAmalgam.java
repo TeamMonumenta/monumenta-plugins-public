@@ -32,11 +32,10 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * causes the apothecary to launch an orb of positive and negative
  * concoctions, this slow moving projectile gives allies within 5
  * blocks of it 1/2 HP per second and Resistance I and giving
- * enemies slowness I/II and Weakness I for 4 seconds. If the
- * projectile passes through an enemy they will get stunned
- * for 2 / 4 seconds.The projectile on collision with terrain
- * heals allies within 5 blocks of it for 2 / 4 hp and,
- * at level 2, deals 10 damage to mobs. CD: 30s
+ * enemies slowness I/II and Weakness I for 4 seconds. The
+ * projectile on collision with terrain heals allies within
+ * 5 blocks of it for 2 / 4 hp and stuns mobs for 2 / 4 seconds,
+ * and at level 2 also deals 10 damage to the mobs. CD: 30s
  */
 public class AlchemicalAmalgam extends Ability {
 
@@ -110,9 +109,6 @@ public class AlchemicalAmalgam extends Ability {
 					                                                  0, true, true));
 				}
 
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 0.9, mPlayer)) {
-					EntityUtils.applyStun(mPlugin, stunDuration, mob);
-				}
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 5, mPlayer)) {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 4, slownessAmplifier));
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 4, weaknessAmplifier));
@@ -126,8 +122,9 @@ public class AlchemicalAmalgam extends Ability {
 					for (Player p : PlayerUtils.getNearbyPlayers(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
 						PlayerUtils.healPlayer(p, heal);
 					}
-					if (getAbilityScore() > 1) {
-						for (LivingEntity le : EntityUtils.getNearbyMobs(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
+					for (LivingEntity le : EntityUtils.getNearbyMobs(loc, ALCHEMICAL_EXPLOSION_RADIUS)) {
+						EntityUtils.applyStun(mPlugin, stunDuration, le);
+						if (getAbilityScore() > 1) {
 							EntityUtils.damageEntity(mPlugin, le, ALCHEMICAL_DAMAGE, mPlayer);;
 						}
 					}
