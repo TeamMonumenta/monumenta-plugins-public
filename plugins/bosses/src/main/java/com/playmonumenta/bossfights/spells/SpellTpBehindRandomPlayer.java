@@ -83,11 +83,19 @@ public class SpellTpBehindRandomPlayer extends Spell {
 				Vector vect = newloc.getDirection().multiply(-3.0f);
 				newloc.add(vect).setY(target.getLocation().getY() + 0.1f);
 				// dont teleport into a wall, teleport as close as possible instead
-				while (newloc.getBlock().getType().isSolid()) {
+				double distance = 3;
+				while (newloc.getBlock().getType().isSolid() && distance >= -1) {
 					newloc.add(newloc.getDirection().multiply(0.2));
+					distance -= 0.2;
 					// make sure its not partly clipped in the wall
-					if (!newloc.getBlock().getType().isSolid())
+					if (!newloc.getBlock().getType().isSolid()) {
 						newloc.add(newloc.getDirection().multiply(0.35));
+						distance -= 0.35;
+					}
+				}
+				// failsafe in case the mob somehow tries to teleport through solid chunks of ground
+				if (distance < -1) {
+					newloc = target.getLocation();
 				}
 				world.spawnParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
 				world.spawnParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
