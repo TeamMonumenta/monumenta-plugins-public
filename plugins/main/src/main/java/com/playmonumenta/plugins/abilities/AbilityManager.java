@@ -151,6 +151,8 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class AbilityManager {
+	private static final float DEFAULT_WALK_SPEED = 0.2f;
+
 	private static AbilityManager mManager = null;
 
 	private Plugin mPlugin;
@@ -371,6 +373,7 @@ public class AbilityManager {
 		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
 
 		List<Ability> abilities = new ArrayList<Ability>();
