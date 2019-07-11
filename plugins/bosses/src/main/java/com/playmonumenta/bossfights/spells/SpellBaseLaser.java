@@ -161,7 +161,7 @@ public class SpellBaseLaser extends Spell {
 
 					boolean cancel = false;
 					for (Block block : blocks) {
-						if (block.getBoundingBox().overlaps(box)) {
+						if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
 							cancel = true;
 							break;
 						}

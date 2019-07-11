@@ -40,7 +40,7 @@ public class EnchantedShot extends Ability {
 	private static final int ENCHANTED_1_DAMAGE = 25;
 	private static final int ENCHANTED_2_DAMAGE = 40;
 	private static final int ENCHANTED_1_COOLDOWN = 20 * 25;
-	private static final int ENCHANTED_2_COOLDOWN = 20 * 5;
+	private static final int ENCHANTED_2_COOLDOWN = 20 * 20;
 	private static final Particle.DustOptions ENCHANTED_ARROW_COLOR = new Particle.DustOptions(Color.fromRGB(225, 255, 219), 2.0f);
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 
