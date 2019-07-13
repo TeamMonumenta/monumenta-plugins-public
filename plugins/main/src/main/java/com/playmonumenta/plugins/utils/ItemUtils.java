@@ -311,17 +311,17 @@ public class ItemUtils {
 			return item.getAmount() * 4;
 		case UNCOMMON:
 			return item.getAmount() * 16;
-		case RARE:
 		case UNIQUE:
 		case UNIQUE_EVENT:
 		case ENHANCED_UNCOMMON:
 			return item.getAmount() * 32;
+		case RARE:
 		case PATRON_MADE:
-		case ENHANCED_RARE:
 			return item.getAmount() * 64 * 1;
 		case RELIC:
 		case ARTIFACT:
 		case SHULKER_BOX:
+		case ENHANCED_RARE:
 			return item.getAmount() * 64 * 2;
 		case EPIC:
 			return item.getAmount() * 64 * 8;
