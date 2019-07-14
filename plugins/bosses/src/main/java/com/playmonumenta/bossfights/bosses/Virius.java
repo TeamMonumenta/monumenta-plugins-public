@@ -73,10 +73,10 @@ public class Virius extends BossAbilityGroup {
 							if (!blocked) {
 								// Check to see if the player is shielding
 								if (player.isBlocking()) {
-									DamageUtils.damage(boss, player, 12);
-									player.setCooldown(Material.SHIELD, 4 * 20);
+									DamageUtils.damage(boss, player, 20);
+									player.setCooldown(Material.SHIELD, 6 * 20);
 								} else {
-									DamageUtils.damage(null, player, 16);
+									DamageUtils.damage(boss, player, 20);
 								}
 							}
 						})

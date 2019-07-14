@@ -54,7 +54,7 @@ public class FlameLaserBoss extends BossAbilityGroup {
 								DamageUtils.damage(boss, player, 12);
 								player.setCooldown(Material.SHIELD, 4 * 20);
 							} else {
-								DamageUtils.damage(null, player, 8);
+								DamageUtils.damage(boss, player, 12);
 								player.setFireTicks(80); //4 seconds
 							}
 						}

@@ -51,10 +51,10 @@ public class PulseLaserBoss extends BossAbilityGroup {
 						if (!blocked) {
 							// Check to see if the player is shielding
 							if (player.isBlocking()) {
-								DamageUtils.damage(boss, player, 12);
+								DamageUtils.damage(boss, player, 18);
 								player.setCooldown(Material.SHIELD, 6 * 20);
 							} else {
-								DamageUtils.damage(null, player, 12);
+								DamageUtils.damage(boss, player, 18);
 							}
 						}
 					})
