@@ -7,6 +7,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -83,10 +84,9 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (!InventoryUtils.isPickaxeItem(mPlayer.getInventory().getItemInMainHand())) {
-			return mPlayer.isSneaking();
-		}
-		return false;
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
 	}
 
 }
