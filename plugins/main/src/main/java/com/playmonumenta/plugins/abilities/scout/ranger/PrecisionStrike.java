@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -98,6 +101,9 @@ public class PrecisionStrike extends Ability {
 
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
+					EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(mPlayer, le, DamageCause.ENTITY_ATTACK, damage);
+					Bukkit.getPluginManager().callEvent(event);
+
 					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 					hitMob = le;
 					PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));

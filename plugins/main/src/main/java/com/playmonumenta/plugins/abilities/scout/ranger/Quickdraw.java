@@ -71,6 +71,7 @@ public class Quickdraw extends Ability {
 			if (inMainHand.containsEnchantment(Enchantment.ARROW_FIRE)) {
 				arrow.setFireTicks(20 * 15);
 			}
+			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(3.0));
 			arrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
