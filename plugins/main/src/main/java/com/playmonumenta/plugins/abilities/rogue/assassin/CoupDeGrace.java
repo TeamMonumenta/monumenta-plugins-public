@@ -12,28 +12,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Coup De Grâce: If you melee attack a non-boss enemy and that attack
- * brings it under 20% health, they die instantly. At level 2,
- * the threshold increases to 25% health and enemies within 8
- * blocks of you are intimidated, taking Weakness I & Slowness
- * I for 8 seconds
+ * brings it under 15% health, they die instantly. At level 2,
+ * the threshold increases to 25% health.
  */
 public class CoupDeGrace extends Ability {
 
-	private static final double COUP_1_THRESHOLD = 0.2;
+	private static final double COUP_1_THRESHOLD = 0.15;
 	private static final double COUP_2_THRESHOLD = 0.25;
-	private static final int COUP_2_INTIMIDATION_DURATION = 20 * 8;
 
 	private final double threshold;
 
@@ -58,10 +52,6 @@ public class CoupDeGrace extends Ability {
 					if (getAbilityScore() > 1) {
 						mWorld.spawnParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65);
 						mWorld.spawnParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData());
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8, mPlayer)) {
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, COUP_2_INTIMIDATION_DURATION, 0, false, true));
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, COUP_2_INTIMIDATION_DURATION, 0, false, true));
-						}
 					}
 				}
 			}

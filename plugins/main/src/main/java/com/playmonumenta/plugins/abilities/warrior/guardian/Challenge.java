@@ -31,37 +31,42 @@ import com.playmonumenta.plugins.utils.LocationUtils;
  * Challenge: Shifting while left-clicking makes all enemies
  * within 12 blocks target you. You gain Absorption I (2 hearts)
  * / II (4 hearts) and one armor toughness per affected mob
- * (max: 8) for 10 s. Cooldown: 30 / 20 s
+ * (max: 8) for 10 s. Cooldown: 20 s
  */
 public class Challenge extends Ability {
 
 	private static final int CHALLENGE_RANGE = 12;
 	private static final int CHALLENGE_1_ABS_LVL = 0;
 	private static final int CHALLENGE_2_ABS_LVL = 1;
-	private static final int CHALLENGE_TOUGHNESS_MAX = 8;
+	private static final int CHALLENGE_1_ARMOR_MAX = 4;
+	private static final int CHALLENGE_2_ARMOR_MAX = 8;
 	private static final int CHALLENGE_DURATION = 10 * 20;
-	private static final int CHALLENGE_1_COOLDOWN = 30 * 20;
-	private static final int CHALLENGE_2_COOLDOWN = 20 * 20;
+	private static final int CHALLENGE_COOLDOWN = 20 * 20;
+
+	private int armorIncrease;
+	private int armorMax;
 
 	public Challenge(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Challenge";
-		mInfo.cooldown = getAbilityScore() == 1 ? CHALLENGE_1_COOLDOWN : CHALLENGE_2_COOLDOWN;
+		mInfo.cooldown = CHALLENGE_COOLDOWN;
 		mInfo.linkedSpell = Spells.CHALLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		armorMax = getAbilityScore() == 1 ? CHALLENGE_1_ARMOR_MAX : CHALLENGE_2_ARMOR_MAX;
+		armorIncrease = getAbilityScore() == 1 ? 1 : 2;
 	}
 
 	@Override
 	public void cast() {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
-		int increase = Math.min(CHALLENGE_TOUGHNESS_MAX, mobs.size());
-		AttributeInstance toughness = mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-		toughness.setBaseValue(toughness.getBaseValue() + increase);
+		int increase = Math.min(armorMax, mobs.size() * armorIncrease);
+		AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+		armor.setBaseValue(armor.getBaseValue() + increase);
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				toughness.setBaseValue(toughness.getBaseValue() - increase);
+				armor.setBaseValue(armor.getBaseValue() - increase);
 			}
 
 		}.runTaskLater(mPlugin, CHALLENGE_DURATION);

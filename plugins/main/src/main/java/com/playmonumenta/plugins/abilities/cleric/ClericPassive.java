@@ -19,6 +19,8 @@ public class ClericPassive extends Ability {
 	private static final double PASSIVE_HP_THRESHOLD = 10.0;
 	private static final String CLERICPASSIVE_METADATA_KEY = "ClericPassiveMetadataKey";
 
+	private int timer = 0;
+
 	public ClericPassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
@@ -30,16 +32,20 @@ public class ClericPassive extends Ability {
 
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		//  Don't trigger this if dead!
-		if (!mPlayer.isDead()) {
-			if (ticks % 60 == 0) {
-				// Passive Heal Radius
-				World world = mPlayer.getWorld();
-				for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, PASSIVE_HEAL_RADIUS, false)) {
-					if (MetadataUtils.checkOnceThisTick(mPlugin, p, CLERICPASSIVE_METADATA_KEY)) {
-						if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
-							PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
-							world.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
+		if (fourHertz) {
+			//  Don't trigger this if dead!
+			if (!mPlayer.isDead()) {
+				// 5 ticks because it triggers on four hertz.
+				timer += 5;
+				if (timer % 60 == 0) {
+					// Passive Heal Radius
+					World world = mPlayer.getWorld();
+					for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, PASSIVE_HEAL_RADIUS, false)) {
+						if (MetadataUtils.checkOnceThisTick(mPlugin, p, CLERICPASSIVE_METADATA_KEY)) {
+							if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
+								PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);
+								world.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.03, 0.03, 0.03, 0.001);
+							}
 						}
 					}
 				}

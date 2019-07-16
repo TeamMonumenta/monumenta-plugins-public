@@ -27,8 +27,8 @@ public class DeathsTouch extends Ability {
 
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "DeathsTouchTickRightClicked";
 
-	private static final int DEATHS_TOUCH_1_COOLDOWN = 30 * 20;
-	private static final int DEATHS_TOUCH_2_COOLDOWN = 20 * 20;
+	private static final int DEATHS_TOUCH_1_COOLDOWN = 25 * 20;
+	private static final int DEATHS_TOUCH_2_COOLDOWN = 15 * 20;
 	private static final int DEATHS_TOUCH_1_BUFF_DURATION = 15 * 20;
 	private static final int DEATHS_TOUCH_2_BUFF_DURATION = 20 * 20;
 	private static final int DEATHS_TOUCH_RANGE = 20;
@@ -41,7 +41,7 @@ public class DeathsTouch extends Ability {
 	 * debuffs affecting it (Weakness -> Strength, Slowness ->
 	 * Speed, On Fire -> Fire Resistance, Wither / Poison ->
 	 * Regeneration, Mining Fatigue -> Haste, Blindness ->
-	 * Night Vision). Cooldown: 30 / 20 s
+	 * Night Vision). Cooldown: 25 / 15 s
 	 */
 
 	// Although we now track the mob buffs on kill with metadata,

@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -14,21 +13,20 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
-/* Growing Rage: Passively gain +20% / +40% damage on
+/* Growing Rage: Passively gain +10% / +30% damage on
  * non-ability based melee damage. Every 2 hearts you fall
- * below max health, gain 1 armor and lose 5% off your
- * damage bonus. Armor capped at 5 / 10.
+ * below max health, gain 5% on your damage bonus.
+ * Damage capped at 40%/60%.
  */
 
 public class GrowingRage extends Ability {
 
 	private static final double GROWING_RAGE_1_DAMAGE_PERCENT = 0.1;
 	private static final double GROWING_RAGE_2_DAMAGE_PERCENT = 0.3;
-	private static final int GROWING_RAGE_1_MAX_ARMOR = 5;
-	private static final int GROWING_RAGE_2_MAX_ARMOR = 10;
+	private static final double GROWING_RAGE_MAX_INCREASES = 6;
 	private static final double GROWING_RAGE_HEALTH_THRESHOLD = 4;
 
-	private final double damagePercent;
+	private double damagePercent;
 	private int mHealthThreshold = 0;
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
@@ -40,11 +38,9 @@ public class GrowingRage extends Ability {
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-		double maxArmor = getAbilityScore() == 1 ? GROWING_RAGE_1_MAX_ARMOR : GROWING_RAGE_2_MAX_ARMOR;
-		int healthThreshold = (int) Math.min(maxArmor, (int)((maxHealth - mPlayer.getHealth()) / GROWING_RAGE_HEALTH_THRESHOLD));
+		int healthThreshold = (int) Math.min(GROWING_RAGE_MAX_INCREASES, (int)((maxHealth - mPlayer.getHealth()) / GROWING_RAGE_HEALTH_THRESHOLD));
 		if (healthThreshold != mHealthThreshold) {
-			AttributeInstance attarmor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-			attarmor.setBaseValue(attarmor.getBaseValue() - mHealthThreshold + healthThreshold);
+			damagePercent = damagePercent + (healthThreshold - mHealthThreshold) * 0.05;
 			mHealthThreshold = healthThreshold;
 		}
 	}

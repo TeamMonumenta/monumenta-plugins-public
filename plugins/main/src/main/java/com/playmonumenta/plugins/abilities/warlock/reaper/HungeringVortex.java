@@ -43,15 +43,17 @@ public class HungeringVortex extends Ability {
 	private static final int HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER = 0;
 	private static final int HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER = 1;
 	private static final int HUNGERING_VORTEX_RESISTANCE_DURATION = 20 * 4;
-	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 0.5;
-	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 1;
+	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 1;
+	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 2;
+	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX = 1;
+	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX = 2;
 
 	/*
 	 * Hungering Vortex: Shift + right click looking down pulls
 	 * all mobs in a 7-block radius towards you, afflicting them
 	 * with Slowness I / II for 8 s and increasing your melee
-	 * damage by 0.5 / 1 for each initially affected enemy, up
-	 * to a maximum of 4 / 8 for 8s. All affected enemies change
+	 * damage by 1 / 2 for each initially affected enemy, up
+	 * to a maximum of 6 / 12 for 8s. All affected enemies change
 	 * target to you. Gives Resistance I / II on activation for 4 seconds.
 	 * Cooldown: 18 s
 	 */
@@ -153,7 +155,8 @@ public class HungeringVortex extends Ability {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
-		double extra_dam = Math.min(8, mobs.size()) * damageInc;
+		double damageMax = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX : HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX;
+		double extra_dam = Math.min(damageMax, mobs.size()) * damageInc;
 
 		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extra_dam));
 		new BukkitRunnable() {
