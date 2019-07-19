@@ -100,27 +100,29 @@ public class PrecisionStrike extends Ability {
 				}
 
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
-				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
-					EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(mPlayer, le, DamageCause.ENTITY_ATTACK, damage);
-					Bukkit.getPluginManager().callEvent(event);
+				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
+					if (!le.isDead()) {
+						EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(mPlayer, le, DamageCause.ENTITY_ATTACK, damage);
+						Bukkit.getPluginManager().callEvent(event);
 
-					EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
-					hitMob = le;
-					PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
-					if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
-						EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
-					}
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-					mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-					mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
-
-					if (getAbilityScore() == 2) {
-						for (LivingEntity e : EntityUtils.getNearbyMobs(hitMob.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
-							EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, e);
+						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+						hitMob = le;
+						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
+						if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+							EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
 						}
+						mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+						mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+						mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+
+						if (getAbilityScore() == 2) {
+							for (LivingEntity e : EntityUtils.getNearbyMobs(hitMob.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
+								EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, e);
+							}
+						}
+						this.cancel();
+						break;
 					}
-					this.cancel();
-					break;
 				}
 			}
 		}.runTaskTimer(mPlugin, 1, 1);
