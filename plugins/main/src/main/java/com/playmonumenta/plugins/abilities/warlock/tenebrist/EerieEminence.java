@@ -1,10 +1,8 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.World;
@@ -39,7 +37,35 @@ public class EerieEminence extends Ability {
 	private static final int EERIE_EFFECT_LINGER_DURATION = 20 * 4;
 	private static final int EERIE_EFFECT_TIMER = 20 * 10;
 
-	private Map<List<PotionEffectType>, Integer> debuffs = new HashMap<List<PotionEffectType>, Integer>() ;
+	private static class DebuffElement {
+		protected final PotionEffectType mDebuff;
+		protected final PotionEffectType mBuff;
+		protected int mDuration;
+
+		protected DebuffElement(PotionEffectType debuff, PotionEffectType buff, int duration) {
+			mDebuff = debuff;
+			mBuff = buff;
+			mDuration = duration;
+		}
+
+		protected PotionEffectType getDebuff() {
+			return mDebuff;
+		}
+
+		protected PotionEffectType getBuff() {
+			return mBuff;
+		}
+
+		protected int getDuration() {
+			return mDuration;
+		}
+
+		protected void setDuration(int duration) {
+			mDuration = duration;
+		}
+	}
+
+	private List<DebuffElement> debuffs = new ArrayList<DebuffElement>();
 
 	public EerieEminence(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -49,13 +75,13 @@ public class EerieEminence extends Ability {
 	@Override
 	public boolean AbilityCastEvent(AbilityCastEvent event) {
 		if (event.getAbility() == Spells.GRASPING_CLAWS) {
-			debuffs.put(Arrays.asList(PotionEffectType.SLOW,PotionEffectType.SPEED), EERIE_EFFECT_TIMER);
+			debuffs.add(new DebuffElement(PotionEffectType.SLOW, PotionEffectType.SPEED, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.CONSUMING_FLAMES) {
-			debuffs.put(Arrays.asList(PotionEffectType.WEAKNESS,PotionEffectType.INCREASE_DAMAGE), EERIE_EFFECT_TIMER);
+			debuffs.add(new DebuffElement(PotionEffectType.WEAKNESS, PotionEffectType.INCREASE_DAMAGE, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.FRACTAL_ENERVATION) {
-			debuffs.put(Arrays.asList(PotionEffectType.SLOW_DIGGING,PotionEffectType.FAST_DIGGING), EERIE_EFFECT_TIMER);
+			debuffs.add(new DebuffElement(PotionEffectType.SLOW_DIGGING, PotionEffectType.FAST_DIGGING, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.WITHERING_GAZE) {
-			debuffs.put(Arrays.asList(PotionEffectType.WITHER,PotionEffectType.REGENERATION), EERIE_EFFECT_TIMER);
+			debuffs.add(new DebuffElement(PotionEffectType.WITHER, PotionEffectType.REGENERATION, EERIE_EFFECT_TIMER));
 		}
 
 		return true;
@@ -66,24 +92,24 @@ public class EerieEminence extends Ability {
 		if (fourHertz) {
 			double radius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
 
-			Iterator<Map.Entry<List<PotionEffectType>, Integer>> iter = debuffs.entrySet().iterator();
+			Iterator<DebuffElement> iter = debuffs.iterator();
 			while (iter.hasNext()) {
-				Map.Entry<List<PotionEffectType>, Integer> entry = iter.next();
+				DebuffElement entry = iter.next();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getKey().get(0), EERIE_EFFECT_LINGER_DURATION, 0));
+					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), EERIE_EFFECT_LINGER_DURATION, 0));
 				}
 				if (getAbilityScore() > 1) {
 					for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-						                                 new PotionEffect(entry.getKey().get(1), EERIE_EFFECT_LINGER_DURATION, 0, true, false));
+						                                 new PotionEffect(entry.getBuff(), EERIE_EFFECT_LINGER_DURATION, 0, true, false));
 					}
 				}
 				// 5 ticks because it triggers on four hertz.
-				int timer = entry.getValue() - 5;
+				int timer = entry.getDuration() - 5;
 				if (timer <= 0) {
 					iter.remove();
 				} else {
-					entry.setValue(timer);
+					entry.setDuration(timer);
 				}
 			}
 
