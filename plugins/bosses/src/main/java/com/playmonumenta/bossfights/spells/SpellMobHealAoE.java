@@ -13,7 +13,7 @@ import org.bukkit.plugin.Plugin;
 public class SpellMobHealAoE extends SpellBaseAoE {
 
 	public SpellMobHealAoE(Plugin plugin, Entity launcher) {
-		super(plugin, launcher, 7, 80, 20 * 7, false, Sound.ENTITY_ARROW_HIT_PLAYER,
+		super(plugin, launcher, 7, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.SPELL_INSTANT, loc, 25, 3.5, 3.5, 3.5);

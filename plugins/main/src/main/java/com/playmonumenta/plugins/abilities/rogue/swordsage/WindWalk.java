@@ -69,7 +69,7 @@ public class WindWalk extends Ability {
 				this.cancel();
 			}
 		}.runTaskLater(mPlugin, 20);
-		if (mLeftClicks < 3) {
+		if (mLeftClicks < 2) {
 			return;
 		}
 		int duration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
@@ -87,15 +87,17 @@ public class WindWalk extends Ability {
 				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), WIND_WALK_RADIUS)) {
 					if (!mobsAlreadyHit.contains(mob)) {
+						if (!EntityUtils.isBoss(mob)) {
+							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
+							EntityUtils.applyStun(mPlugin, duration, mob);
+						}
 						if (EntityUtils.isElite(mob)) {
 							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
 							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
 							mWorld.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 0.75f);
-							EntityUtils.applyStun(mPlugin, duration, mob);
 						} else if (!EntityUtils.isBoss(mob)) {
 							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
 							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
-							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 							mob.setVelocity(mob.getVelocity().setY(0.5));
 							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, duration, 0, true, false));
 							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration + 20 * 3, 0, true, false));

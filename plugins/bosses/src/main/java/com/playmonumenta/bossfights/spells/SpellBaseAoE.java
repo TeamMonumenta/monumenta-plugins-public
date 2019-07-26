@@ -2,6 +2,7 @@ package com.playmonumenta.bossfights.spells;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -72,10 +73,21 @@ public class SpellBaseAoE extends Spell {
 	private final OutburstAction mOutburstAction;
 	private final CircleOutburstAction mCircleOutburstAction;
 	private final DealDamageAction mDealDamageAction;
+	private final float mSoundVolume;
+	private final int mSoundDensity;
 
 	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting,
 	                    Sound chargeSound, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
 	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+
+		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, chargeSound, 1.5f, 1, chargeAuraAction, chargeCircleAction, outburstAction,
+				circleOutburstAction, dealDamageAction);
+	}
+
+	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting,
+            Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
+            OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mRadius = radius;
@@ -88,6 +100,8 @@ public class SpellBaseAoE extends Spell {
 		mOutburstAction = outburstAction;
 		mCircleOutburstAction = circleOutburstAction;
 		mDealDamageAction = dealDamageAction;
+		mSoundVolume = soundVolume;
+		mSoundDensity = soundDensity;
 	}
 
 	@Override
@@ -111,8 +125,8 @@ public class SpellBaseAoE extends Spell {
 				}
 				j++;
 				mChargeAuraAction.run(loc.clone().add(0, 1, 0));
-				if (j <= (mDuration - 5)) {
-					world.playSound(mLauncher.getLocation(), mChargeSound, 1.5f, 0.25f + (j / 100));
+				if (j <= (mDuration - 5) && j % mSoundDensity == 0) {
+					world.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (j / 100));
 				}
 				for (double i = 0; i < 360; i += 15) {
 					double radian1 = Math.toRadians(i);

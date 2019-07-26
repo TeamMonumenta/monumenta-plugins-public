@@ -30,6 +30,7 @@ public class DeadlyRonde extends Ability {
 	private static final int RONDE_2_SLOWNESS_AMPLIFIER = 1;
 	private static final int RONDE_2_SLOWNESS_DURATION = 4 * 20;
 	private static final Particle.DustOptions RONDE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
+	private static final Particle.DustOptions RONDE_ATTACK_COLOR = new Particle.DustOptions(Color.fromRGB(232, 232, 232), 0.8f);
 
 	/*
 	 * Deadly Ronde: After using a skill, your next sword
@@ -80,19 +81,24 @@ public class DeadlyRonde extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (activeRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK
+		if (activeRunnable != null && (event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK)
 		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isSwordItem(mainHand)) {
 				Entity ent = event.getEntity();
 				double damage = getAbilityScore() == 1 ? 4 : 6;
-				if (event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK)) {
+				mWorld.spawnParticle(Particle.REDSTONE, ent.getLocation().add(0, 1, 0), 40, 0.45, 0.65, 0.45, RONDE_ATTACK_COLOR);
+				if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+					event.setDamage(event.getDamage() + damage);
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 0.25, Material.REDSTONE_WIRE.createBlockData());
+					mWorld.spawnParticle(Particle.SWEEP_ATTACK, ent.getLocation().add(0, 1, 0), 6, 0.45, 0.65, 0.45);
+					mPlayer.getWorld().playSound(ent.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 1.25f);
+					mPlayer.getWorld().playSound(ent.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.8f, 0.75f);
+					mPlayer.getWorld().playSound(ent.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
+				} else {
 					double toAdd = getAbilityScore() == 1 ? (damage / 2) : damage;
 					event.setDamage(event.getDamage() + toAdd);
-					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 10, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
-				} else {
-					event.setDamage(event.getDamage() + damage);
-					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 25, 0, 0.45, 0, 0.25, Material.REDSTONE_WIRE.createBlockData());
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, ent.getLocation().add(0, 1, 0), 15, 0.25, 0.45, 0.25, 0.25, Material.REDSTONE_WIRE.createBlockData());
 				}
 
 				if (getAbilityScore() > 1 && event.getCause() == DamageCause.ENTITY_ATTACK
@@ -114,6 +120,7 @@ public class DeadlyRonde extends Ability {
 						activeRunnable.cancel();
 						activeRunnable = null;
 						cancelled = false;
+
 					}
 				}.runTaskLater(mPlugin, 1);
 			}
