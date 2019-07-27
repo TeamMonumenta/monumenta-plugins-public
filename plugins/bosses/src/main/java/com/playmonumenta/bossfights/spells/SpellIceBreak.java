@@ -40,7 +40,7 @@ public class SpellIceBreak extends Spell {
 					testloc.setZ(loc.getZ() + z);
 					Block block = testloc.getBlock();
 					Material material = block.getType();
-					if (material == Material.ICE || material == Material.BLUE_ICE && material == Material.PACKED_ICE) {
+					if (material == Material.ICE || material == Material.BLUE_ICE || material == Material.PACKED_ICE) {
 						iceBlocks.add(testloc.getBlock());
 					}
 				}
@@ -72,6 +72,7 @@ public class SpellIceBreak extends Spell {
 			for (Block block : brokenBlocks) {
 				frostedBlocks.remove(block);
 			}
+			brokenBlocks.clear();
 
 			// Make the new frosted blocks
 			for (Block block : iceBlocks) {
@@ -84,7 +85,6 @@ public class SpellIceBreak extends Spell {
 				}
 			}
 		}
-
 		iceBlocks.clear();
 	}
 
