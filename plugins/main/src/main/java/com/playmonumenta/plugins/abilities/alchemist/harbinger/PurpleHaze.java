@@ -96,11 +96,12 @@ public class PurpleHaze extends Ability {
 							LivingEntity damagee = e.mob;
 							// Since purple haze damage has to stack with any other damage, EntityUtils.damageEntity()
 							// might not see it as intentional damage stacking, so iFrames need to be set manually.
+							int ticks = damagee.getNoDamageTicks();
 							damagee.setNoDamageTicks(0);
 							Vector v = damagee.getVelocity();
 							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.triggeredBy, null, false /* do not register CustomDamageEvent */);
 							damagee.setVelocity(v);
-							damagee.setNoDamageTicks(0);
+							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.triggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 							Location loc = damagee.getLocation();
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 10, 0, 0.2, 0, 0.0001);

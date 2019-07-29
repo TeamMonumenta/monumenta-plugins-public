@@ -80,6 +80,7 @@ public enum Spells {
 	SOUL_REND("Soul Rend"),
 	CONSUMING_FLAMES("Consuming Flames"),
 	GRASPING_CLAWS("Grasping Claws"),
+	EXORCISM("Exorcism"),
 
 	//--Reaper
 	HUNGERING_VORTEX("Hungering Vortex"),

@@ -125,6 +125,7 @@ import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
 import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
+import com.playmonumenta.plugins.abilities.warlock.Exorcism;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.Harvester;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
@@ -265,6 +266,7 @@ public class AbilityManager {
 		                               new WarlockPassive(mPlugin, mWorld, mRandom, null),
 		                               new Harvester(mPlugin, mWorld, mRandom, null),
 		                               new SoulRend(mPlugin, mWorld, mRandom, null),
+		                               new Exorcism(mPlugin, mWorld, mRandom, null),
 
 		                               /********** ALCHEMIST **********/
 		                               new AlchemicalArtillery(mPlugin, mWorld, mRandom, null),
