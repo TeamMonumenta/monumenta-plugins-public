@@ -158,6 +158,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
+		World world = player.getWorld();
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -197,39 +198,46 @@ public class PlayerListener implements Listener {
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 			}
-			if (block != null &&
-			    GraveUtils.isGrave(block) &&
-			    player.getGameMode() != GameMode.CREATIVE &&
-			    player.getGameMode() != GameMode.SPECTATOR) {
-				Chest grave = (Chest) block.getState();
-				if (GraveUtils.canPlayerOpenGrave(block, player)) {
-					// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
-					Inventory graveInventory = grave.getInventory();
-					PlayerInventory playerInventory = player.getInventory();
-					int itemsMoved = 0;
-					int itemsLeftBehind = 0;
-					for (int i = 0; i < graveInventory.getSize(); i++) {
-						if (graveInventory.getItem(i) != null) {
-							if (playerInventory.firstEmpty() != -1) {
-								// Player has a space in their inventory. Move the item
-								playerInventory.setItem(playerInventory.firstEmpty(), graveInventory.getItem(i));
-								graveInventory.setItem(i, null);
-								itemsMoved++;
-							} else {
-								// Player doesn't have a space in their inventory. Don't move anything
-								itemsLeftBehind++;
+			if (block != null) {
+				Location location = block.getLocation();
+				if (player.getGameMode() == GameMode.ADVENTURE
+				    && world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
+					event.setCancelled(true);
+					return;
+				}
+				if (GraveUtils.isGrave(block)
+				    && player.getGameMode() != GameMode.CREATIVE
+				    && player.getGameMode() != GameMode.SPECTATOR) {
+					Chest grave = (Chest) block.getState();
+					if (GraveUtils.canPlayerOpenGrave(block, player)) {
+						// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
+						Inventory graveInventory = grave.getInventory();
+						PlayerInventory playerInventory = player.getInventory();
+						int itemsMoved = 0;
+						int itemsLeftBehind = 0;
+						for (int i = 0; i < graveInventory.getSize(); i++) {
+							if (graveInventory.getItem(i) != null) {
+								if (playerInventory.firstEmpty() != -1) {
+									// Player has a space in their inventory. Move the item
+									playerInventory.setItem(playerInventory.firstEmpty(), graveInventory.getItem(i));
+									graveInventory.setItem(i, null);
+									itemsMoved++;
+								} else {
+									// Player doesn't have a space in their inventory. Don't move anything
+									itemsLeftBehind++;
+								}
 							}
 						}
+						MessagingUtils.sendActionBarMessage(mPlugin, player, String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind));
+						if (itemsLeftBehind == 0) {
+							block.setType(Material.AIR);
+						}
+						event.setCancelled(true);
+					} else {
+						// Player does not have permission to access this grave.
+						MessagingUtils.sendActionBarMessage(mPlugin, player, "You cannot open " + ChatColor.stripColor(grave.getCustomName()));
+						event.setCancelled(true);
 					}
-					MessagingUtils.sendActionBarMessage(mPlugin, player, String.format("Retrieved %d items from the grave. %d items remain.", itemsMoved, itemsLeftBehind));
-					if (itemsLeftBehind == 0) {
-						block.setType(Material.AIR);
-					}
-					event.setCancelled(true);
-				} else {
-					// Player does not have permission to access this grave.
-					MessagingUtils.sendActionBarMessage(mPlugin, player, "You cannot open " + ChatColor.stripColor(grave.getCustomName()));
-					event.setCancelled(true);
 				}
 			}
 		}
