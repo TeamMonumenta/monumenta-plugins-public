@@ -208,7 +208,7 @@ public class PlayerTracking implements EntityTracking {
 					if (inSafeZone) {
 						if (zone == LocationType.Capital) {
 							Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
-							boolean neededMat = mat == Material.SPONGE || mat == Material.OBSIDIAN;
+							boolean neededMat = mat == Material.SPONGE;
 
 							if (mode == GameMode.SURVIVAL && !neededMat) {
 								player.setGameMode(GameMode.ADVENTURE);
