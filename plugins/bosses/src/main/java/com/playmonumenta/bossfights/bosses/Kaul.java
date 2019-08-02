@@ -123,6 +123,7 @@ public class Kaul extends BossAbilityGroup {
 	private final Location mEndLoc;
 	private boolean defeated = false;
 	private boolean cooldown = false;
+	private boolean primordialPhase = false;
 	private int hits = 0;
 	private final Random rand = new Random();
 
@@ -457,6 +458,7 @@ public class Kaul extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
 			teleport(mSpawnLoc.clone().add(0, 5, 0));
+			primordialPhase = true;
 			new BukkitRunnable() {
 				Location loc = mSpawnLoc;
 				double rotation = 0;
@@ -496,6 +498,7 @@ public class Kaul extends BossAbilityGroup {
 									mBoss.setAI(true);
 									teleport(mSpawnLoc);
 									mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+									primordialPhase = false;
 									new BukkitRunnable() {
 
 										@Override
@@ -881,14 +884,17 @@ public class Kaul extends BossAbilityGroup {
 
 						@Override
 						public void run() {
-							mBoss.setInvulnerable(false);
-							mBoss.setAI(true);
-							mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-							teleport(mSpawnLoc);
-							List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
-							if (players.size() > 0) {
-								Player newTarget = players.get(rand.nextInt(players.size()));
-								((Mob) mBoss).setTarget(newTarget);
+							// If the Primordial Elemental is active, don't allow other abilities to turn Kaul's AI back on
+							if (!primordialPhase) {
+								mBoss.setInvulnerable(false);
+								mBoss.setAI(true);
+								mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+								teleport(mSpawnLoc);
+								List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+								if (players.size() > 0) {
+									Player newTarget = players.get(rand.nextInt(players.size()));
+									((Mob) mBoss).setTarget(newTarget);
+								}
 							}
 						}
 
