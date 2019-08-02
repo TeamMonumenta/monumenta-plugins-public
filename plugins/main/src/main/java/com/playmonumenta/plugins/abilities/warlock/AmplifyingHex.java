@@ -98,6 +98,9 @@ public class AmplifyingHex extends Ability {
 				if (getAbilityScore() > 1 && mob.getFireTicks() > 0) {
 					debuffCount++;
 				}
+				if (mob.hasMetadata("MobIsStunnedByEntityUtils")) {
+					debuffCount++;
+				}
 				if (debuffCount > 0) {
 					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
 					MovementUtils.KnockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);

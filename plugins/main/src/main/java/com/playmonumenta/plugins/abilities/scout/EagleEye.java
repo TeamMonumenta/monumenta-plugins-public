@@ -7,7 +7,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +16,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EagleEye extends Ability {
@@ -84,9 +82,7 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand);
+		return mPlayer.isSneaking();
 	}
 
 }

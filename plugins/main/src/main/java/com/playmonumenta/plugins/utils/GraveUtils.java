@@ -2,9 +2,6 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.List;
 
-import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
-
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,6 +9,10 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class GraveUtils {
 
@@ -75,7 +76,7 @@ public class GraveUtils {
 							// TODO: [LOW] If the player is offline, queue the message to be sent to them when they return.
 						} else {
 							// TODO: [MED] Add graves information to /deathhelp and edit this message to point users to the command.
-							player.sendMessage(ChatColor.DARK_RED + "Some of your items were destroyed! They have been placed in a chest near where you died. If you can make it back there you can retrieve them, but you will need to get them repaired");
+							player.sendMessage(ChatColor.RED + "Some of your items were destroyed! They have been shattered, but placed in a chest near to where you died.");
 						}
 					}
 				}

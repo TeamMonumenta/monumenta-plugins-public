@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
@@ -46,7 +47,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
@@ -396,18 +396,21 @@ public class EntityUtils {
 		if (mob instanceof Creature) {
 			((Creature) mob).setTarget(null);
 		}
-		mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ticks, 8, false, true));
-		mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, ticks, 8, false, true));
+
 		mob.setMetadata(MOB_IS_STUNNED_METAKEY, new FixedMetadataValue(plugin, null));
 
 		new BukkitRunnable() {
 			int t = 0;
 			double rotation = 0;
+			double originalMovementSpeed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue();
+
 			@Override
 			public void run() {
 				if (mob.isDead()) {
 					this.cancel();
 				}
+				mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+
 				t++;
 				rotation += 20;
 
@@ -423,6 +426,7 @@ public class EntityUtils {
 					if (mob.hasMetadata(MOB_IS_STUNNED_METAKEY)) {
 						mob.removeMetadata(MOB_IS_STUNNED_METAKEY, plugin);
 					}
+					mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
 					this.cancel();
 				}
 			}
