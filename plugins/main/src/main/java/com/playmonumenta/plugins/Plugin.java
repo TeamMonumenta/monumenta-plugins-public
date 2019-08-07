@@ -38,6 +38,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
+import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
@@ -152,6 +153,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new Spectate(this), this);
 		manager.registerEvents(new SpectateBot(this), this);
 
+		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
