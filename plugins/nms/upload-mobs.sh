@@ -10,5 +10,5 @@ fi
 
 echo "Plugin version: $plugin"
 
+ssh -p 8822 epic@build.playmonumenta.com "cd /home/epic/mob_shard_plugins && rm -f MonumentaNMS*.jar"
 scp -P 8822 $plugin epic@build.playmonumenta.com:/home/epic/mob_shard_plugins/
-ssh -p 8822 epic@build.playmonumenta.com "cd /home/epic/mob_shard_plugins && rm -f MonumentaNMS.jar ; ln -s $plugin MonumentaNMS.jar"
