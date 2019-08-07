@@ -60,12 +60,12 @@ public class CounterStrike extends Ability {
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1);
 				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.7f);
 				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
-	
+
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
 					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
 				}
 			}
-	
+
 			// Active trigger if blocking, Riposte check is done separately through AbilityCastEvent
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.COUNTER_STRIKE)) {
 				if (mPlayer.isBlocking()) {
@@ -82,6 +82,7 @@ public class CounterStrike extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mActive && event.getCause() == DamageCause.ENTITY_ATTACK
 		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			mActive = false;
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
 			new BukkitRunnable() {
@@ -125,7 +126,6 @@ public class CounterStrike extends Ability {
 					}
 				}
 			}
-			mActive = false;
 			putOnCooldown();
 		}
 
