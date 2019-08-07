@@ -114,12 +114,12 @@ public class LocationUtils {
 
 	public static boolean isLocationInWater(Location loc) {
 		Block block = loc.getBlock();
-		if (block.isLiquid() || containsWater(block)) {
+		if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
 			return true;
 		}
 
 		block = loc.subtract(0, 1, 0).getBlock();
-		if (block.isLiquid() || containsWater(block)) {
+		if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
 			return true;
 		}
 
@@ -139,7 +139,7 @@ public class LocationUtils {
 		for (int i = loc.getBlockY(); i > (Math.max(0, loc.getBlockY() - 50)); i--) {
 			loc.setY(i);
 			Block block = loc.getBlock();
-			if (block.isLiquid() || containsWater(block)) {
+			if (block.isLiquid() || containsWater(block) || block.getType() == Material.ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.PACKED_ICE) {
 				return true;
 			} else if (!block.isEmpty()) {
 				return false;
