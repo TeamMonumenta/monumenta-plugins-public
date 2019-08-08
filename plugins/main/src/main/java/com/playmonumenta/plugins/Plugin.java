@@ -69,7 +69,7 @@ public class Plugin extends JavaPlugin {
 
 	public ServerProperties mServerProperties = new ServerProperties();
 	public EnchantmentManager mEnchantmentManager = new EnchantmentManager();
-	public HttpManager mHttpManager = new HttpManager();
+	public HttpManager mHttpManager;
 
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
@@ -116,6 +116,14 @@ public class Plugin extends JavaPlugin {
 		CreateGuild.register(this);
 		MonumentaReload.register(this);
 
+		mHttpManager = new HttpManager(this);
+		try {
+			mHttpManager.start();
+		} catch (IOException err) {
+			getLogger().warning("HTTP manager failed to start");
+			err.printStackTrace();
+		}
+
 		mSafeZoneManager = new SafeZoneManager(this);
 		mServerProperties.load(this, null);
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
@@ -146,12 +154,6 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
-		try {
-			mHttpManager.start();
-		} catch (IOException err) {
-			// TODO Auto-generated catch block
-			err.printStackTrace();
-		}
 
 		DailyReset.startTimer(this);
 
