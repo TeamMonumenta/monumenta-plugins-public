@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
+import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.safezone.SafeZoneManager;
@@ -67,6 +69,7 @@ public class Plugin extends JavaPlugin {
 
 	public ServerProperties mServerProperties = new ServerProperties();
 	public EnchantmentManager mEnchantmentManager = new EnchantmentManager();
+	public HttpManager mHttpManager = new HttpManager();
 
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
@@ -143,6 +146,12 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
+		try {
+			mHttpManager.start();
+		} catch (IOException err) {
+			// TODO Auto-generated catch block
+			err.printStackTrace();
+		}
 
 		DailyReset.startTimer(this);
 
@@ -170,9 +179,14 @@ public class Plugin extends JavaPlugin {
 
 			@Override
 			public void run() {
+				final boolean oneHertz = (ticks % 20) == 0;
 				final boolean twoHertz = (ticks % 10) == 0;
 				final boolean fourHertz = (ticks % 5) == 0;
 				final boolean twentyHertz = true;
+
+				if (oneHertz) {
+					mHttpManager.tick();
+				}
 
 				// NOW IT'S TWICE A SECOND MOTHAFUCKAAAASSSSSSSSS!!!!!!!!!!
 				// FREQUENCY ANARCHY HAPPENING UP IN HERE
@@ -187,11 +201,9 @@ public class Plugin extends JavaPlugin {
 				}
 
 				if (fourHertz) {
-					final boolean one = (ticks % 20 == 0);
-
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
-							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, one, ticks);
+							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, oneHertz, ticks);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -244,7 +256,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getScheduler().cancelTasks(this);
 
 		mTrackingManager.unloadTrackedEntities();
-
+		mHttpManager.stop();
 		MetadataUtils.removeAllMetadata(this);
 	}
 
