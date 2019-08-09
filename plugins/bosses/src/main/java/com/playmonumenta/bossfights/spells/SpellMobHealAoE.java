@@ -40,7 +40,7 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Entity e : loc.getWorld().getNearbyEntities(loc, 14, 7, 14)) {
-					if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
+					if (e instanceof LivingEntity && EntityUtils.isHostileMob(e) && !e.isDead()) {
 						LivingEntity le = (LivingEntity) e;
 						double hp = le.getHealth() + 25;
 						double max = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
