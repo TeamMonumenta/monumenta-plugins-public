@@ -266,7 +266,7 @@ public class SpellBaseCharge extends Spell {
 			Player mTarget = target;
 			@Override
 			public void run() {
-				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null) {
+				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
 					this.cancel();
 					return;
 				}
@@ -318,7 +318,7 @@ public class SpellBaseCharge extends Spell {
 
 			@Override
 			public void run() {
-				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null) {
+				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
 					this.cancel();
 					return;
 				}

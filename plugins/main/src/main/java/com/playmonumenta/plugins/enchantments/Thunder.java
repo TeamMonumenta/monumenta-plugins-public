@@ -41,7 +41,11 @@ public class Thunder implements BaseEnchantment {
 		World world = target.getWorld();
 
 		if (event.getDamage() >= 4 && rand < level * 0.1) {
-			EntityUtils.applyStun(plugin, 50, target);
+			if (EntityUtils.isElite(target)) {
+				EntityUtils.applyStun(plugin, 10, target);
+			} else {
+				EntityUtils.applyStun(plugin, 50, target);
+			}
 
 			if (target instanceof Guardian || target instanceof IronGolem) {
 				event.setDamage(event.getDamage() + 1.0);

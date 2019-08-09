@@ -119,7 +119,7 @@ public class SpellBaseAoE extends Spell {
 			public void run() {
 				Location loc = mLauncher.getLocation();
 
-				if (mLauncher.isDead() || !mLauncher.isValid()) {
+				if (mLauncher.isDead() || !mLauncher.isValid() || mLauncher.hasMetadata("MobIsStunnedByEntityUtils")) {
 					this.cancel();
 					return;
 				}

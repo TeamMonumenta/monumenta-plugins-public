@@ -7,13 +7,17 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class SpellMobHealAoE extends SpellBaseAoE {
 
 	public SpellMobHealAoE(Plugin plugin, Entity launcher) {
-		super(plugin, launcher, 7, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
+		super(plugin, launcher, 14, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.SPELL_INSTANT, loc, 25, 3.5, 3.5, 3.5);
@@ -35,16 +39,21 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 4, 0.25, 0.25, 0.25, 0.15, null, true);
 			},
 			(Location loc) -> {
-				for (Entity e : loc.getWorld().getNearbyEntities(loc, 7, 7, 7)) {
-					if (e instanceof LivingEntity && !(e instanceof Player) && !e.isDead()) {
+				for (Entity e : loc.getWorld().getNearbyEntities(loc, 14, 7, 14)) {
+					if (e instanceof LivingEntity && EntityUtils.isHostileMob(e)) {
 						LivingEntity le = (LivingEntity) e;
 						double hp = le.getHealth() + 25;
 						double max = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 						if (hp >= max) {
+							int missing = (int) (hp - max);
 							le.setHealth(max);
+							PotionUtils.applyPotion(le, le, new PotionEffect(PotionEffectType.ABSORPTION, 60 * 20, missing / 4, true, false));
 						} else {
 							le.setHealth(hp);
 						}
+						World world = loc.getWorld();
+						world.spawnParticle(Particle.FIREWORKS_SPARK, le.getLocation().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.3);
+						world.spawnParticle(Particle.HEART, le.getLocation().add(0, 1, 0), 5, 0.4, 0.5, 0.4);
 					}
 				}
 			}

@@ -187,7 +187,7 @@ public class SpellBaseLaser extends Spell {
 					blocked = !(Utils.hasLineOfSight(launLoc, target));
 				}
 
-				if (blocked && mStopWhenBlocked) {
+				if ((blocked && mStopWhenBlocked) || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;

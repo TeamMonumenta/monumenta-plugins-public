@@ -33,6 +33,7 @@ import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
+import org.bukkit.entity.Shulker;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
@@ -79,7 +80,8 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(Entity entity) {
-		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear || entity instanceof Phantom) {
+		if ((entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear || entity instanceof Phantom || entity instanceof Shulker)
+				&& !entity.getScoreboardTags().contains("SkillImmune")) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return ((Wolf)entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -87,7 +89,7 @@ public class EntityUtils {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
 			LivingEntity target = ((Mob)entity).getTarget();
-			return target != null && (target instanceof Player || entity.getScoreboardTags().contains("boss_targetplayer"));
+			return entity.getScoreboardTags().contains("boss_targetplayer") || (target != null && target instanceof Player);
 		} else if (entity instanceof Player) {
 			return AbilityManager.getManager().isPvPEnabled((Player)entity);
 		}

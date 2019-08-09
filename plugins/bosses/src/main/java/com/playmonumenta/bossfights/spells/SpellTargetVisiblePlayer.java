@@ -50,9 +50,10 @@ public class SpellTargetVisiblePlayer extends Spell {
 		mCooldownRemaining -= PERIOD;
 		mTicksSinceLastSeen += PERIOD;
 
-		// Forget about this target if they leave the game or switch to spectator
+		// Forget about this target if they leave the game or switch to spectator or are invisible
 		if (mLastTarget != null) {
-			if (!mLastTarget.isOnline() || mLastTarget.getGameMode().equals(GameMode.SPECTATOR)) {
+			if (mBoss.hasMetadata("MobIsStunnedByEntityUtils") || !mLastTarget.isOnline() ||
+					mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || mLastTarget.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
 				mCooldownRemaining = 0;
@@ -76,14 +77,14 @@ public class SpellTargetVisiblePlayer extends Spell {
 				if (mLastTarget != null && mBoss.getTarget() != mLastTarget) {
 					mBoss.setTarget(mLastTarget);
 				}
-			} else {
-				// Potentially find a new target
+			} else if (!mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
+				// Potentially find a new target if not stunned
 				Location bossLoc = mBoss.getEyeLocation();
 				List<Player> potentialTargets = Utils.playersInRange(bossLoc, mDetectionRange);
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
-					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player) && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 						mLastTarget = player;
 						mBoss.setTarget(player);
 						mCooldownRemaining = mCooldown;
