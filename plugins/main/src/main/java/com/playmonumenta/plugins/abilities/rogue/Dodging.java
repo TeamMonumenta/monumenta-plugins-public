@@ -101,9 +101,9 @@ public class Dodging extends Ability {
 
 		if (event.getEntity() instanceof TippedArrow) {
 			TippedArrow arrow = (TippedArrow) event.getEntity();
-			arrow.clearCustomEffects();
 			PotionData data = new PotionData(PotionType.MUNDANE);
 			arrow.setBasePotionData(data);
+			arrow.clearCustomEffects();
 		}
 		return true;
 	}

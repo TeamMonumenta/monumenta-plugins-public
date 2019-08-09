@@ -73,17 +73,19 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				List<Player> plist = Utils.playersInRange(mLauncher.getLocation(), 100);
-				Player Target = plist.get(mRand.nextInt(plist.size()));
-				Location sLoc = mLauncher.getLocation();
-				try {
-					Entity tnt = Utils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
-					Location pLoc = Target.getLocation();
-					Location tLoc = tnt.getLocation();
-					Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-					vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
-					tnt.setVelocity(vect);
-				} catch (Exception e) {
-					mPlugin.getLogger().warning("Summoned TNT but could not find TNT entity");
+				if (plist.size() >= 1) {
+					Player Target = plist.get(mRand.nextInt(plist.size()));
+					Location sLoc = mLauncher.getLocation();
+					try {
+						Entity tnt = Utils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
+						Location pLoc = Target.getLocation();
+						Location tLoc = tnt.getLocation();
+						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
+						vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
+						tnt.setVelocity(vect);
+					} catch (Exception e) {
+						mPlugin.getLogger().warning("Summoned TNT but could not find TNT entity");
+					}
 				}
 			}
 		};

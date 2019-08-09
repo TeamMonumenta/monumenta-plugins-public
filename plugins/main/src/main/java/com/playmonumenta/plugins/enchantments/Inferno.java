@@ -44,6 +44,7 @@ public class Inferno implements BaseEnchantment {
 
 	public static final String SET_FIRE_TICK_METAKEY = "FireSetOnMobTick";
 	public static final String FIRE_TICK_METAKEY = "FireDamagedMobTick";
+	public static final String INFERNO_TAG_METAKEY = "InfernoTagMob";
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
 	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 
@@ -67,13 +68,17 @@ public class Inferno implements BaseEnchantment {
 	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		// If the player melee attacks with a fire aspect weapon OR if the mob has the metadata
 		// applied by ability fire, add the mob to inferno tracking
-		if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
-			&& !MetadataUtils.happenedThisTick(plugin, player, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
-			infernoTagMob(plugin, target, level, player);
-			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-		} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
-			infernoTagMob(plugin, target, level, player);
+		if (!target.hasMetadata(INFERNO_TAG_METAKEY)) {
+			target.setMetadata(INFERNO_TAG_METAKEY, new FixedMetadataValue(plugin, true));
+			if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
+				&& !MetadataUtils.happenedThisTick(plugin, player, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+				infernoTagMob(plugin, target, level, player);
+				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
+				infernoTagMob(plugin, target, level, player);
+			}
+			target.removeMetadata(INFERNO_TAG_METAKEY, plugin);
 		}
 	}
 
@@ -170,7 +175,7 @@ public class Inferno implements BaseEnchantment {
 	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageEvent !
 	 */
 	public static void onFireTick(LivingEntity mob, EntityDamageEvent event) {
-		if (!sTaggedMobs.isEmpty()) {
+		if (sTaggedMobs.containsKey(mob)) {
 			Integer infernoValue = sTaggedMobs.get(mob).level;
 			if (infernoValue != null) {
 				mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(Plugin.getInstance(), mob.getTicksLived()));

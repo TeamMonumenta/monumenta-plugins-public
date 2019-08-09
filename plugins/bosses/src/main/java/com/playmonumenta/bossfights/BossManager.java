@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
@@ -482,15 +483,17 @@ public class BossManager implements Listener {
 	/* Another weird one - used for exorcism potion */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void LingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
-		LingeringPotion potEntity = event.getEntity();
-		if (InventoryUtils.testForItemWithLore(potEntity.getItem(), "Exorcism")) {
-			AreaEffectCloud cloud = event.getAreaEffectCloud();
-			if (event.getAreaEffectCloud() != null) {
-				cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
-				cloud.setRadius(8.0f);
-				cloud.setDurationOnUse(0);
-				cloud.setRadiusOnUse(0);
-				cloud.setRadiusPerTick(-0.004f);
+		if (event.getEntityType() == EntityType.LINGERING_POTION) {
+			LingeringPotion potEntity = event.getEntity();
+			if (InventoryUtils.testForItemWithLore(potEntity.getItem(), "Exorcism")) {
+				AreaEffectCloud cloud = event.getAreaEffectCloud();
+				if (event.getAreaEffectCloud() != null) {
+					cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
+					cloud.setRadius(8.0f);
+					cloud.setDurationOnUse(0);
+					cloud.setRadiusOnUse(0);
+					cloud.setRadiusPerTick(-0.004f);
+				}
 			}
 		}
 	}
