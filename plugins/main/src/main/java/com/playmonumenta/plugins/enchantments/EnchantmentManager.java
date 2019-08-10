@@ -88,6 +88,7 @@ public class EnchantmentManager {
 		init.add(new Current());
 		init.add(new InstantDrink());
 		init.add(new JunglesNourishment());
+		init.add(new Adrenaline());
 
 		// Curses
 		init.add(new CurseOfCorruption());
@@ -155,6 +156,11 @@ public class EnchantmentManager {
 					if (item != null) {
 						/* Step over the properties that apply to that slot */
 						for (BaseEnchantment property : slotProperties) {
+							if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
+								// Prevents armor items being held in mainhand / offhand counting towards enchantment level
+								continue;
+							}
+
 							/*
 							 * If this particular property applies levels,
 							 * add them to the running count UNLESS it is an
@@ -162,11 +168,6 @@ public class EnchantmentManager {
 							 */
 							int level = property.getLevelFromItem(item, player, slot);
 							if (level > 0) {
-								if ((property instanceof Evasion || property instanceof MeleeEvasion
-									|| property instanceof AbilityEvasion || property instanceof SecondWind)
-									&& (slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
-									continue;
-								}
 								Integer currentLevel = propertyMap.get(property);
 								if (currentLevel != null) {
 									currentLevel += level;
