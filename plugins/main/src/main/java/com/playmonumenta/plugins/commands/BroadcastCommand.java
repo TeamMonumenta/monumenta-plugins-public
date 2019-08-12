@@ -37,6 +37,7 @@ public class BroadcastCommand {
 	            "difficulty",
 	            "scoreboard",
 	            "tag",
+	            "team",
 	            "setblock"
 	        );
 
