@@ -306,15 +306,17 @@ public class BossManager implements Listener {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void EntitySpawnEvent(EntitySpawnEvent event) {
-		Entity entity = event.getEntity();
+		if (!event.isCancelled()) {
+			Entity entity = event.getEntity();
 
-		if (!(entity instanceof LivingEntity)) {
-			return;
+			if (!(entity instanceof LivingEntity)) {
+				return;
+			}
+
+			ProcessEntity((LivingEntity)entity);
 		}
-
-		ProcessEntity((LivingEntity)entity);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -328,37 +330,41 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void ChunkUnloadEvent(ChunkUnloadEvent event) {
-		Entity[] entities = event.getChunk().getEntities();
+		if (!event.isCancelled()) {
+			Entity[] entities = event.getChunk().getEntities();
 
-		for (Entity entity : entities) {
-			if (!(entity instanceof LivingEntity)) {
-				continue;
+			for (Entity entity : entities) {
+				if (!(entity instanceof LivingEntity)) {
+					continue;
+				}
+
+				unload((LivingEntity)entity);
 			}
-
-			unload((LivingEntity)entity);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void EntityDeathEvent(EntityDeathEvent event) {
-		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
+		if (!event.isCancelled()) {
+			Entity entity = event.getEntity();
+			if (!(entity instanceof LivingEntity)) {
+				return;
+			}
 
-		Boss boss = mBosses.get(entity.getUniqueId());
-		if (boss != null) {
-			boss.death();
-			if (((LivingEntity) entity).getHealth() <= 0) {
-				boss.unload();
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.death();
+				if (((LivingEntity) entity).getHealth() <= 0) {
+					boss.unload();
 
-				/*
-				 * Remove special serialization data from drops. Should not be
-				 * necessary since loaded bosses already have this data stripped
-				 */
-				SerializationUtils.stripSerializationDataFromDrops(event);
+					/*
+					 * Remove special serialization data from drops. Should not be
+					 * necessary since loaded bosses already have this data stripped
+					 */
+					SerializationUtils.stripSerializationDataFromDrops(event);
+				}
 			}
 		}
 	}
