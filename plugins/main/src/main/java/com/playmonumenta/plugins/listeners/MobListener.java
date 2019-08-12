@@ -4,6 +4,8 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
@@ -57,13 +59,20 @@ public class MobListener implements Listener {
 		// We need to allow spawning hostile mobs intentionally, but disable natural spawns.
 		// It's easier to check the intentional ways than the natural ones.
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
+			event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
 		    EntityUtils.isHostileMob(event.getEntity())) {
 			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(event.getEntity());
 			if (locType.equals(LocationType.Capital) ||
 			    locType.equals(LocationType.SafeZone)) {
-				event.setCancelled(true);
-				return;
+				Location loc = entity.getLocation();
+
+				// Cancel spawning unless this is from a dispenser in a plot
+				if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
+					|| !loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType().equals(Material.SPONGE)) {
+					event.setCancelled(true);
+					return;
+				}
 			}
 		}
 
