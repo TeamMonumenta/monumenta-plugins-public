@@ -20,6 +20,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -214,6 +215,10 @@ public class EntityListener implements Listener {
 			// Don't trigger class effects if the event was already cancelled (NPCs, etc.)
 			if (event.isCancelled() || damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
+			}
+			// Don't allow evoker fangs to damage non-players
+			if (damager instanceof EvokerFangs) {
+				event.setCancelled(true);
 			}
 		}
 
