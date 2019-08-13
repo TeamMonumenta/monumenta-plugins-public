@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,6 +25,7 @@ public class AbilityUtils {
 	private static final String ARROW_BONUS_DAMAGE_METAKEY = "ArrowBonusDamageFromAbilities"; // For Bow Mastery and Sharpshooter
 	private static final String ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY = "ArrowVelocityDamageMultiplier"; // Multiplier based on arrow speed
 	private static final String ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY = "ArrowFinalDamageMultiplier"; // For Volley and Pinning Shot
+	private static final String ARROW_REFUNDED_METAKEY = "ArrowRefunded";
 	// This value obtained from testing; in reality, a fully charged shot outputs an arrow with a velocity between 2.95 and 3.05
 	private static final float ARROW_MAX_VELOCITY = 2.9f;
 
@@ -153,4 +155,40 @@ public class AbilityUtils {
 		return false;
 	}
 
+	public static void refundArrow(Player player, Arrow arrow) {
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		//Only refund arrow once
+		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
+			if (InventoryUtils.isBowItem(mainHand) || InventoryUtils.isBowItem(offHand)) {
+				int infLevel = Math.max(mainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE), offHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE));
+				if (infLevel == 0) {
+					arrow.setPickupStatus(Arrow.PickupStatus.ALLOWED);
+					Inventory playerInv = player.getInventory();
+					int firstArrow = playerInv.first(Material.ARROW);
+					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
+
+					final int arrowSlot;
+					if (firstArrow == -1 && firstTippedArrow > -1) {
+						arrowSlot = firstTippedArrow;
+					} else if (firstArrow > - 1 && firstTippedArrow == -1) {
+						arrowSlot = firstArrow;
+					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
+						arrowSlot = Math.min(firstArrow, firstTippedArrow);
+					} else {
+						/* Player shot their last arrow - abort here */
+						return;
+					}
+
+					ItemStack arrowStack = playerInv.getItem(arrowSlot);
+					int arrowQuantity = arrowStack.getAmount();
+					if (arrowQuantity < 64) {
+						arrowStack.setAmount(arrowQuantity);
+						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+					}
+					playerInv.setItem(arrowSlot, arrowStack);
+				}
+			}
+		}
+	}
 }
