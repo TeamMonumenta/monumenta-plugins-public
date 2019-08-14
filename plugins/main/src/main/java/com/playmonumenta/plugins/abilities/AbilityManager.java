@@ -61,7 +61,9 @@ import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
+import com.playmonumenta.plugins.abilities.cleric.SacredProvisions;
 import com.playmonumenta.plugins.abilities.cleric.Sanctified;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
@@ -192,6 +194,8 @@ public class AbilityManager {
 
 		                               // ALL PLAYERS (but technically for Alchemist)
 		                               new NonAlchemistPotionPassive(mPlugin, mWorld, mRandom, null),
+		                               // ALL PLAYERS (but technically for Cleric)
+		                               new NonClericProvisionsPassive(mPlugin, mWorld, mRandom, null),
 
 		                               // All other non-class abilities
 		                               new EvasionEnchant(mPlugin, mWorld, mRandom, null),
@@ -250,6 +254,7 @@ public class AbilityManager {
 		                               new HeavenlyBoon(mPlugin, mWorld, mRandom, null),
 		                               new Rejuvenation(mPlugin, mWorld, mRandom, null),
 		                               new Sanctified(mPlugin, mWorld, mRandom, null),
+		                               new SacredProvisions(mPlugin, mWorld, mRandom, null),
 
 		                               /********** WARLOCK **********/
 		                               new AmplifyingHex(mPlugin, mWorld, mRandom, null),

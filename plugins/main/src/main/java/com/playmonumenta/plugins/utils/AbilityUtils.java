@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -26,6 +27,7 @@ public class AbilityUtils {
 	private static final String ARROW_VELOCITY_DAMAGE_MULTIPLIER_METAKEY = "ArrowVelocityDamageMultiplier"; // Multiplier based on arrow speed
 	private static final String ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY = "ArrowFinalDamageMultiplier"; // For Volley and Pinning Shot
 	private static final String ARROW_REFUNDED_METAKEY = "ArrowRefunded";
+	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 	// This value obtained from testing; in reality, a fully charged shot outputs an arrow with a velocity between 2.95 and 3.05
 	private static final float ARROW_MAX_VELOCITY = 2.9f;
 
@@ -180,14 +182,24 @@ public class AbilityUtils {
 						return;
 					}
 
-					ItemStack arrowStack = playerInv.getItem(arrowSlot);
-					int arrowQuantity = arrowStack.getAmount();
-					if (arrowQuantity < 64) {
-						arrowStack.setAmount(arrowQuantity);
-						arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					}
-					playerInv.setItem(arrowSlot, arrowStack);
+					// Make sure the duplicate arrow can't be picked up
+					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+					// I'm not sure why this works, but it does.
+					playerInv.setItem(arrowSlot, playerInv.getItem(arrowSlot));
 				}
+			}
+		}
+	}
+
+	public static void refundPotion(Player player, ThrownPotion potion) {
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, POTION_REFUNDED_METAKEY)) {
+			ItemStack item = potion.getItem();
+			if (mainHand != null && mainHand.isSimilar(item)) {
+				mainHand.setAmount(mainHand.getAmount()+1);
+			} else if (offHand != null && offHand.isSimilar(item)) {
+				offHand.setAmount(offHand.getAmount()+1);
 			}
 		}
 	}
