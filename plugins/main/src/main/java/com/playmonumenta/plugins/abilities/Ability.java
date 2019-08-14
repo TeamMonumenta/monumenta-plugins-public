@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -18,6 +19,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
@@ -144,6 +147,10 @@ public abstract class Ability {
 		return true;
 	}
 
+	public boolean PlayerThrewLingeringPotionEvent(LingeringPotion potion) {
+		return true;
+	}
+
 	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                           ThrownPotion potion, PotionSplashEvent event) {
 		return true;
@@ -180,6 +187,10 @@ public abstract class Ability {
 	public void PlayerAnimationEvent(PlayerAnimationEvent event) { }
 
 	public void PlayerDamagedByBossEvent(BossAbilityDamageEvent event) { }
+
+	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) { }
+
+	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 

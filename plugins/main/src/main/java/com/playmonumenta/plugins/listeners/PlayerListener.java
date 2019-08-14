@@ -680,6 +680,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
+		AbilityManager.getManager().PlayerItemConsumeEvent(player, event);
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -714,6 +715,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) {
 		ItemStack item = event.getItem();
+		AbilityManager.getManager().PlayerItemDamageEvent(event.getPlayer(), event);
 
 		if (ItemUtils.isArmorItem(item.getType())) {
 			int damage = event.getDamage();

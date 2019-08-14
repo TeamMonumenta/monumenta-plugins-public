@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -29,6 +30,8 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
@@ -538,6 +541,33 @@ public class AbilityManager {
 			}
 		}
 		return true;
+	}
+
+	public boolean PlayerThrewLingeringPotionEvent(Player player, LingeringPotion potion) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				if (!abil.PlayerThrewLingeringPotionEvent(potion)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public void PlayerItemConsumeEvent(Player player, PlayerItemConsumeEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PlayerItemConsumeEvent(event);
+			}
+		}
+	}
+
+	public void PlayerItemDamageEvent(Player player, PlayerItemDamageEvent event) {
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			if (abil.canCast()) {
+				abil.PlayerItemDamageEvent(event);
+			}
+		}
 	}
 
 	public void EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {

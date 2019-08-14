@@ -23,6 +23,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -495,6 +496,11 @@ public class EntityListener implements Listener {
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				SplashPotion potion = (SplashPotion)proj;
 				if (!mAbilities.PlayerThrewSplashPotionEvent(player, potion)) {
+					event.setCancelled(true);
+				}
+			} else if (event.getEntityType() == EntityType.LINGERING_POTION) {
+				LingeringPotion potion = (LingeringPotion)proj;
+				if (!mAbilities.PlayerThrewLingeringPotionEvent(player, potion)) {
 					event.setCancelled(true);
 				}
 			}
