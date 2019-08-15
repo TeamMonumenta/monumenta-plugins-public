@@ -307,6 +307,12 @@ public class EntityListener implements Listener {
 	public void EntityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
+
+		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
+		    damagee.getScoreboardTags().contains("ExplosionImmune")) {
+			event.setCancelled(true);
+			return;
+		}
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
 			World world = player.getWorld();

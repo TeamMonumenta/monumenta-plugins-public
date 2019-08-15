@@ -591,6 +591,17 @@ public class PlayerListener implements Listener {
 					Item droppedItem = player.getWorld().dropItemNaturally(location, item);
 					if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
 						droppedItem.setInvulnerable(true);
+					} else {
+						// Make item invulnerable to explosions for 5 seconds
+						droppedItem.addScoreboardTag("ExplosionImmune");
+						new BukkitRunnable(){
+							@Override
+							public void run() {
+								if (droppedItem != null && droppedItem.isValid()) {
+									droppedItem.removeScoreboardTag("ExplosionImmune");
+								}
+							}
+						}.runTaskLater(Plugin.getInstance(), 5 * 20);
 					}
 					if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER) &&
 					    !player.getScoreboardTags().contains("DisableGraves")) {
