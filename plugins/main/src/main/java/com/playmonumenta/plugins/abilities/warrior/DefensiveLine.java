@@ -100,14 +100,9 @@ public class DefensiveLine extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		//  If we're sneaking and we block with a shield we can attempt to trigger the ability.
-		if (mPlayer.isSneaking()) {
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) {
-				return true;
-			}
-		}
-		return false;
+		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
+		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
+		return mPlayer.isSneaking() && ((mHand != null && mHand.getType() == Material.SHIELD && oHand.getType() != Material.BOW)
+		    || (oHand != null && oHand.getType() == Material.SHIELD && mHand.getType() != Material.BOW));
 	}
 }
