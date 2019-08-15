@@ -110,6 +110,7 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.FinishingBlow;
 import com.playmonumenta.plugins.abilities.scout.ScoutPassive;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
@@ -234,6 +235,7 @@ public class AbilityManager {
 		                               new ScoutPassive(mPlugin, mWorld, mRandom, null),
 		                               new SwiftCuts(mPlugin, mWorld, mRandom, null),
 		                               new Sharpshooter(mPlugin, mWorld, mRandom, null),
+		                               new FinishingBlow(mPlugin, mWorld, mRandom, null),
 
 		                               /********** WARRIOR **********/
 		                               new BruteForce(mPlugin, mWorld, mRandom, null),
