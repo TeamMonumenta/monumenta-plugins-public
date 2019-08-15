@@ -19,9 +19,9 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class WeaponryMastery extends Ability {
 
-	private static final double WEAPON_MASTERY_AXE_1_DAMAGE = 2;
-	private static final double WEAPON_MASTERY_AXE_2_DAMAGE = 4;
-	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 1.5;
+	private static final double WEAPON_MASTERY_AXE_1_DAMAGE = 3;
+	private static final double WEAPON_MASTERY_AXE_2_DAMAGE = 6;
+	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 2;
 
 	private final double damageBonusAxe;
 	private final double damageBonusSword;
