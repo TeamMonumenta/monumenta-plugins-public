@@ -35,14 +35,19 @@ public class BrutalAlchemy extends Ability {
 				int brutalAlchemy = getAbilityScore();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						int damage = (brutalAlchemy == 1) ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
-						int duration = (brutalAlchemy == 1) ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
-						EntityUtils.damageEntity(mPlugin, entity, damage, mPlayer);
-						PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.WITHER, duration, 1, false, true));
+						apply(mPlugin, mPlayer, entity, brutalAlchemy);
 					}
 				}
 			}
 		}
 		return true;
 	}
+
+	public static void apply(Plugin plugin, Player damager, LivingEntity damagee, int score) {
+		int damage = score == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
+		int duration = score == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
+		EntityUtils.damageEntity(plugin, damagee, damage, damager);
+		PotionUtils.applyPotion(damager, damagee, new PotionEffect(PotionEffectType.WITHER, duration, 1, false, true));
+	}
+
 }

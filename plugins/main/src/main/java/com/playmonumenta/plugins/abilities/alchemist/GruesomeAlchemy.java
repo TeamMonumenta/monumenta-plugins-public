@@ -34,14 +34,19 @@ public class GruesomeAlchemy extends Ability {
 				int gruesomeAlchemy = getAbilityScore();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_SLOW, false, true));
-						if (gruesomeAlchemy > 1) {
-							PotionUtils.applyPotion(mPlayer, entity, new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
-						}
+						apply(mPlugin, mPlayer, entity, gruesomeAlchemy);
 					}
 				}
 			}
 		}
 		return true;
 	}
+
+	public static void apply(Plugin plugin, Player damager, LivingEntity damagee, int score) {
+		PotionUtils.applyPotion(damager, damagee, new PotionEffect(PotionEffectType.SLOW, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_SLOW, false, true));
+		if (score > 1) {
+			PotionUtils.applyPotion(damager, damagee, new PotionEffect(PotionEffectType.UNLUCK, GRUESOME_ALCHEMY_DURATION, GRUESOME_ALCHEMY_VULN, false, true));
+		}
+	}
+
 }

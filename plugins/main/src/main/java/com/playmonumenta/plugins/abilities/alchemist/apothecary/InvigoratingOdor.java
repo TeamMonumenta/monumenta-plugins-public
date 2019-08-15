@@ -26,6 +26,7 @@ public class InvigoratingOdor extends Ability {
 
 	private static final int INVIGORATING_1_DAMAGE = 2;
 	private static final int INVIGORATING_2_DAMAGE = 4;
+	private static final int INVIGORATING_DURATION = 20 * 10;
 
 	public InvigoratingOdor(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -36,22 +37,27 @@ public class InvigoratingOdor extends Ability {
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				boolean resistance = getAbilityScore() > 1 ? true : false;
+				int invigoratingOdor = getAbilityScore();
 				for (LivingEntity le : affectedEntities) {
-					if (le instanceof Player) {
-						Player player = (Player) le;
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, 20 * 10, 0, true, true));
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 0, true, true));
-						if (resistance) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
-						}
-					} else if (EntityUtils.isHostileMob(le)) {
-						EntityUtils.damageEntity(mPlugin, le, getAbilityScore() == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE, mPlayer);
-					}
+					apply(mPlugin, mPlayer, le, invigoratingOdor);
 				}
 			}
 		}
 		return true;
+	}
+
+	public static void apply(Plugin plugin, Player damager, LivingEntity damagee, int score) {
+		if (damagee instanceof Player) {
+			Player player = (Player) damagee;
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, INVIGORATING_DURATION, 0, true, true));
+			if (score > 1) {
+				plugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
+			}
+		} else if (EntityUtils.isHostileMob(damagee)) {
+			int damage = score == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE;
+			EntityUtils.damageEntity(plugin, damagee, damage, damager);
+		}
 	}
 
 }
