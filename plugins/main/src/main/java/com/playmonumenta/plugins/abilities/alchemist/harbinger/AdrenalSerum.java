@@ -142,7 +142,10 @@ public class AdrenalSerum extends Ability {
 		// This is sufficient because we are already checking conditions in runCheck()
 		potion.remove();
 		putOnCooldown();
-		// Consumes a potion
+		// Consumes a potion - potion.remove() causes the potion to be returned to the player
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		inMainHand.setAmount(inMainHand.getAmount() - 1);
+
 		return true;
 	}
 
