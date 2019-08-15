@@ -96,6 +96,7 @@ public enum Spells {
 	RIPOSTE("Riposte"),
 	DEFENSIVE_LINE("Defensive Line"),
 	COUNTER_STRIKE("Counter Strike"),
+	SHIELD_BASH("Shield Bash"),
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),
@@ -110,6 +111,7 @@ public enum Spells {
 	IRON_TINCTURE("Iron Tincture"),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
 	UNSTABLE_ARROWS("Unstable Arrows"),
+	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
 
 	//Harbinger
 	ADRENAL_SERUM("Adrenal Serum"),

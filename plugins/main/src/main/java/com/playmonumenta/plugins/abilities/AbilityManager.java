@@ -35,6 +35,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BasiliskPoison;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
@@ -66,6 +67,7 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
+import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.abilities.mage.FrostNova;
 import com.playmonumenta.plugins.abilities.mage.MagePassive;
@@ -134,6 +136,7 @@ import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
 import com.playmonumenta.plugins.abilities.warrior.Frenzy;
 import com.playmonumenta.plugins.abilities.warrior.Riposte;
+import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
@@ -197,6 +200,7 @@ public class AbilityManager {
 
 		                               /********** MAGE **********/
 		                               new ArcaneStrike(mPlugin, mWorld, mRandom, null),
+		                               new Channeling(mPlugin, mWorld, mRandom, null),
 		                               new ElementalArrows(mPlugin, mWorld, mRandom, null),
 		                               new FrostNova(mPlugin, mWorld, mRandom, null),
 		                               new MagePassive(mPlugin, mWorld, mRandom, null),
@@ -229,6 +233,7 @@ public class AbilityManager {
 		                               new DefensiveLine(mPlugin, mWorld, mRandom, null),
 		                               new Frenzy(mPlugin, mWorld, mRandom, null),
 		                               new Riposte(mPlugin, mWorld, mRandom, null),
+		                               new ShieldBash(mPlugin, mWorld, mRandom, null),
 		                               new Toughness(mPlugin, mWorld, mRandom, null),
 		                               new WarriorPassive(mPlugin, mWorld, mRandom, null),
 		                               new WeaponryMastery(mPlugin, mWorld, mRandom, null),
@@ -254,6 +259,7 @@ public class AbilityManager {
 		                               new SoulRend(mPlugin, mWorld, mRandom, null),
 
 		                               /********** ALCHEMIST **********/
+		                               new AlchemicalArtillery(mPlugin, mWorld, mRandom, null),
 		                               new BasiliskPoison(mPlugin, mWorld, mRandom, null),
 		                               new UnstableArrows(mPlugin, mWorld, mRandom, null),
 		                               new PowerInjection(mPlugin, mWorld, mRandom, null),
