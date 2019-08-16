@@ -11,7 +11,6 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,11 +22,11 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
  * Alchemical Artillery: Left click with a bow to prime it with an alchemist potion.
@@ -69,10 +68,6 @@ public class AlchemicalArtillery extends Ability {
 			GruesomeAlchemy ga = (GruesomeAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
 			NightmarishAlchemy na = (NightmarishAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
 			InvigoratingOdor io = (InvigoratingOdor) AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-			int baScore = ScoreboardUtils.getScoreboardValue(mPlayer, "BrutalAlchemy");
-			int gaScore = ScoreboardUtils.getScoreboardValue(mPlayer, "GruesomeAlchemy");
-			int naScore = ScoreboardUtils.getScoreboardValue(mPlayer, "Nightmarish");
-			int ioScore = ScoreboardUtils.getScoreboardValue(mPlayer, "InvigoratingOdor");
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(arrow.getLocation(), mRadius);
 			int size = mobs.size();
@@ -80,21 +75,21 @@ public class AlchemicalArtillery extends Ability {
 
 			for (LivingEntity mob : mobs) {
 				if (ba != null) {
-					ba.apply(mPlugin, mPlayer, mob, baScore);
+					ba.apply(mPlugin, mPlayer, mob, ba.getAbilityScore());
 				}
 				if (ga != null) {
-					ga.apply(mPlugin, mPlayer, mob, gaScore);
+					ga.apply(mPlugin, mPlayer, mob, ga.getAbilityScore());
 				}
 				if (na != null) {
-					guaranteedApplicationApplied = na.apply(mRandom, mPlugin, mPlayer, mob, naScore, size, guaranteedApplicationApplied);
+					guaranteedApplicationApplied = na.apply(mRandom, mPlugin, mPlayer, mob, na.getAbilityScore(), size, guaranteedApplicationApplied);
 				}
 				if (io != null) {
-					io.apply(mPlugin, mPlayer, mob, ioScore);
+					io.apply(mPlugin, mPlayer, mob, io.getAbilityScore());
 				}
 			}
 			if (io != null) {
 				for (Player player : PlayerUtils.getNearbyPlayers(arrow.getLocation(), mRadius)) {
-					io.apply(mPlugin, mPlayer, player, ioScore);
+					io.apply(mPlugin, mPlayer, player, io.getAbilityScore());
 				}
 			}
 		}
@@ -105,20 +100,9 @@ public class AlchemicalArtillery extends Ability {
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (mPlayer.isSneaking()) {
-			ItemStack potionStack = null;
-			int potionCount = 0;
-			for (ItemStack item : mPlayer.getInventory().getContents()) {
-				if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
-					potionStack = item;
-					potionCount = item.getAmount();
-					break;
-				}
-			}
-
-			if (potionCount >= mCost) {
+			if (AbilityUtils.removeAlchemistPotions(mPlayer, mCost)) {
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 				arrow.setMetadata(ALCHEMICAL_ARTILLERY_METAKEY, new FixedMetadataValue(mPlugin, mRadius));
-				potionStack.setAmount(potionCount - mCost);
 			}
 		}
 

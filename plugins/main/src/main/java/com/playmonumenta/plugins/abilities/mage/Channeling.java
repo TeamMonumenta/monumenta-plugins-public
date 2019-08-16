@@ -50,7 +50,7 @@ public class Channeling extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (mLastSpellCast != null && event.getCause() == DamageCause.ENTITY_ATTACK
+		if (mLastSpellCast != null && event.getEntity() instanceof LivingEntity && event.getCause() == DamageCause.ENTITY_ATTACK
 			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			event.setDamage(event.getDamage() + mDamage);
 			LivingEntity mob = (LivingEntity) event.getEntity();

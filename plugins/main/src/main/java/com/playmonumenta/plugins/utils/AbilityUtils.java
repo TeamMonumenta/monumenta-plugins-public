@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -112,6 +113,44 @@ public class AbilityUtils {
 				inv.addItem(newPotions);
 			}
 		}
+	}
+
+	// You can't just use a negative value with the add method if the potions to be remove are distributed across multiple stacks
+	// Returns false if the player doesn't have enough potions in their inventory
+	public static boolean removeAlchemistPotions(Player player, int numPotionsToRemove) {
+		Inventory inv = player.getInventory();
+		List<ItemStack> potionStacks = new ArrayList<ItemStack>();
+		int potionCount = 0;
+
+		// Make sure the player has enough potions
+		for (ItemStack item : inv.getContents()) {
+			if (InventoryUtils.testForItemWithName(item, "Alchemist's Potion")) {
+				potionCount += item.getAmount();
+				potionStacks.add(item);
+				if (potionCount >= numPotionsToRemove) {
+					break;
+				}
+			}
+		}
+
+		if (potionCount >= numPotionsToRemove) {
+			for (ItemStack potionStack : potionStacks) {
+				if (potionStack.getAmount() >= numPotionsToRemove) {
+					potionStack.setAmount(potionStack.getAmount() - numPotionsToRemove);
+					break;
+				} else {
+					numPotionsToRemove -= potionStack.getAmount();
+					potionStack.setAmount(0);
+					if (numPotionsToRemove == 0) {
+						break;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 }
