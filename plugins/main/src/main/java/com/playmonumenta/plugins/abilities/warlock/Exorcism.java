@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Exorcism  extends Ability {
@@ -106,10 +107,10 @@ public class Exorcism  extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > EXORCISM_ANGLE &&
-		       (mainHand == null || mainHand.getType() != Material.BOW) &&
-		       (offHand == null || offHand.getType() != Material.BOW) &&
-		       (!mPlayer.getActivePotionEffects().isEmpty() || (mPlayer.getFireTicks() > 1));
+		return mPlayer.getLocation().getPitch() > EXORCISM_ANGLE &&
+				InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) &&
+				(offHand == null || offHand.getType() != Material.BOW) &&
+				(!mPlayer.getActivePotionEffects().isEmpty() || (mPlayer.getFireTicks() > 1));
 	}
 
 }
