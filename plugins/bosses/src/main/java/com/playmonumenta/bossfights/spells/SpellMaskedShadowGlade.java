@@ -16,10 +16,10 @@ import org.bukkit.Sound;
 import com.playmonumenta.bossfights.utils.Utils;
 
 public class SpellMaskedShadowGlade extends Spell {
-	private Plugin mPlugin;
-	private int mCount;
-	private Location mLoc;
-	private Random mRand = new Random();
+	private final Plugin mPlugin;
+	private final int mCount;
+	private final Location mLoc;
+	private final Random mRand = new Random();
 	private int j;
 
 	public SpellMaskedShadowGlade(Plugin plugin, Location loc, int count) {
@@ -41,10 +41,11 @@ public class SpellMaskedShadowGlade extends Spell {
 			}
 		}
 		int chosen;
-		while (mCount > 0) {
+		int count = mCount;
+		while (count > 0) {
 			chosen = mRand.nextInt(4);
 			if (!isQuadrantDone[chosen]) {
-				mCount--;
+				count--;
 				isQuadrantDone[chosen] = true;
 				animation(possibleLocs[chosen]);
 				damage(possibleLocs[chosen]);
