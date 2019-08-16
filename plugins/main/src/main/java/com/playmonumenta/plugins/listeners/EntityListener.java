@@ -23,6 +23,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
@@ -75,9 +76,9 @@ import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.Impact;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
-import com.playmonumenta.plugins.enchantments.Impact;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
@@ -310,7 +311,7 @@ public class EntityListener implements Listener {
 		DamageCause source = event.getCause();
 
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
-		    damagee.getScoreboardTags().contains("ExplosionImmune")) {
+		    (damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame)) {
 			event.setCancelled(true);
 			return;
 		}
