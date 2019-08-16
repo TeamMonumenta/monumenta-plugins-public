@@ -221,7 +221,7 @@ public abstract class Ability {
 	/*
 	 * For performance, this caches the first scoreboard lookup for future use
 	 */
-	protected int getAbilityScore() {
+	public int getAbilityScore() {
 		AbilityInfo info = getInfo();
 		if (mPlayer != null && info.scoreboardId != null) {
 			if (mScore == null) {
