@@ -268,25 +268,33 @@ public class InventoryUtils {
 		}
 	}
 
-	public static void removeSpecialItems(Player player) {
+	public static int removeSpecialItems(Player player) {
+		int dropped = 0;
+
 		//  Clear inventory
-		_removeSpecialItemsFromInventory(player.getInventory());
+		dropped += _removeSpecialItemsFromInventory(player.getInventory(), player.getLocation());
 
 		//  Clear Ender Chest
-		_removeSpecialItemsFromInventory(player.getEnderChest());
+		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), player.getLocation());
+
+		return dropped;
 	}
 
-	private static void _removeSpecialItemsFromInventory(Inventory inventory) {
+	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc) {
+		int dropped = 0;
+
 		for (ItemStack item : inventory.getContents()) {
 			if (item != null) {
 				if (_containsSpecialLore(item)) {
+					loc.getWorld().dropItem(loc, item);
 					inventory.removeItem(item);
+					dropped += 1;
 				} else {
 					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
 						BlockStateMeta meta = (BlockStateMeta)item.getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							_removeSpecialItemsFromInventory(shulker.getInventory());
+							dropped += _removeSpecialItemsFromInventory(shulker.getInventory(), loc);
 
 							meta.setBlockState(shulker);
 							item.setItemMeta(meta);
@@ -295,6 +303,8 @@ public class InventoryUtils {
 				}
 			}
 		}
+
+		return dropped;
 	}
 
 	private static boolean _containsSpecialLore(ItemStack item) {

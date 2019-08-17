@@ -122,7 +122,12 @@ public class TransferServer extends GenericCommand {
 					/* Mark this player as inventory locked */
 					player.setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(plugin, true));
 
-					InventoryUtils.removeSpecialItems(player);
+					int dropped = InventoryUtils.removeSpecialItems(player);
+					if (dropped == 1) {
+						player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
+					} else if (dropped > 1) {
+						player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
+					}
 
 					NetworkUtils.transferPlayerData(plugin, player, server);
 				} else {
