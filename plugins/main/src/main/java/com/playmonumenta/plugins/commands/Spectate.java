@@ -77,11 +77,12 @@ public class Spectate extends GenericCommand implements Listener {
 			} else {
 				CommandAPI.fail(ChatColor.RED + "You can not use this command in spectator mode");
 			}
-		} else if (plugin.mSafeZoneManager.getLocationType(player).equals(SafeZoneManager.LocationType.Capital)) {
+		} else if (plugin.mSafeZoneManager.getLocationType(player).equals(SafeZoneManager.LocationType.Capital)
+		           || plugin.mSafeZoneManager.getLocationType(player).equals(SafeZoneManager.LocationType.SafeZone)) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
 		} else {
-			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a capital-type safezone");
+			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a safezone");
 		}
 	}
 
