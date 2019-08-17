@@ -55,14 +55,15 @@ public class BlasphemousAura extends Ability {
 		if (getAbilityScore() > 1) {
 			GraspingClaws gc = (GraspingClaws) AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
 			DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
-			Ability[] abilities = new Ability[7];
+			Ability[] abilities = new Ability[8];
 			abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
 			abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
 			abilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, SoulRend.class);
-			abilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, HungeringVortex.class);
-			abilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, DeathsTouch.class);
-			abilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, FractalEnervation.class);
-			abilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, WitheringGaze.class);
+			abilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, Exorcism.class);
+			abilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, HungeringVortex.class);
+			abilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, DeathsTouch.class);
+			abilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, FractalEnervation.class);
+			abilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, WitheringGaze.class);
 
 			int bonus = 0;
 			// Dark Pact will always give armor bonus to promote reaper being tanklock spec
