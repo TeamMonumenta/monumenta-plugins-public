@@ -33,9 +33,12 @@ public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 8;
 	private static final float NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE = 0.2f;
 
+	private int mDamage;
+
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Nightmarish";
+		mDamage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 	}
 
 	@Override
@@ -47,7 +50,7 @@ public class NightmarishAlchemy extends Ability {
 				int size = affectedEntities.size();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						guaranteedApplicationApplied = apply(mRandom, mPlugin, mPlayer, entity, nightmarishAlchemy, size, guaranteedApplicationApplied);
+						guaranteedApplicationApplied = apply(entity, size, guaranteedApplicationApplied);
 					}
 				}
 			}
@@ -57,13 +60,11 @@ public class NightmarishAlchemy extends Ability {
 		return true;
 	}
 
-	public static boolean apply(Random random, Plugin plugin, Player damager, LivingEntity damagee, int score, int size, boolean guaranteedApplicationApplied) {
-		if (damagee instanceof Creature) {
-			int damage = score == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
-			EntityUtils.damageEntity(plugin, damagee, damage, damager);
-
-			if (random.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE || !guaranteedApplicationApplied && size >= 5) {
-				EntityUtils.applyConfusion(plugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, damagee);
+	public boolean apply(LivingEntity mob, int size, boolean guaranteedApplicationApplied) {
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+		if (mob instanceof Creature) {
+			if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE || !guaranteedApplicationApplied && size >= 5) {
+				EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, mob);
 				guaranteedApplicationApplied = true;
 			}
 		}

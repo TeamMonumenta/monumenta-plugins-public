@@ -23,9 +23,14 @@ public class BrutalAlchemy extends Ability {
 	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 6 * 20 + 10;
 	public static final String BRUTAL_ALCHEMY_SCOREBOARD = "BrutalAlchemy";
 
+	private int mDamage;
+	private int mWitherDuration;
+
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
+		mDamage = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
+		mWitherDuration = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
 	}
 
 	@Override
@@ -35,7 +40,7 @@ public class BrutalAlchemy extends Ability {
 				int brutalAlchemy = getAbilityScore();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
-						apply(mPlugin, mPlayer, entity, brutalAlchemy);
+						apply(entity);
 					}
 				}
 			}
@@ -43,11 +48,9 @@ public class BrutalAlchemy extends Ability {
 		return true;
 	}
 
-	public static void apply(Plugin plugin, Player damager, LivingEntity damagee, int score) {
-		int damage = score == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
-		int duration = score == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
-		EntityUtils.damageEntity(plugin, damagee, damage, damager);
-		PotionUtils.applyPotion(damager, damagee, new PotionEffect(PotionEffectType.WITHER, duration, 1, false, true));
+	public void apply(LivingEntity mob) {
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, mWitherDuration, 1, false, true));
 	}
 
 }

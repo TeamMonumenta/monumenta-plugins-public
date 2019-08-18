@@ -11,9 +11,11 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -30,19 +32,22 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Alchemical Artillery: Left click with a bow to prime it with an alchemist potion.
- * Shooting the bow in the next 5 seconds consumes 2 / 1 potions.
+ * Shooting the bow in the next 5 seconds consumes 5 / 4 potions.
  * When the arrow hits an enemy, the potion is applied in a 3 / 5 block radius.
+ * Basilisk Poison is also applied if applicable.
  */
 
 public class AlchemicalArtillery extends Ability {
 	private static final String ALCHEMICAL_ARTILLERY_METAKEY = "AlchemicalArtilleryArrowGotTheDankPot";
 	private static final int ALCHEMICAL_ARTILLERY_1_RADIUS = 3;
-	private static final int ALCHEMICAL_ARTILLERY_2_RADIUS = 5;
-	private static final int ALCHEMICAL_ARTILLERY_1_COST = 2;
-	private static final int ALCHEMICAL_ARTILLERY_2_COST = 1;
+	private static final int ALCHEMICAL_ARTILLERY_2_RADIUS = 4;
+	private static final int ALCHEMICAL_ARTILLERY_1_COST = 5;
+	private static final int ALCHEMICAL_ARTILLERY_2_COST = 4;
+	private static final int ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD = 20 * 5;
 
 	private int mRadius;
 	private int mCost;
+	private boolean mActive = false;
 
 	public AlchemicalArtillery(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -55,12 +60,37 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public void cast() {
+		if (!mActive) {
+			if (!mPlayer.isSneaking() && InventoryUtils.isBowItem(mPlayer.getInventory().getItemInMainHand())) {
+				mActive = true;
+				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
+				new BukkitRunnable() {
+					int t = 0;
+					@Override
+					public void run() {
+						t++;
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 1, 0.25, 0, 0.25, 0);
+						if (t == 3) {
+							mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
+						}
+						if (!mActive || t > ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD) {
+							mActive = false;
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
+			}
+		}
+	}
+
+	@Override
+	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		if (arrow.hasMetadata(ALCHEMICAL_ARTILLERY_METAKEY)) {
-			Location loc = damagee.getLocation().add(0, 0.5, 0);
-			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 10 * (int) Math.pow(mRadius, 2), mRadius, 0, mRadius, 0);
-			mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.3);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.5);
+			Location loc = arrow.getLocation().add(0, 1, 0);
+			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
+			mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.08 * mRadius);
 			mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
 			mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
 
@@ -68,41 +98,44 @@ public class AlchemicalArtillery extends Ability {
 			GruesomeAlchemy ga = (GruesomeAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
 			NightmarishAlchemy na = (NightmarishAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
 			InvigoratingOdor io = (InvigoratingOdor) AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
+			BasiliskPoison bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(arrow.getLocation(), mRadius);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			int size = mobs.size();
 			boolean guaranteedApplicationApplied = false;
 
 			for (LivingEntity mob : mobs) {
 				if (ba != null) {
-					ba.apply(mPlugin, mPlayer, mob, ba.getAbilityScore());
+					ba.apply(mob);
 				}
 				if (ga != null) {
-					ga.apply(mPlugin, mPlayer, mob, ga.getAbilityScore());
+					ga.apply(mob);
 				}
 				if (na != null) {
-					guaranteedApplicationApplied = na.apply(mRandom, mPlugin, mPlayer, mob, na.getAbilityScore(), size, guaranteedApplicationApplied);
+					guaranteedApplicationApplied = na.apply(mob, size, guaranteedApplicationApplied);
 				}
 				if (io != null) {
-					io.apply(mPlugin, mPlayer, mob, io.getAbilityScore());
+					io.apply(mob);
+				}
+				if (bp != null) {
+					bp.apply(mob);
 				}
 			}
 			if (io != null) {
-				for (Player player : PlayerUtils.getNearbyPlayers(arrow.getLocation(), mRadius)) {
-					io.apply(mPlugin, mPlayer, player, io.getAbilityScore());
+				for (Player player : PlayerUtils.getNearbyPlayers(loc, mRadius)) {
+					io.apply(player);
 				}
 			}
 		}
-
-		return true;
 	}
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (mPlayer.isSneaking()) {
+		if (mActive) {
 			if (AbilityUtils.removeAlchemistPotions(mPlayer, mCost)) {
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);
 				arrow.setMetadata(ALCHEMICAL_ARTILLERY_METAKEY, new FixedMetadataValue(mPlugin, mRadius));
+				mActive = false;
 			}
 		}
 
