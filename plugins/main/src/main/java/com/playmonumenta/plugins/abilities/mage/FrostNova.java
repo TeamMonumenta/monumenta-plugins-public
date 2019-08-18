@@ -29,9 +29,13 @@ public class FrostNova extends Ability {
 	private static final float FROST_NOVA_RADIUS = 6.0f;
 	private static final int FROST_NOVA_1_DAMAGE = 4;
 	private static final int FROST_NOVA_2_DAMAGE = 8;
-	private static final int FROST_NOVA_EFFECT_LVL = 1;
+	private static final int FROST_NOVA_1_AMPLIFIER = 1;
+	private static final int FROST_NOVA_2_AMPLIFIER = 3;
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 4 * 20;
+
+	private int mDamage;
+	private int mSlownessAmplifier;
 
 	public FrostNova(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -39,25 +43,21 @@ public class FrostNova extends Ability {
 		mInfo.scoreboardId = "FrostNova";
 		mInfo.cooldown = FROST_NOVA_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_1_DAMAGE;
+		mSlownessAmplifier = getAbilityScore() == 1 ? FROST_NOVA_1_AMPLIFIER : FROST_NOVA_2_AMPLIFIER;
 	}
 
 	@Override
 	public void cast() {
-		int frostNova = getAbilityScore();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
-			int extraDamage = frostNova == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 			Vector velocity = mob.getVelocity();
-			EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ICE);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE);
 			mob.setVelocity(velocity);
-			int amp = (mob instanceof Player) ? FROST_NOVA_EFFECT_LVL - 1 : FROST_NOVA_EFFECT_LVL;
-			if (frostNova > 1) {
-				if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 1, true, false));
-				} else {
-					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, 3, true, false));
-				}
+			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier - 1, true, false));
+			} else {
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier, true, false));
 			}
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, amp, true, false));
 
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);

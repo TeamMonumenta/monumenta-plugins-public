@@ -137,8 +137,8 @@ public class FractalEnervation extends Ability {
 			for (PotionEffectType types : PotionUtils.getNegativeEffects(mob)) {
 				PotionEffect effect = mob.getPotionEffect(types);
 				mob.removePotionEffect(types);
-				mob.addPotionEffect(
-				    new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
+				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
+				mob.addPotionEffect(new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 			}
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
 			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);

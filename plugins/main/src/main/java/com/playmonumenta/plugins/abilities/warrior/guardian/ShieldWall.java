@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
@@ -166,7 +167,7 @@ public class ShieldWall extends Ability {
 										 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
 										 * after they leave shield wall hitbox.
 										 */
-										le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
+										PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
 									}
 								}
 							}

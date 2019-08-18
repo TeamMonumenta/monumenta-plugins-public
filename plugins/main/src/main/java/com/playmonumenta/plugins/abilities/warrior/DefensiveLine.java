@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DefensiveLine extends Ability {
 
@@ -86,7 +87,7 @@ public class DefensiveLine extends Ability {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
 							MovementUtils.KnockAway(target, mob, 0.25f);
 							if (getAbilityScore() > 1) {
-								mob.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
 							}
 						}
 					}
