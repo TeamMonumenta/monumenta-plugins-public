@@ -22,7 +22,7 @@ import me.lucko.luckperms.api.LuckPermsApi;
 
 public class PromoteGuild {
 	public static void register(Plugin plugin, LuckPermsApi lp) {
-		// promoteguild <guildname> <playername>
+		// promoteguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
@@ -41,6 +41,12 @@ public class PromoteGuild {
 			CommandAPI.fail(err);
 		}
 
+		if (ScoreboardUtils.getScoreboardValue(player, "Founder") == 1) {
+			String err = ChatColor.RED + "You are already a founder of guild '" + currentGuildName + "'";
+			player.sendMessage(err);
+			CommandAPI.fail(err);
+		}
+
 		// Check for nearby founder
 		for (Player p : PlayerUtils.getNearbyPlayers(player, 1, false)) {
 			String nearbyPlayerGroup = LuckPermsIntegration.getGuildName(lp, p);
@@ -53,13 +59,18 @@ public class PromoteGuild {
 
 				// Flair (mostly stolen from CreateGuild)
 				player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
+					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + player.getName() + "has been promoted to guild founder");
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				                       "execute at " + player.getName()
-				                       + "run summon minecraft:firework_rocket ~ ~1 ~ "
+				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
 				                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
 				// All done
 				return;
 			}
 		}
+
+		String err = ChatColor.RED + "A founder for " + currentGuildName + " needs to stand within 1 block of you";
+		player.sendMessage(err);
+		CommandAPI.fail(err);
 	}
 }

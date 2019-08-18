@@ -20,10 +20,10 @@ import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
 
 import me.lucko.luckperms.api.LuckPermsApi;
+import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.User;
 
 public class CreateGuild {
@@ -35,7 +35,7 @@ public class CreateGuild {
 
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("guild name", new TextArgument());
-		arguments.put("guild tag", new StringArgument());
+		arguments.put("guild tag", new TextArgument());
 		arguments.put("founders", new EntitySelectorArgument(EntitySelector.MANY_PLAYERS)
 		              .overrideSuggestions("@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"));
 
@@ -94,8 +94,8 @@ public class CreateGuild {
 			founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
 
 			// fireworks!
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "/execute at @a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13] "
-			                       + "run summon minecraft:firework_rocket ~ ~1 ~ "
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + founder.getName()
+			                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
 			                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
 		}
 
@@ -115,7 +115,11 @@ public class CreateGuild {
 				for (Player founder : founders) {
 					User user = lp.getUser(founder.getUniqueId());
 					user.setPermission(lp.getNodeFactory().makeGroupNode(group).build());
+					lp.getUserManager().saveUser(user);
 				}
+				lp.getGroupManager().saveGroup(group);
+				lp.runUpdateTask();
+				lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
 			}, executor
 		);
 	}
