@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Decay implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Decay";
@@ -30,7 +31,7 @@ public class Decay implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 4, level - 1, false, true));
+		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.WITHER, 20 * 4, level - 1, false, true));
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		player.getWorld().spawnParticle(Particle.FALLING_DUST, target.getLocation().add(0, 1, 0), 4, 0.4, 0.5, 0.4, fallingDustData);
 	}

@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class IceAspect implements BaseEnchantment {
 	private static final int ICE_ASPECT_DURATION = 20 * 5;
@@ -30,7 +31,7 @@ public class IceAspect implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, ICE_ASPECT_DURATION, level - 1, false, true));
+		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.SLOW, ICE_ASPECT_DURATION, level - 1, false, true));
 		player.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {

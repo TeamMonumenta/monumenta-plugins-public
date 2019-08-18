@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Frost implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Frost";
@@ -66,7 +67,7 @@ public class Frost implements BaseEnchantment {
 		if (proj.hasMetadata(LEVEL_METAKEY)) {
 			// Level isn't actually used currently
 
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, FROST_DURATION, 1, true, true));
+			PotionUtils.applyPotion(event.getDamager(), target, new PotionEffect(PotionEffectType.SLOW, FROST_DURATION, 1, true, true));
 			target.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1.15, 0), 10, 0.2, 0.35, 0.2, 0.05);
 		}
 	}
