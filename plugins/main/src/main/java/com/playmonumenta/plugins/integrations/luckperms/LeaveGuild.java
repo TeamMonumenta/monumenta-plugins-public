@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
@@ -19,6 +20,7 @@ import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.Entity
 
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
+import me.lucko.luckperms.api.MessagingService;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.User;
 
@@ -42,13 +44,15 @@ public class LeaveGuild {
 
 		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
 			if (userNode.isGroupNode()) {
-				Group group = ((Group)userNode);
+				Group group = lp.getGroup(userNode.getGroupName());
 				boolean guildFound = false;
 				String guildName = "";
+
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
 						Entry<String, String>meta = groupChildNode.getMeta();
 						if (meta.getKey().equals("guildname")) {
+							guildName = meta.getValue();
 							guildFound = true;
 							break;
 						}
@@ -56,8 +60,16 @@ public class LeaveGuild {
 				}
 				if (guildFound) {
 					// Remove user from guild
-					User user = lp.getUser(player.getUniqueId());
-					user.unsetPermission(userNode);
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							User user = lp.getUser(player.getUniqueId());
+							user.unsetPermission(userNode);
+							lp.getUserManager().saveUser(user);
+							lp.runUpdateTask();
+							lp.getMessagingService().ifPresent(MessagingService::pushUpdate);
+						}
+					}.runTaskAsynchronously(plugin);
 
 					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have left the guild '" + guildName + "'");
 					return;

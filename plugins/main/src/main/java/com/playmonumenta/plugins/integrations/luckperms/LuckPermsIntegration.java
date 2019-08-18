@@ -19,12 +19,13 @@ public class LuckPermsIntegration {
 		JoinGuild.register(plugin, lp);
 		PromoteGuild.register(plugin, lp);
 		LeaveGuild.register(plugin, lp);
+		TestGuild.register(plugin, lp);
 	}
 
 	public static Group getGuild(LuckPermsApi lp, Player player) {
 		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
 			if (userNode.isGroupNode()) {
-				Group group = ((Group)userNode);
+				Group group = lp.getGroup(userNode.getGroupName());
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
 						Entry<String, String>meta = groupChildNode.getMeta();
@@ -42,7 +43,7 @@ public class LuckPermsIntegration {
 	public static String getGuildName(LuckPermsApi lp, Player player) {
 		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
 			if (userNode.isGroupNode()) {
-				Group group = ((Group)userNode);
+				Group group = lp.getGroup(userNode.getGroupName());
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
 						Entry<String, String>meta = groupChildNode.getMeta();
