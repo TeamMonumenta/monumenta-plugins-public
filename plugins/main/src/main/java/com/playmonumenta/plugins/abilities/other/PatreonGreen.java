@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PatreonGreen extends Ability {
+	private boolean mNoSelfParticles = false;
+
 	public PatreonGreen(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
@@ -20,16 +22,25 @@ public class PatreonGreen extends Ability {
 	public boolean canUse(Player player) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
+		if (player.getScoreboardTags().contains("noSelfParticles")) {
+			mNoSelfParticles = true;
+		} else {
+			mNoSelfParticles = false;
+		}
 		return shinyGreen > 0 && patreon >= 20;
 	}
 
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
-			for(Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
-				other.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+			if (mNoSelfParticles) {
+				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
+					other.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				}
+				mPlayer.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0);
+			} else {
+				mWorld.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 			}
-			mPlayer.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0);
 		}
 	}
 }

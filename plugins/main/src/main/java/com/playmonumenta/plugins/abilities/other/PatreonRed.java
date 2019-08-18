@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class PatreonRed extends Ability {
 	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
+	private boolean mNoSelfParticles = false;
+
 	public PatreonRed(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
@@ -23,16 +25,25 @@ public class PatreonRed extends Ability {
 	public boolean canUse(Player player) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
+		if (player.getScoreboardTags().contains("noSelfParticles")) {
+			mNoSelfParticles = true;
+		} else {
+			mNoSelfParticles = false;
+		}
 		return shinyRed > 0 && patreon >= 30;
 	}
 
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
-			for(Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
-				other.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
+			if (mNoSelfParticles) {
+				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
+					other.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
+				}
+				mPlayer.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
+			} else {
+				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 			}
-			mPlayer.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 		}
 	}
 }

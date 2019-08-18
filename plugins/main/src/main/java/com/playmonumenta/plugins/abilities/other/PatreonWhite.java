@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PatreonWhite extends Ability {
+	private boolean mNoSelfParticles = false;
+
 	public PatreonWhite(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 	}
@@ -20,16 +22,25 @@ public class PatreonWhite extends Ability {
 	public boolean canUse(Player player) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		int shinyWhite = ScoreboardUtils.getScoreboardValue(player, "ShinyWhite");
+		if (player.getScoreboardTags().contains("noSelfParticles")) {
+			mNoSelfParticles = true;
+		} else {
+			mNoSelfParticles = false;
+		}
 		return shinyWhite > 0 && patreon >= 5;
 	}
 
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
-			for(Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
-				other.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+			if (mNoSelfParticles) {
+				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
+					other.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
+				}
+				mPlayer.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0);
+			} else {
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 			}
-			mPlayer.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0);
 		}
 	}
 }
