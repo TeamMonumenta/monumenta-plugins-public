@@ -92,6 +92,7 @@ public class EnchantmentManager {
 
 		// Curses
 		init.add(new CurseOfCorruption());
+		init.add(new TwoHanded());
 
 		// Forbidden items (dynamically set based on server config)
 		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {
