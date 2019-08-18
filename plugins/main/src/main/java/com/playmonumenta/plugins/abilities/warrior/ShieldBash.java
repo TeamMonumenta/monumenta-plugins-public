@@ -144,6 +144,7 @@ public class ShieldBash extends Ability {
 								mWorld.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 								EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 								putOnCooldown();
+								break;
 							}
 						}
 					}
