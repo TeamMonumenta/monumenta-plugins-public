@@ -18,13 +18,14 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 
 public class UnstableArrows extends Ability {
 	private static final int UNSTABLE_ARROWS_COOLDOWN = 16 * 20;
-	private static final int UNSTABLE_ARROWS_DURATION = 2 * 20;
+	private static final int UNSTABLE_ARROWS_DURATION = 3 * 20;
 	private static final int UNSTABLE_ARROWS_PARTICLE_PERIOD = 3;
-	private static final float UNSTABLE_ARROWS_KNOCKBACK_SPEED = 0.55f;
+	private static final float UNSTABLE_ARROWS_KNOCKBACK_SPEED = 2.5f;
 	private static final int UNSTABLE_ARROWS_1_DAMAGE = 15;
 	private static final int UNSTABLE_ARROWS_2_DAMAGE = 24;
 	private static final int UNSTABLE_ARROWS_RADIUS = 4;
@@ -54,11 +55,13 @@ public class UnstableArrows extends Ability {
 				public void run() {
 					mWorld.spawnParticle(Particle.FLAME, loc, 3, 0.3, 0.3, 0.3, 0.05);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.075);
-					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.5f,
-					                 ((UNSTABLE_ARROWS_DURATION / 2.0f) + mTicks) / (2.0f * UNSTABLE_ARROWS_DURATION));
-
-					mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
-					if (mTicks > UNSTABLE_ARROWS_DURATION) {
+					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.4f,
+					                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
+					if (mTicks % 18 == 0) {
+						mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 2f, 1f + mTicks / 36f);
+						mWorld.spawnParticle(Particle.LAVA, loc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
+					}
+					if (mTicks >= UNSTABLE_ARROWS_DURATION) {
 						arrow.remove();
 						Location explodeLoc = loc;
 						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0f);
@@ -73,13 +76,18 @@ public class UnstableArrows extends Ability {
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(explodeLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
 							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer);
-							MovementUtils.KnockAway(explodeLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED);
+							MovementUtils.knockAwayRealistic(explodeLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
 							if (bp != null) {
 								bp.apply(mob);
 							}
 						}
+						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
+							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS) {
+							MovementUtils.knockAwayRealistic(explodeLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
+						}
 						this.cancel();
 					}
+					mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
 				}
 			}.runTaskTimer(mPlugin, 0, UNSTABLE_ARROWS_PARTICLE_PERIOD);
 		}
