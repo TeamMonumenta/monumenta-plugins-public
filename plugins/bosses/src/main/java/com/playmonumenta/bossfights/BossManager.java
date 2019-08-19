@@ -86,6 +86,7 @@ import com.playmonumenta.bossfights.bosses.PlayerDamageOnlyBoss;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
 import com.playmonumenta.bossfights.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.bossfights.bosses.PulseLaserBoss;
+import com.playmonumenta.bossfights.bosses.PunchResistBoss;
 import com.playmonumenta.bossfights.bosses.RabbitGodBoss;
 import com.playmonumenta.bossfights.bosses.RejuvenationBoss;
 import com.playmonumenta.bossfights.bosses.SnowballDamageBoss;
@@ -195,6 +196,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(GrayBookSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayBookSummoner(p, e));
 		mStatelessBosses.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> new GraySummoned(p, e));
 		mStatelessBosses.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
+		mStatelessBosses.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> new PunchResistBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -279,6 +281,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(GrayBookSummoner.identityTag, (Plugin p, LivingEntity e) -> GrayBookSummoner.deserialize(p, e));
 		mBossDeserializers.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> GraySummoned.deserialize(p, e));
 		mBossDeserializers.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
+		mBossDeserializers.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> PunchResistBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************

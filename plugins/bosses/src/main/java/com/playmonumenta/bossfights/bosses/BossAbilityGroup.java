@@ -33,7 +33,7 @@ public abstract class BossAbilityGroup {
 		void run(LivingEntity entity);
 	}
 
-	private Plugin mPlugin;
+	protected Plugin mPlugin;
 	private LivingEntity mBoss;
 	private String mIdentityTag;
 	private BossBarManager mBossBar;
