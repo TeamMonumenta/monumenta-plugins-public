@@ -58,8 +58,8 @@ public class PromoteGuild {
 				ScoreboardUtils.setScoreboardValue(player, "Founder", 1);
 
 				// Flair (mostly stolen from CreateGuild)
-				player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
-					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + player.getName() + "has been promoted to guild founder");
+				player.sendMessage(ChatColor.GOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
+				p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has been promoted to guild founder");
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				                       "execute at " + player.getName()
 				                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
