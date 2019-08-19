@@ -73,8 +73,8 @@ public class JoinGuild {
 					}.runTaskAsynchronously(plugin);
 
 					// Success indicators
-					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Congratulations! You have joined " + guildName + "!");
-					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + player.getName() + "has joined your guild");
+					player.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + guildName + "!");
+					p.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " has joined your guild");
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 					                       "execute at " + player.getName()
 					                       + " run summon minecraft:firework_rocket ~ ~1 ~ "

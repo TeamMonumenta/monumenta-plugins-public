@@ -89,8 +89,7 @@ public class CreateGuild {
 		// Add tags, display messages and effects
 		for (Player founder : founders) {
 			ScoreboardUtils.setScoreboardValue(founder, "Founder", 1);
-			founder.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD
-			                    + "Congratulations! You have founded a new guild!");
+			founder.sendMessage(ChatColor.GOLD + "Congratulations! You have founded a new guild!");
 			founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
 
 			// fireworks!

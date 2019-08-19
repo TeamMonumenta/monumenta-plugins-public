@@ -71,7 +71,7 @@ public class LeaveGuild {
 						}
 					}.runTaskAsynchronously(plugin);
 
-					player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You have left the guild '" + guildName + "'");
+					player.sendMessage(ChatColor.GOLD + "You have left the guild '" + guildName + "'");
 					return;
 				}
 			}

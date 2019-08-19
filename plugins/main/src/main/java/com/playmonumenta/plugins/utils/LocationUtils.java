@@ -33,6 +33,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class LocationUtils {
 	public static Vector getDirectionTo(Location to, Location from) {
 		Vector vFrom = from.toVector();
@@ -215,6 +218,23 @@ public class LocationUtils {
 			}
 		}
 		return chests;
+	}
+
+	public static String locationToString(Location loc) {
+		JsonObject locObj = new JsonObject();
+		locObj.addProperty("x", loc.getX());
+		locObj.addProperty("y", loc.getY());
+		locObj.addProperty("z", loc.getZ());
+		locObj.addProperty("yaw", loc.getYaw());
+		locObj.addProperty("pitch", loc.getPitch());
+		return locObj.toString();
+	}
+
+	public static Location locationFromString(World world, String locStr) throws Exception {
+		Gson gson = new Gson();
+		JsonObject obj = gson.fromJson(locStr, JsonObject.class);
+		return new Location(world, obj.get("x").getAsDouble(), obj.get("y").getAsDouble(), obj.get("z").getAsDouble(),
+		                    obj.get("yaw").getAsFloat(), obj.get("pitch").getAsFloat());
 	}
 
 	/**
