@@ -18,6 +18,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 
+import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 
 public class PromoteGuild {
@@ -34,8 +35,9 @@ public class PromoteGuild {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, Player player) throws CommandSyntaxException {
-		String currentGuildName = LuckPermsIntegration.getGuildName(lp, player);
-		if (currentGuildName == null) {
+		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
+		if (currentGuild == null || currentGuildName == null) {
 			String err = ChatColor.RED + "You are not in a guild";
 			player.sendMessage(err);
 			CommandAPI.fail(err);
@@ -49,9 +51,10 @@ public class PromoteGuild {
 
 		// Check for nearby founder
 		for (Player p : PlayerUtils.getNearbyPlayers(player, 1, false)) {
-			String nearbyPlayerGroup = LuckPermsIntegration.getGuildName(lp, p);
-			if (nearbyPlayerGroup != null &&
-			    nearbyPlayerGroup.equalsIgnoreCase(currentGuildName) &&
+			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(lp, p);
+			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
+			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&
+			    nearbyPlayerGroupName.equalsIgnoreCase(currentGuildName) &&
 				ScoreboardUtils.getScoreboardValue(p, "Founder") == 1) {
 
 				// Set scores and permissions

@@ -47,17 +47,16 @@ public class LuckPermsIntegration {
 		return null;
 	}
 
-	public static String getGuildName(LuckPermsApi lp, Player player) {
-		for (Node userNode : lp.getUser(player.getUniqueId()).getOwnNodes()) {
-			if (userNode.isGroupNode()) {
-				Group group = lp.getGroup(userNode.getGroupName());
-				for (Node groupChildNode : group.getNodes().values()) {
-					if (groupChildNode.isMeta()) {
-						Entry<String, String>meta = groupChildNode.getMeta();
-						if (meta.getKey().equals("guildname")) {
-							return meta.getValue();
-						}
-					}
+	public static String getGuildName(Group group) {
+		if (group == null) {
+			return null;
+		}
+
+		for (Node groupChildNode : group.getNodes().values()) {
+			if (groupChildNode.isMeta()) {
+				Entry<String, String>meta = groupChildNode.getMeta();
+				if (meta.getKey().equals("guildname")) {
+					return meta.getValue();
 				}
 			}
 		}
@@ -107,6 +106,6 @@ public class LuckPermsIntegration {
 
 	public static String getCleanGuildName(String guildName) {
 		// Guild name sanitization for command usage
-		return guildName.toLowerCase().replace(" ", "");
+		return guildName.toLowerCase().replace(" ", "_");
 	}
 }

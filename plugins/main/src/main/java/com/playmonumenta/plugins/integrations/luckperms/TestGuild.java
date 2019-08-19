@@ -15,6 +15,7 @@ import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
 
+import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 
 public class TestGuild {
@@ -33,7 +34,8 @@ public class TestGuild {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, String guildName, Player player) throws CommandSyntaxException {
-		String currentGuildName = LuckPermsIntegration.getGuildName(lp, player);
+		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 
 		if (currentGuildName == null) {
 			CommandAPI.fail("Player '" + player.getName() + "' is not in a guild!");
