@@ -41,22 +41,30 @@ public class TeleportGuild {
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
 	                        Player player, String guildName) throws CommandSyntaxException {
 
+		Group group = null;
+
 		if (guildName == null) {
 			// Look up the player's guild
-			guildName = LuckPermsIntegration.getGuildName(lp, player);
-			if (guildName == null) {
+			group = LuckPermsIntegration.getGuild(lp, player);
+			if (group == null) {
 				String err = ChatColor.RED + "You are not in a guild!";
 				player.sendMessage(err);
 				CommandAPI.fail(err);
 			}
 		}
 
-		// Guild name sanitization for command usage
-		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
-
-		Group group = lp.getGroup(cleanGuildName);
 		if (group == null) {
-			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
+			// Still null, need to look up from name
+			// The only way to get here is if guildName != null
+
+			// Guild name sanitization for command usage
+			//TODO: Better lookup of guild name?
+			String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
+
+			group = lp.getGroup(cleanGuildName);
+			if (group == null) {
+				CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
+			}
 		}
 
 		Location loc = LuckPermsIntegration.getGuildTp(lp, player.getWorld(), group);

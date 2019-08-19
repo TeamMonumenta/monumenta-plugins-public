@@ -38,7 +38,8 @@ public class JoinGuild {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, Player player) throws CommandSyntaxException {
-		String currentGuildName = LuckPermsIntegration.getGuildName(lp, player);
+		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
+		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuildName != null) {
 			String err = ChatColor.RED + "You are already in the guild '" + currentGuildName + "' !";
 			player.sendMessage(err);
@@ -49,17 +50,11 @@ public class JoinGuild {
 		for (Player p : PlayerUtils.getNearbyPlayers(player, 1, false)) {
 			if (ScoreboardUtils.getScoreboardValue(p, "Founder") == 1) {
 				/* Nearby player is a founder - join to that guild */
-				String guildName = LuckPermsIntegration.getGuildName(lp, p);
-				if (guildName != null) {
-					String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
-
-					Group group = lp.getGroup(cleanGuildName);
-					if (group == null) {
-						String err = ChatColor.RED + "The luckperms group '" + cleanGuildName + "' does not exist!";
-						player.sendMessage(err);
-						CommandAPI.fail(err);
-					}
-
+				Group group = LuckPermsIntegration.getGuild(lp, p);
+				if (group == null) {
+					continue;
+				} else {
+					String guildName = LuckPermsIntegration.getGuildName(group);
 					// Add user to guild
 					new BukkitRunnable() {
 						@Override

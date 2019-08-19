@@ -43,6 +43,7 @@ public class SetGuildTeleport {
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
+		//TODO: Better lookup of guild name?
 		Group group = lp.getGroup(cleanGuildName);
 		if (group == null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");

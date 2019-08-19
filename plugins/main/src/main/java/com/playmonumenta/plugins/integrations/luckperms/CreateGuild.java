@@ -50,6 +50,7 @@ public class CreateGuild {
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
 
+		//TODO: Better lookup of guild name?
 		if (lp.getGroup(cleanGuildName) != null) {
 			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' already exists!");
 		}
