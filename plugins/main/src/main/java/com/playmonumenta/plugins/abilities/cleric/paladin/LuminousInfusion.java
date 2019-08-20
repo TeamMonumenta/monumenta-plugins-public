@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -22,28 +23,26 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
-* All attacks against undead deal +2/5 damage. Sneak and right-click while
-* looking at the ground to charge your weapon with holy light for 15 seconds.
-* Your next swing to an undead explodes with holy light, dealing 10 damage
-* to all mobs within 4 blocks. Cooldown 25/18s
+* Level 1: Shift+RClick+LookDown to charge you weapon with light. Your next
+* attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion
+* with a 4 block radius, knocking enemies away. Undead take 20 damage
+* from the explosion and all other mobs take 10 (Cooldown: 15 seconds).
+* Level 2: Additionally, deal 5 extra damage with melee attacks on undead.
 */
 
 public class LuminousInfusion extends Ability {
 
 	private static final String LUMINOUS_INFUSION_EXPIRATION_MESSAGE = "The light from your hands fades...";
 	private static final double LUMINOUS_INFUSION_RADIUS = 4;
-	private static final int LUMINOUS_INFUSION_EXPLOSION_DAMAGE = 10;
-	private static final int LUMINOUS_INFUSION_UNDEAD_DAMAGE = 10;
-	private static final int LUMINOUS_INFUSION_1_PASSIVE_DAMAGE = 2;
-	private static final int LUMINOUS_INFUSION_2_PASSIVE_DAMAGE = 5;
-	private static final int LUMINOUS_INFUSION_MAX_DURATION = 15 * 20;
-	private static final int LUMINOUS_INFUSION_1_COOLDOWN = 25 * 20;
-	private static final int LUMINOUS_INFUSION_2_COOLDOWN = 18 * 20;
-
-	private final int damageBonus;
+	private static final int LUMINOUS_INFUSION_NORMIE_DAMAGE = 10;
+	private static final int LUMINOUS_INFUSION_UNDEAD_DAMAGE = 20;
+	private static final int LUMINOUS_INFUSION_PASSIVE_DAMAGE = 5;
+	private static final int LUMINOUS_INFUSION_COOLDOWN = 20 * 15;
+	private static final float LUMINOUS_INFUSION_KNOCKBACK_SPEED = 0.7f;
 
 	private boolean mActive = false;
 
@@ -51,9 +50,8 @@ public class LuminousInfusion extends Ability {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.scoreboardId = "LuminousInfusion";
-		mInfo.cooldown = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_COOLDOWN : LUMINOUS_INFUSION_2_COOLDOWN;
+		mInfo.cooldown = LUMINOUS_INFUSION_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		damageBonus = getAbilityScore() == 1 ? LUMINOUS_INFUSION_1_PASSIVE_DAMAGE : LUMINOUS_INFUSION_2_PASSIVE_DAMAGE;
 
 		/*
 		 * NOTE! Because LuminousInfusion has two events (cast and damage), we
@@ -94,9 +92,11 @@ public class LuminousInfusion extends Ability {
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				if (t >= LUMINOUS_INFUSION_MAX_DURATION || !mActive) {
+				if (t >= LUMINOUS_INFUSION_COOLDOWN || !mActive) {
+					if (t >= LUMINOUS_INFUSION_COOLDOWN) {
+						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
+					}
 					mActive = false;
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
 					this.cancel();
 				}
 			}
@@ -109,32 +109,51 @@ public class LuminousInfusion extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity le = (LivingEntity) event.getEntity();
-			if (EntityUtils.isUndead(le)
+			if (getAbilityScore() > 1 && EntityUtils.isUndead(le)
 			    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 				// Passive damage to undead from every melee hit, regardless of active
-				event.setDamage(event.getDamage() + damageBonus);
+				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_PASSIVE_DAMAGE);
 			}
 
 			if (mActive && EntityUtils.isUndead(le)) {
-				mActive = false;
-				Location loc = le.getLocation();
-				// Active damage to undead
-				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
-				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
-				mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
-				mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
-				List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, le);
-				for (LivingEntity e : affected) {
-					// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
-					double volume = 0.6 / Math.sqrt(affected.size());
-					mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
-					mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
-					EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_EXPLOSION_DAMAGE, mPlayer);
-				}
+				execute(le, event);
 			}
 		}
 
 		return true;
 	}
+
+	@Override
+	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (mActive && EntityUtils.isUndead(damagee)) {
+			execute(damagee, event);
+		}
+
+		return true;
+	}
+
+	public void execute(LivingEntity damagee, EntityDamageByEntityEvent event) {
+		mActive = false;
+		Location loc = damagee.getLocation();
+		// Active damage to undead
+		event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
+		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
+		mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
+		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
+		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, damagee);
+		for (LivingEntity e : affected) {
+			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
+			double volume = 0.6 / Math.sqrt(affected.size());
+			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
+			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
+			mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
+			if (EntityUtils.isUndead(e)) {
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer);
+			} else {
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer);
+			}
+			MovementUtils.knockAwayConstant(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
+		}
+	}
+
 }
