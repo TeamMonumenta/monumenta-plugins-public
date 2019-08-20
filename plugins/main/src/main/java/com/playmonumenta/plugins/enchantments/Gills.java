@@ -21,7 +21,7 @@ public class Gills implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.OFFHAND);
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
 	@Override
