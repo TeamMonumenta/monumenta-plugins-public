@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -65,6 +67,23 @@ public class PotionUtils {
 		PotionEffectType.LEVITATION,
 		PotionEffectType.UNLUCK
 	};
+
+	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
+	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<PotionEffectType, PotionEffectType>();
+
+	static {
+		OPPOSITE_EFFECTS.put(PotionEffectType.SPEED, PotionEffectType.SLOW);
+		OPPOSITE_EFFECTS.put(PotionEffectType.SLOW, PotionEffectType.SPEED);
+		OPPOSITE_EFFECTS.put(PotionEffectType.FAST_DIGGING, PotionEffectType.SLOW_DIGGING);
+		OPPOSITE_EFFECTS.put(PotionEffectType.SLOW_DIGGING, PotionEffectType.FAST_DIGGING);
+		OPPOSITE_EFFECTS.put(PotionEffectType.REGENERATION, PotionEffectType.WITHER);
+		OPPOSITE_EFFECTS.put(PotionEffectType.WITHER, PotionEffectType.REGENERATION);
+		OPPOSITE_EFFECTS.put(PotionEffectType.POISON, PotionEffectType.REGENERATION);
+		OPPOSITE_EFFECTS.put(PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.UNLUCK);
+		OPPOSITE_EFFECTS.put(PotionEffectType.UNLUCK, PotionEffectType.DAMAGE_RESISTANCE);
+		OPPOSITE_EFFECTS.put(PotionEffectType.INCREASE_DAMAGE, PotionEffectType.WEAKNESS);
+		OPPOSITE_EFFECTS.put(PotionEffectType.WEAKNESS, PotionEffectType.INCREASE_DAMAGE);
+	}
 
 	public static class PotionInfo {
 		public static final PotionInfo HEALING = new PotionInfo(PotionEffectType.HEAL, 0, 0, false, true);
@@ -323,4 +342,9 @@ public class PotionUtils {
 		}
 		return types;
 	}
+
+	public static PotionEffectType getOppositeEffect(PotionEffectType type) {
+		return OPPOSITE_EFFECTS.get(type);
+	}
+
 }

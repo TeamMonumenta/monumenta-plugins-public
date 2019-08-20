@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DeathsTouchNonReaper extends Ability {
 
@@ -33,14 +34,9 @@ public class DeathsTouchNonReaper extends Ability {
 	private static List<PotionEffectType> getOppositeEffects(LivingEntity e) {
 		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
 		for (PotionEffect effect : e.getActivePotionEffects()) {
-			if (effect.getType().equals(PotionEffectType.WEAKNESS)) {
-				types.add(PotionEffectType.INCREASE_DAMAGE);
-			} else if (effect.getType().equals(PotionEffectType.SLOW)) {
-				types.add(PotionEffectType.SPEED);
-			} else if (effect.getType().equals(PotionEffectType.WITHER) || effect.getType().equals(PotionEffectType.POISON)) {
-				types.add(PotionEffectType.REGENERATION);
-			} else if (effect.getType().equals(PotionEffectType.SLOW_DIGGING)) {
-				types.add(PotionEffectType.FAST_DIGGING);
+			PotionEffectType type = effect.getType();
+			if (PotionUtils.hasNegativeEffects(type)) {
+				types.add(PotionUtils.getOppositeEffect(type));
 			}
 		}
 		if (e.getFireTicks() > 0) {
@@ -55,7 +51,7 @@ public class DeathsTouchNonReaper extends Ability {
 			List<PotionEffectType> effects = getOppositeEffects(event.getEntity());
 			int duration = event.getEntity().getMetadata("DeathsTouchBuffDuration").get(0).asInt();
 			for (PotionEffectType effect : effects) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(effect, duration, 0, true, true));
+				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect, duration, 0, true, true));
 			}
 		}
 	}
