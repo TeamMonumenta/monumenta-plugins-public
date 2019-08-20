@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -36,7 +37,11 @@ public class UnstableArrows extends Ability {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
-		mInfo.cooldown = UNSTABLE_ARROWS_COOLDOWN;
+		if (player != null && ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
+			mInfo.cooldown = 0;
+		} else {
+			mInfo.cooldown = UNSTABLE_ARROWS_COOLDOWN;
+		}
 	}
 
 	@Override
@@ -55,17 +60,17 @@ public class UnstableArrows extends Ability {
 				public void run() {
 					mWorld.spawnParticle(Particle.FLAME, loc, 3, 0.3, 0.3, 0.3, 0.05);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.075);
-					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.4f,
+					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
 					                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
 					if (mTicks % 18 == 0) {
-						mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 2f, 1f + mTicks / 36f);
+						mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
 						mWorld.spawnParticle(Particle.LAVA, loc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
 					}
 					if (mTicks >= UNSTABLE_ARROWS_DURATION) {
 						arrow.remove();
 						Location explodeLoc = loc;
-						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0f);
-						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1.25f);
+						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
+						mWorld.playSound(explodeLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
 
 						mWorld.spawnParticle(Particle.FLAME, explodeLoc, 115, 0.02, 0.02, 0.02, 0.2);
 						mWorld.spawnParticle(Particle.SMOKE_LARGE, explodeLoc, 40, 0.02, 0.02, 0.02, 0.35);
@@ -81,9 +86,17 @@ public class UnstableArrows extends Ability {
 								bp.apply(mob);
 							}
 						}
+
+						// Custom knockback function because this is unreliable as is with weird arrow location calculations
 						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
 							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS) {
-							MovementUtils.knockAwayRealistic(explodeLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
+							Vector dir = mPlayer.getLocation().subtract(explodeLoc.toVector()).toVector();
+							dir.setY(dir.getY() / 1.5).normalize().multiply(2);
+							dir.setY(dir.getY() + 0.5);
+							mPlayer.setVelocity(dir);
+						} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001
+							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS) {
+							MovementUtils.knockAwayRealistic(explodeLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED * 4, 6);
 						}
 						this.cancel();
 					}

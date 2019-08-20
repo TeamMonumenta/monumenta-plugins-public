@@ -53,9 +53,11 @@ public class MovementUtils {
 			speed /= 2;
 		}
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector();
-		dir.setY(0.5 * dir.getY());
 		dir = dir.multiply(speed / Math.pow(Math.max(1, dir.length()), 2));
-		dir.setY(Math.max(0.5, Math.min(1, dir.getY())));
+		dir.setY(Math.max(0.5, Math.min(2.5, dir.getY())));
+		if (y != 0) {
+			dir.setY(y);
+		}
 		double mult = 1 - target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
 		if (mult > 0) {
 			dir.multiply(mult);
