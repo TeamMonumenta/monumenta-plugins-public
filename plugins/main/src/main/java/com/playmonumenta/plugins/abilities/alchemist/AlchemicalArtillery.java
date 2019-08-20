@@ -87,6 +87,8 @@ public class AlchemicalArtillery extends Ability {
 	@Override
 	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		if (arrow.hasMetadata(ALCHEMICAL_ARTILLERY_METAKEY)) {
+			// Must remove metadata or the arrow could bounce and go boom x2
+			arrow.removeMetadata(ALCHEMICAL_ARTILLERY_METAKEY, mPlugin);
 			Location loc = arrow.getLocation().add(0, 1, 0);
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
 			mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
