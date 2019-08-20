@@ -10,6 +10,8 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -86,6 +88,7 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -278,9 +281,39 @@ public class EntityListener implements Listener {
 			if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 				Player player = (Player)arrow.getShooter();
 				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)
+					|| damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
 					damager.remove();
 					event.setCancelled(true);
+				}
+
+				/*
+				 * This handles bow damage for abilities
+				 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
+				 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
+				 */
+
+				if (damagee instanceof LivingEntity) {
+					LivingEntity mob = (LivingEntity) damagee;
+
+					if (arrow.hasMetadata("ArrowQuickdraw")) {
+						event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+					}
+
+					double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
+					double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
+					if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
+						&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
+						&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
+						multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
+						mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
+						mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
+						mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
+						mob.removePotionEffect(PotionEffectType.SLOW);
+					}
+
+					event.setDamage(event.getDamage() * multiplier + bonusDamage);
 				}
 			}
 		}
@@ -494,6 +527,9 @@ public class EntityListener implements Listener {
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
+
+				// Stores velocity for ability damage calculations
+				AbilityUtils.setArrowVelocityDamageMultiplier(mPlugin, arrow);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				SplashPotion potion = (SplashPotion)proj;
 				if (!mAbilities.PlayerThrewSplashPotionEvent(player, potion)) {
