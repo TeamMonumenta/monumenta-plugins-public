@@ -22,7 +22,7 @@ public class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final double BRUTE_FORCE_1_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_DAMAGE = 5;
-	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.5f;
+	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
 	private final double damageBonus;
 
@@ -47,7 +47,7 @@ public class BruteForce extends Ability {
 					EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
 				}
 				if (!EntityUtils.isBoss(mob)) {
-					MovementUtils.KnockAway(mPlayer, mob, BRUTE_FORCE_KNOCKBACK_SPEED);
+					MovementUtils.knockAwayConstant(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2);
 				}
 			}
 		}
