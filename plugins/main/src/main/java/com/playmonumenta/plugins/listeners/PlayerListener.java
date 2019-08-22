@@ -100,10 +100,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -999,8 +999,17 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void BlockBreakEvent(BlockBreakEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
+		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
+			event.setCancelled(true);
+			return;
+		}
+
 		mPlugin.mTrackingManager.mPlayers.onBlockBreak(mPlugin, player, event, item);
 	}
 
