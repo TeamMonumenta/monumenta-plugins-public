@@ -294,7 +294,7 @@ public class EntityUtils {
 
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
 		for (Entity entity : entities) {
-			if (isHostileMob(entity)) {
+			if (isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
 				mobs.add((LivingEntity)entity);
 			}
 		}

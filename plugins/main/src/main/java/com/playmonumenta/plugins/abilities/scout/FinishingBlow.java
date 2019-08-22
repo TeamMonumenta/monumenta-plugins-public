@@ -16,6 +16,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -30,6 +31,8 @@ public class FinishingBlow extends Ability {
 
 	private static final Particle.DustOptions FINISHING_BLOW_COLOR = new Particle.DustOptions(Color.fromRGB(168, 0, 0), 1.0f);
 
+	private static final String FINISHING_BLOW_RESET_METAKEY = "ResetFinishingBlowTimer";
+
 	private ArrayList<Entity> marked = new ArrayList<Entity>();
 
 	public FinishingBlow(Plugin plugin, World world, Random random, Player player) {
@@ -39,25 +42,32 @@ public class FinishingBlow extends Ability {
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (arrow.isCritical() && !marked.contains(damagee)) {
-			marked.add(damagee);
-			new BukkitRunnable() {
-				int t = 0;
-				@Override
-				public void run() {
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, damagee.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.02);
-					if (t % 4 == 0) {
-						mWorld.spawnParticle(Particle.CRIT_MAGIC, damagee.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0);
+		if (arrow.isCritical()) {
+			if (marked.contains(damagee)) {
+				damagee.setMetadata(FINISHING_BLOW_RESET_METAKEY, new FixedMetadataValue(mPlugin, null));
+			} else {
+				marked.add(damagee);
+				new BukkitRunnable() {
+					int t = 0;
+					@Override
+					public void run() {
+						if (damagee.hasMetadata(FINISHING_BLOW_RESET_METAKEY)) {
+							t = 0;
+							damagee.removeMetadata(FINISHING_BLOW_RESET_METAKEY, mPlugin);
+						}
+						mWorld.spawnParticle(Particle.SMOKE_NORMAL, damagee.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.02);
+						if (t % 4 == 0) {
+							mWorld.spawnParticle(Particle.CRIT_MAGIC, damagee.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0);
+						}
+						if (t >= 5 * 20 || !marked.contains(damagee) || damagee.isDead() || !damagee.isValid()) {
+							marked.remove(damagee);
+							this.cancel();
+						}
+						t += 2;
 					}
-					if (t >= 5 * 20 || !marked.contains(damagee) || damagee.isDead() || !damagee.isValid()) {
-						marked.remove(damagee);
-						this.cancel();
-					}
-					t += 2;
-				}
-			}.runTaskTimer(mPlugin, 0, 2);
+				}.runTaskTimer(mPlugin, 0, 2);
+			}
 		}
-
 		return true;
 	}
 

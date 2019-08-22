@@ -99,6 +99,7 @@ import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
 import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
+import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
 import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
@@ -225,6 +226,7 @@ public class AbilityManager {
 		                               new RoguePassive(mPlugin, mWorld, mRandom, null),
 		                               new Smokescreen(mPlugin, mWorld, mRandom, null),
 		                               new ViciousCombos(mPlugin, mWorld, mRandom, null),
+		                               new Skirmisher(mPlugin, mWorld, mRandom, null),
 
 		                               /********** SCOUT **********/
 		                               new Agility(mPlugin, mWorld, mRandom, null),
