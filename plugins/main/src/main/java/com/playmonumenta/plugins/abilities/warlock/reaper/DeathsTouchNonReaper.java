@@ -36,7 +36,10 @@ public class DeathsTouchNonReaper extends Ability {
 		for (PotionEffect effect : e.getActivePotionEffects()) {
 			PotionEffectType type = effect.getType();
 			if (PotionUtils.hasNegativeEffects(type)) {
-				types.add(PotionUtils.getOppositeEffect(type));
+				type = PotionUtils.getOppositeEffect(type);
+				if (type != null) {
+					types.add(type);
+				}
 			}
 		}
 		if (e.getFireTicks() > 0) {
