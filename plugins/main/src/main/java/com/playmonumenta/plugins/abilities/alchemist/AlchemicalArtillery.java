@@ -32,8 +32,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Alchemical Artillery: Left click with a bow to prime it with an alchemist potion.
- * Shooting the bow in the next 5 seconds consumes 5 / 4 potions.
- * When the arrow hits an enemy, the potion is applied in a 3 / 5 block radius.
+ * Shooting the bow in the next 5 seconds consumes 4 / 3 potions.
+ * When the arrow hits an enemy, the potion is appled in a 3 / 5 block radius.
  * Basilisk Poison is also applied if applicable.
  */
 
@@ -41,8 +41,8 @@ public class AlchemicalArtillery extends Ability {
 	private static final String ALCHEMICAL_ARTILLERY_METAKEY = "AlchemicalArtilleryArrowGotTheDankPot";
 	private static final int ALCHEMICAL_ARTILLERY_1_RADIUS = 3;
 	private static final int ALCHEMICAL_ARTILLERY_2_RADIUS = 4;
-	private static final int ALCHEMICAL_ARTILLERY_1_COST = 5;
-	private static final int ALCHEMICAL_ARTILLERY_2_COST = 4;
+	private static final int ALCHEMICAL_ARTILLERY_1_COST = 4;
+	private static final int ALCHEMICAL_ARTILLERY_2_COST = 3;
 	private static final int ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD = 20 * 5;
 
 	private int mRadius;
@@ -124,9 +124,7 @@ public class AlchemicalArtillery extends Ability {
 				}
 			}
 			if (io != null) {
-				for (Player player : PlayerUtils.getNearbyPlayers(loc, mRadius)) {
-					io.apply(player);
-				}
+				io.createAura(loc, mRadius);
 			}
 		}
 	}
