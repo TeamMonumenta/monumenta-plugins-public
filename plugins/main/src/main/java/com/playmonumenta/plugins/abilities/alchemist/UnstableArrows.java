@@ -89,7 +89,7 @@ public class UnstableArrows extends Ability {
 
 						// Custom knockback function because this is unreliable as is with weird arrow location calculations
 						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
-							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS) {
+							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
 							Vector dir = mPlayer.getLocation().subtract(explodeLoc.toVector()).toVector();
 							dir.setY(dir.getY() / 1.5).normalize().multiply(2);
 							dir.setY(dir.getY() + 0.5);
