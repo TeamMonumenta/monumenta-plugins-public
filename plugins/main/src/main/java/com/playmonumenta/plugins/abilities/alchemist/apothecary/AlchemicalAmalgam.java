@@ -36,8 +36,8 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 /*
  * Shift left click with an Alchemist Potion to shoot a mixture
  * that deals 8 / 16 damage to every enemy touched and adds 2 / 3
- * absorption health to players (including yourself), maximum 8.
- * After hitting a block or travelling 8 blocks, the mixture traces
+ * absorption health to players (including yourself), maximum 12.
+ * After hitting a block or travelling 10 blocks, the mixture traces
  * and returns to you, able to damage enemies and shield allies a
  * second time. Cooldown: 30 seconds.
  */
@@ -48,8 +48,9 @@ public class AlchemicalAmalgam extends Ability {
 	private static final int AMALGAM_2_DAMAGE = 16;
 	private static final int AMALGAM_1_SHIELD = 2;
 	private static final int AMALGAM_2_SHIELD = 3;
-	private static final int AMALGAM_MAX_SHIELD = 8;
-	private static final int AMALGAM_MAX_DURATION = 20 * 2;
+	private static final int AMALGAM_MAX_SHIELD = 12;
+	// Calculate the range with MAX_DURATION * MOVE_SPEED
+	private static final int AMALGAM_MAX_DURATION = (int) (20 * 2.5);
 	private static final double AMALGAM_MOVE_SPEED = 0.2;
 	private static final double AMALGAM_RADIUS = 1.5;
 	private static final Particle.DustOptions AMALGAM_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
@@ -112,6 +113,7 @@ public class AlchemicalAmalgam extends Ability {
 			BoundingBox box = BoundingBox.of(loc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
 			Vector increment = loc.getDirection().multiply(0.2);
 
+			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
 			List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
 
@@ -167,11 +169,12 @@ public class AlchemicalAmalgam extends Ability {
 				if (reverse) {
 					if (t <= 0) {
 						mAbsorptionManipulator.addAbsorption(mShield, AMALGAM_MAX_SHIELD);
+						mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
 						this.cancel();
 					}
 
 					// The increment is calculated by the distance to the player divided by the number of increments left
-					increment = mPlayer.getLocation().toVector().subtract(loc.toVector()).multiply(1.0 / t);
+					increment = mPlayer.getEyeLocation().toVector().subtract(loc.toVector()).multiply(1.0 / t);
 
 					// To make the particles function without rewriting the particle code, manually calculate and set pitch and yaw
 					double x = increment.getX();
