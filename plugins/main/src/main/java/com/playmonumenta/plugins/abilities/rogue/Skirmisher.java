@@ -20,7 +20,8 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Your critical strikes deal +3 / +5 damage when there are 3 / 4 or fewer enemies within 8 blocks of you.
+ * Melee attacks deal +3 / +5 damage when there are 3 / 4 or fewer
+ * enemies within 8 blocks of you.
  */
 
 public class Skirmisher extends Ability {
@@ -40,8 +41,7 @@ public class Skirmisher extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK
-				&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)
-				&& isCrit()) {
+			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
 			int surrounding = 0;
 			for (Entity e : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8)) {
 				surrounding ++ ;
@@ -72,10 +72,10 @@ public class Skirmisher extends Ability {
 		return true;
 	}
 
-	private boolean isCrit() {
+	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return PlayerUtils.isCritical(mPlayer) && InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
+		return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
 	}
 }
 
