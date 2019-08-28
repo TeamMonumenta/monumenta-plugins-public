@@ -49,8 +49,8 @@ import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.Bezoar;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.BezoarNonApothecary;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNonApothecary;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
@@ -358,10 +358,10 @@ public class AbilityManager {
 			                               new PurpleHaze(mPlugin, mWorld, mRandom, null),
 
 			                               // APOTHECARY
-			                               new Bezoar(mPlugin, mWorld, mRandom, null),
 			                               new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
 			                               new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
-			                               new BezoarNonApothecary(mPlugin, mWorld, mRandom, null)
+			                               new WardingRemedy(mPlugin, mWorld, mRandom, null),
+			                               new WardingRemedyNonApothecary(mPlugin, mWorld, mRandom, null)
 			                           ));
 		}
 
