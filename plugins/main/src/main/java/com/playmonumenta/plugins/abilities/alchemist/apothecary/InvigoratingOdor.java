@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -10,23 +12,27 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- * Invigorating Odor: Alchemist potions give Speed 1 and
- * Regeneration 1 (0:10) on allies they hit, also your alch
- * pots deal +2/4 damage. At level 2, they also provide Resistance
- * 1 for 10 seconds.
+ * INVIGORATING ODOR:
+ * Alchemist Potions do +2 / +4 damage, and leave behind a
+ * 3 second aura that gives players Speed I and Haste I for
+ * 10 seconds. At level 2, Resistance I is added to the aura.
  */
 public class InvigoratingOdor extends Ability {
 
 	private static final int INVIGORATING_1_DAMAGE = 2;
 	private static final int INVIGORATING_2_DAMAGE = 4;
 	private static final int INVIGORATING_DURATION = 20 * 10;
+	private static final int INVIGORATING_AURA_DURATION = 20 * 3;
+	private static final int INVIGORATING_RADIUS = 3;
 
 	private int mDamage;
 
@@ -45,21 +51,40 @@ public class InvigoratingOdor extends Ability {
 					apply(le);
 				}
 			}
+
+			createAura(potion.getLocation(), INVIGORATING_RADIUS);
 		}
+
 		return true;
 	}
 
 	public void apply(LivingEntity le) {
-		if (le instanceof Player) {
-			Player player = (Player) le;
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, INVIGORATING_DURATION, 0, true, true));
-			if (getAbilityScore() > 1) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
+		EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer);
+	}
+
+	public void createAura(Location loc, double radius) {
+		new BukkitRunnable() {
+			int t = 0;
+
+			@Override
+			public void run() {
+				if (t >= INVIGORATING_AURA_DURATION) {
+					this.cancel();
+				}
+
+				mWorld.spawnParticle(Particle.END_ROD, loc, (int) Math.pow(radius, 2) * 2, radius, 0.15, radius, 0.05);
+
+				for (Player player : PlayerUtils.getNearbyPlayers(loc, radius)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
+					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, INVIGORATING_DURATION, 0, true, true));
+					if (getAbilityScore() > 1) {
+						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 0, true, true));
+					}
+				}
+
+				t += 5;
 			}
-		} else if (EntityUtils.isHostileMob(le)) {
-			EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer);
-		}
+		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
 }
