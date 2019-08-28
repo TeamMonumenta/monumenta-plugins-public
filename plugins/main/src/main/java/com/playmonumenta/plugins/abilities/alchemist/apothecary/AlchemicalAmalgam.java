@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -56,13 +57,8 @@ public class AlchemicalAmalgam extends Ability {
 	private static final Particle.DustOptions AMALGAM_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions AMALGAM_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
-	// The map stores AbsorptionManipulators so we only need to instantiate the reflection methods and fields once
-	public static Map<UUID, AbsorptionManipulator> mAbsorptionManipulators = new HashMap<UUID, AbsorptionManipulator>();
-	private static BukkitRunnable mMapCleaner;
-
 	private int mDamage;
 	private int mShield;
-	private AbsorptionManipulator mAbsorptionManipulator;
 
 	public AlchemicalAmalgam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -72,29 +68,6 @@ public class AlchemicalAmalgam extends Ability {
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? AMALGAM_1_DAMAGE : AMALGAM_2_DAMAGE;
 		mShield = getAbilityScore() == 1 ? AMALGAM_1_SHIELD : AMALGAM_2_SHIELD;
-
-		if (player != null) {
-			mAbsorptionManipulator = new AbsorptionManipulator(plugin, player);
-			mAbsorptionManipulators.put(player.getUniqueId(), mAbsorptionManipulator);
-		}
-
-		if (mMapCleaner == null || mMapCleaner.isCancelled()) {
-			mMapCleaner = new BukkitRunnable() {
-				@Override
-				public void run() {
-					Iterator<Map.Entry<UUID, AbsorptionManipulator>> iter = mAbsorptionManipulators.entrySet().iterator();
-					while (iter.hasNext()) {
-						AbsorptionManipulator x = iter.next().getValue();
-						if (!x.isPlayerOnline()) {
-							iter.remove();
-						}
-					}
-				}
-			};
-
-			// Remove offline players from the map every minute
-			mMapCleaner.runTaskTimer(plugin, 0, 20 * 60);
-		}
 	}
 
 	@Override
@@ -105,7 +78,7 @@ public class AlchemicalAmalgam extends Ability {
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
 		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
 
-		mAbsorptionManipulator.addAbsorption(mShield, AMALGAM_MAX_SHIELD);
+		AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
 		putOnCooldown();
 
 		new BukkitRunnable() {
@@ -137,10 +110,7 @@ public class AlchemicalAmalgam extends Ability {
 				while (playerIter.hasNext()) {
 					Player player = playerIter.next();
 					if (box.overlaps(player.getBoundingBox())) {
-						if (!mAbsorptionManipulators.containsKey(player.getUniqueId())) {
-							mAbsorptionManipulators.put(player.getUniqueId(), new AbsorptionManipulator(mPlugin, player));
-						}
-						mAbsorptionManipulators.get(player.getUniqueId()).addAbsorption(mShield, AMALGAM_MAX_SHIELD);
+						AbsorptionUtils.addAbsorption(player, mShield, AMALGAM_MAX_SHIELD);
 						playerIter.remove();
 					}
 				}
@@ -168,7 +138,7 @@ public class AlchemicalAmalgam extends Ability {
 
 				if (reverse) {
 					if (t <= 0) {
-						mAbsorptionManipulator.addAbsorption(mShield, AMALGAM_MAX_SHIELD);
+						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
 						mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
 						this.cancel();
 					}

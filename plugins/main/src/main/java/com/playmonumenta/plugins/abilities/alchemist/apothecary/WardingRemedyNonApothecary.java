@@ -15,10 +15,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
+import com.playmonumenta.plugins.utils.NetworkUtils;
 /*
  * Does the heavy lifting for WardingRemedy because we need to
  * check the player-specific damage event and also prevent
@@ -39,7 +41,6 @@ public class WardingRemedyNonApothecary extends Ability {
 	// Stored level so we don't have to run checks too often
 	private int mLevel = 0;
 	private int mSeconds = 0;
-	private AbsorptionManipulator mAbsorptionManipulator;
 
 	public WardingRemedyNonApothecary(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -54,11 +55,7 @@ public class WardingRemedyNonApothecary extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK
 			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
-			mLevel = getWardingRemedyLevel();
-			if (mLevel > 0 && mAbsorptionManipulator.getAbsorption() >= REMEDY_SHIELD_THRESHOLD) {
-				double multiplier = mLevel == 1 ? REMEDY_1_DAMAGE_MULTIPLIER : REMEDY_2_DAMAGE_MULTIPLIER;
-				event.setDamage(event.getDamage() * multiplier);
-			}
+			applyBonusDamage(event);
 		}
 
 		return true;
@@ -66,13 +63,18 @@ public class WardingRemedyNonApothecary extends Ability {
 
 	@Override
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		mLevel = getWardingRemedyLevel();
-		if (mLevel > 0 && mAbsorptionManipulator.getAbsorption() > REMEDY_SHIELD_THRESHOLD) {
-			double multiplier = mLevel == 1 ? REMEDY_1_DAMAGE_MULTIPLIER : REMEDY_2_DAMAGE_MULTIPLIER;
-			event.setDamage(event.getDamage() * multiplier);
-		}
+		applyBonusDamage(event);
 
 		return true;
+	}
+
+	private void applyBonusDamage(EntityDamageByEntityEvent event) {
+		mLevel = getWardingRemedyLevel();
+		if (mLevel > 0 && AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+			double multiplier = mLevel == 1 ? REMEDY_1_DAMAGE_MULTIPLIER : REMEDY_2_DAMAGE_MULTIPLIER;
+			mWorld.spawnParticle(Particle.CRIT, event.getEntity().getLocation().add(0, 1, 0), 10, 0.2, 0.5, 0.2, 0.1);
+			event.setDamage(event.getDamage() * multiplier);
+		}
 	}
 
 	@Override
@@ -83,38 +85,22 @@ public class WardingRemedyNonApothecary extends Ability {
 			if (mSeconds == REMEDY_2_FREQUENCY) {
 				// We can reuse this value for the next check if needed
 				mLevel = getWardingRemedyLevel();
-
 				if (mLevel == 2) {
+					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
+					mWorld.spawnParticle(Particle.END_ROD, mPlayer.getLocation(), 5, 0.2, 0, 0.2, 0.02);
 					mSeconds = 0;
-
-					if (mAbsorptionManipulator == null) {
-						mAbsorptionManipulator = new AbsorptionManipulator(mPlugin, mPlayer);
-					}
-
-					mAbsorptionManipulator.addAbsorption(REMEDY_SHIELD, REMEDY_SHIELD_MAX);
-
-					if (mAbsorptionManipulator.getAbsorption() >= REMEDY_SHIELD_THRESHOLD) {
-						spawnHelix(mPlayer);
-					}
 				}
 			} else if (mSeconds >= REMEDY_1_FREQUENCY) {
 				mSeconds = 0;
 				if (mLevel > 0) {
-					if (mAbsorptionManipulator == null) {
-						mAbsorptionManipulator = new AbsorptionManipulator(mPlugin, mPlayer);
-					}
-
-					mAbsorptionManipulator.addAbsorption(REMEDY_SHIELD, REMEDY_SHIELD_MAX);
-
-					if (mAbsorptionManipulator.getAbsorption() >= REMEDY_SHIELD_THRESHOLD) {
-						spawnHelix(mPlayer);
-					}
+					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
+					mWorld.spawnParticle(Particle.END_ROD, mPlayer.getLocation(), 5, 0.2, 0, 0.2, 0.02);
 				}
 			}
 		}
 	}
 
-	public int getWardingRemedyLevel() {
+	private int getWardingRemedyLevel() {
 		int level = 0;
 
 		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, REMEDY_RANGE, true)) {
@@ -130,32 +116,6 @@ public class WardingRemedyNonApothecary extends Ability {
 		}
 
 		return level;
-	}
-
-	// Definitely not stealing and repurposing Fire's particles
-	private void spawnHelix(Player player) {
-		new BukkitRunnable() {
-			double rotation = 0;
-			double y = 0.15;
-			double radius = 1.15;
-			@Override
-			public void run() {
-				Location loc = player.getLocation();
-				rotation += 15;
-				y += 0.175;
-				for (int i = 0; i < 3; i++) {
-					double degree = Math.toRadians(rotation + (i * 120));
-					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
-					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.05, 0);
-					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
-				}
-
-				if (y >= 1.8) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 }
