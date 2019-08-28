@@ -43,15 +43,27 @@ public class AbsorptionManipulator {
 	}
 
 	// Doesn't work for subtracting absorption because newAbsorption makes sure it never drops (in case absorption is higher than maxAmount)
-	public void addAbsorption(double amount, double maxAmount) {
+	public void addAbsorption(float amount, float maxAmount) {
 		float absorption = getAbsorption();
-		float newAbsorption = (float) Math.max(absorption, Math.min(absorption + amount, maxAmount));
+		float newAbsorption = Math.max(absorption, Math.min(absorption + amount, maxAmount));
 		if (newAbsorption != absorption) {
-			try {
-				setAbsorptionMethod.invoke(handle, newAbsorption);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
+			setAbsorption(newAbsorption);
+		}
+	}
+
+	public void subtractAbsorption(float amount) {
+		float absorption = getAbsorption();
+		float newAbsorption = Math.max(absorption - amount, 0);
+		if (newAbsorption != absorption) {
+			setAbsorption(newAbsorption);
+		}
+	}
+
+	public void setAbsorption(float amount) {
+		try {
+			setAbsorptionMethod.invoke(handle, amount);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -18,6 +18,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.AbsorptionManipulator;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -28,12 +30,19 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
+	private AbsorptionManipulator mAbsorptionManipulator;
+
 	public IronTincture(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
 		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+
+		if (player != null) {
+			mAbsorptionManipulator = new AbsorptionManipulator(plugin, player);
+			AlchemicalAmalgam.mAbsorptionManipulators.put(player.getUniqueId(), mAbsorptionManipulator);
+		}
 	}
 
 	@Override
@@ -86,18 +95,34 @@ public class IronTincture extends Ability {
 					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
 					tincture.remove();
 
-					p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
+					// Do not allow Absorption stacking with WardingRemedy and Amalgam:
+					// If current Absorption is less than Tincture Absorption, remove all Absorption and apply Tincture.
+					// Otherwise, do not apply Tincture.
+					if ((ironTincture + 1) * 4 > mAbsorptionManipulator.getAbsorption()) {
+						mAbsorptionManipulator.setAbsorption(0);
+						mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
+					}
+
+					spawnHelix(mPlayer);
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 
 					if (p != mPlayer) {
-						mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
-						spawnHelix(mPlayer);
-						mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
+						if (!AlchemicalAmalgam.mAbsorptionManipulators.containsKey(p.getUniqueId())) {
+							AlchemicalAmalgam.mAbsorptionManipulators.put(p.getUniqueId(), new AbsorptionManipulator(mPlugin, p));
+						}
+						AbsorptionManipulator am = AlchemicalAmalgam.mAbsorptionManipulators.get(p.getUniqueId());
+
+						if ((ironTincture + 1) * 4 > am.getAbsorption()) {
+							am.setAbsorption(0);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN - tinctureDecay, ironTincture));
+						}
+
+						spawnHelix(p);
+						mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 					}
+
 					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
 					putOnCooldown();
-
-					spawnHelix(p);
-					mWorld.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 
 					this.cancel();
 					return;
