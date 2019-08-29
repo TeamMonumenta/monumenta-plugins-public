@@ -70,9 +70,9 @@ public class PotionMap {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
-			    || currentInfo.duration < newPotionInfo.duration
-			    || currentInfo.type != PotionEffectType.REGENERATION
-			    || newPotionInfo.duration - currentInfo.duration >= 50 / (currentInfo.amplifier + 1) + 1) {
+			    || (currentInfo.duration < newPotionInfo.duration
+			        && (currentInfo.type != PotionEffectType.REGENERATION
+			            || newPotionInfo.duration - currentInfo.duration >= 50 / (currentInfo.amplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
