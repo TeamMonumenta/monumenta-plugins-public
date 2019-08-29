@@ -89,10 +89,12 @@ public class EnchantmentManager {
 		init.add(new InstantDrink());
 		init.add(new JunglesNourishment());
 		init.add(new Adrenaline());
+		init.add(new Sustenance());
 
 		// Curses
 		init.add(new CurseOfCorruption());
 		init.add(new TwoHanded());
+		init.add(new CurseOfCrippling());
 
 		// Forbidden items (dynamically set based on server config)
 		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {

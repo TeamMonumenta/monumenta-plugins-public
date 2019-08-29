@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -89,6 +91,11 @@ public interface BaseEnchantment {
 	 * they have any levels of this property (This only applies for MELEE attacks)
 	 */
 	default public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	/*
+	 * The onKill() method will be called whenever the player kills something
+	 * while they have any levels of this property
+	 */
+	default public void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) { }
 
 	/*
 	 * The onDamage() method will be called whenever the player damages something, no

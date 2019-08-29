@@ -5,12 +5,14 @@ import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -87,6 +89,15 @@ public class PlayerInventory {
 				property.removeProperty(plugin, player);
 				property.applyProperty(plugin, player, level);
 			}
+		}
+	}
+
+	public void onKill(Plugin plugin, Player player, Entity target, EntityDeathEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onKill(plugin, player, level, target, event);
 		}
 	}
 
