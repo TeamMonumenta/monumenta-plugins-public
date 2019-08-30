@@ -107,11 +107,12 @@ public class AlchemicalArtillery extends Ability {
 			boolean guaranteedApplicationApplied = false;
 
 			for (LivingEntity mob : mobs) {
-				if (ba != null) {
-					ba.apply(mob);
-				}
+				// Gruesome must go first to apply the Vulnerability
 				if (ga != null) {
 					ga.apply(mob);
+				}
+				if (ba != null) {
+					ba.apply(mob);
 				}
 				if (na != null) {
 					guaranteedApplicationApplied = na.apply(mob, size, guaranteedApplicationApplied);
