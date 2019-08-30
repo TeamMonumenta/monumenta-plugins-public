@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -90,10 +91,13 @@ public class UnstableArrows extends Ability {
 						// Custom knockback function because this is unreliable as is with weird arrow location calculations
 						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
 							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
-							Vector dir = mPlayer.getLocation().subtract(explodeLoc.toVector()).toVector();
-							dir.setY(dir.getY() / 1.5).normalize().multiply(2);
-							dir.setY(dir.getY() + 0.5);
-							mPlayer.setVelocity(dir);
+							LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
+							if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+								Vector dir = mPlayer.getLocation().subtract(explodeLoc.toVector()).toVector();
+								dir.setY(dir.getY() / 1.5).normalize().multiply(2);
+								dir.setY(dir.getY() + 0.5);
+								mPlayer.setVelocity(dir);
+							}
 						} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001
 							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS) {
 							MovementUtils.knockAwayRealistic(explodeLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED * 4, 6);
