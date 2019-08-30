@@ -187,7 +187,7 @@ public class PotionUtils {
 				if (isExtended) {
 					newInfo = new PotionInfo(type.getEffectType(), MINUTES_1_HALF / dividend, 0, false, true);
 				} else if (isUpgraded) {
-					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF / dividend, 0, false, true);
+					newInfo = new PotionInfo(type.getEffectType(), SECONDS_22_HALF / dividend, 1, false, true);
 				} else {
 					newInfo = new PotionInfo(type.getEffectType(), SECONDS_45 / dividend, 0, false, true);
 				}
