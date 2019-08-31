@@ -33,6 +33,7 @@ public class BroadcastCommand {
 	            "tellraw",
 	            "title",
 
+	            "re",
 	            "function",
 	            "difficulty",
 	            "scoreboard",
