@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-for x in main bosses nms; do
+for x in nms main bosses; do
 	cd "$SCRIPT_DIR/$x"
 	./compile.sh
 	ret=$?

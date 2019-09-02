@@ -56,6 +56,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.playmonumenta</groupId>
+            <artifactId>monumenta-nms</artifactId>
+            <version>dev</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.github.jorelali</groupId>
             <artifactId>commandapi</artifactId>
             <version>1.8.1</version>

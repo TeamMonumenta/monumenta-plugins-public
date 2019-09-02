@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -20,18 +22,24 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.playmonumenta.nms.utils.NmsCommandUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 
 public class PlayerInventory {
+	private static boolean mParsingCommandFailed = false;
+	private static NmsCommandUtils.ParsedCommandWrapper mCachedParsedCommand = null;
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
 	 */
-	Map<BaseEnchantment, Integer> mCurrentProperties = new HashMap<BaseEnchantment, Integer>();
-	Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+	private Map<BaseEnchantment, Integer> mCurrentProperties = new HashMap<BaseEnchantment, Integer>();
+	private Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+
+	private Material mPrevOffhandMat = null;
+	private List<String> mPrevOffhandLore = null;
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player);
@@ -53,6 +61,40 @@ public class PlayerInventory {
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
+		// Parse the command and cache it
+		if (!mParsingCommandFailed && mCachedParsedCommand == null) {
+			try {
+				mCachedParsedCommand = NmsCommandUtils.parseCommand("function monumenta:mechanisms/buyback/mobile_buyback");
+			} catch (Exception e) {
+				plugin.getLogger().warning("Failed to parse buyback command: " + e.getMessage());
+				e.printStackTrace();
+				mParsingCommandFailed = true;
+				mCachedParsedCommand = null;
+			}
+		}
+
+		if (mCachedParsedCommand != null) {
+			// Offhand item change detection if the parsed command worked
+			ItemStack offhand = player.getInventory().getItemInOffHand();
+
+			if (offhand.getType() != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
+				mPrevOffhandMat = offhand.getType();
+				mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
+
+				try {
+					NmsCommandUtils.runParsedCommand(mCachedParsedCommand, player);
+				} catch (Exception e) {
+					plugin.getLogger().warning("Failed to run buyback command: " + e.getMessage());
+					e.printStackTrace();
+
+					// Don't try again
+					mParsingCommandFailed = true;
+					mCachedParsedCommand = null;
+				}
+			}
+		}
+
+
 		// Swap current and previous lists
 		Map<BaseEnchantment, Integer> temp = mPreviousProperties;
 		mPreviousProperties = mCurrentProperties;

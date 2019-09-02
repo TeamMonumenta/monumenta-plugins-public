@@ -480,7 +480,7 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
-			mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves in safe zones automatically when closed
@@ -651,7 +651,7 @@ public class PlayerListener implements Listener {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
-				mPlugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
 			}
 		}, 0);
 	}

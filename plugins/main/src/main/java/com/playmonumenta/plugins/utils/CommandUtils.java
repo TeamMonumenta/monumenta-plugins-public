@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -220,5 +221,9 @@ public class CommandUtils {
 		}
 
 		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
+	}
+
+	public static void runCommandViaConsole(String cmd) {
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 }
