@@ -28,9 +28,13 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
+	private int mSocketPort = 9576;
+
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
+
+	private String mShardName = "default_settings";
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	public Set<String> mForbiddenItemLore = new HashSet<>();
@@ -61,6 +65,10 @@ public class ServerProperties {
 		return mPlotSurvivalMinHeight;
 	}
 
+	public int getSocketPort() {
+		return mSocketPort;
+	}
+
 	public boolean getIsSleepingEnabled() {
 		return mIsSleepingEnabled;
 	}
@@ -71,6 +79,10 @@ public class ServerProperties {
 
 	public boolean getClassSpecializationsEnabled() {
 		return mClassSpecializationsEnabled;
+	}
+
+	public String getShardName() {
+		return mShardName;
 	}
 
 	public void load(Plugin plugin, CommandSender sender) {
@@ -108,9 +120,13 @@ public class ServerProperties {
 					mIsTownWorld                 = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
 					mBroadcastCommandEnabled     = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
 					mPlotSurvivalMinHeight       = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mSocketPort                  = _getPropertyValueInt(plugin, object, "socketPort", mSocketPort);
+
 					mIsSleepingEnabled           = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 					mKeepLowTierInventory        = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 					mClassSpecializationsEnabled = _getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+
+					mShardName                   = _getPropertyValueString(plugin, object, "shardName", mShardName);
 
 					mAllowedTransferTargets      = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mForbiddenItemLore           = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
@@ -154,6 +170,19 @@ public class ServerProperties {
 		JsonElement element = object.get(properyName);
 		if (element != null) {
 			value = element.getAsInt();
+		}
+
+		plugin.getLogger().info("Properties: " + properyName + " = " + value);
+
+		return value;
+	}
+
+	private String _getPropertyValueString(Plugin plugin, JsonObject object, String properyName, String defaultVal) {
+		String value = defaultVal;
+
+		JsonElement element = object.get(properyName);
+		if (element != null) {
+			value = element.getAsString();
 		}
 
 		plugin.getLogger().info("Properties: " + properyName + " = " + value);

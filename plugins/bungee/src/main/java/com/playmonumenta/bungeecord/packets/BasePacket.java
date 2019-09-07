@@ -1,7 +1,8 @@
-package com.playmonumenta.plugins.packets;
+package com.playmonumenta.bungeecord.packets;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.bungeecord.network.ClientSocket;
+import com.playmonumenta.bungeecord.network.SocketManager;
 
 public class BasePacket {
 	public static final String PacketOperation = "Do.Not.Use.This.Packet";
@@ -48,7 +49,7 @@ public class BasePacket {
 		return json;
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		throw new Exception("BasePacket cannot be handled by shards");
+	public static void handlePacket(SocketManager manager, ClientSocket client, BasePacket packet) throws Exception {
+		throw new Exception("BasePacket cannot be handled by bungee");
 	}
 }

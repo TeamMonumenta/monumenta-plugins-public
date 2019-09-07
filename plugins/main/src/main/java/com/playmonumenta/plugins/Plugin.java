@@ -42,10 +42,10 @@ import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
-import com.playmonumenta.plugins.listeners.SocketListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.network.HttpManager;
+import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.safezone.SafeZoneManager;
@@ -57,8 +57,6 @@ import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-
-import fr.rhaz.socketapi.SocketAPI.Client.SocketClient;
 
 public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
@@ -77,7 +75,7 @@ public class Plugin extends JavaPlugin {
 	public AbilityManager mAbilityManager;
 	public SafeZoneManager mSafeZoneManager;
 
-	public SocketClient mSocketClient;
+	public SocketManager mSocketManager;
 
 	public ItemOverrides mItemOverrides;
 
@@ -139,6 +137,9 @@ public class Plugin extends JavaPlugin {
 		STATIC_PLUGIN_REF = this;
 		PluginManager manager = getServer().getPluginManager();
 
+		mSocketManager = new SocketManager(this, mServerProperties.getSocketPort(), mServerProperties.getShardName());
+		mSocketManager.open();
+
 		mItemOverrides = new ItemOverrides();
 
 		//  Initialize Variables.
@@ -164,7 +165,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SpectateBot(this), this);
 
 		manager.registerEvents(new ExceptionListener(this), this);
-		manager.registerEvents(new SocketListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mWorld, mAbilityManager), this);
@@ -264,6 +264,7 @@ public class Plugin extends JavaPlugin {
 
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
+		mSocketManager.close();
 		MetadataUtils.removeAllMetadata(this);
 	}
 

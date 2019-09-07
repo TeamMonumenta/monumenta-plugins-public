@@ -2,44 +2,36 @@ package com.playmonumenta.plugins.packets;
 
 import org.bukkit.Bukkit;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.PacketUtils;
 
-public class BroadcastCommandPacket implements BasePacket {
-	public static final String StaticPacketChannel = "Monumenta.Bungee.Broadcast.BroadcastCommand";
-	private String mCommand;
+public class BroadcastCommandPacket extends BasePacket {
+	public static final String PacketOperation = "Monumenta.Broadcast.Command";
 
 	public BroadcastCommandPacket(String command) {
-		mCommand = command;
+		super("*", PacketOperation, new JsonObject());
+		mData.addProperty("command", command);
 	}
 
-	@Override
-	public String getPacketChannel() {
-		return StaticPacketChannel;
-	}
-
-	@Override
-	public String getPacketData() throws Exception {
-		String[] data = {mCommand};
-		return PacketUtils.encodeStrings(data);
-	}
-
-	public static void handlePacket(Plugin plugin, String data) throws Exception {
-		String[] rcvStrings = PacketUtils.decodeStrings(data);
-		if (rcvStrings == null || rcvStrings.length != 1) {
-			throw new Exception("Received string data is null or invalid length");
+	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
+		if (!packet.hasData() ||
+		    !packet.getData().has("command") ||
+		    !packet.getData().get("command").isJsonPrimitive() ||
+		    !packet.getData().getAsJsonPrimitive("command").isString()) {
+			throw new Exception("CommandPacket failed to parse required string field 'command'");
 		}
+		String command = packet.getData().get("command").getAsString();
 
 		if (plugin.mServerProperties.getBroadcastCommandEnabled() == true
-		    || rcvStrings[0].startsWith("say")
-		    || rcvStrings[0].startsWith("msg")
-		    || rcvStrings[0].startsWith("tell")
-		    || rcvStrings[0].startsWith("tellraw")) {
+		    || command.startsWith("say")
+		    || command.startsWith("msg")
+		    || command.startsWith("tell")
+		    || command.startsWith("tellraw")) {
 
-			plugin.getLogger().info("Executing broadcast received command '" + rcvStrings[0] + "'");
+			plugin.getLogger().info("Executing broadcast received command '" + command + "'");
 
 			/* Call this on the main thread */
-			Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), rcvStrings[0]));
+			Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command));
 		}
 	}
 }
