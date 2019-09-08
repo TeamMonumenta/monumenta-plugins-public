@@ -44,7 +44,7 @@ public class CoupDeGrace extends Ability {
 			LivingEntity le = (LivingEntity) event.getEntity();
 			double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 			if (!EntityUtils.isBoss(le)) {
-				if (le.getHealth() - event.getFinalDamage() < maxHealth * threshold) {
+				if (le.getHealth() - (event.getFinalDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealth * threshold) {
 					event.setDamage(event.getDamage() + 9001);
 					mWorld.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 					mWorld.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
