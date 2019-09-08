@@ -374,7 +374,7 @@ public class ItemUtils {
 	 */
 	public static float getItemDropChance(ItemStack item) {
 		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$")) {
-			return 1.0f;
+			return 100.0f;
 		} else {
 			return -200.0f;
 		}
