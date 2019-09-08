@@ -2,8 +2,10 @@ package com.playmonumenta.bossfights.bosses;
 
 import java.util.Arrays;
 
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.SpellManager;
@@ -22,6 +24,10 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	public PlayerTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		if (!(boss instanceof Mob)) {
 			throw new Exception("boss_targetplayer only works on mobs!");
+		}
+
+		if (boss instanceof Wolf || boss instanceof Golem) {
+			boss.setRemoveWhenFarAway(true);
 		}
 
 		mBoss = (Mob)boss;
