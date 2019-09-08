@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,6 +36,8 @@ import com.playmonumenta.bossfights.utils.Utils;
  */
 
 public class SpellRaiseJungle extends Spell {
+	private final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
+
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mSummonRange;
@@ -124,14 +127,14 @@ public class SpellRaiseJungle extends Spell {
 								t++;
 
 								if (!raised) {
-									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 2, 0.25, 0.1, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
+									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 1, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
 									ele.teleport(ele.getLocation().add(0, yinc, 0));
 								}
 
 								if (t >= mSummonTime && !raised) {
 									raised = true;
 									ele.setAI(true);
-									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 20, 0.25, 0.1, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
+									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 6, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
@@ -200,7 +203,7 @@ public class SpellRaiseJungle extends Spell {
 		if (summoned.size() > 0) {
 			event.setDamage(event.getDamage() * 0.4);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
-			mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, Material.DIRT.createBlockData());
+			mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA);
 		}
 	};
 
