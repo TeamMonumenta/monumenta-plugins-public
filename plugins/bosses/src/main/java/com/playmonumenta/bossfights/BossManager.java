@@ -13,12 +13,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -474,8 +474,8 @@ public class BossManager implements Listener {
 
 	@EventHandler
 	public void EntityPathfindEvent(EntityPathfindEvent event) {
-		if (event.getEntity() instanceof Creature) {
-			Creature entity = (Creature) event.getEntity();
+		if (event.getEntity() instanceof Mob) {
+			Mob entity = (Mob) event.getEntity();
 
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {

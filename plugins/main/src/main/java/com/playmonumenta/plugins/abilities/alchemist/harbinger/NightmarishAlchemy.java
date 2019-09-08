@@ -1,20 +1,15 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -62,7 +57,7 @@ public class NightmarishAlchemy extends Ability {
 
 	public boolean apply(LivingEntity mob, int size, boolean guaranteedApplicationApplied) {
 		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
-		if (mob instanceof Creature) {
+		if (mob instanceof Mob) {
 			if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE || !guaranteedApplicationApplied && size >= 5) {
 				EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, mob);
 				guaranteedApplicationApplied = true;

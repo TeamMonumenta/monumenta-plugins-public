@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -395,8 +394,8 @@ public class EntityUtils {
 			return;
 		}
 
-		if (mob instanceof Creature) {
-			((Creature) mob).setTarget(null);
+		if (mob instanceof Mob) {
+			((Mob) mob).setTarget(null);
 		}
 
 		mob.setMetadata(MOB_IS_STUNNED_METAKEY, new FixedMetadataValue(plugin, null));
@@ -439,11 +438,11 @@ public class EntityUtils {
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 
 	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob) || !(mob instanceof Creature)) {
+		if (isBoss(mob) || !(mob instanceof Mob)) {
 			return;
 		}
 
-		Creature creature = (Creature)mob;
+		Mob creature = (Mob)mob;
 
 		creature.setTarget(null);
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
