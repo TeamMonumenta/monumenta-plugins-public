@@ -36,6 +36,7 @@ import org.bukkit.entity.Shulker;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.Vex;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
@@ -398,6 +399,10 @@ public class EntityUtils {
 			((Mob) mob).setTarget(null);
 		}
 
+		if (mob instanceof Vex) {
+			mob.setVelocity(new Vector(0, 0, 0));
+		}
+
 		mob.setMetadata(MOB_IS_STUNNED_METAKEY, new FixedMetadataValue(plugin, null));
 
 		new BukkitRunnable() {
@@ -443,6 +448,10 @@ public class EntityUtils {
 		}
 
 		Mob creature = (Mob)mob;
+
+		if (mob instanceof Vex) {
+			mob.setVelocity(new Vector(0, 0, 0));
+		}
 
 		creature.setTarget(null);
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
