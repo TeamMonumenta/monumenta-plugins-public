@@ -8,6 +8,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
@@ -15,9 +17,11 @@ import com.playmonumenta.bossfights.events.SpellCastEvent;
 import com.playmonumenta.bossfights.spells.Spell;
 
 public class Boss {
+	private final Plugin mPlugin;
 	private final List<BossAbilityGroup> mAbilities;
 
-	public Boss(BossAbilityGroup ability) {
+	public Boss(Plugin plugin, BossAbilityGroup ability) {
+		mPlugin = plugin;
 		mAbilities = new ArrayList<BossAbilityGroup>(5);
 		mAbilities.add(ability);
 	}
@@ -192,7 +196,17 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.unload();
 		}
-		mAbilities.clear();
+
+		/*
+		 * Clear mAbilities the next available chance - this prevents ConcurrentModificationException's
+		 * when the boss dies or is unloaded as a result of abilities
+		 */
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mAbilities.clear();
+			}
+		}.runTaskLater(mPlugin, 0);
 	}
 
 	public void death() {

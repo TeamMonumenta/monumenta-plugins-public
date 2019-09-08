@@ -602,7 +602,7 @@ public class BossManager implements Listener {
 
 		Boss boss = mBosses.get(targetEntity.getUniqueId());
 		if (boss == null) {
-			boss = new Boss(ability);
+			boss = new Boss(mPlugin, ability);
 		} else {
 			boss.add(ability);
 		}
@@ -636,7 +636,7 @@ public class BossManager implements Listener {
 					}
 
 					if (boss == null) {
-						boss = new Boss(ability);
+						boss = new Boss(mPlugin, ability);
 						mBosses.put(entity.getUniqueId(), boss);
 					} else {
 						boss.add(ability);
