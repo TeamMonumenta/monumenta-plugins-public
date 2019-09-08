@@ -78,8 +78,7 @@ public class SpellBlockBreak extends Spell {
 			}
 			if (badBlockList.size() > 0) {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
-				Location particleLoc = loc.add(new Location(loc.getWorld(), -0.5f, 0f, 0.5f));
-				particleLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, particleLoc, 10, 1, 1, 1, 0.03);
+				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
 			}
 		}
 	}

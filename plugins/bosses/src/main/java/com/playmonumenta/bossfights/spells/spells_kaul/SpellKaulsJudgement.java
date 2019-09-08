@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Kaul’s Judgement: (Stone Brick)Give a Tellraw to ¼ (min 2) of the
@@ -162,6 +163,8 @@ public class SpellKaulsJudgement extends Spell {
 					player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
 					player.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "ESCAPE", "", 1, 20 * 3, 1);
 					new BukkitRunnable() {
+						com.playmonumenta.plugins.Plugin mMainPlugin = com.playmonumenta.plugins.Plugin.getInstance();
+
 						int t = 0;
 						@Override
 						public void run() {
@@ -173,9 +176,11 @@ public class SpellKaulsJudgement extends Spell {
 									player.spigot().respawn();
 								}
 								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10 * 20, 8));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 30 * 20, 0));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30 * 20, 1));
+								if (mMainPlugin != null) {
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.WEAKNESS, 30 * 20, 0));
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.SLOW, 30 * 20, 1));
+								}
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
 								world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
@@ -190,9 +195,11 @@ public class SpellKaulsJudgement extends Spell {
 
 							if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
 								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-								player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10 * 20, 8));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
+								if (mMainPlugin != null) {
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
+									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
+								}
 								player.teleport(loc);
 								world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
 								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);

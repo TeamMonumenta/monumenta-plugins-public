@@ -83,10 +83,10 @@ public class Plugin extends JavaPlugin {
 
 	public World mWorld;
 
-	private static Plugin plugin;
+	private static Plugin STATIC_PLUGIN_REF = null;
 
 	public static Plugin getInstance() {
-		return plugin;
+		return STATIC_PLUGIN_REF;
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
-		plugin = this;
+		STATIC_PLUGIN_REF = this;
 		PluginManager manager = getServer().getPluginManager();
 
 		mItemOverrides = new ItemOverrides();
@@ -172,7 +172,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 
 		// The last remaining Spigot-style command...
-		plugin.getCommand("testNoScore").setExecutor(new TestNoScore());
+		this.getCommand("testNoScore").setExecutor(new TestNoScore());
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -259,6 +259,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
+		STATIC_PLUGIN_REF = null;
 		getServer().getScheduler().cancelTasks(this);
 
 		mTrackingManager.unloadTrackedEntities();
