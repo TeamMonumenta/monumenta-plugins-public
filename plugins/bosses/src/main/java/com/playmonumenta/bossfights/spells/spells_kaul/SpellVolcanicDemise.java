@@ -134,22 +134,27 @@ public class SpellVolcanicDemise extends Spell {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
 				y -= 1;
-				for (Player player : players) {
-					if (player.getLocation().distance(loc) < 15) {
-						for (double t = 10; t > 0; t -= 0.5) {
+				if (y % 2 == 0) {
+					for (Player player : players) {
+						// Player gets more particles the closer they are to the landing area
+						double dist = player.getLocation().distance(loc);
+						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 10);
+						for (double t = 0.5; t <= 10; t += step) {
 							player.spawnParticle(Particle.FLAME, loc.clone().add(0, t, 0), 1, 0.15, 0.15, 0.15, 0);
 						}
 					}
 				}
 				Location particle = loc.clone().add(0, y, 0);
-				world.spawnParticle(Particle.FLAME, particle, 4, 0.2f, 0.2f, 0.2f, 0.05, null, true);
-				world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+				world.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				if (random.nextBoolean()) {
+					world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+				}
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
 				if (y <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175, null, true);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.25, null, true);
+					world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175, null, true);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25, null, true);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
