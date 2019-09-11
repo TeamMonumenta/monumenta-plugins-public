@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,83 +29,87 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * [Swift Cuts Level 1] : On melee hit the target is marked.
- * When the target is hit again they take an additional 2 damage,
+ * When the target is hit again they take an additional 3 damage,
  * remove the mark, and get 10% Vulnerability for 2 seconds.
  * Targets can only be marked each again after 3s
  *
- * [Swift Cuts Level 2] : The damage is increased to 4 and the
+ * [Swift Cuts Level 2] : The damage is increased to 5 and the
  * Vulnerability is increased to 20%
  */
 public class SwiftCuts extends Ability {
 
-	private static final double SWIFT_CUTS_1_DAMAGE = 2;
-	private static final double SWIFT_CUTS_2_DAMAGE = 4;
+	public static class Counter {
+		public LivingEntity mob;
+		public int ticksLeftRefractory = SWIFT_CUTS_REFRACTORY;
+		public boolean isMarked = true;
+		public Counter(LivingEntity mob) {
+			this.mob = mob;
+		}
+	}
+
+	private static final int SWIFT_CUTS_1_VULNERABILITY_AMPLIFIER = 1;
+	private static final int SWIFT_CUTS_2_VULNERABILITY_AMPLIFIER = 3;
+	private static final int SWIFT_CUTS_VULNERABILITY_DURATION = 20 * 2;
+	private static final int SWIFT_CUTS_REFRACTORY = 20 * 3;
+	private static final int SWIFT_CUTS_1_DAMAGE = 3;
+	private static final int SWIFT_CUTS_2_DAMAGE = 5;
+
+	private Map<UUID, Counter> mMarkedMobs = new HashMap<UUID, Counter>();
+	private int mVulnerabilityAmplifier;
+	private int mDamageBonus;
 
 	public SwiftCuts(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "SwiftCuts";
+		mVulnerabilityAmplifier = getAbilityScore() == 1 ? SWIFT_CUTS_1_VULNERABILITY_AMPLIFIER : SWIFT_CUTS_2_VULNERABILITY_AMPLIFIER;
+		mDamageBonus = getAbilityScore() == 1 ? SWIFT_CUTS_1_DAMAGE : SWIFT_CUTS_2_DAMAGE;
 	}
 
-	private List<Entity> marked = new ArrayList<Entity>();
-	private List<Entity> cooldown = new ArrayList<Entity>();
-	private boolean activated = false;
+	@Override
+	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+		if (fourHertz) {
+			Iterator<Map.Entry<UUID, Counter>> iter = mMarkedMobs.entrySet().iterator();
+			while (iter.hasNext()) {
+				Counter counter = iter.next().getValue();
+				if (!counter.isMarked) {
+					counter.ticksLeftRefractory -= 5;
+				}
+
+				mWorld.spawnParticle(Particle.FALLING_DUST, counter.mob.getLocation().add(0, 1, 0), 1, 0.35, 0.45, 0.35, Material.GRAVEL.createBlockData());
+
+				if (counter.ticksLeftRefractory <= 0 || counter.mob.isDead() || !counter.mob.isValid()) {
+					iter.remove();
+				}
+			}
+		}
+	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-		    && event.getEntityType().isAlive()
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
-			LivingEntity ent = (LivingEntity) event.getEntity();
-			if (!cooldown.contains(ent)) {
-				World world = ent.getWorld();
-				int amp = getAbilityScore() == 1 ? 1 : 3;
-				if (!marked.contains(ent)) {
-					marked.add(ent);
-					new BukkitRunnable() {
-						int t = 0;
-						@Override
-						public void run() {
-							t++;
-							world.spawnParticle(Particle.FALLING_DUST, ent.getLocation().add(0, 1, 0), 1, 0.35, 0.45, 0.35, Material.GRAVEL.createBlockData());
-							if (!marked.contains(ent) || t >= 20 * 3 || ent.isDead() || !ent.isValid()) {
-								this.cancel();
-								marked.remove(ent);
-							}
-						}
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) event.getEntity();
+			UUID uuid = mob.getUniqueId();
 
-					}.runTaskTimer(mPlugin, 0, 2);
-				} else {
-					marked.remove(ent);
-					cooldown.add(ent);
-					new BukkitRunnable() {
-
-						@Override
-						public void run() {
-							cooldown.remove(ent);
-						}
-
-					}.runTaskLater(mPlugin, 20 * 3);
-					ent.getWorld().playSound(ent.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
-					world.spawnParticle(Particle.SWEEP_ATTACK, ent.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.001);
-					double damage = getAbilityScore() == 1 ? SWIFT_CUTS_1_DAMAGE : SWIFT_CUTS_2_DAMAGE;
-					event.setDamage(event.getDamage() + damage);
-					if (getAbilityScore() > 1 && !activated) {
-						activated = true;
-						mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() + 0.1);
-						mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.01);
-						new BukkitRunnable() {
-
-							@Override
-							public void run() {
-								activated = false;
-								mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getBaseValue() - 0.1);
-								mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.01);
-							}
-
-						}.runTaskLater(mPlugin, 20 * 3);
-					}
-
-					PotionUtils.applyPotion(mPlayer, ent, new PotionEffect(PotionEffectType.UNLUCK, 20 * 2, amp));
+			/*
+			 * If the mob is not in the map, mark it.
+			 *
+			 * If the mob is in the map and marked, apply effects and unmark it.
+			 *
+			 * If the mob is in the map and unmarked, do nothing, as this indicates the mob is "on cooldown".
+			 * The timer will remove the mob from the map once it is allowed to be marked again.
+			 */
+			if (!mMarkedMobs.containsKey(uuid)) {
+				mMarkedMobs.put(uuid, new Counter(mob));
+			} else {
+				Counter counter = mMarkedMobs.get(uuid);
+				if (counter.isMarked) {
+					Location loc = mob.getLocation().add(0, 1, 0);
+					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
+					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 3, 0.35, 0.45, 0.35, 0.001);
+					counter.isMarked = false;
+					event.setDamage(event.getDamage() + mDamageBonus);
+					PotionUtils.applyPotion(mPlayer, mob,
+											new PotionEffect(PotionEffectType.UNLUCK, SWIFT_CUTS_VULNERABILITY_DURATION, mVulnerabilityAmplifier));
 				}
 			}
 		}
