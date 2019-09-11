@@ -23,6 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -465,7 +466,8 @@ public class AbilityManager {
 			i++;
 			if (abil.canCast()) {
 				// Do not allow any skills with no cooldown to apply damage more than once
-				if ((abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
+				// Always allow sweep attacks to go through for things like Deadly Ronde
+				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && (abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
 				    && !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
 					return true;
 				}
