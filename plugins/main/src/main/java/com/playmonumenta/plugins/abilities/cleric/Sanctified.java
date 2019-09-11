@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -23,43 +24,34 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Sanctified extends Ability {
 
-	private static final double SANCTIFIED_1_DAMAGE = 5;
-	private static final double SANCTIFIED_2_DAMAGE = 7;
+	private static final int SANCTIFIED_1_DAMAGE = 5;
+	private static final int SANCTIFIED_2_DAMAGE = 7;
 	private static final int SANCTIFIED_EFFECT_LEVEL = 0;
 	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
 	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
 
+	private int mDamage;
+
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Sanctified";
+		mDamage = getAbilityScore() == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
 	}
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getDamager();
-		if (EntityUtils.isUndead(damager)) {
-			if (damager instanceof Skeleton) {
-				Skeleton skelly = (Skeleton)damager;
-				ItemStack mainHand = skelly.getEquipment().getItemInMainHand();
-				if (mainHand != null && mainHand.getType() == Material.BOW) {
-					return true;
-				}
-			}
+		if (EntityUtils.isUndead(damager) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer);
 
-			int sanctified = getAbilityScore();
-			if (sanctified > 0) {
-				double extraDamage = sanctified == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
-				EntityUtils.damageEntity(mPlugin, damager, extraDamage, mPlayer);
+			MovementUtils.KnockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
 
-				MovementUtils.KnockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
+			Location loc = damager.getLocation();
+			mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, damager.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
+			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
 
-				Location loc = damager.getLocation();
-				mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, damager.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
-				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
-
-				if (sanctified > 1) {
-					PotionUtils.applyPotion(mPlayer, damager, new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
-				}
+			if (getAbilityScore() > 1) {
+				PotionUtils.applyPotion(mPlayer, damager, new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
 			}
 		}
 		return true;

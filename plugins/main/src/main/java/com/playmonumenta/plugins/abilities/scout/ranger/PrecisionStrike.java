@@ -102,10 +102,7 @@ public class PrecisionStrike extends Ability {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					if (!le.isDead()) {
-						EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(mPlayer, le, DamageCause.ENTITY_ATTACK, damage);
-						Bukkit.getPluginManager().callEvent(event);
-
-						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer, null, true, mInfo.linkedSpell);
 						hitMob = le;
 						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
 						if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {

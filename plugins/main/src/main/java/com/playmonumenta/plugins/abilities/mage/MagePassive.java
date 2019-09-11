@@ -34,8 +34,7 @@ public class MagePassive extends Ability {
 		Entity damagee = event.getEntity();
 
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && InventoryUtils.isWandItem(mainHand)
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && InventoryUtils.isWandItem(mainHand)) {
 			event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
 		}
 		return true;

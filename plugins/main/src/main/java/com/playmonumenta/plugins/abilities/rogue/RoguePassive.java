@@ -17,8 +17,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class RoguePassive extends Ability {
 
-	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
+	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
+	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 
 	public RoguePassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);

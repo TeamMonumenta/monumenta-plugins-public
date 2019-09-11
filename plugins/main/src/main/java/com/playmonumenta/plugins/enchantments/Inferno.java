@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffectType;
@@ -70,8 +71,8 @@ public class Inferno implements BaseEnchantment {
 		// applied by ability fire, add the mob to inferno tracking
 		if (!target.hasMetadata(INFERNO_TAG_METAKEY)) {
 			target.setMetadata(INFERNO_TAG_METAKEY, new FixedMetadataValue(plugin, true));
-			if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
-				&& !MetadataUtils.happenedThisTick(plugin, player, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+			if (event.getCause() == DamageCause.ENTITY_ATTACK
+				&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
 				infernoTagMob(plugin, target, level, player);
 				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
 				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));

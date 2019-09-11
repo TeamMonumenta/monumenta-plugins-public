@@ -28,45 +28,39 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ByMyBlade extends Ability {
 
-	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
-	private static final int BY_MY_BLADE_HASTE_1_LVL = 1;
-	private static final int BY_MY_BLADE_HASTE_2_LVL = 3;
+	private static final int BY_MY_BLADE_1_HASTE_AMPLIFIER = 1;
+	private static final int BY_MY_BLADE_2_HASTE_AMPLIFIER = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
-	private static final double BY_MY_BLADE_DAMAGE_1 = 12;
-	private static final double BY_MY_BLADE_DAMAGE_2 = 24;
+	private static final int BY_MY_BLADE_1_DAMAGE = 12;
+	private static final int BY_MY_BLADE_2_DAMAGE = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
+
+	private int mHasteAmplifier;
+	private int mDamageBonus;
 
 	public ByMyBlade(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.BY_MY_BLADE;
 		mInfo.scoreboardId = "ByMyBlade";
 		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;
+		mHasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
+		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
-			int byMyBlade = getAbilityScore();
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
-			int effectLevel = (byMyBlade == 1) ? BY_MY_BLADE_HASTE_1_LVL : BY_MY_BLADE_HASTE_2_LVL;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.FAST_DIGGING,
-			                                                  BY_MY_BLADE_HASTE_DURATION,
-			                                                  effectLevel, false, true));
+			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, mHasteAmplifier, false, true));
 
-
-			double extraDamage = (byMyBlade == 1) ? BY_MY_BLADE_DAMAGE_1 : BY_MY_BLADE_DAMAGE_2;
-			if (damagee instanceof Player) {
-				extraDamage = BY_MY_BLADE_DAMAGE_1;
-			}
+			int extraDamage = mDamageBonus;
 			// Since RoguePassive uses a Custom Damage Event, I'll just put the modifier here
 			if (damagee instanceof LivingEntity) {
 				if (EntityUtils.isElite(damagee)) {
-					extraDamage *= PASSIVE_DAMAGE_ELITE_MODIFIER;
+					extraDamage *= RoguePassive.PASSIVE_DAMAGE_ELITE_MODIFIER;
 				} else if (EntityUtils.isBoss(damagee)) {
-					extraDamage *= PASSIVE_DAMAGE_BOSS_MODIFIER;
+					extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
 			}
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
@@ -78,15 +72,13 @@ public class ByMyBlade extends Ability {
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);
 			int count = 15;
-			if (byMyBlade > 1) {
+			if (getAbilityScore() > 1) {
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
 				if (damagee instanceof Player) {
 					MovementUtils.KnockAway(mPlayer, damagee, 0.3f);
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-					                                 new PotionEffect(PotionEffectType.SPEED,
-					                                                  BY_MY_BLADE_HASTE_DURATION,
-					                                                  0, false, true));
+					                                 new PotionEffect(PotionEffectType.SPEED, BY_MY_BLADE_HASTE_DURATION, 0, false, true));
 				}
 			}
 			mWorld.spawnParticle(Particle.SPELL_MOB, loc, count, 0.25, 0.5, 0.5, 0.001);
@@ -102,9 +94,7 @@ public class ByMyBlade extends Ability {
 		if (PlayerUtils.isCritical(mPlayer)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-				return true;
-			}
+			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
 		}
 		return false;
 	}

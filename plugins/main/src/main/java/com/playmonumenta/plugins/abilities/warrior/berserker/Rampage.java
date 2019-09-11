@@ -93,8 +93,7 @@ public class Rampage extends Ability {
 	// Increase damage
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(event.getDamage() + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
 		}
 

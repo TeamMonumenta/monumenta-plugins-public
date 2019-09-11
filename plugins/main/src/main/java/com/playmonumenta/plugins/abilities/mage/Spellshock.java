@@ -180,8 +180,7 @@ public class Spellshock extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity mob = (LivingEntity) event.getEntity();
-		if (!mPendingStaticMobs.contains(mob) && event.getCause() == DamageCause.ENTITY_ATTACK
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (!mPendingStaticMobs.contains(mob) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mPendingStaticMobs.add(mob);
 		}
 		return true;

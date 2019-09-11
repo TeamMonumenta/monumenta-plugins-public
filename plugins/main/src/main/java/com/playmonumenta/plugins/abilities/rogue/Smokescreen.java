@@ -26,12 +26,15 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class Smokescreen extends Ability {
 
 	private static final int SMOKESCREEN_RANGE = 7;
-	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 = 0;
-	private static final int SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2 = 1;
 	private static final int SMOKESCREEN_DURATION = 8 * 20;
-	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 = 1;
-	private static final int SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2 = 2;
+	private static final int SMOKESCREEN_1_SLOWNESS_AMPLIFIER = 1;
+	private static final int SMOKESCREEN_2_SLOWNESS_AMPLIFIER = 2;
+	private static final int SMOKESCREEN_1_WEAKNESS_AMPLIFIER = 0;
+	private static final int SMOKESCREEN_2_WEAKNESS_AMPLIFIER = 1;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
+
+	private int mSlownessAmplifier;
+	private int mWeaknessAmplifier;
 
 	public Smokescreen(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -39,31 +42,24 @@ public class Smokescreen extends Ability {
 		mInfo.scoreboardId = "SmokeScreen";
 		mInfo.cooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_SLOWNESS_AMPLIFIER : SMOKESCREEN_2_SLOWNESS_AMPLIFIER;
+		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
 	}
 
 	@Override
 	public void cast() {
-		int smokeScreen = getAbilityScore();
 		Location loc = mPlayer.getLocation();
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 300, 2.5, 0.8, 2.5, 0.05);
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 600, 2.5, 0.2, 2.5, 0.1);
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SMOKESCREEN_RANGE, mPlayer)) {
-			int weaknessLevel = smokeScreen == 1 ? SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_1 :
-			                    SMOKESCREEN_WEAKNESS_EFFECT_LEVEL_2;
-			int slownessLevel = smokeScreen == 1 ? SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_1 :
-			                    SMOKESCREEN_SLOWNESS_EFFECT_LEVEL_2;
-
 			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
 			int ppDuration = 0;
 			if (pp != null) {
 				ppDuration = pp.getBonus(mInfo.linkedSpell);
 			}
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION + ppDuration, weaknessLevel, false, true));
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION + ppDuration, slownessLevel, false, true));
-
-
-			mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), Spells.SMOKESCREEN, SMOKESCREEN_COOLDOWN);
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SMOKESCREEN_DURATION + ppDuration, mSlownessAmplifier, false, true));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, SMOKESCREEN_DURATION + ppDuration, mWeaknessAmplifier, false, true));
 		}
 		putOnCooldown();
 	}
@@ -72,9 +68,8 @@ public class Smokescreen extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (mainHand != null && mainHand.getType() != Material.BOW && InventoryUtils.isSwordItem(mainHand)) {
-				return true;
-			}
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
 		}
 		return false;
 	}

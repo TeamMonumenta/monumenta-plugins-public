@@ -252,15 +252,9 @@ public class EntityListener implements Listener {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						mPlugin.mTrackingManager.mPlayers.onAttack(mPlugin, player, (LivingEntity)damagee, event);
-					}
-				}
-
-				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+						// Also do Celestial Blessing since it is +%
 						Celestial.modifyDamage(player, event);
 					}
 				}
@@ -270,8 +264,7 @@ public class EntityListener implements Listener {
 				}
 
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
-					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-					    && !MetadataUtils.happenedThisTick(mPlugin, event.getDamager(), EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}
 				}

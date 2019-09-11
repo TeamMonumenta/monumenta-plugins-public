@@ -23,24 +23,26 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 public class Overload extends Ability {
 
+	private static final Particle.DustOptions OVERLOAD_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 	private static final int OVERLOAD_1_DAMAGE = 1;
 	private static final int OVERLOAD_2_DAMAGE = 2;
+
+	private int mDamage;
 
 	public Overload(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Overload";
+		mDamage = getAbilityScore() == 1 ? OVERLOAD_1_DAMAGE : OVERLOAD_2_DAMAGE;
 	}
-
-	private static final Particle.DustOptions OVERLOAD_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	@Override
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			Set<Spells> cds = mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId());
-			if (cds != null && cds.size() > 0) {
+			if (cds != null) {
 				Location loc = mPlayer.getLocation().add(0, 1, 0);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.4, 0.4, 0.4, 1);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.4, 0.4, 0.4, OVERLOAD_COLOR);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 2 * cds.size(), 0.4, 0.4, 0.4, 1);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3 * cds.size(), 0.4, 0.4, 0.4, OVERLOAD_COLOR);
 			}
 		}
 	}
@@ -49,14 +51,7 @@ public class Overload extends Ability {
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		Set<Spells> cds = mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId());
 		if (cds != null) {
-			if (cds.size() > 0) {
-				int mult = cds.size();
-				double dmg = getAbilityScore() == 1 ? OVERLOAD_1_DAMAGE : OVERLOAD_2_DAMAGE;
-				if (event.getDamaged() instanceof Player) {
-					dmg *= 0.5;
-				}
-				event.setDamage(event.getDamage() + (dmg * mult));
-			}
+			event.setDamage(event.getDamage() + mDamage * cds.size());
 		}
 	}
 

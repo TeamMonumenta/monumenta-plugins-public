@@ -53,6 +53,14 @@ public class CloakAndDagger extends Ability {
 	private static final int CLOAK_2_MAX_STACKS = 12;
 	private static final int CLOAK_MIN_STACKS = 5;
 	private static final int CLOAK_PENALTY_DURATION = 20 * 5;
+	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
+
+	private double mDamageMultiplier;
+	private int mMaxStacks;
+	private boolean active = false;
+	private int mTickAttacked = 0;
+	private int cloak = 0;
+	private int cloakOnActivation = 0;
 
 	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -60,12 +68,9 @@ public class CloakAndDagger extends Ability {
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.cooldown = 0;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
+		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 	}
-
-	private boolean active = false;
-	private int mTickAttacked = 0;
-	private int cloak = 0;
-	private int cloakOnActivation = 0;
 
 	@Override
 	public void cast() {
@@ -123,22 +128,19 @@ public class CloakAndDagger extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (active && mTickAttacked != mPlayer.getTicksLived() && event.getCause() == DamageCause.ENTITY_ATTACK
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (active && mTickAttacked != mPlayer.getTicksLived() && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			active = false;
 			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
-			double multiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
-			event.setDamage(event.getDamage() + cloakOnActivation * multiplier);
+			event.setDamage(event.getDamage() + cloakOnActivation * mDamageMultiplier);
 		}
 		return true;
 	}
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		int maxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
-		if (cloak < maxStacks) {
+		if (cloak < mMaxStacks) {
 			if (EntityUtils.isElite(event.getEntity())) {
-				cloak = Math.min(maxStacks, cloak + 5);
+				cloak = Math.min(mMaxStacks, cloak + CLOAK_STACKS_ON_ELITE_KILL);
 			} else {
 				cloak++;
 			}

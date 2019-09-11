@@ -42,8 +42,7 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();
 			if (EntityUtils.isHostileMob(damagee)) {

@@ -69,8 +69,7 @@ public class HungeringVortex extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {
 			event.setDamage(event.getDamage() + mPlayer.getMetadata(HUNGERING_VORTEX_METAKEY).get(0).asDouble());
 		}
 		return true;

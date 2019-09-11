@@ -39,8 +39,7 @@ public class CoupDeGrace extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-		    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity le = (LivingEntity) event.getEntity();
 			double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 			if (!EntityUtils.isBoss(le)) {

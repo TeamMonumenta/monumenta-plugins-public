@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
 * Attacking while sprinting throws a spear of light in a 12 block line, dealing
-* 10/20 damage to undead and 5/10 damage to all others, also lights all targets
-* on fire for 5s. (7s/7s cooldown)
+* 10 / 20 damage to undead and 5 / 10 damage to all others, also lights all
+* targets on fire for 5s. (7s cooldown)
 */
 
 public class HolyJavelin extends Ability {
@@ -44,12 +44,17 @@ public class HolyJavelin extends Ability {
 	private static final int HOLY_JAVELIN_1_COOLDOWN = 7 * 20;
 	private static final int HOLY_JAVELIN_2_COOLDOWN = 8 * 20;
 
+	private int mDamage;
+	private int mDamageUndead;
+
 	public HolyJavelin(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.scoreboardId = "HolyJavelin";
 		mInfo.cooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mDamage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
+		mDamageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
 	}
 
 	@Override
@@ -62,9 +67,6 @@ public class HolyJavelin extends Ability {
 	public void cast() {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
-		int holyJavelin = getAbilityScore();
-		int damageUndead = holyJavelin == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
-		int damage = holyJavelin == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
 		Location playerLoc = mPlayer.getEyeLocation();
 		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();
@@ -84,9 +86,9 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, damageUndead, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer);
 					} else {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
 					}
 					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob);
 					iter.remove();
@@ -107,10 +109,10 @@ public class HolyJavelin extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)
-			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			cast();
 		}
+
 		return true;
 	}
 

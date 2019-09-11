@@ -38,37 +38,32 @@ public class ArcaneStrike extends Ability {
 	private static final int ARCANE_STRIKE_2_BONUS_DAMAGE = 4;
 	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
 
-	private final int damageBonus;
-	private final int damageBonusAffected;
+	private final int mDamageBonus;
+	private final int mDamageBonusAffected;
 
 	public ArcaneStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.scoreboardId = "ArcaneStrike";
 		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;
-		damageBonus = getAbilityScore() == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
-		damageBonusAffected = getAbilityScore() == 1 ? ARCANE_STRIKE_1_BONUS_DAMAGE : ARCANE_STRIKE_2_BONUS_DAMAGE;
+		mDamageBonus = getAbilityScore() == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
+		mDamageBonusAffected = getAbilityScore() == 1 ? ARCANE_STRIKE_1_BONUS_DAMAGE : ARCANE_STRIKE_2_BONUS_DAMAGE;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK
-			&& !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS, mPlayer)) {
-				int dmg = damageBonus;
+				int dmg = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if ((mob.hasPotionEffect(PotionEffectType.SLOW)
 				     && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
 				    || (mob.getFireTicks() > 0
 				        && !MetadataUtils.happenedThisTick(mPlugin, mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
-					if (mob instanceof Player) {
-						dmg += 2;
-					} else {
-						dmg += damageBonusAffected;
-					}
+					dmg += mDamageBonusAffected;
 				}
 
 				Vector velocity = mob.getVelocity();

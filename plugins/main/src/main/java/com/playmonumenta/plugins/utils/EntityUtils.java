@@ -55,9 +55,10 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 
+import com.playmonumenta.nms.utils.NmsEntityUtils;
+
 public class EntityUtils {
 
-	public static final String PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY = "DealtCustomDamageWithEntityUtilsTick";
 	public static final String MOB_IS_STUNNED_METAKEY = "MobIsStunnedByEntityUtils";
 	public static final String MOB_IS_CONFUSED_METAKEY = "MobIsConfusedByEntityUtils";
 
@@ -339,12 +340,16 @@ public class EntityUtils {
 			if (target.getNoDamageTicks() == target.getMaximumNoDamageTicks()) {
 				target.setNoDamageTicks(0);
 			}
-			if (damager != null) {
-				// This is a janky workaround check to differentiate player damage from spell damage
-				// The actual check for this happens inside LivingEntityDamagedByPlayerEvent events in ability files
-				MetadataUtils.checkOnceThisTick(plugin, damager, PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY);
+
+			// We want Precision Strike to trigger Swift Cuts
+			if (spell == Spells.PRECISION_STRIKE || !(damager instanceof Player)) {
+				// Applies DamageCause.ENTITY_ATTACK
 				target.damage(damage, damager);
+			} else if (damager instanceof Player) {
+				// Applies DamageCause.CUSTOM
+				NmsEntityUtils.customDamageEntity(target, damage, (Player) damager, "magic");
 			} else {
+				// Applies DamageCause.GENERIC
 				target.damage(damage);
 			}
 		}

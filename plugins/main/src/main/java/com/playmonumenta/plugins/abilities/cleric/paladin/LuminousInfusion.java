@@ -52,27 +52,18 @@ public class LuminousInfusion extends Ability {
 		mInfo.scoreboardId = "LuminousInfusion";
 		mInfo.cooldown = LUMINOUS_INFUSION_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-
-		/*
-		 * NOTE! Because LuminousInfusion has two events (cast and damage), we
-		 * need both events to trigger even when it is on cooldown. Therefor it
-		 * needs to bypass the automatic cooldown check and manage cooldown
-		 * itself
-		 */
 		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
 	public void cast() {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-			// On cooldown - can't cast it again yet
 			return;
 		}
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (inMainHand == null || !mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand)
 		    || mPlayer.getLocation().getPitch() < 50) {
-			// Conditions not met - can't cast
 			return;
 		}
 
@@ -107,11 +98,12 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+		DamageCause cause = event.getCause();
+		if (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.CUSTOM) {
 			LivingEntity le = (LivingEntity) event.getEntity();
-			if (getAbilityScore() > 1 && EntityUtils.isUndead(le)
-			    && !MetadataUtils.happenedThisTick(mPlugin, mPlayer, EntityUtils.PLAYER_DEALT_CUSTOM_DAMAGE_METAKEY, 0)) {
-				// Passive damage to undead from every melee hit, regardless of active
+
+			// Passive damage to undead from every melee hit, regardless of active
+			if (cause == DamageCause.ENTITY_ATTACK && getAbilityScore() > 1 && EntityUtils.isUndead(le)) {
 				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_PASSIVE_DAMAGE);
 			}
 
