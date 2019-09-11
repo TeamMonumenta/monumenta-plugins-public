@@ -30,11 +30,12 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
  * Enchanted Arrow: Left click while not sneaking will prime an enchanted arrow.
- * If the next arrow is fired within 5 seconds, the ability goes on cooldown and
+ * If a critical arrow is fired within 5 seconds, the ability goes on cooldown and
  * the arrow will instantaneously travel in a straight line for 30
  * blocks until hitting a block, piercing through all targets,
  * dealing 25 / 40 damage. (Cooldown: 25 / 20 s)
  */
+
 public class EnchantedShot extends Ability {
 
 	private static final int ENCHANTED_1_DAMAGE = 25;
@@ -81,7 +82,7 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (active) {
+		if (active && arrow.isCritical()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			active = false;
