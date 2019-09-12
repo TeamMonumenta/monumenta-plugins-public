@@ -1,5 +1,6 @@
 package com.playmonumenta.bossfights.spells.spells_kaul;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -84,10 +85,16 @@ public class SpellVolcanicDemise extends Spell {
 							i++;
 							List<Player> players = Utils.playersInRange(mCenter, 50);
 							players.removeIf(p -> p.getLocation().getY() >= 61);
+							Collections.shuffle(players);
+							int pcount = 0;
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
+									pcount += 1;
 									rainMeteor(player.getLocation(), players, 10);
+									if (pcount >= 5) {
+										break;
+									}
 								}
 							}
 							for (int j = 0; j < 4; j++) {
