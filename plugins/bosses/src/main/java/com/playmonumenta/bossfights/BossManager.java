@@ -82,6 +82,7 @@ import com.playmonumenta.bossfights.bosses.Kaul;
 import com.playmonumenta.bossfights.bosses.LivingBladeBoss;
 import com.playmonumenta.bossfights.bosses.Masked_1;
 import com.playmonumenta.bossfights.bosses.Masked_2;
+import com.playmonumenta.bossfights.bosses.OldLabsBoss;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
 import com.playmonumenta.bossfights.bosses.PlayerDamageOnlyBoss;
 import com.playmonumenta.bossfights.bosses.PlayerTargetBoss;
@@ -216,6 +217,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(TCalin.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new TCalin(p, e, s, l));
 		mStatefulBosses.put(CrownbearerBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CrownbearerBoss(p, e, s, l));
 		mStatefulBosses.put(RabbitGodBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new RabbitGodBoss(p, e, s, l));
+		mStatefulBosses.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new OldLabsBoss(p, e, s, l));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
@@ -285,6 +287,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
 		mBossDeserializers.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> PunchResistBoss.deserialize(p, e));
 		mBossDeserializers.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> EvokerNoVex.deserialize(p, e));
+		mBossDeserializers.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e) -> OldLabsBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
