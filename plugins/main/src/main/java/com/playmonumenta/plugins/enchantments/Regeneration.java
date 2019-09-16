@@ -9,12 +9,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -37,9 +34,9 @@ public class Regeneration implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item, Player player, ItemSlot slot) {
 		if (slot.equals(ItemSlot.MAINHAND)) {
-			return InventoryUtils.getCustomEnchantLevel(item, MAINHAND_REGEN);
+			return InventoryUtils.getCustomEnchantLevel(item, MAINHAND_REGEN, useEnchantLevels());
 		} else {
-			return InventoryUtils.getCustomEnchantLevel(item, REGEN);
+			return InventoryUtils.getCustomEnchantLevel(item, REGEN, useEnchantLevels());
 		}
 	}
 

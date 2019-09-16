@@ -45,7 +45,7 @@ public class Colorful implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item) {
 		if (item != null && item.getItemMeta() != null && item.getItemMeta() instanceof LeatherArmorMeta) {
-			return InventoryUtils.getCustomEnchantLevel(item, getProperty());
+			return InventoryUtils.getCustomEnchantLevel(item, getProperty(), useEnchantLevels());
 		}
 		return 0;
 	}
@@ -57,7 +57,7 @@ public class Colorful implements BaseEnchantment {
 		int modulo = 10; //once a minute
 
 		if (ticks % modulo == 0) {
-			PlayerInventory inv = (PlayerInventory) player.getInventory();
+			PlayerInventory inv = player.getInventory();
 			for (ItemStack item : inv.getArmorContents()) {
 				if (item != null) {
 					if (getLevelFromItem(item) > 0) { //if armor piece has colorful and right type

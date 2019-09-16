@@ -30,6 +30,11 @@ public class Clucking implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.INVENTORY);
 	}

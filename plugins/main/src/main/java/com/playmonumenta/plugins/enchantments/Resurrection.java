@@ -29,6 +29,11 @@ public class Resurrection implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.ARMOR);
 	}

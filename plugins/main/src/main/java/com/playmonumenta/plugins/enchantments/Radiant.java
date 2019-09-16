@@ -23,6 +23,11 @@ public class Radiant implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
@@ -30,7 +35,7 @@ public class Radiant implements BaseEnchantment {
 	@Override
 	public int getLevelFromItem(ItemStack item, Player player) {
 		if (InventoryUtils.isSoulboundToPlayer(item, player)) {
-			return InventoryUtils.getCustomEnchantLevel(item, getProperty());
+			return InventoryUtils.getCustomEnchantLevel(item, getProperty(), useEnchantLevels());
 		}
 		return 0;
 	}

@@ -19,6 +19,11 @@ public class Intuition implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}

@@ -20,6 +20,11 @@ public class Darksight implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.ARMOR, ItemSlot.OFFHAND);
 	}

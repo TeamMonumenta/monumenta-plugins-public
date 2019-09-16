@@ -88,7 +88,7 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static int getCustomEnchantLevel(ItemStack item, String nameText) {
+	public static int getCustomEnchantLevel(ItemStack item, String nameText, boolean useLevel) {
 		if (nameText == null || nameText.isEmpty()) {
 			return 0;
 		}
@@ -100,30 +100,41 @@ public class InventoryUtils {
 				if (lore != null && !lore.isEmpty()) {
 					for (String loreEntry : lore) {
 						if (loreEntry.startsWith(nameText)) {
-							if (loreEntry.endsWith(" I")) {
+							if (useLevel) {
+								int offset = 1;
+								int level = 0;
+								while (true) {
+									char c = loreEntry.charAt(loreEntry.length() - offset);
+									if (c == 'I') {
+										level += 1;
+									} else if (c == 'V') {
+										char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+										if (cn == 'I') {
+											level += 4;
+											offset += 1;
+										} else {
+											level += 5;
+										}
+									} else if (c == 'X') {
+										char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+										if (cn == 'I') {
+											level += 9;
+											offset += 1;
+										} else {
+											level += 10;
+										}
+									} else if (c == ' ') {
+										break;
+									} else {
+										level = 1;
+										break;
+									}
+									offset += 1;
+								}
+								return level;
+							} else {
 								return 1;
-							} else if (loreEntry.endsWith(" II")) {
-								return 2;
-							} else if (loreEntry.endsWith(" III")) {
-								return 3;
-							} else if (loreEntry.endsWith(" IV")) {
-								return 4;
-							} else if (loreEntry.endsWith(" V")) {
-								return 5;
-							} else if (loreEntry.endsWith(" VI")) {
-								return 6;
-							} else if (loreEntry.endsWith(" VII")) {
-								return 7;
-							} else if (loreEntry.endsWith(" VIII")) {
-								return 8;
-							} else if (loreEntry.endsWith(" IX")) {
-								return 9;
-							} else if (loreEntry.endsWith(" X")) {
-								return 10;
 							}
-
-							// Default level is 1
-							return 1;
 						}
 					}
 				}

@@ -32,6 +32,15 @@ public interface BaseEnchantment {
 	public String getProperty();
 
 	/*
+	 * To use enchant levels or not
+	 * If true, uses enchant levels (I, II, III, etc.)
+	 * If false
+	 */
+	default public boolean useEnchantLevels() {
+		return true;
+	}
+
+	/*
 	 * Describes which slots this property is valid in
 	 */
 	default public EnumSet<ItemSlot> validSlots() {
@@ -43,7 +52,7 @@ public interface BaseEnchantment {
 	 * If the item does not have this property, it should return 0
 	 */
 	default public int getLevelFromItem(ItemStack item) {
-		return InventoryUtils.getCustomEnchantLevel(item, getProperty());
+		return InventoryUtils.getCustomEnchantLevel(item, getProperty(), useEnchantLevels());
 	}
 
 	/*

@@ -24,6 +24,11 @@ public class Hope implements BaseEnchantment {
 	}
 
 	@Override
+	public boolean useEnchantLevels() {
+		return false;
+	}
+
+	@Override
 	public boolean hasOnSpawn() {
 		return true;
 	}
