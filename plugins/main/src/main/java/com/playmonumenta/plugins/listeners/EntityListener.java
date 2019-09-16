@@ -273,9 +273,19 @@ public class EntityListener implements Listener {
 			Arrow arrow = (Arrow)damager;
 			if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 				Player player = (Player)arrow.getShooter();
+
+				if (damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
+					damager.remove();
+					event.setCancelled(true);
+					/*
+					 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
+					 * still occur (e.g. wither) despite the damage event being canceled.
+					 */
+					return;
+				}
+
 				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)
-					|| damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
+				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 					damager.remove();
 					event.setCancelled(true);
 				}
