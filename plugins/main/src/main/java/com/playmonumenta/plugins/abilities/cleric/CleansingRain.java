@@ -24,7 +24,6 @@ public class CleansingRain extends Ability {
 
 	private static final int CLEANSING_DURATION = 15 * 20;
 	private static final int CLEANSING_RESIST_LEVEL = 0;
-	private static final int CLEANSING_STRENGTH_LEVEL = 0;
 	private static final int CLEANSING_EFFECT_DURATION = 3 * 20;
 	private static final int CLEANSING_APPLY_PERIOD = 1;
 	private static final int CLEANSING_RADIUS = 4;
@@ -63,7 +62,6 @@ public class CleansingRain extends Ability {
 						player.setFireTicks(1);
 					}
 
-					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, CLEANSING_EFFECT_DURATION, CLEANSING_STRENGTH_LEVEL, true, true));
 					if (cleansing > 1) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, CLEANSING_EFFECT_DURATION, CLEANSING_RESIST_LEVEL, true, true));
 					}
