@@ -417,7 +417,8 @@ public class EntityListener implements Listener {
 
 			// Only items and players can activate tripwires
 			// Also pigs, for the pig quest
-			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig) {
+			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig ||
+				(entity.getScoreboardTags() != null && entity.getScoreboardTags().contains("block_interact"))) {
 				return;
 			}
 
