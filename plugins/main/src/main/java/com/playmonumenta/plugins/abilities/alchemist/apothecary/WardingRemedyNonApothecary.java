@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import java.util.Random;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -37,6 +38,8 @@ public class WardingRemedyNonApothecary extends Ability {
 	private static final int REMEDY_2_FREQUENCY = 4;				// Seconds
 	private static final double REMEDY_1_DAMAGE_MULTIPLIER = 1.1;
 	private static final double REMEDY_2_DAMAGE_MULTIPLIER = 1.2;
+	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
 	// Stored level so we don't have to run checks too often
 	private int mLevel = 0;
@@ -71,7 +74,9 @@ public class WardingRemedyNonApothecary extends Ability {
 		mLevel = getWardingRemedyLevel();
 		if (mLevel > 0 && AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
 			double multiplier = mLevel == 1 ? REMEDY_1_DAMAGE_MULTIPLIER : REMEDY_2_DAMAGE_MULTIPLIER;
-			mWorld.spawnParticle(Particle.CRIT, event.getEntity().getLocation().add(0, 1, 0), 10, 0.2, 0.5, 0.2, 0.1);
+			Location loc = event.getEntity().getLocation().add(0, 1, 0);
+			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 10, 0.4, 0.5, 0.4, APOTHECARY_DARK_COLOR);
 			event.setDamage(event.getDamage() * multiplier);
 		}
 	}
@@ -86,14 +91,20 @@ public class WardingRemedyNonApothecary extends Ability {
 				mLevel = getWardingRemedyLevel();
 				if (mLevel == 2) {
 					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
-					mWorld.spawnParticle(Particle.END_ROD, mPlayer.getLocation(), 5, 0.2, 0, 0.2, 0.02);
+					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 10, 0.35, 0.4, 0.35, APOTHECARY_LIGHT_COLOR);
+					if (AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 7, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
+					}
 					mSeconds = 0;
 				}
 			} else if (mSeconds >= REMEDY_1_FREQUENCY) {
 				mSeconds = 0;
 				if (mLevel > 0) {
 					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
-					mWorld.spawnParticle(Particle.END_ROD, mPlayer.getLocation(), 5, 0.2, 0, 0.2, 0.02);
+					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 10, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
+					if (AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 7, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
+					}
 				}
 			}
 		}

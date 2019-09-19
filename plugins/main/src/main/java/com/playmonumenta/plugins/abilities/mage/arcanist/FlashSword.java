@@ -9,6 +9,8 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -164,4 +166,12 @@ public class FlashSword extends Ability {
 		                                 || (oHand != null && InventoryUtils.isWandItem(oHand)));
 	}
 
+	@Override
+	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			cast();
+		}
+
+		return true;
+	}
 }

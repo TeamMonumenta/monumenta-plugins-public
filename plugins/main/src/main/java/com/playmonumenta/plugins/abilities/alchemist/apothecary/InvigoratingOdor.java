@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import java.util.Collection;
 import java.util.Random;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -33,6 +34,8 @@ public class InvigoratingOdor extends Ability {
 	private static final int INVIGORATING_DURATION = 20 * 10;
 	private static final int INVIGORATING_AURA_DURATION = 20 * 3;
 	private static final int INVIGORATING_RADIUS = 3;
+	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.5f);
+	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
 	private int mDamage;
 
@@ -72,7 +75,13 @@ public class InvigoratingOdor extends Ability {
 					this.cancel();
 				}
 
-				mWorld.spawnParticle(Particle.END_ROD, loc, (int) Math.pow(radius, 2) * 2, radius, 0.15, radius, 0.05);
+				if (t == 0) {
+					mWorld.spawnParticle(Particle.END_ROD, loc, 35, 0.3, 0.3, 0.3, 0.1);
+					mWorld.spawnParticle(Particle.SPELL, loc, 35, radius / 2, 0.15, radius / 2);
+				}
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.3, 0.3, 0.3, APOTHECARY_DARK_COLOR);
+				mWorld.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2) * 2, radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
 
 				for (Player player : PlayerUtils.getNearbyPlayers(loc, radius)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));

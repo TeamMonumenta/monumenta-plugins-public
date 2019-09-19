@@ -1,11 +1,8 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -15,8 +12,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -25,17 +20,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
- * Shift left click with an Alchemist Potion to shoot a mixture
+ * Shift left click with an bow to shoot a mixture
  * that deals 8 / 16 damage to every enemy touched and adds 2 / 3
  * absorption health to players (including yourself), maximum 12.
  * After hitting a block or travelling 10 blocks, the mixture traces
@@ -51,11 +44,11 @@ public class AlchemicalAmalgam extends Ability {
 	private static final int AMALGAM_2_SHIELD = 3;
 	private static final int AMALGAM_MAX_SHIELD = 12;
 	// Calculate the range with MAX_DURATION * MOVE_SPEED
-	private static final int AMALGAM_MAX_DURATION = (int) (20 * 2.5);
-	private static final double AMALGAM_MOVE_SPEED = 0.2;
+	private static final int AMALGAM_MAX_DURATION = (int) (20 * 2);
+	private static final double AMALGAM_MOVE_SPEED = 0.25;
 	private static final double AMALGAM_RADIUS = 1.5;
-	private static final Particle.DustOptions AMALGAM_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
-	private static final Particle.DustOptions AMALGAM_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
+	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
 	private int mDamage;
 	private int mShield;
@@ -84,7 +77,7 @@ public class AlchemicalAmalgam extends Ability {
 		new BukkitRunnable() {
 			Location loc = mPlayer.getEyeLocation();
 			BoundingBox box = BoundingBox.of(loc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
-			Vector increment = loc.getDirection().multiply(0.2);
+			Vector increment = loc.getDirection().multiply(AMALGAM_MOVE_SPEED);
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
@@ -124,8 +117,8 @@ public class AlchemicalAmalgam extends Ability {
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 					Location l = loc.clone().add(vec);
-					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, AMALGAM_LIGHT_COLOR);
-					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, AMALGAM_DARK_COLOR);
+					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR);
+					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR);
 				}
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.35, 0.35, 0.35, 1);
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.35, 0.35, 0.35, 1);
@@ -140,6 +133,9 @@ public class AlchemicalAmalgam extends Ability {
 					if (t <= 0) {
 						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
 						mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
+						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);
+						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR);
 						this.cancel();
 					}
 
@@ -174,7 +170,7 @@ public class AlchemicalAmalgam extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && InventoryUtils.testForItemWithName(inMainHand, "Alchemist's Potion");
+		return mPlayer.isSneaking() && InventoryUtils.isBowItem(inMainHand);
 	}
 
 }
