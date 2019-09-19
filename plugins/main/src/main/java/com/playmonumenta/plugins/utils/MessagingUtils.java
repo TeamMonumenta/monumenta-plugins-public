@@ -71,5 +71,7 @@ public class MessagingUtils {
 		                                                      "  ")).color(ChatColor.RED).create();
 		formattedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, textStackTrace));
 		sender.spigot().sendMessage(formattedMessage);
+
+		e.printStackTrace();
 	}
 }

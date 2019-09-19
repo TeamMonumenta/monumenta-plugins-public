@@ -22,17 +22,19 @@ public class SpellBombToss extends Spell {
 	private final int mRange;
 	private final int mYield;
 	private final int mLobs;
+	private final int mFuse;
 
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range) {
-		this(plugin, boss, range, 4, 1);
+		this(plugin, boss, range, 4, 1, 50);
 	}
 
-	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int yield, int lobs) {
+	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int yield, int lobs, int fuse) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mYield = yield;
 		mLobs = lobs;
+		mFuse = fuse;
 	}
 
 	@Override
@@ -72,7 +74,7 @@ public class SpellBombToss extends Spell {
 		sLoc.setY(sLoc.getY() + 1.7f);
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 		try {
-			TNTPrimed tnt = (TNTPrimed) Utils.summonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:50}");
+			TNTPrimed tnt = (TNTPrimed) Utils.summonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + Integer.toString(mFuse) + "}");
 			tnt.setYield(mYield);
 			Location pLoc = target.getLocation();
 			Location tLoc = tnt.getLocation();

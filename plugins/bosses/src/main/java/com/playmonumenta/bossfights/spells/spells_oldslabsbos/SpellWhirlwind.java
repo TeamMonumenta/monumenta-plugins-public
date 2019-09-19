@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells.spells_oldslabsbos;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
@@ -39,6 +41,7 @@ public class SpellWhirlwind extends Spell {
 		new BukkitRunnable() {
 			int t = 0;
 			double radius = 4;
+			double bladeDamageRadius = 4;
 			@Override
 			public void run() {
 
@@ -62,10 +65,7 @@ public class SpellWhirlwind extends Spell {
 				if (t >= 25) {
 					this.cancel();
 
-					for (Player player : Utils.playersInRange(loc, radius)) {
-						DamageUtils.damage(mBoss, player, 6);
-						Utils.KnockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
-					}
+					List<Player> playersNearby = Utils.playersInRange(loc, 40);
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.5f, 0.85f);
 					new BukkitRunnable() {
@@ -89,6 +89,21 @@ public class SpellWhirlwind extends Spell {
 								mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025);
 								mWorld.spawnParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2);
 								loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+
+								/*
+								 * Check if this hits a player
+								 * A player can only be hit once per cast of this attack
+								 */
+								Iterator<Player> iter = playersNearby.iterator();
+								while (iter.hasNext()) {
+									Player player = iter.next();
+
+									if (player.getLocation().distance(loc) < bladeDamageRadius) {
+										DamageUtils.damage(mBoss, player, 6);
+										Utils.KnockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+										iter.remove();
+									}
+								}
 							}
 
 							if (rotation >= 360) {
@@ -106,7 +121,6 @@ public class SpellWhirlwind extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 9;
 	}
 

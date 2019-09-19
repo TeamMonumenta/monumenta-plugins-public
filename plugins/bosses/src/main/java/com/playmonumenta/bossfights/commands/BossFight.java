@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -54,7 +55,7 @@ public class BossFight {
 				try {
 					plugin.mBossManager.createBoss(sender, (LivingEntity)entity, requestedTag);
 				} catch (Exception ex) {
-					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
+					MessagingUtils.sendStackTrace(sender, ex);
 				}
 			}
 		} else {
@@ -68,7 +69,7 @@ public class BossFight {
 				try {
 					plugin.mBossManager.createBoss(sender, (LivingEntity)entity, requestedTag, endLoc);
 				} catch (Exception ex) {
-					sender.sendMessage(ChatColor.RED + "Failed to load boss: " + ex.getMessage());
+					MessagingUtils.sendStackTrace(sender, ex);
 				}
 			}
 		} else {
