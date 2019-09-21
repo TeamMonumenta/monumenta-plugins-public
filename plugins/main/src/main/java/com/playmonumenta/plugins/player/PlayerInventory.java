@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -31,8 +32,10 @@ import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 
 public class PlayerInventory {
-	private EnumSet<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);
-	private EnumMap<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
+	private Set<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);
+	private Set<Material> mNoOffhandRemoveFunctionMats = EnumSet.noneOf(Material.class);
+	private Map<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
+	private Map<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandRemoveFunctions = new EnumMap<>(Material.class);
 
 	/*
 	 * This list contains all of a player's currently valid item properties,
@@ -63,42 +66,50 @@ public class PlayerInventory {
 		}
 	}
 
+	private static void runOffhandFunction(Plugin plugin, String functionFolder, Material type,
+	                                       Set<Material>noFunctionSet,
+										   Map<Material, NmsCommandUtils.ParsedCommandWrapper>functionMap,
+										   Player player) {
+		if (!noFunctionSet.contains(type)) {
+			// This particular material either hasn't been tested yet or it has a corresponding function
+
+			if (!functionMap.containsKey(type)) {
+				// Don't have this function cached - need to see if it exists and cache it
+				try {
+					functionMap.put(type, NmsCommandUtils.parseCommand("function " + functionFolder + "/" + type.getKey().getKey()));
+				} catch (Exception e) {
+					plugin.getLogger().info("Failed to parse buyback command for material '" + type.getKey().getKey() + "' : " + e.getMessage());
+
+					// This function doesn't exist - mark it as such and never try again
+					noFunctionSet.add(type);
+				}
+			}
+
+			NmsCommandUtils.ParsedCommandWrapper cmd = functionMap.get(type);
+			if (cmd != null) {
+				try {
+					NmsCommandUtils.runParsedCommand(cmd, player);
+				} catch (Exception e) {
+					plugin.getLogger().warning("Failed to run cached offhand command: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
 		// Offhand item change detection if the parsed command worked
 		ItemStack offhand = player.getInventory().getItemInOffHand();
 
 		Material type = offhand.getType();
 		if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
+			runOffhandFunction(plugin, "monumenta:on_offhand_remove", mPrevOffhandMat, mNoOffhandRemoveFunctionMats, mOffhandRemoveFunctions, player);
+
 			mPrevOffhandMat = type;
 			mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
 
-			if (!mNoOffhandFunctionMats.contains(type)) {
-				// This particular material either hasn't been tested yet or it has a corresponding function
-
-				if (!mOffhandFunctions.containsKey(type)) {
-					// Don't have this function cached - need to see if it exists and cache it
-					try {
-						mOffhandFunctions.put(type, NmsCommandUtils.parseCommand("function monumenta:on_swap/" + type.getKey().getKey()));
-					} catch (Exception e) {
-						plugin.getLogger().info("Failed to parse buyback command for material '" + type.getKey().getKey() + "' : " + e.getMessage());
-
-						// This function doesn't exist - mark it as such and never try again
-						mNoOffhandFunctionMats.add(type);
-					}
-				}
-
-				NmsCommandUtils.ParsedCommandWrapper cmd = mOffhandFunctions.get(type);
-				if (cmd != null) {
-					try {
-						NmsCommandUtils.runParsedCommand(cmd, player);
-					} catch (Exception e) {
-						plugin.getLogger().warning("Failed to run cached offhand command: " + e.getMessage());
-						e.printStackTrace();
-					}
-				}
-			}
+			runOffhandFunction(plugin, "monumenta:on_offhand", type, mNoOffhandFunctionMats, mOffhandFunctions, player);
 		}
-
 
 		// Swap current and previous lists
 		Map<BaseEnchantment, Integer> temp = mPreviousProperties;
