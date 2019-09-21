@@ -174,6 +174,10 @@ public class ItemUtils {
 					String name = meta.getDisplayName();
 					if (name.contains("Quest Compass")) {
 						return ItemRegion.MONUMENTA;
+					} else if (name.contains("Experiencinator")) {
+						return ItemRegion.KINGS_VALLEY;
+					} else if (name.contains("Crystallizer")) {
+						return ItemRegion.CELSIAN_ISLES;
 					}
 				}
 				if (meta.hasLore()) {
@@ -195,11 +199,30 @@ public class ItemUtils {
 	}
 
 	public static ItemTier getItemTier(ItemStack item) {
+		if (item == null) {
+			return ItemTier.UNKNOWN;
+		}
+
 		if (isShulkerBox(item.getType())) {
 			return ItemTier.SHULKER_BOX;
-		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains("Quest Compass")) {
-			return ItemTier.QUEST_COMPASS;
-		} else if (item == null || item.getLore() == null) {
+		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+			String itemName = item.getItemMeta().getDisplayName();
+			if (itemName.contains("Quest Compass")) {
+				return ItemTier.QUEST_COMPASS;
+			} else if (itemName.contains("Experiencinator (u)")) {
+				return ItemTier.ENHANCED_RARE;
+			} else if (itemName.contains("Experiencinator")) {
+				return ItemTier.RARE;
+			} else if (itemName.contains("Perfect Crystallizer")) {
+				return ItemTier.EPIC;
+			} else if (itemName.contains("Crystallizer (u)")) {
+				return ItemTier.ENHANCED_RARE;
+			} else if (itemName.contains("Crystallizer")) {
+				return ItemTier.ENHANCED_RARE;
+			}
+		}
+
+		if (item.getLore() == null) {
 			return ItemTier.UNKNOWN;
 		}
 
