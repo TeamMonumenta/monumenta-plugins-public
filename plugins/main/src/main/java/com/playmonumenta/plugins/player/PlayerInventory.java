@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.player;
 
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +31,9 @@ import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 
 public class PlayerInventory {
-	private static boolean mParsingCommandFailed = false;
-	private static NmsCommandUtils.ParsedCommandWrapper mCachedParsedCommand = null;
+	private EnumSet<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);
+	private EnumMap<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
+
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
@@ -61,35 +64,37 @@ public class PlayerInventory {
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player) {
-		// Parse the command and cache it
-		if (!mParsingCommandFailed && mCachedParsedCommand == null) {
-			try {
-				mCachedParsedCommand = NmsCommandUtils.parseCommand("function monumenta:mechanisms/buyback/mobile_buyback");
-			} catch (Exception e) {
-				plugin.getLogger().warning("Failed to parse buyback command: " + e.getMessage());
-				e.printStackTrace();
-				mParsingCommandFailed = true;
-				mCachedParsedCommand = null;
-			}
-		}
+		// Offhand item change detection if the parsed command worked
+		ItemStack offhand = player.getInventory().getItemInOffHand();
 
-		if (mCachedParsedCommand != null) {
-			// Offhand item change detection if the parsed command worked
-			ItemStack offhand = player.getInventory().getItemInOffHand();
+		Material type = offhand.getType();
+		if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
+			mPrevOffhandMat = type;
+			mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
 
-			if (offhand.getType() != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
-				mPrevOffhandMat = offhand.getType();
-				mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
+			if (!mNoOffhandFunctionMats.contains(type)) {
+				// This particular material either hasn't been tested yet or it has a corresponding function
 
-				try {
-					NmsCommandUtils.runParsedCommand(mCachedParsedCommand, player);
-				} catch (Exception e) {
-					plugin.getLogger().warning("Failed to run buyback command: " + e.getMessage());
-					e.printStackTrace();
+				if (!mOffhandFunctions.containsKey(type)) {
+					// Don't have this function cached - need to see if it exists and cache it
+					try {
+						mOffhandFunctions.put(type, NmsCommandUtils.parseCommand("function monumenta:on_swap/" + type.getKey().getKey()));
+					} catch (Exception e) {
+						plugin.getLogger().info("Failed to parse buyback command for material '" + type.getKey().getKey() + "' : " + e.getMessage());
 
-					// Don't try again
-					mParsingCommandFailed = true;
-					mCachedParsedCommand = null;
+						// This function doesn't exist - mark it as such and never try again
+						mNoOffhandFunctionMats.add(type);
+					}
+				}
+
+				NmsCommandUtils.ParsedCommandWrapper cmd = mOffhandFunctions.get(type);
+				if (cmd != null) {
+					try {
+						NmsCommandUtils.runParsedCommand(cmd, player);
+					} catch (Exception e) {
+						plugin.getLogger().warning("Failed to run cached offhand command: " + e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 		}
