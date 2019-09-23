@@ -70,15 +70,17 @@ public class PlayerInventory {
 	                                       Set<Material>noFunctionSet,
 										   Map<Material, NmsCommandUtils.ParsedCommandWrapper>functionMap,
 										   Player player) {
-		if (!noFunctionSet.contains(type)) {
+		if (type != null && !noFunctionSet.contains(type)) {
 			// This particular material either hasn't been tested yet or it has a corresponding function
 
 			if (!functionMap.containsKey(type)) {
 				// Don't have this function cached - need to see if it exists and cache it
+				String cmd = "function " + functionFolder + "/" + type.toString().toLowerCase();
 				try {
-					functionMap.put(type, NmsCommandUtils.parseCommand("function " + functionFolder + "/" + type.getKey().getKey()));
+					plugin.getLogger().info("Parsing command: '" + cmd + "'");
+					functionMap.put(type, NmsCommandUtils.parseCommand(cmd));
 				} catch (Exception e) {
-					plugin.getLogger().info("Failed to parse buyback command for material '" + type.getKey().getKey() + "' : " + e.getMessage());
+					plugin.getLogger().info("Failed to parse buyback command '" + cmd + "' : " + e.getMessage());
 
 					// This function doesn't exist - mark it as such and never try again
 					noFunctionSet.add(type);
@@ -101,7 +103,11 @@ public class PlayerInventory {
 		// Offhand item change detection if the parsed command worked
 		ItemStack offhand = player.getInventory().getItemInOffHand();
 
-		Material type = offhand.getType();
+		Material type = null;
+		if (offhand != null) {
+			type = offhand.getType();
+		}
+
 		if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
 			runOffhandFunction(plugin, "monumenta:on_offhand_remove", mPrevOffhandMat, mNoOffhandRemoveFunctionMats, mOffhandRemoveFunctions, player);
 
