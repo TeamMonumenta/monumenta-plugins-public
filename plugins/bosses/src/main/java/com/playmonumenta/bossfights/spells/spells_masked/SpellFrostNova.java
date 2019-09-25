@@ -1,21 +1,23 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.bossfights.spells.spells_masked;
 
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 
+import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellMaskedFrostNova extends Spell {
+public class SpellFrostNova extends Spell {
+
 	private Plugin mPlugin;
 	private Random mRand = new Random();
 	private Entity mLauncher;
@@ -23,7 +25,7 @@ public class SpellMaskedFrostNova extends Spell {
 	private int mTime;
 	private int w;
 
-	public SpellMaskedFrostNova(Plugin plugin, Entity launcher, int radius, int time) {
+	public SpellFrostNova(Plugin plugin, Entity launcher, int radius, int time) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mRadius = radius;
@@ -79,7 +81,7 @@ public class SpellMaskedFrostNova extends Spell {
 				double rad = (double)(mRadius * w) / 5;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
-					angle = (double)j * increment;
+					angle = j * increment;
 					particleLoc.setX(lloc.getX() + (rad * Math.cos(angle)));
 					particleLoc.setZ(lloc.getZ() + (rad * Math.sin(angle)));
 					particleLoc.setY(lloc.getY() + 1.5);

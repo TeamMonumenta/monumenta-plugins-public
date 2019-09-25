@@ -1,28 +1,30 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.bossfights.spells.spells_masked;
 
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 
+import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.Utils;
 
-public class SpellMaskedShadowGlade extends Spell {
+public class SpellShadowGlade extends Spell {
+
 	private final Plugin mPlugin;
 	private final int mCount;
 	private final Location mLoc;
 	private final Random mRand = new Random();
 	private int j;
 
-	public SpellMaskedShadowGlade(Plugin plugin, Location loc, int count) {
+	public SpellShadowGlade(Plugin plugin, Location loc, int count) {
 		mPlugin = plugin;
 		mLoc = loc;
 		mCount = count;
@@ -36,7 +38,7 @@ public class SpellMaskedShadowGlade extends Spell {
 		int i = 0;
 		for (int x = 0; x < 2; x++) {
 			for (int y = 0; y < 2; y++) {
-				possibleLocs[i] = new Location(mLoc.getWorld(), mLoc.getX() - 8.25 + x * 12.5, mLoc.getY() - 5, mLoc.getZ() - 8.25 + y * 12.5);
+				possibleLocs[i] = new Location(mLoc.getWorld(), mLoc.getX() - 8.25 + x * 12.5, mLoc.getY() + 0.5, mLoc.getZ() - 8.25 + y * 12.5);
 				i++;
 			}
 		}

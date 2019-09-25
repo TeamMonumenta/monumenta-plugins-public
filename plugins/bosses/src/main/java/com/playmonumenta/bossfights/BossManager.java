@@ -80,8 +80,7 @@ import com.playmonumenta.bossfights.bosses.InfestedBoss;
 import com.playmonumenta.bossfights.bosses.InvisibleBoss;
 import com.playmonumenta.bossfights.bosses.Kaul;
 import com.playmonumenta.bossfights.bosses.LivingBladeBoss;
-import com.playmonumenta.bossfights.bosses.Masked_1;
-import com.playmonumenta.bossfights.bosses.Masked_2;
+import com.playmonumenta.bossfights.bosses.Masked;
 import com.playmonumenta.bossfights.bosses.OldLabsBoss;
 import com.playmonumenta.bossfights.bosses.Orangyboi;
 import com.playmonumenta.bossfights.bosses.PlayerDamageOnlyBoss;
@@ -204,8 +203,7 @@ public class BossManager implements Listener {
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
 		mStatefulBosses.put(CAxtal.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new CAxtal(p, e, s, l));
-		mStatefulBosses.put(Masked_1.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_1(p, e, s, l));
-		mStatefulBosses.put(Masked_2.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked_2(p, e, s, l));
+		mStatefulBosses.put(Masked.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Masked(p, e, s, l));
 		mStatefulBosses.put(Virius.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Virius(p, e, s, l));
 		mStatefulBosses.put(Orangyboi.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Orangyboi(p, e, s, l));
 		mStatefulBosses.put(Azacor.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Azacor(p, e, s, l));
@@ -250,8 +248,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(DebuffHitBoss.identityTag, (Plugin p, LivingEntity e) -> DebuffHitBoss.deserialize(p, e));
 		mBossDeserializers.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> IceAspectBoss.deserialize(p, e));
 		mBossDeserializers.put(CAxtal.identityTag, (Plugin p, LivingEntity e) -> CAxtal.deserialize(p, e));
-		mBossDeserializers.put(Masked_1.identityTag, (Plugin p, LivingEntity e) -> Masked_1.deserialize(p, e));
-		mBossDeserializers.put(Masked_2.identityTag, (Plugin p, LivingEntity e) -> Masked_2.deserialize(p, e));
+		mBossDeserializers.put(Masked.identityTag, (Plugin p, LivingEntity e) -> Masked.deserialize(p, e));
 		mBossDeserializers.put(Virius.identityTag, (Plugin p, LivingEntity e) -> Virius.deserialize(p, e));
 		mBossDeserializers.put(Orangyboi.identityTag, (Plugin p, LivingEntity e) -> Orangyboi.deserialize(p, e));
 		mBossDeserializers.put(Azacor.identityTag, (Plugin p, LivingEntity e) -> Azacor.deserialize(p, e));

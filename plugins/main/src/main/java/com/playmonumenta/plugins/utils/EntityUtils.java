@@ -48,14 +48,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.nms.utils.NmsEntityUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-
-import com.playmonumenta.nms.utils.NmsEntityUtils;
 
 public class EntityUtils {
 
@@ -82,7 +81,7 @@ public class EntityUtils {
 
 	public static boolean isHostileMob(Entity entity) {
 		if ((entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear || entity instanceof Phantom || entity instanceof Shulker)
-				&& !entity.getScoreboardTags().contains("SkillImmune")) {
+		    && !entity.getScoreboardTags().contains("SkillImmune")) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return ((Wolf)entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -100,7 +99,7 @@ public class EntityUtils {
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+		       || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -217,7 +216,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends Arrow> arrowClass) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class <? extends Arrow > arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch() + (float)rotation.getX());
@@ -233,7 +232,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends Arrow> arrowClass) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class <? extends Arrow > arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);
@@ -280,6 +279,41 @@ public class EntityUtils {
 		return false;
 	}
 
+	/**
+	 * Returns a List of LivingEntity objects in the bounding box with the specified dimensions.
+	 * <p>
+	 * The List will only include objects with EntityType contained in types. If types is null, only hostile mobs will be included.
+	 *
+	 * @param loc   Location representing center of the bounding box
+	 * @param rx    distance from center to faces perpendicular to x-axis
+	 * @param ry    distance from center to faces perpendicular to y-axis
+	 * @param rz    distance from center to faces perpendicular to z-axis
+	 * @param types List of EntityTypes to be returned, defaults to hostile mobs if null
+	 * @return      List of LivingEntity objects of the specified type within the bounding box
+	 */
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, Set<EntityType> types) {
+		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
+
+		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
+		for (Entity entity : entities) {
+			if (types == null) {
+				if (types == null && isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
+					mobs.add((LivingEntity)entity);
+				}
+			} else {
+				if (types.contains(entity.getType()) && !entity.isDead() && entity.isValid()) {
+					mobs.add((LivingEntity)entity);
+				}
+			}
+		}
+
+		return mobs;
+	}
+
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
+		return getNearbyMobs(loc, rx, ry, rz, null);
+	}
+
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, LivingEntity getter) {
 		List<LivingEntity> list = getNearbyMobs(loc, radius, radius, radius);
 		list.remove(getter);
@@ -290,17 +324,8 @@ public class EntityUtils {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
-	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz) {
-		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
-
-		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
-		for (Entity entity : entities) {
-			if (isHostileMob(entity) && !entity.isDead() && entity.isValid()) {
-				mobs.add((LivingEntity)entity);
-			}
-		}
-
-		return mobs;
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, Set<EntityType> types) {
+		return getNearbyMobs(loc, radius, radius, radius, types);
 	}
 
 	public static Entity getEntity(World world, UUID entityUUID) {

@@ -1,41 +1,56 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.bossfights.spells.spells_masked;
 
+import java.util.EnumSet;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.bossfights.bosses.Masked;
+import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
-public class SpellMaskedSummonBlazes extends Spell {
+public class SpellSummonBlazes extends Spell {
+
+	private static final int MAX_NEARBY_BLAZES_MULTIPLIER = 4;
+	private static final int MAX_BLAZES_PER_SPAWN = 4;
+	private static final int SPAWN_CYCLES = 2;
+	private static final int DURATION = 20 * 8;
 	private Plugin mPlugin;
 	private Entity mLauncher;
 	private Random mRand = new Random();
 
-	public SpellMaskedSummonBlazes(Plugin plugin, Entity launcher) {
+	public SpellSummonBlazes(Plugin plugin, Entity launcher) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 	}
 
+	// Only run if there are fewer blazes than the multiplier * # of players.
+	@Override
+	public boolean canRun() {
+		return EntityUtils.getNearbyMobs(mLauncher.getLocation(), Masked.DETECTION_RANGE, EnumSet.of(EntityType.BLAZE)).size()
+		       < PlayerUtils.getNearbyPlayers(mLauncher.getLocation(), Masked.DETECTION_RANGE).size() * MAX_NEARBY_BLAZES_MULTIPLIER;
+	}
+
 	@Override
 	public void run() {
-		Location lLoc = mLauncher.getLocation();
-		int count = Utils.playersInRange(mLauncher.getLocation(), 25).size();
-		count = count >= 3 ? 4 : count;
-		animation(lLoc, 2);
-		spawn(lLoc, count, 2);
+		Location loc = mLauncher.getLocation();
+		int count = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.getNearbyPlayers(loc, Masked.DETECTION_RANGE).size());
+		animation(loc, SPAWN_CYCLES);
+		spawn(loc, count, SPAWN_CYCLES);
 	}
 
 	@Override
 	public int duration() {
-		return 160; // 8 seconds
+		return DURATION;
 	}
 
 	private void spawn(Location loc, int count, int repeats) {
