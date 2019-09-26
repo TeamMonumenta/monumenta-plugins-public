@@ -1,25 +1,32 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Gilded implements BaseEnchantment {
 	private static final Particle.DustOptions GILDED_1_COLOR = new Particle.DustOptions(Color.fromRGB(191, 166, 51), 1.0f);
 	private static final Particle.DustOptions GILDED_2_COLOR = new Particle.DustOptions(Color.fromRGB(210, 191, 76), 1.0f);
 	private static final Particle.DustOptions GILDED_3_COLOR = new Particle.DustOptions(Color.fromRGB(229, 229, 128), 1.0f);
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Gilded";
-	private static final int tickPeriod = 6;
+	private static final int TICK_PERIOD = 6;
+	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+
 
 	@Override
 	public String getProperty() {
@@ -42,20 +49,44 @@ public class Gilded implements BaseEnchantment {
 	}
 
 	@Override
+	public int getLevelFromItem(ItemStack item, Player player) {
+		if (player.getScoreboardTags().contains("noSelfParticles")) {
+			NO_SELF_PARTICLES.add(player);
+		} else {
+			NO_SELF_PARTICLES.remove(player);
+		}
+		return getLevelFromItem(item);
+	}
+
+	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
+		final Particle.DustOptions color;
+		final int count;
 		switch (level) {
 		case 0:
-			break;
+			return;
 		case 1:
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_1_COLOR);
+			color = GILDED_1_COLOR;
+			count = 3;
 			break;
 		case 2:
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_2_COLOR);
+			count = 4;
+			color = GILDED_2_COLOR;
 			break;
 		case 3:
 		default:
-			world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.8, 0), 4, 0.3, 0.5, 0.3, GILDED_3_COLOR);
+			count = 5;
+			color = GILDED_3_COLOR;
 			break;
+		}
+
+		final Location loc = player.getLocation().add(0, 0.8, 0);
+		if (NO_SELF_PARTICLES.contains(player)) {
+			for (Player other : PlayerUtils.getNearbyPlayers(player, 30, false)) {
+				other.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
+			}
+		} else {
+			world.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
 		}
 	}
 
@@ -81,6 +112,6 @@ public class Gilded implements BaseEnchantment {
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10, tickPeriod);
+		}.runTaskTimer(plugin, 10, TICK_PERIOD);
 	}
 }

@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -18,13 +21,15 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineAura implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Divine Aura";
 	private static final String TAG_TO_DISABLE = "NoDivineAura";
 	private static final Random rand = new Random();
 	/* This is shared by all instances */
-	private static int staticTicks = 0;
+	private static int STATIC_TICKS = 0;
+	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
 
 	// A little easter egg for my friends.
 
@@ -115,6 +120,11 @@ public class DivineAura implements BaseEnchantment {
 		if (player.getScoreboardTags().contains(TAG_TO_DISABLE)) {
 			return 1000;
 		}
+		if (player.getScoreboardTags().contains("noSelfParticles")) {
+			NO_SELF_PARTICLES.add(player);
+		} else {
+			NO_SELF_PARTICLES.remove(player);
+		}
 		return 1;
 	}
 
@@ -136,6 +146,9 @@ public class DivineAura implements BaseEnchantment {
 					world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1);
 					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1.25f);
 					player.sendMessage(ChatColor.AQUA + "You feel a Divine Aura envelop you.");
+					if (NO_SELF_PARTICLES.contains(player)) {
+						player.sendMessage(ChatColor.GRAY + "Note: You have self-particles disabled");
+					}
 					player.removeScoreboardTag(TAG_TO_DISABLE);
 				}
 				player.setCooldown(item.getType(), 20);
@@ -147,9 +160,9 @@ public class DivineAura implements BaseEnchantment {
 	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
 		if (isActive(level)) {
-			staticTicks += 5;
-			if (staticTicks >= 20 * 300) {
-				staticTicks = 0;
+			STATIC_TICKS += 5;
+			if (STATIC_TICKS >= 20 * 300) {
+				STATIC_TICKS = 0;
 
 				UUID uuid = player.getUniqueId();
 				if (uuid.equals(neodymeowm)) {
@@ -169,7 +182,14 @@ public class DivineAura implements BaseEnchantment {
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				}
 			}
-			world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0);
+			final Location loc = player.getLocation().add(0, 1, 0);
+			if (NO_SELF_PARTICLES.contains(player)) {
+				for (Player other : PlayerUtils.getNearbyPlayers(player, 30, false)) {
+					other.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
+				}
+			} else {
+				world.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.4, 0.4, 0.4, 0);
+			}
 		}
 	}
 

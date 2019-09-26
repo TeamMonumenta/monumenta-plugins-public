@@ -37,7 +37,6 @@ public class PatreonPurple extends Ability {
 				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
 					other.spawnParticle(Particle.DRAGON_BREATH, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				}
-				mPlayer.spawnParticle(Particle.DRAGON_BREATH, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0);
 			} else {
 				mWorld.spawnParticle(Particle.DRAGON_BREATH, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 			}

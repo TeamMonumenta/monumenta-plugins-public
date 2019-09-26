@@ -34,7 +34,7 @@ public interface BaseEnchantment {
 	/*
 	 * To use enchant levels or not
 	 * If true, uses enchant levels (I, II, III, etc.)
-	 * If false
+	 * If false, always return level 1 for the item when the enchant is found
 	 */
 	default public boolean useEnchantLevels() {
 		return true;

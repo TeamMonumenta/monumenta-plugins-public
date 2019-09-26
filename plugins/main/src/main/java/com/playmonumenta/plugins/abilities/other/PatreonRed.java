@@ -40,7 +40,6 @@ public class PatreonRed extends Ability {
 				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
 					other.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 				}
-				mPlayer.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 1, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 			} else {
 				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0, RED_PARTICLE_COLOR);
 			}
