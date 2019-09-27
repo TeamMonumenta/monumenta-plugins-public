@@ -278,7 +278,36 @@ public class PlayerListener implements Listener {
 		if (clickedEntity instanceof ItemFrame) {
 			ItemFrame frame = (ItemFrame) clickedEntity;
 			if (frame.isInvulnerable()) {
-				event.setCancelled(true);
+				if (player.getGameMode().equals(GameMode.CREATIVE)) {
+					player.sendMessage(ChatColor.GOLD + "This item frame is invulnerable / creative only");
+				} else {
+					event.setCancelled(true);
+				}
+
+				ItemStack frameItem = frame.getItem();
+				if (frameItem != null && frameItem.getType().equals(Material.FILLED_MAP)) {
+					if (player.getGameMode().equals(GameMode.ADVENTURE)) {
+						ItemStack giveMap = frameItem.clone();
+						ItemMeta mapMeta;
+						List<String> mapLore;
+
+						if (giveMap.hasItemMeta()) {
+							mapMeta = giveMap.getItemMeta();
+						} else {
+							mapMeta = Bukkit.getServer().getItemFactory().getItemMeta(Material.FILLED_MAP);
+						}
+
+						if (mapMeta.hasLore()) {
+							mapLore = mapMeta.getLore();
+						} else {
+							mapLore = new ArrayList<String>(1);
+						}
+						mapLore.add(ChatColor.GOLD + "* Official Map *");
+						mapMeta.setLore(mapLore);
+						giveMap.setItemMeta(mapMeta);
+						InventoryUtils.giveItem(player, giveMap);
+					}
+				}
 			}
 		}
 

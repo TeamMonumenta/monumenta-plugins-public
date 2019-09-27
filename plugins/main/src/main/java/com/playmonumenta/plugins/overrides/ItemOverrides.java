@@ -173,6 +173,9 @@ public class ItemOverrides {
 		BaseOverride conduitOverride = new ConduitOverride();
 		mItems.put(Material.CONDUIT, conduitOverride);
 
+		BaseOverride mapOverride = new MapOverride();
+		mItems.put(Material.FILLED_MAP, mapOverride);
+
 		BaseOverride bucketOverride = new BucketOverride();
 		mItems.put(Material.BUCKET, bucketOverride);
 		mItems.put(Material.WATER_BUCKET, bucketOverride);
