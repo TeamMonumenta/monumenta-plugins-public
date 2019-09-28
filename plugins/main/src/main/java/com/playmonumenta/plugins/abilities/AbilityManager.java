@@ -160,6 +160,7 @@ import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class AbilityManager {
@@ -687,7 +688,7 @@ public class AbilityManager {
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
 					if (action == Action.RIGHT_CLICK_AIR
-					    || (action == Action.RIGHT_CLICK_BLOCK && !blockClicked.isInteractable())) {
+					    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
 							abil.cast();
 						}
