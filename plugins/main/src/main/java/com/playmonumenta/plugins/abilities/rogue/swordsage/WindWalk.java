@@ -37,7 +37,7 @@ public class WindWalk extends Ability {
 	 * mobs are affected by their respective debuffs for 5 seconds.
 	 */
 
-	private static final int WIND_WALK_COOLDOWN = 20 * 25;
+	private static final int WIND_WALK_COOLDOWN = 20 * 20;
 	private static final int WIND_WALK_1_DURATION = 20 * 2;
 	private static final int WIND_WALK_2_DURATION = 20 * 4;
 	private static final int WIND_WALK_VULNERABILITY_DURATION_INCREASE = 20 * 3;
@@ -85,7 +85,7 @@ public class WindWalk extends Ability {
 			@Override
 			public void run() {
 				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), WIND_WALK_RADIUS)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(mPlayer.getVelocity().normalize()), WIND_WALK_RADIUS)) {
 					if (!mobsAlreadyHit.contains(mob)) {
 						if (!EntityUtils.isBoss(mob)) {
 							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
@@ -100,7 +100,6 @@ public class WindWalk extends Ability {
 							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
 							mob.setVelocity(mob.getVelocity().setY(0.5));
 							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, duration, 0, true, false));
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration + 20 * 3, 0, true, false));
 							if (getAbilityScore() > 1) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, duration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
 							}
