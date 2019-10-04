@@ -26,8 +26,8 @@ import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.spells.SpellBaseLaser;
 import com.playmonumenta.bossfights.spells.SpellBlockBreak;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
 import com.playmonumenta.bossfights.spells.SpellPushPlayersAway;
+import com.playmonumenta.bossfights.spells.SpellRunAction;
 import com.playmonumenta.bossfights.spells.spells_masked.SpellFrostNova;
 import com.playmonumenta.bossfights.spells.spells_masked.SpellShadowGlade;
 import com.playmonumenta.bossfights.spells.spells_masked.SpellSummonBlazes;
@@ -165,17 +165,32 @@ public class Masked extends BossAbilityGroup {
 			new SpellSummonBlazes(mPlugin, mBoss)
 		));
 
+
 		List<Spell> passiveSpells1 = Arrays.asList(
 			new SpellBlockBreak(mBoss),
 			new SpellPushPlayersAway(mBoss, 7, 15),
-			// Teleport the boss to spawnLoc whenever "true" (always)
-			new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> true)
+			// Teleport the boss to spawn, preserving look direction
+			new SpellRunAction(() -> {
+				Location teleLoc = mSpawnLoc.clone();
+				Location curLoc = mBoss.getLocation();
+				teleLoc.setYaw(curLoc.getYaw());
+				teleLoc.setPitch(curLoc.getPitch());
+				mBoss.teleport(teleLoc);
+			})
 		);
 
 		List<Spell> passiveSpells2 = Arrays.asList(
 			new SpellBlockBreak(mBoss),
-			// Teleport the boss to spawnLoc whenever condition is true
-			new SpellConditionalTeleport(mBoss, mSpawnLoc, b -> b.getLocation().getY() < 157)
+			// Teleport the boss to spawn preserving look direction whenever in water
+			new SpellRunAction(() -> {
+				Location curLoc = mBoss.getLocation();
+				if (curLoc.getY() < 157) {
+					Location teleLoc = mSpawnLoc.clone();
+					teleLoc.setYaw(curLoc.getYaw());
+					teleLoc.setPitch(curLoc.getPitch());
+					mBoss.teleport(teleLoc);
+				}
+			})
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

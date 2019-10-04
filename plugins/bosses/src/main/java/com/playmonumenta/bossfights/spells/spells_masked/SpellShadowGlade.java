@@ -57,7 +57,7 @@ public class SpellShadowGlade extends Spell {
 
 	@Override
 	public int duration() {
-		return 160; // 8 seconds
+		return 200; // 10 seconds
 	}
 
 	public void animation(Location zoneStart) {
@@ -85,7 +85,7 @@ public class SpellShadowGlade extends Spell {
 			}
 		};
 
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 35; i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 4);
 		}
 	}
@@ -108,6 +108,6 @@ public class SpellShadowGlade extends Spell {
 				}
 			}
 		};
-		scheduler.scheduleSyncDelayedTask(mPlugin, burst, 100L);
+		scheduler.scheduleSyncDelayedTask(mPlugin, burst, 140L);
 	}
 }
