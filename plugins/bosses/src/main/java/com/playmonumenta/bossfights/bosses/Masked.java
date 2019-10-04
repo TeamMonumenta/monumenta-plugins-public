@@ -87,6 +87,7 @@ public class Masked extends BossAbilityGroup {
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
 		mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 
 		mBoss.addScoreboardTag("Boss");
 
@@ -198,6 +199,7 @@ public class Masked extends BossAbilityGroup {
 		events.put(50, mBoss -> {
 			changePhase(activeSpells2, passiveSpells2, null);
 			mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED);
+			mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 			// Put sword back in mainhand
 			mBoss.getEquipment().setItemInMainHand(mMeleeWeapon);
 			Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
