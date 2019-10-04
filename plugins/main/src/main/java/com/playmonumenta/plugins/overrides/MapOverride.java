@@ -32,7 +32,23 @@ public class MapOverride extends BaseOverride {
 			Material.BROWN_BANNER,
 			Material.GREEN_BANNER,
 			Material.RED_BANNER,
-			Material.BLACK_BANNER
+			Material.BLACK_BANNER,
+			Material.WHITE_WALL_BANNER,
+			Material.ORANGE_WALL_BANNER,
+			Material.MAGENTA_WALL_BANNER,
+			Material.LIGHT_BLUE_WALL_BANNER,
+			Material.YELLOW_WALL_BANNER,
+			Material.LIME_WALL_BANNER,
+			Material.PINK_WALL_BANNER,
+			Material.GRAY_WALL_BANNER,
+			Material.LIGHT_GRAY_WALL_BANNER,
+			Material.CYAN_WALL_BANNER,
+			Material.PURPLE_WALL_BANNER,
+			Material.BLUE_WALL_BANNER,
+			Material.BROWN_WALL_BANNER,
+			Material.GREEN_WALL_BANNER,
+			Material.RED_WALL_BANNER,
+			Material.BLACK_WALL_BANNER
 		);
 
 	private boolean canUseMap(Player player, ItemStack mapItem) {
