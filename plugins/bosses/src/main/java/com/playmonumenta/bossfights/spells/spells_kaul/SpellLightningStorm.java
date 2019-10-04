@@ -59,7 +59,7 @@ public class SpellLightningStorm extends Spell {
 						lightning(player);
 					}
 				} else {
-					if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid()) {
+					if (!loc.subtract(0, 5, 0).getBlock().getType().isSolid() && loc.getY() > 9.9) {
 						lightning(player);
 					}
 				}

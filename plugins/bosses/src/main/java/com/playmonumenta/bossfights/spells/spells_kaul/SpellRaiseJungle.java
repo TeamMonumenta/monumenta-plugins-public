@@ -127,7 +127,6 @@ public class SpellRaiseJungle extends Spell {
 								t++;
 
 								if (!raised) {
-									pLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, pLoc, 1, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
 									ele.teleport(ele.getLocation().add(0, yinc, 0));
 								}
 
