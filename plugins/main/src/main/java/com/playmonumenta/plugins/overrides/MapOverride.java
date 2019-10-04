@@ -69,7 +69,7 @@ public class MapOverride extends BaseOverride {
 	}
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (BANNERS.contains(block.getType())) {
 			return canUseMap(player, item);
 		}
