@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
+import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.ReforgeHeldItem;
 import com.playmonumenta.plugins.commands.ReforgeInventory;
@@ -112,6 +113,7 @@ public class Plugin extends JavaPlugin {
 		UpdateApartments.register();
 		TransferScores.register(this);
 		MonumentaReload.register(this);
+		MonumentaDebug.register(this);
 
 		mHttpManager = new HttpManager(this);
 		try {

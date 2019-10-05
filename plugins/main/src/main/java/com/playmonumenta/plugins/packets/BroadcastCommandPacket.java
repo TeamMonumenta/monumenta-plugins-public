@@ -28,7 +28,7 @@ public class BroadcastCommandPacket extends BasePacket {
 		    || command.startsWith("tell")
 		    || command.startsWith("tellraw")) {
 
-			plugin.getLogger().info("Executing broadcast received command '" + command + "'");
+			plugin.getLogger().fine("Executing broadcast received command '" + command + "'");
 
 			/* Call this on the main thread */
 			Bukkit.getScheduler().callSyncMethod(plugin, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command));

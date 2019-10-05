@@ -44,6 +44,6 @@ public class NetworkUtils {
 		plugin.mSocketManager.sendPacket(new BroadcastCommandPacket(command));
 
 		// Success, print transfer message request to log
-		plugin.getLogger().info("Requested broadcast of command '" + command + "'");
+		plugin.getLogger().fine("Requested broadcast of command '" + command + "'");
 	}
 }
