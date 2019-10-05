@@ -45,6 +45,14 @@ public class BroadcastCommand {
 	public static void register(Plugin plugin) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("command", new SuggestedStringArgument(ALLOWED_COMMANDS));
+		CommandAPI.getInstance().register("broadcastcommand",
+		                                  CommandPermission.fromString("monumenta.command.broadcastcommand"),
+		                                  arguments,
+		                                  (sender, args) -> {
+											  run(plugin, sender, (String)args[0], null);
+		                                  }
+		);
+
 		arguments.put("args", new GreedyStringArgument());
 		CommandAPI.getInstance().register("broadcastcommand",
 		                                  CommandPermission.fromString("monumenta.command.broadcastcommand"),
@@ -73,7 +81,10 @@ public class BroadcastCommand {
 			}
 		}
 
-		String commandStr = command + " " + args;
+		String commandStr = command;
+		if (args != null) {
+			commandStr += " " + args;
+		}
 
 		/* Replace all instances of @S with the player's name */
 		commandStr = commandStr.replaceAll("@S", name);
