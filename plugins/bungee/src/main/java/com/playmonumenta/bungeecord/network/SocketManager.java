@@ -5,8 +5,8 @@ import java.net.Socket;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.packets.BasePacket;
@@ -14,8 +14,8 @@ import com.playmonumenta.bungeecord.packets.BroadcastCommandPacket;
 import com.playmonumenta.bungeecord.packets.BungeeCommandPacket;
 import com.playmonumenta.bungeecord.packets.BungeeErrorPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetServerListPacket;
-import com.playmonumenta.bungeecord.packets.BungeeHeartbeatPacket;
 import com.playmonumenta.bungeecord.packets.BungeeHandshakePacket;
+import com.playmonumenta.bungeecord.packets.BungeeHeartbeatPacket;
 import com.playmonumenta.bungeecord.packets.BungeeSendPlayerPacket;
 import com.playmonumenta.bungeecord.packets.ShardCommandPacket;
 import com.playmonumenta.bungeecord.packets.ShardTransferPlayerDataPacket;
@@ -81,7 +81,7 @@ public class SocketManager {
 	}
 
 	public void sortPacket(ClientSocket client, BasePacket packet) {
-		mMain.getLogger().info("Received packet from " + client.getName() + ": " + packet.getOperation());
+		mMain.getLogger().fine("Received packet from " + client.getName() + ": " + packet.getOperation());
 
 		if (!packet.hasDestination()) {
 			// Packet has no destination field. The destination is bungee itself.
@@ -121,7 +121,7 @@ public class SocketManager {
 			}
 		} else if (packet.getDestination().equals("*")) {
 			// Packet should be sent to all connected clients, including the sender.
-			mMain.getLogger().info("Received broadcast packet: " + packet.getOperation());
+			mMain.getLogger().fine("Received broadcast packet: " + packet.getOperation());
 			for (Entry<String, ClientSocket> entry : mClients.entrySet()) {
 				if (!entry.getValue().sendPacket(packet)) {
 					// // TODO: Make the queue work when dynamic start/stop is implemented.
@@ -134,7 +134,7 @@ public class SocketManager {
 			// Packet is addressed to a particular client
 			//TODO: Poke offline servers to turn on to receive packets
 			String dest = packet.getDestination();
-			mMain.getLogger().info("Received packet to " + dest + ": " + packet.getOperation());
+			mMain.getLogger().fine("Received packet to " + dest + ": " + packet.getOperation());
 			if (!mClients.containsKey(dest) ||
 			    !mClients.get(dest).sendPacket(packet)) {
 				// // TODO: Make the queue work when dynamic start/stop is implemented.

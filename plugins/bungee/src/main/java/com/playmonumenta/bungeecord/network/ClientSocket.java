@@ -16,7 +16,6 @@ import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.packets.BasePacket;
 
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class ClientSocket {
 	public final Main mMain;
@@ -50,7 +49,7 @@ public class ClientSocket {
 	}
 
 	public Boolean sendPacket(BasePacket packet) {
-		mMain.getLogger().info("Sending packet to " + mName + ":");
+		mMain.getLogger().fine("Sending packet to " + mName + ":");
 		try {
 			Streams.write(packet.toJson(), mOutput);
 			mOutput.flush();
