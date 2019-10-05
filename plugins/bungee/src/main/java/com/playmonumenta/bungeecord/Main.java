@@ -4,19 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import com.playmonumenta.bungeecord.listeners.EventListener;
+import com.playmonumenta.bungeecord.network.SocketManager;
+import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
+
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
-import com.playmonumenta.bungeecord.listeners.EventListener;
-import com.playmonumenta.bungeecord.network.SocketManager;
-import com.playmonumenta.bungeecord.reconnect.MonumentaReconnectHandler;
-
 public class Main extends Plugin {
 	private Configuration mConfig = null;
 	private int mSocketPort = 0;
+	private Level mLogLevel = Level.INFO;
 
 	public String mDefaultServer = null;
 
@@ -58,6 +59,23 @@ public class Main extends Plugin {
 
 			// load socket port
 			mSocketPort = mConfig.getInt("socket_port", 0);
+
+			// Load default server
+			String level = mConfig.getString("log_level", "INFO").toLowerCase();
+			switch (level) {
+				case "finest":
+					mLogLevel = Level.FINEST;
+					break;
+				case "finer":
+					mLogLevel = Level.FINER;
+					break;
+				case "fine":
+					mLogLevel = Level.FINE;
+					break;
+				default:
+					mLogLevel = Level.INFO;
+			}
+			this.getLogger().setLevel(mLogLevel);
 		} catch (IOException ex) {
 			getLogger().log(Level.WARNING, "Could not load config.yml", ex);
 		}
@@ -76,6 +94,16 @@ public class Main extends Plugin {
 			}
 
 			mConfig.set("socket_port", mSocketPort);
+
+			if (mLogLevel.equals(Level.FINEST)) {
+				mConfig.set("log_level", "FINEST");
+			} else if (mLogLevel.equals(Level.FINER)) {
+				mConfig.set("log_level", "FINER");
+			} else if (mLogLevel.equals(Level.FINE)) {
+				mConfig.set("log_level", "FINE");
+			} else {
+				mConfig.set("log_level", "INFO");
+			}
 
 			try {
 				ConfigurationProvider.getProvider(YamlConfiguration.class).save(mConfig, new File(getDataFolder(), "config.yml"));
