@@ -31,21 +31,7 @@ public class ReforgeHeldItem extends GenericCommand {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			if (item == null || item.getLore() == null) {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
-			}
-			List<String> oldLore = item.getLore();
-			List<String> newLore = new ArrayList<>();
-			boolean isShattered = false;
-			for (String loreEntry : oldLore) {
-				if (loreEntry.contains(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *") ||
-				    loreEntry.contains(ChatColor.DARK_RED + "Maybe a Master Repairman") ||
-				    loreEntry.contains(ChatColor.DARK_RED + "could reforge it...")) {
-					isShattered = true;
-				} else {
-					newLore.add(loreEntry);
-				}
-			}
-
-			if (isShattered) {
+			} else if (ItemUtils.isItemShattered(item)) {
 				ItemRegion region = ItemUtils.getItemRegion(item);
 				int cost = ItemUtils.getReforgeCost(item);
 				PlayerInventory inventory = player.getInventory();
@@ -95,9 +81,9 @@ public class ReforgeHeldItem extends GenericCommand {
 					CommandAPI.fail("Invalid ItemRegion");
 					return;
 				}
-				item.setLore(newLore);
+				ItemUtils.reforgeItem(item);
 				player.sendMessage("Your item has been reforged!");
-				sender.sendMessage("Succesfully reforged the player's held item");
+				sender.sendMessage("Successfully reforged the player's held item");
 			} else {
 				CommandAPI.fail("Player must have a Shattered item in their main hand!");
 			}

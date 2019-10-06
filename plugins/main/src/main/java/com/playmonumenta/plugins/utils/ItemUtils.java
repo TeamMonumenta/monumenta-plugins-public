@@ -567,16 +567,39 @@ public class ItemUtils {
 	}
 
 	public static boolean shatterItem(ItemStack item) {
-		List<String> lore = item.getLore();
-		if (getItemDeathResult(item) == ItemDeathResult.SHATTER && !isItemShattered(item)) {
-			if (lore == null) {
-				lore = new ArrayList<String>();
+		if (item != null) {
+			List<String> lore = item.getLore();
+			if (getItemDeathResult(item) == ItemDeathResult.SHATTER && !isItemShattered(item)) {
+				if (lore == null) {
+					lore = new ArrayList<String>();
+				}
+				lore.add(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *");
+				lore.add(ChatColor.DARK_RED + "Maybe a Master Repairman");
+				lore.add(ChatColor.DARK_RED + "could reforge it...");
+				item.setLore(lore);
+				return true;
 			}
-			lore.add(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *");
-			lore.add(ChatColor.DARK_RED + "Maybe a Master Repairman");
-			lore.add(ChatColor.DARK_RED + "could reforge it...");
-			item.setLore(lore);
-			return true;
+		}
+		return false;
+	}
+
+	public static boolean reforgeItem(ItemStack item) {
+		if (item != null) {
+			List<String> oldLore = item.getLore();
+			List<String> newLore = new ArrayList<>();
+			if (oldLore != null && isItemShattered(item)) {
+				for (String line : oldLore) {
+					if (!line.equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *") &&
+					    !line.equals(ChatColor.DARK_RED + "Maybe a Master Repairman") &&
+					    !line.equals(ChatColor.DARK_RED + "could reforge it...")) {
+						newLore.add(line);
+					}
+				}
+				if (!newLore.isEmpty()) {
+					item.setLore(newLore);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
