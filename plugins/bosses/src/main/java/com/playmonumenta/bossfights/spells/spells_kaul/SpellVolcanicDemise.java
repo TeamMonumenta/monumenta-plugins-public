@@ -92,9 +92,6 @@ public class SpellVolcanicDemise extends Spell {
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
 									pcount += 1;
 									rainMeteor(player.getLocation(), players, 10);
-									if (pcount >= 5) {
-										break;
-									}
 								}
 							}
 							for (int j = 0; j < 4; j++) {
@@ -105,7 +102,7 @@ public class SpellVolcanicDemise extends Spell {
 							if (players.size() >= 1) {
 								Player rPlayer = players.get(random.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 30);
+								rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 40);
 							}
 
 							if (i >= 25) {
