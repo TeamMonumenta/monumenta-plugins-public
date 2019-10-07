@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class InventoryUtils {
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
 
-	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player) {
+	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player, Event event) {
 		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
@@ -40,7 +41,7 @@ public class InventoryUtils {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
-				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, event);
 			}
 		}, 0);
 	}

@@ -30,6 +30,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
@@ -185,6 +186,9 @@ public class WorldListener implements Listener {
 			}
 			event.setCancelled(true);
 			return;
+		}
+		if(event.getTargetEntity() instanceof Player) {
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}
 	}
 

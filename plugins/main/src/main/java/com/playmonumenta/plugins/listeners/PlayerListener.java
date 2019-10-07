@@ -196,7 +196,7 @@ public class PlayerListener implements Listener {
 				return;
 			}
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
-				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 			if (block != null) {
 				Location location = block.getLocation();
@@ -333,7 +333,7 @@ public class PlayerListener implements Listener {
 	// The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// The player dropped an item.
@@ -348,8 +348,7 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// An entity picked up an item
@@ -365,15 +364,14 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
 	}
 
 	// An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// If an inventory interaction happened.
@@ -386,6 +384,7 @@ public class PlayerListener implements Listener {
 				if (inventory == null) {
 					return;
 				} else if (inventory instanceof PlayerInventory) {
+					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 					// Don't sort player inventories until support is added
 					// to prevent sorting hotbar / armor slots
 
@@ -466,6 +465,7 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
 			}
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
 	}
 
@@ -509,7 +509,8 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			//InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves in safe zones automatically when closed
@@ -536,13 +537,14 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
 	}
 
 	// Player changed hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// Player swapped hand items
@@ -552,7 +554,7 @@ public class PlayerListener implements Listener {
 			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be repaired before use");
 			event.setCancelled(true);
 		}
-		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer());
+		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	private static final List<Integer> KEEP_EQUIPPED_SLOTS =
@@ -680,7 +682,7 @@ public class PlayerListener implements Listener {
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
-				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player);
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 		}, 0);
 	}

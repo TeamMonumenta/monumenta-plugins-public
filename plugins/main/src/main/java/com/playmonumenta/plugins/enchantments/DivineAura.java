@@ -152,7 +152,7 @@ public class DivineAura implements BaseEnchantment {
 					player.removeScoreboardTag(TAG_TO_DISABLE);
 				}
 				player.setCooldown(item.getType(), 20);
-				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player);
+				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, event);
 			}
 		}
 	}

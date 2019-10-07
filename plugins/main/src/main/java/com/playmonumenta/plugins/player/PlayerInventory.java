@@ -14,15 +14,24 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.nms.utils.NmsCommandUtils;
@@ -40,15 +49,23 @@ public class PlayerInventory {
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
+	 * Contains the hashmaps in a hashmap that represents the inventory slots
+	 *
+	 * mInventoryProperties indexes 0-40 for inventory slots and custom enchants.
+	 * 0-8 = hotbar, 36-39 = armor, 40 = offhand
 	 */
+	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new HashMap<Integer, Map<BaseEnchantment, Integer>>();
 	private Map<BaseEnchantment, Integer> mCurrentProperties = new HashMap<BaseEnchantment, Integer>();
 	private Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+
+	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
+	private boolean hasShiftClicked = false;
 
 	private Material mPrevOffhandMat = null;
 	private List<String> mPrevOffhandLore = null;
 
 	public PlayerInventory(Plugin plugin, Player player) {
-		updateEquipmentProperties(plugin, player);
+		updateEquipmentProperties(plugin, player, null);
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
@@ -99,60 +116,116 @@ public class PlayerInventory {
 		}
 	}
 
-	public void updateEquipmentProperties(Plugin plugin, Player player) {
-		// Offhand item change detection if the parsed command worked
-		ItemStack offhand = player.getInventory().getItemInOffHand();
+	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
+		//Runs offhand check for things like crystalizers
+		if(event == null || event instanceof PlayerSwapHandItemsEvent || event instanceof InventoryClickEvent) {
+			// Offhand item change detection if the parsed command worked
+			ItemStack offhand = player.getInventory().getItemInOffHand();
 
-		Material type = null;
-		if (offhand != null) {
-			type = offhand.getType();
-		}
+			Material type = null;
+			if (offhand != null) {
+				type = offhand.getType();
+			}
 
-		if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
-			runOffhandFunction(plugin, "monumenta:on_offhand_remove", mPrevOffhandMat, mNoOffhandRemoveFunctionMats, mOffhandRemoveFunctions, player);
+			if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
+				runOffhandFunction(plugin, "monumenta:on_offhand_remove", mPrevOffhandMat, mNoOffhandRemoveFunctionMats, mOffhandRemoveFunctions, player);
 
-			mPrevOffhandMat = type;
-			mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
+				mPrevOffhandMat = type;
+				mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
 
-			runOffhandFunction(plugin, "monumenta:on_offhand", type, mNoOffhandFunctionMats, mOffhandFunctions, player);
-		}
-
-		// Swap current and previous lists
-		Map<BaseEnchantment, Integer> temp = mPreviousProperties;
-		mPreviousProperties = mCurrentProperties;
-		mCurrentProperties = temp;
-
-		// Clear the current map and update it with current properties
-		mCurrentProperties.clear();
-		try {
-			plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, player);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Remove properties from the player that were removed
-		for (BaseEnchantment property : mPreviousProperties.keySet()) {
-			if (!mCurrentProperties.containsKey(property)) {
-				property.removeProperty(plugin, player);
+				runOffhandFunction(plugin, "monumenta:on_offhand", type, mNoOffhandFunctionMats, mOffhandFunctions, player);
 			}
 		}
 
-		// Apply properties to the player that changed or have a new level
-		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+		//Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
+		if(event instanceof InventoryClickEvent) {
+			if(((InventoryClickEvent) event).isShiftClick()) {
+				hasShiftClicked = true;
+				return;
+			}
+				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(event instanceof InventoryDragEvent) {
+			for(int i : ((InventoryDragEvent) event).getInventorySlots()) {
+				plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
+			}
+		} else if(event instanceof PlayerInteractEvent || event instanceof BlockDispenseArmorEvent) {
+			plugin.mEnchantmentManager.updateItemProperties(36, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(37, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(38, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(39, mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(event instanceof PlayerItemBreakEvent) {
+			//Updates item properties for armor, mainhand and offhand
+			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(36, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(37, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(38, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(39, mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(event instanceof PlayerItemHeldEvent) {
+			plugin.mEnchantmentManager.updateItemProperties(((PlayerItemHeldEvent) event).getPreviousSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(((PlayerItemHeldEvent) event).getNewSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(event instanceof PlayerSwapHandItemsEvent) {
+			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+			plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(event instanceof PlayerDropItemEvent) {
+			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+		} else if(!hasShiftClicked && event instanceof InventoryCloseEvent) {
+			return; //Only ever updates on InventoryCloseEvent if shift clicks have been made
+		} else {
+
+			if(hasShiftClicked && event instanceof InventoryCloseEvent) {
+				hasShiftClicked = false;
+			}//Sets hasShiftClicked to false after updating entire inventory
+
+			// Swap current and previous lists
+			mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+			Map<BaseEnchantment, Integer> temp = mPreviousProperties;
+			mPreviousProperties = mCurrentProperties;
+			mCurrentProperties = temp;
+
+			for(int i = 0; i <= 40; i++) {
+				mInventoryProperties.put(i, new HashMap<BaseEnchantment, Integer>());
+			}
+
+			// Clear the current map and update it with current properties
+			mCurrentProperties.clear();
+			try {
+				plugin.mEnchantmentManager.getItemProperties(mCurrentProperties, mInventoryProperties, player);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Remove properties from the player that were removed
+			for (BaseEnchantment property : mPreviousProperties.keySet()) {
+				if (!mCurrentProperties.containsKey(property)) {
+					property.removeProperty(plugin, player);
+				}
+			}
+
+			// Apply properties to the player that changed or have a new level
+			for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+				BaseEnchantment property = iter.getKey();
+				Integer level = iter.getValue();
+
+				Integer oldLevel = mPreviousProperties.get(property);
+				if (oldLevel == level) {
+					// Don't need to do anything - player already had effects from this
+				} else if (oldLevel == null) {
+					// This didn't exist before - just apply the new property
+					property.applyProperty(plugin, player, level);
+				} else {
+					// This existed before but was a different level - clear and re-add
+					property.removeProperty(plugin, player);
+					property.applyProperty(plugin, player, level);
+				}
+			}
+		}
+
+		//Runs onEquipmentUpdate() method for all BaseEnchantments
+		for(Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
 			BaseEnchantment property = iter.getKey();
-			Integer level = iter.getValue();
 
-			Integer oldLevel = mPreviousProperties.get(property);
-			if (oldLevel == level) {
-				// Don't need to do anything - player already had effects from this
-			} else if (oldLevel == null) {
-				// This didn't exist before - just apply the new property
-				property.applyProperty(plugin, player, level);
-			} else {
-				// This existed before but was a different level - clear and re-add
-				property.removeProperty(plugin, player);
-				property.applyProperty(plugin, player, level);
-			}
+			property.onEquipmentUpdate(plugin, player);
 		}
 	}
 

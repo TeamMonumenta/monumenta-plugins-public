@@ -14,6 +14,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -79,10 +80,10 @@ public class PlayerTracking implements EntityTracking {
 		return mPlayers.keySet();
 	}
 
-	public void updateEquipmentProperties(Player player) {
+	public void updateEquipmentProperties(Player player, Event event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
-			manager.updateEquipmentProperties(mPlugin, player);
+			manager.updateEquipmentProperties(mPlugin, player, event);
 		}
 	}
 

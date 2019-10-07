@@ -91,6 +91,11 @@ public interface BaseEnchantment {
 	 */
 	default public void removeProperty(Plugin plugin, Player player) { }
 
+	/*
+	 * Runs whenever the player changes their inventory and equipment is updated
+	 */
+	default public void onEquipmentUpdate(Plugin plugin, Player player) { }
+
 
 	/* This method will be called once per second */
 	default public void tick(Plugin plugin, World world, Player player, int level) { }

@@ -33,7 +33,7 @@ public class ThrowingKnife implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.HAND);
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
 	}
 
 	@Override

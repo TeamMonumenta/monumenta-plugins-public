@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -32,23 +31,20 @@ public class TwoHanded implements BaseEnchantment{
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player, int level) {
-		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 0, true, false));
-		plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, 1, true, false));
-	}
-	@Override
 	public void removeProperty(Plugin plugin, Player player) {
 		plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.WEAKNESS);
 		plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW);
 	}
 
 	@Override
-	public int getLevelFromItem(ItemStack item, Player player) {
+	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		PlayerInventory inventory = player.getInventory();
 		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR) {
-			return getLevelFromItem(item);
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 0, true, false));
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, 1, true, false));
 		} else {
-			return 0;
+			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.WEAKNESS);
+			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW);
 		}
 	}
 }
