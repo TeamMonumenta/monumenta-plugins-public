@@ -139,7 +139,9 @@ public class Plugin extends JavaPlugin {
 		STATIC_PLUGIN_REF = this;
 		PluginManager manager = getServer().getPluginManager();
 
-		mSocketManager = new SocketManager(this, mServerProperties.getSocketPort(), mServerProperties.getShardName());
+		mSocketManager = new SocketManager(this, mServerProperties.getSocketHost(),
+		                                   mServerProperties.getSocketPort(),
+										   mServerProperties.getShardName());
 		mSocketManager.open();
 
 		mItemOverrides = new ItemOverrides();

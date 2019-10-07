@@ -39,13 +39,13 @@ public class SocketManager {
 	private BukkitRunnable mHeart = null;
 	private BukkitRunnable mRunnable = null;
 
-	public SocketManager(Plugin plugin, int port, String shardName) {
+	public SocketManager(Plugin plugin, String host, int port, String shardName) {
 		mPlugin = plugin;
 		mName = shardName;
 		mRunnable = new BukkitRunnable(){
 			@Override
 			public void run() {
-				_connect("bungee", port);
+				_connect(host, port);
 			}
 		};
 		mHeart = new BukkitRunnable(){

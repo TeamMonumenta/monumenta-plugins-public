@@ -35,6 +35,7 @@ public class ServerProperties {
 	private boolean mClassSpecializationsEnabled = false;
 
 	private String mShardName = "default_settings";
+	private String mSocketHost = "bungee";
 
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	public Set<String> mForbiddenItemLore = new HashSet<>();
@@ -85,6 +86,10 @@ public class ServerProperties {
 		return mShardName;
 	}
 
+	public String getSocketHost() {
+		return mSocketHost;
+	}
+
 	public void load(Plugin plugin, CommandSender sender) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
@@ -127,6 +132,7 @@ public class ServerProperties {
 					mClassSpecializationsEnabled = _getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 
 					mShardName                   = _getPropertyValueString(plugin, object, "shardName", mShardName);
+					mSocketHost                  = _getPropertyValueString(plugin, object, "socketHost", mSocketHost);
 
 					mAllowedTransferTargets      = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mForbiddenItemLore           = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
