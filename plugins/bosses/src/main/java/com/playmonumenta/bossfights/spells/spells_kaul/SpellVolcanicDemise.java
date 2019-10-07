@@ -142,9 +142,9 @@ public class SpellVolcanicDemise extends Spell {
 					for (Player player : players) {
 						// Player gets more particles the closer they are to the landing area
 						double dist = player.getLocation().distance(loc);
-						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 10);
-						for (double t = 0.5; t <= 10; t += step) {
-							player.spawnParticle(Particle.FLAME, loc.clone().add(0, t, 0), 1, 0.15, 0.15, 0.15, 0);
+						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
+						for(double deg = 0; deg < 360; deg += (step * 30)) {
+							player.spawnParticle(Particle.FLAME, loc.clone().add(Math.cos(deg), 0, Math.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
 						}
 					}
 				}
