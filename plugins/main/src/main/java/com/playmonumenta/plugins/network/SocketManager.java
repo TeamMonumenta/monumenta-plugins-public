@@ -28,16 +28,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class SocketManager {
-	private String mName = null;
-	private Plugin mPlugin = null;
+	private String mName;
+	private Plugin mPlugin;
 	private Socket mSocket = null;
 	private Boolean mEnabled = false;
 	private JsonReader mInput = null;
 	private JsonWriter mOutput = null;
 	private BukkitTask mHeartTask = null;
 	private BukkitTask mAsyncTask = null;
-	private BukkitRunnable mHeart = null;
-	private BukkitRunnable mRunnable = null;
+	private BukkitRunnable mHeart;
+	private BukkitRunnable mRunnable;
 
 	public SocketManager(Plugin plugin, String host, int port, String shardName) {
 		mPlugin = plugin;
@@ -104,56 +104,32 @@ public class SocketManager {
 		close(); // If the socket is open, close it and stop the current loop.
 		mEnabled = true; // Allows the new loop to run
 		mAsyncTask = mRunnable.runTaskAsynchronously(mPlugin); // Start the loop
-		mHeartTask = mHeart.runTaskTimerAsynchronously(mPlugin, 30 * 20, 30 * 20); // Send a heartbeat every 30 seconds
 	}
 
-	public Boolean sendPacket(String destination, String operation, JsonObject data) {
-		if (mSocket != null && mSocket.isConnected() && !mSocket.isClosed()) {
-			JsonObject raw = new JsonObject();
-			if (destination != null) {
-				raw.addProperty("dest", destination);
-			}
-			if (operation != null) {
-				raw.addProperty("op", operation);
-			}
-			if (data != null) {
-				raw.add("data", data);
-			}
-			try {
-				Streams.write(raw, mOutput);
-				mOutput.flush();
-				return true;
-			} catch (Exception e) {
-				mPlugin.getLogger().warning("Error sending packet:");
+	public void sendPacket(BasePacket packet) {
+		JsonObject raw = packet.toJson();
+		try {
+			Streams.write(raw, mOutput);
+			mOutput.flush();
+		} catch (Exception e) {
+			if (packet.hasOperation() && packet.getOperation().equals(BungeeHeartbeatPacket.PacketOperation)) {
+				mPlugin.getLogger().fine("Error sending heartbeat packet, socket is likely dead. Reconnecting");
+			} else {
+				mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
 				e.printStackTrace();
 			}
+			// Failed to send, reconnect
+			open();
 		}
-		return false;
 	}
-
-	public Boolean sendPacket(BasePacket packet) {
-		if (mSocket != null && mSocket.isConnected() && !mSocket.isClosed()) {
-			JsonObject raw = packet.toJson();
-			try {
-				Streams.write(raw, mOutput);
-				mOutput.flush();
-				return true;
-			} catch (Exception e) {
-				mPlugin.getLogger().warning("Error sending packet:");
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-
-	// public Boolean send(BasePacket packet) {
-	// 	return send(packet.getDestination(), packet.getOperation(), packet.getData());
-	// }
 
 	private void _connect(String address, int port) {
 		int attempts = 0;
 		while (mEnabled) {
-			mPlugin.getLogger().info("Attempt "+attempts+" connecting to socket on "+address+":"+port);
+			mPlugin.getLogger().fine("Attempt "+attempts+" connecting to socket on "+address+":"+port);
+			if (mHeartTask != null) {
+				mHeartTask.cancel();
+			}
 			try {
 				mSocket = new Socket(address, port);
 				mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
@@ -163,7 +139,8 @@ public class SocketManager {
 				mPlugin.getLogger().info("Connected to socket after "+attempts+" attempts");
 				attempts = 0;
 				sendPacket(new BungeeHandshakePacket(mName));
-				while (!mSocket.isClosed()) {
+				mHeartTask = mHeart.runTaskTimerAsynchronously(mPlugin, 30 * 20, 30 * 20); // Send a heartbeat every 30 seconds
+				while (mEnabled) {
 					JsonElement raw = Streams.parse(mInput);
 					if (raw != null && raw.isJsonObject()) {
 						JsonObject rawData = raw.getAsJsonObject();
@@ -185,28 +162,42 @@ public class SocketManager {
 							data = rawData.getAsJsonObject("data");
 						}
 						BasePacket compiled = new BasePacket(dest, op, data);
-						if (op.equals(BasePacket.PacketOperation)) {
-							BasePacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BroadcastCommandPacket.PacketOperation)) {
-							BroadcastCommandPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BungeeCommandPacket.PacketOperation)) {
-							BungeeCommandPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BungeeErrorPacket.PacketOperation)) {
-							BungeeErrorPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BungeeGetServerListPacket.PacketOperation)) {
-							BungeeGetServerListPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BungeeSendPlayerPacket.PacketOperation)) {
-							BungeeSendPlayerPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(BungeeHeartbeatPacket.PacketOperation)) {
-							BungeeHeartbeatPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(ShardCommandPacket.PacketOperation)) {
-							ShardCommandPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(ShardErrorPacket.PacketOperation)) {
-							ShardErrorPacket.handlePacket(mPlugin, compiled);
-						} else if (op.equals(ShardTransferPlayerDataPacket.PacketOperation)) {
-							ShardTransferPlayerDataPacket.handlePacket(mPlugin, compiled);
-						} else {
-							mPlugin.getLogger().warning(mName+" received unknown packet: "+op);
+						if (op != null) {
+							switch (op) {
+								case BasePacket.PacketOperation:
+									BasePacket.handlePacket(mPlugin, compiled);
+									break;
+								case BroadcastCommandPacket.PacketOperation:
+									BroadcastCommandPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeCommandPacket.PacketOperation:
+									BungeeCommandPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeErrorPacket.PacketOperation:
+									BungeeErrorPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeGetServerListPacket.PacketOperation:
+									BungeeGetServerListPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeSendPlayerPacket.PacketOperation:
+									BungeeSendPlayerPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeHeartbeatPacket.PacketOperation:
+									BungeeHeartbeatPacket.handlePacket(mPlugin, compiled);
+									break;
+								case ShardCommandPacket.PacketOperation:
+									ShardCommandPacket.handlePacket(mPlugin, compiled);
+									break;
+								case ShardErrorPacket.PacketOperation:
+									ShardErrorPacket.handlePacket(mPlugin, compiled);
+									break;
+								case ShardTransferPlayerDataPacket.PacketOperation:
+									ShardTransferPlayerDataPacket.handlePacket(mPlugin, compiled);
+									break;
+								default:
+									mPlugin.getLogger().warning(mName + " received unknown packet: " + op);
+									break;
+							}
 						}
 					}
 				}
