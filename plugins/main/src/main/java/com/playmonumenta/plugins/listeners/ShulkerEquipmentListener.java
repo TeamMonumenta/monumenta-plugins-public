@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,6 +26,24 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
+	private static final Map<Integer, Integer> SWAP_SLOTS = new TreeMap<Integer, Integer>();
+
+	static {
+		SWAP_SLOTS.put(0, 0);
+		SWAP_SLOTS.put(1, 1);
+		SWAP_SLOTS.put(2, 2);
+		SWAP_SLOTS.put(3, 3);
+		SWAP_SLOTS.put(4, 4);
+		SWAP_SLOTS.put(5, 5);
+		SWAP_SLOTS.put(6, 6);
+		SWAP_SLOTS.put(7, 7);
+		SWAP_SLOTS.put(8, 8);
+		SWAP_SLOTS.put(36, 9);
+		SWAP_SLOTS.put(37, 10);
+		SWAP_SLOTS.put(38, 11);
+		SWAP_SLOTS.put(39, 12);
+		SWAP_SLOTS.put(40, 13);
+	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void InventoryClickEvent(InventoryClickEvent event) {
@@ -153,18 +174,23 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	private void swap(Player player, PlayerInventory pInv, ShulkerBox sbox) {
+		/* Prevent swapping/nesting shulkers */
+		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
+			ItemStack item = pInv.getItem(slot.getKey());
+			if (item != null && ItemUtils.isShulkerBox(item.getType())) {
+				player.sendMessage(ChatColor.RED + "You can not store shulker boxes");
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
+				return;
+			}
+		}
+
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Equipment Swapped");
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
 		Inventory sInv = sbox.getInventory();
 
-		for (int slot = 0; slot < 9; slot++) {
-			swapItem(pInv, sInv, slot, slot);
+		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
+			swapItem(pInv, sInv, slot.getKey(), slot.getValue());
 		}
-		swapItem(pInv, sInv, 36, 9);
-		swapItem(pInv, sInv, 37, 10);
-		swapItem(pInv, sInv, 38, 11);
-		swapItem(pInv, sInv, 39, 12);
-		swapItem(pInv, sInv, 40, 13);
 	}
 
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {
