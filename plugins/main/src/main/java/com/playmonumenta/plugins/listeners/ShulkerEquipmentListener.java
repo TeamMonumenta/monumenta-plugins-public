@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -131,20 +130,6 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 	*/
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void BlockPlaceEvent(BlockPlaceEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
-		if (isEquipmentBox(event.getItemInHand())) {
-			event.setCancelled(true);
-			if (event.getPlayer() != null) {
-				event.getPlayer().sendMessage(ChatColor.RED + "This item can not be placed");
-			}
-		}
-	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void BlockDispenseEvent(BlockDispenseEvent event) {
