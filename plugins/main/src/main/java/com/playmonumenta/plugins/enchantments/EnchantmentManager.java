@@ -69,6 +69,7 @@ public class EnchantmentManager {
 		init.add(new Resurrection());
 		init.add(new DivineAura());
 		init.add(new SecondWind());
+		init.add(new VoidTether());
 
 		// Active enchantments
 		init.add(new Chaotic());

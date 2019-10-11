@@ -97,7 +97,7 @@ public interface BaseEnchantment {
 	default public void onEquipmentUpdate(Plugin plugin, Player player) { }
 
 
-	/* This method will be called once per second */
+	/* This method will be called four times per second */
 	default public void tick(Plugin plugin, World world, Player player, int level) { }
 
 	/*
