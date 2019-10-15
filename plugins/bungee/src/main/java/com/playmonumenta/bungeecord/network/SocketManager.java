@@ -170,13 +170,16 @@ public class SocketManager {
 					} catch (Exception e) {
 						mMain.getLogger().warning("Error accepting socket: ");
 						e.printStackTrace();
+						break;
 					}
 				}
 			} catch (Exception e) {
 				mMain.getLogger().warning("Error creating socket server: ");
 				e.printStackTrace();
 			}
+			// Socket server must close or restart.
 			if (mEnabled) {
+				// Server will restart, add a delay between attempts
 				try {
 					Thread.sleep(Math.min(attempts, 10) * 1000);
 				} catch (Exception e) {
