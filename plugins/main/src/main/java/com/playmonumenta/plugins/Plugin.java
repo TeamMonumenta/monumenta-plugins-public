@@ -143,7 +143,7 @@ public class Plugin extends JavaPlugin {
 		mSocketManager = new SocketManager(this, mServerProperties.getSocketHost(),
 		                                   mServerProperties.getSocketPort(),
 										   mServerProperties.getShardName());
-		mSocketManager.open();
+		// mSocketManager.open();
 
 		mItemOverrides = new ItemOverrides();
 

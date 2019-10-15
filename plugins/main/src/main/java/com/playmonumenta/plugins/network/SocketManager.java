@@ -31,7 +31,8 @@ public class SocketManager {
 	private String mName;
 	private Plugin mPlugin;
 	private Socket mSocket = null;
-	private Boolean mEnabled = false;
+	private boolean mSocketEnabled = true;
+	private boolean mHeartbeatEnabled = false;
 	private JsonReader mInput = null;
 	private JsonWriter mOutput = null;
 	private BukkitTask mHeartTask = null;
@@ -51,13 +52,16 @@ public class SocketManager {
 		mHeart = new BukkitRunnable(){
 			@Override
 			public void run() {
-				sendPacket(new BungeeHeartbeatPacket());
+				_heartbeat();
 			}
 		};
+
+		mAsyncTask = mRunnable.runTaskAsynchronously(mPlugin); // Start the loop
+		mHeartTask = mHeart.runTaskTimerAsynchronously(mPlugin, 30 * 20, 30 * 20); // Send a heartbeat every 30 seconds
 	}
 
 	public void close() {
-		mEnabled = false;
+		mSocketEnabled = false;
 		if (mAsyncTask != null) {
 			mAsyncTask.cancel();
 			mAsyncTask = null;
@@ -66,9 +70,7 @@ public class SocketManager {
 			mHeartTask.cancel();
 			mHeartTask = null;
 		}
-		if (mSocket != null &&
-		    mSocket.isConnected() &&
-		    !mSocket.isClosed()) {
+		if (mSocket != null) {
 			try {
 				mSocket.close();
 			} catch (Exception e) {
@@ -100,17 +102,13 @@ public class SocketManager {
 		}
 	}
 
-	public void open() {
-		close(); // If the socket is open, close it and stop the current loop.
-		mEnabled = true; // Allows the new loop to run
-		mAsyncTask = mRunnable.runTaskAsynchronously(mPlugin); // Start the loop
-	}
-
-	public void sendPacket(BasePacket packet) {
+	public boolean sendPacket(BasePacket packet) {
+		mPlugin.getLogger().fine("Sending packet to "+packet.getDestination()+" : "+packet.getOperation());
 		JsonObject raw = packet.toJson();
 		try {
 			Streams.write(raw, mOutput);
 			mOutput.flush();
+			return true;
 		} catch (Exception e) {
 			if (packet.hasOperation() && packet.getOperation().equals(BungeeHeartbeatPacket.PacketOperation)) {
 				mPlugin.getLogger().fine("Error sending heartbeat packet, socket is likely dead. Reconnecting");
@@ -118,18 +116,33 @@ public class SocketManager {
 				mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
 				e.printStackTrace();
 			}
-			// Failed to send, reconnect
-			open();
+			return false;
 		}
 	}
 
+	private void _heartbeat() {
+		if (mHeartbeatEnabled) {
+			if (!sendPacket(new BungeeHeartbeatPacket())) {
+				// Heartbeat failed, reconnect
+				// Prevent heartbeats until reconnected
+				mHeartbeatEnabled = false;
+				try {
+					// Make sure the socket is fully closed.
+					// If mSocketEnabled is still true, it will reconnect automatically.
+					mSocket.close();
+				} catch (Exception e) {
+					mPlugin.getLogger().info("Error closing socket: ");
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+
 	private void _connect(String address, int port) {
 		int attempts = 0;
-		while (mEnabled) {
+		while (mSocketEnabled) {
 			mPlugin.getLogger().fine("Attempt "+attempts+" connecting to socket on "+address+":"+port);
-			if (mHeartTask != null) {
-				mHeartTask.cancel();
-			}
 			try {
 				mSocket = new Socket(address, port);
 				mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
@@ -139,8 +152,8 @@ public class SocketManager {
 				mPlugin.getLogger().info("Connected to socket after "+attempts+" attempts");
 				attempts = 0;
 				sendPacket(new BungeeHandshakePacket(mName));
-				mHeartTask = mHeart.runTaskTimerAsynchronously(mPlugin, 30 * 20, 30 * 20); // Send a heartbeat every 30 seconds
-				while (mEnabled) {
+				mHeartbeatEnabled = true;
+				while (mSocketEnabled) {
 					JsonElement raw = Streams.parse(mInput);
 					if (raw != null && raw.isJsonObject()) {
 						JsonObject rawData = raw.getAsJsonObject();
@@ -211,7 +224,7 @@ public class SocketManager {
 				mPlugin.getLogger().warning("Socket Error: Misc");
 				e.printStackTrace();
 			}
-			if (mEnabled) {
+			if (mSocketEnabled) {
 				// Something went wrong. Socket will retry, but let's wait.
 				try {
 					Thread.sleep(Math.min(attempts, 10) * 1000);
