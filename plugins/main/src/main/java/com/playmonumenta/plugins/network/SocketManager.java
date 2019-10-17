@@ -31,12 +31,13 @@ public class SocketManager {
 	private String mName;
 	private Plugin mPlugin;
 	private Socket mSocket = null;
+	private boolean mConnecting = false;
 	private boolean mSocketEnabled = true;
 	private boolean mHeartbeatEnabled = false;
 	private JsonReader mInput = null;
 	private JsonWriter mOutput = null;
-	private BukkitTask mHeartTask = null;
-	private BukkitTask mAsyncTask = null;
+	private BukkitTask mHeartTask;
+	private BukkitTask mAsyncTask;
 	private BukkitRunnable mHeart;
 	private BukkitRunnable mRunnable;
 
@@ -116,25 +117,14 @@ public class SocketManager {
 				mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
 				e.printStackTrace();
 			}
+			_reconnect();
 			return false;
 		}
 	}
 
 	private void _heartbeat() {
 		if (mHeartbeatEnabled) {
-			if (!sendPacket(new BungeeHeartbeatPacket())) {
-				// Heartbeat failed, reconnect
-				// Prevent heartbeats until reconnected
-				mHeartbeatEnabled = false;
-				try {
-					// Make sure the socket is fully closed.
-					// If mSocketEnabled is still true, it will reconnect automatically.
-					mSocket.close();
-				} catch (Exception e) {
-					mPlugin.getLogger().info("Error closing socket: ");
-					e.printStackTrace();
-				}
-			}
+			sendPacket(new BungeeHeartbeatPacket());
 		}
 	}
 
@@ -142,6 +132,7 @@ public class SocketManager {
 	private void _connect(String address, int port) {
 		int attempts = 0;
 		while (mSocketEnabled) {
+			mConnecting = true;
 			mPlugin.getLogger().fine("Attempt "+attempts+" connecting to socket on "+address+":"+port);
 			try {
 				mSocket = new Socket(address, port);
@@ -151,6 +142,7 @@ public class SocketManager {
 				mOutput.setLenient(true); // Even if the JSON is perfect, the socket will fail if not lenient.
 				mPlugin.getLogger().info("Connected to socket after "+attempts+" attempts");
 				attempts = 0;
+				mConnecting = false;
 				sendPacket(new BungeeHandshakePacket(mName));
 				mHeartbeatEnabled = true;
 				while (mSocketEnabled) {
@@ -233,6 +225,44 @@ public class SocketManager {
 					e2.printStackTrace();
 				}
 				attempts++;
+			}
+		}
+	}
+
+	private void _reconnect() {
+		if (mSocketEnabled && !mConnecting) {
+			// Close the socket
+			if (mSocket != null) {
+				try {
+					mSocket.close();
+				} catch (Exception e) {
+					//TODO: handle exception
+					mPlugin.getLogger().warning("Error attempting to close socket");
+					e.printStackTrace();
+				}
+				mSocket = null;
+			}
+			// Closing the socket should also close input, but let's be safe
+			if (mInput != null) {
+				try {
+					mInput.close();
+				} catch (Exception e) {
+					//TODO: handle exception
+					mPlugin.getLogger().warning("Error attempting to close socket input stream");
+					e.printStackTrace();
+				}
+				mInput = null;
+			}
+			// Closing the socket should also close output, but let's be safe
+			if (mOutput != null) {
+				try {
+					mOutput.close();
+				} catch (Exception e) {
+					//TODO: handle exception
+					mPlugin.getLogger().warning("Error attempting to close socket output stream");
+					e.printStackTrace();
+				}
+				mOutput = null;
 			}
 		}
 	}

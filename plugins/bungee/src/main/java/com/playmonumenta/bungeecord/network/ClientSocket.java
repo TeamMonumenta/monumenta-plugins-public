@@ -62,26 +62,43 @@ public class ClientSocket {
 		}
 	}
 
-	public Boolean close() {
-		if (mEnabled) {
+	public void close() {
+		mEnabled = false;
+		if (mSocket != null) {
 			try {
-				mEnabled = false;
 				mSocket.close();
-				mInput.close();
-				mOutput.close();
-				return true;
 			} catch (Exception e) {
-				return false;
+				//TODO: handle exception
+				mMain.getLogger().warning("Error attempting to close socket");
+				e.printStackTrace();
 			}
+			mSocket = null;
 		}
-		return false;
+		if (mInput != null) {
+			try {
+				mInput.close();
+			} catch (Exception e) {
+				//TODO: handle exception
+				mMain.getLogger().warning("Error attempting to close socket input stream");
+				e.printStackTrace();
+			}
+			mInput = null;
+		}
+		if (mOutput != null) {
+			try {
+				mOutput.close();
+			} catch (Exception e) {
+				//TODO: handle exception
+				mMain.getLogger().warning("Error attempting to close socket output stream");
+				e.printStackTrace();
+			}
+			mOutput = null;
+		}
 	}
 
 	public void open() {
-		if (!mEnabled) {
-			mEnabled = true;
-			mProxy.getScheduler().runAsync(mMain, mRunnable);
-		}
+		mEnabled = true;
+		mProxy.getScheduler().runAsync(mMain, mRunnable);
 	}
 
 	public Status getStatus() {
@@ -103,53 +120,53 @@ public class ClientSocket {
 	}
 
 	private void _listen() {
-		while (mEnabled) {
-			try {
-				mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
-				mOutput = new JsonWriter(new OutputStreamWriter(mSocket.getOutputStream()));
-				mInput.setLenient(true);
-				mOutput.setLenient(true);
-				while (mEnabled) {
-					JsonElement in = Streams.parse(mInput);
-					if (in.isJsonObject()) {
-						JsonObject raw = in.getAsJsonObject();
-						String dest = null;
-						String op = null;
-						JsonObject data = null;
-						if (raw.has("dest") &&
-						    raw.get("dest").isJsonPrimitive() &&
-						    raw.getAsJsonPrimitive("dest").isString()) {
-							dest = raw.get("dest").getAsString();
-						}
-						if (raw.has("op") &&
-						    raw.get("op").isJsonPrimitive() &&
-						    raw.getAsJsonPrimitive("op").isString()) {
-							op = raw.get("op").getAsString();
-						}
-						if (raw.has("data") &&
-						    raw.get("data").isJsonObject()) {
-							data = raw.getAsJsonObject("data");
-						}
-						mManager.sortPacket(this, new BasePacket(dest, op, data));
+		try {
+			// Create a reader/writer for this socket
+			mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
+			mOutput = new JsonWriter(new OutputStreamWriter(mSocket.getOutputStream()));
+			// Both streams *must* be set as lenient to accommodate for how sockets communicate
+			mInput.setLenient(true);
+			mOutput.setLenient(true);
+			while (mEnabled) {
+				// Use gson's Streams module to read one full object.
+				JsonElement in = Streams.parse(mInput);
+				if (in.isJsonObject()) {
+					JsonObject raw = in.getAsJsonObject();
+					String dest = null;
+					String op = null;
+					JsonObject data = null;
+					if (raw.has("dest") &&
+						raw.get("dest").isJsonPrimitive() &&
+						raw.getAsJsonPrimitive("dest").isString()) {
+						dest = raw.get("dest").getAsString();
 					}
+					if (raw.has("op") &&
+						raw.get("op").isJsonPrimitive() &&
+						raw.getAsJsonPrimitive("op").isString()) {
+						op = raw.get("op").getAsString();
+					}
+					if (raw.has("data") &&
+						raw.get("data").isJsonObject()) {
+						data = raw.getAsJsonObject("data");
+					}
+					mManager.sortPacket(this, new BasePacket(dest, op, data));
 				}
-			} catch (SocketException e) {
-				mMain.getLogger().warning("Socket Error: Closed");
-				e.printStackTrace();
-				close();
-			} catch (IOException e) {
-				mMain.getLogger().warning("Socket Error: Connection");
-				e.printStackTrace();
-				close();
-			} catch (JsonParseException e) {
-				mMain.getLogger().warning("Socket Error: JSON Parse");
-				e.printStackTrace();
-				close();
-			} catch (Exception e) {
-				mMain.getLogger().warning("Socket Error: Misc");
-				e.printStackTrace();
-				close();
 			}
+		} catch (SocketException e) {
+			mMain.getLogger().warning("Socket Error: Closed");
+			e.printStackTrace();
+		} catch (IOException e) {
+			mMain.getLogger().warning("Socket Error: Connection");
+			e.printStackTrace();
+		} catch (JsonParseException e) {
+			mMain.getLogger().warning("Socket Error: JSON Parse");
+			e.printStackTrace();
+		} catch (Exception e) {
+			mMain.getLogger().warning("Socket Error: Misc");
+			e.printStackTrace();
 		}
+		// If execution reaches this point, it means either the socket was closed or threw an error
+		// In either case, close the socket and stop the listener. The client can reconnect.
+		close();
 	}
 }

@@ -129,7 +129,12 @@ public class TransferServer extends GenericCommand {
 						player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
 					}
 
-					NetworkUtils.transferPlayerData(plugin, player, server);
+					if (!NetworkUtils.transferPlayerData(plugin, player, server)) {
+						// Failed to send, unlock the player's inventory and let them know to retry later
+						player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, plugin);
+						player.sendMessage(ChatColor.RED + "Transfer failed! Please try again.");
+						player.sendMessage(ChatColor.RED + "If this issue persists, please ask a moderator for assistance.");
+					}
 				} else {
 					player.sendMessage(ChatColor.GOLD + "Transferring you " + ChatColor.RED + "without playerdata" +
 					                   ChatColor.GOLD + " to " + server);

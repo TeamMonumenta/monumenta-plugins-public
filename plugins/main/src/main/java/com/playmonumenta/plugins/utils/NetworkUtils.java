@@ -26,11 +26,11 @@ public class NetworkUtils {
 		plugin.getLogger().info("Requested bungeecord transfer " + playerName + " to " + server);
 	}
 
-	public static void transferPlayerData(Plugin plugin, Player player, String server) throws Exception {
-		plugin.mSocketManager.sendPacket(new ShardTransferPlayerDataPacket(server,
-		                                                                   player.getName(),
-		                                                                   player.getUniqueId(),
-		                                                                   PlayerData.convertToString(plugin, player)));
+	public static boolean transferPlayerData(Plugin plugin, Player player, String server) throws Exception {
+		return plugin.mSocketManager.sendPacket(new ShardTransferPlayerDataPacket(server,
+		                                                                          player.getName(),
+		                                                                          player.getUniqueId(),
+		                                                                          PlayerData.convertToString(plugin, player)));
 	}
 
 	public static void getServerList(Plugin plugin, Player player) throws Exception {
