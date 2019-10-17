@@ -40,14 +40,10 @@ public class ReforgeInventory extends GenericCommand {
 			int ccsCost = reforgeCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
 			int cmmCost = reforgeCost.getOrDefault(ItemRegion.MONUMENTA, 0);
 			if (cmmCost != 0) {
-				// If the player has any "Monumenta :" items, convert the cost to repair that item into the current region's currency, or CXP by default.
-				if (player.getWorld().getName().equals("Project_Epic-region_1")) {
-					cxpCost += cmmCost;
-				} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
-					ccsCost += cmmCost;
-				} else {
-					cxpCost += cmmCost;
-				}
+				// ItemRegion.MONUMENTA currently only exists to allow items from
+				// Celsian Isles to be used in King's Valley. So the cost to reforge is Celsian Isles currency
+				// We need to figure out a more permanent solution to this at some point.
+				ccsCost += cmmCost;
 			}
 			boolean paid = false;
 			ItemStack cxp = CalculateReforge.mCXP.clone();

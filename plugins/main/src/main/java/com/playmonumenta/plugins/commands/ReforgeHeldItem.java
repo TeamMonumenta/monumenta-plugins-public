@@ -36,13 +36,10 @@ public class ReforgeHeldItem extends GenericCommand {
 				int cost = ItemUtils.getReforgeCost(item);
 				PlayerInventory inventory = player.getInventory();
 				if (region == ItemRegion.MONUMENTA) {
-					if (player.getWorld().getName().equals("Project_Epic-region_1")) {
-						region = ItemRegion.KINGS_VALLEY;
-					} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
-						region = ItemRegion.CELSIAN_ISLES;
-					} else {
-						region = ItemRegion.KINGS_VALLEY;
-					}
+					// ItemRegion.MONUMENTA currently only exists to allow items from
+					// Celsian Isles to be used in King's Valley. So the cost to reforge is Celsian Isles currency
+					// We need to figure out a more permanent solution to this at some point.
+					region = ItemRegion.CELSIAN_ISLES;
 				}
 				if (region == ItemRegion.KINGS_VALLEY) {
 					ItemStack cxp = CalculateReforge.mCXP.clone();
