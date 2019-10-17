@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -32,7 +33,7 @@ public class VoidTether implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.HAND);
+		return EnumSet.of(ItemSlot.OFFHAND, ItemSlot.MAINHAND);
 	}
 
 	@Override
@@ -55,12 +56,7 @@ public class VoidTether implements BaseEnchantment {
 	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		Location ploc = player.getLocation();
 
-		if (ploc.getY() > 0) {
-			/* Not in the void */
-			return;
-		}
-
-		if (event.getFinalDamage() + 5 < player.getHealth()) {
+		if (event.getFinalDamage() < player.getHealth()) {
 			/* Non-fatal damage */
 			return;
 		}
@@ -75,31 +71,59 @@ public class VoidTether implements BaseEnchantment {
 			}
 		}
 
-		/* Activate! */
+		if (ploc.getY() > 0) {
+			plugin.getLogger().info("Player '" + player.getName() + "' was not in the void when taking fatal damage and carrying a void totem");
+			/* Player took fatal damage but is not in the void */
+
+			if (event.getFinalDamage() >= player.getHealth() && !player.isOnGround()) {
+				/* Player really is going to die and is not on the ground - put them on a block */
+				Location saveLoc = new Location(ploc.getWorld(), ploc.getBlockX(), Math.max(0, ploc.getBlockY() - 1), ploc.getBlockZ());
+				if (saveLoc.getBlock().isPassable()) {
+					/* Since they're not dying in the void, only set the block if it's already not solid */
+					saveLoc.getBlock().setType(Material.OBSIDIAN);
+				}
+				player.setVelocity(new Vector(0, 0, 0));
+				player.setFallDistance(0);
+				player.setNoDamageTicks(20);
+				player.teleport(saveLoc.clone().add(0.5, 1, 0.5));
+			}
+
+			return;
+		}
+
+		plugin.getLogger().info("Player '" + player.getName() + "' was in the void when taking fatal damage and carrying a void totem");
+
+		/* In the void and taking near-fatal damage - activate! */
 		Location lastPlayerLoc = PLAYER_LOCS.get(player);
 		if (lastPlayerLoc == null || lastPlayerLoc.getY() < ploc.getY()) {
 			lastPlayerLoc = ploc;
 		}
-
-		/* Teleport the player to the nearest location to where they crossed into the void */
 		Location saveLoc = getNearestVoidCrossing(lastPlayerLoc, 5);
-		saveLoc.getBlock().setType(Material.OBSIDIAN);
-		saveLoc.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
-		saveLoc.clone().add(0, 2, 0).getBlock().setType(Material.AIR);
-		player.teleport(saveLoc.clone().add(0, 1, 0));
+
+		/* Don't let the player die in this event */
+		event.setCancelled(true);
+
+		plugin.getLogger().info("Activating void tether for player '" + player.getName() + "'");
+
+		/* Teleport the player to the nearest location to where they crossed into the void and let above logic catch them */
 		player.setVelocity(new Vector(0, 0, 0));
 		player.setFallDistance(0);
-		player.setNoDamageTicks(20);
+		player.teleport(saveLoc.clone().add(0.5, 1, 0.5));
 
-		/* Kill the player to trigger the totem */
-		event.setDamage(1000);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				/* Kill the player shortly after, triggering the totem */
+				player.damage(100);
+			}
+		}.runTaskLater(plugin, 0);
 	}
 
 	private static Location getNearestVoidCrossing(Location center, int radius) {
 		int cx = center.getBlockX();
 		int cz = center.getBlockZ();
 		World world = center.getWorld();
-		Location nearest = center.clone(); /* Return center if no matches */
+		Location nearest = new Location(world, cx, 0, cz); /* Return center if no matches */
 		double nearestDistance = Double.MAX_VALUE;
 
 		for (double x = cx - radius; x <= cx + radius; x++) {
@@ -107,7 +131,7 @@ public class VoidTether implements BaseEnchantment {
 				Location loc = new Location(world, x, 0, z);
 				double distance = Math.sqrt(((cx - x) * (cx - x)) + ((cz - z) * (cz - z)));
 				if (distance < nearestDistance) {
-					if (!loc.getBlock().getType().isSolid()) {
+					if (loc.getBlock().isPassable()) {
 						// Found a valid non-solid location
 						nearest = loc;
 						nearestDistance = distance;
