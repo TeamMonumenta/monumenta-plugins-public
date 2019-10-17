@@ -23,7 +23,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 
 	public PlayerTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		if (!(boss instanceof Mob)) {
-			throw new Exception("boss_targetplayer only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs!");
 		}
 
 		if (boss instanceof Wolf || boss instanceof Golem) {

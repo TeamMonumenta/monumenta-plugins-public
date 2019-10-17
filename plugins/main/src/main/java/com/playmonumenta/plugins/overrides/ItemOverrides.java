@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.overrides;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -80,7 +82,7 @@ public class ItemOverrides {
 		registerOverrides();
 	}
 
-	HashMap<Material, BaseOverride> mItems = new HashMap<Material, BaseOverride>();
+	Map<Material, BaseOverride> mItems = new EnumMap<Material, BaseOverride>(Material.class);
 
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
@@ -170,11 +172,9 @@ public class ItemOverrides {
 		mItems.put(Material.HOPPER_MINECART, minecartOverride);
 		mItems.put(Material.TNT_MINECART, minecartOverride);
 
-		BaseOverride conduitOverride = new ConduitOverride();
-		mItems.put(Material.CONDUIT, conduitOverride);
-
-		BaseOverride mapOverride = new MapOverride();
-		mItems.put(Material.FILLED_MAP, mapOverride);
+		mItems.put(Material.CONDUIT, new ConduitOverride());
+		mItems.put(Material.FILLED_MAP, new MapOverride());
+		mItems.put(Material.PUMPKIN_PIE, new PumpkinPieOverride());
 
 		BaseOverride bucketOverride = new BucketOverride();
 		mItems.put(Material.BUCKET, bucketOverride);
@@ -362,6 +362,14 @@ public class ItemOverrides {
 		BaseOverride override = mItems.get(block.getType());
 		if (override != null) {
 			return override.blockChangeInteraction(plugin, block);
+		}
+		return true;
+	}
+
+	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
+		BaseOverride override = mItems.get(event.getItem().getType());
+		if (override != null) {
+			return override.playerItemConsume(plugin, player, event);
 		}
 		return true;
 	}

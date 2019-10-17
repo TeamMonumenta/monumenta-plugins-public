@@ -717,6 +717,11 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		if (!mPlugin.mItemOverrides.playerItemConsume(mPlugin, player, event)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getItem().containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			event.setReplacement(event.getItem());
 		}

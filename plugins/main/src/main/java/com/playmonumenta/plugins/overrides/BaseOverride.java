@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -43,6 +44,10 @@ public class BaseOverride {
 	}
 
 	public boolean blockChangeInteraction(Plugin plugin, Block block) {
+		return true;
+	}
+
+	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
 		return true;
 	}
 }

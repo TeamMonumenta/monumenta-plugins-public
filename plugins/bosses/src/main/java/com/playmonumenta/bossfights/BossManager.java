@@ -71,6 +71,7 @@ import com.playmonumenta.bossfights.bosses.FlameNovaBoss;
 import com.playmonumenta.bossfights.bosses.FloatBoss;
 import com.playmonumenta.bossfights.bosses.FrostNovaBoss;
 import com.playmonumenta.bossfights.bosses.GenericBoss;
+import com.playmonumenta.bossfights.bosses.HalloweenCreeperBoss;
 import com.playmonumenta.bossfights.bosses.HandSwapBoss;
 import com.playmonumenta.bossfights.bosses.HiddenBoss;
 import com.playmonumenta.bossfights.bosses.IceAspectBoss;
@@ -199,6 +200,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
 		mStatelessBosses.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> new PunchResistBoss(p, e));
 		mStatelessBosses.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> new EvokerNoVex(p, e));
+		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> new HalloweenCreeperBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -285,6 +287,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> PunchResistBoss.deserialize(p, e));
 		mBossDeserializers.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> EvokerNoVex.deserialize(p, e));
 		mBossDeserializers.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e) -> OldLabsBoss.deserialize(p, e));
+		mBossDeserializers.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> HalloweenCreeperBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
