@@ -277,9 +277,6 @@ public class ItemUtils {
 
 	public static ItemRegion getItemRegion(ItemStack item) {
 		if (item != null) {
-			if (isShulkerBox(item.getType())) {
-				return ItemRegion.MONUMENTA;
-			}
 			if (item.hasItemMeta()) {
 				ItemMeta meta = item.getItemMeta();
 				if (meta.hasDisplayName()) {
@@ -306,6 +303,10 @@ public class ItemUtils {
 					}
 				}
 			}
+			// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
+			if (isShulkerBox(item.getType())) {
+				return ItemRegion.KINGS_VALLEY;
+			}
 		}
 		return ItemRegion.UNKNOWN;
 	}
@@ -315,9 +316,7 @@ public class ItemUtils {
 			return ItemTier.UNKNOWN;
 		}
 
-		if (isShulkerBox(item.getType())) {
-			return ItemTier.SHULKER_BOX;
-		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
 			String itemName = item.getItemMeta().getDisplayName();
 			if (itemName.contains("Quest Compass")) {
 				return ItemTier.QUEST_COMPASS;
@@ -374,6 +373,10 @@ public class ItemUtils {
 			} else if (stripped.endsWith(": Unique Event")) {
 				return ItemTier.UNIQUE_EVENT;
 			}
+		}
+		// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
+		if (isShulkerBox(item.getType())) {
+			return ItemTier.SHULKER_BOX;
 		}
 		return ItemTier.UNKNOWN;
 	}
@@ -584,24 +587,28 @@ public class ItemUtils {
 	}
 
 	public static boolean reforgeItem(ItemStack item) {
+		boolean reforged = false;
 		if (item != null) {
 			List<String> oldLore = item.getLore();
 			List<String> newLore = new ArrayList<>();
 			if (oldLore != null && isItemShattered(item)) {
 				for (String line : oldLore) {
-					if (!line.equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *") &&
-					    !line.equals(ChatColor.DARK_RED + "Maybe a Master Repairman") &&
-					    !line.equals(ChatColor.DARK_RED + "could reforge it...")) {
+					if (line.equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *") ||
+					    line.equals(ChatColor.DARK_RED + "Maybe a Master Repairman") ||
+					    line.equals(ChatColor.DARK_RED + "could reforge it...")) {
+						reforged = true;
+					} else {
 						newLore.add(line);
 					}
 				}
-				if (!newLore.isEmpty()) {
+				if (newLore.isEmpty()) {
+					item.setLore(null);
+				} else {
 					item.setLore(newLore);
-					return true;
 				}
 			}
 		}
-		return false;
+		return reforged;
 	}
 
 	// Check if item is a wearable with the "* Shattered *" lore entry
