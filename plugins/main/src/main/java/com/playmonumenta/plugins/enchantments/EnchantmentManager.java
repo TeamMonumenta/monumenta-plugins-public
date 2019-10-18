@@ -123,11 +123,11 @@ public class EnchantmentManager {
 	private static int[] _getItems(PlayerInventory inv, ItemSlot slot) {
 		switch (slot) {
 		case MAINHAND:
-			return new int[]{inv.getHeldItemSlot()};
+			return new int[] {inv.getHeldItemSlot()};
 		case OFFHAND:
 			return new int[] {40};
 		case ARMOR:
-			return new int[] {36,37,38,39};
+			return new int[] {36, 37, 38, 39};
 		case INVENTORY:
 			int[] indexes = new int[41];
 			for (int i = 0; i <= 40; i++) {
@@ -151,7 +151,7 @@ public class EnchantmentManager {
 
 			//Sets ItemSlot enchants to check depending on what slot it is in inventory
 			ItemSlot slot = null;
-			if(index == player.getInventory().getHeldItemSlot()) {
+			if (index == player.getInventory().getHeldItemSlot()) {
 				slot = ItemSlot.MAINHAND;
 			} else if (index == 40) {
 				slot = ItemSlot.OFFHAND;
@@ -160,13 +160,13 @@ public class EnchantmentManager {
 			}
 
 			//If map exists previously in slot, remove however much that slot had from it
-			if(invMapSlot != null && !invMapSlot.isEmpty()) {
+			if (invMapSlot != null && !invMapSlot.isEmpty()) {
 				//Removes the previously stored custom enchants from that item slot and applies the new enchant
-				for(Map.Entry<BaseEnchantment, Integer> enchant : invMapSlot.entrySet()) {
+				for (Map.Entry<BaseEnchantment, Integer> enchant : invMapSlot.entrySet()) {
 					int newLevel = propertyMap.get(enchant.getKey()) - enchant.getValue();
 					propertyMap.remove(enchant.getKey());
 					enchant.getKey().removeProperty(plugin, player);
-					if(newLevel > 0) {
+					if (newLevel > 0) {
 						propertyMap.put(enchant.getKey(), newLevel);
 						enchant.getKey().applyProperty(plugin, player, newLevel);
 					}
@@ -178,67 +178,48 @@ public class EnchantmentManager {
 			}
 
 			//If enum matches a slot (hand/armor), runs through those enchantments
-			if(slot != null) {
-
-
+			if (slot != null) {
 				//Adds in the new custom enchants at the index only
-				for(BaseEnchantment property : mProperties.get(slot)) {
-					if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
-						// Prevents armor items being held in mainhand / offhand counting towards enchantment level
-						continue;
-					}
-
-					/*
-					 * If this particular property applies levels,
-					 * add them to the running count UNLESS it is an
-					 * evasion or second wind armor piece in hand
-					 */
-					int level = property.getLevelFromItem(item, player, slot);
-					if (level > 0) {
-						Integer currentLevel = propertyMap.get(property);
-						if (currentLevel != null) {
-							currentLevel += level;
-						} else {
-							currentLevel = level;
-						}
-						propertyMap.put(property, currentLevel);
-						inventoryMap.get(index).put(property, level);
-						property.applyProperty(plugin, player, currentLevel);
-					}
+				for (BaseEnchantment property : mProperties.get(slot)) {
+					_updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 				}
 			}
 
 			slot = ItemSlot.INVENTORY;
 			//Checks for inventory enchants too, since all slots use them, so always checks regardless of above
-			for(BaseEnchantment property : mProperties.get(slot)) {
-				if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
-					// Prevents armor items being held in mainhand / offhand counting towards enchantment level
-					continue;
-				}
-
-				/*
-				 * If this particular property applies levels,
-				 * add them to the running count UNLESS it is an
-				 * evasion or second wind armor piece in hand
-				 */
-				int level = property.getLevelFromItem(item, player, slot);
-				if (level > 0) {
-					Integer currentLevel = propertyMap.get(property);
-					if (currentLevel != null) {
-						currentLevel += level;
-					} else {
-						currentLevel = level;
-					}
-					propertyMap.put(property, currentLevel);
-					inventoryMap.get(index).put(property, level);
-					property.applyProperty(plugin, player, currentLevel);
-				}
+			for (BaseEnchantment property : mProperties.get(slot)) {
+				_updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 			}
-
-
-
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void _updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item,
+	                                Player player, BaseEnchantment property,
+	                                Map<BaseEnchantment, Integer>propertyMap,
+									Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
+		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
+			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
+			return;
+		}
+
+		/*
+		 * If this particular property applies levels,
+		 * add them to the running count UNLESS it is an
+		 * evasion or second wind armor piece in hand
+		 */
+		int level = property.getLevelFromItem(item, player, slot);
+		if (level > 0) {
+			Integer currentLevel = propertyMap.get(property);
+			if (currentLevel != null) {
+				currentLevel += level;
+			} else {
+				currentLevel = level;
+			}
+			propertyMap.put(property, currentLevel);
+			inventoryMap.get(index).put(property, level);
+			property.applyProperty(plugin, player, currentLevel);
 		}
 	}
 

@@ -510,7 +510,6 @@ public class PlayerListener implements Listener {
 
 			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
-			//InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves in safe zones automatically when closed
