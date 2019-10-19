@@ -7,8 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -19,7 +25,7 @@ import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
-public class EnchantmentManager {
+public class EnchantmentManager implements Listener {
 	/* NOTE:
 	 *
 	 * It is important that the specified slots do not overlap. That means you can have an item property
@@ -31,6 +37,7 @@ public class EnchantmentManager {
 		OFFHAND,
 		ARMOR,     // Does NOT include offhand!
 		INVENTORY, // Includes everything, including armor, offhand, and hotbar
+		NONE,
 	}
 
 	/*
@@ -41,6 +48,11 @@ public class EnchantmentManager {
 	 */
 	private final Map<ItemSlot, List<BaseEnchantment>> mProperties = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
 	private final List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
+	private final Plugin mPlugin;
+
+	public EnchantmentManager(Plugin plugin) {
+		mPlugin = plugin;
+	}
 
 	public void load(Collection<String> forbiddenItemLore) {
 		mProperties.clear();
@@ -97,6 +109,9 @@ public class EnchantmentManager {
 		init.add(new TwoHanded());
 		init.add(new CurseOfCrippling());
 
+		// Tesseracts (not actually items a player can get enchants from)
+		init.add(new PestilenceTesseract());
+
 		// Forbidden items (dynamically set based on server config)
 		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {
 			for (String str : forbiddenItemLore) {
@@ -129,6 +144,8 @@ public class EnchantmentManager {
 			return new int[] {40};
 		case ARMOR:
 			return new int[] {36, 37, 38, 39};
+		case NONE:
+			return null;
 		case INVENTORY:
 			int[] indexes = new int[41];
 			for (int i = 0; i <= 40; i++) {
@@ -276,19 +293,36 @@ public class EnchantmentManager {
 		}
 	}
 
-	/*
-	 * Check if the newly spawned item entity matches any of the spawned item properties
-	 */
-	public void ItemSpawnEvent(Plugin plugin, Item item) {
+	private void checkSpawnedItem(Item item) {
 		if (item != null) {
 			ItemStack stack = item.getItemStack();
 			if (stack != null) {
 				for (BaseEnchantment property : mSpawnedProperties) {
 					int level = property.getLevelFromItem(stack);
 					if (level > 0) {
-						property.onSpawn(plugin, item, level);
+						property.onSpawn(mPlugin, item, level);
 					}
 				}
+			}
+		}
+	}
+
+	/*
+	 * Watch for spawned items
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void itemSpawnEvent(ItemSpawnEvent event) {
+		checkSpawnedItem(event.getEntity());
+	}
+
+	/*
+	 * Chunk loading an item entity also counts as spawning
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void ChunkLoadEvent(ChunkLoadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof Item) {
+				checkSpawnedItem((Item)entity);
 			}
 		}
 	}

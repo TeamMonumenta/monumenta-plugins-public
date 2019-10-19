@@ -23,28 +23,28 @@ public class ParticleUtils {
 		void run(Location loc);
 	}
 
-	public static void explodingSphereEffect(Plugin plugin, Location loc, float radius, Collection<Map.Entry<Double, SpawnParticleAction>> particles) {
+	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, Collection<Map.Entry<Double, SpawnParticleAction>> particles) {
 		new BukkitRunnable() {
-			double t = Math.PI / 4;
+			double currentRad = 0;
 
 			public void run() {
-				t = t + 0.5 * Math.PI;
-				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / 32) {
-					for (Map.Entry<Double, SpawnParticleAction> particle : particles) {
-						theta = theta + Math.PI / 64;
-						double x = t * Math.cos(theta);
-						double y = 2 * Math.exp(-0.1 * t) * Math.sin(t) + 1.5;
-						double z = t * Math.sin(theta);
-						loc.add(x, y, z);
+				currentRad += radius / ticks;
 
+				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / (7 * radius)) {
+					double x = currentRad * Math.cos(theta);
+					double y = (PARTICLE_RAND.nextDouble() - 0.5) * height;
+					double z = currentRad * Math.sin(theta);
+					loc.add(x, y, z);
+
+					for (Map.Entry<Double, SpawnParticleAction> particle : particles) {
 						if (PARTICLE_RAND.nextDouble() < particle.getKey()) {
 							particle.getValue().run(loc);
 						}
-
-						loc.subtract(x, y, z);
 					}
+
+					loc.subtract(x, y, z);
 				}
-				if (t > radius) {
+				if (currentRad >= radius) {
 					this.cancel();
 				}
 			}

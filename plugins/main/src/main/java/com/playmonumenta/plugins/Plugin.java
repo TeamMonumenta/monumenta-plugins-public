@@ -68,7 +68,7 @@ public class Plugin extends JavaPlugin {
 	int mPeriodicTimer = -1;
 
 	public ServerProperties mServerProperties = new ServerProperties();
-	public EnchantmentManager mEnchantmentManager = new EnchantmentManager();
+	public EnchantmentManager mEnchantmentManager;
 	public HttpManager mHttpManager;
 
 	public TrackingManager mTrackingManager;
@@ -126,6 +126,8 @@ public class Plugin extends JavaPlugin {
 
 		mSafeZoneManager = new SafeZoneManager(this);
 		mServerProperties.load(this, null);
+
+		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 
 		Bot.register(this);
@@ -176,6 +178,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 		manager.registerEvents(new ShulkerEquipmentListener(), this);
+		manager.registerEvents(mEnchantmentManager, this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());

@@ -54,7 +54,6 @@ import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -787,12 +786,6 @@ public class EntityListener implements Listener {
 				arrow.removeCustomEffect(effect.getType());
 			}
 		}
-	}
-
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void ItemSpawnEvent(ItemSpawnEvent event) {
-		mPlugin.mEnchantmentManager.ItemSpawnEvent(mPlugin, event.getEntity());
 	}
 
 	@EventHandler
