@@ -82,6 +82,7 @@ public class EnchantmentManager implements Listener {
 		init.add(new DivineAura());
 		init.add(new SecondWind());
 		init.add(new VoidTether());
+		init.add(new Ethereal());
 
 		// Active enchantments
 		init.add(new Chaotic());
@@ -216,8 +217,8 @@ public class EnchantmentManager implements Listener {
 	private static void _updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item,
 	                                Player player, BaseEnchantment property,
 	                                Map<BaseEnchantment, Integer>propertyMap,
-									Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
-		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND || item == null) && ItemUtils.isWearable(item.getType())) {
+	                                Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
+		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
 			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
 			return;
 		}

@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,6 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class ShulkerEquipmentListener implements Listener {
@@ -44,31 +47,37 @@ public class ShulkerEquipmentListener implements Listener {
 		SWAP_SLOTS.put(40, 13);
 	}
 
+	Plugin mPlugin = null;
+
+	public ShulkerEquipmentListener(Plugin plugin) {
+		mPlugin = plugin;
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void InventoryClickEvent(InventoryClickEvent event) {
 		if (
-				// Must not be cancelled
-				event.isCancelled() ||
-				// Must be a right click
-				event.getClick() == null ||
-				!event.getClick().equals(ClickType.RIGHT) ||
-				// Must be placing a single block
-				event.getAction() == null ||
-				!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-				// Must be a player interacting with their main inventory
-				event.getWhoClicked() == null ||
-				!(event.getWhoClicked() instanceof Player) ||
-				event.getClickedInventory() == null ||
-				!(event.getClickedInventory() instanceof PlayerInventory) ||
-				// Must be in main inventory
-				// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-				event.getSlot() < 9 ||
-				event.getSlot() > 35 ||
-				// Must be a click on a shulker box with an empty hand
-				(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
-				event.getCurrentItem() == null ||
-				!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
-			) {
+		    // Must not be cancelled
+		    event.isCancelled() ||
+		    // Must be a right click
+		    event.getClick() == null ||
+		    !event.getClick().equals(ClickType.RIGHT) ||
+		    // Must be placing a single block
+		    event.getAction() == null ||
+		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+		    // Must be a player interacting with their main inventory
+		    event.getWhoClicked() == null ||
+		    !(event.getWhoClicked() instanceof Player) ||
+		    event.getClickedInventory() == null ||
+		    !(event.getClickedInventory() instanceof PlayerInventory) ||
+		    // Must be in main inventory
+		    // https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+		    event.getSlot() < 9 ||
+		    event.getSlot() > 35 ||
+		    // Must be a click on a shulker box with an empty hand
+		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
+		    event.getCurrentItem() == null ||
+		    !ItemUtils.isShulkerBox(event.getCurrentItem().getType())
+		) {
 
 			// Nope!
 			return;
@@ -92,6 +101,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 						player.updateInventory();
 						event.setCancelled(true);
+						InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 					}
 				}
 			}
@@ -109,7 +119,7 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	private boolean isEquipmentBox(ItemStack sboxItem) {
+	public static boolean isEquipmentBox(ItemStack sboxItem) {
 		if (ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta) {
 				BlockStateMeta sMeta = (BlockStateMeta)sboxItem.getItemMeta();
@@ -141,7 +151,10 @@ public class ShulkerEquipmentListener implements Listener {
 		Inventory sInv = sbox.getInventory();
 
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
-			swapItem(pInv, sInv, slot.getKey(), slot.getValue());
+			//Does not swap if armor equipped has curse of binding on it
+			if (slot.getKey() < 36 || slot.getKey() > 39 || pInv.getItem(slot.getKey()) == null || pInv.getItem(slot.getKey()).getEnchantmentLevel(Enchantment.BINDING_CURSE) == 0) {
+				swapItem(pInv, sInv, slot.getKey(), slot.getValue());
+			}
 		}
 	}
 

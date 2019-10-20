@@ -182,7 +182,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new EntityListener(this, mWorld, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
-		manager.registerEvents(new ShulkerEquipmentListener(), this);
+		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);

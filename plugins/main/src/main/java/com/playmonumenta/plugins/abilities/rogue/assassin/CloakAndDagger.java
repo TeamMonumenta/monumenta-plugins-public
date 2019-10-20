@@ -101,7 +101,9 @@ public class CloakAndDagger extends Ability {
 					ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 					if (t >= 20 * cloakOnActivation || !active || !InventoryUtils.isSwordItem(mHand)) {
 						if (active) {
-							mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
+							if (mPlayer.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() <= 400) {
+								mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
+							}
 							mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							                                 new PotionEffect(PotionEffectType.SLOW_DIGGING, CLOAK_PENALTY_DURATION, 1, false, true));
 						}
@@ -130,7 +132,9 @@ public class CloakAndDagger extends Ability {
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (active && mTickAttacked != mPlayer.getTicksLived() && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			active = false;
-			mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
+			if (mPlayer.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() <= 400) {
+				mPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
+			}
 			event.setDamage(event.getDamage() + cloakOnActivation * mDamageMultiplier);
 		}
 		return true;
