@@ -51,11 +51,14 @@ public class DailyReset {
 					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The chains of fate have realigned. Perhaps you should ask the Seer for new wisdom...");
 				}
 
-				// Remove the tag that prevents players from beating Azacor more than once per day
+				// Remove the tag that prevents players from getting more than one Azacor artifact per day
 				player.removeScoreboardTag("am_antiartifact");
 
-				// Remove the tag that prevents players from beating Kaul more than once per day
+				// Remove the tag that prevents players from getting more than one Kaul artifact per day
 				player.removeScoreboardTag("kaul_daily_artifact");
+
+				// Remove the tag that prevents players from getting more than one Headless Horseman artifact per day
+				player.removeScoreboardTag("horseman_daily_artifact");
 
 				/* Reset the player's access to the Patreon shrine (if applicable) */
 				int Patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
