@@ -44,7 +44,7 @@ public class FrostNova extends Ability {
 		mInfo.scoreboardId = "FrostNova";
 		mInfo.cooldown = FROST_NOVA_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
-		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_1_DAMAGE;
+		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 		mSlownessAmplifier = getAbilityScore() == 1 ? FROST_NOVA_1_AMPLIFIER : FROST_NOVA_2_AMPLIFIER;
 	}
 
