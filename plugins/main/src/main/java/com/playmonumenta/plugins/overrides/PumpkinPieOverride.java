@@ -22,7 +22,9 @@ public class PumpkinPieOverride extends BaseOverride {
 		if (player == null
 			|| clickedEntity == null
 			|| !(clickedEntity instanceof Creeper)
-			|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")) {
+			|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight")
+			|| clickedEntity.getScoreboardTags() == null
+			|| clickedEntity.getScoreboardTags().contains("boss_halloween_creeper")) {
 			return true;
 		}
 
