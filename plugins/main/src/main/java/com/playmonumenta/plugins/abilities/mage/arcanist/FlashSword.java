@@ -18,7 +18,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.mage.Spellshock;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -69,8 +68,13 @@ public class FlashSword extends Ability {
 				t++;
 				sw++;
 				Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), FSWORD_RADIUS)) {
-					Vector toMobVector = mob.getLocation().toVector().subtract(player.getLocation().toVector()).setY(0)
+				Location origin = player.getLocation();
+				if (player.getVelocity().length() > 0.1) {
+					// If the player is moving, shift the flash sword in the direction they are moving
+					origin.add(player.getVelocity().normalize().multiply(1.2));
+				}
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, FSWORD_RADIUS)) {
+					Vector toMobVector = mob.getLocation().toVector().subtract(origin.toVector()).setY(0)
 					                     .normalize();
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
@@ -88,9 +92,8 @@ public class FlashSword extends Ability {
 				if (t >= FSWORD_SWINGS) {
 					pitch = 1.45f;
 				}
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.75f, pitch);
-				Location loc = player.getLocation();
+				player.getWorld().playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
+				player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, pitch);
 				new BukkitRunnable() {
 					final int i = sw;
 					double roll;
@@ -116,10 +119,10 @@ public class FlashSword extends Ability {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, roll);
-									vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
+									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
-									Location l = loc.clone().add(0, 1.25, 0).add(vec);
+									Location l = origin.clone().add(0, 1.25, 0).add(vec);
 									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
 									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
 								}
@@ -133,10 +136,10 @@ public class FlashSword extends Ability {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, roll);
-									vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
+									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
-									Location l = loc.clone().add(0, 1.25, 0).add(vec);
+									Location l = origin.clone().add(0, 1.25, 0).add(vec);
 									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR1);
 									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
 								}
