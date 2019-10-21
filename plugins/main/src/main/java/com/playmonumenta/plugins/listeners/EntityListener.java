@@ -90,8 +90,6 @@ import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -183,6 +181,9 @@ public class EntityListener implements Listener {
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
@@ -243,11 +244,6 @@ public class EntityListener implements Listener {
 
 			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
-				if (ItemUtils.isItemShattered(player.getInventory().getItemInMainHand())) {
-					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-					event.setCancelled(true);
-					return;
-				}
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);

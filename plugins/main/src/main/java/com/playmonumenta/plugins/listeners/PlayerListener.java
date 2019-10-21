@@ -26,6 +26,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -42,8 +43,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -68,7 +67,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.BrewerInventory;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -152,7 +150,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
@@ -170,44 +168,39 @@ public class PlayerListener implements Listener {
 		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
-		// Left Click.
+		// Overrides
+		// TODO: Rewrite overrides system to handle item/block interactions separately
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			if (!mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
 				event.setCancelled(true);
+				return;
 			}
-			if (item != null && !ItemUtils.isArmorItem(item.getType()) && ItemUtils.isItemShattered(item)) {
-				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-				event.setCancelled(true);
-			}
-		}
-		// Right Click.
-		else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
 			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
-				event.setCancelled(true);
-			}
-
-			if (item != null && ItemUtils.isItemShattered(item)) {
-				if (ItemUtils.isArmorItem(item.getType())) {
-					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-				} else {
-					MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-				}
 				event.setCancelled(true);
 				return;
 			}
+		}
+
+		// Item Interactions
+		if (event.useItemInHand() != Event.Result.DENY) {
 			if (item != null && ItemUtils.isArmorItem(item.getType())) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
+		}
+
+		// Block Interactions
+		if (event.useInteractedBlock() != Event.Result.DENY) {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-				    && world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
-					event.setCancelled(true);
+					&& world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
+					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
 				if (GraveUtils.isGrave(block)
-				    && player.getGameMode() != GameMode.CREATIVE
-				    && player.getGameMode() != GameMode.SPECTATOR) {
+					&& player.getGameMode() != GameMode.CREATIVE
+					&& player.getGameMode() != GameMode.SPECTATOR) {
 					Chest grave = (Chest) block.getState();
 					if (GraveUtils.canPlayerOpenGrave(block, player)) {
 						// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
@@ -232,19 +225,22 @@ public class PlayerListener implements Listener {
 						if (itemsLeftBehind == 0) {
 							block.setType(Material.AIR);
 						}
-						event.setCancelled(true);
+						event.setUseInteractedBlock(Event.Result.DENY);
 					} else {
 						// Player does not have permission to access this grave.
 						MessagingUtils.sendActionBarMessage(mPlugin, player, "You cannot open " + ChatColor.stripColor(grave.getCustomName()));
-						event.setCancelled(true);
+						event.setUseInteractedBlock(Event.Result.DENY);
 					}
 				}
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void BlockPlaceEvent(BlockPlaceEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		ItemStack item = event.getItemInHand();
 		Player player = event.getPlayer();
 
@@ -377,6 +373,9 @@ public class PlayerListener implements Listener {
 	// If an inventory interaction happened.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryClickEvent(InventoryClickEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		if (JeffChestSortIntegration.isPresent()) {
 			if (event.getWhoClicked() instanceof Player) {
 				Player player = (Player)event.getWhoClicked();
@@ -387,39 +386,6 @@ public class PlayerListener implements Listener {
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 					// Don't sort player inventories until support is added
 					// to prevent sorting hotbar / armor slots
-
-					// Prevent equipping armor if the armor is shattered
-					// We only need to worry about armor slots if they are visible
-					if (event.getView().getTopInventory().getType() == InventoryType.CRAFTING) {
-						ItemStack item = null;
-						boolean equipping = false;
-						ClickType click = event.getClick();
-						if ((click.equals(ClickType.LEFT) || click.equals(ClickType.RIGHT))) {
-							item = event.getCursor();
-							if (event.getSlotType() == SlotType.ARMOR || event.getSlot() == 40) {
-								equipping = true;
-							}
-						} else if ((click.equals(ClickType.SHIFT_LEFT) || click.equals(ClickType.SHIFT_RIGHT))) {
-							item = event.getCurrentItem();
-							EquipmentSlot targetSlotType = ItemUtils.getEquipmentSlot(item);
-							if ((targetSlotType == EquipmentSlot.FEET && inventory.getItem(36) == null) ||
-							    (targetSlotType == EquipmentSlot.LEGS && inventory.getItem(37) == null) ||
-							    (targetSlotType == EquipmentSlot.CHEST && inventory.getItem(38) == null) ||
-							    (targetSlotType == EquipmentSlot.HEAD && inventory.getItem(39) == null) ||
-							    (targetSlotType == EquipmentSlot.OFF_HAND && inventory.getItem(40) == null)) {
-								equipping = true;
-							}
-						} else if (click.equals(ClickType.NUMBER_KEY)) {
-							item = inventory.getItem(event.getHotbarButton());
-							if (event.getSlotType() == SlotType.ARMOR || event.getSlot() == 40) {
-								equipping = true;
-							}
-						}
-						if (equipping && ItemUtils.isItemShattered(item)) {
-							event.setCancelled(true);
-							MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-						}
-					}
 				} else {
 					if (event.getClick() != null &&
 					    event.getClick().equals(ClickType.RIGHT) &&
@@ -454,17 +420,11 @@ public class PlayerListener implements Listener {
 	// If an item is being dragged in an inventory
 	@EventHandler(priority = EventPriority.HIGH)
 	public void InventoryDragEvent(InventoryDragEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
-			// Check if the player tried to be sneaky and drag shattered armor into a slot
-			if (ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(5, null)) || // Head  Slot
-			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(6, null)) || // Chest Slot
-			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(7, null)) || // Legs  Slot
-			    ItemUtils.isWearableItemShattered(event.getNewItems().getOrDefault(8, null)) || // Feet  Slot
-			    ItemUtils.isItemShattered(event.getNewItems().getOrDefault(45, null))) { // Offhand Slot
-				event.setCancelled(true);
-				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be repaired before use");
-			}
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
 	}
@@ -551,9 +511,8 @@ public class PlayerListener implements Listener {
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-		if (ItemUtils.isItemShattered(event.getOffHandItem())) {
-			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be repaired before use");
-			event.setCancelled(true);
+		if (event.isCancelled()) {
+			return;
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}

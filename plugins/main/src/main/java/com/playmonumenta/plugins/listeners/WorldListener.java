@@ -166,8 +166,8 @@ public class WorldListener implements Listener {
 	public void BlockDispenseEvent(BlockDispenseEvent event) {
 		Block block = event.getBlock();
 		ItemStack dispensed = event.getItem();
-		if (ItemUtils.isItemShattered(dispensed)) {
-			event.setCancelled(true);
+		if (event.isCancelled()) {
+			return;
 		}
 
 		if (!mPlugin.mItemOverrides.blockDispenseInteraction(mPlugin, block, dispensed)) {
