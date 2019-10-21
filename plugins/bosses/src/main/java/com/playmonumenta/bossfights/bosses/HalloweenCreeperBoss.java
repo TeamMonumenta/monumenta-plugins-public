@@ -93,7 +93,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 
 		if (mCreeper.isDead() || !mCreeper.isValid()) {
 			Location loc = mCreeper.getLocation().add(0, 1, 0);
-			CommandUtils.runCommandViaConsole("setblock " + Integer.toString(loc.getBlockX()) + " " + Integer.toString(loc.getBlockY()) + " " + Integer.toString(loc.getBlockZ()) + " minecraft:chest{LootTable:\"epic:event/halloween2019/tricked_creeper\"}");
+			CommandUtils.runCommandViaConsole("setblock " + Integer.toString(loc.getBlockX()) + " " + Integer.toString(loc.getBlockY()) + " " + Integer.toString(loc.getBlockZ()) + " minecraft:chest{LootTable:\"epic:event/halloween2019/tricked_creeper\",CustomName:\"{\\\"text\\\":\\\"§6§lCreeperween Chest\\\"}\"}");
 		}
 	}
 }

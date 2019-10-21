@@ -512,8 +512,10 @@ public class PlayerListener implements Listener {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
-			// Break empty graves in safe zones automatically when closed
-			if (GraveUtils.isGrave(chest) && ChestUtils.isEmpty(chest)) {
+			// Break empty graves or halloween creeper chests in safe zones automatically when closed
+			if (ChestUtils.isEmpty(chest)
+			    && (GraveUtils.isGrave(chest)
+			        || (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest")))) {
 				LocationType locationType = mPlugin.mSafeZoneManager.getLocationType(chest.getLocation());
 				if (locationType != LocationType.None) {
 					chest.getBlock().breakNaturally();
