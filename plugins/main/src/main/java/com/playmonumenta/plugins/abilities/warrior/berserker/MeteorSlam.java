@@ -1,11 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
@@ -45,27 +40,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
  */
 
 public class MeteorSlam extends Ability {
-
-	public static class PlayerWithMeteorSlam {
-		private static final double FALL_DISTANCE_THRESHOLD = 3;
-		public Player playerMS;
-		public double fallDistance = 0;
-		public int abilityScore;
-		public boolean canTrigger = false;
-
-		public PlayerWithMeteorSlam(Player player, int abilityScore) {
-			this.playerMS = player;
-			this.abilityScore = abilityScore;
-		}
-
-		public void updateFallDistance() {
-			fallDistance = playerMS.getFallDistance();
-		}
-
-		public void updateCanTrigger() {
-			canTrigger = fallDistance > FALL_DISTANCE_THRESHOLD;
-		}
-	}
+	private static final double FALL_DISTANCE_THRESHOLD = 3;
 
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickRightClicked";
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
@@ -82,64 +57,55 @@ public class MeteorSlam extends Ability {
 	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
 	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
 
-	// We can't use PeriodicTrigger since the trigger intervals are too long
-	private static BukkitRunnable mFallTimer;
-	private static Map<UUID, PlayerWithMeteorSlam> mPlayersWithMeteorSlam = new HashMap<UUID, PlayerWithMeteorSlam>();
+	private double mFallDistance = 0;
+	private boolean mCanTrigger = false;
+	private final Plugin mPlugin;
 
 	public MeteorSlam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
+		mPlugin = plugin;
+
 		mInfo.linkedSpell = Spells.METEOR_SLAM;
 		mInfo.scoreboardId = "MeteorSlam";
 		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 		mInfo.ignoreCooldown = true;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		if (player != null) {
-			mPlayersWithMeteorSlam.put(player.getUniqueId(), new PlayerWithMeteorSlam(player, getAbilityScore()));
-		}
 
-		// One timer runs for all players and tracks the passive aspect of this ability
-		if (mFallTimer == null || mFallTimer.isCancelled()) {
-			mFallTimer = new BukkitRunnable() {
-				@Override
-				public void run() {
-					Iterator<Entry<UUID, PlayerWithMeteorSlam>> iter = mPlayersWithMeteorSlam.entrySet().iterator();
-
-					while (iter.hasNext()) {
-						Map.Entry<UUID, PlayerWithMeteorSlam> entry = iter.next();
-						PlayerWithMeteorSlam p = entry.getValue();
-
-						p.updateCanTrigger();
-						if (p.canTrigger && p.playerMS.isOnGround()) {
-							// This value is only checked for in the LivingEntityDamagedByPlayerEvent so we don't slam twice
-							MetadataUtils.checkOnceThisTick(Plugin.getInstance(), p.playerMS, SLAM_ONCE_THIS_TICK_METAKEY);
-							doSlamAttack(p.playerMS, p.abilityScore, null, getSlamDamage(p.playerMS, p.abilityScore, p.fallDistance));
-							p.canTrigger = false;
-							p.fallDistance = 0;
-						} else {
-							p.updateFallDistance();
-						}
-
-						if (AbilityManager.getManager().getPlayerAbility(p.playerMS, MeteorSlam.class) == null) {
-							iter.remove();
-						}
-					}
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!player.isOnline()
+					|| !player.isValid()
+					|| AbilityManager.getManager().getPlayerAbility(player, MeteorSlam.class) == null) {
+					this.cancel();
+					return;
 				}
-			};
-			mFallTimer.runTaskTimer(mPlugin, 0, 1);
-		}
+
+				mCanTrigger = mFallDistance > FALL_DISTANCE_THRESHOLD;
+				if (mCanTrigger && player.isOnGround()) {
+					// This value is only checked for in the LivingEntityDamagedByPlayerEvent so we don't slam twice
+					MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
+					doSlamAttack(null, getSlamDamage());
+					mCanTrigger = false;
+					mFallDistance = 0;
+				} else {
+					mFallDistance = player.getFallDistance();
+				}
+			}
+		}.runTaskTimer(plugin, 0, 1);
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getFallDistance() > 1.5
 		    && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
-			double damage = getSlamDamage(mPlayer, getAbilityScore(), mPlayer.getFallDistance());
+			double damage = getSlamDamage();
 			event.setDamage(event.getDamage() + damage);
 			LivingEntity damagee = (LivingEntity) event.getEntity();
-			doSlamAttack(mPlayer, getAbilityScore(), damagee, damage);
+			doSlamAttack(damagee, damage);
 			mPlayer.setFallDistance(0);
-			mPlayersWithMeteorSlam.get(mPlayer.getUniqueId()).fallDistance = 0;
-			mPlayersWithMeteorSlam.get(mPlayer.getUniqueId()).canTrigger = false;
+			mFallDistance = 0;
+			mCanTrigger = false;
 		}
 
 		return true;
@@ -177,7 +143,6 @@ public class MeteorSlam extends Ability {
 			mRightClicks = 0;
 			int meteorSlam = getAbilityScore();
 			int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
-			int cooldown = meteorSlam == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
 			putOnCooldown();
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
@@ -195,19 +160,19 @@ public class MeteorSlam extends Ability {
 		}
 	}
 
-	public static void doSlamAttack(Player player, int meteorSlam, LivingEntity damagee, double damage) {
-		double radius = meteorSlam == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
+	public void doSlamAttack(LivingEntity damagee, double damage) {
+		double radius = getAbilityScore() == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
 		Location loc;
 		if (damagee == null) {
-			loc = player.getLocation();
+			loc = mPlayer.getLocation();
 		} else {
 			loc = damagee.getLocation();
 		}
-		World world = player.getWorld();
+		World world = mPlayer.getWorld();
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
 			if (mob != damagee) {
-				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, player);
+				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer);
 			}
 		}
 
@@ -218,10 +183,11 @@ public class MeteorSlam extends Ability {
 		world.spawnParticle(Particle.LAVA, loc, 100, radius, 0.25f, radius, 0);
 	}
 
-	public static double getSlamDamage(Player player, int meteorSlam, double fall) {
+	public double getSlamDamage() {
+		int meteorSlam = getAbilityScore();
 		double dmgMultLow = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_LOW : METEOR_SLAM_2_DAMAGE_LOW;
 		double dmgMultHigh = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_HIGH : METEOR_SLAM_2_DAMAGE_HIGH;
-		return Math.min(8, fall) * dmgMultLow + Math.max(0, (fall - 8)) * dmgMultHigh;
+		return Math.min(8, mFallDistance) * dmgMultLow + Math.max(0, (mFallDistance - 8)) * dmgMultHigh;
 	}
 
 }
