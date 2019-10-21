@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -41,7 +42,7 @@ public class DefensiveLine extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		// This timer makes sure that the player actually blocked instead of some other right click interaction
 		new BukkitRunnable() {
 			@Override

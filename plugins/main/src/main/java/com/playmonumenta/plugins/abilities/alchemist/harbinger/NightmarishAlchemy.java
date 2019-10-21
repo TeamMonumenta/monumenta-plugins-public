@@ -41,7 +41,6 @@ public class NightmarishAlchemy extends Ability {
 		boolean guaranteedApplicationApplied = false;
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				int nightmarishAlchemy = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 				int size = affectedEntities.size();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {

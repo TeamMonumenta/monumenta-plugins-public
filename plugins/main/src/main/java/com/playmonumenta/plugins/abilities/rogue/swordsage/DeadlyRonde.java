@@ -39,8 +39,6 @@ public class DeadlyRonde extends Ability {
 
 	private static final int RONDE_1_DAMAGE = 5;
 	private static final int RONDE_2_DAMAGE = 8;
-	private static final int RONDE_2_SLOWNESS_AMPLIFIER = 1;
-	private static final int RONDE_2_SLOWNESS_DURATION = 4 * 20;
 	private static final int RONDE_1_MAX_STACKS = 2;
 	private static final int RONDE_2_MAX_STACKS = 3;
 	private static final double RONDE_RADIUS = 4.5;

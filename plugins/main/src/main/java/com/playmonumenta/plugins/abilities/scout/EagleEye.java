@@ -7,6 +7,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,7 +38,7 @@ public class EagleEye extends Ability {
 
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		Player player = mPlayer;
 		int eagleEye = getAbilityScore();
 		World world = player.getWorld();

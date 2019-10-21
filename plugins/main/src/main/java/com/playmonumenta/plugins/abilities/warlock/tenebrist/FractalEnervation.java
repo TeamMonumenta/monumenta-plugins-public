@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -61,7 +62,7 @@ public class FractalEnervation extends Ability {
 	private List<LivingEntity> hit = new ArrayList<LivingEntity>();
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;
 			new BukkitRunnable() {
@@ -100,7 +101,6 @@ public class FractalEnervation extends Ability {
 			// Find the first hit mob and add it to justHit
 			for (LivingEntity mob : mobsInInitialRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
-					int k = 0;
 					cancel = true;
 					hit.add(mob);
 					justHit.add(mob);

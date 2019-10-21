@@ -8,9 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -44,7 +44,7 @@ public class PowerInjection extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		int powerInjection = getAbilityScore();
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();

@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -58,7 +59,7 @@ public class Blizzard extends Ability {
 	private boolean mActive = false;
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (mActive) {
 			return;
 		}
@@ -85,11 +86,6 @@ public class Blizzard extends Ability {
 							affected.put(mob.getUniqueId(), 1);
 						} else {
 							int duration = affected.get(mob.getUniqueId());
-							int amp = -1;
-							if (mob.hasPotionEffect(PotionEffectType.SLOW)) {
-								PotionEffect effect = mob.getPotionEffect(PotionEffectType.SLOW);
-								amp = effect.getAmplifier();
-							}
 							if (duration >= 12) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 							} else if (duration >= 6) {

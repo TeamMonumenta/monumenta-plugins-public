@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SoulRend extends Ability {

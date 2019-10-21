@@ -10,11 +10,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -27,8 +25,6 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Alchemical Artillery: Left click with a bow to prime it with an alchemist potion.
@@ -60,7 +56,7 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (!mActive) {
 			if (!mPlayer.isSneaking() && InventoryUtils.isBowItem(mPlayer.getInventory().getItemInMainHand())) {
 				mActive = true;

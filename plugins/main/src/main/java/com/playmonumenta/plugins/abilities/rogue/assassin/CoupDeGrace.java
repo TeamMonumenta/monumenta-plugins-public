@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Coup De Grâce: If you melee attack a non-boss enemy and that attack

@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -48,7 +49,7 @@ public class FrostNova extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			Vector velocity = mob.getVelocity();
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE);

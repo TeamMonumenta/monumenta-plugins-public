@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -53,7 +54,7 @@ public abstract class Ability {
 	 * AbilityTrigger (Right Click/Left Click), along with whatever
 	 * runCheck() may contain, is correct.
 	 */
-	public void cast() { }
+	public void cast(Action trigger) { }
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.

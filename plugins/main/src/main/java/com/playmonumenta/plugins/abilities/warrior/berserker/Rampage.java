@@ -16,9 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Rampage: Killing an enemy starts a kill streak.

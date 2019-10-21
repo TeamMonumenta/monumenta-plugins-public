@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -43,7 +44,7 @@ public class Exorcism  extends Ability {
 	private List<PotionEffect> debuffs = new ArrayList<PotionEffect>();
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		//	needs better sound
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 0.7f, -3f);
 
@@ -106,7 +107,6 @@ public class Exorcism  extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.getLocation().getPitch() > EXORCISM_ANGLE &&
 				InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) &&
 				(offHand == null || offHand.getType() != Material.BOW) &&

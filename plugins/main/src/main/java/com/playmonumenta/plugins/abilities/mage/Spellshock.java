@@ -30,7 +30,6 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
@@ -133,7 +132,7 @@ public class Spellshock extends Ability {
 					// prevents you from doing something like static'ing half the mobs in a group at any given time,
 					// which would allow you to trigger spellshock on every spellcast
 					for (LivingEntity mob : mPendingStaticMobs) {
-						if (!pendingDamageMobs.containsKey(mob.getUniqueId())) {
+						if (!pendingDamageMobs.containsKey(mob)) {
 							mSpellShockedMobs.put(mob.getUniqueId(), new SpellShockedMob(mob));
 						}
 					}

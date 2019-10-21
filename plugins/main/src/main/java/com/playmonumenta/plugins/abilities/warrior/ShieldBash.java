@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -119,7 +120,7 @@ public class ShieldBash extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		// This timer makes sure that the player actually blocked instead of some other right click interaction
 		new BukkitRunnable() {
 			@Override

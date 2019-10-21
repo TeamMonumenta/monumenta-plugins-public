@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -61,7 +62,7 @@ public class ShieldWall extends Ability {
 	private int mRightClicks = 0;
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		// Prevent two right clicks being registered from one action (e.g. blocking)
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 			mRightClicks++;

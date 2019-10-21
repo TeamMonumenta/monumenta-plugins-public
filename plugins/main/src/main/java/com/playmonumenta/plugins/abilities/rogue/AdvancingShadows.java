@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -50,7 +51,7 @@ public class AdvancingShadows extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 
 		LivingEntity entity = target;
 		if (entity != null) {

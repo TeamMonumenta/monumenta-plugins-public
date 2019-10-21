@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 

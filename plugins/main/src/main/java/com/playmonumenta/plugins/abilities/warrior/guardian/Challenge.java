@@ -12,6 +12,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,7 +58,7 @@ public class Challenge extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
 		int increase = Math.min(armorMax, mobs.size() * armorIncrease);
 		AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);

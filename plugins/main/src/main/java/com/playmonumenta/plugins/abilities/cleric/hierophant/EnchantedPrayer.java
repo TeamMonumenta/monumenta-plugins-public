@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -46,7 +47,7 @@ public class EnchantedPrayer extends Ability {
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
 		new BukkitRunnable() {

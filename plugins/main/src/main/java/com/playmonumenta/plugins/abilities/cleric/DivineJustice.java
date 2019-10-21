@@ -15,7 +15,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineJustice extends Ability {

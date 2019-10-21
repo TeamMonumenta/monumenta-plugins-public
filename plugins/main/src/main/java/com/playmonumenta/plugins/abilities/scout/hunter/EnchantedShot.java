@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -57,7 +58,7 @@ public class EnchantedShot extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (!active && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isBowItem(mainHand)) {

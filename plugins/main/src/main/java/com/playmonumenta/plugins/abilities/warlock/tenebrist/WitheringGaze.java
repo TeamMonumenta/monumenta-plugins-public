@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -50,7 +51,7 @@ public class WitheringGaze extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		Player player = mPlayer;
 		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by halfslabs
 		Vector direction = loc.getDirection().setY(0).normalize();

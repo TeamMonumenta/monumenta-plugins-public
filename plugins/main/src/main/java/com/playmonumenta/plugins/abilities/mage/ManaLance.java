@@ -12,22 +12,19 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ManaLance extends Ability {
 
@@ -36,7 +33,6 @@ public class ManaLance extends Ability {
 	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
 	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
-	private static final int MANA_LANCE_STAGGER_DURATION = 20;
 
 	public ManaLance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -48,7 +44,7 @@ public class ManaLance extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		int extraDamage = getAbilityScore() == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
 
 		Location loc = mPlayer.getEyeLocation();

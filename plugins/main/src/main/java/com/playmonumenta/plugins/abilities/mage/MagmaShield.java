@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -41,7 +42,7 @@ public class MagmaShield extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();

@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,7 +41,7 @@ public class Celestial extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		int celestial = getAbilityScore();
 
 		World world = mPlayer.getWorld();

@@ -16,8 +16,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Melee attacks deal +3 / +5 damage when there are 3 / 4 or fewer
@@ -41,10 +39,7 @@ public class Skirmisher extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			int surrounding = 0;
-			for (Entity e : EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8)) {
-				surrounding ++ ;
-			}
+			int surrounding = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8).size();
 
 			Entity ent = event.getEntity();
 			int threshold = getAbilityScore() == 1 ? SKIRMISHER_1_THRESHOLD : SKIRMISHER_2_THRESHOLD;

@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -45,7 +46,7 @@ public class GraspingClaws extends Ability {
 	private Arrow arrow = null;
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS) && mPlayer.isSneaking() && InventoryUtils.isBowItem(inMainHand)) {
 			arrow = mPlayer.launchProjectile(Arrow.class);

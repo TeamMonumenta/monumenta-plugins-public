@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,8 +19,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -52,8 +53,7 @@ public class IronTincture extends Ability {
 	}
 
 	@Override
-	public void cast() {
-		int ironTincture = getAbilityScore();
+	public void cast(Action action) {
 		Location loc = mPlayer.getLocation().add(0, 1.8, 0);
 		ItemStack itemTincture = new ItemStack(Material.SPLASH_POTION);
 		mWorld.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);

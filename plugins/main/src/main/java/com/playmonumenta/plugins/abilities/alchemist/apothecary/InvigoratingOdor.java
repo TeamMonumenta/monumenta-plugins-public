@@ -49,7 +49,6 @@ public class InvigoratingOdor extends Ability {
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				int invigoratingOdor = getAbilityScore();
 				for (LivingEntity le : affectedEntities) {
 					apply(le);
 				}

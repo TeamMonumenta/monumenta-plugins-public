@@ -10,8 +10,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /* Growing Rage: Passively gain +10% / +30% damage on
  * non-ability based melee damage. Every 2 hearts you fall

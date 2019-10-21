@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -26,7 +27,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Cloak & Dagger: Every time you kill a normal mob by any means,
@@ -73,7 +73,7 @@ public class CloakAndDagger extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (!active && cloak >= CLOAK_MIN_STACKS && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50) {
 			cloakOnActivation = cloak;
 			cloak = 0;

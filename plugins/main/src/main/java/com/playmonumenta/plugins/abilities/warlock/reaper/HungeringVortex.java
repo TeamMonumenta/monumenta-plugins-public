@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -76,7 +76,7 @@ public class HungeringVortex extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.HUNGERING_VORTEX)
 		    || !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
 			return;
@@ -159,7 +159,6 @@ public class HungeringVortex extends Ability {
 
 		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extra_dam));
 		new BukkitRunnable() {
-			int t = 0;
 			@Override
 			public void run() {
 				if (mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {

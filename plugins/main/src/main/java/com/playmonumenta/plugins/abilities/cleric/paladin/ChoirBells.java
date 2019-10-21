@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -55,7 +56,7 @@ public class ChoirBells extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 10, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
 		Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();

@@ -37,7 +37,6 @@ public class BrutalAlchemy extends Ability {
 	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
-				int brutalAlchemy = getAbilityScore();
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
 						apply(entity);

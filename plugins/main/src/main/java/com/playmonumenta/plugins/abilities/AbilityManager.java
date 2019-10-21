@@ -50,9 +50,9 @@ import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNonApothecary;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
@@ -683,28 +683,30 @@ public class AbilityManager {
 				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
 					if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast();
+							abil.cast(action);
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
 					if (action == Action.RIGHT_CLICK_AIR
 					    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast();
+							abil.cast(action);
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.LEFT_CLICK_AIR) {
 					if (action == Action.LEFT_CLICK_AIR) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast();
+							abil.cast(action);
 						}
 					}
 				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK_AIR) {
 					if (action == Action.RIGHT_CLICK_AIR) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast();
+							abil.cast(action);
 						}
 					}
+				} else if (info.trigger == AbilityTrigger.ALL) {
+					abil.cast(action);
 				}
 			}
 		}

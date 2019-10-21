@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +55,7 @@ public class FlashSword extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		int flashSword = getAbilityScore();
 		Player player = mPlayer;
 		putOnCooldown();
@@ -172,7 +173,7 @@ public class FlashSword extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			cast();
+			cast(Action.LEFT_CLICK_AIR);
 		}
 
 		return true;

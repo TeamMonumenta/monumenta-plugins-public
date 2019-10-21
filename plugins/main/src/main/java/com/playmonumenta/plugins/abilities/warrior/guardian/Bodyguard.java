@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -59,7 +60,7 @@ public class Bodyguard extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
 		Location oLoc = mPlayer.getLocation();
 		Vector dir = oLoc.getDirection();

@@ -11,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +24,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
 * Attacking while sprinting throws a spear of light in a 12 block line, dealing
@@ -64,7 +64,7 @@ public class HolyJavelin extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
 		Location playerLoc = mPlayer.getEyeLocation();
@@ -110,7 +110,7 @@ public class HolyJavelin extends Ability {
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
-			cast();
+			cast(Action.LEFT_CLICK_AIR);
 		}
 
 		return true;

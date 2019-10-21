@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -55,7 +56,7 @@ public class AdrenalSerum extends Ability {
 	}
 
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.45, 0.45, 0.45, 0.025);
 		new BukkitRunnable() {
 			double rotation = 0;

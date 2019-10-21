@@ -14,18 +14,13 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class FinishingBlow extends Ability {
 
@@ -38,7 +33,6 @@ public class FinishingBlow extends Ability {
 	}
 
 	private static final Particle.DustOptions FINISHING_BLOW_COLOR = new Particle.DustOptions(Color.fromRGB(168, 0, 0), 1.0f);
-	private static final String FINISHING_BLOW_RESET_METAKEY = "ResetFinishingBlowTimer";
 	private static final int FINISHING_BLOW_DURATION = 20 * 5;
 	private static final int FINISHING_BLOW_1_DAMAGE = 3;
 	private static final int FINISHING_BLOW_2_DAMAGE = 6;

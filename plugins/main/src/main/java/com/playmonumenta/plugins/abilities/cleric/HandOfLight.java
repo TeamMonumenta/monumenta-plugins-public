@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -39,7 +40,7 @@ public class HandOfLight extends Ability {
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 	@Override
-	public void cast() {
+	public void cast(Action action) {
 		int healing = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();

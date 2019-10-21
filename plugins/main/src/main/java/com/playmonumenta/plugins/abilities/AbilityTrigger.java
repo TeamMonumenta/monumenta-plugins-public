@@ -9,10 +9,9 @@ package com.playmonumenta.plugins.abilities;
  *
  */
 public enum AbilityTrigger {
-
+	ALL,
 	RIGHT_CLICK,
 	RIGHT_CLICK_AIR,
 	LEFT_CLICK,
 	LEFT_CLICK_AIR
-
 }

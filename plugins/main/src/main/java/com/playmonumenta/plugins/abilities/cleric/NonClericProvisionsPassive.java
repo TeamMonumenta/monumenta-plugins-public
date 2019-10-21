@@ -3,10 +3,9 @@ package com.playmonumenta.plugins.abilities.cleric;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LingeringPotion;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -16,7 +15,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
  * All players can use this ability! It is used to generate potions for nearby
