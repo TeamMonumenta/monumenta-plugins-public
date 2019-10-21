@@ -163,16 +163,17 @@ public class Spellshock extends Ability {
 	@Override
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity mob = event.getDamaged();
+		Spells spell = event.getSpell();
+
 		// If the mob has static, trigger it
-		if (mSpellShockedMobs.containsKey(mob.getUniqueId()) && event.getSpell() != Spells.ARCANE_STRIKE) {
+		if (mSpellShockedMobs.containsKey(mob.getUniqueId()) && spell != Spells.ARCANE_STRIKE && spell != Spells.FSWORD) {
 			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
 			e.triggeredBy = mPlayer;
 			e.triggered = true;
 			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword or Elemental Arrows
 			// The check for these specific spells is the only reason why we need to have the CustomDamageEvent
 			// check instead of just lumping it all in with EntityDamageByEntityEvent
-		} else if (!mPendingStaticMobs.contains(mob) && event.getSpell() != Spells.BLIZZARD
-			&& event.getSpell() != Spells.ELEMENTAL_ARROWS && event.getSpell() != Spells.FSWORD) {
+		} else if (!mPendingStaticMobs.contains(mob) && spell != Spells.BLIZZARD && spell != Spells.ELEMENTAL_ARROWS) {
 			mPendingStaticMobs.add(mob);
 		}
 	}
