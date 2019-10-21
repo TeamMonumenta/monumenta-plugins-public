@@ -354,7 +354,7 @@ public class PlayerListener implements Listener {
 	// An entity picked up an item
 	@EventHandler(priority = EventPriority.HIGH)
 	public void EntityPickupItemEvent(EntityPickupItemEvent event) {
-		if (event.getEntity() instanceof Player) {
+		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
 			Player player = (Player)event.getEntity();
 
 			/* Don't let the player do this when transferring or if in a restricted zone */

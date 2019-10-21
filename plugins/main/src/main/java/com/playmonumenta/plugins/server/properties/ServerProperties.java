@@ -40,7 +40,8 @@ public class ServerProperties {
 	public Set<String> mAllowedTransferTargets = new HashSet<>();
 	public Set<String> mForbiddenItemLore = new HashSet<>();
 
-	public EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
+	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
+	private EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -88,6 +89,14 @@ public class ServerProperties {
 
 	public String getSocketHost() {
 		return mSocketHost;
+	}
+
+	public Set<Material> getUnbreakableBlocks() {
+		return mUnbreakableBlocks;
+	}
+
+	public Set<Material> getAlwaysPickupMats() {
+		return mAlwaysPickupMats;
 	}
 
 	public void load(Plugin plugin, CommandSender sender) {
@@ -138,6 +147,7 @@ public class ServerProperties {
 					mForbiddenItemLore           = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
 					mUnbreakableBlocks           = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
+					mAlwaysPickupMats            = _getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
 
 					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
 

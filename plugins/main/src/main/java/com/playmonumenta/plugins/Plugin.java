@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
+import com.playmonumenta.plugins.listeners.JunkItemListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
@@ -69,6 +70,7 @@ public class Plugin extends JavaPlugin {
 
 	public ServerProperties mServerProperties = new ServerProperties();
 	public EnchantmentManager mEnchantmentManager;
+	public JunkItemListener mJunkItemsListener;
 	public HttpManager mHttpManager;
 
 	public TrackingManager mTrackingManager;
@@ -130,6 +132,8 @@ public class Plugin extends JavaPlugin {
 		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 
+		mJunkItemsListener = new JunkItemListener(this);
+
 		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
 			BroadcastCommand.register(this);
@@ -179,6 +183,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this, mWorld), this);
 		manager.registerEvents(new ShulkerEquipmentListener(), this);
 		manager.registerEvents(mEnchantmentManager, this);
+		manager.registerEvents(mJunkItemsListener, this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());

@@ -330,7 +330,7 @@ public class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-		    plugin.mServerProperties.mUnbreakableBlocks.contains(block.getType())) {
+		    plugin.mServerProperties.getUnbreakableBlocks().contains(block.getType())) {
 			eventCancelled |= true;
 		}
 
