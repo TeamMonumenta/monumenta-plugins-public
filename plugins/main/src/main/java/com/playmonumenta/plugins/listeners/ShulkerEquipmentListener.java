@@ -98,39 +98,6 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	/*
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerInteractEvent(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Block block = event.getClickedBlock();
-
-		if (event.isCancelled() || player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) {
-			return;
-		}
-
-		Material mat = (block != null) ? block.getType() : Material.AIR;
-
-		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) &&
-		    ItemUtils.isShulkerBox(mat) &&
-			block.getState() instanceof ShulkerBox) {
-
-			ShulkerBox sbox = (ShulkerBox)block.getState();
-
-			if (sbox.isLocked() && sbox.getLock().equals(LOCK_STRING)) {
-				PlayerInventory pInv = player.getInventory();
-
-				swap(player, pInv, sbox);
-
-				// TODO: This doesn't quite work. Not sure why, but the shulker inventory is not changed
-				sbox.update(true, false);
-
-				player.updateInventory();
-				event.setCancelled(true);
-			}
-		}
-	}
-	*/
-
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void BlockDispenseEvent(BlockDispenseEvent event) {
 		if (event.isCancelled()) {
