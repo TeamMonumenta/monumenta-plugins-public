@@ -1,6 +1,7 @@
 package com.playmonumenta.bossfights.bosses;
 
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -32,7 +33,7 @@ public class VolatileBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION)) {
+		if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION) && !(event.getDamager() instanceof Firework)) {
 			mBoss.explode();
 		}
 	};
