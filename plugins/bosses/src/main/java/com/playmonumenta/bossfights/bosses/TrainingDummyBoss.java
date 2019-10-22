@@ -1,11 +1,17 @@
 package com.playmonumenta.bossfights.bosses;
 
+import java.util.Arrays;
+
 import org.bukkit.ChatColor;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
+
+import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.SpellRunAction;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -16,7 +22,13 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	}
 
 	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		SpellManager activeSpells = new SpellManager(Arrays.asList(
+			new SpellRunAction(() -> {
+				boss.setHealth(boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+			}, 60 * 20)
+		));
+
+		super.constructBoss(plugin, identityTag, boss, activeSpells, null, detectionRange, null);
 	}
 
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {

@@ -14,9 +14,15 @@ public class SpellRunAction extends Spell {
 	}
 
 	private Action mAction;
+	private int mDuration;
 
 	public SpellRunAction(Action action) {
+		this(action, 1);
+	}
+
+	public SpellRunAction(Action action, int duration) {
 		mAction = action;
+		mDuration = duration;
 	}
 
 	@Override
@@ -28,6 +34,6 @@ public class SpellRunAction extends Spell {
 
 	@Override
 	public int duration() {
-		return 1;
+		return mDuration;
 	}
 }
