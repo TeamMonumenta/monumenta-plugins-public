@@ -217,7 +217,7 @@ public class EnchantmentManager implements Listener {
 	                                Player player, BaseEnchantment property,
 	                                Map<BaseEnchantment, Integer>propertyMap,
 									Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
-		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && ItemUtils.isWearable(item.getType())) {
+		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND || item == null) && ItemUtils.isWearable(item.getType())) {
 			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
 			return;
 		}
@@ -259,7 +259,11 @@ public class EnchantmentManager implements Listener {
 
 			if (slotProperties != null && !(slotProperties.isEmpty())) {
 				/* Step over the item(s) the player has in that slot */
-				for (int index : _getItems(inv, slot)) {
+				int indexes[] = _getItems(inv, slot);
+				if (indexes == null) {
+					continue;
+				}
+				for (int index : indexes) {
 					ItemStack item = inv.getItem(index);
 					if (item != null) {
 						/* Step over the properties that apply to that slot */
