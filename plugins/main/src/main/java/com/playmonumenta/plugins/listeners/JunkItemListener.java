@@ -60,11 +60,11 @@ public class JunkItemListener implements Listener {
 		if (tags.contains(NO_JUNK_ITEMS_TAG)) {
 			tags.remove(NO_JUNK_ITEMS_TAG);
 			mPlayers.remove(player);
-			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + " You will now pick up all items");
+			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now pick up all items");
 		} else {
 			tags.add(NO_JUNK_ITEMS_TAG);
 			mPlayers.add(player);
-			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + " You will no longer pick up uninteresting items");
+			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items");
 		}
 	}
 
