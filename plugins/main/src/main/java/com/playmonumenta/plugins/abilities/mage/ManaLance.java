@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,7 +18,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -85,9 +86,14 @@ public class ManaLance extends Ability {
 
 	@Override
 	public boolean runCheck() {
+		// Must not have triggered Starfall
+		Starfall starfall = (Starfall)AbilityManager.getManager().getPlayerAbility(mPlayer, Starfall.class);
+		if (starfall != null && starfall.shouldCancelManaLance()) {
+			return false;
+		}
+
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand)
-		       && mPlayer.getGameMode() != GameMode.SPECTATOR;
+		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand);
 	}
 
 }

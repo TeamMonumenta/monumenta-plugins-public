@@ -20,14 +20,19 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 
 /*
- * Triple left-click without hitting a mob makes a meteor fall where the
- * player is looking, dealing 18 / 24 damage in a 5-block radius and
- * setting mobs on fire for 3s. Cooldown 16 / 12 s
+ * Right click while looking up to prime the next right click within 10s
+ * to summon a meteor where the player is looking (up to 25 blocks),
+ * dealing 18 / 24 damage in a 5 - block radius and setting mobs on fire
+ * for 3s. Does not activate mana lance. Cooldown 16 / 12 s
  */
 
 public class Starfall extends Ability {
+	private static final int STARFALL_PRIMED_TICKS = 10 * 20;
+	private static final double STARFALL_ANGLE = 70.0;
+
 	private static final int STARFALL_1_COOLDOWN = 16 * 20;
 	private static final int STARFALL_2_COOLDOWN = 12 * 20;
 	private static final int STARFALL_1_DAMAGE = 18;
@@ -35,14 +40,15 @@ public class Starfall extends Ability {
 	private static final int STARFALL_FIRE_DURATION = 3 * 20;
 	private static final double STARFALL_RADIUS = 5;
 
-	private int mLeftClicks = 0;
+	/* The player's getTicksLived() when the skill was last primed or cast */
+	private int mPrimedTick = -1;
 
 	public Starfall(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.STARFALL;
 		mInfo.scoreboardId = "Starfall";
 		mInfo.cooldown = getAbilityScore() == 1 ? STARFALL_1_COOLDOWN : STARFALL_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -52,22 +58,30 @@ public class Starfall extends Ability {
 		return InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand);
 	}
 
+	public boolean shouldCancelManaLance() {
+		// If cast or primed this tick, don't run mana lance
+		return mPrimedTick == mPlayer.getTicksLived();
+	}
+
 	@Override
 	public void cast(Action action) {
-		mLeftClicks++;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mLeftClicks > 0) {
-					mLeftClicks--;
-				}
-				this.cancel();
+		int ticksSincePrimed = mPlayer.getTicksLived() - mPrimedTick;
+		boolean lookingUp = mPlayer.getLocation().getPitch() < -STARFALL_ANGLE;
+		if (ticksSincePrimed > STARFALL_PRIMED_TICKS || ticksSincePrimed < 0 || lookingUp) {
+			if (lookingUp) {
+				// Looking up - prime starfall
+				mPrimedTick = mPlayer.getTicksLived();
+				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.1f);
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Starfall primed!");
 			}
-		}.runTaskLater(mPlugin, 20);
 
-		if (mLeftClicks < 3) {
+			// Either just primed or wasn't primed to begin with - abort
 			return;
 		}
+
+		// Set this again when cast - this allows easy testing for whether Mana Lance should trigger
+		mPrimedTick = mPlayer.getTicksLived();
+
 		Location loc = mPlayer.getEyeLocation();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
 		mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f);
@@ -84,7 +98,6 @@ public class Starfall extends Ability {
 			}
 		}
 
-		mLeftClicks = 0;
 		putOnCooldown();
 	}
 

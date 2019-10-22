@@ -189,7 +189,9 @@ public class AbilityManager {
 		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(Arrays.asList(
 			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
-			                               new DarkPact(mPlugin, mWorld, mRandom, null)
+			                               new DarkPact(mPlugin, mWorld, mRandom, null),
+										   // Starfall needs to come before Mana Lance
+			                               new Starfall(mPlugin, mWorld, mRandom, null)
 			                           ));
 		}
 
@@ -290,7 +292,7 @@ public class AbilityManager {
 			mReferenceAbilities.addAll(Arrays.asList(
 			                               /********** MAGE **********/
 			                               // ELEMENTALIST
-			                               new Starfall(mPlugin, mWorld, mRandom, null),
+										   // Starfall up above
 			                               new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
 			                               new Blizzard(mPlugin, mWorld, mRandom, null),
 
