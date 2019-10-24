@@ -25,6 +25,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
+	private static final int JUNK_ITEM_SIZE_THRESHOLD = 16;
 	private final Plugin mPlugin;
 	private final Set<Player> mPlayers = new HashSet<Player>();
 
@@ -85,11 +86,15 @@ public class JunkItemListener implements Listener {
 	public void pickupItem(EntityPickupItemEvent event) {
 		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
 			ItemStack item = event.getItem().getItemStack();
-			if (mPlayers.contains((Player)event.getEntity()) &&
-				!mPlugin.mServerProperties.getAlwaysPickupMats().contains(item.getType())
-			    && (!item.hasItemMeta() || !item.getItemMeta().hasLore())) {
+			if (mPlayers.contains((Player)event.getEntity()) && !isInteresting(item)) {
 				event.setCancelled(true);
 			}
 		}
+	}
+
+	private boolean isInteresting(ItemStack item) {
+		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
+		       || mPlugin.mServerProperties.getAlwaysPickupMats().contains(item.getType())
+		       || (item.hasItemMeta() && item.getItemMeta().hasLore());
 	}
 }
