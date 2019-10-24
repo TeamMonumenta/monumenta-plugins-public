@@ -316,64 +316,62 @@ public class ItemUtils {
 			return ItemTier.UNKNOWN;
 		}
 
-		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-			String itemName = item.getItemMeta().getDisplayName();
-			if (itemName.contains("Quest Compass")) {
-				return ItemTier.QUEST_COMPASS;
-			} else if (itemName.contains("Experiencinator (u)")) {
-				return ItemTier.ENHANCED_RARE;
-			} else if (itemName.contains("Experiencinator")) {
-				return ItemTier.RARE;
-			} else if (itemName.contains("Perfect Crystallizer")) {
-				return ItemTier.EPIC;
-			} else if (itemName.contains("Crystallizer (u)")) {
-				return ItemTier.ENHANCED_RARE;
-			} else if (itemName.contains("Crystallizer")) {
-				return ItemTier.ENHANCED_RARE;
+		if (item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta.hasDisplayName()) {
+				String itemName = meta.getDisplayName();
+				if (itemName.contains("Quest Compass")) {
+					return ItemTier.QUEST_COMPASS;
+				} else if (itemName.contains("Experiencinator (u)")) {
+					return ItemTier.ENHANCED_RARE;
+				} else if (itemName.contains("Experiencinator")) {
+					return ItemTier.RARE;
+				} else if (itemName.contains("Perfect Crystallizer")) {
+					return ItemTier.EPIC;
+				} else if (itemName.contains("Crystallizer (u)")) {
+					return ItemTier.ENHANCED_RARE;
+				} else if (itemName.contains("Crystallizer")) {
+					return ItemTier.ENHANCED_RARE;
+				}
+			}
+			if (meta.hasLore()) {
+				for (String loreEntry : meta.getLore()) {
+					String stripped = ChatColor.stripColor(loreEntry);
+					if (stripped.endsWith(": Tier I")) {
+						return ItemTier.ONE;
+					} else if (stripped.endsWith(": Tier II")) {
+						return ItemTier.TWO;
+					} else if (stripped.endsWith(": Tier III")) {
+						return ItemTier.THREE;
+					} else if (stripped.endsWith(": Tier IV")) {
+						return ItemTier.FOUR;
+					} else if (stripped.endsWith(": Tier V")) {
+						return ItemTier.FIVE;
+					} else if (stripped.endsWith(": Uncommon")) {
+						return ItemTier.UNCOMMON;
+					} else if (stripped.endsWith(": Enhanced Uncommon")) {
+						return ItemTier.ENHANCED_UNCOMMON;
+					} else if (stripped.endsWith(": Patron Made")) {
+						return ItemTier.PATRON_MADE;
+					} else if (stripped.endsWith(": Rare")) {
+						return ItemTier.RARE;
+					} else if (stripped.endsWith(": Enhanced Rare")) {
+						return ItemTier.ENHANCED_RARE;
+					} else if (stripped.endsWith(": Artifact")) {
+						return ItemTier.ARTIFACT;
+					} else if (stripped.endsWith(": Relic")) {
+						return ItemTier.RELIC;
+					} else if (stripped.endsWith(": Epic")) {
+						return ItemTier.EPIC;
+					} else if (stripped.endsWith(": Unique")) {
+						return ItemTier.UNIQUE;
+					} else if (stripped.endsWith(": Unique Event")) {
+						return ItemTier.UNIQUE_EVENT;
+					}
+				}
 			}
 		}
 
-		if (item.getLore() == null) {
-			return ItemTier.UNKNOWN;
-		}
-
-		List<String> lore = item.getLore();
-		for (String loreEntry : lore) {
-			String stripped = ChatColor.stripColor(loreEntry);
-			if (stripped.endsWith(": Tier I")) {
-				return ItemTier.ONE;
-			} else if (stripped.endsWith(": Tier II")) {
-				return ItemTier.TWO;
-			} else if (stripped.endsWith(": Tier II")) {
-				return ItemTier.TWO;
-			} else if (stripped.endsWith(": Tier III")) {
-				return ItemTier.THREE;
-			} else if (stripped.endsWith(": Tier IV")) {
-				return ItemTier.FOUR;
-			} else if (stripped.endsWith(": Tier V")) {
-				return ItemTier.FIVE;
-			} else if (stripped.endsWith(": Uncommon")) {
-				return ItemTier.UNCOMMON;
-			} else if (stripped.endsWith(": Enhanced Uncommon")) {
-				return ItemTier.ENHANCED_UNCOMMON;
-			} else if (stripped.endsWith(": Patron Made")) {
-				return ItemTier.PATRON_MADE;
-			} else if (stripped.endsWith(": Rare")) {
-				return ItemTier.RARE;
-			} else if (stripped.endsWith(": Enhanced Rare")) {
-				return ItemTier.ENHANCED_RARE;
-			} else if (stripped.endsWith(": Artifact")) {
-				return ItemTier.ARTIFACT;
-			} else if (stripped.endsWith(": Relic")) {
-				return ItemTier.RELIC;
-			} else if (stripped.endsWith(": Epic")) {
-				return ItemTier.EPIC;
-			} else if (stripped.endsWith(": Unique")) {
-				return ItemTier.UNIQUE;
-			} else if (stripped.endsWith(": Unique Event")) {
-				return ItemTier.UNIQUE_EVENT;
-			}
-		}
 		// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
 		if (isShulkerBox(item.getType())) {
 			return ItemTier.SHULKER_BOX;
