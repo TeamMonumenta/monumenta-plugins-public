@@ -230,15 +230,15 @@ public class SwordsageRichter extends BossAbilityGroup {
 			switch (t) {
 				case 3:
 					// Swing Living Sword
-					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:30f,CustomName:\"{\\\"text\\\":\\\"Swift Living Blade\\\"}\",HandItems:[{id:\"minecraft:iron_sword\",Count:1b,tag:{Damage:4}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:30},{Name:generic.movementSpeed,Base:0.425}]}";
+					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:30f,CustomName:\"{\\\"text\\\":\\\"Swift Living Blade\\\"}\",HandItems:[{id:\"minecraft:iron_sword\",Count:1b,tag:{Damage:4}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:30},{Name:generic.movementSpeed,Base:0.425}]}";
 					break;
 				case 2:
 					// Fiery Living Sword
-					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:40f,CustomName:\"{\\\"text\\\":\\\"Fiery Living Blade\\\"}\",HandItems:[{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:4,Unbreakable:1b,Damage:6,Enchantments:[{id:\"minecraft:fire_aspect\",lvl:2}]}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:40},{Name:generic.movementSpeed,Base:0.325}]}";
+					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:40f,CustomName:\"{\\\"text\\\":\\\"Fiery Living Blade\\\"}\",HandItems:[{id:\"minecraft:golden_sword\",Count:1b,tag:{HideFlags:4,Unbreakable:1b,Damage:6,Enchantments:[{id:\"minecraft:fire_aspect\",lvl:2}]}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:40},{Name:generic.movementSpeed,Base:0.325}]}";
 					break;
 				default:
 					// Heavy Living Sword
-					mobdata = "{Tags:[\"boss_livingblade\"],Silent:1b,Health:80f,CustomName:\"{\\\"text\\\":\\\"Heavy Living Blade\\\"}\",HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{Damage:16}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:80},{Name:generic.knockbackResistance,Base:0.5},{Name:generic.movementSpeed,Base:0.3}]}";
+					mobdata = "{DeathLootTable:\"minecraft:empty\",Tags:[\"boss_livingblade\"],Silent:1b,Health:80f,CustomName:\"{\\\"text\\\":\\\"Heavy Living Blade\\\"}\",HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{Damage:16}},{}],ActiveEffects:[{Id:14b,Amplifier:1b,Duration:120000,ShowParticles:0b}],Attributes:[{Name:generic.maxHealth,Base:80},{Name:generic.knockbackResistance,Base:0.5},{Name:generic.movementSpeed,Base:0.3}]}";
 					break;
 			}
 
