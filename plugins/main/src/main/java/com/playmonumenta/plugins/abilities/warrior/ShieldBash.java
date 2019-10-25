@@ -39,21 +39,13 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_2_STUN = 20 * 2;
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 5;
 	private static final int SHIELD_BASH_RANGE = 4;
-	private static final float SHIELD_BASH_1_SPEED_BONUS = 0.2f;
-	private static final float SHIELD_BASH_2_SPEED_BONUS = 0.4f;
 
 	public static class PlayerWithShieldBash {
 		public Player player;
-		public Location currentLocation;
-		public Location previousLocation;
-		public float speedBonus;
 		public boolean isShielding = false;
 		public boolean wasShielding = false;
-		public PlayerWithShieldBash(Player player, float speedBonus) {
+		public PlayerWithShieldBash(Player player) {
 			this.player = player;
-			this.speedBonus = speedBonus;
-			currentLocation = player.getLocation();
-			previousLocation = player.getLocation();
 		}
 		public void updateStatus() {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
@@ -61,10 +53,8 @@ public class ShieldBash extends Ability {
 			wasShielding = isShielding;
 			// Check for no bows because drawing them counts as raising your hand
 			isShielding = (player.isBlocking() || player.isHandRaised())
-						  && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
-						  && (offHand.getType() != Material.BOW || mainHand.getType() != Material.BOW);
-			previousLocation = currentLocation;
-			currentLocation = player.getLocation();
+			              && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
+			              && (offHand.getType() != Material.BOW || mainHand.getType() != Material.BOW);
 		}
 		public boolean startedShielding() {
 			return isShielding && !wasShielding;
@@ -86,9 +76,8 @@ public class ShieldBash extends Ability {
 		mInfo.cooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mStunDuration = getAbilityScore() == 1 ? SHIELD_BASH_1_STUN : SHIELD_BASH_2_STUN;
-		float speedBonus = getAbilityScore() == 1 ? SHIELD_BASH_1_SPEED_BONUS : SHIELD_BASH_2_SPEED_BONUS;
 		if (player != null) {
-			mPlayersWithShieldBash.put(player.getUniqueId(), new PlayerWithShieldBash(player, speedBonus));
+			mPlayersWithShieldBash.put(player.getUniqueId(), new PlayerWithShieldBash(player));
 		}
 
 		if (mShieldTracker == null || mShieldTracker.isCancelled()) {
@@ -101,13 +90,6 @@ public class ShieldBash extends Ability {
 						PlayerWithShieldBash p = iter.next().getValue();
 
 						p.updateStatus();
-						if (p.startedShielding()) {
-							p.player.setWalkSpeed(p.player.getWalkSpeed() + p.speedBonus);
-						} else if (p.stoppedShielding()) {
-							p.player.setWalkSpeed(p.player.getWalkSpeed() - p.speedBonus);
-							// Prevents YEETING forward in the one tick where speed is still there but no longer blocking
-							p.player.teleport(p.previousLocation);
-						}
 
 						if (AbilityManager.getManager().getPlayerAbility(p.player, ShieldBash.class) == null) {
 							iter.remove();
