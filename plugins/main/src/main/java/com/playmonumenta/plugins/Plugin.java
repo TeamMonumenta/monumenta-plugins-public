@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -80,6 +82,7 @@ public class Plugin extends JavaPlugin {
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public SafeZoneManager mSafeZoneManager;
+	public ShulkerInventoryManager mShulkerInventoryManager;
 
 	public SocketManager mSocketManager;
 
@@ -167,6 +170,7 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
+		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 
 		DailyReset.startTimer(this);
 
@@ -183,6 +187,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new EntityListener(this, mWorld, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this, mWorld), this);
+		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
