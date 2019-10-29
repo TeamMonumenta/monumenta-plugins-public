@@ -161,6 +161,10 @@ public class CommandUtils {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
+		if (ItemUtils.isShulkerBox(item.getType())) {
+			duplicateItem = false;
+		}
+
 		List<String> newLore = new ArrayList<>();
 		boolean enchantmentFound = false;
 		boolean nameAdded = (ownerPrefix == null);
