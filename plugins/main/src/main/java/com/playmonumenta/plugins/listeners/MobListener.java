@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,6 +52,11 @@ public class MobListener implements Listener {
 		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
 		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CURED ||
 		    event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.VILLAGE_DEFENSE) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (entity instanceof Slime && event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) {
 			event.setCancelled(true);
 			return;
 		}
