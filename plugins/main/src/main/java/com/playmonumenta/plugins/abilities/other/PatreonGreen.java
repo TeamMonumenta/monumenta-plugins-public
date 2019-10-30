@@ -16,17 +16,18 @@ public class PatreonGreen extends Ability {
 
 	public PatreonGreen(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
+
+		if (player != null) {
+			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");
+		} else {
+			mNoSelfParticles = false;
+		}
 	}
 
 	@Override
 	public boolean canUse(Player player) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		int shinyGreen = ScoreboardUtils.getScoreboardValue(player, "ShinyGreen");
-		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			mNoSelfParticles = true;
-		} else {
-			mNoSelfParticles = false;
-		}
 		return shinyGreen > 0 && patreon >= 20;
 	}
 

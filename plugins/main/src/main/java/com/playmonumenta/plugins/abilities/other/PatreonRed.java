@@ -15,21 +15,22 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class PatreonRed extends Ability {
 	private static final Particle.DustOptions RED_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
-	private boolean mNoSelfParticles = false;
+	private final boolean mNoSelfParticles;
 
 	public PatreonRed(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
+
+		if (player != null) {
+			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");
+		} else {
+			mNoSelfParticles = false;
+		}
 	}
 
 	@Override
 	public boolean canUse(Player player) {
 		int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
 		int shinyRed = ScoreboardUtils.getScoreboardValue(player, "ShinyRed");
-		if (player.getScoreboardTags().contains("noSelfParticles")) {
-			mNoSelfParticles = true;
-		} else {
-			mNoSelfParticles = false;
-		}
 		return shinyRed > 0 && patreon >= 30;
 	}
 
