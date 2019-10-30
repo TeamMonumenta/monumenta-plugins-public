@@ -9,6 +9,8 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.bossfights.SpellManager;
+import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.bossfights.spells.SpellRunAction;
 import com.playmonumenta.bossfights.spells.SpellTargetVisiblePlayer;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
@@ -32,8 +34,16 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 
 		mBoss = (Mob)boss;
 
+		Spell tgt = new SpellTargetVisiblePlayer(mBoss, detectionRange, 60, 160);
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTargetVisiblePlayer(mBoss, detectionRange, 60, 160)
+			new SpellRunAction(() -> {
+				if (boss instanceof Wolf && ((Wolf)boss).isTamed()) {
+					((Wolf)boss).setAngry(false);
+				} else {
+					tgt.run();
+				}
+			})
 		));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
