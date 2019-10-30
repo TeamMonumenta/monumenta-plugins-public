@@ -86,11 +86,9 @@ public class SpellVolcanicDemise extends Spell {
 							List<Player> players = Utils.playersInRange(mCenter, 50);
 							players.removeIf(p -> p.getLocation().getY() >= 61);
 							Collections.shuffle(players);
-							int pcount = 0;
 							for (Player player : players) {
 								Vector loc = player.getLocation().toVector();
 								if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mCenter.toVector(), 42)) {
-									pcount += 1;
 									rainMeteor(player.getLocation(), players, 10);
 								}
 							}
@@ -200,7 +198,7 @@ public class SpellVolcanicDemise extends Spell {
 
 	@Override
 	public int castTime() {
-		return 20 * 15;
+		return 20 * 17;
 	}
 
 	@Override
