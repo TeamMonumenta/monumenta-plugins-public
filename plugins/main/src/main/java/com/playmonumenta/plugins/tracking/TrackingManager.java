@@ -8,7 +8,6 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.entity.Villager;
@@ -71,13 +70,11 @@ public class TrackingManager {
 	public void addEntity(Entity entity) {
 		if (Constants.TRACKING_MANAGER_ENABLED) {
 			// Check whether this entity should be pushable
-			if (!(entity instanceof Monster)) {
-				if ((entity instanceof Villager && (!entity.getScoreboardTags().contains(PUSHABLE_TAG))) ||
-				    entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
+			if ((entity instanceof Villager && !entity.getScoreboardTags().contains(PUSHABLE_TAG))
+			    || entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
 
-					// This entity should not be pushable - join to the unpushable team
-					mUnpushableTeam.addEntry(entity.getUniqueId().toString());
-				}
+				// This entity should not be pushable - join to the unpushable team
+				mUnpushableTeam.addEntry(entity.getUniqueId().toString());
 			}
 
 			if (entity instanceof Player) {
