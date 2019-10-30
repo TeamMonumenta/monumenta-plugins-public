@@ -29,7 +29,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -195,19 +194,14 @@ public class WorldListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void BlockFormEvent(BlockFormEvent event) {
-		Location blockLocation = event.getBlock().getLocation();
 		Material blockType = event.getNewState().getType();
 		if (blockType == null) {
 			blockType = Material.AIR;
 		}
 
-		if (blockType.equals(Material.SNOW) ||
-		    blockType.equals(Material.ICE)) {
-			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(blockLocation);
-			if (!locType.equals(LocationType.None)) {
-				event.setCancelled(true);
-				return;
-			}
+		if (blockType.equals(Material.SNOW) || blockType.equals(Material.ICE)) {
+			event.setCancelled(true);
+			return;
 		}
 	}
 }
