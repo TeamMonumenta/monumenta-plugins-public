@@ -74,6 +74,29 @@ public class AdvancingShadows extends Ability {
 			while (loc.getBlock().getType().isSolid()) {
 				loc.subtract(dir.clone().multiply(1.15));
 			}
+
+			// Prevent the player from teleporting over void
+			if (loc.getY() < 8) {
+				boolean safe = false;
+				for (int y = 0; y < loc.getY() - 1; y++) {
+					Location tempLoc = loc.clone();
+					tempLoc.setY(y);
+					if (!tempLoc.getBlock().isPassable()) {
+						safe = true;
+						break;
+					}
+				}
+
+				// Maybe void - not worth it
+				if (!safe) {
+					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.8f);
+					return;
+				}
+
+				// Don't teleport players below y = 1.1 to avoid clipping into oblivion
+				loc.setY(Math.max(1.1, loc.getY()));
+			}
+
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
