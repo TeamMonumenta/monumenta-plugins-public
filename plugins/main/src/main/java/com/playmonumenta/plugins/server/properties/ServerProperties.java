@@ -42,6 +42,7 @@ public class ServerProperties {
 
 	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
+	private EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
 	public boolean getDailyResetEnabled() {
 		return mDailyResetEnabled;
@@ -99,6 +100,10 @@ public class ServerProperties {
 		return mAlwaysPickupMats;
 	}
 
+	public Set<Material> getNamedPickupMats() {
+		return mNamedPickupMats;
+	}
+
 	public void load(Plugin plugin, CommandSender sender) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
@@ -148,6 +153,7 @@ public class ServerProperties {
 
 					mUnbreakableBlocks           = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
 					mAlwaysPickupMats            = _getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
+					mNamedPickupMats             = _getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
 
 					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
 

@@ -95,6 +95,8 @@ public class JunkItemListener implements Listener {
 	private boolean isInteresting(ItemStack item) {
 		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
 		       || mPlugin.mServerProperties.getAlwaysPickupMats().contains(item.getType())
-		       || (item.hasItemMeta() && item.getItemMeta().hasLore());
+		       || (item.hasItemMeta() && (item.getItemMeta().hasLore() ||
+					                      (item.getItemMeta().hasDisplayName()
+										   && mPlugin.mServerProperties.getNamedPickupMats().contains(item.getType()))));
 	}
 }
