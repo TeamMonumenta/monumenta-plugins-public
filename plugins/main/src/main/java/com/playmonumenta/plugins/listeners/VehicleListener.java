@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -55,10 +56,12 @@ public class VehicleListener implements Listener {
 		Entity entity = event.getEntered();
 		Vehicle vehicle = event.getVehicle();
 
-		if (!(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None) {
+		if (!(vehicle instanceof AbstractHorse) && !(entity instanceof Player) && mPlugin.mSafeZoneManager.getLocationType(vehicle) != LocationType.None) {
 			/*
 			 * Vehicles cannot be entered if:
 			 *
+			 * The vehicle is not a horse
+			 * AND
 			 * The entity entering is not a player
 			 * AND
 			 * the vehicle is inside of a safezone
