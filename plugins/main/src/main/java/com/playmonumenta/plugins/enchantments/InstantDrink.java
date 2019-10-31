@@ -26,7 +26,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 public class InstantDrink implements BaseEnchantment {
 
-	private static final String PROPERTY_NAME = ChatColor.GRAY + "Instant Drink";
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Instant Drink";
 
 	@Override
 	public String getProperty() {

@@ -22,20 +22,18 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.InstantDrink;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-
-import net.md_5.bungee.api.ChatColor;
 
 public class PotionConsumeListener implements Listener {
-
-	Plugin mPlugin = null;
-	private Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
 	private static final int DRINK_DURATION = 24; //Ticks of total drinking
 	private static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
+
+	private final Plugin mPlugin;
+	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
 
 	public PotionConsumeListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -53,7 +51,7 @@ public class PotionConsumeListener implements Listener {
 		    // Must be placing a single block
 		    event.getAction() == null ||
 		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-		    // Must be a player interacting with their main inventory
+		    // Must be a player interacting with an inventory
 		    event.getWhoClicked() == null ||
 		    !(event.getWhoClicked() instanceof Player) ||
 		    event.getClickedInventory() == null ||
@@ -71,15 +69,15 @@ public class PotionConsumeListener implements Listener {
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
-		BukkitRunnable runnable  = mRunnables.get(player.getUniqueId());
+		BukkitRunnable runnable = mRunnables.get(player.getUniqueId());
 		if (!tags.contains(INVENTORY_DRINK_TAG) || runnable != null && !runnable.isCancelled()) {
 			return;
 		}//Cannot drink another potion if one is already being drinked, or player does not have this feature enabled
 
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
-		if (InventoryUtils.getCustomEnchantLevel(item, ChatColor.GRAY + "Instant Drink", false) != 0) {
+		if (InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false) != 0) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
-			applyPotion(player, meta);
+			PotionUtils.applyPotion(mPlugin, player, meta);
 		} else {
 			//Gives slowness IV to emulate the slow walking of drinking, extra 5 ticks to match delay of drinking
 			mPlugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, DRINK_DURATION + 5, 3, true, false));
@@ -90,7 +88,7 @@ public class PotionConsumeListener implements Listener {
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
 					if (mTicks >= DRINK_DURATION) {
-						applyPotion(player, meta);
+						PotionUtils.applyPotion(mPlugin, player, meta);
 						this.cancel();
 					}
 					float pitch = ((float)Math.random() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
@@ -102,10 +100,7 @@ public class PotionConsumeListener implements Listener {
 			mRunnables.put(player.getUniqueId(), runnable);
 		}
 
-		//Wait, this is illegal for a potion to have.
-		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
-
-		} else {
+		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			item.setAmount(item.getAmount() - 1);
 			if (item.getAmount() == 0) {
 				event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
@@ -115,16 +110,5 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		event.setCancelled(true);
-	}
-
-	private void applyPotion(Player player, PotionMeta meta) {
-		if (meta.hasCustomEffects()) {
-			for (PotionEffect effect : meta.getCustomEffects()) {
-				mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
-			}
-		} else {
-			PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
-			PotionUtils.apply(player, info);
-		}
 	}
 }

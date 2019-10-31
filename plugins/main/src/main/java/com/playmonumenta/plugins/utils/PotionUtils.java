@@ -332,6 +332,17 @@ public class PotionUtils {
 		}
 	}
 
+	public static void applyPotion(Plugin plugin, Player player, PotionMeta meta) {
+		if (meta.hasCustomEffects()) {
+			for (PotionEffect effect : meta.getCustomEffects()) {
+				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
+			}
+		} else {
+			PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
+			PotionUtils.apply(player, info);
+		}
+	}
+
 	public static List<PotionEffectType> getNegativeEffects(LivingEntity le) {
 		List<PotionEffectType> types = new ArrayList<PotionEffectType>();
 		List<PotionEffectType> negatives = Arrays.asList(NEGATIVE_EFFECTS);
