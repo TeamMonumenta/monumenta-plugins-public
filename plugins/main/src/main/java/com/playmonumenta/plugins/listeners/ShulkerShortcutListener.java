@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.permissions.Permission;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -27,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @see com.playmonumenta.plugins.inventories.ShulkerInventory
  */
 public class ShulkerShortcutListener implements Listener {
+	private static final Permission PERMISSION = new Permission("monumenta.feature.shulkershortcut");
 	private final Plugin mPlugin;
 
 	public ShulkerShortcutListener(Plugin plugin) {
@@ -77,51 +79,53 @@ public class ShulkerShortcutListener implements Listener {
 					event.setCancelled(true);
 				} else {
 					// A shulker box that isn't currently open was clicked.
-					if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
-					    itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType())) {
-						// Player right-clicked shulker while holding an item on their cursor.
-						event.setCancelled(true);
-						int starting = itemHeld.getAmount();
-						int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, itemClicked, itemHeld);
-						switch (remaining) {
-							case -3:
-								// Somehow that wasn't a shulker
-								player.sendMessage(String.format("%s%sHow did you...? That isn't a shulker. Please report this", ChatColor.DARK_RED, ChatColor.BOLD));
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								break;
-							case -2:
-								// Shulker is locked
-								player.sendMessage(String.format("%s%sThat shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD));
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								break;
-							case -1:
-								// Shulker is already open
-								player.sendMessage(String.format("%s%sThat shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD));
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								break;
-							case 0:
-								// All items were inserted successfully.
-								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(ChatColor.GOLD + "Item deposited into shulker.");
-								event.getView().setCursor(null);
-								break;
-							default:
-								if (remaining == starting) {
-									// No items were placed, shulker is full.
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									player.sendMessage(ChatColor.DARK_RED + "That shulker is full.");
-								} else {
-									// Items were inserted, but not all
-									player.sendMessage(ChatColor.DARK_RED + "That shulker was too full to accept the full stack.");
-									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								}
-						}
-					} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
-						// Player right-clicked shulker with an empty cursor.
-						if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, itemClicked)) {
-							// Shulker was successfully opened, cancel.
-							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					if (player.hasPermission(PERMISSION)) {
+						if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
+							itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType())) {
+							// Player right-clicked shulker while holding an item on their cursor.
 							event.setCancelled(true);
+							int starting = itemHeld.getAmount();
+							int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, itemClicked, itemHeld);
+							switch (remaining) {
+								case -3:
+									// Somehow that wasn't a shulker
+									player.sendMessage(String.format("%s%sHow did you...? That isn't a shulker. Please report this", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									break;
+								case -2:
+									// Shulker is locked
+									player.sendMessage(String.format("%s%sThat shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									break;
+								case -1:
+									// Shulker is already open
+									player.sendMessage(String.format("%s%sThat shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									break;
+								case 0:
+									// All items were inserted successfully.
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									player.sendMessage(ChatColor.GOLD + "Item deposited into shulker.");
+									event.getView().setCursor(null);
+									break;
+								default:
+									if (remaining == starting) {
+										// No items were placed, shulker is full.
+										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+										player.sendMessage(ChatColor.DARK_RED + "That shulker is full.");
+									} else {
+										// Items were inserted, but not all
+										player.sendMessage(ChatColor.DARK_RED + "That shulker was too full to accept the full stack.");
+										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									}
+							}
+						} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
+							// Player right-clicked shulker with an empty cursor.
+							if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, itemClicked)) {
+								// Shulker was successfully opened, cancel.
+								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+								event.setCancelled(true);
+							}
 						}
 					}
 				}
