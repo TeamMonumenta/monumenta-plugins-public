@@ -120,13 +120,9 @@ public class CalculateReforge extends GenericCommand {
 				} else if (handRegion == ItemRegion.CELSIAN_ISLES) {
 					handCurrency = "CS";
 				} else if (handRegion == ItemRegion.MONUMENTA) {
-					if (player.getWorld().getName() == "Project_Epic-region_1") {
-						handCurrency = "XP";
-					} else if (player.getWorld().getName() == "Project_Epic-region_2") {
-						handCurrency = "CS";
-					} else {
-						handCurrency = "XP";
-					}
+					// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
+					// Since they are obtained in R2, they should always cost R2 currency to repair.
+					handCurrency = "CS";
 				}
 				if (handCurrency != null) {
 					// If the player is holding a shattered item, let them know how much it costs to reforge
@@ -141,14 +137,9 @@ public class CalculateReforge extends GenericCommand {
 			int ccs = fullInventoryCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
 			int cmm = fullInventoryCost.getOrDefault(ItemRegion.MONUMENTA, 0);
 			if (cmm != 0) {
-				// If the player has any "Monumenta :" items, convert the cost to reforge that item to the current region, or CXP by default
-				if (player.getWorld().getName() == "Project_Epic-region_1") {
-					cxp += cmm;
-				} else if (player.getWorld().getName() == "Project_Epic-region_2") {
-					ccs += cmm;
-				} else {
-					cxp += cmm;
-				}
+				// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
+				// Since they are obtained in R2, they should always cost R2 currency to repair.
+				ccs += cmm;
 			}
 
 			// Tell the player the cost to reforge all items in their inventory
