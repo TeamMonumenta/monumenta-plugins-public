@@ -301,11 +301,11 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
-		int hp_del = 1280;
+		int hp_del = 2048;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
 			bossTargetHp = bossTargetHp + hp_del;
-			hp_del = hp_del / 2;
+			hp_del = hp_del / 2 + 32;
 			player_count--;
 		}
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
