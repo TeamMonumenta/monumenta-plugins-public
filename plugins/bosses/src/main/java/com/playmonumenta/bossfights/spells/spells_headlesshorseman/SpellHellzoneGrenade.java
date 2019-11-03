@@ -36,11 +36,13 @@ public class SpellHellzoneGrenade extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mRange;
+	private Location mCenter;
 	private HeadlessHorsemanBoss mHorseman;
-	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, double range, HeadlessHorsemanBoss horseman) {
+	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mRange = range;
+		mCenter = center;
 		mHorseman = horseman;
 	}
 
@@ -49,7 +51,7 @@ public class SpellHellzoneGrenade extends Spell {
 		mHorseman.disableShield();
 		World world = mBoss.getWorld();
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = Utils.playersInRange(mCenter, mRange);
 
 		new BukkitRunnable() {
 			int t = 0;

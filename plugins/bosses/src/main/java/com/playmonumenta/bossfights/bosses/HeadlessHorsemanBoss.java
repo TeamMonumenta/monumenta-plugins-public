@@ -124,14 +124,14 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellHellzoneGrenade(plugin, boss, detectionRange, this),
+				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
 				new SpellBatBombs(plugin, boss),
 				new SpellSinisterReach(plugin, boss),
 				new SpellBurningVengence(plugin, boss, this)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellHellzoneGrenade(plugin, boss, detectionRange, this),
+				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
 				new SpellBatBombs(plugin, boss),
 				new SpellSinisterReach(plugin, boss),
 				new SpellBurningVengence(plugin, boss, this),
@@ -247,7 +247,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
-			List<Player> players = Utils.playersInRange(mBoss.getLocation(), 32);
+			List<Player> players = Utils.playersInRange(mSpawnLoc, detectionRange);
 			if (players.contains(event.getEntity())) {
 				players.remove(event.getEntity());
 			}
@@ -313,10 +313,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect @s minecraft:blindness 2 2");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Headless Horseman\",\"color\":\"dark_red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Scourge of the Isles\",\"color\":\"red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect @s minecraft:blindness 2 2");
+		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Headless Horseman\",\"color\":\"dark_red\",\"bold\":true}]");
+		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Scourge of the Isles\",\"color\":\"red\",\"bold\":true}]");
+		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 	@Override
