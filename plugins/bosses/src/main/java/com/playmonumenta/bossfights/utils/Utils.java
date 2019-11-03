@@ -29,6 +29,10 @@ public class Utils {
 	}
 
 	public static List<Player> playersInRange(Location loc, double range) {
+		return playersInRange(loc, range, false);
+	}
+
+	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
 		List<Player> out = new ArrayList<Player>();
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {

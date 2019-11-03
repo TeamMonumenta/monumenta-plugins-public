@@ -97,7 +97,7 @@ it are also blinded for 5 seconds.)
 public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_horseman";
-	public static final int detectionRange = 50;
+	public static final int detectionRange = 22;
 
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
@@ -300,7 +300,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange, true).size();
 		int hp_del = 2048;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -321,7 +321,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public void death() {
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), detectionRange)) {
+		for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
