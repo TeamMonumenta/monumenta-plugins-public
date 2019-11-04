@@ -335,6 +335,19 @@ public class PotionUtils {
 	public static void applyPotion(Plugin plugin, Player player, PotionMeta meta) {
 		if (meta.hasCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
+				// Kill the player if they drink a potion with instant damage 10+
+				if (effect.getType() != null &&
+				    effect.getType().equals(PotionEffectType.HARM) &&
+				    effect.getAmplifier() >= 9) {
+
+					player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+						@Override
+						public void run() {
+							player.setHealth(0);
+						}
+					}, 0);
+				}
+
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 			}
 		} else {
