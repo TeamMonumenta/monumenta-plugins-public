@@ -146,11 +146,17 @@ public class PlayerInventory {
 				return;
 			} else if (((InventoryClickEvent) event).isRightClick() && ShulkerEquipmentListener.isEquipmentBox(((InventoryClickEvent) event).getCurrentItem()))  {
 				for (int i = 0; i <= 8; i++) {
+					// Update hotbar
 					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
-				}//Update hotbar
+				}
 				for (int i = 36; i <= 40; i++) {
+					// Update armor and offhand
 					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
-				}//Update armor and offhand
+				}
+			} else if (((InventoryClickEvent) event).getHotbarButton() != -1) {
+				// Updates clicked slot and hotbar slot if numbers were used to swap
+				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getHotbarButton(), mCurrentProperties, mInventoryProperties, player, plugin);
 			} else {
 				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
 			}
