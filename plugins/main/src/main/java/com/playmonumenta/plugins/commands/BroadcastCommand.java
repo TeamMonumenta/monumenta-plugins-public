@@ -39,7 +39,8 @@ public class BroadcastCommand {
 	            "scoreboard",
 	            "tag",
 	            "team",
-	            "setblock"
+	            "setblock",
+	            "restart-empty"
 	        );
 
 	public static void register(Plugin plugin) {

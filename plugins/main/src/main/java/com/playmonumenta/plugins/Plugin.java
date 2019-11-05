@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
-import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -31,6 +29,7 @@ import com.playmonumenta.plugins.commands.ReforgeHeldItem;
 import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
+import com.playmonumenta.plugins.commands.RestartEmptyCommand;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TestNoScore;
@@ -41,6 +40,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.VotifierIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
@@ -49,6 +49,7 @@ import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.PotionConsumeListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -122,6 +123,7 @@ public class Plugin extends JavaPlugin {
 		TransferScores.register(this);
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
+		RestartEmptyCommand.register(this);
 
 		mHttpManager = new HttpManager(this);
 		try {
