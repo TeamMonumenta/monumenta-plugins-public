@@ -24,8 +24,9 @@ public class ShulkerInventory {
 	private final ItemStack mShulkerItem;
 	private final Inventory mInventory;
 	private final Inventory mParentInventory;
-	private final boolean mForDeposit;
+	private final int mDepositLimit;
 	private final String mLock;
+	private int mDepositCount;
 
 	/**
 	 * Create a new ShulkerInventory to allow players to access a Shulker Box without being placed.
@@ -34,10 +35,10 @@ public class ShulkerInventory {
 	 * @param player The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
 	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
-	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, boolean)
+	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, int)
 	 */
 	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, ItemStack shulkerItem) {
-		this(plugin, player, parentInventory, shulkerItem, false);
+		this(plugin, player, parentInventory, shulkerItem, 0);
 	}
 
 	/**
@@ -50,15 +51,18 @@ public class ShulkerInventory {
 	 * @param player The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
 	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
-	 * @param forDeposit True if this inventory should be marked as For Deposit Only.
+	 * @param depositLimit The number of ItemStacks that will be deposited into this Shulker Box.
+	 *                     Attempting to deposit more than this number will throw an error.
+	 *                     The shulker will automatically be closed when this number of deposits is reached.
+	 *                     If 0, the shulker is not being used for deposit, but to be opened by a player.
 	 */
-	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, ItemStack shulkerItem, boolean forDeposit) {
+	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, ItemStack shulkerItem, int depositLimit) {
 		mPlugin = plugin;
 		mPlayer = player;
 		mParentInventory = parentInventory;
 		mShulkerItem = shulkerItem;
-		mForDeposit = forDeposit;
-		mLock = (mForDeposit ? "ShulkerDeposit:" : "ShulkerShortcut:") + mPlayer.getUniqueId();
+		mDepositLimit = depositLimit;
+		mLock = (mDepositLimit > 0 ? "ShulkerDeposit:" : "ShulkerShortcut:") + mPlayer.getUniqueId();
 		BlockStateMeta shulkerMeta = (BlockStateMeta)mShulkerItem.getItemMeta();
 		ShulkerBox shulkerBox = (ShulkerBox)shulkerMeta.getBlockState();
 		if (shulkerBox.getCustomName() != null) {
@@ -139,7 +143,7 @@ public class ShulkerInventory {
 	 * This will refuse to work and log a warning if the constructor specified forDeposit = true
 	 */
 	void openShulker() {
-		if (mForDeposit) {
+		if (mDepositLimit > 0) {
 			mPlugin.getLogger().warning("ShulkerInventory attempted to open a Shulker Box marked as For Deposit Only");
 		} else {
 			mPlayer.openInventory(mInventory);
@@ -148,15 +152,20 @@ public class ShulkerInventory {
 
 	/**
 	 * Attempt to deposit one ItemStack into the open Shulker Box.
-	 * If the Shulker Box is For Deposit Only, it will be closed after the item is deposited.
+	 * If the deposit limit has been reached, the Shulker Box will be closed after the item is deposited.
+	 * If the limit is exceeded, an exception will be thrown.
 	 *
 	 * @param item The ItemStack to be deposited.
 	 * @return The amount of the original stack that could not be deposited.
-	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, boolean)
+	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, int)
 	 */
-	int depositItem(ItemStack item) {
+	int depositItem(ItemStack item) throws Exception {
+		if (isDepositComplete()) {
+			throw new Exception("Deposit Limit Exceeded");
+		}
+		mDepositCount++;
 		HashMap<Integer, ItemStack> remaining = mInventory.addItem(item);
-		updateShulker(mForDeposit);
+		updateShulker(isDepositComplete());
 		if (remaining.isEmpty()) {
 			return 0;
 		}
@@ -172,5 +181,9 @@ public class ShulkerInventory {
 	 */
 	List<HumanEntity> getViewers() {
 		return mInventory.getViewers();
+	}
+
+	public boolean isDepositComplete() {
+		return mDepositCount >= mDepositLimit;
 	}
 }

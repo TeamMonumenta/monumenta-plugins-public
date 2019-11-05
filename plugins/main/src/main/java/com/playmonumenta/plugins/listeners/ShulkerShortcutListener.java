@@ -5,10 +5,13 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -170,6 +173,41 @@ public class ShulkerShortcutListener implements Listener {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
 			mPlugin.mShulkerInventoryManager.closeShulker(player);
+		}
+	}
+
+	/**
+	 * Event Handler for whenever a dispenser is activated.
+	 * Used to prevent placing open shulkers, and unlock shulkers with an invalid lock.
+	 *
+	 * @see BlockDispenseEvent
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void BlockDispenseEvent(BlockDispenseEvent event) {
+		if (!event.isCancelled() &&
+			ItemUtils.isShulkerBox(event.getItem().getType()) &&
+			mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem())) {
+			event.setCancelled(true);
+		}
+	}
+
+	/**
+	 * Event Handler for whenever a block is placed.
+	 * Used to prevent placing open shulkers, and unlock shulkers with an invalid lock.
+	 *
+	 * @see BlockPlaceEvent
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void BlockPlaceEvent(BlockPlaceEvent event) {
+		Player player = event.getPlayer();
+		Block block = event.getBlockPlaced();
+		if (!event.isCancelled() &&
+		    ItemUtils.isShulkerBox(block.getType()) &&
+		    mPlugin.mShulkerInventoryManager.isShulkerInUse(block)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			player.sendMessage(ChatColor.DARK_RED + "That shulker is open");
+			event.setCancelled(true);
+			event.setBuild(false);
 		}
 	}
 }
