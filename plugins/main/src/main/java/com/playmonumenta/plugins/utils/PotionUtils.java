@@ -335,24 +335,34 @@ public class PotionUtils {
 	public static void applyPotion(Plugin plugin, Player player, PotionMeta meta) {
 		if (meta.hasCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
-				// Kill the player if they drink a potion with instant damage 10+
-				if (effect.getType() != null &&
-				    effect.getType().equals(PotionEffectType.HARM) &&
-				    effect.getAmplifier() >= 9) {
-
-					player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-						@Override
-						public void run() {
+				if (effect.getType() != null) {
+					if (effect.getType().equals(PotionEffectType.HARM)) {
+						//If 10+, kill, if below, deal normal instant damage
+						//If instant healing, manually add health
+						if (effect.getAmplifier() >= 9) {
 							player.setHealth(0);
+						} else {
+							EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, effect.getAmplifier() + 1), null);
 						}
-					}, 0);
+					} else if (effect.getType().equals(PotionEffectType.HEAL)) {
+						PlayerUtils.healPlayer(player, 2 * Math.pow(2, effect.getAmplifier() + 1));
+					}
 				}
 
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 			}
 		} else {
 			PotionInfo info = PotionUtils.getPotionInfo(meta.getBasePotionData(), 1);
-			PotionUtils.apply(player, info);
+
+			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
+			//Check then add health
+			if (info != null && info.type.equals(PotionEffectType.HEAL)) {
+				PlayerUtils.healPlayer(player, 2 * Math.pow(2, info.amplifier + 1));
+			} else if (info != null && info.type.equals(PotionEffectType.HARM)) {
+				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.amplifier + 1), null);
+			} else {
+				PotionUtils.apply(player, info);
+			}
 		}
 	}
 
