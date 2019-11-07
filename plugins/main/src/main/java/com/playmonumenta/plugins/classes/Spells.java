@@ -37,7 +37,7 @@ public enum Spells {
 	WIND_WALK("Wind Walk"),
 
 	//--Assassin Spec.
-	PREPARATION("Preparation"),
+	BODKIN_BLITZ("Bodkin Blitz"),
 	CLOAK_AND_DAGGER("Cloak And Dagger"),
 
 	//Cleric

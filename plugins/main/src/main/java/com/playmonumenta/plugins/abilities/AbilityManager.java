@@ -103,9 +103,9 @@ import com.playmonumenta.plugins.abilities.rogue.RoguePassive;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
+import com.playmonumenta.plugins.abilities.rogue.assassin.BodkinBlitz;
 import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
 import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
-import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
@@ -308,7 +308,7 @@ public class AbilityManager {
 			                               new DeadlyRonde(mPlugin, mWorld, mRandom, null),
 
 			                               // ASSASSIN
-			                               new Preparation(mPlugin, mWorld, mRandom, null),
+			                               new BodkinBlitz(mPlugin, mWorld, mRandom, null),
 			                               new CloakAndDagger(mPlugin, mWorld, mRandom, null),
 			                               new CoupDeGrace(mPlugin, mWorld, mRandom, null),
 

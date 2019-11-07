@@ -16,8 +16,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -62,12 +60,6 @@ public class ByMyBlade extends Ability {
 					extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
 			}
-			Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-			if (pp != null) {
-				extraDamage += pp.getBonus(mInfo.linkedSpell);
-			}
-			event.setDamage(event.getDamage() + extraDamage);
-
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);
 			int count = 15;

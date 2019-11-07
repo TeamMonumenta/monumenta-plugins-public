@@ -19,9 +19,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.rogue.assassin.Preparation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -63,12 +61,6 @@ public class DaggerThrow extends Ability {
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.25f);
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.9f, 1.0f);
 
-		Preparation pp = (Preparation) AbilityManager.getManager().getPlayerAbility(mPlayer, Preparation.class);
-		int ppDuration = 0;
-		if (pp != null) {
-			ppDuration = pp.getBonus(mInfo.linkedSpell);
-		}
-
 		for (int a = -1; a <= 1; a++) {
 			double angle = a * DAGGER_THROW_SPREAD;
 			Vector newDir = new Vector(Math.cos(angle) * dir.getX() + Math.sin(angle) * dir.getZ(), dir.getY(), Math.cos(angle) * dir.getZ() - Math.sin(angle) * dir.getX());
@@ -95,9 +87,6 @@ public class DaggerThrow extends Ability {
 
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
-						if (ppDuration > 0) {
-							EntityUtils.applyStun(mPlugin, ppDuration, mob);
-						}
 						break;
 					} else if (bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract((newDir.clone()).multiply(0.5));

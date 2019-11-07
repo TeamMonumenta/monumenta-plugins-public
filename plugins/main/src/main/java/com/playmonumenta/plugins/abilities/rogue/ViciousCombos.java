@@ -20,15 +20,18 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ViciousCombos extends Ability {
 
 	private static final int VICIOUS_COMBOS_RANGE = 5;
-	private static final int VICIOUS_COMBOS_DAMAGE = 24;
 	private static final int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
 	private static final int VICIOUS_COMBOS_COOL_1 = 1 * 20;
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
+	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;
+	private static final int VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 3;
+	private static final int VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0;
 
 	public ViciousCombos(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -56,7 +59,9 @@ public class ViciousCombos extends Ability {
 
 						if (viciousCombos > 1) {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, VICIOUS_COMBOS_RANGE, mPlayer)) {
-								EntityUtils.damageEntity(mPlugin, mob, VICIOUS_COMBOS_DAMAGE, mPlayer);
+								mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0);
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL, true, false));
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, VICIOUS_COMBOS_CRIPPLE_DURATION, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL, true, false));
 							}
 						}
 
