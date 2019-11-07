@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -40,6 +41,7 @@ public class ChoirBells extends Ability {
 	private static final int CHOIR_BELLS_VULNERABILITY_LEVEL = 5;
 	private static final int CHOIR_BELLS_1_COOLDOWN = 30 * 20;
 	private static final int CHOIR_BELLS_2_COOLDOWN = 20 * 20;
+	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
 
 	public ChoirBells(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -58,7 +60,19 @@ public class ChoirBells extends Ability {
 	@Override
 	public void cast(Action action) {
 		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, 10, Particle.VILLAGER_HAPPY, 0.5f, Particle.SPELL_INSTANT, 0.5f, 0.33);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.4f);
+
+		for (int i = 0; i < CHOIR_BELLS_PITCHES.length; i++) {
+			float pitch = CHOIR_BELLS_PITCHES[i];
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3, pitch);
+					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3, pitch);
+					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3, pitch);
+				}
+			}.runTaskLater(mPlugin, i);
+		}
+
 		Vector playerDirection = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHOIR_BELLS_RANGE)) {
 			if (EntityUtils.isUndead(mob)) {
