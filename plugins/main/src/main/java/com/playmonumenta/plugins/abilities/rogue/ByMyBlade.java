@@ -60,6 +60,9 @@ public class ByMyBlade extends Ability {
 					extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
 			}
+
+			event.setDamage(event.getDamage() + extraDamage);
+
 			Location loc = damagee.getLocation();
 			loc.add(0, 1, 0);
 			int count = 15;
