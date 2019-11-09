@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,8 +29,6 @@ public class ItemOverrides {
 			Material.CHEST,
 			Material.FLINT_AND_STEEL,
 			Material.ENDER_CHEST,
-			Material.PACKED_ICE,
-			Material.MAGMA_BLOCK,
 
 			Material.WHITE_BANNER,
 			Material.ORANGE_BANNER,
@@ -77,6 +76,13 @@ public class ItemOverrides {
 			Material.IRON_SHOVEL,
 			Material.DIAMOND_SHOVEL
 		);
+
+	public static EnumMap<Material, String> ALLOW_PRECISE_LORE_MATS = new EnumMap<>(Material.class);
+
+	static {
+		ALLOW_PRECISE_LORE_MATS.put(Material.MAGMA_BLOCK, "Turns into lava when");
+		ALLOW_PRECISE_LORE_MATS.put(Material.PACKED_ICE, "Turns into water when");
+	}
 
 	public ItemOverrides() {
 		registerOverrides();
@@ -309,8 +315,12 @@ public class ItemOverrides {
 		}
 
 		//  Don't allow placing of certain items with Lore.
-		if (item.hasItemMeta() && item.getItemMeta().hasLore() && player.getGameMode() != GameMode.CREATIVE
-		    && !(ALLOW_LORE_MATS.contains(item.getType()))) {
+		if (item.hasItemMeta()
+		    && item.getItemMeta().hasLore()
+		    && player.getGameMode() != GameMode.CREATIVE
+		    && !(ALLOW_LORE_MATS.contains(item.getType())
+		         || (ALLOW_PRECISE_LORE_MATS.containsKey(item.getType())
+			         && InventoryUtils.testForItemWithLore(item, ALLOW_PRECISE_LORE_MATS.get(item.getType()))))) {
 			eventCancelled |= true;
 		}
 

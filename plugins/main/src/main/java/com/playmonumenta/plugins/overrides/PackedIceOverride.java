@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,8 +17,7 @@ public class PackedIceOverride extends BaseOverride {
 			return true;
 		}
 
-		if (item.hasItemMeta()
-		    && item.getItemMeta().hasLore()
+		if (InventoryUtils.testForItemWithLore(item, "Turns into water when")
 		    && player.getGameMode() == GameMode.SURVIVAL) {
 			if (plugin.mSafeZoneManager.getLocationType(player) == LocationType.Capital) {
 				event.getBlockPlaced().setType(Material.WATER);
