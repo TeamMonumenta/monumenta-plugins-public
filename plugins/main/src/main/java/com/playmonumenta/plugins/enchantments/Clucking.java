@@ -81,7 +81,7 @@ public class Clucking implements BaseEnchantment {
 
 				// Very infrequently check if the item is still actually there
 				numTicks++;
-				if (numTicks > 200) {
+				if (numTicks > 60) {
 					numTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
