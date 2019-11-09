@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
@@ -71,10 +72,16 @@ public class JunkItemListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void join(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		if (player.getScoreboardTags() != null && player.getScoreboardTags().contains(NO_JUNK_ITEMS_TAG)) {
-			mPlayers.add(player);
-		}
+		/* TODO: This is a gross hack to work around player data transferring... */
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Player player = event.getPlayer();
+				if (player.getScoreboardTags() != null && player.getScoreboardTags().contains(NO_JUNK_ITEMS_TAG)) {
+					mPlayers.add(player);
+				}
+			}
+		}.runTaskLater(mPlugin, 30);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
