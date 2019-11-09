@@ -186,6 +186,7 @@ public class EntityListener implements Listener {
 		}
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
+		World world = damager.getWorld();
 
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
@@ -242,6 +243,13 @@ public class EntityListener implements Listener {
 				return;
 			}
 
+			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
+			if (player.getGameMode() == GameMode.ADVENTURE
+				&& world.getBlockAt(damagee.getLocation().getBlockX(), 10, damagee.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+				event.setCancelled(true);
+				return;
+			}
+
 			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
@@ -266,53 +274,64 @@ public class EntityListener implements Listener {
 			}
 		} else if (damager instanceof Arrow) {
 			Arrow arrow = (Arrow)damager;
-			if (arrow.getShooter() instanceof Player && damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+			if (arrow.getShooter() instanceof Player) {
 				Player player = (Player)arrow.getShooter();
 
-				if (damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
+				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
+				if (player.getGameMode() == GameMode.ADVENTURE
+					&& world.getBlockAt(damagee.getLocation().getBlockX(), 10, damagee.getLocation().getBlockZ()).getType() == Material.SPONGE) {
 					damager.remove();
 					event.setCancelled(true);
-					/*
-					 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
-					 * still occur (e.g. wither) despite the damage event being canceled.
-					 */
 					return;
 				}
 
-				mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-				if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
-					damager.remove();
-					event.setCancelled(true);
-				}
-
-				/*
-				 * This handles bow damage for abilities
-				 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
-				 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
-				 */
-
-				if (damagee instanceof LivingEntity) {
-					LivingEntity mob = (LivingEntity) damagee;
-
-					if (arrow.hasMetadata("ArrowQuickdraw")) {
-						event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
+					if (damagee instanceof Player && !AbilityManager.getManager().isPvPEnabled((Player) damagee)) {
+						damager.remove();
+						event.setCancelled(true);
+						/*
+						 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
+						 * still occur (e.g. wither) despite the damage event being canceled.
+						 */
+						return;
 					}
 
-					double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
-					double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
-					if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
-						&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
-						&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
-						multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
-						mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
-						mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
-						mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
-						mob.removePotionEffect(PotionEffectType.SLOW);
+					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
+					if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+						damager.remove();
+						event.setCancelled(true);
 					}
 
-					event.setDamage(event.getDamage() * multiplier + bonusDamage);
+					/*
+					 * This handles bow damage for abilities
+					 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
+					 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
+					 */
+
+					if (damagee instanceof LivingEntity) {
+						LivingEntity mob = (LivingEntity) damagee;
+
+						if (arrow.hasMetadata("ArrowQuickdraw")) {
+							event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+						}
+
+						double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
+						double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
+						if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
+							&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
+							&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
+							multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
+							mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
+							mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+							mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
+							mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
+							mob.removePotionEffect(PotionEffectType.SLOW);
+						}
+
+						event.setDamage(event.getDamage() * multiplier + bonusDamage);
+					}
 				}
+
 			}
 		}
 

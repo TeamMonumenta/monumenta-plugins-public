@@ -21,6 +21,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
@@ -259,6 +260,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
+		World world = player.getWorld();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
@@ -273,6 +275,14 @@ public class PlayerListener implements Listener {
 
 		if (clickedEntity instanceof ItemFrame) {
 			ItemFrame frame = (ItemFrame) clickedEntity;
+
+			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
+			if (player.getGameMode() == GameMode.ADVENTURE
+			    && world.getBlockAt(frame.getLocation().getBlockX(), 10, frame.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (frame.isInvulnerable()) {
 				if (player.getGameMode().equals(GameMode.CREATIVE)) {
 					player.sendMessage(ChatColor.GOLD + "This item frame is invulnerable / creative only");
@@ -316,11 +326,20 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
+		World world = player.getWorld();
+		ArmorStand armorStand = event.getRightClicked();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
 		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
 		        && player.getGameMode() != GameMode.CREATIVE)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
+		if (player.getGameMode() == GameMode.ADVENTURE
+			&& world.getBlockAt(armorStand.getLocation().getBlockX(), 10, armorStand.getLocation().getBlockZ()).getType() == Material.SPONGE) {
 			event.setCancelled(true);
 			return;
 		}
