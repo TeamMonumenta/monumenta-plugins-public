@@ -26,7 +26,6 @@ import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
 import com.playmonumenta.bossfights.SpellManager;
 import com.playmonumenta.bossfights.spells.SpellBaseCharge;
 import com.playmonumenta.bossfights.spells.SpellDelayedAction;
-import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
 import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -152,14 +151,6 @@ public class CrownbearerBoss extends BossAbilityGroup {
 			}
 		);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			charge, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 6)
-		));
-
-		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-			multidash, new SpellTpBehindRandomPlayer(plugin, mBoss, 20 * 5), aoe
-		));
-
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!\",\"color\":\"white\"}]");
@@ -190,7 +181,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		});
 		events.put(30, mBoss -> {
 			knockback(plugin, 6);
-			changePhase(phase2Spells, null, null);
+			changePhase(null, null, null);
 			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
 		});
 		events.put(20, mBoss -> {
@@ -216,7 +207,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
-		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, bossBar);
+		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, bossBar);
 	}
 
 	private void summonSOTF(Location loc) {
