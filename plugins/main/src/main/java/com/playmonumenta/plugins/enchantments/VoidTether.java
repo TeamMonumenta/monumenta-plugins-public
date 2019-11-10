@@ -16,6 +16,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class VoidTether implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Void Tether";
@@ -61,12 +62,12 @@ public class VoidTether implements BaseEnchantment {
 			return;
 		}
 
-		/* Check to make sure the player still has a totem */
+		/* Check to make sure the player still has a non-shattered totem */
 		ItemStack totemItem = player.getInventory().getItemInMainHand();
-		if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING)) {
+		if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(totemItem)) {
 			totemItem = player.getInventory().getItemInOffHand();
-			if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING)) {
-				/* Nope, no totem */
+			if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(totemItem)) {
+				/* Nope, no totem or it is shattered */
 				return;
 			}
 		}
