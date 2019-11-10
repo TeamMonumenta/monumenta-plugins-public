@@ -90,6 +90,7 @@ import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -487,6 +488,13 @@ public class EntityListener implements Listener {
 	public void EntityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
+			ItemStack mainhand = ((Player) entity).getInventory().getItemInMainHand();
+			ItemStack offhand = ((Player) entity).getInventory().getItemInOffHand();
+			//If one hand has a shattered totem, do not resurrect
+			if (mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(mainhand) ||
+				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(offhand) ) {
+				event.setCancelled(true);
+			}
 			new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -818,7 +826,7 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
-		LivingEntity applied = (LivingEntity) event.getApplied();
+		LivingEntity applied = event.getApplied();
 		LivingEntity applier = (LivingEntity) event.getApplier();
 
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
