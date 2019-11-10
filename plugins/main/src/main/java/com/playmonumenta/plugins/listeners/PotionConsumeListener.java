@@ -137,12 +137,16 @@ public class PotionConsumeListener implements Listener {
 			mPotionsConsumed.put(player.getUniqueId(), new ItemStack(item));
 		}
 
-		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE) && instantDrinkLevel == 0) {
+		//Do not reduce potions or place glass bottles if the potion is infinite
+		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			item.setAmount(item.getAmount() - 1);
-			if (item.getAmount() == 0) {
-				event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
-			} else {
-				player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+			//If not instant drink, place an empty bottle in the inventory
+			if (instantDrinkLevel == 0) {
+				if (item.getAmount() == 0) {
+					event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
+				} else {
+					player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+				}
 			}
 		}
 
