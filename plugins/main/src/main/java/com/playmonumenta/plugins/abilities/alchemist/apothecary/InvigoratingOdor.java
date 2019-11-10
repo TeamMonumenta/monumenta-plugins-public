@@ -50,7 +50,9 @@ public class InvigoratingOdor extends Ability {
 		if (potion.hasMetadata("AlchemistPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity le : affectedEntities) {
-					apply(le);
+					if (EntityUtils.isHostileMob(le)) {
+						apply(le);
+					}
 				}
 			}
 
