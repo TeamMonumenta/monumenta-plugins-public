@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
@@ -23,6 +24,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
@@ -64,7 +66,7 @@ public class MobListener implements Listener {
 		// We need to allow spawning hostile mobs intentionally, but disable natural spawns.
 		// It's easier to check the intentional ways than the natural ones.
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
-			event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
+		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
 		    EntityUtils.isHostileMob(event.getEntity())) {
 			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(event.getEntity());
@@ -74,7 +76,7 @@ public class MobListener implements Listener {
 
 				// Cancel spawning unless this is from a dispenser in a plot
 				if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-					|| !loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType().equals(Material.SPONGE)) {
+				    || !loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType().equals(Material.SPONGE)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -193,6 +195,36 @@ public class MobListener implements Listener {
 					AbilityManager.getManager().EntityDeathRadiusEvent(p, event, shouldGenDrops);
 				}
 			}
+
+			//Do not run below if it is the death of a player
+			if (livingEntity instanceof Player) {
+				return;
+			}
+			//If the item has meta, run through the lore to check if it has quest item in the lore list
+			ListIterator<ItemStack> iter = event.getDrops().listIterator();
+			while (iter.hasNext()) {
+				ItemStack item = iter.next();
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					List<String> lore = meta.getLore();
+					if (lore != null && !lore.isEmpty()) {
+						for (String loreEntry : lore) {
+							if (loreEntry.contains("Quest Item")) {
+								//Scales based off player count in a 20 meter radius, drops at least one quest item
+								int count = PlayerUtils.getNearbyPlayers(entity.getLocation(), 20).size();
+								if (count < 1) {
+									count = 1;
+								}
+								if (count > item.getAmount()) {
+									item.setAmount(count);
+								}
+								return;
+							}
+						}
+					}
+				}
+			}
+
 		}
 	}
 
