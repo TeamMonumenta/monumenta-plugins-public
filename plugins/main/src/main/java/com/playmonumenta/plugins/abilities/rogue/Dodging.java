@@ -1,16 +1,20 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import java.util.Collection;
 import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -106,6 +110,18 @@ public class Dodging extends Ability {
 			arrow.clearCustomEffects();
 		}
 		return true;
+	}
+
+	@Override
+	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
+	                                           ThrownPotion potion, PotionSplashEvent event) {
+		if (!(event.getEntity().getShooter() instanceof LivingEntity) || event.getEntity().getShooter() instanceof Player) {
+			return true;
+		}
+		if (!_dodge()) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean _dodge() {
