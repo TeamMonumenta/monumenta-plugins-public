@@ -34,6 +34,7 @@ public class PotionConsumeListener implements Listener {
 
 	private final Plugin mPlugin;
 	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
+	private Map<UUID, ItemStack> mPotionsConsumed = new HashMap<UUID, ItemStack>();
 
 	public PotionConsumeListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -45,37 +46,72 @@ public class PotionConsumeListener implements Listener {
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||
-		    // Must be a right click
+		    // Must be a left or right click
 		    event.getClick() == null ||
-		    !event.getClick().equals(ClickType.RIGHT) ||
+		    !(event.getClick().equals(ClickType.LEFT) || event.getClick().equals(ClickType.RIGHT)) ||
 		    // Must be placing a single block
 		    event.getAction() == null ||
-		    !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
 		    // Must be a player interacting with an inventory
 		    event.getWhoClicked() == null ||
 		    !(event.getWhoClicked() instanceof Player) ||
 		    event.getClickedInventory() == null ||
-		    // Must be a click on a drinkable potion in empty hand
+		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
-		    !event.getCurrentItem().getType().equals(Material.POTION)
+		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
+		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		) {
 			// Nope!
 			return;
 		}
 
 		Player player = (Player)event.getWhoClicked();
-		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
 		ItemStack item = event.getCurrentItem();
 
 		Set<String> tags = player.getScoreboardTags();
 		BukkitRunnable runnable = mRunnables.get(player.getUniqueId());
-		if (!tags.contains(INVENTORY_DRINK_TAG) || runnable != null && !runnable.isCancelled()) {
+		ItemStack prevPotion = mPotionsConsumed.get(player.getUniqueId());
+
+		//If empty bottle is left clicked, stops potion buff and reverts the potion back
+		//Otherwise, cannot drink another potion if one is already being drinked, or player does not have this feature enabled
+		if (event.getClick().equals(ClickType.LEFT) &&
+		    item != null &&
+		    item.getType().equals(Material.GLASS_BOTTLE) &&
+		    !item.hasItemMeta() &&
+		    runnable != null &&
+		    !runnable.isCancelled() &&
+		    prevPotion != null &&
+		    !prevPotion.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+
+			//Sets previous drink in and stops drink runnable
+			//Replaces glass bottle if there's one, if more, removes one and places the potion somewhere in the inventory
+			if (item.getAmount() == 1) {
+				event.getClickedInventory().setItem(event.getSlot(), prevPotion);
+			} else {
+				item.subtract();
+				event.getClickedInventory().addItem(prevPotion);
+			}
+			mPotionsConsumed.put(player.getUniqueId(), null);
+			runnable.cancel();
+			event.setCancelled(true);
 			return;
-		}//Cannot drink another potion if one is already being drinked, or player does not have this feature enabled
+
+			//If it was a left click that did not satisfy previous conditions, return
+		} else if (!event.getClick().equals(ClickType.RIGHT) ||
+		           !event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+		           event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE) ||
+		           !tags.contains(INVENTORY_DRINK_TAG) ||
+		           runnable != null && !runnable.isCancelled()) {
+
+			//Return time
+			return;
+		}
+
+		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
+		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
 
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
-		if (InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false) != 0) {
+		if (instantDrinkLevel != 0) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
 			PotionUtils.applyPotion(mPlugin, player, meta);
 		} else {
@@ -87,7 +123,7 @@ public class PotionConsumeListener implements Listener {
 				@Override
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
-					if (mTicks >= DRINK_DURATION) {
+					if (mTicks >= DRINK_DURATION && !this.isCancelled()) {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 						this.cancel();
 					}
@@ -98,9 +134,10 @@ public class PotionConsumeListener implements Listener {
 			};
 			runnable.runTaskTimer(mPlugin, 5, DRINK_TICK_DELAY); //Delay of 5 seconds before first drink in minecraft
 			mRunnables.put(player.getUniqueId(), runnable);
+			mPotionsConsumed.put(player.getUniqueId(), new ItemStack(item));
 		}
 
-		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE) && instantDrinkLevel == 0) {
 			item.setAmount(item.getAmount() - 1);
 			if (item.getAmount() == 0) {
 				event.getClickedInventory().setItem(event.getSlot(), new ItemStack(Material.GLASS_BOTTLE));
