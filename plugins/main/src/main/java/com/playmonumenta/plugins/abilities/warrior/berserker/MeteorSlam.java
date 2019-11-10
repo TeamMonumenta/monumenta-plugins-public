@@ -75,7 +75,8 @@ public class MeteorSlam extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (!player.isOnline()
+				if (player == null ||
+					!player.isOnline()
 					|| !player.isValid()
 					|| AbilityManager.getManager().getPlayerAbility(player, MeteorSlam.class) == null) {
 					this.cancel();
