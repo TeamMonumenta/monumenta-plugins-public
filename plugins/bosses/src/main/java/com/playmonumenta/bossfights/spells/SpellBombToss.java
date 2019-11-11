@@ -1,10 +1,12 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,6 +26,8 @@ public class SpellBombToss extends Spell {
 	private final int mLobs;
 	private final int mFuse;
 
+	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
+
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range) {
 		this(plugin, boss, range, 4, 1, 50);
 	}
@@ -42,11 +46,12 @@ public class SpellBombToss extends Spell {
 		// Choose random player within range that has line of sight to boss
 		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
 
-		new BukkitRunnable() {
+		BukkitRunnable task = new BukkitRunnable() {
 			int t = 0;
 			@Override
 			public void run() {
 				t++;
+				mTNTList.clear();
 
 				// TODO: Add particles
 				Collections.shuffle(players);
@@ -61,12 +66,26 @@ public class SpellBombToss extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 15);
+		};
+
+		task.runTaskTimer(mPlugin, 0, 15);
+		mActiveRunnables.add(task);
 	}
 
 	@Override
 	public int duration() {
 		return 160; //8 seconds
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+
+		for (Entity e : mTNTList) {
+			if (e.isValid()) {
+				e.remove();
+			}
+		}
 	}
 
 	public void launch(Player target) {
@@ -75,6 +94,7 @@ public class SpellBombToss extends Spell {
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 		try {
 			TNTPrimed tnt = (TNTPrimed) Utils.summonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + Integer.toString(mFuse) + "}");
+			mTNTList.add(tnt);
 			tnt.setYield(mYield);
 			Location pLoc = target.getLocation();
 			Location tLoc = tnt.getLocation();
@@ -86,4 +106,6 @@ public class SpellBombToss extends Spell {
 			e.printStackTrace();
 		}
 	}
+
+
 }
