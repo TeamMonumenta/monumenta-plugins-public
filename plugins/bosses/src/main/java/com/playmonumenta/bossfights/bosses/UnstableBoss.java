@@ -1,6 +1,5 @@
 package com.playmonumenta.bossfights.bosses;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -25,6 +24,6 @@ public class UnstableBoss extends BossAbilityGroup {
 	@Override
 	public void death() {
 		Location loc = mBoss.getLocation();
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:creeper " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0,ignited:1b}");
+		loc.getWorld().createExplosion(loc, 3F);
 	}
 }

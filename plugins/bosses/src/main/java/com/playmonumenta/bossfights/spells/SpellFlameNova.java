@@ -25,8 +25,6 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.77F);
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.5F);
 				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.65F);
 			},
 			(Location loc) -> {
