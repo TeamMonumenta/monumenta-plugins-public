@@ -1,14 +1,19 @@
 package com.playmonumenta.bungeecord.listeners;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 import com.playmonumenta.bungeecord.Main;
 
 import de.myzelyam.api.vanish.BungeeVanishAPI;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.event.EventHandler;
@@ -18,6 +23,9 @@ public class EventListener implements Listener {
 	final boolean mVanishEnabled;
 
 	final Main mMain;
+
+	/* Keeps track of players that have had their join message sent */
+	private final Set<UUID> mOnlinePlayers = new ConcurrentSkipListSet<UUID>();
 
 	public EventListener(Main main) {
 		mMain = main;
@@ -84,14 +92,26 @@ public class EventListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void postLoginEvent(PostLoginEvent event) {
-		_joinLeaveEvent(event.getPlayer(), " joined the game",
-		                mVanishEnabled && BungeeVanishAPI.isInvisible(event.getPlayer()));
+	public void serverSwitchEvent(ServerSwitchEvent event) {
+		ProxiedPlayer player = event.getPlayer();
+
+		if (!mOnlinePlayers.contains(player.getUniqueId())) {
+			/* This player is not already online - send join message */
+			mOnlinePlayers.add(player.getUniqueId());
+			_joinLeaveEvent(player, " joined the game",
+			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerDisconnectEvent(PlayerDisconnectEvent event) {
-		_joinLeaveEvent(event.getPlayer(), " left the game",
-		                mVanishEnabled && BungeeVanishAPI.isInvisible(event.getPlayer()));
+		ProxiedPlayer player = event.getPlayer();
+
+		if (mOnlinePlayers.contains(player.getUniqueId())) {
+			/* This player was online - send leave message */
+			mOnlinePlayers.remove(player.getUniqueId());
+			_joinLeaveEvent(player, " left the game",
+			                mVanishEnabled && BungeeVanishAPI.isInvisible(player));
+		}
 	}
 }
