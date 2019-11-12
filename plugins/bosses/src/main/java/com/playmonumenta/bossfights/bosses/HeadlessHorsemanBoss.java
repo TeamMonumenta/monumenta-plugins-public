@@ -38,7 +38,6 @@ import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellHellzone
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellOnTheHunt;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellSinisterReach;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellSkyFlare;
 import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.SerializationUtils;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -136,13 +135,11 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				new SpellSinisterReach(plugin, boss),
 				new SpellBurningVengence(plugin, boss, this),
 				new SpellPhantomOfTheOpera(plugin, boss),
-				new SpellOnTheHunt(plugin, boss),
 				new SpellHallowsEnd(plugin, boss)
 				));
 
 		List<Spell> phase1Passives = Arrays.asList(
 				new SpellPurgeNegatives(mBoss, 20 * 6),
-				new SpellSkyFlare(mBoss),
 				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 				// Teleport the boss to spawnLoc if he is stuck in bedrock
@@ -153,7 +150,6 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		List<Spell> phase2Passives = Arrays.asList(
 				new SpellPurgeNegatives(mBoss, 20 * 4),
-				new SpellSkyFlare(mBoss),
 				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 				// Teleport the boss to spawnLoc if he is stuck in bedrock
@@ -192,8 +188,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0.025);
 
 					if (t % 20 == 0) {
-						for (Player player : Utils.playersInRange(mBoss.getLocation(), 3)) {
-							DamageUtils.damagePercent(boss, player, 0.05);
+						for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
+							DamageUtils.damagePercent(boss, player, 0.075);
 							player.setFireTicks(20 * 5);
 						}
 					}
@@ -301,7 +297,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange, true).size();
-		int hp_del = 2048;
+		int hp_del = 2448;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
 			bossTargetHp = bossTargetHp + hp_del;
