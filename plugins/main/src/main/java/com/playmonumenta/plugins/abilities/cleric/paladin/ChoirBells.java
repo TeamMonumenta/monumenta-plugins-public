@@ -67,7 +67,6 @@ public class ChoirBells extends Ability {
 				@Override
 				public void run() {
 					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1, pitch);
-					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1, pitch);
 				}
 			}.runTaskLater(mPlugin, i);
 		}
