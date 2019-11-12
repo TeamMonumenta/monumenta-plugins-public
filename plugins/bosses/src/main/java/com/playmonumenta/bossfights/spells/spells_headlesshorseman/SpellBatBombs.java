@@ -67,9 +67,10 @@ public class SpellBatBombs extends Spell {
 								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
-								for (Player player : Utils.playersInRange(loc, 5)) {
+								for (Player player : Utils.playersInRange(loc, 6)) {
 									if (!player.isBlocking()) {
 										DamageUtils.damage(bat, player, 32);
+										Utils.KnockAway(loc, player, 0.2f, 0.4f);
 									} else {
 										player.setCooldown(Material.SHIELD, 20 * 8);
 									}
@@ -87,7 +88,7 @@ public class SpellBatBombs extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 14; i++) {
 			Location loc = new Location(
 			    world,
 			    mBoss.getLocation().getX() + mRand.nextDouble(-15, 15),
