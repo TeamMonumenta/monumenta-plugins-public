@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,8 +61,61 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 public class EntityUtils {
 
-	public static final String MOB_IS_STUNNED_METAKEY = "MobIsStunnedByEntityUtils";
-	public static final String MOB_IS_CONFUSED_METAKEY = "MobIsConfusedByEntityUtils";
+	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
+	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
+	private static BukkitRunnable mobsTracker = null;
+
+	private static void startTracker(Plugin plugin) {
+		mobsTracker = new BukkitRunnable() {
+			int rotation = 0;
+
+			@Override
+			public void run() {
+				rotation += 20;
+
+				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
+				Iterator<Map.Entry<LivingEntity, Integer>> confusedIter = CONFUSED_MOBS.entrySet().iterator();
+
+				while (stunnedIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> stunned = stunnedIter.next();
+					LivingEntity mob = stunned.getKey();
+					STUNNED_MOBS.put(mob, stunned.getValue() - 1);
+
+					double angle = Math.toRadians(rotation);
+					Location l = mob.getLocation();
+					l.add(Math.cos(angle) * 0.5, mob.getHeight(), Math.sin(angle) * 0.5);
+					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR);
+
+					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 10);
+						stunnedIter.remove();
+					}
+				}
+
+				while (confusedIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> confused = confusedIter.next();
+					Mob mob = (Mob) confused.getKey();
+					CONFUSED_MOBS.put(mob, confused.getValue() - 1);
+
+					double angle = Math.toRadians(rotation);
+					Location l = mob.getLocation();
+					l.add(Math.cos(angle) * 0.5, mob.getHeight() + 0.25, Math.sin(angle) * 0.5);
+					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
+
+					if (mob.getTarget() == null) {
+						mob.setTarget(getNearbyMobs(mob.getLocation(), 8, mob).get(0));
+					}
+
+					if (confused.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						mob.setTarget(null);
+						confusedIter.remove();
+					}
+				}
+			}
+		};
+
+		mobsTracker.runTaskTimer(plugin, 0, 1);
+	}
 
 	public static boolean isUndead(LivingEntity mob) {
 		EntityType type = mob.getType();
@@ -420,9 +476,21 @@ public class EntityUtils {
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 
+	public static boolean isStunned(LivingEntity mob) {
+		return STUNNED_MOBS.containsKey(mob);
+	}
+
+	public static void removeStun(LivingEntity mob) {
+		STUNNED_MOBS.put(mob, 0);
+	}
+
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
 		if (isBoss(mob)) {
 			return;
+		}
+
+		if (mobsTracker == null || mobsTracker.isCancelled()) {
+			startTracker(plugin);
 		}
 
 		if (mob instanceof Mob) {
@@ -433,98 +501,47 @@ public class EntityUtils {
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
 
-		mob.setMetadata(MOB_IS_STUNNED_METAKEY, new FixedMetadataValue(plugin, null));
-
-		new BukkitRunnable() {
-			int t = 0;
-			double rotation = 0;
-			double originalMovementSpeed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue();
-
-			@Override
-			public void run() {
-				if (mob.isDead()) {
-					this.cancel();
-				}
-				mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-
-				t++;
-				rotation += 20;
-
-				double radian1 = Math.toRadians(rotation);
-				Location l = mob.getLocation();
-				l.add(Math.cos(radian1) * 0.5, mob.getHeight(), Math.sin(radian1) * 0.5);
-				for (int i = 0; i < 5; i++) {
-					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 1, 0, 0, 0, STUN_COLOR);
-				}
-				l.subtract(Math.cos(radian1) * 0.5, mob.getHeight(), Math.sin(radian1) * 0.5);
-
-				if (t >= ticks) {
-					if (mob.hasMetadata(MOB_IS_STUNNED_METAKEY)) {
-						mob.removeMetadata(MOB_IS_STUNNED_METAKEY, plugin);
-					}
-					mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(plugin, 0, 1);
+		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
+		Integer t = STUNNED_MOBS.get(mob);
+		if (t == null) {
+			mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 10);
+		}
+		if (t == null || t < ticks) {
+			STUNNED_MOBS.put(mob, ticks);
+		}
 	}
 
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
+
+	public static boolean isConfused(LivingEntity mob) {
+		return CONFUSED_MOBS.containsKey(mob);
+	}
+
+	public static void removeConfusion(LivingEntity mob) {
+		CONFUSED_MOBS.put(mob, 0);
+	}
 
 	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
 		if (isBoss(mob) || !(mob instanceof Mob)) {
 			return;
 		}
 
-		Mob creature = (Mob)mob;
+		if (mobsTracker == null || mobsTracker.isCancelled()) {
+			startTracker(plugin);
+		}
+
+		Mob creature = (Mob) mob;
 
 		if (mob instanceof Vex) {
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
 
-		creature.setTarget(null);
+		creature.setTarget(getNearbyMobs(mob.getLocation(), 8, mob).get(0));
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
-		mob.setMetadata(MOB_IS_CONFUSED_METAKEY, new FixedMetadataValue(plugin, null));
 
-		for (LivingEntity targetMob : getNearbyMobs(mob.getLocation(), 8, mob)) {
-			mob.setMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY, new FixedMetadataValue(plugin, null));
-			creature.setTarget(targetMob);
-			new BukkitRunnable() {
-				int t = 0;
-				double rotation = 0;
-
-				@Override
-				public void run() {
-					if (mob.isDead()) {
-						this.cancel();
-					}
-					t++;
-					rotation += 20;
-
-					double radian1 = Math.toRadians(rotation);
-					Location l = mob.getLocation();
-					l.add(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
-					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
-					l.subtract(Math.cos(radian1) * 0.5, mob.getHeight() + 0.25, Math.sin(radian1) * 0.5);
-
-					if (creature.getTarget() == null) {
-						for (LivingEntity newTargetMob : getNearbyMobs(mob.getLocation(), 8, mob)) {
-							creature.setTarget(newTargetMob);
-							break;
-						}
-					}
-
-					if (t >= ticks) {
-						this.cancel();
-						creature.setTarget(null);
-						if (mob.hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY)) {
-							mob.removeMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY, plugin);
-						}
-					}
-				}
-			}.runTaskTimer(plugin, 0, 1);
-			break;
+		Integer t = CONFUSED_MOBS.get(mob);
+		if (t == null || t < ticks) {
+			CONFUSED_MOBS.put(mob, ticks);
 		}
 	}
 

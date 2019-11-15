@@ -679,7 +679,7 @@ public class EntityListener implements Listener {
 
 		// Cancel the event if from a confused creeper, damage still applies it seems
 		Entity entity = event.getEntity();
-		if (entity instanceof Creeper && entity.hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY)) {
+		if (entity instanceof Creeper && EntityUtils.isConfused((LivingEntity) event.getEntity())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -813,8 +813,8 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-		if (event.getEntity() instanceof Creature && (event.getEntity().hasMetadata(EntityUtils.MOB_IS_STUNNED_METAKEY)
-		                                              || event.getEntity().hasMetadata(EntityUtils.MOB_IS_CONFUSED_METAKEY))) {
+		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned((LivingEntity) event.getEntity())
+		                                              || EntityUtils.isConfused((LivingEntity) event.getEntity()))) {
 			event.setCancelled(true);
 			return;
 		}
