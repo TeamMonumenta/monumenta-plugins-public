@@ -922,7 +922,6 @@ public class Kaul extends BossAbilityGroup {
 		for (Player player : players) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.removePotionEffect(PotionEffectType.REGENERATION);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
 		}
 		changePhase(null, null, null);
