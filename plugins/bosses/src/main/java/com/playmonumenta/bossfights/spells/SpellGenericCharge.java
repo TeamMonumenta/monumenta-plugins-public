@@ -1,17 +1,14 @@
 package com.playmonumenta.bossfights.spells;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.utils.DamageUtils;
-
-import org.bukkit.Sound;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
@@ -19,8 +16,8 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-		          boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 1.5f);
+		          boss.setAI(false);
 		      },
 		      // Warning particles
 		      (Location loc) -> {
@@ -46,6 +43,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      () -> {
 		          boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
+		          boss.setAI(true);
 		      });
 	}
 }
