@@ -52,7 +52,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 
 		// Forget about this target if they leave the game or switch to spectator or are invisible
 		if (mLastTarget != null) {
-			if (mBoss.hasMetadata("MobIsStunnedByEntityUtils") || !mLastTarget.isOnline() ||
+			if (mBoss.hasMetadata("MobIsStunnedByEntityUtils") || mBoss.hasMetadata("MobIsConfusedByEntityUtils") || !mLastTarget.isOnline() ||
 					mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || mLastTarget.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
