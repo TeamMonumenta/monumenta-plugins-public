@@ -148,9 +148,6 @@ public class SpellPutridPlague extends Spell {
 						ps.removeIf(p -> p.getLocation().getY() >= 61);
 						for (Player player : ps) {
 							if (!safe.contains(player)) {
-								if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) {
-									continue;
-								}
 								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
 								world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
 								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,

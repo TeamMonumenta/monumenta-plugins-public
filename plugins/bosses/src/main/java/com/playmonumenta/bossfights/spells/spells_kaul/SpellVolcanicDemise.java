@@ -15,8 +15,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -161,12 +159,6 @@ public class SpellVolcanicDemise extends Spell {
 					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
 					for (Player player : Utils.playersInRange(loc, 4)) {
-						if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-							PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-							if (effect.getAmplifier() >= 5) {
-								continue;
-							}
-						}
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							DamageUtils.damage(mBoss, player, 100);

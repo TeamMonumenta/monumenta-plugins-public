@@ -13,8 +13,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.bossfights.spells.Spell;
@@ -31,6 +29,9 @@ import com.playmonumenta.bossfights.utils.Utils;
  * ( 22s cd )
  */
 public class SpellLightningStrike extends Spell {
+	private static final String LIGHTNING_STRIKE_METAKEY = "MonumentaPlayerStruckByKaulLightning";
+	private static final int NO_STRIKE_PERIOD = 60;
+
 	private int cooldown = 0;
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
@@ -111,20 +112,17 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : Utils.playersInRange(loc, 3)) {
-						if (p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && p.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) {
-							continue;
+						/* Get the last time the player was struck by this attack */
+						int lastStrikeTime = 0;
+						if (p.hasMetadata(LIGHTNING_STRIKE_METAKEY)) {
+							lastStrikeTime = p.getMetadata(LIGHTNING_STRIKE_METAKEY).get(0).asInt();
 						}
-						if (!p.hasMetadata("MonumentaPlayerStruckByKaulLightning")) {
-							p.setMetadata("MonumentaPlayerStruckByKaulLightning", new FixedMetadataValue(mPlugin, true));
+
+						if ((p.getTicksLived() - lastStrikeTime) > NO_STRIKE_PERIOD) {
 							DamageUtils.damagePercent(mBoss, p, 0.4);
-							new BukkitRunnable() {
-								@Override
-								public void run() {
-									if (p.hasMetadata("MonumentaPlayerStruckByKaulLightning")) {
-										p.removeMetadata("MonumentaPlayerStruckByKaulLightning", mPlugin);
-									}
-								}
-							}.runTaskLater(mPlugin, 40);
+
+							/* Store the current time the player was struck */
+							p.setMetadata(LIGHTNING_STRIKE_METAKEY, new FixedMetadataValue(mPlugin, p.getTicksLived()));
 						}
 					}
 				}
@@ -137,5 +135,4 @@ public class SpellLightningStrike extends Spell {
 	public int duration() {
 		return 0;
 	}
-
 }

@@ -13,8 +13,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.DamageUtils;
@@ -68,12 +66,6 @@ public class SpellLightningStorm extends Spell {
 	}
 
 	private void lightning(Player player) {
-		if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-			PotionEffect effect = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			if (effect.getAmplifier() >= 4) {
-				return;
-			}
-		}
 		World world = player.getWorld();
 		Location strike = player.getLocation().add(0, 10, 0);
 		Location loc = player.getLocation();
