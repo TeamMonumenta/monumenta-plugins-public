@@ -35,7 +35,6 @@ import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellBatBombs
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellBurningVengence;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellHallowsEnd;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellHellzoneGrenade;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellOnTheHunt;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
 import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellSinisterReach;
 import com.playmonumenta.bossfights.utils.DamageUtils;
@@ -259,6 +258,13 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 			if (target != null) {
 				((Creature) mBoss).setTarget(target);
+			}
+		}
+
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			if (player.isBlocking()) {
+				player.setCooldown(Material.SHIELD, 20 * 30);
 			}
 		}
 	}
