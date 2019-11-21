@@ -1,5 +1,7 @@
 package com.playmonumenta.bossfights.spells;
 
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -81,12 +83,12 @@ public class SpellBaseAoE extends Spell {
 	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
 
 		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, chargeSound, 1.5f, 1, chargeAuraAction, chargeCircleAction, outburstAction,
-				circleOutburstAction, dealDamageAction);
+		     circleOutburstAction, dealDamageAction);
 	}
 
 	public SpellBaseAoE(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting,
-            Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
-            OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
+	                    Sound chargeSound, float soundVolume, int soundDensity, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
+	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
 
 		mPlugin = plugin;
 		mLauncher = launcher;
@@ -110,6 +112,12 @@ public class SpellBaseAoE extends Spell {
 		World world = mLauncher.getWorld();
 		if (!mCanMoveWhileCasting) {
 			((LivingEntity) mLauncher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
+		}
+		// TODO: This should really be refactored / made more generic
+		// healer exception shouldn't be here but there's not an easy way to do this right
+		if (mLauncher.getScoreboardTags().contains("boss_rejuvenation") && !shouldHeal()) {
+			// Do not cast as healer if too many healers and check fails
+			return;
 		}
 		new BukkitRunnable() {
 			float j = 0;
@@ -170,6 +178,20 @@ public class SpellBaseAoE extends Spell {
 	@Override
 	public int duration() {
 		return 160 + mCooldown;
+	}
+
+	private boolean shouldHeal() {
+		List<Entity> nearby = mLauncher.getNearbyEntities(10, 10, 10);
+		int healers = 1;
+		for (Entity e : nearby) {
+			if (e.getScoreboardTags().contains("boss_rejuvenation")) {
+				healers++;
+			}
+		}
+		if (Math.random() > 1.0 / Math.pow(healers, 2)) {
+			return false;
+		}
+		return true;
 	}
 
 }
