@@ -92,6 +92,8 @@ public class EnchantmentManager implements Listener {
 		init.add(new Thunder());
 		init.add(new Inferno());
 		init.add(new Impact());
+		init.add(new AttributeArrowSpeed());
+		init.add(new AttributeBowDamage());
 		init.add(new Sniper());
 		init.add(new PointBlank());
 		init.add(new Decay());
@@ -185,7 +187,7 @@ public class EnchantmentManager implements Listener {
 					int newLevel = propertyMap.get(enchant.getKey()) - enchant.getValue();
 					propertyMap.remove(enchant.getKey());
 					enchant.getKey().removeProperty(plugin, player);
-					if (newLevel > 0) {
+					if (newLevel > 0 || enchant.getKey().negativeLevelsAllowed()) {
 						propertyMap.put(enchant.getKey(), newLevel);
 						enchant.getKey().applyProperty(plugin, player, newLevel);
 					}
@@ -223,13 +225,8 @@ public class EnchantmentManager implements Listener {
 			return;
 		}
 
-		/*
-		 * If this particular property applies levels,
-		 * add them to the running count UNLESS it is an
-		 * evasion or second wind armor piece in hand
-		 */
 		int level = property.getLevelFromItem(item, player, slot);
-		if (level > 0) {
+		if (level > 0 || property.negativeLevelsAllowed()) {
 			Integer currentLevel = propertyMap.get(property);
 			if (currentLevel != null) {
 				currentLevel += level;
@@ -274,13 +271,8 @@ public class EnchantmentManager implements Listener {
 								continue;
 							}
 
-							/*
-							 * If this particular property applies levels,
-							 * add them to the running count UNLESS it is an
-							 * evasion or second wind armor piece in hand
-							 */
 							int level = property.getLevelFromItem(item, player, slot);
-							if (level > 0) {
+							if (level > 0 || property.negativeLevelsAllowed()) {
 								Integer currentLevel = propertyMap.get(property);
 								if (currentLevel != null) {
 									currentLevel += level;
@@ -304,7 +296,7 @@ public class EnchantmentManager implements Listener {
 			if (stack != null) {
 				for (BaseEnchantment property : mSpawnedProperties) {
 					int level = property.getLevelFromItem(stack);
-					if (level > 0) {
+					if (level > 0 || property.negativeLevelsAllowed()) {
 						property.onSpawn(mPlugin, item, level);
 					}
 				}

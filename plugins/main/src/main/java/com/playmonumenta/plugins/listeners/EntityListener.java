@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.enchantments.AttributeBowDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.Impact;
@@ -319,6 +320,9 @@ public class EntityListener implements Listener {
 						 */
 						return;
 					}
+
+					// Set the arrow damage from attributes
+					AttributeBowDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
 
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
 					if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
