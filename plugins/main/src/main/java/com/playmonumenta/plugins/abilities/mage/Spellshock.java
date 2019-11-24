@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -25,7 +23,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -62,7 +59,7 @@ public class Spellshock extends Ability {
 	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	private static Map<UUID, SpellShockedMob> mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
-	private static List<LivingEntity> mPendingStaticMobs = new ArrayList<LivingEntity>();
+	private static Set<LivingEntity> mPendingStaticMobs = new HashSet<LivingEntity>();
 	private static BukkitRunnable mRunnable = null;
 
 	public Spellshock(Plugin plugin, World world, Random random, Player player) {
@@ -162,17 +159,13 @@ public class Spellshock extends Ability {
 	@Override
 	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity mob = event.getDamaged();
-		Spells spell = event.getSpell();
 
-		// If the mob has static, trigger it
-		if (mSpellShockedMobs.containsKey(mob.getUniqueId()) && spell != Spells.ARCANE_STRIKE && spell != Spells.FSWORD) {
+		// If the mob has static, trigger it, otherwise, apply it
+		if (event.triggersSpellshock() && mSpellShockedMobs.containsKey(mob.getUniqueId())) {
 			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
 			e.triggeredBy = mPlayer;
 			e.triggered = true;
-			// Otherwise, add it to the list of static candidates, unless the spell is Blizzard or Flash Sword or Elemental Arrows
-			// The check for these specific spells is the only reason why we need to have the CustomDamageEvent
-			// check instead of just lumping it all in with EntityDamageByEntityEvent
-		} else if (!mPendingStaticMobs.contains(mob) && spell != Spells.BLIZZARD && spell != Spells.ELEMENTAL_ARROWS) {
+		} else if (event.appliesSpellshock() && !mPendingStaticMobs.contains(mob)) {
 			mPendingStaticMobs.add(mob);
 		}
 	}

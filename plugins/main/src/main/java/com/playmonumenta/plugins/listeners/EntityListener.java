@@ -13,6 +13,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AreaEffectCloud;
@@ -20,6 +22,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
@@ -60,6 +63,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -209,6 +213,25 @@ public class EntityListener implements Listener {
 				//  If we're hit by a rocket, cancel the damage.
 				event.setCancelled(true);
 			} else if (damager instanceof Projectile) {
+				// Drowneds throwing tridents at players should deal the damage of the trident
+				if (damager instanceof Trident) {
+					ProjectileSource source = ((Projectile) damager).getShooter();
+					if (source instanceof Drowned) {
+						ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
+						if (meta != null) {
+							Iterator<AttributeModifier> iter = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE).iterator();
+							while (iter.hasNext()) {
+								AttributeModifier mod = iter.next();
+								if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
+									// Use the last flat damage modifier on the trident, ignore other modifiers
+									// +1 for base damage to be consistent with melee attack damage
+									event.setDamage(iter.next().getAmount() + 1);
+								}
+							}
+						}
+					}
+				}
+
 				if (!mAbilities.PlayerDamagedByProjectileEvent(player, event)) {
 					damager.remove();
 					event.setCancelled(true);

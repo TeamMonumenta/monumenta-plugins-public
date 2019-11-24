@@ -81,7 +81,14 @@ public class FlashSword extends Ability {
 						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
 						Vector velocity = mob.getVelocity();
 						mob.setNoDamageTicks(0);
-						EntityUtils.damageEntity(mPlugin, mob, damageMult, player, MagicType.ARCANE, true, mInfo.linkedSpell);
+
+						// Only interact with spellshock on the first swing
+						if (t == 1) {
+							EntityUtils.damageEntity(mPlugin, mob, damageMult, player, MagicType.ARCANE, true, mInfo.linkedSpell, true, true);
+						} else {
+							EntityUtils.damageEntity(mPlugin, mob, damageMult, player, MagicType.ARCANE, true, mInfo.linkedSpell, false, false);
+						}
+
 						if (t >= FSWORD_SWINGS) {
 							MovementUtils.KnockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
 						} else {

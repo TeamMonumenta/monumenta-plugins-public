@@ -408,10 +408,13 @@ public class EntityUtils {
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell) {
+		damageEntity(plugin, target, damage, damager, magicType, callEvent, spell, true, true);
+	}
+
+	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
 		if (!target.isDead() && !target.isInvulnerable()) {
 			if (callEvent) {
-				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType);
-				event.setSpell(spell);
+				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType, spell, applySpellshock, triggerSpellshock);
 				Bukkit.getPluginManager().callEvent(event);
 				if (event.isCancelled()) {
 					return;

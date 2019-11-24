@@ -99,7 +99,7 @@ public class Blizzard extends Ability {
 				if (t % 20 == 0) {
 					for (LivingEntity mob : mobs) {
 						Vector v = mob.getVelocity();
-						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
 						mob.setVelocity(v);
 					}
 				}

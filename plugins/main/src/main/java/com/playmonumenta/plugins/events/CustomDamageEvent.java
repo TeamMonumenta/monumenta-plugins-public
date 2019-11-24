@@ -13,15 +13,21 @@ public class CustomDamageEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	public boolean mIsCancelled;
-	public Entity mDamager;
-	public LivingEntity mDamaged;
-	public double mDamage;
-	public MagicType mMagicType;
+	private boolean mIsCancelled;
+	private final Entity mDamager;
+	private final LivingEntity mDamaged;
+	private double mDamage;
+	private final MagicType mMagicType;
 
-	public Spells mSpell = null;
+	private final Spells mSpell;
+	private final boolean mApplySpellshock;
+	private final boolean mTriggerSpellshock;
 
 	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType) {
+		this(damager, damaged, damage, magicType, null, true, true);
+	}
+
+	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
 		mIsCancelled = false;
 		mDamager = damager;
 		mDamaged = damaged;
@@ -31,6 +37,9 @@ public class CustomDamageEvent extends Event implements Cancellable {
 		} else {
 			mMagicType = magicType;
 		}
+		mSpell = spell;
+		mApplySpellshock = applySpellshock;
+		mTriggerSpellshock = triggerSpellshock;
 	}
 
 	@Override
@@ -41,10 +50,6 @@ public class CustomDamageEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean arg0) {
 		mIsCancelled = arg0;
-	}
-
-	public void setSpell(Spells spell) {
-		mSpell = spell;
 	}
 
 	public Spells getSpell() {
@@ -69,6 +74,14 @@ public class CustomDamageEvent extends Event implements Cancellable {
 
 	public void setDamage(double damage) {
 		mDamage = damage;
+	}
+
+	public boolean appliesSpellshock() {
+		return mApplySpellshock;
+	}
+
+	public boolean triggersSpellshock() {
+		return mTriggerSpellshock;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

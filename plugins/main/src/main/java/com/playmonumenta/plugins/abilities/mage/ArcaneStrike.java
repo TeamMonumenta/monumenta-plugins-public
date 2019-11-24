@@ -67,7 +67,7 @@ public class ArcaneStrike extends Ability {
 				}
 
 				Vector velocity = mob.getVelocity();
-				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE);
+				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell, true, false);
 				mob.setVelocity(velocity);
 			}
 

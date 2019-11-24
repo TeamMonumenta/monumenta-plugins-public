@@ -42,7 +42,7 @@ public class ElementalArrows extends Ability {
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell, false, true);
 					mob.setFireTicks(ELEMENTAL_ARROWS_DURATION);
 				}
 			}
@@ -51,12 +51,12 @@ public class ElementalArrows extends Ability {
 			}
 			damage += event.getDamage();
 			event.setDamage(0);
-			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell, false, true);
 			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, damagee);
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 				}
 			}
@@ -65,7 +65,7 @@ public class ElementalArrows extends Ability {
 			}
 			damage += event.getDamage();
 			event.setDamage(0);
-			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
 			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 		}
 
