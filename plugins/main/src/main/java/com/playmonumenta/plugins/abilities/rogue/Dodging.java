@@ -157,7 +157,7 @@ public class Dodging extends Ability {
 			                                 new PotionEffect(PotionEffectType.SPEED,
 			                                                  DODGING_SPEED_EFFECT_DURATION,
 			                                                  DODGING_SPEED_EFFECT_LEVEL,
-			                                                  true, false));
+			                                                  true, true));
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
 		}

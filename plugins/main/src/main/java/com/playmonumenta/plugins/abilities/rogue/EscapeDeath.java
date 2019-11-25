@@ -59,13 +59,13 @@ public class EscapeDeath extends Ability {
 		if (escapeDeath > 1) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION,
-			                                                  ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, false));
+			                                                  ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, true));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER,
-			                                                  ESCAPE_DEATH_SPEED_EFFECT_LVL, true, false));
+			                                                  ESCAPE_DEATH_SPEED_EFFECT_LVL, true, true));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.JUMP, ESCAPE_DEATH_DURATION_OTHER,
-			                                                  ESCAPE_DEATH_JUMP_EFFECT_LVL, true, false));
+			                                                  ESCAPE_DEATH_JUMP_EFFECT_LVL, true, true));
 		}
 
 		Location loc = mPlayer.getLocation();
