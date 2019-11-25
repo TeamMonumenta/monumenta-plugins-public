@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -68,7 +69,9 @@ public class ShulkerEquipmentListener implements Listener {
 		    event.getWhoClicked() == null ||
 		    !(event.getWhoClicked() instanceof Player) ||
 		    event.getClickedInventory() == null ||
-		    !(event.getClickedInventory() instanceof PlayerInventory) ||
+		    !(event.getClickedInventory() instanceof PlayerInventory ||
+		      event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
+		      event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
 		    // Must be in main inventory
 		    // https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
 		    event.getSlot() < 9 ||
