@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.TippedArrow;
@@ -67,6 +68,7 @@ public class ThrowingKnife implements BaseEnchantment {
 						}
 						arrow.setVelocity(dir.clone().multiply(ARROW_VELOCITY));
 						arrow.setCritical(true);
+						arrow.setPickupStatus(PickupStatus.DISALLOWED);
 					}
 
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.65f);
