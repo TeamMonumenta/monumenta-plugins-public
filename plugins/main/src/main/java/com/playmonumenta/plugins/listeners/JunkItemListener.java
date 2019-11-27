@@ -26,7 +26,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
-	private static final int JUNK_ITEM_SIZE_THRESHOLD = 16;
+	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
 	private final Plugin mPlugin;
 	private final Set<Player> mPlayers = new HashSet<Player>();
 
