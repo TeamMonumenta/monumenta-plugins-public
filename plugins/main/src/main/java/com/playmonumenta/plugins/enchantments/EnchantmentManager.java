@@ -187,7 +187,7 @@ public class EnchantmentManager implements Listener {
 					int newLevel = propertyMap.get(enchant.getKey()) - enchant.getValue();
 					propertyMap.remove(enchant.getKey());
 					enchant.getKey().removeProperty(plugin, player);
-					if (newLevel > 0 || enchant.getKey().negativeLevelsAllowed()) {
+					if (newLevel > 0 || (enchant.getKey().negativeLevelsAllowed() && newLevel < 0)) {
 						propertyMap.put(enchant.getKey(), newLevel);
 						enchant.getKey().applyProperty(plugin, player, newLevel);
 					}
@@ -226,7 +226,7 @@ public class EnchantmentManager implements Listener {
 		}
 
 		int level = property.getLevelFromItem(item, player, slot);
-		if (level > 0 || property.negativeLevelsAllowed()) {
+		if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
 			Integer currentLevel = propertyMap.get(property);
 			if (currentLevel != null) {
 				currentLevel += level;
@@ -272,7 +272,7 @@ public class EnchantmentManager implements Listener {
 							}
 
 							int level = property.getLevelFromItem(item, player, slot);
-							if (level > 0 || property.negativeLevelsAllowed()) {
+							if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
 								Integer currentLevel = propertyMap.get(property);
 								if (currentLevel != null) {
 									currentLevel += level;
@@ -296,7 +296,7 @@ public class EnchantmentManager implements Listener {
 			if (stack != null) {
 				for (BaseEnchantment property : mSpawnedProperties) {
 					int level = property.getLevelFromItem(stack);
-					if (level > 0 || property.negativeLevelsAllowed()) {
+					if (level > 0 || (property.negativeLevelsAllowed() && level < 0)) {
 						property.onSpawn(mPlugin, item, level);
 					}
 				}

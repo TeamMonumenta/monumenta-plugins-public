@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class AttributeArrowSpeed implements BaseEnchantment {
-	public static final String SPEED_METAKEY = "AttributeArrowSpeedMetakey";
+	private static final String SPEED_METAKEY = "AttributeArrowSpeedMetakey";
 	private static final String PROPERTY_NAME = " Arrow Speed";
 
 	@Override
@@ -46,5 +46,12 @@ public class AttributeArrowSpeed implements BaseEnchantment {
 			proj.setMetadata(SPEED_METAKEY, new FixedMetadataValue(plugin, arrowSpeedModifier));
 			proj.setVelocity(proj.getVelocity().multiply(arrowSpeedModifier));
 		}
+	}
+
+	public static double getArrowSpeedModifier(Projectile proj) {
+		if (proj.hasMetadata(SPEED_METAKEY)) {
+			return proj.getMetadata(AttributeArrowSpeed.SPEED_METAKEY).get(0).asDouble();
+		}
+		return 1;
 	}
 }

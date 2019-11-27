@@ -43,7 +43,7 @@ public class AttributeBowDamage implements BaseEnchantment {
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
-		// If level is 0, that means we probably have a vanilla bow
+		// This should never be called with level = 0, but it doesn't hurt anything
 		if (level != 0 && proj instanceof Arrow) {
 			proj.setMetadata(DAMAGE_METAKEY, new FixedMetadataValue(plugin, InventoryUtils.getAttributeValue(level)));
 		}
@@ -54,12 +54,8 @@ public class AttributeBowDamage implements BaseEnchantment {
 			double damage = proj.getMetadata(DAMAGE_METAKEY).get(0).asDouble();
 			// Only scale damage if not fully charged arrow
 			if (!((Arrow) proj).isCritical()) {
-				double arrowSpeedModifier = 1;
-				if (proj.hasMetadata(AttributeArrowSpeed.SPEED_METAKEY)) {
-					arrowSpeedModifier = proj.getMetadata(AttributeArrowSpeed.SPEED_METAKEY).get(0).asDouble();
-				}
 				// Arrow speed will be different if arrow speed attribute is active, so scale properly
-				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / arrowSpeedModifier);
+				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeArrowSpeed.getArrowSpeedModifier(proj));
 			}
 
 			event.setDamage(damage);
