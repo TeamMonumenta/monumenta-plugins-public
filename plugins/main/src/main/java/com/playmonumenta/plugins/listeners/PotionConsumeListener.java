@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -109,6 +112,14 @@ public class PotionConsumeListener implements Listener {
 
 		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
 		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
+
+		if (meta.getEnchantLevel(Enchantment.LUCK) > 0) {
+			Location loc = player.getLocation();
+			loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Luck potions can no longer be consumed");
+			event.setCancelled(true);
+			return;
+		}
 
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
 		if (instantDrinkLevel != 0) {
