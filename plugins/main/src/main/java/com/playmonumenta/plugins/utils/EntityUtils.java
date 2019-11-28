@@ -36,6 +36,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Shulker;
+import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
@@ -43,6 +44,7 @@ import org.bukkit.entity.Vex;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.ZombieHorse;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -143,6 +145,8 @@ public class EntityUtils {
 			return ((Wolf)entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
 		} else if (entity instanceof Rabbit) {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
+		} else if (entity instanceof SkeletonHorse || entity instanceof ZombieHorse) {
+			return true;
 		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
 			LivingEntity target = ((Mob)entity).getTarget();
 			return entity.getScoreboardTags().contains("boss_targetplayer") || (target != null && target instanceof Player);

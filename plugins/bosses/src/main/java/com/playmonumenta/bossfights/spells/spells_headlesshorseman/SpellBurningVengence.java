@@ -57,7 +57,7 @@ public class SpellBurningVengence extends Spell {
 					@Override
 					public void run() {
 						if (t % 2 == 0) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + (float)((float) t / 32f));
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + t / 32f);
 						}
 						t++;
 						Location loc = h.getLocation();
@@ -81,10 +81,12 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.1, 0.1, 0.1, 0.065);
 
 							for (Player player : Utils.playersInRange(loc, 0.75)) {
-								DamageUtils.damage(mBoss, player, 20);
-								player.setFireTicks(20 * 5);
-								Vector direction = player.getLocation().toVector().subtract(loc.toVector()).normalize();
-								player.setVelocity(direction.multiply(-0.5));
+								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+									DamageUtils.damage(mBoss, player, 20);
+									player.setFireTicks(20 * 5);
+									Vector direction = player.getLocation().toVector().subtract(loc.toVector()).normalize();
+									player.setVelocity(direction.multiply(-0.5));
+								}
 							}
 							if (reduce) {
 								loc.subtract(0, 1, 0);
@@ -103,8 +105,10 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : Utils.playersInRange(loc, 5)) {
-								DamageUtils.damage(mBoss, player, 37);
-								MovementUtils.KnockAway(loc, player, 0.7f);
+								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+									DamageUtils.damage(mBoss, player, 37);
+									MovementUtils.KnockAway(loc, player, 0.7f);
+								}
 							}
 						}
 					}

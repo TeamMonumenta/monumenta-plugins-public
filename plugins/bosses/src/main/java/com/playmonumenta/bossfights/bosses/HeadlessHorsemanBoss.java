@@ -123,18 +123,18 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
-				new SpellBatBombs(plugin, boss),
-				new SpellSinisterReach(plugin, boss),
+				new SpellBatBombs(plugin, boss, this),
+				new SpellSinisterReach(plugin, boss, this),
 				new SpellBurningVengence(plugin, boss, this)
 				));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
 				new SpellHellzoneGrenade(plugin, boss, mSpawnLoc, detectionRange, this),
-				new SpellBatBombs(plugin, boss),
-				new SpellSinisterReach(plugin, boss),
+				new SpellBatBombs(plugin, boss, this),
+				new SpellSinisterReach(plugin, boss, this),
 				new SpellBurningVengence(plugin, boss, this),
-				new SpellPhantomOfTheOpera(plugin, boss),
-				new SpellHallowsEnd(plugin, boss)
+				new SpellPhantomOfTheOpera(plugin, boss, this),
+				new SpellHallowsEnd(plugin, boss, this)
 				));
 
 		List<Spell> phase1Passives = Arrays.asList(
@@ -208,6 +208,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
 		super.constructBoss(plugin, identityTag, mBoss, phase1Spells, phase1Passives, detectionRange, bossBar);
+	}
+
+	public Location getSpawnLocation() {
+		return mSpawnLoc;
 	}
 
 	private boolean mAggro = true;

@@ -3,6 +3,7 @@ package com.playmonumenta.bossfights.spells.spells_headlesshorseman;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.bossfights.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -31,11 +33,13 @@ public class SpellHallowsEnd extends Spell {
 	private LivingEntity mBoss;
 	private boolean mHit;
 	private boolean mCooldown;
-	public SpellHallowsEnd(Plugin plugin, LivingEntity entity) {
+	private HeadlessHorsemanBoss mHorseman;
+	public SpellHallowsEnd(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
 		mHit = false;
 		mCooldown = false;
+		mHorseman = horseman;
 	}
 
 	private void pillar(Location loc, boolean bounce) {
@@ -63,11 +67,14 @@ public class SpellHallowsEnd extends Spell {
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 65, 0, 0, 0, 0.15);
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 					for (Player player : Utils.playersInRange(loc, 4)) {
-						DamageUtils.damage(mBoss, player, 35);
-						player.setFireTicks(20 * 8);
-						Utils.KnockAway(loc, player, 0.50f, 1.5f);
-						if (bounce) {
-							mHit = true;
+						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange
+								&& player.getGameMode() == GameMode.SURVIVAL) {
+							DamageUtils.damage(mBoss, player, 35);
+							player.setFireTicks(20 * 8);
+							Utils.KnockAway(loc, player, 0.50f, 1.5f);
+							if (bounce) {
+								mHit = true;
+							}
 						}
 					}
 				}
@@ -100,7 +107,7 @@ public class SpellHallowsEnd extends Spell {
 
 				if (!init) {
 					init = true;
-					List<Player> players = Utils.playersInRange(mBoss.getLocation(), 32);
+					List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3;
@@ -117,7 +124,7 @@ public class SpellHallowsEnd extends Spell {
 					mHit = false;
 					t = 0;
 					hits++;
-					List<Player> players = Utils.playersInRange(mBoss.getLocation(), 32);
+					List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3;

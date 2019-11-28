@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.bossfights.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.bossfights.spells.Spell;
 import com.playmonumenta.bossfights.utils.DamageUtils;
 import com.playmonumenta.bossfights.utils.Utils;
@@ -33,10 +34,12 @@ public class SpellSinisterReach extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+	private HeadlessHorsemanBoss mHorseman;
 
-	public SpellSinisterReach(Plugin plugin, LivingEntity entity) {
+	public SpellSinisterReach(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
+		mHorseman = horseman;
 	}
 
 	@Override
@@ -55,7 +58,7 @@ public class SpellSinisterReach extends Spell {
 		}
 
 		if (target == null) {
-			List<Player> players = Utils.playersInRange(mBoss.getLocation(), 40);
+			List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 			Collections.shuffle(players);
 			if (players.size() > 0) {
 				target = players.get(0);
@@ -96,17 +99,19 @@ public class SpellSinisterReach extends Spell {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 1.65f);
 
 						for (Player player : Utils.playersInRange(mBoss.getLocation(), 8)) {
-							Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
-							if (dir.dot(toVector) > .33) {
-								if (!player.isBlocking()) {
-									DamageUtils.damage(mBoss, player, 32);
-									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
-								} else {
-									player.setCooldown(Material.SHIELD, 20 * 5);
-									Utils.KnockAway(mBoss.getLocation(), player, .6f, .6f);
-								}
+							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
+								if (dir.dot(toVector) > .33) {
+									if (!player.isBlocking()) {
+										DamageUtils.damage(mBoss, player, 32);
+										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
+										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
+									} else {
+										player.setCooldown(Material.SHIELD, 20 * 5);
+										Utils.KnockAway(mBoss.getLocation(), player, .6f, .6f);
+									}
 
+								}
 							}
 						}
 						new BukkitRunnable() {

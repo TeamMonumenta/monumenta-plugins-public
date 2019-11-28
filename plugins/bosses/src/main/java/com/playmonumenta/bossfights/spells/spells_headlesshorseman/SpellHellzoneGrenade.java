@@ -106,11 +106,13 @@ public class SpellHellzoneGrenade extends Spell {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 						for (Player player : Utils.playersInRange(fallingBlock.getLocation(), 4)) {
-							if (!player.isBlocking()) {
-								DamageUtils.damage(mBoss, player, 35);
-								player.setFireTicks(20 * 3);
-							} else {
-								player.setCooldown(Material.SHIELD, 20 * 12);
+							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+								if (!player.isBlocking()) {
+									DamageUtils.damage(mBoss, player, 35);
+									player.setFireTicks(20 * 3);
+								} else {
+									player.setCooldown(Material.SHIELD, 20 * 12);
+								}
 							}
 
 						}
@@ -126,8 +128,10 @@ public class SpellHellzoneGrenade extends Spell {
 
 								if (t % 10 == 0) {
 									for (Player player : Utils.playersInRange(fallingBlock.getLocation(), 4)) {
-										DamageUtils.damagePercent(mBoss, player, 0.05);
-										player.setFireTicks(20 * 3);
+										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+											DamageUtils.damagePercent(mBoss, player, 0.05);
+											player.setFireTicks(20 * 3);
+										}
 									}
 								}
 
