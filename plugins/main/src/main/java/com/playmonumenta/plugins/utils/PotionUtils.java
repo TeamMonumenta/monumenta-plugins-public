@@ -361,7 +361,7 @@ public class PotionUtils {
 			} else if (info != null && info.type.equals(PotionEffectType.HARM)) {
 				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.amplifier + 1), null);
 			} else {
-				PotionUtils.apply(player, info);
+				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 			}
 		}
 	}
