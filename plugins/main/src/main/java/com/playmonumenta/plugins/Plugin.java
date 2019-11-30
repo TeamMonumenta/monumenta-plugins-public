@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
@@ -185,6 +186,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new Spectate(this), this);
 		manager.registerEvents(new SpectateBot(this), this);
 
+		manager.registerEvents(new AuditListener(this, mServerProperties.getShardName()), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
