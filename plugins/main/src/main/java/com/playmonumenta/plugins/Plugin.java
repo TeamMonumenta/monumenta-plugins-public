@@ -51,7 +51,6 @@ import com.playmonumenta.plugins.listeners.PotionConsumeListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
-import com.playmonumenta.plugins.listeners.ThrowablePotionListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -197,7 +196,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
-		manager.registerEvents(new ThrowablePotionListener(), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
 
