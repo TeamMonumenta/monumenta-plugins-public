@@ -128,6 +128,7 @@ public class TransferServer extends GenericCommand {
 					} else if (dropped > 1) {
 						player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
 					}
+					plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, null);
 
 					if (!NetworkUtils.transferPlayerData(plugin, player, server)) {
 						// Failed to send, unlock the player's inventory and let them know to retry later
