@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -9,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.Container;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,6 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
@@ -31,6 +36,8 @@ import com.playmonumenta.plugins.packets.AuditLogPacket;
 public class AuditListener implements Listener {
 	private final Plugin mPlugin;
 	private final String mShardName;
+
+	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
 
 	public AuditListener(@Nonnull Plugin plugin, @Nonnull String shardName) {
 		mPlugin = plugin;
@@ -57,6 +64,8 @@ public class AuditListener implements Listener {
 		}
 
 		log("GameMode: " + player.getName() + " " + curMode.toString() + " -> " + newMode.toString());
+
+		checkDestroy(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -71,6 +80,8 @@ public class AuditListener implements Listener {
 		}
 
 		log("Death: " + player.getName() + " " + event.getDeathMessage());
+
+		checkDestroy(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -91,6 +102,8 @@ public class AuditListener implements Listener {
 		}
 
 		log("Command: " + player.getName() + " " + cmd);
+
+		checkDestroy(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -104,7 +117,9 @@ public class AuditListener implements Listener {
 			return;
 		}
 
-		log("PlaceDuplicateBlock: " + player.getName() + " " + getItemLogString(event.getItemInHand()));
+		log("+PlaceDuplicateBlock: " + player.getName() + " " + getItemLogString(event.getItemInHand()));
+
+		checkDestroy(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -113,11 +128,42 @@ public class AuditListener implements Listener {
 			return;
 		}
 
-		if (event.getCurrentItem() != null && !event.getCurrentItem().getType().equals(Material.AIR)) {
-			log("InventoryDestroy: " + event.getWhoClicked().getName() + " " + getItemLogString(event.getCurrentItem()));
-		}
+		HumanEntity player = event.getWhoClicked();
+
 		if (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) {
-			log("CreativeInventory: " + event.getWhoClicked().getName() + " " + getItemLogString(event.getCursor()));
+			ItemStack lastItem = mLastCreativeDestroy.get(player);
+			ItemStack newItem = event.getCursor();
+			if (lastItem != null) {
+				if (lastItem.isSimilar(newItem)) {
+					/* These are the same item, but with potentially different counts */
+					if (lastItem.getAmount() == newItem.getAmount()) {
+						/* Exactly the same item */
+						mLastCreativeDestroy.remove(player);
+					} else if (lastItem.getAmount() > newItem.getAmount()) {
+						/* Just decrease the stack size of the removed amount and hang onto it */
+						lastItem.setAmount(lastItem.getAmount() - newItem.getAmount());
+					} else {
+						/* Same item, but we added more than we removed (combined stacks) */
+						ItemStack logItem = newItem.clone();
+						logItem.setAmount(logItem.getAmount() - lastItem.getAmount());
+						log("+CreateItem: " + player.getName() + " " + getItemLogString(logItem));
+						mLastCreativeDestroy.remove(player);
+					}
+				} else {
+					/* These are totally different items - log both destroy and create */
+					log("-DeleteItem: " + player.getName() + " " + getItemLogString(lastItem));
+					log("+CreateItem: " + player.getName() + " " + getItemLogString(newItem));
+					mLastCreativeDestroy.remove(player);
+				}
+			} else {
+				/* There was no last item - this item was created */
+				log("+CreateItem: " + player.getName() + " " + getItemLogString(newItem));
+			}
+		}
+		if (event.getCurrentItem() != null && !event.getCurrentItem().getType().equals(Material.AIR)) {
+			/* Make sure we're not overwriting the previous removed item without logging it */
+			checkDestroy(player);
+			mLastCreativeDestroy.put(player, event.getCurrentItem().clone());
 		}
 	}
 
@@ -129,8 +175,15 @@ public class AuditListener implements Listener {
 
 		/* For some stupid reason UNKNOWN = clone stack with pick block key */
 		if (event.getAction().equals(InventoryAction.UNKNOWN) && event.getCurrentItem() != null) {
-			log("CloneItemStack: " + event.getWhoClicked().getName() + " " + getItemLogString(event.getCurrentItem()));
+			log("+CloneItem: " + event.getWhoClicked().getName() + " " + getItemLogString(event.getCurrentItem()));
 		}
+
+		/* Don't checkDestroy() here - this event fires every time InventoryCreativeEvent fires */
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void inventoryClose(InventoryCloseEvent event) {
+		checkDestroy(event.getPlayer());
 	}
 
 	/* Format:
@@ -193,6 +246,15 @@ public class AuditListener implements Listener {
 			}
 		}
 		return retStr + ")";
+	}
+
+	/* Checks that a destroyed item gets logged if the player doesn't place it again immediately */
+	private void checkDestroy(HumanEntity player) {
+		ItemStack lastItem = mLastCreativeDestroy.get(player);
+		if (lastItem != null) {
+			log("-DeleteItem: " + player.getName() + " " + getItemLogString(lastItem));
+			mLastCreativeDestroy.remove(player);
+		}
 	}
 
 	private void log(@Nonnull String message) {
