@@ -174,7 +174,7 @@ public class AuditListener implements Listener {
 		}
 
 		/* For some stupid reason UNKNOWN = clone stack with pick block key */
-		if (event.getAction().equals(InventoryAction.UNKNOWN) && event.getCurrentItem() != null) {
+		if ((event.getAction().equals(InventoryAction.UNKNOWN) || event.getAction().equals(InventoryAction.CLONE_STACK)) && event.getCurrentItem() != null) {
 			log("+CloneItem: " + event.getWhoClicked().getName() + " " + getItemLogString(event.getCurrentItem()));
 		}
 
