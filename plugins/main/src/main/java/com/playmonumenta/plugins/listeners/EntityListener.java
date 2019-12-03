@@ -226,7 +226,7 @@ public class EntityListener implements Listener {
 								if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
 									// Use the last flat damage modifier on the trident, ignore other modifiers
 									// +1 for base damage to be consistent with melee attack damage
-									event.setDamage(iter.next().getAmount() + 1);
+									event.setDamage(mod.getAmount() + 1);
 								}
 							}
 						}
