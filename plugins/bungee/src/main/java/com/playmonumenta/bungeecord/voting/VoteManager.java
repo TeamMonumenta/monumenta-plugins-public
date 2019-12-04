@@ -39,6 +39,7 @@ public class VoteManager implements Listener {
 	private final Logger mLogger;
 	private final HashMap<UUID, VoteContext> mContexts = new HashMap<UUID, VoteContext>();
 	private final ScheduledTask mTickTask;
+	private final Map<String, String> mAlternateNames = new HashMap<String, String>();
 
 	/*
 	 * The time in minutes between allowed votes on these sites.
@@ -59,6 +60,7 @@ public class VoteManager implements Listener {
 		}
 
 		List<String> urls = config.getStringList("sites");
+		List<String> alternate_names = config.getStringList("alternate_names");
 		List<Integer> times = config.getIntList("cooldown_minutes");
 
 		if (urls.size() < 1 || times.size() < 1 || urls.size() != times.size()) {
@@ -67,6 +69,9 @@ public class VoteManager implements Listener {
 
 		for (int i = 0; i < urls.size(); i++) {
 			SITE_TIMERS.put(urls.get(i), Long.valueOf(times.get(i)));
+			if (!alternate_names.get(i).isEmpty()) {
+				mAlternateNames.put(alternate_names.get(i), urls.get(i));
+			}
 		}
 
 		// For testing!
@@ -119,10 +124,20 @@ public class VoteManager implements Listener {
 
 		String matchingSite = null;
 		long cooldown = 0;
+
+		/* Match against URLs first (preferred) */
 		for (Map.Entry<String, Long> site : SITE_TIMERS.entrySet()) {
 			if (site.getKey().toLowerCase().contains(vote.getServiceName().toLowerCase())) {
 				matchingSite = site.getKey();
 				cooldown = site.getValue();
+				break;
+			}
+		}
+		/* Match alternate names in case URL matching failed */
+		for (Map.Entry<String, String> alternate : mAlternateNames.entrySet()) {
+			if (alternate.getKey().toLowerCase().contains(vote.getServiceName().toLowerCase())) {
+				matchingSite = alternate.getValue();
+				cooldown = SITE_TIMERS.get(matchingSite);
 				break;
 			}
 		}
