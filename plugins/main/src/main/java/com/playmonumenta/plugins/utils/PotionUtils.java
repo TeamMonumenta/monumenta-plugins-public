@@ -333,7 +333,10 @@ public class PotionUtils {
 	}
 
 	public static void applyPotion(Plugin plugin, Player player, PotionMeta meta) {
-		if (meta.hasCustomEffects()) {
+		//Do not run if null to avoid NullPointerException
+		if(meta == null) {
+			return;
+		} else if (meta.hasCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
 				if (effect.getType() != null) {
 					if (effect.getType().equals(PotionEffectType.HARM)) {
