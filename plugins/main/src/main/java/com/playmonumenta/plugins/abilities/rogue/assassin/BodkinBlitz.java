@@ -10,6 +10,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -21,6 +24,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -28,22 +32,27 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class BodkinBlitz extends Ability {
 
-	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
-	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 15;
+	private static final int BODKINBLITZ_COOLDOWN = 25 * 20;
 	private static final int BODKINBLITZ_1_DAMAGE = 25;
 	private static final int BODKINBLITZ_2_DAMAGE = 30;
 
 	private int mLeftClicks = 0;
+	private LivingEntity mark;
 
 	public BodkinBlitz(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
-		mInfo.cooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+		mInfo.cooldown = BODKINBLITZ_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.ignoreCooldown = true;
 	}
 
 	public void cast(Action action) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+			return;
+		}
+
 		mLeftClicks++;
 		new BukkitRunnable() {
 			@Override
@@ -78,12 +87,11 @@ public class BodkinBlitz extends Ability {
 
 					if (!loc.getBlock().getType().isSolid() && !loc.clone().add(0, 1, 0).getBlock().getType().isSolid()) {
 						tpLoc = loc;
-					} else if (!loc.getBlock().getType().isSolid() && !loc.clone().add(0, -1, 0).getBlock().getType().isSolid()) {
-						tpLoc = loc.clone().add(0, -1, 0);
 					} else if (!loc.clone().add(0, 1, 0).getBlock().getType().isSolid() && !loc.clone().add(0, 2, 0).getBlock().getType().isSolid()) {
 						tpLoc = loc.clone().add(0, 1, 0);
 					} else {
-						j = 8;
+						j = 4;
+						break;
 					}
 
 					mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 5, 0.15, 0.45, 0.1, Bukkit.createBlockData("gray_concrete"));
@@ -142,8 +150,23 @@ public class BodkinBlitz extends Ability {
 						mWorld.playSound(enemyLoc, Sound.BLOCK_ANVIL_LAND, 0.6f, 2f);
 
 						if (getAbilityScore() > 1) {
-							mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), Spells.BY_MY_BLADE);
-							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "By My Blade cooldown reset!");
+							mark = target;
+
+							new BukkitRunnable() {
+								int i = 0;
+								public void run() {
+									if (i >= 100) {
+										mark = null;
+										this.cancel();
+									} else {
+										mWorld.spawnParticle(Particle.SMOKE_LARGE, mark.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.07f);
+										i++;
+										if (mark == null) {
+											i = 100;
+										}
+									}
+								}
+							}.runTaskTimer(mPlugin, 0, 1);
 						}
 						int damage = getAbilityScore() == 1 ? BODKINBLITZ_1_DAMAGE : BODKINBLITZ_2_DAMAGE;
 						EntityUtils.damageEntity(mPlugin, target, damage, mPlayer);
@@ -158,6 +181,31 @@ public class BodkinBlitz extends Ability {
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
+		if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
+			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
+			return locType != LocationType.Capital && locType != LocationType.SafeZone;
+		}
+		return false;
+	}
+
+	@Override
+	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		EntityDamageEvent e = event.getEntity().getLastDamageCause();
+		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK || e.getCause() == DamageCause.CUSTOM) {
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Killed mob!");
+			if (event.getEntity() == mark) {
+				LivingEntity mob = event.getEntity();
+				mWorld.playSound(mob.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);
+				mWorld.playSound(mob.getLocation(), Sound.ENTITY_HORSE_ARMOR, 0.5f, 0.75f);
+				mWorld.playSound(mob.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 2f);
+				mWorld.spawnParticle(Particle.SMOKE_LARGE, mob.getLocation(), 30, 0.25, 0.5, 0.25, 0.2f);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.35, 0.5, 0.35, 0f);
+
+				mPlugin.mTimers.UpdateCooldowns(mPlayer, 200);
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cooldown refreshed!");
+
+				mark = null;
+			}
+		}
 	}
 }
