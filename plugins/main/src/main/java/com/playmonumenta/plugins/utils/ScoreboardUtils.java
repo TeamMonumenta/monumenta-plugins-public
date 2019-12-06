@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 
 public class ScoreboardUtils {
 	public static final String[] NOT_TRANSFERRED_OBJECTIVES_VALS =
-	    new String[] {"Apartment", "AptIdle", "VotesWeekly", "VotesTotal", "VotesSinceWin", "VoteRewards", "VoteRaffle", "VoteCache"};
+	    new String[] {"Apartment", "AptIdle", "VotesWeekly", "VotesTotal", "VotesSinceWin", "VoteRewards", "VoteRaffle", "VoteCache", "KaulSpleefWins"};
 	public static final Set<String> NOT_TRANSFERRED_OBJECTIVES =
 	    new HashSet<>(Arrays.asList(NOT_TRANSFERRED_OBJECTIVES_VALS));
 
