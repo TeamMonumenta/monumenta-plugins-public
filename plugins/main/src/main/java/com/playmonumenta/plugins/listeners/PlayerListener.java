@@ -744,8 +744,14 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItem();
 		AbilityManager.getManager().PlayerItemDamageEvent(event.getPlayer(), event);
 
+		int damage = event.getDamage();
+		/*
+		 * Reduce giant spikes of gear damage to make high-damage mobs less destructive to gear
+		 * https://www.wolframalpha.com/input/?i=plot+min%28x%2F8%2B2%2Cx%2F4%29+and+min%28sqrt%28x%29%2Cx%2F4%29+and+x%2F4%2C+x%3D1..40
+		 */
+		damage = (int)Math.min(damage, Math.sqrt(damage * 4));
+
 		if (ItemUtils.isArmorItem(item.getType())) {
-			int damage = event.getDamage();
 
 			int unbreaking = item.getEnchantmentLevel(Enchantment.DURABILITY);
 			if (unbreaking > 0) {
