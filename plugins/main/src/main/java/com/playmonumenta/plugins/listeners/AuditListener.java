@@ -96,8 +96,12 @@ public class AuditListener implements Listener {
 		}
 
 		String cmd = event.getMessage();
-		if (cmd.startsWith("/questtrigger")
-		    || cmd.startsWith("/msg")) {
+		if (cmd.startsWith("/questtrigger ")
+		    || cmd.startsWith("/clickable ")
+		    || cmd.startsWith("/r ")
+		    || cmd.startsWith("/vtell ")
+		    || cmd.startsWith("/peb")
+		    || cmd.startsWith("/msg ")) {
 			return;
 		}
 
