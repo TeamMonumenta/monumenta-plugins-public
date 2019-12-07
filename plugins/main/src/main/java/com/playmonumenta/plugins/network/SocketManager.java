@@ -17,6 +17,7 @@ import com.google.gson.stream.JsonWriter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.packets.BasePacket;
 import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
+import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.plugins.packets.BungeeCommandPacket;
 import com.playmonumenta.plugins.packets.BungeeErrorPacket;
 import com.playmonumenta.plugins.packets.BungeeGetServerListPacket;
@@ -202,6 +203,9 @@ public class SocketManager {
 									break;
 								case BungeeGetVotesUnclaimedPacket.PacketOperation:
 									BungeeGetVotesUnclaimedPacket.handlePacket(mPlugin, compiled);
+									break;
+								case BungeeCheckRaffleEligibilityPacket.PacketOperation:
+									BungeeCheckRaffleEligibilityPacket.handlePacket(mPlugin, compiled);
 									break;
 								default:
 									mPlugin.getLogger().warning(mName + " received unknown packet: " + op);

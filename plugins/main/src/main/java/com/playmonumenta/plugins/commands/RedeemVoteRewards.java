@@ -86,6 +86,7 @@ public class RedeemVoteRewards extends GenericCommand {
 
 		if (context != null) {
 			context.run(rewardCount);
+			mPendingRewards.remove(uuid);
 		} else if (rewardCount > 0) {
 			plugin.mSocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(uuid, rewardCount));
 			plugin.getLogger().info("Sending " + Integer.toString(rewardCount) + " votes back to bungee for " + uuid.toString());

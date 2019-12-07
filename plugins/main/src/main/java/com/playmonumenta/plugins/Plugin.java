@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
+import com.playmonumenta.plugins.commands.ClaimRaffle;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
@@ -111,6 +112,7 @@ public class Plugin extends JavaPlugin {
 		HopeifyHeldItem.register();
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
+		ClaimRaffle.register(this);
 		DeCluckifyHeldItem.register();
 		CalculateReforge.register();
 		ReforgeHeldItem.register();

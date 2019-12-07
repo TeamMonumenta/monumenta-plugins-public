@@ -205,6 +205,17 @@ public class VoteManager implements Listener {
 		}
 	}
 
+	public static void gotShardRaffleEligibilityRequest(ClientSocket client, UUID uuid, boolean claimReward, boolean eligible) {
+		if (MANAGER != null) {
+			VoteContext context = MANAGER.mContexts.get(uuid);
+			if (context == null) {
+				MANAGER.mPlugin.getLogger().warning("Got raffle eligibility request for player " + uuid.toString() + " who has no vote context");
+				return;
+			}
+			context.gotShardRaffleEligibilityRequest(client, uuid, claimReward, eligible);
+		}
+	}
+
 	public static Map<String, Long> getSiteTimers() {
 		return SITE_TIMERS;
 	}

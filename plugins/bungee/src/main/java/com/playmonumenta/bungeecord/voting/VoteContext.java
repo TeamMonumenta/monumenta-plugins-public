@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.bungeecord.network.ClientSocket;
+import com.playmonumenta.bungeecord.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetVotesUnclaimedPacket;
 import com.playmonumenta.bungeecord.utils.FileUtils;
 
@@ -304,7 +305,10 @@ public class VoteContext {
 
 		if (mRaffleWinsTotal > 0) {
 			builder = builder.append("Raffle wins: " + Integer.toString(mRaffleWinsTotal) + "\n");
-			builder = builder.append("Unclaimed raffle rewards: " + Integer.toString(mRaffleWinsUnclaimed) + "\n");
+			builder = builder.append("Unclaimed raffle rewards: " + Integer.toString(mRaffleWinsUnclaimed) + "\n").bold(mRaffleWinsUnclaimed > 0);
+			if (mRaffleWinsUnclaimed > 0) {
+				builder = builder.append("To claim your raffle reward, run /claimraffle");
+			}
 		}
 
 		builder = builder.append("\n").append(getSiteInfo(true), ComponentBuilder.FormatRetention.NONE);
@@ -351,6 +355,25 @@ public class VoteContext {
 		}
 
 		save();
+	}
+
+	protected void gotShardRaffleEligibilityRequest(ClientSocket client, UUID uuid, boolean claimReward, boolean eligible) {
+		if (!claimReward && !eligible) {
+			/* Request eligibility */
+			client.sendPacket(new BungeeCheckRaffleEligibilityPacket(uuid, claimReward, mRaffleWinsUnclaimed > 0));
+		} else if (!claimReward && eligible) {
+			/* Sending back a failed claim */
+			mRaffleWinsUnclaimed++;
+			save();
+		} else if (claimReward && !eligible) {
+			/* Request eligibility */
+			client.sendPacket(new BungeeCheckRaffleEligibilityPacket(uuid, claimReward, mRaffleWinsUnclaimed > 0));
+
+			if (mRaffleWinsUnclaimed > 0) {
+				mRaffleWinsUnclaimed--;
+				save();
+			}
+		}
 	}
 
 	/* Check if any are off cooldown, and prune the ones that are from the cooldown list

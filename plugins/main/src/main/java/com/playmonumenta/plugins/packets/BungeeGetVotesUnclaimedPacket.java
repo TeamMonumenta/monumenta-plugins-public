@@ -29,14 +29,14 @@ public class BungeeGetVotesUnclaimedPacket extends BasePacket {
 		    !packet.getData().has("playerUUID") ||
 		    !packet.getData().get("playerUUID").isJsonPrimitive() ||
 		    !packet.getData().getAsJsonPrimitive("playerUUID").isString()) {
-			throw new Exception("CommandPacket failed to parse required string field 'playerUUID'");
+			throw new Exception("GetVotesUnclaimedPacket failed to parse required string field 'playerUUID'");
 		}
 
 		if (!packet.hasData() ||
 		    !packet.getData().has("votesUnclaimed") ||
 		    !packet.getData().get("votesUnclaimed").isJsonPrimitive() ||
 		    !packet.getData().getAsJsonPrimitive("votesUnclaimed").isNumber()) {
-			throw new Exception("CommandPacket failed to parse required int field 'votesUnclaimed'");
+			throw new Exception("GetVotesUnclaimedPacket failed to parse required int field 'votesUnclaimed'");
 		}
 
 		UUID uuid = UUID.fromString(packet.getData().get("playerUUID").getAsString());

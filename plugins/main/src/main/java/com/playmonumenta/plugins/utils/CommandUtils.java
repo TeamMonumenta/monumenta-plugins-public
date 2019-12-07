@@ -157,6 +157,10 @@ public class CommandUtils {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
+		if (item.getAmount() > 1) {
+			CommandAPI.fail("Only one item can be enchanted!");
+		}
+
 		List<String> newLore = new ArrayList<>();
 		boolean enchantmentFound = false;
 		boolean nameAdded = (ownerPrefix == null);
@@ -168,6 +172,7 @@ public class CommandUtils {
 			String loreStripped = ChatColor.stripColor(loreEntry).trim();
 			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
 			                          loreStripped.contains("Celsian Isles :") ||
+			                          loreStripped.contains("Monumenta :") ||
 			                          loreStripped.contains("Armor") ||
 			                          loreStripped.contains("Magic Wand") ||
 			                          loreStripped.isEmpty())) {
@@ -183,13 +188,16 @@ public class CommandUtils {
 			newLore.add(loreEntry);
 		}
 
+		if (!enchantmentFound) {
+			CommandAPI.fail("Item must be labeled 'King's Valley', 'Celsian Isles', or 'Monumenta'");
+		}
+
 		if (!nameAdded) {
 			newLore.add(ownerPrefix + " " + player.getName());
 		}
 
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
-		item.setAmount(1);
 
 		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
 	}
