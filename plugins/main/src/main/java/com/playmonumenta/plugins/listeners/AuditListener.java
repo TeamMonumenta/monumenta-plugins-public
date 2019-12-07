@@ -100,6 +100,9 @@ public class AuditListener implements Listener {
 		    || cmd.startsWith("/clickable ")
 		    || cmd.startsWith("/r ")
 		    || cmd.startsWith("/vtell ")
+		    || cmd.startsWith("/pickup ")
+		    || cmd.startsWith("/vmessage ")
+		    || cmd.startsWith("/vwhisper ")
 		    || cmd.startsWith("/peb")
 		    || cmd.startsWith("/msg ")) {
 			return;
