@@ -185,7 +185,9 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new Spectate(this), this);
 		manager.registerEvents(new SpectateBot(this), this);
 
-		manager.registerEvents(new AuditListener(this, mServerProperties.getShardName()), this);
+		if (mServerProperties.getAuditMessagesEnabled()) {
+			manager.registerEvents(new AuditListener(this, mServerProperties.getShardName()), this);
+		}
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);

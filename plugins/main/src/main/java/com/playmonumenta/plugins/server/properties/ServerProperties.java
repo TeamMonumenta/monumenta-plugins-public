@@ -33,6 +33,7 @@ public class ServerProperties {
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
+	private boolean mAuditMessagesEnabled = true;
 
 	private String mShardName = "default_settings";
 	private String mSocketHost = "bungee";
@@ -82,6 +83,10 @@ public class ServerProperties {
 
 	public boolean getClassSpecializationsEnabled() {
 		return mClassSpecializationsEnabled;
+	}
+
+	public boolean getAuditMessagesEnabled() {
+		return mAuditMessagesEnabled;
 	}
 
 	public String getShardName() {
@@ -144,6 +149,7 @@ public class ServerProperties {
 					mIsSleepingEnabled           = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 					mKeepLowTierInventory        = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 					mClassSpecializationsEnabled = _getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+					mAuditMessagesEnabled        = _getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
 
 					mShardName                   = _getPropertyValueString(plugin, object, "shardName", mShardName);
 					mSocketHost                  = _getPropertyValueString(plugin, object, "socketHost", mSocketHost);
