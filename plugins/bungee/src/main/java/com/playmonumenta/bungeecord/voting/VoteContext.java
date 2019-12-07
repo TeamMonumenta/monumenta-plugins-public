@@ -297,7 +297,7 @@ public class VoteContext {
 		).color(ChatColor.WHITE).bold(true)
 		.append("Voting helps other people find Monumenta!\nClaim rewards at Pollmaster Tennenbaum in Sierhaven\n\n", ComponentBuilder.FormatRetention.NONE).color(ChatColor.GOLD)
 		.append("Voting status:\n").color(ChatColor.GOLD)
-		.append("Total votes: " + Integer.toString(mVotesThisWeek) + "\n").color(ChatColor.WHITE)
+		.append("Total votes: " + Integer.toString(mVotesTotal) + "\n").color(ChatColor.WHITE)
 		.append("Votes this week: " + Integer.toString(mVotesThisWeek) + "\n")
 		.append("Unclaimed rewards: " + Integer.toString(mVotesUnclaimed) + "\n")
 		.append("Raffle Entries: " + Integer.toString(mRaffleEntries) + "\n");
