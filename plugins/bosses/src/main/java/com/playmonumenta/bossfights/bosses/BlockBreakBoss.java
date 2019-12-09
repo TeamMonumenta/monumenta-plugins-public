@@ -20,7 +20,6 @@ public class BlockBreakBoss extends BossAbilityGroup {
 	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {
 		List<Spell> passiveSpells = Arrays.asList(new SpellBlockBreak(boss));
 
-		boss.setRemoveWhenFarAway(false);
 		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
 	}
 }

@@ -2,9 +2,11 @@ package com.playmonumenta.bossfights.bosses;
 
 import java.util.Arrays;
 
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 
@@ -28,7 +30,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
-		if (boss instanceof Wolf || boss instanceof Golem) {
+		if (boss instanceof Wolf || boss instanceof Golem || boss instanceof Dolphin || boss instanceof Ocelot) {
 			boss.setRemoveWhenFarAway(true);
 		}
 
