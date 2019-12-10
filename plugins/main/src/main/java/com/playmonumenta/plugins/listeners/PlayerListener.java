@@ -143,6 +143,9 @@ public class PlayerListener implements Listener {
 
 		Player player = event.getPlayer();
 
+		/* Remove ephemeral items on logout */
+		InventoryUtils.removeSpecialItems(player, true);
+
 		mPlugin.mTrackingManager.removeEntity(player);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), 20)) {
@@ -407,9 +410,9 @@ public class PlayerListener implements Listener {
 					// to prevent sorting hotbar / armor slots
 				} else {
 					if (event.getClick() != null &&
-					    event.getClick().equals(ClickType.RIGHT) &&
-					    inventory.getItem(event.getSlot()) == null &&
-					    event.getAction().equals(InventoryAction.NOTHING)) {
+						event.getClick().equals(ClickType.RIGHT) &&
+						inventory.getItem(event.getSlot()) == null &&
+						event.getAction().equals(InventoryAction.NOTHING)) {
 
 						// Player right clicked an empty space and nothing happened
 						// Check if the last thing the player did was also the same thing.
@@ -434,6 +437,21 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+		//If item contains curse of ephemerality, prevent from putting in other inventories
+		/* TODO: Fix this so it won't block non-ephemeral chest operations
+		if (event.getWhoClicked() instanceof Player && !(event.getClickedInventory() instanceof PlayerInventory)) {
+
+			Player player = (Player)event.getWhoClicked();
+			Inventory inventory = player.getInventory();
+
+			for (ItemStack item : inventory.getContents()) {
+				if (item != null && CurseOfEphemerality.isEphemeral(item)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+		*/
 	}
 
 	// If an item is being dragged in an inventory
@@ -446,6 +464,20 @@ public class PlayerListener implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
+		//If item contains curse of ephemerality, prevent from putting in other inventories
+		/* TODO: Fix this so it won't block non-ephemeral chest operations
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player)event.getWhoClicked();
+			Inventory inventory = player.getInventory();
+
+			for (ItemStack item : inventory.getContents()) {
+				if (item != null && CurseOfEphemerality.isEphemeral(item)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+		*/
 	}
 
 	// The player opened an inventory

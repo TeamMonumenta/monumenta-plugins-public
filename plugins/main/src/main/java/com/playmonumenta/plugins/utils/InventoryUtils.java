@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class InventoryUtils {
@@ -370,33 +371,35 @@ public class InventoryUtils {
 		}
 	}
 
-	public static int removeSpecialItems(Player player) {
+	public static int removeSpecialItems(Player player, boolean ephemeral_only) {
 		int dropped = 0;
 
 		//  Clear inventory
-		dropped += _removeSpecialItemsFromInventory(player.getInventory(), player.getLocation());
+		dropped += _removeSpecialItemsFromInventory(player.getInventory(), player.getLocation(), ephemeral_only);
 
 		//  Clear Ender Chest
-		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), player.getLocation());
+		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), player.getLocation(), ephemeral_only);
 
 		return dropped;
 	}
 
-	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc) {
+	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeral_only) {
 		int dropped = 0;
 
 		for (ItemStack item : inventory.getContents()) {
 			if (item != null) {
-				if (_containsSpecialLore(item)) {
+				if (!ephemeral_only && _containsSpecialLore(item)) {
 					loc.getWorld().dropItem(loc, item);
 					inventory.removeItem(item);
 					dropped += 1;
+				} else if (CurseOfEphemerality.isEphemeral(item)) {
+					inventory.removeItem(item);
 				} else {
 					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
 						BlockStateMeta meta = (BlockStateMeta)item.getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							dropped += _removeSpecialItemsFromInventory(shulker.getInventory(), loc);
+							dropped += _removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeral_only);
 
 							meta.setBlockState(shulker);
 							item.setItemMeta(meta);

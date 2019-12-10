@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.listeners;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
@@ -20,8 +17,14 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.permissions.Permission;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -84,7 +87,9 @@ public class ShulkerShortcutListener implements Listener {
 					// A shulker box that isn't currently open was clicked.
 					if (player.hasPermission(PERMISSION)) {
 						if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
-							itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType())) {
+							itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
+							!CurseOfEphemerality.isEphemeral(itemHeld)) {
+
 							// Player right-clicked shulker while holding an item on their cursor.
 							event.setCancelled(true);
 							int starting = itemHeld.getAmount();
