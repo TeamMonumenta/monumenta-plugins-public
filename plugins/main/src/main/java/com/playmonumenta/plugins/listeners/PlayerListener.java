@@ -21,6 +21,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -68,6 +69,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.BrewerInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -198,13 +200,13 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-					&& world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
+				    && world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
 				if (GraveUtils.isGrave(block)
-					&& player.getGameMode() != GameMode.CREATIVE
-					&& player.getGameMode() != GameMode.SPECTATOR) {
+				    && player.getGameMode() != GameMode.CREATIVE
+				    && player.getGameMode() != GameMode.SPECTATOR) {
 					Chest grave = (Chest) block.getState();
 					if (GraveUtils.canPlayerOpenGrave(block, player)) {
 						// Player has permission to access this grave. Move as much of the grave's contents as possible into the player's inventory.
@@ -275,8 +277,15 @@ public class PlayerListener implements Listener {
 
 		Entity clickedEntity = event.getRightClicked();
 		ItemStack itemInHand = player.getEquipment().getItemInMainHand();
+		if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+			itemInHand = player.getEquipment().getItemInOffHand();
+		}
 
-		if (clickedEntity instanceof ItemFrame) {
+		//Prevent feeding special item lore items to animals (specifically horses)
+		if (clickedEntity instanceof Animals && itemInHand != null && itemInHand.getLore() != null) {
+			event.setCancelled(true);
+			return;
+		} else if (clickedEntity instanceof ItemFrame) {
 			ItemFrame frame = (ItemFrame) clickedEntity;
 
 			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
@@ -342,7 +351,7 @@ public class PlayerListener implements Listener {
 
 		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
 		if (player.getGameMode() == GameMode.ADVENTURE
-			&& world.getBlockAt(armorStand.getLocation().getBlockX(), 10, armorStand.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+		    && world.getBlockAt(armorStand.getLocation().getBlockX(), 10, armorStand.getLocation().getBlockZ()).getType() == Material.SPONGE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -410,9 +419,9 @@ public class PlayerListener implements Listener {
 					// to prevent sorting hotbar / armor slots
 				} else {
 					if (event.getClick() != null &&
-						event.getClick().equals(ClickType.RIGHT) &&
-						inventory.getItem(event.getSlot()) == null &&
-						event.getAction().equals(InventoryAction.NOTHING)) {
+					    event.getClick().equals(ClickType.RIGHT) &&
+					    inventory.getItem(event.getSlot()) == null &&
+					    event.getAction().equals(InventoryAction.NOTHING)) {
 
 						// Player right clicked an empty space and nothing happened
 						// Check if the last thing the player did was also the same thing.
@@ -636,7 +645,7 @@ public class PlayerListener implements Listener {
 					} else {
 						// Make item invulnerable to explosions for 5 seconds
 						droppedItem.addScoreboardTag("ExplosionImmune");
-						new BukkitRunnable(){
+						new BukkitRunnable() {
 							@Override
 							public void run() {
 								if (droppedItem != null && droppedItem.isValid()) {
