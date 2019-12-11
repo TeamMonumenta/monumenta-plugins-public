@@ -176,7 +176,7 @@ public class AuditListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void cloneClick(InventoryClickEvent event) {
-		if (event.isCancelled()) {
+		if (event.isCancelled() || !event.getWhoClicked().getGameMode().equals(GameMode.CREATIVE)) {
 			return;
 		}
 
