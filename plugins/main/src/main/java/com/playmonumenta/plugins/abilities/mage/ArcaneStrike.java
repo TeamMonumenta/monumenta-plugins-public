@@ -32,8 +32,8 @@ public class ArcaneStrike extends Ability {
 	private static final Particle.DustOptions ARCANE_STRIKE_COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
 
 	private static final float ARCANE_STRIKE_RADIUS = 4.0f;
-	private static final int ARCANE_STRIKE_1_DAMAGE = 4;
-	private static final int ARCANE_STRIKE_2_DAMAGE = 6;
+	private static final int ARCANE_STRIKE_1_DAMAGE = 5;
+	private static final int ARCANE_STRIKE_2_DAMAGE = 8;
 	private static final int ARCANE_STRIKE_1_BONUS_DAMAGE = 2;
 	private static final int ARCANE_STRIKE_2_BONUS_DAMAGE = 4;
 	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
