@@ -39,6 +39,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class ThuribleProcession extends Ability {
 
 	private static final int EFFECTS_DURATION = 20 * 8;
+	private static final int PASSIVE_DURATION = 50; //50 ticks; 20 * 2.5
 	private static final int THURIBLE_1_RADIUS = 20;
 	private static final int THURIBLE_2_RADIUS = 30;
 	private static final int THURIBLE_COOLDOWN = 8;
@@ -66,15 +67,8 @@ public class ThuribleProcession extends Ability {
 
 			updateBuffs();
 
-			int radius = getAbilityScore() == 1 ? THURIBLE_1_RADIUS : THURIBLE_2_RADIUS;
-
 			//Give everyone buffs from the array
-			List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, radius, true);
-			for (Player pl : players) {
-				for (int i = 0; i < buffs; i++) {
-					mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(EFFECTS[i], EFFECTS_DURATION, 0, true, true));
-				}
-			}
+			applyBuffs(EFFECTS_DURATION);
 
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35);
@@ -96,6 +90,7 @@ public class ThuribleProcession extends Ability {
 		if (oneSecond) {
 			seconds++;
 			updateBuffs();
+			applyBuffs(PASSIVE_DURATION);
 		}
 		if (fourHertz) {
 			for (int i = 0; i < buffs; i++) {
@@ -105,7 +100,7 @@ public class ThuribleProcession extends Ability {
 		}
 	}
 
-	//Recounts number of buffs
+	//Recounts number of buffs and applies the passive ones
 	private void updateBuffs() {
 
 		//Convert time into number of buffs and cap to maximum effect index for that level
@@ -117,6 +112,20 @@ public class ThuribleProcession extends Ability {
 				buffs = 4;
 			} else {
 				buffs = 3;
+			}
+		}
+	}
+
+	//Applies built up buffs to all around them and themselves, take the duration as parameter (passive/built-up)
+	private void applyBuffs(int duration) {
+
+		int radius = getAbilityScore() == 1 ? THURIBLE_1_RADIUS : THURIBLE_2_RADIUS;
+
+		//Give everyone buffs from the array
+		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, radius, true);
+		for (Player pl : players) {
+			for (int i = 0; i < buffs; i++) {
+				mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(EFFECTS[i], duration, 0, true, true));
 			}
 		}
 	}
