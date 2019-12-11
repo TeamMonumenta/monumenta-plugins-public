@@ -121,8 +121,7 @@ public class Blizzard extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return !mActive && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && (InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand));
+		return !mActive && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && (InventoryUtils.isWandItem(mHand));
 	}
 
 }

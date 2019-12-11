@@ -54,8 +54,7 @@ public class Starfall extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.isWandItem(mHand) || InventoryUtils.isWandItem(oHand);
+		return InventoryUtils.isWandItem(mHand);
 	}
 
 	public boolean shouldCancelManaLance() {

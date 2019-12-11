@@ -96,10 +96,8 @@ public class MagmaShield extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.isWandItem(mainHand)
-		    || InventoryUtils.isWandItem(offHand)) {
+		if (InventoryUtils.isWandItem(mainHand)) {
 			return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50;
 		}
 		return false;
