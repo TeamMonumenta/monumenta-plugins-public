@@ -220,13 +220,16 @@ public class EntityListener implements Listener {
 					if (source instanceof Drowned) {
 						ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
 						if (meta != null) {
-							Iterator<AttributeModifier> iter = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE).iterator();
-							while (iter.hasNext()) {
-								AttributeModifier mod = iter.next();
-								if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
-									// Use the last flat damage modifier on the trident, ignore other modifiers
-									// +1 for base damage to be consistent with melee attack damage
-									event.setDamage(mod.getAmount() + 1);
+							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+							if (modifiers != null) {
+								Iterator<AttributeModifier> iter = modifiers.iterator();
+								while (iter.hasNext()) {
+									AttributeModifier mod = iter.next();
+									if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
+										// Use the last flat damage modifier on the trident, ignore other modifiers
+										// +1 for base damage to be consistent with melee attack damage
+										event.setDamage(mod.getAmount() + 1);
+									}
 								}
 							}
 						}
