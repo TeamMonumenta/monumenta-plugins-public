@@ -277,6 +277,7 @@ public class EntityListener implements Listener {
 
 			// Make sure to not trigger class abilities off Thorns
 			if (event.getCause() != DamageCause.THORNS) {
+				// Class damage-based abilities only apply to living entities that are not villagers
 				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					// Apply any damage modifications that items they have may apply.
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
@@ -285,13 +286,11 @@ public class EntityListener implements Listener {
 						// Also do Celestial Blessing since it is +%
 						Celestial.modifyDamage(player, event);
 					}
-				}
 
-				if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
-					event.setCancelled(true);
-				}
+					if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
+						event.setCancelled(true);
+					}
 
-				if (damagee instanceof LivingEntity && !(damagee instanceof Villager)) {
 					if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 						EnchantedPrayer.onEntityAttack(mPlugin, player, (LivingEntity)damagee);
 					}
