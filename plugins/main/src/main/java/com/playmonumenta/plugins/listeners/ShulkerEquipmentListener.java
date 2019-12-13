@@ -123,7 +123,7 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	public static boolean isEquipmentBox(ItemStack sboxItem) {
-		if (ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
+		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta) {
 				BlockStateMeta sMeta = (BlockStateMeta)sboxItem.getItemMeta();
 				if (sMeta.getBlockState() instanceof ShulkerBox) {
