@@ -90,69 +90,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
 			new SpellEarthenRupture(plugin, mBoss),
-			new SpellBaseBolt(plugin, mBoss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
-				(Entity entity, int tick) -> {
-					if (entity.getLocation().getY() > 60) {
-						return;
-					}
-					float t = tick / 15;
-					world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
-					world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 3, 0, 0, 0, 0.5,
-					Material.STONE.createBlockData());
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 10, t);
-					mBoss.removePotionEffect(PotionEffectType.SLOW);
-					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
-				},
-
-				(Entity entity) -> {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
-					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
-					0.2, 0.2);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 30, 0.2,
-					0.45, 0.2, 0.1);
-				},
-
-				(Location loc) -> {
-					if (loc.getY() > 60) {
-						return;
-					}
-					world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
-					Material.STONE.createBlockData());
-					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
-					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 1)) {
-						if (block.getType().isSolid()) {
-							Material material = block.getType();
-							if (material == Material.SMOOTH_SANDSTONE
-							    || material == Material.SMOOTH_RED_SANDSTONE
-							    || material == Material.NETHERRACK
-							    || material == Material.MAGMA_BLOCK) {
-								block.setType(Material.AIR);
-							}
-						}
-					}
-				},
-
-				(Player player, Location loc, boolean blocked) -> {
-					if ((player != null && player.getLocation().getY() > 60) || (loc != null && loc.getY() > 60)) {
-						return;
-					}
-					if (!blocked) {
-						DamageUtils.damage(mBoss, player, 22);
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
-					} else {
-						for (Player p : Utils.playersInRange(loc, 2.5)) {
-							DamageUtils.damage(mBoss, p, 16);
-							Utils.KnockAway(loc, p, 0.3f);
-							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
-							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
-						}
-					}
-					world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-				}
-			)
+			getBoltSpell(plugin, mBoss)
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
@@ -192,11 +130,6 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void init() {
-
-	}
-
-	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
@@ -204,5 +137,75 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 				player.setCooldown(Material.SHIELD, 20 * 30);
 			}
 		}
+	}
+
+	protected static SpellBaseBolt getBoltSpell(Plugin plugin, LivingEntity boss) {
+		World world = boss.getWorld();
+
+		return new SpellBaseBolt(plugin, boss, 20 * 2, 20 * 5, 1.1, detectionRange, 0.5, false, true,
+			(Entity entity, int tick) -> {
+				if (entity.getLocation().getY() > 60) {
+					return;
+				}
+				float t = tick / 15;
+				world.spawnParticle(Particle.LAVA, boss.getLocation(), 1, 0.35, 0, 0.35, 0.005);
+				world.spawnParticle(Particle.BLOCK_CRACK, boss.getLocation(), 3, 0, 0, 0, 0.5,
+				Material.STONE.createBlockData());
+				world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, 10, t);
+				boss.removePotionEffect(PotionEffectType.SLOW);
+				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
+			},
+
+			(Entity entity) -> {
+				world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
+				world.spawnParticle(Particle.FLAME, boss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
+				0.2, 0.2);
+				world.spawnParticle(Particle.SMOKE_LARGE, boss.getLocation().add(0, 1, 0), 30, 0.2,
+				0.45, 0.2, 0.1);
+			},
+
+			(Location loc) -> {
+				if (loc.getY() > 60) {
+					return;
+				}
+				world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
+				Material.STONE.createBlockData());
+				world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
+				for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 1)) {
+					if (block.getType().isSolid()) {
+						Material material = block.getType();
+						if (material == Material.SMOOTH_SANDSTONE
+						|| material == Material.SMOOTH_RED_SANDSTONE
+						|| material == Material.NETHERRACK
+						|| material == Material.MAGMA_BLOCK) {
+							block.setType(Material.AIR);
+						}
+					}
+				}
+			},
+
+			(Player player, Location loc, boolean blocked) -> {
+				if ((player != null && player.getLocation().getY() > 60) || (loc != null && loc.getY() > 60)) {
+					return;
+				}
+				if (!blocked) {
+					DamageUtils.damage(boss, player, 22);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
+				} else {
+					for (Player p : Utils.playersInRange(loc, 2.5)) {
+						if (p.getLocation().getY() <= 60) {
+							DamageUtils.damage(boss, p, 16);
+							Utils.KnockAway(loc, p, 0.3f);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
+							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
+						}
+					}
+				}
+				world.spawnParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175);
+				world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
+			}
+		);
 	}
 }
