@@ -87,7 +87,7 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 
 		Player player = (Player)event.getWhoClicked();
-		PlayerInventory pInv = (PlayerInventory)event.getClickedInventory();
+		PlayerInventory pInv = player.getInventory();
 		ItemStack sboxItem = event.getCurrentItem();
 
 		if (ItemUtils.isShulkerBox(sboxItem.getType()) && !ItemUtils.isItemShattered(sboxItem) && sboxItem.hasItemMeta()) {
