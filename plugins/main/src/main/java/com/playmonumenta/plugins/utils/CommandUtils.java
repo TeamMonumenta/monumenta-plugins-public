@@ -142,10 +142,6 @@ public class CommandUtils {
 	}
 
 	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws CommandSyntaxException {
-		enchantify(sender, player, enchantment, ownerPrefix, false);
-	}
-
-	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix, boolean duplicateItem) throws CommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
@@ -161,33 +157,15 @@ public class CommandUtils {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
 		}
 
-		if (ItemUtils.isShulkerBox(item.getType())) {
-			duplicateItem = false;
-		}
-
 		List<String> newLore = new ArrayList<>();
 		boolean enchantmentFound = false;
 		boolean nameAdded = (ownerPrefix == null);
 		for (String loreEntry : lore) {
 			if (loreEntry.contains(ChatColor.GRAY + enchantment)) {
-				if (duplicateItem) {
-					CommandAPI.fail("Player's item already has the " + enchantment + " enchantment");
-				} else {
-					enchantmentFound = true;
-				}
+				enchantmentFound = true;
 			}
 
 			String loreStripped = ChatColor.stripColor(loreEntry).trim();
-			if (loreStripped.contains("Ephemeral Corridors") ||
-			    loreStripped.contains("King's Valley : Epic") ||
-			    loreStripped.contains("King's Valley : Artifact") ||
-			    loreStripped.contains("King's Valley : Enhanced Rare") ||
-			    loreStripped.contains("King's Valley : Enhanced Uncommon") ||
-			    loreStripped.contains("Celsian Isles : Epic") ||
-			    loreStripped.contains("Celsian Isles : Artifact")) {
-				duplicateItem = false;
-			}
-
 			if (!enchantmentFound && (loreStripped.contains("King's Valley :") ||
 			                          loreStripped.contains("Celsian Isles :") ||
 			                          loreStripped.contains("Armor") ||
@@ -209,20 +187,9 @@ public class CommandUtils {
 			newLore.add(ownerPrefix + " " + player.getName());
 		}
 
-		ItemStack dupe = null;
-		if (duplicateItem) {
-			// Give the player a copy of their un-modified item
-			dupe = item.clone();
-			dupe.setAmount(1);
-		}
-
 		meta.setLore(newLore);
 		item.setItemMeta(meta);
 		item.setAmount(1);
-
-		if (duplicateItem) {
-			player.getInventory().addItem(dupe);
-		}
 
 		sender.sendMessage("Succesfully added " + enchantment + " to player's held item");
 	}
