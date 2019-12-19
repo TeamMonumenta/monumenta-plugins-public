@@ -147,11 +147,11 @@ public class EntityUtils {
 			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
 		} else if (entity instanceof SkeletonHorse || entity instanceof ZombieHorse) {
 			return true;
-		} else if (entity instanceof PolarBear || entity instanceof IronGolem || entity instanceof Dolphin || entity instanceof Snowman) {
-			LivingEntity target = ((Mob)entity).getTarget();
-			return entity.getScoreboardTags().contains("boss_targetplayer") || (target != null && target instanceof Player);
 		} else if (entity instanceof Player) {
 			return AbilityManager.getManager().isPvPEnabled((Player)entity);
+		} else if (entity instanceof Mob) {
+			LivingEntity target = ((Mob)entity).getTarget();
+			return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer");
 		}
 
 		return false;
