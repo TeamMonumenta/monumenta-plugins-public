@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -88,6 +89,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
@@ -447,20 +449,11 @@ public class PlayerListener implements Listener {
 			}
 		}
 		//If item contains curse of ephemerality, prevent from putting in other inventories
-		/* TODO: Fix this so it won't block non-ephemeral chest operations
-		if (event.getWhoClicked() instanceof Player && !(event.getClickedInventory() instanceof PlayerInventory)) {
-
-			Player player = (Player)event.getWhoClicked();
-			Inventory inventory = player.getInventory();
-
-			for (ItemStack item : inventory.getContents()) {
-				if (item != null && CurseOfEphemerality.isEphemeral(item)) {
-					event.setCancelled(true);
-					return;
-				}
-			}
+		//Checks for player inevntory unless it's a shift click
+		if (event.getWhoClicked() instanceof Player && ( event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor()) && !(event.getClickedInventory() instanceof PlayerInventory)
+				|| event.getCurrentItem() != null && CurseOfEphemerality.isEphemeral(event.getCurrentItem()) && ( event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) )) {
+			event.setCancelled(true);
 		}
-		*/
 	}
 
 	// If an item is being dragged in an inventory
@@ -474,19 +467,16 @@ public class PlayerListener implements Listener {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		}
 		//If item contains curse of ephemerality, prevent from putting in other inventories
-		/* TODO: Fix this so it won't block non-ephemeral chest operations
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player)event.getWhoClicked();
-			Inventory inventory = player.getInventory();
-
-			for (ItemStack item : inventory.getContents()) {
-				if (item != null && CurseOfEphemerality.isEphemeral(item)) {
+		if (event.getWhoClicked() instanceof Player && event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor())) {
+			event.setCancelled(true);
+		} else if (event.getNewItems() != null) {
+			for(Map.Entry<Integer, ItemStack> iter : event.getNewItems().entrySet()) {
+				if(CurseOfEphemerality.isEphemeral(iter.getValue())) {
 					event.setCancelled(true);
 					return;
 				}
 			}
 		}
-		*/
 	}
 
 	// The player opened an inventory
