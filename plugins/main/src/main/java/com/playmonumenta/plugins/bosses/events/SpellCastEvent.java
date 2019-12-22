@@ -1,10 +1,10 @@
-package com.playmonumenta.bossfights.events;
+package com.playmonumenta.plugins.bosses.events;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class SpellCastEvent extends Event implements Cancellable {
 

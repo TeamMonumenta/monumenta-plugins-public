@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellBombToss extends Spell {
 

@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.utils;
+package com.playmonumenta.plugins.bosses.utils;
 
 import java.lang.reflect.InvocationTargetException;
 

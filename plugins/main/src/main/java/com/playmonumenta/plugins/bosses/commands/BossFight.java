@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.commands;
+package com.playmonumenta.plugins.bosses.commands;
 
 import java.util.LinkedHashMap;
 
@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.plugins.bosses.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;

@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.IntegerArgument;

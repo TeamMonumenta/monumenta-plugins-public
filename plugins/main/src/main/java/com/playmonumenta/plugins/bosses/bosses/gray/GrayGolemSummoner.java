@@ -1,10 +1,10 @@
-package com.playmonumenta.bossfights.bosses.gray;
+package com.playmonumenta.plugins.bosses.bosses.gray;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 
 public class GrayGolemSummoner extends GrayStrongSummonerBase {
 	public static final String identityTag = "boss_gray_summ_golem";

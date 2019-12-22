@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_cluckingop;
+package com.playmonumenta.plugins.bosses.spells.spells_cluckingop;
 
 import java.util.List;
 import java.util.Random;
@@ -15,8 +15,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellFluffingDeath extends Spell {
 

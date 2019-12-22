@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 /*
  * Super simple Spell which just runs in-line function

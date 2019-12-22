@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellPushPlayersAway extends Spell {
 	private Entity mLauncher;

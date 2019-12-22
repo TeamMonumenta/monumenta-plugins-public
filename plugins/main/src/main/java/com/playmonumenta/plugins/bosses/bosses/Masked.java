@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,20 +20,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.spells.SpellBlockBreak;
-import com.playmonumenta.bossfights.spells.SpellPushPlayersAway;
-import com.playmonumenta.bossfights.spells.SpellRunAction;
-import com.playmonumenta.bossfights.spells.spells_masked.SpellFrostNova;
-import com.playmonumenta.bossfights.spells.spells_masked.SpellShadowGlade;
-import com.playmonumenta.bossfights.spells.spells_masked.SpellSummonBlazes;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellPushPlayersAway;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellFrostNova;
+import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellShadowGlade;
+import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellSummonBlazes;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class Masked extends BossAbilityGroup {
 

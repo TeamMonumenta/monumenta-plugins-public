@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellRunAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";

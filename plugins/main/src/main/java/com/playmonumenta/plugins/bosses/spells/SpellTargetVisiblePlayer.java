@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * This spell is designed to run as a passive. Here are the rules:

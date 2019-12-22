@@ -1,6 +1,6 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 import java.util.Random;
 

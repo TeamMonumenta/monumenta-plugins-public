@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_masked;
+package com.playmonumenta.plugins.bosses.spells.spells_masked;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -12,8 +12,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.bosses.Masked;
-import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.plugins.bosses.bosses.Masked;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 

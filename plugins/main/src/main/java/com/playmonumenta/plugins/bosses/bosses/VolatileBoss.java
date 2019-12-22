@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Firework;

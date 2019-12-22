@@ -1,11 +1,11 @@
-package com.playmonumenta.bossfights.utils;
+package com.playmonumenta.plugins.bosses.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
-import com.playmonumenta.bossfights.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.Plugin;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights;
+package com.playmonumenta.plugins.bosses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
-import com.playmonumenta.bossfights.events.SpellCastEvent;
-import com.playmonumenta.bossfights.spells.Spell;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class Boss {
 	private final Plugin mPlugin;

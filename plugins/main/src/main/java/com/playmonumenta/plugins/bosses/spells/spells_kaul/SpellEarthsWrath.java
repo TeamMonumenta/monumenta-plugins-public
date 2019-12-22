@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_kaul;
+package com.playmonumenta.plugins.bosses.spells.spells_kaul;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,9 +13,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;

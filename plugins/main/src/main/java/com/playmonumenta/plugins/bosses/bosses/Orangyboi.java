@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
@@ -10,11 +10,11 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellGenericCharge;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class Orangyboi extends BossAbilityGroup {
 	public static final String identityTag = "boss_orangyboi";

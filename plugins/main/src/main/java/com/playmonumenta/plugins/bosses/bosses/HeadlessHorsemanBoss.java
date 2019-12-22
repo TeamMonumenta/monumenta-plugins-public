@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,21 +25,21 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
-import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellBatBombs;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellBurningVengence;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellHallowsEnd;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellHellzoneGrenade;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
-import com.playmonumenta.bossfights.spells.spells_headlesshorseman.SpellSinisterReach;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellBatBombs;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellBurningVengence;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellHallowsEnd;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellHellzoneGrenade;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
+import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellSinisterReach;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of

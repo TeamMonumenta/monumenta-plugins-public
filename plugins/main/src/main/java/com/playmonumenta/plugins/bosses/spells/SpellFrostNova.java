@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellFrostNova extends SpellBaseAoE {
 

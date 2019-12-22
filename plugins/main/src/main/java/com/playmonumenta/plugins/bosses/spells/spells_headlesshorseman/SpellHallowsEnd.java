@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_headlesshorseman;
+package com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,10 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.bosses.HeadlessHorsemanBoss;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * (Ultimate) Hallow’s End - A pillar of smoke and flames appears on the horseman, after 1 second the area

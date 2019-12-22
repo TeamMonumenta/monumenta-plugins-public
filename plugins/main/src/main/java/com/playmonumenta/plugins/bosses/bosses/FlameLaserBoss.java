@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
@@ -12,9 +12,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
 
 public class FlameLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flamelaser";

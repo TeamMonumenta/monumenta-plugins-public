@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,17 +18,17 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.events.SpellCastEvent;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellBaseCharge;
-import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
-import com.playmonumenta.bossfights.spells.SpellBlockBreak;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
-import com.playmonumenta.bossfights.spells.SpellPurgeNegatives;
-import com.playmonumenta.bossfights.spells.spells_kaul.SpellEarthenRupture;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
+import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellEarthenRupture;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulimmortal";

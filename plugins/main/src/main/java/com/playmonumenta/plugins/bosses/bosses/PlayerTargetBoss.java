@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 
@@ -10,10 +10,10 @@ import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellRunAction;
-import com.playmonumenta.bossfights.spells.SpellTargetVisiblePlayer;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";

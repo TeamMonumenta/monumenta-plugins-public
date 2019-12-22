@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -16,13 +16,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.BossManager;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.events.SpellCastEvent;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public abstract class BossAbilityGroup {
 	@FunctionalInterface

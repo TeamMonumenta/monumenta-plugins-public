@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,19 +16,19 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellAxtalMeleeMinions;
-import com.playmonumenta.bossfights.spells.SpellAxtalTntThrow;
-import com.playmonumenta.bossfights.spells.SpellAxtalWitherAoe;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.spells.SpellBlockBreak;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
-import com.playmonumenta.bossfights.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalMeleeMinions;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalTntThrow;
+import com.playmonumenta.plugins.bosses.spells.SpellAxtalWitherAoe;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class CAxtal extends BossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";

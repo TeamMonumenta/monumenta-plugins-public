@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights;
+package com.playmonumenta.plugins.bosses;
 
 import java.util.Map;
 

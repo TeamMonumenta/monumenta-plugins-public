@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses.gray;
+package com.playmonumenta.plugins.bosses.bosses.gray;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,10 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.bosses.BossAbilityGroup;
-import com.playmonumenta.bossfights.spells.SpellBaseSummon;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int SUMMON_TIME = 200;

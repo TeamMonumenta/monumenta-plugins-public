@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_headlesshorseman;
+package com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -7,9 +7,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellSkyFlare extends Spell {
 

@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,22 +25,22 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.BossBarManager;
-import com.playmonumenta.bossfights.BossBarManager.BossHealthAction;
-import com.playmonumenta.bossfights.SpellManager;
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellBaseCharge;
-import com.playmonumenta.bossfights.spells.SpellBaseLaser;
-import com.playmonumenta.bossfights.spells.SpellBaseParticleAura;
-import com.playmonumenta.bossfights.spells.SpellConditionalTeleport;
-import com.playmonumenta.bossfights.spells.SpellPlayerAction;
-import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellEruption;
-import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellFluffPools;
-import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellFluffingDeath;
-import com.playmonumenta.bossfights.spells.spells_cluckingop.SpellOmegaLeap;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.SerializationUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
+import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
+import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
+import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
+import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellEruption;
+import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffPools;
+import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffingDeath;
+import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellOmegaLeap;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";

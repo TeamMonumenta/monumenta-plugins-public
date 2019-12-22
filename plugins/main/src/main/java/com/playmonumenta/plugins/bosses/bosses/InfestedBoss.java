@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,9 +10,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.spells.SpellDelayedAction;
-import com.playmonumenta.bossfights.spells.SpellRunAction;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
+import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 
 public class InfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_infested";

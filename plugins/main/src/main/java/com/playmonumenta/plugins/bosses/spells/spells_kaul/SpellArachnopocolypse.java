@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_kaul;
+package com.playmonumenta.plugins.bosses.spells.spells_kaul;
 
 import java.util.List;
 import java.util.Random;
@@ -15,8 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellArachnopocolypse extends Spell {
 	private Plugin mPlugin;

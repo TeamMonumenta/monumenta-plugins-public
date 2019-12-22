@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_headlesshorseman;
+package com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -13,9 +13,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * On the Hunt - The Horseman begins marking the player that currently has aggro to be the target of

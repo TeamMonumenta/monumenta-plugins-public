@@ -1,9 +1,9 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class SpellPlayerAction extends Spell {
 	@FunctionalInterface

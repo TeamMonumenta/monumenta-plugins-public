@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_oldslabsbos;
+package com.playmonumenta.plugins.bosses.spells.spells_oldslabsbos;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,9 +13,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.DamageUtils;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellBash extends Spell {

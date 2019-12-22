@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.bosses;
+package com.playmonumenta.plugins.bosses.bosses;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

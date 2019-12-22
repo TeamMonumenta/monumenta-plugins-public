@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.bossfights.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.utils.DamageUtils;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {

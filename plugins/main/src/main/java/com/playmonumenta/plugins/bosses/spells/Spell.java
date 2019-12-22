@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells;
+package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -11,7 +11,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.events.SpellCastEvent;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 
 public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();

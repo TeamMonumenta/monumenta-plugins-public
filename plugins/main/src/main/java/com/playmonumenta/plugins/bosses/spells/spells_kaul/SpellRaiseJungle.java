@@ -1,4 +1,4 @@
-package com.playmonumenta.bossfights.spells.spells_kaul;
+package com.playmonumenta.plugins.bosses.spells.spells_kaul;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.playmonumenta.bossfights.spells.Spell;
-import com.playmonumenta.bossfights.utils.Utils;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * Raise Jungle/Earth Elementals (dirt): In random spots in the arena,
