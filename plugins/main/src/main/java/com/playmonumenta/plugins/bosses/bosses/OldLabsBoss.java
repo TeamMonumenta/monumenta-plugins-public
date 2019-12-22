@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.bosses.spells.spells_oldslabsbos.SpellBash;
 import com.playmonumenta.plugins.bosses.spells.spells_oldslabsbos.SpellWhirlwind;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class OldLabsBoss extends BossAbilityGroup {

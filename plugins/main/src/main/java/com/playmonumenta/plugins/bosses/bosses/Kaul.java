@@ -56,7 +56,7 @@ import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellVolcanicDemise;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /* Woah it's Kaul! */

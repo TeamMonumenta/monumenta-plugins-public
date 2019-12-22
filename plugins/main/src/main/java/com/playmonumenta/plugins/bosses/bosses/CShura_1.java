@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class CShura_1 extends BossAbilityGroup {

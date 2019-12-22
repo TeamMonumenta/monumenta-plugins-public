@@ -31,7 +31,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
 import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class AzacorNormal extends BossAbilityGroup {

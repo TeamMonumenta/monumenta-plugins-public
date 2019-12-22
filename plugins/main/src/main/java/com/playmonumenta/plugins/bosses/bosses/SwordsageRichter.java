@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 

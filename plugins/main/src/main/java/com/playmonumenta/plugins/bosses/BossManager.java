@@ -109,8 +109,10 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
+import com.playmonumenta.plugins.bosses.commands.BossFight;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class BossManager implements Listener {
@@ -303,6 +305,9 @@ public class BossManager implements Listener {
 		mInstance = this;
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
+
+		BossFight.register();
+		SpellDetectionCircle.registerCommand(plugin);
 
 		/* When starting up, look for bosses in all current world entities */
 		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {

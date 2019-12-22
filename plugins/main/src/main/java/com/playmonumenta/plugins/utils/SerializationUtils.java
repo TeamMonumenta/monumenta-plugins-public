@@ -1,23 +1,21 @@
-package com.playmonumenta.plugins.bosses.utils;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
-import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.Plugin;
+package com.playmonumenta.plugins.utils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.Location;
-import org.bukkit.Material;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 
 public class SerializationUtils {
 	private static final String SERIALCONST = "SERIALDATA=";

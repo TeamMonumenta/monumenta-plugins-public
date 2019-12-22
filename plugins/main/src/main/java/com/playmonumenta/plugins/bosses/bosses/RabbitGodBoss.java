@@ -39,7 +39,7 @@ import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffPools
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffingDeath;
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellOmegaLeap;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class RabbitGodBoss extends BossAbilityGroup {

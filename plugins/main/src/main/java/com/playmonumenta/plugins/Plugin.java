@@ -12,6 +12,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
@@ -79,13 +80,13 @@ public class Plugin extends JavaPlugin {
 	public EnchantmentManager mEnchantmentManager;
 	public JunkItemListener mJunkItemsListener;
 	public HttpManager mHttpManager;
-
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public SafeZoneManager mSafeZoneManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
+	private BossManager mBossManager;
 
 	public SocketManager mSocketManager;
 
@@ -144,6 +145,7 @@ public class Plugin extends JavaPlugin {
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 
 		mJunkItemsListener = new JunkItemListener(this);
+		mBossManager = new BossManager(this);
 
 		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
@@ -202,6 +204,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
+		manager.registerEvents(mBossManager, this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());
@@ -292,6 +295,7 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
 		mSocketManager.close();
+		mBossManager.unloadAll();
 		MetadataUtils.removeAllMetadata(this);
 	}
 
