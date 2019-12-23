@@ -34,18 +34,18 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.playmonumenta.nms.utils.NmsCommandUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class PlayerInventory {
 	private Set<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);
 	private Set<Material> mNoOffhandRemoveFunctionMats = EnumSet.noneOf(Material.class);
-	private Map<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
-	private Map<Material, NmsCommandUtils.ParsedCommandWrapper> mOffhandRemoveFunctions = new EnumMap<>(Material.class);
+	private Map<Material, NmsUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
+	private Map<Material, NmsUtils.ParsedCommandWrapper> mOffhandRemoveFunctions = new EnumMap<>(Material.class);
 
 	/*
 	 * This list contains all of a player's currently valid item properties,
@@ -87,7 +87,7 @@ public class PlayerInventory {
 
 	private static void runOffhandFunction(Plugin plugin, String functionFolder, Material type,
 	                                       Set<Material>noFunctionSet,
-	                                       Map<Material, NmsCommandUtils.ParsedCommandWrapper>functionMap,
+	                                       Map<Material, NmsUtils.ParsedCommandWrapper>functionMap,
 	                                       Player player) {
 		if (type != null && !noFunctionSet.contains(type)) {
 			// This particular material either hasn't been tested yet or it has a corresponding function
@@ -97,7 +97,7 @@ public class PlayerInventory {
 				String cmd = "function " + functionFolder + "/" + type.toString().toLowerCase();
 				try {
 					plugin.getLogger().info("Parsing command: '" + cmd + "'");
-					functionMap.put(type, NmsCommandUtils.parseCommand(cmd));
+					functionMap.put(type, NmsUtils.parseCommand(cmd));
 				} catch (Exception e) {
 					plugin.getLogger().info("Failed to parse buyback command '" + cmd + "' : " + e.getMessage());
 
@@ -106,10 +106,10 @@ public class PlayerInventory {
 				}
 			}
 
-			NmsCommandUtils.ParsedCommandWrapper cmd = functionMap.get(type);
+			NmsUtils.ParsedCommandWrapper cmd = functionMap.get(type);
 			if (cmd != null) {
 				try {
-					NmsCommandUtils.runParsedCommand(cmd, player);
+					NmsUtils.runParsedCommand(cmd, player);
 				} catch (Exception e) {
 					plugin.getLogger().warning("Failed to run cached offhand command: " + e.getMessage());
 					e.printStackTrace();

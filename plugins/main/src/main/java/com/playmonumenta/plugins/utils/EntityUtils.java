@@ -50,7 +50,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.nms.utils.NmsEntityUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
@@ -432,7 +431,7 @@ public class EntityUtils {
 				target.damage(damage, damager);
 			} else if (damager instanceof Player) {
 				// Applies DamageCause.CUSTOM
-				NmsEntityUtils.customDamageEntity(target, damage, (Player) damager, "magic");
+				NmsUtils.customDamageEntity(target, damage, (Player) damager, "magic");
 			} else {
 				// Applies DamageCause.GENERIC
 				target.damage(damage);

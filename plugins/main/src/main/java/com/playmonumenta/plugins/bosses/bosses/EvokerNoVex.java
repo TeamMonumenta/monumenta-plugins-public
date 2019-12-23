@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.nms.utils.NmsBossUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 /*
  * This isn't a boss AI or tag. It applies an AI that makes a mob able to wander around within a radius.
@@ -22,7 +22,7 @@ public class EvokerNoVex extends BossAbilityGroup {
 	}
 
 	public EvokerNoVex(Plugin plugin, LivingEntity boss) {
-		NmsBossUtils.removeVexSpawnAIFromEvoker(boss);
+		NmsUtils.removeVexSpawnAIFromEvoker(boss);
 
 		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
 	}

@@ -30,8 +30,9 @@
             <url>file://${project.baseUri}/repo</url>
         </repository>
         <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
+            <id>minecraft-libraries</id>
+            <name>Minecraft Libraries</name>
+            <url>https://libraries.minecraft.net</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -46,14 +47,14 @@
     <dependencies>
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
+            <artifactId>paper</artifactId>
             <version>${minecraft.server.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.playmonumenta</groupId>
-            <artifactId>monumenta-nms</artifactId>
-            <version>dev</version>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.17</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

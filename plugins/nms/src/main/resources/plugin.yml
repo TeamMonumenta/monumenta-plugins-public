@@ -1,5 +1,0 @@
-name: MonumentaNMS
-main: com.playmonumenta.nms.Plugin
-depend: []
-version: dev
-api-version: 1.13
