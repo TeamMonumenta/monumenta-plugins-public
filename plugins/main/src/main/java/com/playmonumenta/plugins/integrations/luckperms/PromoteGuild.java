@@ -50,7 +50,7 @@ public class PromoteGuild {
 		}
 
 		// Check for nearby founder
-		for (Player p : PlayerUtils.getNearbyPlayers(player, 1, false)) {
+		for (Player p : PlayerUtils.playersInRange(player, 1, false)) {
 			Group nearbyPlayerGroup = LuckPermsIntegration.getGuild(lp, p);
 			String nearbyPlayerGroupName = LuckPermsIntegration.getGuildName(nearbyPlayerGroup);
 			if (nearbyPlayerGroup != null && nearbyPlayerGroupName != null &&

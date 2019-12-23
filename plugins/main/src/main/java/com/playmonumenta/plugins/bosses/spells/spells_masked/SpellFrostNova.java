@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFrostNova extends Spell {
 
@@ -60,7 +60,7 @@ public class SpellFrostNova extends Spell {
 						centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.77F);
 						centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.5F);
 						centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.65F);
-						for (Player player : Utils.playersInRange(mLauncher.getLocation(), mRadius)) {
+						for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
 							player.damage(12.0f);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 8 * 20, 4));
 						}

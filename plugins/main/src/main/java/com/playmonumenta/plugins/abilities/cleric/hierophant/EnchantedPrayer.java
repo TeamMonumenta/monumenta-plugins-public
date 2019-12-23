@@ -75,7 +75,7 @@ public class EnchantedPrayer extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		int enchantedPrayer = getAbilityScore();
-		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, 15, true)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer, 15, true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
 			p.setMetadata(ENCHANTED_PRAYER_METAKEY, new FixedMetadataValue(mPlugin, enchantedPrayer));

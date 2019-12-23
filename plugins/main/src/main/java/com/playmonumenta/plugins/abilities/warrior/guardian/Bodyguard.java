@@ -64,7 +64,7 @@ public class Bodyguard extends Ability {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
 		Location oLoc = mPlayer.getLocation();
 		Vector dir = oLoc.getDirection();
-		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer.getEyeLocation(), BODYGUARD_RANGE);
+		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), BODYGUARD_RANGE);
 		players.remove(mPlayer);
 		for (int i = 0; i < BODYGUARD_RANGE; i++) {
 			box.shift(dir);
@@ -132,7 +132,7 @@ public class Bodyguard extends Ability {
 
 					}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), BODYGUARD_RADIUS)) {
-						MovementUtils.KnockAway(player, mob, 0.45f);
+						MovementUtils.knockAway(player, mob, 0.45f);
 						if (bodyguard > 1) {
 							EntityUtils.applyStun(mPlugin, BODYGUARD_STUN_DURATION, mob);
 						}

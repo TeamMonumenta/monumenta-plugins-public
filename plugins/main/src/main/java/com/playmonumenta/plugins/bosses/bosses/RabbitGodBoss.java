@@ -39,8 +39,8 @@ import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffPools
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffingDeath;
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellOmegaLeap;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class RabbitGodBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
@@ -213,7 +213,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, spawnLoc, 50, 0, 0, 0, 0.175);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
-						Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK OINK! OINK OINK OINK, OINK OINK OINK OINK!!! OOIIINNNKKK!!!\",\"color\":\"dark_red\"}]");
+						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK OINK! OINK OINK OINK, OINK OINK OINK OINK!!! OOIIINNNKKK!!!\",\"color\":\"dark_red\"}]");
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
 					}
 					mBoss.teleport(mSpawnLoc.clone().add(0, y, 0));
@@ -243,7 +243,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.SPELL_WITCH, to, 70, 0.25, 0.45, 0.25, 0.15);
 			world.spawnParticle(Particle.SMOKE_LARGE, to, 35, 0.1, 0.45, 0.1, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, to, 25, 0.2, 0, 0.2, 0.1);
-			for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 9999, 20));
 				player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 9999, -5));
 			}
@@ -254,7 +254,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 				@Override
 				public void run() {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[t].toUpperCase() + "\",\"color\":\"dark_red\"}]");
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[t].toUpperCase() + "\",\"color\":\"dark_red\"}]");
 					t++;
 					if (t == dio.length) {
 						this.cancel();
@@ -286,7 +286,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 									chicken.setCustomName(ChatColor.AQUA + "" + ChatColor.BOLD + "Godly Clucking Spirit");
 									chicken.setCustomNameVisible(true);
 									world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, 1, 1);
-									Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck Cluck!\",\"color\":\"white\"}]");
+									PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck Cluck!\",\"color\":\"white\"}]");
 									new BukkitRunnable() {
 
 										@Override
@@ -305,13 +305,13 @@ public class RabbitGodBoss extends BossAbilityGroup {
 										public void run() {
 											if (t == 0) {
 												world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 1f);
-												Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!? OINK OINK OINK!?!\",\"color\":\"dark_red\"}]");
+												PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!? OINK OINK OINK!?!\",\"color\":\"dark_red\"}]");
 											}
 											t++;
 
 											if (t >= 20 * 4) {
 												this.cancel();
-												Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck. Cluck Cluck Cluck Cluck. Cluck CLUCK!!!\",\"color\":\"white\"}]");
+												PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck. Cluck Cluck Cluck Cluck. Cluck CLUCK!!!\",\"color\":\"white\"}]");
 												world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, 1, 1);
 												world.playSound(chicken.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1, 1.35f);
 												new BukkitRunnable() {
@@ -321,7 +321,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 
 													@Override
 													public void run() {
-														for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+														for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 															world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 0.25, 0), 1, 0.3, 0.3, 0.3, 0);
 														}
 														radius -= 0.2;
@@ -341,7 +341,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 															world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_DEATH, 2, 0.5f);
 															chicken.remove();
 															changePhase(null, passive2Spells, null);
-															for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+															for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 																world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 0.4f);
 																player.removePotionEffect(PotionEffectType.SLOW);
 																if (player.hasPotionEffect(PotionEffectType.JUMP)) {
@@ -357,8 +357,8 @@ public class RabbitGodBoss extends BossAbilityGroup {
 															mBoss.setAI(true);
 															phase2 = true;
 															mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-															Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"Your curse of Clucking is suddenly brought out in power, making you feel extremely powerful!\",\"color\":\"aqua\"}]");
-															Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"You have gained OP AS CLUCK powers!! Cluck em' up!\",\"color\":\"aqua\"}]");
+															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"Your curse of Clucking is suddenly brought out in power, making you feel extremely powerful!\",\"color\":\"aqua\"}]");
+															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"You have gained OP AS CLUCK powers!! Cluck em' up!\",\"color\":\"aqua\"}]");
 															new BukkitRunnable() {
 																int t = 0;
 																@Override
@@ -366,7 +366,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 																	t++;
 																	if (t == 1) {
 																		world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
-																		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!! OINK OINK OINK!!! OINK OINK!!!!!!!\",\"color\":\"dark_red\"}]");
+																		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!! OINK OINK OINK!!! OINK OINK!!!!!!!\",\"color\":\"dark_red\"}]");
 																	} else if (t == 2) {
 																		changePhase(phase2Spells, passive2Spells, null);
 																		this.cancel();
@@ -444,7 +444,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		changePhase(null, null, null);
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");
 		new BukkitRunnable() {
 			int t = 0;
 			ThreadLocalRandom rand = ThreadLocalRandom.current();
@@ -457,7 +457,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 
 				if (t >= 12) {
-					Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OOOOOOIIIIIIINNNNNNNNNNKKKKKKKKK!!!!!!!\",\"color\":\"dark_red\"}]");
+					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OOOOOOIIIIIIINNNNNNNNNNKKKKKKKKK!!!!!!!\",\"color\":\"dark_red\"}]");
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 1f);
 					mBoss.remove();
@@ -468,7 +468,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.5f, 0f);
-					for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 						player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
 						if (player.hasPotionEffect(PotionEffectType.SPEED)) {
@@ -483,9 +483,9 @@ public class RabbitGodBoss extends BossAbilityGroup {
 						@Override
 						public void run() {
 							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 1.15");
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"April Clucking Fools\",\"color\":\"dark_green\",\"bold\":true}]");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 1.15");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"April Clucking Fools\",\"color\":\"dark_green\",\"bold\":true}]");
 						}
 
 					}.runTaskLater(mPlugin, 20 * 3);
@@ -499,7 +499,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 9001;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -512,9 +512,9 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 		mBoss.setHealth(bossTargetHp);
 		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Pig God");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK!!! OINK OINK, OINK OINK OINK!?!?\",\"color\":\"dark_red\"}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"The Pig God\",\"color\":\"dark_red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"A Broken Clucking Boss\",\"color\":\"red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK!!! OINK OINK, OINK OINK OINK!?!?\",\"color\":\"dark_red\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"The Pig God\",\"color\":\"dark_red\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"A Broken Clucking Boss\",\"color\":\"red\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
 	}
 }

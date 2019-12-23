@@ -7,19 +7,19 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 public class MovementUtils {
-	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed) {
-		KnockAway(awayFromEntity.getLocation(), target, speed, 0.5f);
+	public static void knockAway(Entity awayFromEntity, LivingEntity target, float speed) {
+		knockAway(awayFromEntity.getLocation(), target, speed, 0.5f);
 	}
 
-	public static void KnockAway(Entity awayFromEntity, LivingEntity target, float speed, float y) {
-		KnockAway(awayFromEntity.getLocation(), target, speed, y);
+	public static void knockAway(Entity awayFromEntity, LivingEntity target, float speed, float y) {
+		knockAway(awayFromEntity.getLocation(), target, speed, y);
 	}
 
-	public static void KnockAway(Location loc, LivingEntity target, float speed) {
-		KnockAway(loc, target, speed, 0.5f);
+	public static void knockAway(Location loc, LivingEntity target, float speed) {
+		knockAway(loc, target, speed, 0.5f);
 	}
 
-	public static void KnockAway(Location loc, LivingEntity target, float speed, float y) {
+	public static void knockAway(Location loc, LivingEntity target, float speed, float y) {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}

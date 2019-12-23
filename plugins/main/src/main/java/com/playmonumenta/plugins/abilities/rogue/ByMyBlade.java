@@ -70,7 +70,7 @@ public class ByMyBlade extends Ability {
 				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 45, 0.2, 0.65, 0.2, 1.0);
 				count = 30;
 				if (damagee instanceof Player) {
-					MovementUtils.KnockAway(mPlayer, damagee, 0.3f);
+					MovementUtils.knockAway(mPlayer, damagee, 0.3f);
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 					                                 new PotionEffect(PotionEffectType.SPEED, BY_MY_BLADE_HASTE_DURATION, 0, false, true));
 				}

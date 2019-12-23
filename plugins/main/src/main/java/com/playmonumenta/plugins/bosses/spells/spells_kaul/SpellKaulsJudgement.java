@@ -21,7 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
@@ -110,7 +110,7 @@ public class SpellKaulsJudgement extends Spell {
 			}
 
 		}.runTaskLater(mPlugin, 20 * 55);
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");

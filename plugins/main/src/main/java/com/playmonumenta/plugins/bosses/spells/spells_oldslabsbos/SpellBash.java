@@ -15,7 +15,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellBash extends Spell {
@@ -48,7 +50,7 @@ public class SpellBash extends Spell {
 				if (t >= 25) {
 					this.cancel();
 					Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
-					Vector direction = Utils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);
+					Vector direction = LocationUtils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);
 					loc.setDirection(direction);
 					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
 					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 1.25f);
@@ -80,11 +82,11 @@ public class SpellBash extends Spell {
 
 					}.runTaskTimer(mPlugin, 0, 1);
 
-					for (Player player : Utils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 						if (direction.dot(toPlayerVector) > 0.33f) {
 							DamageUtils.damage(mBoss, player, 6);
-							Utils.KnockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+							MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 						}
 					}
 				}

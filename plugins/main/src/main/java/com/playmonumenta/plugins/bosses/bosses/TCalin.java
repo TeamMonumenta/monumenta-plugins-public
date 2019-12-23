@@ -30,8 +30,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
@@ -80,7 +81,7 @@ public class TCalin extends BossAbilityGroup {
 				player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1, 0.15);
 				boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
 				DamageUtils.damage(mBoss, player, 14);
-				Utils.KnockAway(mBoss.getLocation(), player, 0.25f, 0.4f);
+				MovementUtils.knockAway(mBoss.getLocation(), player, 0.25f, 0.4f);
 			},
 			// Attack particles
 			(Location loc) -> {
@@ -171,7 +172,7 @@ public class TCalin extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 				knockback(plugin, 5);
-				for (Player player : Utils.playersInRange(mBoss.getLocation(), 5)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
 					DamageUtils.damage(mBoss, player, 16);
 				}
 			}
@@ -191,11 +192,11 @@ public class TCalin extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Fangride! You dare test the might of the boss-coder FirelordWeaponry!? Let me show you his efficiency!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Fangride! You dare test the might of the boss-coder FirelordWeaponry!? Let me show you his efficiency!\",\"color\":\"white\"}]");
 		});
 
 		events.put(75, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You're strong, but this fight is only beginning for you!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You're strong, but this fight is only beginning for you!\",\"color\":\"white\"}]");
 		});
 
 		events.put(50, mBoss -> {
@@ -253,7 +254,7 @@ public class TCalin extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 30, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]");
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
@@ -265,8 +266,8 @@ public class TCalin extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), r)) {
-			Utils.KnockAway(mBoss.getLocation(), player, 0.4f);
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f);
 		}
 		new BukkitRunnable() {
 			double rotation = 0;
@@ -304,15 +305,15 @@ public class TCalin extends BossAbilityGroup {
 
 	@Override
 	public void death() {
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Now you understand... Now... Change my... damn dialogue...\",\"color\":\"white\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Now you understand... Now... Change my... damn dialogue...\",\"color\":\"white\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -323,8 +324,8 @@ public class TCalin extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"T'Calin\",\"color\":\"green\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Forest Battlemage\",\"color\":\"dark_green\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"T'Calin\",\"color\":\"green\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Forest Battlemage\",\"color\":\"dark_green\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
 	}
 }

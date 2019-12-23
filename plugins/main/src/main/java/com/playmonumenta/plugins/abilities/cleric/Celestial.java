@@ -48,7 +48,7 @@ public class Celestial extends Ability {
 		int duration = celestial == 1 ? CELESTIAL_1_DURATION : CELESTIAL_2_DURATION;
 		String tagName = celestial == 1 ? CELESTIAL_1_TAGNAME : CELESTIAL_2_TAGNAME;
 
-		List<Player> affectedPlayers = PlayerUtils.getNearbyPlayers(mPlayer, CELESTIAL_RADIUS, true);
+		List<Player> affectedPlayers = PlayerUtils.playersInRange(mPlayer, CELESTIAL_RADIUS, true);
 
 		// Don't buff players that have their class disabled
 		affectedPlayers.removeIf(p -> p.getScoreboardTags().contains("disable_class"));

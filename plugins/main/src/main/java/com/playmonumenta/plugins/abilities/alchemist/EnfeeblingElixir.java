@@ -49,7 +49,7 @@ public class EnfeeblingElixir extends Ability {
 					int weaknessLevel = enfeeblingElixir;
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
-						MovementUtils.KnockAway(damagee, mob, kbSpeed);
+						MovementUtils.knockAway(damagee, mob, kbSpeed);
 						PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WEAKNESS, duration, weaknessLevel, true, false));
 					}
 

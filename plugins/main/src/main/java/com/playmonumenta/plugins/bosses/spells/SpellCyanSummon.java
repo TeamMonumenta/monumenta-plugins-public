@@ -10,7 +10,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellCyanSummon extends Spell {
 	private static final int PLAYER_RANGE = 16;
@@ -47,8 +48,8 @@ public class SpellCyanSummon extends Spell {
 			return true;
 		}
 
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), PLAYER_RANGE)) {
-			if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), PLAYER_RANGE)) {
+			if (LocationUtils.hasLineOfSight(mBoss, player)) {
 				return true;
 			}
 		}

@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEruption extends Spell {
 
@@ -29,7 +29,7 @@ public class SpellEruption extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), 30);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30);
 		new BukkitRunnable() {
 			int t = 0;
 			@Override

@@ -35,7 +35,7 @@ public class PatreonGreen extends Ability {
 	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			if (mNoSelfParticles) {
-				for (Player other : PlayerUtils.getNearbyPlayers(mPlayer, 30, false)) {
+				for (Player other : PlayerUtils.playersInRange(mPlayer, 30, false)) {
 					other.spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 0.2, 0), 4, 0.25, 0.25, 0.25, 0);
 				}
 			} else {

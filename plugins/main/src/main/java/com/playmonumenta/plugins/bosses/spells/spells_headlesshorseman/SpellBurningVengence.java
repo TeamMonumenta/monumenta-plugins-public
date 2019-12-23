@@ -16,8 +16,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Burning Vengeance - The horseman after 0.5 seconds summons a ring of flames at the edge of a 16 block
@@ -80,7 +80,7 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.FLAME, loc, 3, 0.1, 0.1, 0.1, 0.065);
 							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.1, 0.1, 0.1, 0.065);
 
-							for (Player player : Utils.playersInRange(loc, 0.75)) {
+							for (Player player : PlayerUtils.playersInRange(loc, 0.75)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 									DamageUtils.damage(mBoss, player, 20);
 									player.setFireTicks(20 * 5);
@@ -104,10 +104,10 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.125);
 							world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
-							for (Player player : Utils.playersInRange(loc, 5)) {
+							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 									DamageUtils.damage(mBoss, player, 37);
-									MovementUtils.KnockAway(loc, player, 0.7f);
+									MovementUtils.knockAway(loc, player, 0.7f);
 								}
 							}
 						}

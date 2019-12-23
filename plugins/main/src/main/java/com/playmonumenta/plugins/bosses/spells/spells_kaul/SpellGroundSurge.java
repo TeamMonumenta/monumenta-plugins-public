@@ -22,7 +22,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellGroundSurge extends Spell {
 	private Plugin mPlugin;
@@ -40,7 +42,7 @@ public class SpellGroundSurge extends Spell {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		new BukkitRunnable() {
 			int t = 0;
@@ -84,7 +86,7 @@ public class SpellGroundSurge extends Spell {
 							int i = 0;
 							Location nloc = mBoss.getLocation().add(0, 0.5, 0);
 							BoundingBox box = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
-							Vector dir = Utils.getDirectionTo(target.getLocation(), nloc).setY(0).normalize();
+							Vector dir = LocationUtils.getDirectionTo(target.getLocation(), nloc).setY(0).normalize();
 							@Override
 							public void run() {
 								i++;
@@ -122,7 +124,7 @@ public class SpellGroundSurge extends Spell {
 										this.cancel();
 										DamageUtils.damage(mBoss, player, 20);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
-										Utils.KnockAway(mBoss.getLocation(), player, 0.3f, 1.25f);
+										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1.25f);
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
 										world.spawnParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25);
 										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -147,7 +149,7 @@ public class SpellGroundSurge extends Spell {
 											public void run() {
 												j++;
 												Location _bLoc = box.getCenter().toLocation(world);
-												Vector dir = Utils.getDirectionTo(_tPlayer.getLocation(), _bLoc).setY(0).normalize();
+												Vector dir = LocationUtils.getDirectionTo(_tPlayer.getLocation(), _bLoc).setY(0).normalize();
 												box.shift(dir.clone().multiply(0.7));
 												if (_bLoc.getBlock().getType().isSolid()) {
 													_bLoc.add(0, 1, 0);
@@ -180,7 +182,7 @@ public class SpellGroundSurge extends Spell {
 														hit.add(_player.getUniqueId());
 														DamageUtils.damage(mBoss, _player, 18);
 														_player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
-														Utils.KnockAway(mBoss.getLocation(), _player, 0.175f, 0.85f);
+														MovementUtils.knockAway(mBoss.getLocation(), _player, 0.175f, 0.85f);
 														world.spawnParticle(Particle.SMOKE_LARGE, _bLoc, 10, 0, 0, 0, 0.2);
 														world.spawnParticle(Particle.FLAME, _bLoc, 50, 0, 0, 0, 0.25);
 														world.playSound(_bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);

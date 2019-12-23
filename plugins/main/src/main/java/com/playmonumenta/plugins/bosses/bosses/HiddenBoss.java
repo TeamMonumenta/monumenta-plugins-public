@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Mob that is invisible until players are nearby
@@ -32,7 +32,7 @@ public class HiddenBoss extends BossAbilityGroup {
 
 		// Immediately apply the effect, don't wait
 		Spell invis = new SpellRunAction(() -> {
-			if (Utils.playersInRange(mBoss.getLocation(), visibleRange).size() == 0) {
+			if (PlayerUtils.playersInRange(mBoss.getLocation(), visibleRange).size() == 0) {
 				mBoss.addPotionEffect(potion, true);
 			}
 		});

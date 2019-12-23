@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -23,12 +22,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class CrownbearerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_crownbearer";
@@ -144,22 +143,21 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.5f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
 				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 2f);
-				for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 					DamageUtils.damage(mBoss, player, 16);
-					Utils.KnockAway(mBoss.getLocation(), player, 0.2f);
+					MovementUtils.knockAway(mBoss.getLocation(), player, 0.2f);
 				}
 			}
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!\",\"color\":\"white\"}]");
 		});
 		events.put(75, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Don't underestimate me! After you fall, so will the King, and all of Sierhaven with him!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Don't underestimate me! After you fall, so will the King, and all of Sierhaven with him!\",\"color\":\"white\"}]");
 		});
 		events.put(50, mBoss -> {
-			// TODO: Summon mobs here
 			new BukkitRunnable() {
 				int t = 0;
 				int summon_radius = 5;
@@ -177,12 +175,12 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 30, 10);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Sons of the Forest, come to me! Let us conquer this place once and for all!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Sons of the Forest, come to me! Let us conquer this place once and for all!\",\"color\":\"white\"}]");
 		});
 		events.put(30, mBoss -> {
 			knockback(plugin, 6);
 			changePhase(null, null, null);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
 		});
 		events.put(20, mBoss -> {
 			new BukkitRunnable() {
@@ -202,7 +200,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 15, 7);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"My allies, aid me! Let us finish this fight!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"My allies, aid me! Let us finish this fight!\",\"color\":\"white\"}]");
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
@@ -218,8 +216,8 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), r)) {
-			Utils.KnockAway(mBoss.getLocation(), player, 0.45f);
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f);
 		}
 		new BukkitRunnable() {
 			double rotation = 0;
@@ -257,15 +255,15 @@ public class CrownbearerBoss extends BossAbilityGroup {
 
 	@Override
 	public void death() {
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Damn you... The King... Must meet... His...\",\"color\":\"white\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Damn you... The King... Must meet... His...\",\"color\":\"white\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -276,9 +274,9 @@ public class CrownbearerBoss extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Onyx Crownbearer\",\"color\":\"gold\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The King's Assassinator\",\"color\":\"dark_red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Onyx Crownbearer\",\"color\":\"gold\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The King's Assassinator\",\"color\":\"dark_red\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 1.25");
 	}
 
 }

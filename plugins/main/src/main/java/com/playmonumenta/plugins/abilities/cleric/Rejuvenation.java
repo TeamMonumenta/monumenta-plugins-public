@@ -33,7 +33,7 @@ public class Rejuvenation extends Ability {
 				timer += 5;
 				if (timer % 60 == 0) {
 					int rejuvenation = getAbilityScore();
-					for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, REJUVENATION_RADIUS, true)) {
+					for (Player p : PlayerUtils.playersInRange(mPlayer, REJUVENATION_RADIUS, true)) {
 						// Don't buff players that have their class disabled or who have PvP enabled
 						if (p.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(p)) {
 							continue;

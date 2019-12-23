@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellPlayerAction extends Spell {
 	@FunctionalInterface
@@ -29,7 +29,7 @@ public class SpellPlayerAction extends Spell {
 
 	@Override
 	public void run() {
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), mRange)) {
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange)) {
 			mAction.run(player);
 		}
 	}

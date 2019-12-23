@@ -14,7 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBaseLaser extends Spell {
 	@FunctionalInterface
@@ -90,13 +91,13 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		if (!players.isEmpty()) {
 			if (mSingleTarget) {
 				// Single target chooses a random player within range
 				Collections.shuffle(players);
 				for (Player player : players) {
-					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+					if (LocationUtils.hasLineOfSight(mBoss, player)) {
 						launch(player);
 						return;
 					}
@@ -112,10 +113,10 @@ public class SpellBaseLaser extends Spell {
 
 	@Override
 	public boolean canRun() {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
-				if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+				if (LocationUtils.hasLineOfSight(mBoss, player)) {
 					return true;
 				}
 			}
@@ -184,7 +185,7 @@ public class SpellBaseLaser extends Spell {
 				if (!blocked) {
 					// Really check to make sure it's not blocked
 					// This takes into account block shapes!
-					blocked = !(Utils.hasLineOfSight(launLoc, target));
+					blocked = !(LocationUtils.hasLineOfSight(launLoc, target.getEyeLocation()));
 				}
 
 				if ((blocked && mStopWhenBlocked) || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {

@@ -15,7 +15,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;
@@ -51,7 +53,7 @@ public class SpellEarthsWrath extends Spell {
 							BoundingBox box = BoundingBox.of(loc, 0.75, 0.4, 0.75);
 							double radian1 = Math.toRadians((7.5 * j));
 							Location point = loc.clone().add(Math.cos(radian1) * 0.5, 0, Math.sin(radian1) * 0.5);
-							Vector dir = Utils.getDirectionTo(point, loc);
+							Vector dir = LocationUtils.getDirectionTo(point, loc);
 							int t = 0;
 							@Override
 							public void run() {
@@ -60,10 +62,10 @@ public class SpellEarthsWrath extends Spell {
 								Location bLoc = box.getCenter().toLocation(world);
 								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
-								for (Player player : Utils.playersInRange(mBoss.getLocation(), 40)) {
+								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
 									if (player.getBoundingBox().overlaps(box)) {
 										DamageUtils.damage(mBoss, player, 24);
-										Utils.KnockAway(mBoss.getLocation(), player, -0.5f, 0.65f);
+										MovementUtils.knockAway(mBoss.getLocation(), player, -0.5f, 0.65f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
 									}

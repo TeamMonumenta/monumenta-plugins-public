@@ -20,8 +20,8 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class Virius extends BossAbilityGroup {
 	public static final String identityTag = "boss_virius";
@@ -90,7 +90,7 @@ public class Virius extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 256;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

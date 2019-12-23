@@ -16,7 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Bat Bomb - The Horseman summons 20* bats around himself to distract his enemies. After 3 seconds
@@ -67,11 +68,11 @@ public class SpellBatBombs extends Spell {
 								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
-								for (Player player : Utils.playersInRange(loc, 6)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 6)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 										if (!player.isBlocking()) {
 											DamageUtils.damage(bat, player, 32);
-											Utils.KnockAway(loc, player, 0.2f, 0.4f);
+											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
 										} else {
 											player.setCooldown(Material.SHIELD, 20 * 8);
 										}

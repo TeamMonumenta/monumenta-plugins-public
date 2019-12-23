@@ -103,7 +103,7 @@ public class WardingRemedyNonApothecary extends Ability {
 	private int getWardingRemedyLevel() {
 		int level = 0;
 
-		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, REMEDY_RANGE, true)) {
+		for (Player player : PlayerUtils.playersInRange(mPlayer, REMEDY_RANGE, true)) {
 			Ability wr = AbilityManager.getManager().getPlayerAbility(player, WardingRemedy.class);
 			if (wr != null) {
 				int score = wr.getAbilityScore();

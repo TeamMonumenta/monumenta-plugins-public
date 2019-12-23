@@ -1,23 +1,23 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
-
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Sound;
+
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellChangeFloor extends Spell {
 	private Plugin mPlugin;
@@ -56,7 +56,7 @@ public class SpellChangeFloor extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = Utils.playersInRange(mCenterLoc, mRange);
+		List<Player> players = PlayerUtils.playersInRange(mCenterLoc, mRange);
 		if (!players.isEmpty()) {
 			launch(players.get(mRandom.nextInt(players.size())));
 		}

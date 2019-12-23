@@ -71,7 +71,7 @@ public class SoulRend extends Ability {
 					}
 				} else {
 					if (soulRend > 1) {
-						for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, SOUL_REND_RADIUS, true)) {
+						for (Player p : PlayerUtils.playersInRange(mPlayer, SOUL_REND_RADIUS, true)) {
 							world.spawnParticle(Particle.DAMAGE_INDICATOR, p.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
 							PlayerUtils.healPlayer(p, heal);
 						}

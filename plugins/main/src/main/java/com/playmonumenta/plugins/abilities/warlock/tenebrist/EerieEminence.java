@@ -99,7 +99,7 @@ public class EerieEminence extends Ability {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), EERIE_EFFECT_LINGER_DURATION, 0));
 				}
 				if (getAbilityScore() > 1) {
-					for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, radius, true)) {
+					for (Player player : PlayerUtils.playersInRange(mPlayer, radius, true)) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 						                                 new PotionEffect(entry.getBuff(), EERIE_EFFECT_LINGER_DURATION, 0, true, false));
 					}

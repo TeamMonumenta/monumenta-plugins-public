@@ -76,7 +76,7 @@ public class IronTincture extends Ability {
 			public void run() {
 				mWorld.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
 
-				for (Player p : PlayerUtils.getNearbyPlayers(tincture.getLocation(), 1)) {
+				for (Player p : PlayerUtils.playersInRange(tincture.getLocation(), 1)) {
 					// Prevent players from picking up their own tincture instantly
 					if (p == mPlayer && tincture.getTicksLived() < 12) {
 						continue;

@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellAxtalWitherAoe extends SpellBaseAoE {
 
@@ -36,7 +36,7 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.35, null, true);
 			},
 			(Location loc) -> {
-				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {
+				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
 					int pot_pow = (int)(power * ((radius - distance) / radius));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));

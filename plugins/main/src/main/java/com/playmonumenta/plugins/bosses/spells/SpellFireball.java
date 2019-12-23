@@ -15,7 +15,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFireball extends Spell {
 	@FunctionalInterface
@@ -69,7 +70,7 @@ public class SpellFireball extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
-			private List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+			private List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 
 			@Override
 			public void run() {
@@ -83,12 +84,12 @@ public class SpellFireball extends Spell {
 					mLaunches++;
 					mTicks = 0;
 
-					players = Utils.playersInRange(mBoss.getLocation(), mRange);
+					players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(players);
 						for (Player player : players) {
-							if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								launch(player);
 								break;
 							}

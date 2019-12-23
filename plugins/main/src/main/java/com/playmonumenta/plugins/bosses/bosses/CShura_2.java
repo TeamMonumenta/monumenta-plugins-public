@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellSmokeBomb;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class CShura_2 extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura_2";
@@ -69,10 +69,10 @@ public class CShura_2 extends BossAbilityGroup {
 		);
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(50, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[\",\"color\":\"gold\"},{\"text\":\"C'Shura\",\"color\":\"dark_red\",\"bold\":true},{\"text\":\"] \",\"color\":\"gold\",\"bold\":false},{\"text\":\"Z'CUN, DIE ALREADY!\",\"color\":\"red\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[\",\"color\":\"gold\"},{\"text\":\"C'Shura\",\"color\":\"dark_red\",\"bold\":true},{\"text\":\"] \",\"color\":\"gold\",\"bold\":false},{\"text\":\"Z'CUN, DIE ALREADY!\",\"color\":\"red\"}]");
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0), true);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 0), true);
-			for (Player player : Utils.playersInRange(mBoss.getLocation(), 5)) {
+			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
 				Vector dir = player.getLocation().subtract(mBoss.getLocation().toVector()).toVector().multiply(1.0f);
 				dir.setY(0.5f);
 
@@ -88,7 +88,7 @@ public class CShura_2 extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -100,10 +100,10 @@ public class CShura_2 extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect @s minecraft:blindness 2 2");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"C'Shura\",\"color\":\"dark_green\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Soulbinder\",\"color\":\"green\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"C'Shura\",\"color\":\"dark_green\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Soulbinder\",\"color\":\"green\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		int rand = mRand.nextInt(4);

@@ -47,7 +47,7 @@ public class JoinGuild {
 		}
 
 		// Check for nearby founder
-		for (Player p : PlayerUtils.getNearbyPlayers(player, 1, false)) {
+		for (Player p : PlayerUtils.playersInRange(player, 1, false)) {
 			if (ScoreboardUtils.getScoreboardValue(p, "Founder") == 1) {
 				/* Nearby player is a founder - join to that guild */
 				Group group = LuckPermsIntegration.getGuild(lp, p);

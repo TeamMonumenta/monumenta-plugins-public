@@ -15,8 +15,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellTpBehindRandomPlayer extends Spell {
 	private static final int MAX_RANGE = 80;
@@ -42,7 +42,7 @@ public class SpellTpBehindRandomPlayer extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = Utils.playersInRange(mLauncher.getLocation(), 80);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), 80);
 		while (!players.isEmpty()) {
 			Player target = players.get(mRand.nextInt(players.size()));
 

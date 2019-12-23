@@ -56,7 +56,7 @@ public class CleansingRain extends Ability {
 				mPlayer.getWorld().spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
 				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
 
-				for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, CLEANSING_RADIUS, true)) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer, CLEANSING_RADIUS, true)) {
 					PotionUtils.clearNegatives(mPlugin, player);
 
 					if (player.getFireTicks() > 1) {

@@ -162,7 +162,7 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		for (Player player : PlayerUtils.getNearbyPlayers(block.getLocation(), 30)) {
+		for (Player player : PlayerUtils.playersInRange(block.getLocation(), 30)) {
 			check_nerf_chest(block, player);
 		}
 

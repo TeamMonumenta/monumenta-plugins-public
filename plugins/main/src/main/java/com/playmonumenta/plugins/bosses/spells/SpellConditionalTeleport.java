@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.function.Predicate;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
 public class SpellConditionalTeleport extends Spell {
 	private Entity mLauncher;

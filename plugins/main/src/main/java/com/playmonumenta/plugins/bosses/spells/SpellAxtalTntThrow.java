@@ -14,7 +14,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellAxtalTntThrow extends Spell {
 	private Plugin mPlugin;
@@ -72,12 +73,12 @@ public class SpellAxtalTntThrow extends Spell {
 		Runnable single_launch = new Runnable() {
 			@Override
 			public void run() {
-				List<Player> plist = Utils.playersInRange(mLauncher.getLocation(), 100);
+				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100);
 				if (plist.size() >= 1) {
 					Player Target = plist.get(mRand.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation();
 					try {
-						Entity tnt = Utils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
+						Entity tnt = EntityUtils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
 						Location pLoc = Target.getLocation();
 						Location tLoc = tnt.getLocation();
 						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());

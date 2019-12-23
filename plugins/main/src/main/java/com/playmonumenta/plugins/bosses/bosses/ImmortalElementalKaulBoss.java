@@ -28,7 +28,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulimmortal";
@@ -47,7 +48,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -83,7 +84,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 					player.getWorld().spawnParticle(Particle.BLOCK_DUST, player.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
 					DamageUtils.damage(mBoss, player, 25);
-					Utils.KnockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
+					MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
 				},
 				// Attack particles
 				(Location loc) -> {
@@ -128,7 +129,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	private Random rand = new Random();
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 		if (players.size() > 0) {
 			Player newTarget = players.get(rand.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);

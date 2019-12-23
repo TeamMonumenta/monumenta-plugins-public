@@ -20,7 +20,7 @@ public class ChestUtils {
 	public static void chestScalingLuck(Plugin plugin, Player player, Block block) {
 		int chestLuck = ScoreboardUtils.getScoreboardValue(player, "ChestLuckToggle");
 		if (chestLuck > 0) {
-			int playerCount = PlayerUtils.getNearbyPlayers(player.getLocation(), CHEST_LUCK_RADIUS).size();
+			int playerCount = PlayerUtils.playersInRange(player.getLocation(), CHEST_LUCK_RADIUS).size();
 
 			int luckLevel;
 

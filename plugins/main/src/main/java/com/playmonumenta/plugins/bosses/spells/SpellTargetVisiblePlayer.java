@@ -8,7 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * This spell is designed to run as a passive. Here are the rules:
@@ -61,7 +62,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 		}
 
 		// Check if current target is still visible
-		if (mLastTarget != null && Utils.hasLineOfSight(mBoss.getEyeLocation(), mLastTarget)) {
+		if (mLastTarget != null && LocationUtils.hasLineOfSight(mBoss, mLastTarget)) {
 			mTicksSinceLastSeen = 0;
 
 			// Make sure that player is still the target
@@ -80,11 +81,11 @@ public class SpellTargetVisiblePlayer extends Spell {
 			} else if (!mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
 				// Potentially find a new target if not stunned
 				Location bossLoc = mBoss.getEyeLocation();
-				List<Player> potentialTargets = Utils.playersInRange(bossLoc, mDetectionRange);
+				List<Player> potentialTargets = PlayerUtils.playersInRange(bossLoc, mDetectionRange);
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
-					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player) && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
+					if (LocationUtils.hasLineOfSight(mBoss, player) && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
 						mLastTarget = player;
 						mBoss.setTarget(player);
 						mCooldownRemaining = mCooldown;

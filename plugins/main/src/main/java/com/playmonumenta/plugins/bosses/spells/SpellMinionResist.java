@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

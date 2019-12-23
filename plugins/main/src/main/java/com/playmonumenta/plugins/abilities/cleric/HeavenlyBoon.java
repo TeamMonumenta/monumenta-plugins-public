@@ -115,7 +115,7 @@ public class HeavenlyBoon extends Ability {
 		if (event.getIntensity(mPlayer) >= HEAVENLY_BOON_TRIGGER_INTENSITY) {
 			/* If within range, apply full strength of all potion effects to all nearby players */
 
-			for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEAVENLY_BOON_RADIUS, true)) {
+			for (Player p : PlayerUtils.playersInRange(mPlayer, HEAVENLY_BOON_RADIUS, true)) {
 				// Don't buff players that have their class disabled
 				if (p.getScoreboardTags().contains("disable_class")) {
 					continue;

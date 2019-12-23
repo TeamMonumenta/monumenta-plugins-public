@@ -3,16 +3,16 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 // TODO: This entire spell is probably broken...

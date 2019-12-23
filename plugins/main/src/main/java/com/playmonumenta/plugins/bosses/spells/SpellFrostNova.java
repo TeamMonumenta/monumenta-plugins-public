@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -12,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFrostNova extends SpellBaseAoE {
 
@@ -38,7 +36,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 				world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
 			},
 			(Location loc) -> {
-				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {
+				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
 					int pot_pow = (int)(power * ((radius - distance) / radius));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));

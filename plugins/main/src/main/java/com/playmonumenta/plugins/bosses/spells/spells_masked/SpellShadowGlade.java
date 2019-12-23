@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellShadowGlade extends Spell {
 
@@ -58,7 +58,7 @@ public class SpellShadowGlade extends Spell {
 
 	private void run(Location zoneStart) {
 		final int PERIOD = 4;
-		List<Player> pList = Utils.playersInRange(zoneStart, 40);
+		List<Player> pList = PlayerUtils.playersInRange(zoneStart, 40);
 
 		BukkitRunnable loop = new BukkitRunnable() {
 			private int j = 0;

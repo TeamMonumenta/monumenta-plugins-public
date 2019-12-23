@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSmokeBomb extends Spell {
 	private Plugin mPlugin;
@@ -48,7 +48,7 @@ public class SpellSmokeBomb extends Spell {
 		Runnable dealer = new Runnable() {
 			@Override
 			public void run() {
-				for (Player player : Utils.playersInRange(mLauncher.getLocation(), mRadius)) {
+				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
 					DamageUtils.damage(null, player, 2);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0), true);

@@ -26,8 +26,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
-import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseParticleAura;
@@ -37,7 +37,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Summons a powerful Primordial Elemental that is invulnerable and immovable until out of the ground.
@@ -74,7 +76,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		Location spawnLoc = mBoss.getLocation();
 		World world = mBoss.getWorld();
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 768;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -122,7 +124,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	private Random rand = new Random();
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 		if (players.size() > 0) {
 			Player newTarget = players.get(rand.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);
@@ -171,7 +173,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 				world.spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
 				Material.STONE.createBlockData());
 				world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25);
-				for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 1)) {
+				for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 1)) {
 					if (block.getType().isSolid()) {
 						Material material = block.getType();
 						if (material == Material.SMOOTH_SANDSTONE
@@ -193,10 +195,10 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 				} else {
-					for (Player p : Utils.playersInRange(loc, 2.5)) {
+					for (Player p : PlayerUtils.playersInRange(loc, 2.5)) {
 						if (p.getLocation().getY() <= 60) {
 							DamageUtils.damage(boss, p, 16);
-							Utils.KnockAway(loc, p, 0.3f);
+							MovementUtils.knockAway(loc, p, 0.3f);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));
 						}

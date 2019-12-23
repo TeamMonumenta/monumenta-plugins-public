@@ -56,8 +56,10 @@ import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellVolcanicDemise;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /* Woah it's Kaul! */
 
@@ -164,7 +166,7 @@ public class Kaul extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange)) {
+				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
@@ -191,7 +193,7 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
 		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, false)));
 
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 
 		SpellManager phase3Spells = new SpellManager(
 		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
@@ -221,7 +223,7 @@ public class Kaul extends BossAbilityGroup {
 				} else {
 					player.setHealth(newHealth);
 					player.damage(1, mBoss);
-					Utils.KnockAway(mSpawnLoc, player, -2.5f, 0.85f);
+					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
 					world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15);
 					cd.add(player.getUniqueId());
@@ -324,9 +326,9 @@ public class Kaul extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			if (players.size() == 1) {
-				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USUPRER!\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USUPRER!\",\"color\":\"dark_green\"}]");
 			} else {
-				Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.\",\"color\":\"dark_green\"}]");
 			}
 		});
 
@@ -398,7 +400,7 @@ public class Kaul extends BossAbilityGroup {
 											                    Material.COARSE_DIRT.createBlockData());
 											loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
 										}
-										for (Block block : Utils.getEdge(loc.clone().subtract(t, 0, t),
+										for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t),
 										                                 loc.clone().add(t, 0, t))) {
 											if (rand.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
 											    && block.getLocation().add(0, 1.5, 0).getBlock()
@@ -412,7 +414,7 @@ public class Kaul extends BossAbilityGroup {
 									}
 
 								}.runTaskTimer(mPlugin, 0, 1);
-								for (Player player : Utils.playersInRange(mBoss.getLocation(), detectionRange)) {
+								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange)) {
 									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1,
 									                 0.75f);
 								}
@@ -442,7 +444,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
 		});
 
 		// Forcecast Raise Jungle
@@ -522,7 +524,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -557,7 +559,7 @@ public class Kaul extends BossAbilityGroup {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 5, 0.75f);
 							new BukkitRunnable() {
 								Location loc = point.getLocation().add(0, 15, 0);
-								Vector dir = Utils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), loc);
+								Vector dir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), loc);
 								float t = 0;
 
 								@Override
@@ -629,7 +631,7 @@ public class Kaul extends BossAbilityGroup {
 													world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
 													loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
 												}
-												for (Block block : Utils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
+												for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
 													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 														block.setType(Material.NETHERRACK);
 														if (rand.nextInt(3) == 1) {
@@ -673,7 +675,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -730,13 +732,13 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
 		});
 
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			forceCastSpell(SpellVolcanicDemise.class);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -756,8 +758,8 @@ public class Kaul extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0f);
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), r)) {
-			Utils.KnockAway(mBoss.getLocation(), player, 0.55f);
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
 		new BukkitRunnable() {
@@ -822,7 +824,7 @@ public class Kaul extends BossAbilityGroup {
 
 				}.runTaskLater(mPlugin, 20);
 				UUID uuid = event.getEntity().getUniqueId();
-				for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 					if (!player.getUniqueId().equals(uuid)) {
 						player.damage(event.getDamage(), mBoss);
 					}
@@ -890,7 +892,7 @@ public class Kaul extends BossAbilityGroup {
 								mBoss.setAI(true);
 								mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 								teleport(mSpawnLoc);
-								List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 								if (players.size() > 0) {
 									Player newTarget = players.get(rand.nextInt(players.size()));
 									((Mob) mBoss).setTarget(newTarget);
@@ -907,7 +909,7 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void death() {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 		if (players.size() <= 0) {
 			return;
 		}
@@ -954,7 +956,7 @@ public class Kaul extends BossAbilityGroup {
 					world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.4, 0.25, 0.4, 0.25, null, true);
 					loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
 				}
-				for (Block block : Utils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
+				for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
 					if (block.getType() == Material.MAGMA_BLOCK) {
 						block.setType(Material.OAK_LEAVES);
 						if (rand.nextInt(5) == 1) {
@@ -982,7 +984,7 @@ public class Kaul extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + d[t].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + d[t].toUpperCase() + "\",\"color\":\"dark_green\"}]");
 				t++;
 				if (t == d.length) {
 					this.cancel();
@@ -1008,9 +1010,9 @@ public class Kaul extends BossAbilityGroup {
 								mBoss.setInvulnerable(true);
 								if (t >= 100) {
 									this.cancel();
-									Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
-									Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
-									Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Kaul, Soul of the Jungle\",\"color\":\"dark_green\",\"bold\":true}]");
+									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
+									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
+									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Kaul, Soul of the Jungle\",\"color\":\"dark_green\",\"bold\":true}]");
 									mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 									mBoss.remove();
 								}
@@ -1026,7 +1028,7 @@ public class Kaul extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 2048;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -1075,7 +1077,7 @@ public class Kaul extends BossAbilityGroup {
 
 						if (t % (20 * 4) == 0) {
 							if (index < dio.length) {
-								Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+								PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
 								index++;
 							}
 						}
@@ -1099,9 +1101,9 @@ public class Kaul extends BossAbilityGroup {
 							mBoss.getEquipment().setItemInMainHand(m);
 							mBoss.getEquipment().setItemInOffHand(o);
 
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Kaul\",\"color\":\"dark_green\",\"bold\":true}]");
-							Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Soul of the Jungle\",\"color\":\"green\",\"bold\":true}]");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Kaul\",\"color\":\"dark_green\",\"bold\":true}]");
+							PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Soul of the Jungle\",\"color\":\"green\",\"bold\":true}]");
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 						}
 

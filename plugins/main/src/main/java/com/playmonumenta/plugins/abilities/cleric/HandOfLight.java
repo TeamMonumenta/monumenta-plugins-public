@@ -45,7 +45,7 @@ public class HandOfLight extends Ability {
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
 		boolean healCaster = AbilityManager.getManager().isPvPEnabled(mPlayer);
-		for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, HEALING_RADIUS, healCaster)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer, HEALING_RADIUS, healCaster)) {
 			double healAmount = healing == 1 ? 2 + (p.getMaxHealth() * 0.1) : 4 + (p.getMaxHealth() * 0.2);
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 

@@ -141,7 +141,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 							/* Adjust forward/outer zoom velocity every second */
 							if (mTicks >= DISTANCE_VELOCITY_ADJUST_PERIOD) {
 								mTicks = 0;
-								if (LocationUtils.hasLosToLocation(targetRawLoc, cameraLoc)) {
+								if (LocationUtils.hasLineOfSight(targetRawLoc, cameraLoc)) {
 									ctx.distanceVelocity = DISTANCE_VELOCITY;
 								} else {
 									ctx.distanceVelocity = -DISTANCE_VELOCITY;

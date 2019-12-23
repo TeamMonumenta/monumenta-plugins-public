@@ -38,8 +38,8 @@ import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellHell
 import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
 import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellSinisterReach;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of
@@ -159,7 +159,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\": \"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\": \"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
 		});
 
 		events.put(50, mBoss -> {
@@ -187,7 +187,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0.025);
 
 					if (t % 20 == 0) {
-						for (Player player : Utils.playersInRange(mBoss.getLocation(), 4)) {
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 							DamageUtils.damagePercent(boss, player, 0.075);
 							player.setFireTicks(20 * 5);
 						}
@@ -197,12 +197,12 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 			changePhase(phase2Spells, phase2Passives, null);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to go all out.\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to go all out.\",\"color\":\"gold\"}]");
 		});
 
 		events.put(10, mBoss -> {
 			forceCastSpell(SpellHallowsEnd.class);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -246,7 +246,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
-			List<Player> players = Utils.playersInRange(mSpawnLoc, detectionRange);
+			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
 			if (players.contains(event.getEntity())) {
 				players.remove(event.getEntity());
 			}
@@ -306,7 +306,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange, true).size();
+		int player_count = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
 		int hp_del = 2448;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -319,15 +319,15 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect @s minecraft:blindness 2 2");
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Headless Horseman\",\"color\":\"dark_red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Scourge of the Isles\",\"color\":\"red\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Headless Horseman\",\"color\":\"dark_red\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Scourge of the Isles\",\"color\":\"red\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 	@Override
 	public void death() {
-		for (Player player : Utils.playersInRange(mSpawnLoc, detectionRange, true)) {
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));

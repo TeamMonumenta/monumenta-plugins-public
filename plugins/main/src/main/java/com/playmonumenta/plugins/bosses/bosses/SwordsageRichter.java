@@ -36,8 +36,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 
 public class SwordsageRichter extends BossAbilityGroup {
@@ -115,17 +116,17 @@ public class SwordsageRichter extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is the challenger you speak of, master? Very well, let's get this over with quickly.\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is the challenger you speak of, master? Very well, let's get this over with quickly.\",\"color\":\"white\"}]");
 		});
 
 		events.put(75, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Not bad so far, but at this rate you shouldn't even bother learning my path.\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Not bad so far, but at this rate you shouldn't even bother learning my path.\",\"color\":\"white\"}]");
 		});
 
 		events.put(50, mBoss -> {
 			// Spawn adds
 			summonLivingBlades(plugin, mBoss);
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Let's make this more interesting shall we? Living Blades, cut down this infidel!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Let's make this more interesting shall we? Living Blades, cut down this infidel!\",\"color\":\"white\"}]");
 		});
 
 		events.put(30, mBoss -> {
@@ -133,16 +134,16 @@ public class SwordsageRichter extends BossAbilityGroup {
 			                  (LivingEntity entity) -> {
 			                      knockback(plugin, 7);
 			                  });
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Agh! I won't lose to a weakling like you!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Agh! I won't lose to a weakling like you!\",\"color\":\"white\"}]");
 		});
 
 		events.put(15, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is impossible! How are you still standing!?\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is impossible! How are you still standing!?\",\"color\":\"white\"}]");
 		});
 
 		events.put(8, mBoss -> {
-			Utils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"DAMN YOU! This match ends here! I won't allow myself to be beaten like this! NEVER!\",\"color\":\"white\"}]");
-			List<Player> players = Utils.playersInRange(mBoss.getLocation(), detectionRange);
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"DAMN YOU! This match ends here! I won't allow myself to be beaten like this! NEVER!\",\"color\":\"white\"}]");
+			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 			mBoss.setAI(false);
 			mBoss.setInvulnerable(true);
 
@@ -278,8 +279,8 @@ public class SwordsageRichter extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), r)) {
-			Utils.KnockAway(mBoss.getLocation(), player, 0.45f);
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r)) {
+			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f);
 		}
 		new BukkitRunnable() {
 			double rotation = 0;
@@ -318,7 +319,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 650;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -330,9 +331,9 @@ public class SwordsageRichter extends BossAbilityGroup {
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Richter\",\"color\":\"aqua\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Expert Swordsage\",\"color\":\"dark_aqua\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Richter\",\"color\":\"aqua\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"Expert Swordsage\",\"color\":\"dark_aqua\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 }

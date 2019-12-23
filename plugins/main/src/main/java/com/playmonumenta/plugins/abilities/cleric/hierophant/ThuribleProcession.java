@@ -122,7 +122,7 @@ public class ThuribleProcession extends Ability {
 		int radius = getAbilityScore() == 1 ? THURIBLE_1_RADIUS : THURIBLE_2_RADIUS;
 
 		//Give everyone buffs from the array
-		List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, radius, true);
+		List<Player> players = PlayerUtils.playersInRange(mPlayer, radius, true);
 		for (Player pl : players) {
 			for (int i = 0; i < buffs; i++) {
 				mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(EFFECTS[i], duration, 0, true, true));

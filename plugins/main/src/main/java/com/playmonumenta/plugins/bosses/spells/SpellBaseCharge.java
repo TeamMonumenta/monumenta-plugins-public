@@ -14,7 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBaseCharge extends Spell {
 	@FunctionalInterface
@@ -133,13 +134,13 @@ public class SpellBaseCharge extends Spell {
 	@Override
 	public void run() {
 		// Get list of all nearby players who could be hit by the attack
-		List<Player> bystanders = Utils.playersInRange(mBoss.getLocation(), mRange * 2);
+		List<Player> bystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2);
 
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		Collections.shuffle(players);
 		for (Player player : players) {
-			if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+			if (LocationUtils.hasLineOfSight(mBoss, player)) {
 				if (mCharges <= 0 || mRate <= 0) {
 					launch(player, bystanders);
 				} else {
@@ -288,13 +289,13 @@ public class SpellBaseCharge extends Spell {
 						mActiveRunnables.remove(this);
 					} else {
 						// Get list of all nearby players who could be hit by the attack
-						bystanders = Utils.playersInRange(mBoss.getLocation(), mRange * 2);
+						bystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2);
 
 						// Choose random player within range that has line of sight to boss
-						List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+						List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 						Collections.shuffle(players);
 						for (Player player : players) {
-							if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								mTarget = player;
 								targetLoc = mTarget.getLocation().add(0, 1.0f, 0);
 								break;

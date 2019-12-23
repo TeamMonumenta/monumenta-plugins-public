@@ -41,7 +41,7 @@ public class Sanctified extends Ability {
 		if (EntityUtils.isUndead(damager) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer);
 
-			MovementUtils.KnockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
+			MovementUtils.knockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
 
 			Location loc = damager.getLocation();
 			mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, damager.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);

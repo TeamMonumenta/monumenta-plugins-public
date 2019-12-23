@@ -21,7 +21,9 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
@@ -58,7 +60,7 @@ public class SpellSinisterReach extends Spell {
 		}
 
 		if (target == null) {
-			List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+			List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 			Collections.shuffle(players);
 			if (players.size() > 0) {
 				target = players.get(0);
@@ -72,7 +74,7 @@ public class SpellSinisterReach extends Spell {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 1.25f);
 			new BukkitRunnable() {
 				int t = 0;
-				Vector dir = Utils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
+				Vector dir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
 				Location tloc = mBoss.getLocation().setDirection(dir);
 				@Override
 				public void run() {
@@ -98,7 +100,7 @@ public class SpellSinisterReach extends Spell {
 						world.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 3, 0.75f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 1.65f);
 
-						for (Player player : Utils.playersInRange(mBoss.getLocation(), 8)) {
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 8)) {
 							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
 								if (dir.dot(toVector) > .33) {
@@ -108,7 +110,7 @@ public class SpellSinisterReach extends Spell {
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
 									} else {
 										player.setCooldown(Material.SHIELD, 20 * 5);
-										Utils.KnockAway(mBoss.getLocation(), player, .6f, .6f);
+										MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
 									}
 
 								}

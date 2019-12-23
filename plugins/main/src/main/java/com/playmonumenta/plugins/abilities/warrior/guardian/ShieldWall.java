@@ -150,7 +150,7 @@ public class ShieldWall extends Ability {
 									Vector v = le.getVelocity();
 									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
 									if (knockback) {
-										MovementUtils.KnockAway(loc, le, 0.3f);
+										MovementUtils.knockAway(loc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {

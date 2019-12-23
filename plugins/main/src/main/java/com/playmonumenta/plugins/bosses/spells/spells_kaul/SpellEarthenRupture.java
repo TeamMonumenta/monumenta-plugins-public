@@ -14,7 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Earthen Rupture: After charging for 2 seconds, the Elemental will cause a large rupture that
@@ -54,9 +55,9 @@ public class SpellEarthenRupture extends Spell {
 					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
-					for (Player player : Utils.playersInRange(loc, 6)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 6)) {
 						DamageUtils.damage(mBoss, player, 23);
-						Utils.KnockAway(loc, player, 0.50f, 1.5f);
+						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}
 				}

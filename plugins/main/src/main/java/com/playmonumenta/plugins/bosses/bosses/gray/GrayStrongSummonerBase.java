@@ -19,7 +19,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 	private static final int SUMMON_TIME = 200;
@@ -39,7 +41,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
 				() -> {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
-					List <Player> targets = Utils.playersInRange(boss.getLocation(), PLAYER_RANGE);
+					List <Player> targets = PlayerUtils.playersInRange(boss.getLocation(), PLAYER_RANGE);
 					Collections.shuffle(targets);
 					switch(targets.size()) {
 					case 0:
@@ -68,7 +70,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 				(summonLoc, player) -> {
 					try {
 						Location loc = summonLoc.clone().subtract(0, 2.5f, 0);
-						Entity entity = Utils.summonEntityAt(loc, mobType, mobNBT);
+						Entity entity = EntityUtils.summonEntityAt(loc, mobType, mobNBT);
 						if (entity != null && entity instanceof Mob) {
 							Mob mob = (Mob)entity;
 							mob.setAI(false);
@@ -155,8 +157,8 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 						return true;
 					}
 
-					for (Player player : Utils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
-						if (Utils.hasLineOfSight(boss.getEyeLocation(), player)) {
+					for (Player player : PlayerUtils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
+						if (LocationUtils.hasLineOfSight(boss, player)) {
 							return true;
 						}
 					}

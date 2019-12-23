@@ -17,7 +17,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellWhirlwind extends Spell {
 
@@ -65,7 +66,7 @@ public class SpellWhirlwind extends Spell {
 				if (t >= 25) {
 					this.cancel();
 
-					List<Player> playersNearby = Utils.playersInRange(loc, 40);
+					List<Player> playersNearby = PlayerUtils.playersInRange(loc, 40);
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.5f, 0.85f);
 					new BukkitRunnable() {
@@ -100,7 +101,7 @@ public class SpellWhirlwind extends Spell {
 
 									if (player.getLocation().distance(loc) < bladeDamageRadius) {
 										DamageUtils.damage(mBoss, player, 6);
-										Utils.KnockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
+										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 										iter.remove();
 									}
 								}

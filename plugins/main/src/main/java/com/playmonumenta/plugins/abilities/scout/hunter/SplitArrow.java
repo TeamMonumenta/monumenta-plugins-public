@@ -69,7 +69,7 @@ public class SplitArrow extends Ability {
 				mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer);
-				MovementUtils.KnockAway(damagee, nearestMob, 0.125f, 0.35f);
+				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
 			}
 		}
 

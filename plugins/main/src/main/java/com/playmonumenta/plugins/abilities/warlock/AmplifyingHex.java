@@ -104,7 +104,7 @@ public class AmplifyingHex extends Ability {
 				}
 				if (debuffCount > 0) {
 					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
-					MovementUtils.KnockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
+					MovementUtils.knockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
 				}
 			}
 		}

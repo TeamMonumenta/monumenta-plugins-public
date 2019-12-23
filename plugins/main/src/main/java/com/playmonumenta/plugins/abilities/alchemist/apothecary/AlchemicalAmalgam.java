@@ -82,7 +82,7 @@ public class AlchemicalAmalgam extends Ability {
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
-			List<Player> players = PlayerUtils.getNearbyPlayers(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
+			List<Player> players = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
 
 			int t = 0;
 			double degree = 0;
@@ -126,7 +126,7 @@ public class AlchemicalAmalgam extends Ability {
 
 				if (!reverse && (LocationUtils.collidesWithSolid(loc, loc.getBlock()) || t >= AMALGAM_MAX_DURATION)) {
 					mobs = EntityUtils.getNearbyMobs(loc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
-					players = PlayerUtils.getNearbyPlayers(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
+					players = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
 					reverse = true;
 				}
 

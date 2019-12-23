@@ -40,7 +40,7 @@ public class ClericPassive extends Ability {
 				if (timer % 60 == 0) {
 					// Passive Heal Radius
 					World world = mPlayer.getWorld();
-					for (Player p : PlayerUtils.getNearbyPlayers(mPlayer, PASSIVE_HEAL_RADIUS, false)) {
+					for (Player p : PlayerUtils.playersInRange(mPlayer, PASSIVE_HEAL_RADIUS, false)) {
 						if (MetadataUtils.checkOnceThisTick(mPlugin, p, CLERICPASSIVE_METADATA_KEY)) {
 							if (p.getHealth() <= PASSIVE_HP_THRESHOLD) {
 								PlayerUtils.healPlayer(p, PASSIVE_HEAL_AMOUNT);

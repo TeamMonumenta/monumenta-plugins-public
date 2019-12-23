@@ -15,7 +15,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBombToss extends Spell {
 
@@ -44,7 +46,7 @@ public class SpellBombToss extends Spell {
 	@Override
 	public void run() {
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 
 		BukkitRunnable task = new BukkitRunnable() {
 			int t = 0;
@@ -56,7 +58,7 @@ public class SpellBombToss extends Spell {
 				// TODO: Add particles
 				Collections.shuffle(players);
 				for (Player player : players) {
-					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+					if (LocationUtils.hasLineOfSight(mBoss, player)) {
 						launch(player);
 						break;
 					}
@@ -93,7 +95,7 @@ public class SpellBombToss extends Spell {
 		sLoc.setY(sLoc.getY() + 1.7f);
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 		try {
-			TNTPrimed tnt = (TNTPrimed) Utils.summonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + Integer.toString(mFuse) + "}");
+			TNTPrimed tnt = (TNTPrimed) EntityUtils.summonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + Integer.toString(mFuse) + "}");
 			mTNTList.add(tnt);
 			tnt.setYield(mYield);
 			Location pLoc = target.getLocation();

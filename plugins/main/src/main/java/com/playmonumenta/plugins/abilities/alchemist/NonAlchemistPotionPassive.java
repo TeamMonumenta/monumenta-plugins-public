@@ -29,7 +29,7 @@ public class NonAlchemistPotionPassive extends Ability {
 
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, 12, false)) {
+		for (Player player : PlayerUtils.playersInRange(mPlayer, 12, false)) {
 			if (AbilityManager.getManager().getPlayerAbility(player, GruesomeAlchemy.class) != null
 			    || AbilityManager.getManager().getPlayerAbility(player, BrutalAlchemy.class) != null) {
 				// Nearby player has one of the alchemist skills - chance to give them a potion

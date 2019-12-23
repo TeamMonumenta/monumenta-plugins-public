@@ -15,7 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFluffPools extends Spell {
 
@@ -31,7 +31,7 @@ public class SpellFluffPools extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = Utils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 		List<Player> targets;
 		if (players.size() <= 3) {
 			targets = players;
@@ -66,7 +66,7 @@ public class SpellFluffPools extends Spell {
 						@Override
 						public void run() {
 							i += 2;
-							for (Player player : Utils.playersInRange(loc, 3)) {
+							for (Player player : PlayerUtils.playersInRange(loc, 3)) {
 								player.damage(1, mBoss);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -6));
 							}

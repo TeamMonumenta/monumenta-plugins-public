@@ -51,7 +51,7 @@ public class DefensiveLine extends Ability {
 					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
 					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
-					for (Player target : PlayerUtils.getNearbyPlayers(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
+					for (Player target : PlayerUtils.playersInRange(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
 						// Don't buff players that have their class disabled
 						if (target.getScoreboardTags().contains("disable_class")) {
 							continue;
@@ -86,7 +86,7 @@ public class DefensiveLine extends Ability {
 						                                                  DEFENSIVE_LINE_DURATION,
 						                                                  1, true, true));
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
-							MovementUtils.KnockAway(target, mob, 0.25f);
+							MovementUtils.knockAway(target, mob, 0.25f);
 							if (getAbilityScore() > 1) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
 							}

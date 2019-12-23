@@ -65,7 +65,7 @@ public class PrismaticShield extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, prisDamage, mPlayer, MagicType.ARCANE);
-			MovementUtils.KnockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
+			MovementUtils.knockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,

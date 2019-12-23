@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Lighting Storm : if a player is higher than 2 blocks
@@ -50,7 +50,7 @@ public class SpellLightningStorm extends Spell {
 		t--;
 		if (t <= 0) {
 			t = 6;
-			for (Player player : Utils.playersInRange(mCenter.getLocation(), mRange)) {
+			for (Player player : PlayerUtils.playersInRange(mCenter.getLocation(), mRange)) {
 				Location loc = player.getLocation();
 				if (player.isOnGround()) {
 					if (loc.getY() - mCenter.getLocation().getY() >= 2) {

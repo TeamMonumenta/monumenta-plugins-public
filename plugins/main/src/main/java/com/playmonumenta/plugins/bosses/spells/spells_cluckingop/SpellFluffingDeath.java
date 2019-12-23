@@ -16,7 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFluffingDeath extends Spell {
 
@@ -38,7 +39,7 @@ public class SpellFluffingDeath extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 		teleport(mStartLoc);
-		List<Player> players = Utils.playersInRange(mStartLoc, mRange);
+		List<Player> players = PlayerUtils.playersInRange(mStartLoc, mRange);
 		mBoss.setAI(false);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 12, 10));
 		new BukkitRunnable() {
@@ -104,9 +105,9 @@ public class SpellFluffingDeath extends Spell {
 					world.spawnParticle(Particle.FLAME, loc, 25, 0, 0, 0, 0.175, null, true);
 					world.spawnParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.25, null, true);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-					for (Player player : Utils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						player.damage(1, mBoss);
-						Utils.KnockAway(loc, player, 0.5f, 0.65f);
+						MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
 					}
 				}
 			}

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFlameNova extends SpellBaseAoE {
 
@@ -33,7 +33,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.1);
 			},
 			(Location loc) -> {
-				for (Player player : Utils.playersInRange(launcher.getLocation(), radius)) {
+				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					DamageUtils.damage(null, player, 11);
 					player.setFireTicks(80);
 				}

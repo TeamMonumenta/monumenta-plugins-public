@@ -19,11 +19,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mob;
@@ -38,7 +36,6 @@ import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
-import org.bukkit.entity.Snowman;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.Vex;
 import org.bukkit.entity.Wither;
@@ -550,6 +547,23 @@ public class EntityUtils {
 		if (t == null || t < ticks) {
 			CONFUSED_MOBS.put(mob, ticks);
 		}
+	}
+
+	/*
+	 * TODO: This is really janky - it *probably* returns the correct entity... but it might not
+	 */
+	public static Entity summonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
+		String cmd = "summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+
+		List<Entity> entities = new ArrayList<Entity>(loc.getNearbyEntities(1f, 1f, 1f));
+		entities.removeIf(e -> !e.getType().equals(type));
+		if (entities.size() <= 0) {
+			throw new Exception("Summoned mob but no mob appeared - " + cmd);
+		}
+
+		entities.sort((left, right) -> left.getLocation().distance(loc) >= right.getLocation().distance(loc) ? 1 : -1);
+		return entities.get(0);
 	}
 
 }

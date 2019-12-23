@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
 /*
@@ -56,7 +56,7 @@ public class SpellLightningStrike extends Spell {
 		cooldown--;
 		if (cooldown <= 0) {
 			cooldown = (mTimer / 5);
-			List<Player> players = Utils.playersInRange(mLoc, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mLoc, mRange);
 			if (players.size() > 2) {
 				List<Player> toHit = new ArrayList<Player>();
 				int cap = players.size() / mDivisor;
@@ -111,7 +111,7 @@ public class SpellLightningStrike extends Spell {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-					for (Player p : Utils.playersInRange(loc, 3)) {
+					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
 						/* Get the last time the player was struck by this attack */
 						int lastStrikeTime = 0;
 						if (p.hasMetadata(LIGHTNING_STRIKE_METAKEY)) {

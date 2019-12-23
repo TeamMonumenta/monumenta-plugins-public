@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Putrid Plague (Holds one of four colored wools reflecting a pillar):
@@ -73,7 +73,7 @@ public class SpellPutridPlague extends Spell {
 			ArmorStand point = points.get(rand.nextInt(points.size()));
 			if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color blue");
-				for (Player player : Utils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.BLUE + "The water begins to ripple...");
 					} else {
@@ -82,7 +82,7 @@ public class SpellPutridPlague extends Spell {
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color red");
-				for (Player player : Utils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.RED + "Your blood begins to shiver slightly...");
 					} else {
@@ -91,7 +91,7 @@ public class SpellPutridPlague extends Spell {
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color yellow");
-				for (Player player : Utils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.YELLOW + "You feel the temperature rise significantly...");
 					} else {
@@ -100,7 +100,7 @@ public class SpellPutridPlague extends Spell {
 				}
 			} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color green");
-				for (Player player : Utils.playersInRange(loc, mRange)) {
+				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {
 					if (!mPhase3) {
 						player.sendMessage(ChatColor.GREEN + "The ground begins to vibrate...");
 					} else {
@@ -108,7 +108,7 @@ public class SpellPutridPlague extends Spell {
 					}
 				}
 			}
-			List<Player> players = Utils.playersInRange(mCenter, mRange);
+			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
 				int t = 0;
@@ -143,8 +143,8 @@ public class SpellPutridPlague extends Spell {
 					if (t >= mTime) {
 						this.cancel();
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color white");
-						List<Player> safe = Utils.playersInRange(point.getLocation(), 8);
-						List<Player> ps = Utils.playersInRange(mCenter, mRange);
+						List<Player> safe = PlayerUtils.playersInRange(point.getLocation(), 8);
+						List<Player> ps = PlayerUtils.playersInRange(mCenter, mRange);
 						ps.removeIf(p -> p.getLocation().getY() >= 61);
 						for (Player player : ps) {
 							if (!safe.contains(player)) {

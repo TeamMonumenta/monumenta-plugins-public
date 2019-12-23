@@ -18,7 +18,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  *Phantom of the Opera (Idfk) - Fires out black projectiles at anyone within 12 blocks of himself after
@@ -40,7 +41,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 	private void launch(Player player) {
 		new BukkitRunnable() {
 			World world = mBoss.getWorld();
-			Vector dir = Utils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getEyeLocation());
+			Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getEyeLocation());
 			Location loc = mBoss.getEyeLocation();
 			@Override
 			public void run() {
@@ -48,7 +49,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.15, 0.15, 0.15, 0.125);
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.15, 0.15, 0.15, 0.05);
 
-				for (Player p : Utils.playersInRange(loc, 1.45)) {
+				for (Player p : PlayerUtils.playersInRange(loc, 1.45)) {
 					if (mHorseman.getSpawnLocation().distance(p.getLocation()) < HeadlessHorsemanBoss.detectionRange
 							&& p.getGameMode() == GameMode.SURVIVAL) {
 						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.15, 0.15, 0.15, 0.15);
@@ -102,7 +103,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 					world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 25, 0.4, 0.4, 0.4, 0.125);
 					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.09);
 					world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 50, 0.4, 0.4, 0.4, 0.05);
-					for (Player player : Utils.playersInRange(mBoss.getLocation(), 14)) {
+					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 14)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							launch(player);
 						}

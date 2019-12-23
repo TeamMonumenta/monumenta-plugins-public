@@ -1,20 +1,20 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
-
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellKnockAway extends Spell {
 	private Plugin mPlugin;
@@ -50,7 +50,7 @@ public class SpellKnockAway extends Spell {
 		Runnable dealer = new Runnable() {
 			@Override
 			public void run() {
-				for (Player player : Utils.playersInRange(mLauncher.getLocation(), mRadius)) {
+				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
 					player.damage(10.0f);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1), true);

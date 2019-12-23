@@ -13,7 +13,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /**
  * This is the base spell for a bolt spell.
@@ -125,7 +126,7 @@ public class SpellBaseBolt extends Spell {
 
 	@Override
 	public void run() {
-		if (Utils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
 			new BukkitRunnable() {
 				int t = 0;
 				@Override
@@ -141,7 +142,7 @@ public class SpellBaseBolt extends Spell {
 					if (t >= mDelay) {
 						this.cancel();
 
-						List<Player> players = Utils.playersInRange(mCaster.getLocation(), mDetect_range);
+						List<Player> players = PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range);
 						if (players.size() > 0) {
 							if (mSingleTarget) {
 								if (mCaster instanceof Mob) {
@@ -178,9 +179,9 @@ public class SpellBaseBolt extends Spell {
 				t++;
 				new BukkitRunnable() {
 					BoundingBox box = BoundingBox.of(mCaster.getEyeLocation(), mHitbox_radius, mHitbox_radius, mHitbox_radius);
-					Vector dir = Utils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
+					Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
 					Location detLoc = mCaster.getLocation();
-					List<Player> players = Utils.playersInRange(detLoc, 75);
+					List<Player> players = PlayerUtils.playersInRange(detLoc, 75);
 					int i = 0;
 					@Override
 					public void run() {
@@ -223,7 +224,7 @@ public class SpellBaseBolt extends Spell {
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
 	public int duration() {
-		if (Utils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
 			return mDelay + (20 * 5);
 		} else {
 			return 1;

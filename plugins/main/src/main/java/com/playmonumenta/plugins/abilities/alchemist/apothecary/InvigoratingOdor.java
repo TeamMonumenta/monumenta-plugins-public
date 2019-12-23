@@ -84,7 +84,7 @@ public class InvigoratingOdor extends Ability {
 				mWorld.spawnParticle(Particle.END_ROD, loc, 1, radius / 2, 0.15, radius / 2, 0.05);
 				mWorld.spawnParticle(Particle.REDSTONE, loc, (int) Math.pow(radius, 2) * 2, radius / 2, 0.15, radius / 2, APOTHECARY_LIGHT_COLOR);
 
-				for (Player player : PlayerUtils.getNearbyPlayers(loc, radius)) {
+				for (Player player : PlayerUtils.playersInRange(loc, radius)) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, INVIGORATING_DURATION, 0, true, true));
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.FAST_DIGGING, INVIGORATING_DURATION, 0, true, true));
 					if (getAbilityScore() > 1) {

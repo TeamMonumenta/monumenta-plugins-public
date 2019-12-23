@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Color;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

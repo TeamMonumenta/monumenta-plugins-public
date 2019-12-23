@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSkyFlare extends Spell {
 
@@ -29,7 +29,7 @@ public class SpellSkyFlare extends Spell {
 		if (t <= 0) {
 			t = 20;
 			World world = mBoss.getWorld();
-			for (Player player : Utils.playersInRange(mFloor, 50)) {
+			for (Player player : PlayerUtils.playersInRange(mFloor, 50)) {
 				if (player.getLocation().getY() - mFloor.getY() >= 3) {
 					DamageUtils.damagePercent(mBoss, player, 0.1);
 					player.setFireTicks(20 * 8);

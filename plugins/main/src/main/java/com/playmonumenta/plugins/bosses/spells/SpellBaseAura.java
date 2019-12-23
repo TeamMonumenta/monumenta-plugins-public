@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBaseAura extends Spell {
 	@FunctionalInterface
@@ -85,7 +85,7 @@ public class SpellBaseAura extends Spell {
 		if (mEffectIter >= 2 && mAuraEffect != null) {
 			mEffectIter = 0;
 
-			for (Player player : Utils.playersInRange(bossLoc, mRadius)) {
+			for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius)) {
 				Location playerLoc = player.getLocation();
 				if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
 				        Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
@@ -104,7 +104,7 @@ public class SpellBaseAura extends Spell {
 			// Loop through all nearby players and put the ones that don't have
 			// the noAuraParticles tag on a list to send particles to them
 			mParticlePlayers.clear();
-			for (Player player : Utils.playersInRange(bossLoc, 80)) {
+			for (Player player : PlayerUtils.playersInRange(bossLoc, 80)) {
 				boolean particlesOk = true;
 				for (String tag : player.getScoreboardTags()) {
 					if (tag.equals("noAuraParticles")) {

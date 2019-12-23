@@ -17,7 +17,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 
 public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
@@ -68,9 +68,9 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				float absorp = Utils.getAbsorp(player);
+				float absorp = AbsorptionUtils.getAbsorption(player);
 				absorp -= 2;
-				Utils.setAbsorp(player, absorp);
+				AbsorptionUtils.setAbsorption(player, absorp);
 
 				Location loc = player.getLocation().add(0, 1.4, 0);
 				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);

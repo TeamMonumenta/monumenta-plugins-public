@@ -82,7 +82,7 @@ public class Gilded implements BaseEnchantment {
 
 		final Location loc = player.getLocation().add(0, 0.8, 0);
 		if (NO_SELF_PARTICLES.contains(player)) {
-			for (Player other : PlayerUtils.getNearbyPlayers(player, 30, false)) {
+			for (Player other : PlayerUtils.playersInRange(player, 30, false)) {
 				other.spawnParticle(Particle.REDSTONE, loc, count, 0.3, 0.5, 0.3, color);
 			}
 		} else {

@@ -30,6 +30,7 @@ import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.Stairs.Shape;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
@@ -152,7 +153,12 @@ public class LocationUtils {
 		return false;
 	}
 
-	public static boolean hasLosToLocation(Location fromLocation, Location toLocation) {
+	public static boolean hasLineOfSight(Entity from, Entity to) {
+		return hasLineOfSight((from instanceof LivingEntity ? ((LivingEntity)from).getEyeLocation() : from.getLocation()),
+		                      (to instanceof LivingEntity ? ((LivingEntity)to).getEyeLocation() : to.getLocation()));
+	}
+
+	public static boolean hasLineOfSight(Location fromLocation, Location toLocation) {
 		int range = (int)fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 
@@ -958,4 +964,60 @@ public class LocationUtils {
 		return collides;
 	}
 
+	/* Note:
+	 * loc1 must be the location with a lesser x, y, and z coordinate than loc2.
+	 * loc2 must be the location with a greater x, y, and z coordinate than loc1.
+	 */
+	public static List<Block> getEdge(Location loc1, Location loc2) {
+		List<Block> blocks = new ArrayList<Block>();
+		int x1 = loc1.getBlockX();
+		int y1 = loc1.getBlockY();
+		int z1 = loc1.getBlockZ();
+
+		int x2 = loc2.getBlockX();
+		int y2 = loc2.getBlockY();
+		int z2 = loc2.getBlockZ();
+
+		World world = loc1.getWorld();
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y1, z1);
+			blocks.add(currentBlock);
+		}
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y2, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x1, yPoint, z1);
+			blocks.add(currentBlock);
+		}
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x2, yPoint, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x1, y1, zPoint);
+			blocks.add(currentBlock);
+		}
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x2, y2, zPoint);
+			blocks.add(currentBlock);
+		}
+		return blocks;
+	}
+
+	public static ArrayList<Block> getNearbyBlocks(Block start, int radius) {
+		ArrayList<Block> blocks = new ArrayList<Block>();
+		for (double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++) {
+			for (double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++) {
+				for (double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++) {
+					Location loc = new Location(start.getWorld(), x, y, z);
+					blocks.add(loc.getBlock());
+				}
+			}
+		}
+		return blocks;
+	}
 }

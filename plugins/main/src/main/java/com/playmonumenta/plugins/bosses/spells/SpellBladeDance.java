@@ -14,7 +14,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellBladeDance extends Spell {
 	private Plugin mPlugin;
@@ -59,7 +61,7 @@ public class SpellBladeDance extends Spell {
 					double z2 = ThreadLocalRandom.current().nextDouble(loc2.getZ(), loc1.getZ());
 					Location l2 = new Location(world, x2, y2, z2);
 
-					Vector dir = Utils.getDirectionTo(l2, l1);
+					Vector dir = LocationUtils.getDirectionTo(l2, l1);
 
 					int t = 0;
 					@Override
@@ -118,9 +120,9 @@ public class SpellBladeDance extends Spell {
 					world.spawnParticle(Particle.FLAME, mCaster.getLocation(), 150, 0, 0, 0, 0.25);
 					world.spawnParticle(Particle.CLOUD, mCaster.getLocation(), 70, 0, 0, 0, 0.25);
 					world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0);
-					for (Player player : Utils.playersInRange(mCaster.getLocation(), 4)) {
+					for (Player player : PlayerUtils.playersInRange(mCaster.getLocation(), 4)) {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, 2));
-						Utils.KnockAway(mCaster.getLocation(), player, 0.45f);
+						MovementUtils.knockAway(mCaster.getLocation(), player, 0.45f);
 					}
 				}
 			}

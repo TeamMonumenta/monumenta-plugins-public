@@ -32,8 +32,8 @@ import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellFrostNova;
 import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellShadowGlade;
 import com.playmonumenta.plugins.bosses.spells.spells_masked.SpellSummonBlazes;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class Masked extends BossAbilityGroup {
 
@@ -97,13 +97,13 @@ public class Masked extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (t == TIME_SPAWN) {
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, SPAWN_DIALOG_COMMAND);
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, SPAWN_DIALOG_COMMAND);
 					mWorld.spawnParticle(Particle.DRAGON_BREATH, mSpawnLoc, 50, 0.5, 0.5, 0.5, 0.02);
 					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 1f);
 				} else if (t == TIME_TITLE) {
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TIME_COMMAND);
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_SUBTITLE_COMMAND);
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TITLE_COMMAND);
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TIME_COMMAND);
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_SUBTITLE_COMMAND);
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TITLE_COMMAND);
 				} else if (t == TIME_BEGIN) {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
@@ -111,7 +111,7 @@ public class Masked extends BossAbilityGroup {
 					ItemStack item = new ItemStack(Material.BOW, 1);
 					item.addEnchantment(Enchantment.ARROW_DAMAGE, 3);
 					mBoss.getEquipment().setItemInMainHand(item);
-					Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, BEGIN_DIALOG_COMMAND);
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, BEGIN_DIALOG_COMMAND);
 					resumeBossFight();
 					this.cancel();
 				}
@@ -123,7 +123,7 @@ public class Masked extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = Utils.playersInRange(mBoss.getLocation(), DETECTION_RANGE).size();
+		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE).size();
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 		int health = (int)((1 - Math.pow(0.5, playerCount)) * MAXIMUM_BASE_HEALTH);
 
@@ -136,7 +136,7 @@ public class Masked extends BossAbilityGroup {
 	public void death() {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
-		Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, DEATH_DIALOG_COMMAND);
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, DEATH_DIALOG_COMMAND);
 	}
 
 	private void resumeBossFight() {
@@ -202,7 +202,7 @@ public class Masked extends BossAbilityGroup {
 			mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
 			// Put sword back in mainhand
 			mBoss.getEquipment().setItemInMainHand(mMeleeWeapon);
-			Utils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
+			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
 		});
 
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, DETECTION_RANGE, BarColor.WHITE, BarStyle.SEGMENTED_10, events);

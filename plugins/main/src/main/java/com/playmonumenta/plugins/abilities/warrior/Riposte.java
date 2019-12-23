@@ -50,7 +50,7 @@ public class Riposte extends Ability {
 			if (event.getCause() == DamageCause.ENTITY_ATTACK &&
 			    damager.getBoundingBox().expand(RIPOSTE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
 				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-				MovementUtils.KnockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
+				MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
 				if (InventoryUtils.isAxeItem(mainHand) || InventoryUtils.isSwordItem(mainHand)) {
 					if (getAbilityScore() > 1) {

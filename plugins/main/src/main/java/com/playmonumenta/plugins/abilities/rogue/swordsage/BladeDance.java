@@ -108,7 +108,7 @@ public class BladeDance extends Ability {
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 								mob.setNoDamageTicks(0);
 								EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-								MovementUtils.KnockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
+								MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
 
 								int amplifier = getAbilityScore() == 1 ? 2 : 3;
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 100, amplifier, true, true));

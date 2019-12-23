@@ -54,8 +54,12 @@ public class PlayerUtils {
 		player.teleport(player.getWorld().getSpawnLocation());
 	}
 
-	public static List<Player> getNearbyPlayers(Player player, double radius, boolean includeSourcePlayer) {
-		List<Player> players = getNearbyPlayers(player.getLocation(), radius);
+	public static List<Player> playersInRange(Player player, double radius, boolean includeSourcePlayer) {
+		return playersInRange(player, radius, includeSourcePlayer, false);
+	}
+
+	public static List<Player> playersInRange(Player player, double radius, boolean includeSourcePlayer, boolean includeNonTargetable) {
+		List<Player> players = playersInRange(player.getLocation(), radius, includeNonTargetable);
 		if (!includeSourcePlayer) {
 			players.removeIf(p -> (p == player));
 		} else {
@@ -66,17 +70,20 @@ public class PlayerUtils {
 		return players;
 	}
 
-	public static List<Player> getNearbyPlayers(Location loc, double radius) {
-		List<Player> players = new ArrayList<Player>();
+	public static List<Player> playersInRange(Location loc, double range) {
+		return playersInRange(loc, range, false);
+	}
 
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (loc.distance(player.getLocation()) <= radius && player.getGameMode() != GameMode.SPECTATOR
-			    && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
-				players.add(player);
+	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
+		List<Player> out = new ArrayList<Player>();
+
+		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+			if (player.getLocation().distance(loc) < range && player.getGameMode() != GameMode.SPECTATOR
+			    && player.getHealth() > 0 && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
+				out.add(player);
 			}
 		}
-
-		return players;
+		return out;
 	}
 
 	public static void healPlayer(Player player, double healAmount) {
@@ -91,4 +98,17 @@ public class PlayerUtils {
 		return location.clone().subtract(new Vector(Math.cos(angle), 0, Math.sin(angle)).normalize().multiply(distance));
 	}
 
+	/* Command should use @s for targeting selector */
+	private static String getExecuteCommandOnNearbyPlayers(Location loc, int radius, String command) {
+		String executeCmd = "execute as @a[x=" + (int)loc.getX() +
+		                    ",y=" + (int)loc.getY() +
+		                    ",z=" + (int)loc.getZ() +
+		                    ",distance=.." + radius + "] at @s run ";
+		return executeCmd + command;
+	}
+
+	public static void executeCommandOnNearbyPlayers(Location loc, int radius, String command) {
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+		                                   getExecuteCommandOnNearbyPlayers(loc, radius, command));
+	}
 }

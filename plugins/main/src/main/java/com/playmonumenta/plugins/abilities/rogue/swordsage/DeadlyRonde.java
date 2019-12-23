@@ -112,7 +112,7 @@ public class DeadlyRonde extends Ability {
 						int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
 						mob.setNoDamageTicks(0);
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-						MovementUtils.KnockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED);
+						MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED);
 					}
 				}
 			}

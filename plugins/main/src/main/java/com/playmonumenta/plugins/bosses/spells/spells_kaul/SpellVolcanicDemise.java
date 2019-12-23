@@ -21,7 +21,9 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Volcanic Demise:
@@ -55,7 +57,7 @@ public class SpellVolcanicDemise extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		List<Player> players = Utils.playersInRange(mCenter, 50);
+		List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
@@ -81,7 +83,7 @@ public class SpellVolcanicDemise extends Spell {
 						@Override
 						public void run() {
 							i++;
-							List<Player> players = Utils.playersInRange(mCenter, 50);
+							List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
 							players.removeIf(p -> p.getLocation().getY() >= 61);
 							Collections.shuffle(players);
 							for (Player player : players) {
@@ -158,19 +160,19 @@ public class SpellVolcanicDemise extends Spell {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
 					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
-					for (Player player : Utils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
 							DamageUtils.damage(mBoss, player, 100);
-							Utils.KnockAway(loc, player, 0.5f, 0.65f);
+							MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
 						} else if (pBox.overlaps(box)) {
 							DamageUtils.damage(mBoss, player, 42);
 							if (!player.isBlocking()) {
-								Utils.KnockAway(loc, player, 0.5f, 0.65f);
+								MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
 							}
 						}
 					}
-					for (Block block : Utils.getNearbyBlocks(loc.getBlock(), 4)) {
+					for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 4)) {
 						if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) {
 							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 								block.setType(Material.NETHERRACK);

@@ -21,7 +21,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Raise Jungle/Earth Elementals (dirt): In random spots in the arena,
@@ -76,7 +77,7 @@ public class SpellRaiseJungle extends Spell {
 		if (mY > 0) {
 			loc.setY(mY);
 		}
-		List<Player> players = Utils.playersInRange(loc, mDetectRange);
+		List<Player> players = PlayerUtils.playersInRange(loc, mDetectRange);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		int num = 0;
 		if (players.size() == 1) {
@@ -145,7 +146,7 @@ public class SpellRaiseJungle extends Spell {
 								if (raised) {
 									Block block = ele.getLocation().getBlock();
 									if (block.getType().isSolid() || block.isLiquid()) {
-										Utils.KnockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
+										MovementUtils.knockAway(mBoss.getLocation(), ele, -2.25f, 0.7f);
 									}
 								}
 

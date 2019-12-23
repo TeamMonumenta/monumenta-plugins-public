@@ -66,7 +66,7 @@ public class FrostNova extends Ability {
 		}
 
 		// Extinguish fire on all nearby players
-		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
+		for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
 			if (player.getFireTicks() > 1) {
 				player.setFireTicks(1);
 			}

@@ -90,7 +90,7 @@ public class FlashSword extends Ability {
 						}
 
 						if (t >= FSWORD_SWINGS) {
-							MovementUtils.KnockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
+							MovementUtils.knockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
 						} else {
 							mob.setVelocity(velocity);
 						}

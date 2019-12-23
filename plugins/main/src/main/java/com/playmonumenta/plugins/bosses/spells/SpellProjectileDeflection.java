@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionEffect;
 
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class SpellProjectileDeflection extends Spell {
 	private LivingEntity mBoss;
@@ -39,7 +39,7 @@ public class SpellProjectileDeflection extends Spell {
 						}
 					}
 				}
-				deflected.setVelocity(Utils.getDirectionTo(player.getLocation().add(0, 1.25, 0), deflected.getLocation()).multiply(proj.getVelocity().length()));
+				deflected.setVelocity(LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), deflected.getLocation()).multiply(proj.getVelocity().length()));
 				proj.remove();
 			}
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);

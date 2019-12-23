@@ -16,7 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * (Ultimate) Hallow’s End - A pillar of smoke and flames appears on the horseman, after 1 second the area
@@ -66,12 +67,12 @@ public class SpellHallowsEnd extends Spell {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 35, 0, 0, 0, 0.1);
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 65, 0, 0, 0, 0.15);
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-					for (Player player : Utils.playersInRange(loc, 4)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange
 								&& player.getGameMode() == GameMode.SURVIVAL) {
 							DamageUtils.damage(mBoss, player, 35);
 							player.setFireTicks(20 * 8);
-							Utils.KnockAway(loc, player, 0.50f, 1.5f);
+							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 							if (bounce) {
 								mHit = true;
 							}
@@ -107,7 +108,7 @@ public class SpellHallowsEnd extends Spell {
 
 				if (!init) {
 					init = true;
-					List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3;
@@ -124,7 +125,7 @@ public class SpellHallowsEnd extends Spell {
 					mHit = false;
 					t = 0;
 					hits++;
-					List<Player> players = Utils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
+					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
 					int amt = players.size() / 3;

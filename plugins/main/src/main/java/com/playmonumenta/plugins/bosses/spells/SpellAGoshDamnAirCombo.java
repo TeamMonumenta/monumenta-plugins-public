@@ -12,7 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 
 
 public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
@@ -63,7 +63,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 							player.getWorld().spawnParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.175);
 							player.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
 							player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc, 75, 3, 3, 3, 0);
-							Utils.KnockAway(boss.getLocation(), player, 0.65f);
+							MovementUtils.knockAway(boss.getLocation(), player, 0.65f);
 							boss.setVelocity(new Vector(0, -5, 0));
 							new BukkitRunnable() {
 								int t = 0;

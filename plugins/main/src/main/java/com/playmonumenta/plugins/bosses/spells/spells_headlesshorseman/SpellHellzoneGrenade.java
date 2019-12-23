@@ -18,7 +18,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Hellzone Grenade - The horseman fires a pumpkin (Fireball with pumpkin block maybe) that
@@ -51,7 +52,7 @@ public class SpellHellzoneGrenade extends Spell {
 		mHorseman.disableShield();
 		World world = mBoss.getWorld();
 		// Choose random player within range that has line of sight to boss
-		List<Player> players = Utils.playersInRange(mCenter, mRange);
+		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 
 		new BukkitRunnable() {
 			int t = 0;
@@ -65,7 +66,7 @@ public class SpellHellzoneGrenade extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_SNOWBALL_THROW, 3, 0.65f);
 				Collections.shuffle(players);
 				for (Player player : players) {
-					if (Utils.hasLineOfSight(mBoss.getEyeLocation(), player)) {
+					if (LocationUtils.hasLineOfSight(mBoss, player)) {
 						launch(player);
 						break;
 					}
@@ -105,7 +106,7 @@ public class SpellHellzoneGrenade extends Spell {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
-						for (Player player : Utils.playersInRange(fallingBlock.getLocation(), 4)) {
+						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								if (!player.isBlocking()) {
 									DamageUtils.damage(mBoss, player, 35);
@@ -127,7 +128,7 @@ public class SpellHellzoneGrenade extends Spell {
 								world.spawnParticle(Particle.SMOKE_LARGE, loc, 4, 1.5, 0.15, 1.5, 0.025);
 
 								if (t % 10 == 0) {
-									for (Player player : Utils.playersInRange(fallingBlock.getLocation(), 4)) {
+									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 											DamageUtils.damagePercent(mBoss, player, 0.05);
 											player.setFireTicks(20 * 3);

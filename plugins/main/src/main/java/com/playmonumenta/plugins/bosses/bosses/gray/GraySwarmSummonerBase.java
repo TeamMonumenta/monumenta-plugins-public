@@ -20,7 +20,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
-import com.playmonumenta.plugins.bosses.utils.Utils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int SUMMON_TIME = 200;
@@ -42,7 +44,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
 				() -> {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
-					List <Player> targets = Utils.playersInRange(boss.getLocation(), 20);
+					List <Player> targets = PlayerUtils.playersInRange(boss.getLocation(), 20);
 					Collections.shuffle(targets);
 					switch(targets.size()) {
 					case 0:
@@ -79,7 +81,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 								public void run() {
 									try {
 										summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
-										Entity entity = Utils.summonEntityAt(summonLoc, mobType, mobNBT);
+										Entity entity = EntityUtils.summonEntityAt(summonLoc, mobType, mobNBT);
 										if (entity != null && entity instanceof Mob) {
 											Mob mob = (Mob)entity;
 											mob.setTarget(player);
@@ -135,8 +137,8 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 						return true;
 					}
 
-					for (Player player : Utils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
-						if (Utils.hasLineOfSight(boss.getEyeLocation(), player)) {
+					for (Player player : PlayerUtils.playersInRange(boss.getLocation(), PLAYER_RANGE)) {
+						if (LocationUtils.hasLineOfSight(boss, player)) {
 							return true;
 						}
 					}

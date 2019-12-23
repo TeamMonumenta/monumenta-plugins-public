@@ -36,7 +36,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	private boolean testRandomChance() {
 		int level = 0;
-		for (Player player : PlayerUtils.getNearbyPlayers(mPlayer, PROVISIONS_RANGE, true)) {
+		for (Player player : PlayerUtils.playersInRange(mPlayer, PROVISIONS_RANGE, true)) {
 			Ability provisions = AbilityManager.getManager().getPlayerAbility(player, SacredProvisions.class);
 			if (provisions != null) {
 				Integer score = provisions.getAbilityScore();

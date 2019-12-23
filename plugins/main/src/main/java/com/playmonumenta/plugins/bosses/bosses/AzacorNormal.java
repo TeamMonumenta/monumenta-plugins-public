@@ -31,8 +31,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
 import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
 import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import com.playmonumenta.plugins.bosses.utils.Utils;
 
 public class AzacorNormal extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacornorm";
@@ -106,7 +106,7 @@ public class AzacorNormal extends BossAbilityGroup {
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		int player_count = Utils.playersInRange(mSpawnLoc, detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mSpawnLoc, detectionRange).size();
 		events.put(100, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?\",\"color\":\"dark_red\"}]");
 			if (player_count >= 3) {
@@ -126,13 +126,13 @@ public class AzacorNormal extends BossAbilityGroup {
 
 
 	private void randomMinion(String tellraw) {
-		Azacor.randomMinion(tellraw, mSpawnLoc, mRand, 100.0 + Utils.playersInRange(mSpawnLoc, detectionRange).size() * 50.0);
+		Azacor.randomMinion(tellraw, mSpawnLoc, mRand, 100.0 + PlayerUtils.playersInRange(mSpawnLoc, detectionRange).size() * 50.0);
 	}
 
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = Utils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {
@@ -145,17 +145,17 @@ public class AzacorNormal extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect @s minecraft:blindness 2 2");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Azacor\",\"color\":\"dark_gray\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Dark Summoner\",\"color\":\"gray\",\"bold\":true}]");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Azacor\",\"color\":\"dark_gray\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Dark Summoner\",\"color\":\"gray\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 	@Override
 	public void death() {
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		Utils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
-		for (Player player : Utils.playersInRange(mBoss.getLocation(), detectionRange)) {
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange)) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}
