@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.spells_kaul;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,11 +17,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -34,62 +41,78 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * like his passive) with a timer, to be determined to the dungeon’s length
  * (Players that got banished get strength 1 and speed 1 for 30s if they survived)
  * (triggers once in phase 2 , and twice in phase 3)
+ *
+ *
+ * This is a very weird skill implementation wise. Only one instance can ever exist
  */
-public class SpellKaulsJudgement extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private LivingEntity mTp = null;
-	private Random rand = new Random();
-	private int uses = 0;
-	private final int mMax;
-	private boolean onCooldown = false;
-	private boolean mPhase3;
-
+public class SpellKaulsJudgement extends Spell implements Listener {
+	private static final int KAULS_JUDGEMENT_RANGE = 50;
 	private static final String KAULS_JUDGEMENT_TP_TAG = "KaulsJudgementTPTag";
 	private static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
 	private static final String mob = "{ArmorDropChances:[-327.67f,-327.67f,-327.67f,-327.67f],CustomName:\"{\\\"text\\\":\\\"§6Stoneborn Immortal\\\"}\",IsBaby:0,Health:30.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:10395294},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:6191160},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:10395294},Damage:0}},{id:\"minecraft:player_head\",Count:1b,tag:{SkullOwner:{Id:\"86d08d4a-3cc6-46fa-61cf-c54d58373c70\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk4ZDNjMzFmOWJjNTc1Mzk4MzdkMTc2NTdiOWJhZTczNWE4OTZmMWEwNzc4MTZlZDk1NzU3YzE1NDJhYTMifX19\"}]}}}}],Attributes:[{Base:30,Name:\"generic.maxHealth\"},{Base:0.21d,Name:\"generic.movementSpeed\"},{Base:0.0f,Name:\"zombie.spawnReinforcements\"},{Base:60,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,-327.67f],PersistenceRequired:1b,Tags:[\"Elite\",\"deleteelite\"],ActiveEffects:[{Duration:1999980,Id:5,Amplifier:0},{Duration:1999980,Id:11,Amplifier:4}],HandItems:[{id:\"minecraft:shield\",Count:1b,tag:{BlockEntityTag:{id:\"minecraft:banner\",Patterns:[{Pattern:\"tt\",Color:7},{Pattern:\"cs\",Color:7},{Pattern:\"flo\",Color:7},{Pattern:\"gru\",Color:7}],Base:8},Enchantments:[{lvl:30s,id:\"minecraft:sharpness\"}],AttributeModifiers:[{UUIDMost:-1113277120483211494L,UUIDLeast:-5231964292071775789L,Amount:0.2d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}},{id:\"minecraft:shield\",Count:1b,tag:{BlockEntityTag:{id:\"minecraft:banner\",Patterns:[{Pattern:\"tt\",Color:7},{Pattern:\"cs\",Color:7},{Pattern:\"flo\",Color:7},{Pattern:\"gru\",Color:7}],Base:8},Enchantments:[{lvl:30s,id:\"minecraft:sharpness\"}],AttributeModifiers:[{UUIDMost:-1113277120483211494L,UUIDLeast:-5231964292071775789L,Amount:0.2d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}]}";
-	public SpellKaulsJudgement(Plugin plugin, LivingEntity boss, double range, int max, boolean phase3) {
-		mPlugin = plugin;
-		mBoss = boss;
-		mRange = range;
-		mMax = max;
-		mPhase3 = phase3;
-		for (Entity e : boss.getWorld().getEntities()) {
+	private static final int KAULS_JUDGEMENT_TIME = 20 * 55;
+
+	private static SpellKaulsJudgement INSTANCE = null;
+
+	private final Plugin mPlugin = Plugin.getInstance();
+	private final Location mBossLoc;
+	private LivingEntity mTp = null;
+	private boolean onCooldown = false;
+
+	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
+	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
+
+	private SpellKaulsJudgement(Location bossLoc) {
+		mBossLoc = bossLoc;
+		for (Entity e : bossLoc.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_TP_TAG) && e instanceof LivingEntity) {
 				mTp = (LivingEntity) e;
 				break;
 			}
 		}
+
+		/* Register this instance as an event handler so it can catch player events */
+		mPlugin.getServer().getPluginManager().registerEvents(this, mPlugin);
+	}
+
+	/*
+	 * If a boss is specified, overwrites the current boss entity
+	 * If no boss is specified (null), does not create an instance
+	 */
+	public static SpellKaulsJudgement getInstance(Location bossLoc) {
+		if (INSTANCE == null) {
+			if (bossLoc == null) {
+				return null;
+			} else {
+				INSTANCE = new SpellKaulsJudgement(bossLoc);
+			}
+		}
+		return INSTANCE;
 	}
 
 	@Override
 	public void run() {
-		uses++;
-
 		onCooldown = true;
-		World world = mBoss.getWorld();
+		World world = mBossLoc.getWorld();
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
 				onCooldown = false;
 			}
-
 		}.runTaskLater(mPlugin, 20 * 90);
-		for (Entity e : mBoss.getWorld().getEntities()) {
+
+		for (Entity e : world.getEntities()) {
 			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_TAG)) {
 				e.remove();
 			}
 		}
 
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-				for (Entity e : mBoss.getWorld().getEntities()) {
+				for (Entity e : world.getEntities()) {
 					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_SPAWN_TAG)) {
 						Location loc = e.getLocation().add(0, 1, 0);
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0.3, 0.45, 0.3, 1);
@@ -97,133 +120,147 @@ public class SpellKaulsJudgement extends Spell {
 					}
 				}
 			}
-
 		}.runTaskLater(mPlugin, 50);
-		new BukkitRunnable() {
 
+		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Entity e : mBoss.getWorld().getEntities()) {
+				for (Entity e : world.getEntities()) {
 					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_TAG)) {
 						e.remove();
 					}
 				}
 			}
+		}.runTaskLater(mPlugin, KAULS_JUDGEMENT_TIME);
 
-		}.runTaskLater(mPlugin, 20 * 55);
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");
 		}
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 2);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
+		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 2);
+		world.spawnParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0);
 		double amount = Math.ceil(players.size() / 2);
 		if (amount < 2) {
 			amount++;
 		}
-		List<Player> judge = new ArrayList<Player>();
-		for (int i = 0; i < amount; i++) {
-			Player player = players.get(rand.nextInt(players.size()));
-			if (!judge.contains(player)) {
-				judge.add(player);
-			} else {
-				amount++;
-			}
+
+		Collections.shuffle(players);
+		while (players.size() > amount) {
+			players.remove(0);
 		}
-		for (Player player : judge) {
-			judge(player);
+
+		mOrigPlayerLocs.clear();
+		for (Player player : players) {
+			mOrigPlayerLocs.put(player, player.getLocation());
 		}
+		mJudgedPlayers.addAll(players);
+
+		// This is in a separate function to ensure it doesn't use local variables from this function
+		judge();
 	}
 
-	public void judge(Player player) {
-		int time = mPhase3 ? 20 * 50 : 20 * 53;
+	private void judge() {
 		new BukkitRunnable() {
-			World world = player.getWorld();
-			Location loc = player.getLocation();
+			World world = mBossLoc.getWorld();
 			int t = 0;
+
 			@Override
 			public void run() {
 				t++;
-				world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
-				world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
-				if (player.isDead()) {
-					this.cancel();
-					return;
-				}
-				if (t >= 20 * 2) {
-					this.cancel();
-					player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
-					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-					world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
-					world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
-					player.teleport(mTp);
-					player.playSound(mTp.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-					player.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
-					player.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
-					player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
-					player.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "ESCAPE", "", 1, 20 * 3, 1);
-					new BukkitRunnable() {
-						com.playmonumenta.plugins.Plugin mMainPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
-						int t = 0;
-						@Override
-						public void run() {
-							t++;
-							world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0);
+				if (t < 20 * 2) {
+					/* pre-judgement particles */
+					for (Player player : mJudgedPlayers) {
+						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0);
+						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0);
+					}
+				} else if (t == 20 * 2) {
+					/* Start judgement */
+					for (Player player : mJudgedPlayers) {
+						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
+						world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
+						world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+						player.teleport(mTp);
+						player.playSound(mTp.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+						player.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
+						player.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
+						player.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "ESCAPE", "", 1, 20 * 3, 1);
+					}
+				} else if (t < KAULS_JUDGEMENT_TIME) {
+					/* Judgement ticks - anyone who loses the tag early must have succeeded */
+					Iterator<Player> iter = mJudgedPlayers.iterator();
+					while (iter.hasNext()) {
+						Player player = iter.next();
 
-							if (player.isDead() || t >= time) {
-								if (player.isDead()) {
-									player.spigot().respawn();
-								}
-								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-								if (mMainPlugin != null) {
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.WEAKNESS, 30 * 20, 0));
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.SLOW, 30 * 20, 1));
-								}
-								player.teleport(loc);
-								world.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
-								world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
-								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
-								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
-								world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
-								player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
-								player.removeScoreboardTag(KAULS_JUDGEMENT_TAG);
-								this.cancel();
-								return;
-							}
-
-							if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
-								player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-								if (mMainPlugin != null) {
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
-									PotionUtils.applyPotion(mMainPlugin, player, new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
-								}
-								player.teleport(loc);
-								world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-								world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
-								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
-								player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
-								this.cancel();
-								return;
-							}
+						world.spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0);
+						if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
+							iter.remove();
+							succeed(player);
 						}
-					}.runTaskTimer(mPlugin, 0, 1);
+					}
+				} else {
+					/* Judgement ends - anyone left in judgement fails
+					 * Make a copy to avoid concurrent modification exceptions
+					 */
+					for (Player player : new ArrayList<Player>(mJudgedPlayers)) {
+						fail(player);
+					}
+					mOrigPlayerLocs.clear();
+					mJudgedPlayers.clear();
+					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
+	private void fail(Player player) {
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.WEAKNESS, 30 * 20, 0));
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SLOW, 30 * 20, 1));
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
+		player.getWorld().spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData());
+		player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
+
+		endCommon(player);
+	}
+
+	private void succeed(Player player) {
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+		player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
+
+		endCommon(player);
+	}
+
+	private void endCommon(Player player) {
+		player.removeScoreboardTag(KAULS_JUDGEMENT_TAG);
+
+		player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
+		if (player.getFireTicks() > 0) {
+			player.setFireTicks(1);
+		}
+		Location loc = mOrigPlayerLocs.get(player);
+		if (loc != null) {
+			player.teleport(loc);
+			mOrigPlayerLocs.remove(player);
+		}
+		player.getWorld().spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1);
+		player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15);
+		mJudgedPlayers.remove(player);
+	}
+
 	@Override
 	public boolean canRun() {
-		return mTp != null && uses < mMax && !onCooldown;
+		return mTp != null && !onCooldown;
 	}
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 16;
 	}
 
@@ -232,4 +269,32 @@ public class SpellKaulsJudgement extends Spell {
 		return 20 * 4;
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void EntityDamageEvent(EntityDamageEvent event) {
+		Entity damagee = event.getEntity();
+
+		if (damagee instanceof Player) {
+			Player player = (Player)damagee;
+			if (mOrigPlayerLocs.containsKey(player)) {
+				/* A player currently in judgement took damage */
+				if (event.getFinalDamage() > player.getHealth()) {
+					/* This would kill the player */
+
+					fail(player);
+					event.setDamage(0.1);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PlayerQuitEvent(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+
+		if (mOrigPlayerLocs.containsKey(player)) {
+			/* A player currently in judgement logged out */
+
+			fail(player);
+		}
+	}
 }

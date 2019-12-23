@@ -93,7 +93,6 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				// Ending particles on boss
 				() -> {
 					boss.getWorld().spawnParticle(Particle.SMOKE_LARGE, boss.getLocation(), 200, 2, 2, 2, 0);
-
 				}
 			),
 			new SpellEarthenRupture(plugin, mBoss),

@@ -186,12 +186,14 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
 		                  new SpellArachnopocolypse(mPlugin, mBoss, mCenter.getLocation(), detectionRange)));
 
+		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
+
 		SpellManager phase2Spells = new SpellManager(
 		    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, false, mCenter.getLocation()),
 		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
 		                  new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mCenter.getLocation().getY()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, false)));
+		                  judgement));
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 
@@ -200,7 +202,7 @@ public class Kaul extends BossAbilityGroup {
 		                  new SpellEarthsWrath(mPlugin, mBoss, mCenter.getLocation().getY()),
 		                  new SpellVolcanicDemise(plugin, mBoss, 40D, mCenter.getLocation()),
 		                  new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-		                  new SpellKaulsJudgement(mPlugin, mBoss, detectionRange, 1, true)));
+		                  judgement));
 
 		SpellManager phase4Spells = new SpellManager(
 			    Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange / 2, true, mCenter.getLocation()),
