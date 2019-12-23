@@ -1,5 +1,0 @@
-name: MonumentaBosses
-main: com.playmonumenta.bossfights.Plugin
-depend: [MonumentaNMS, CommandAPI, MonumentaMain]
-version: dev
-api-version: 1.13
