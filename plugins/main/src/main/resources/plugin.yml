@@ -1,8 +1,8 @@
-name: MonumentaMain
+name: Monumenta
 main: com.playmonumenta.plugins.Plugin
 version: 0.0.1
 api-version: 1.13
-depend: [MonumentaNMS]
+depend: []
 softdepend: [PlaceholderAPI,ChestSort,LuckPerms]
 commands:
   testnoscore:
