@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -70,7 +70,7 @@ public class SpellHallowsEnd extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange
 								&& player.getGameMode() == GameMode.SURVIVAL) {
-							DamageUtils.damage(mBoss, player, 35);
+							BossUtils.bossDamage(mBoss, player, 35);
 							player.setFireTicks(20 * 8);
 							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 							if (bounce) {

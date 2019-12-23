@@ -55,7 +55,7 @@ import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellVolcanicDemise;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -168,7 +168,7 @@ public class Kaul extends BossAbilityGroup {
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 					if (player.isSleeping()) {
-						DamageUtils.damage(mBoss, player, 22);
+						BossUtils.bossDamage(mBoss, player, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
@@ -217,23 +217,17 @@ public class Kaul extends BossAbilityGroup {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
-				double newHealth = player.getHealth() - (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.4);
-				if (newHealth <= 0) {
-					player.damage(100, mBoss);
-				} else {
-					player.setHealth(newHealth);
-					player.damage(1, mBoss);
+				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
+					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
 					world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15);
 					cd.add(player.getUniqueId());
 					new BukkitRunnable() {
-
 						@Override
 						public void run() {
 							cd.remove(player.getUniqueId());
 						}
-
 					}.runTaskLater(mPlugin, 10);
 				}
 				if (player.getLocation().getBlock().isLiquid()) {
@@ -812,21 +806,20 @@ public class Kaul extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+		/* Boss deals AoE damage when melee'ing a player */
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity().getLocation().distance(mBoss.getLocation()) <= 2) {
 			if (!cooldown) {
 				cooldown = true;
 				new BukkitRunnable() {
-
 					@Override
 					public void run() {
 						cooldown = false;
 					}
-
 				}.runTaskLater(mPlugin, 20);
 				UUID uuid = event.getEntity().getUniqueId();
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 					if (!player.getUniqueId().equals(uuid)) {
-						player.damage(event.getDamage(), mBoss);
+						BossUtils.bossDamage(mBoss, player, event.getDamage());
 					}
 				}
 				World world = mBoss.getWorld();

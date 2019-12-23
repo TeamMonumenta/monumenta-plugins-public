@@ -38,7 +38,7 @@ import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellEruption;
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffPools;
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellFluffingDeath;
 import com.playmonumenta.plugins.bosses.spells.spells_cluckingop.SpellOmegaLeap;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -93,7 +93,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			// Attack hit a player
 			(Player player) -> {
 				player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 20, 1, 1, 1, 0);
-				player.damage(1, boss);
+				BossUtils.bossDamage(boss, player, 1);
 			},
 			// Attack particles
 			(Location loc) -> {
@@ -126,10 +126,10 @@ public class RabbitGodBoss extends BossAbilityGroup {
 				if (!blocked) {
 					// Check to see if the player is shielding
 					if (player.isBlocking()) {
-						DamageUtils.damage(mBoss, player, 1);
+						BossUtils.bossDamage(mBoss, player, 1);
 						player.setCooldown(Material.SHIELD, 10);
 					} else {
-						DamageUtils.damage(null, player, 1);
+						BossUtils.bossDamage(null, player, 1);
 					}
 				}
 			}

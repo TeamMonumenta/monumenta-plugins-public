@@ -14,7 +14,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -64,7 +64,7 @@ public class SpellEarthsWrath extends Spell {
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
 									if (player.getBoundingBox().overlaps(box)) {
-										DamageUtils.damage(mBoss, player, 24);
+										BossUtils.bossDamage(mBoss, player, 24);
 										MovementUtils.knockAway(mBoss.getLocation(), player, -0.5f, 0.65f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));

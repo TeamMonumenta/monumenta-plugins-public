@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellRaiseJungle;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -191,13 +191,13 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 					return;
 				}
 				if (!blocked) {
-					DamageUtils.damage(boss, player, 22);
+					BossUtils.bossDamage(boss, player, 22);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, 2.5)) {
 						if (p.getLocation().getY() <= 60) {
-							DamageUtils.damage(boss, p, 16);
+							BossUtils.bossDamage(boss, p, 16);
 							MovementUtils.knockAway(loc, p, 0.3f);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));

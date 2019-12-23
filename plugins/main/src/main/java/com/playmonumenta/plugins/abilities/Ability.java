@@ -27,9 +27,9 @@ import org.bukkit.inventory.ItemStack;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 

@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellOmegaLeap extends Spell {
@@ -67,7 +68,7 @@ public class SpellOmegaLeap extends Spell {
 							}
 							for (Player player : PlayerUtils.playersInRange(l, radius)) {
 								if (player.getLocation().toVector().isInSphere(l.toVector(), radius)) {
-									player.damage(1, mBoss);
+									BossUtils.bossDamage(mBoss, player, 1);
 								}
 							}
 							radius += 1;

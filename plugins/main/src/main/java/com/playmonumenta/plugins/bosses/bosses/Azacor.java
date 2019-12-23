@@ -29,9 +29,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
-import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
 import com.playmonumenta.plugins.bosses.spells.SpellKnockAway;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -90,7 +90,7 @@ public class Azacor extends BossAbilityGroup {
 			                       loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 			                       if (!blocked) {
-									   DamageUtils.damagePercent(mBoss, player, 0.75);
+									   BossUtils.bossDamagePercent(mBoss, player, 0.75);
 			                           player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2), true);
 			                       } else {
 			                           Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0}");

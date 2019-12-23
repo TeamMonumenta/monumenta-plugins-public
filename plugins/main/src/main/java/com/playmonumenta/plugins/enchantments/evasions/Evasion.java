@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class Evasion implements BaseEnchantment {
 

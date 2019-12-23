@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -60,7 +60,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 
 						}
 
-						DamageUtils.damage(mBoss, p, 28);
+						BossUtils.bossDamage(mBoss, p, 28);
 						world.spawnParticle(Particle.SMOKE_LARGE, p.getLocation().add(0, 3.5, 0), 20, 0.4, 0.4, 0.4, 0.1);
 						world.spawnParticle(Particle.SMOKE_NORMAL, p.getLocation().add(0, 3.5, 0), 45, 0.4, 0.4, 0.4, 0.145);
 						world.spawnParticle(Particle.SPELL_WITCH, p.getLocation().add(0, 3.5, 0), 60, 0.4, 0.4, 0.4, 0.1);

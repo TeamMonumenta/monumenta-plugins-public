@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -109,7 +109,7 @@ public class SpellHellzoneGrenade extends Spell {
 						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								if (!player.isBlocking()) {
-									DamageUtils.damage(mBoss, player, 35);
+									BossUtils.bossDamage(mBoss, player, 35);
 									player.setFireTicks(20 * 3);
 								} else {
 									player.setCooldown(Material.SHIELD, 20 * 12);
@@ -130,7 +130,7 @@ public class SpellHellzoneGrenade extends Spell {
 								if (t % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-											DamageUtils.damagePercent(mBoss, player, 0.05);
+											BossUtils.bossDamagePercent(mBoss, player, 0.05);
 											player.setFireTicks(20 * 3);
 										}
 									}

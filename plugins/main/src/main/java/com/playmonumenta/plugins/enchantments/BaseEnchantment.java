@@ -21,8 +21,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public interface BaseEnchantment {

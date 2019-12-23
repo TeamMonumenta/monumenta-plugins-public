@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -71,7 +71,7 @@ public class SpellBatBombs extends Spell {
 								for (Player player : PlayerUtils.playersInRange(loc, 6)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 										if (!player.isBlocking()) {
-											DamageUtils.damage(bat, player, 32);
+											BossUtils.bossDamage(bat, player, 32);
 											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
 										} else {
 											player.setCooldown(Material.SHIELD, 20 * 8);

@@ -12,8 +12,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class EvasionEnchant extends Ability {
 	public double chance = 0;

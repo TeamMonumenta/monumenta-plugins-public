@@ -7,6 +7,8 @@ import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 
+import com.playmonumenta.plugins.utils.BossUtils;
+
 
 public class SnowballDamageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowballdamage";
@@ -33,7 +35,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				player.damage(2.0, mBoss);
+				BossUtils.bossDamage(mBoss, player, 2);
 			}
 		}
 	}

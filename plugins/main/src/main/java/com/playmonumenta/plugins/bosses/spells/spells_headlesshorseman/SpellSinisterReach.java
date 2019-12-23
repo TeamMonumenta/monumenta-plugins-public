@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -105,7 +105,7 @@ public class SpellSinisterReach extends Spell {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
 								if (dir.dot(toVector) > .33) {
 									if (!player.isBlocking()) {
-										DamageUtils.damage(mBoss, player, 32);
+										BossUtils.bossDamage(mBoss, player, 32);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
 									} else {

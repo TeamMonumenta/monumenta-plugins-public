@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSkyFlare extends Spell {
@@ -31,7 +31,7 @@ public class SpellSkyFlare extends Spell {
 			World world = mBoss.getWorld();
 			for (Player player : PlayerUtils.playersInRange(mFloor, 50)) {
 				if (player.getLocation().getY() - mFloor.getY() >= 3) {
-					DamageUtils.damagePercent(mBoss, player, 0.1);
+					BossUtils.bossDamagePercent(mBoss, player, 0.1);
 					player.setFireTicks(20 * 8);
 					world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
 					world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 15, 0.4, 0.4, 0.4, 0.1);

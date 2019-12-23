@@ -39,6 +39,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
 					int pot_pow = (int)(power * ((radius - distance) / radius));
+					// TODO: Convert to boss damage so it can be evaded
 					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 				}

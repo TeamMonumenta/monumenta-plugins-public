@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
@@ -119,7 +119,7 @@ public class SpellLightningStrike extends Spell {
 						}
 
 						if ((p.getTicksLived() - lastStrikeTime) > NO_STRIKE_PERIOD) {
-							DamageUtils.damagePercent(mBoss, p, 0.4);
+							BossUtils.bossDamagePercent(mBoss, p, 0.4);
 
 							/* Store the current time the player was struck */
 							p.setMetadata(LIGHTNING_STRIKE_METAKEY, new FixedMetadataValue(mPlugin, p.getTicksLived()));

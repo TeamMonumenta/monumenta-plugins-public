@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -82,7 +82,7 @@ public class SpellBurningVengence extends Spell {
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									DamageUtils.damage(mBoss, player, 20);
+									BossUtils.bossDamage(mBoss, player, 20);
 									player.setFireTicks(20 * 5);
 									Vector direction = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 									player.setVelocity(direction.multiply(-0.5));
@@ -106,7 +106,7 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									DamageUtils.damage(mBoss, player, 37);
+									BossUtils.bossDamage(mBoss, player, 37);
 									MovementUtils.knockAway(loc, player, 0.7f);
 								}
 							}

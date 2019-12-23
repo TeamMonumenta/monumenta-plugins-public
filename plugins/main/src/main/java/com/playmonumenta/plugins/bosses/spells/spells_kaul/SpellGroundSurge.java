@@ -21,7 +21,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -122,7 +122,7 @@ public class SpellGroundSurge extends Spell {
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(box)) {
 										this.cancel();
-										DamageUtils.damage(mBoss, player, 20);
+										BossUtils.bossDamage(mBoss, player, 20);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1.25f);
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
@@ -180,7 +180,7 @@ public class SpellGroundSurge extends Spell {
 															&& !_player.getUniqueId().equals(player.getUniqueId())
 															&& !hit.contains(_player.getUniqueId())) {
 														hit.add(_player.getUniqueId());
-														DamageUtils.damage(mBoss, _player, 18);
+														BossUtils.bossDamage(mBoss, _player, 18);
 														_player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(mBoss.getLocation(), _player, 0.175f, 0.85f);
 														world.spawnParticle(Particle.SMOKE_LARGE, _bLoc, 10, 0, 0, 0, 0.2);

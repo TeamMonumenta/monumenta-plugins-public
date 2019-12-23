@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -56,7 +56,7 @@ public class SpellEarthenRupture extends Spell {
 					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
 					for (Player player : PlayerUtils.playersInRange(loc, 6)) {
-						DamageUtils.damage(mBoss, player, 23);
+						BossUtils.bossDamage(mBoss, player, 23);
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}

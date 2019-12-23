@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -73,10 +73,10 @@ public class Virius extends BossAbilityGroup {
 							if (!blocked) {
 								// Check to see if the player is shielding
 								if (player.isBlocking()) {
-									DamageUtils.damage(boss, player, 20);
+									BossUtils.bossDamage(boss, player, 20);
 									player.setCooldown(Material.SHIELD, 6 * 20);
 								} else {
-									DamageUtils.damage(boss, player, 20);
+									BossUtils.bossDamage(boss, player, 20);
 								}
 							}
 						})

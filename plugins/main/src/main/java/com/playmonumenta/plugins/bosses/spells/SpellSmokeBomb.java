@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSmokeBomb extends Spell {
@@ -49,7 +49,7 @@ public class SpellSmokeBomb extends Spell {
 			@Override
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
-					DamageUtils.damage(null, player, 2);
+					BossUtils.bossDamage(null, player, 2);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0), true);
 				}

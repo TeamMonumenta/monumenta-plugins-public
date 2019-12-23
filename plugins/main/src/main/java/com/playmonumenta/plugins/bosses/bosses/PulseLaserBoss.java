@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class PulseLaserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pulselaser";
@@ -51,10 +51,10 @@ public class PulseLaserBoss extends BossAbilityGroup {
 						if (!blocked) {
 							// Check to see if the player is shielding
 							if (player.isBlocking()) {
-								DamageUtils.damage(boss, player, 18);
+								BossUtils.bossDamage(boss, player, 18);
 								player.setCooldown(Material.SHIELD, 6 * 20);
 							} else {
-								DamageUtils.damage(boss, player, 18);
+								BossUtils.bossDamage(boss, player, 18);
 							}
 						}
 					})

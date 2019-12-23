@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellChangeFloor;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
 import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -88,7 +88,7 @@ public class AzacorNormal extends BossAbilityGroup {
 			                       loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3);
 
 			                       if (!blocked) {
-			                           DamageUtils.damagePercent(mBoss, player, 0.74);
+			                           BossUtils.bossDamagePercent(mBoss, player, 0.74);
 			                       } else {
 			                           Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0}");
 			                       }

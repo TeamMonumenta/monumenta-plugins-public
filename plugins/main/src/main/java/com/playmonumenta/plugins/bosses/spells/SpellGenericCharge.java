@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 
 public class SpellGenericCharge extends SpellBaseCharge {
 	public SpellGenericCharge(Plugin plugin, LivingEntity boss, int range, float damage) {
@@ -32,7 +32,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 		      (Player player) -> {
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
 		          player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-		          DamageUtils.damage(boss, player, damage);
+		          BossUtils.bossDamage(boss, player, damage);
 		      },
 		      // Attack particles
 		      (Location loc) -> {

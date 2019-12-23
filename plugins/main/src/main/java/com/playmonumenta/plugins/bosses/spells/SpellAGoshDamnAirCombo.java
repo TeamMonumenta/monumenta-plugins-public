@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 
@@ -47,7 +47,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 					player.getWorld().spawnParticle(Particle.LAVA, player.getLocation(), 80, 1.25, 0.1, 1.25, 0);
 					player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 50, 1.25, 0.1, 1.25, 0);
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 1f);
-					DamageUtils.damage(boss, player, 12);
+					BossUtils.bossDamage(boss, player, 12);
 					player.setVelocity(new Vector(0, 1.15, 0));
 					boss.setVelocity(new Vector(0, 1.23, 0));
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
@@ -55,7 +55,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 
 						@Override
 						public void run() {
-							DamageUtils.damage(boss, player, 12);
+							BossUtils.bossDamage(boss, player, 12);
 							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 1);
 							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3F, 0);
 							Location loc = player.getLocation().add(0, 1, 0);

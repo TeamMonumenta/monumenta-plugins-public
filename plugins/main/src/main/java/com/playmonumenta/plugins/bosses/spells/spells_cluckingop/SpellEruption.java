@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEruption extends Spell {
@@ -49,12 +50,12 @@ public class SpellEruption extends Spell {
 						world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 						world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 						world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-						player.damage(1, mBoss);
+						BossUtils.bossDamage(mBoss, player, 1);
 						new BukkitRunnable() {
 
 							@Override
 							public void run() {
-								player.damage(1, mBoss);
+								BossUtils.bossDamage(mBoss, player, 1);
 								world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 								world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -70,7 +71,7 @@ public class SpellEruption extends Spell {
 
 												@Override
 												public void run() {
-													player.damage(1, mBoss);
+													BossUtils.bossDamage(mBoss, player, 1);
 													world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
 													world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
 													world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);

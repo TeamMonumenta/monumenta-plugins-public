@@ -35,7 +35,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBladeDance;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -96,7 +96,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 
 			                  (Player player, Location loc, boolean blocked) -> {
 			                      if (!blocked) {
-			                          DamageUtils.damage(mBoss, player, 15);
+			                          BossUtils.bossDamage(mBoss, player, 15);
 			                          player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
 			                          player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
 			                      }

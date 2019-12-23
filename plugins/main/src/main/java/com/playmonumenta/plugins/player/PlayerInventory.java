@@ -37,9 +37,9 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.nms.utils.NmsCommandUtils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class PlayerInventory {
 	private Set<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);

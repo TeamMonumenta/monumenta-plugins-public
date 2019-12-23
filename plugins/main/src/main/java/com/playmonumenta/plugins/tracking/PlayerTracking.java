@@ -28,13 +28,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -175,7 +175,6 @@ public class PlayerTracking implements EntityTracking {
 	public void onBossDamage(Plugin plugin, Player player, BossAbilityDamageEvent event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
-
 			manager.onBossDamage(plugin, player, event);
 		}
 	}

@@ -15,7 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -80,7 +80,7 @@ public class SpellLightningStorm extends Spell {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 
-		DamageUtils.damagePercent(mBoss, player, 0.4);
+		BossUtils.bossDamagePercent(mBoss, player, 0.4);
 		if (!mWarnedPlayers.contains(player)) {
 			mWarnedPlayers.add(player);
 			player.sendMessage(ChatColor.AQUA

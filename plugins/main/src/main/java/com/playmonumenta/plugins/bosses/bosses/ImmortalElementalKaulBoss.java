@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.spells_kaul.SpellEarthenRupture;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -83,7 +83,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 					player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
 					player.getWorld().spawnParticle(Particle.BLOCK_DUST, player.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData());
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
-					DamageUtils.damage(mBoss, player, 25);
+					BossUtils.bossDamage(mBoss, player, 25);
 					MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f, 0.4f);
 				},
 				// Attack particles

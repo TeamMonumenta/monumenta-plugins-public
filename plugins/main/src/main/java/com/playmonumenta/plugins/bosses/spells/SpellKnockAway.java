@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellKnockAway extends Spell {
@@ -51,7 +52,7 @@ public class SpellKnockAway extends Spell {
 			@Override
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
-					player.damage(10.0f);
+					BossUtils.bossDamage(mLauncher, player, 9.0f);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1), true);
 

@@ -29,7 +29,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -80,7 +80,7 @@ public class TCalin extends BossAbilityGroup {
 				player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0);
 				player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1, 0.15);
 				boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
-				DamageUtils.damage(mBoss, player, 14);
+				BossUtils.bossDamage(mBoss, player, 14);
 				MovementUtils.knockAway(mBoss.getLocation(), player, 0.25f, 0.4f);
 			},
 			// Attack particles
@@ -119,7 +119,7 @@ public class TCalin extends BossAbilityGroup {
 
 			(Player player, Location loc, boolean blocked) -> {
 				if (!blocked) {
-					DamageUtils.damage(mBoss, player, 12);
+					BossUtils.bossDamage(mBoss, player, 12);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, 1));
 				}
 				world.spawnParticle(Particle.BLOCK_CRACK, loc, 125, 0.35, 0.35, 0.35, 1,
@@ -173,7 +173,7 @@ public class TCalin extends BossAbilityGroup {
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
 				knockback(plugin, 5);
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
-					DamageUtils.damage(mBoss, player, 16);
+					BossUtils.bossDamage(mBoss, player, 16);
 				}
 			}
 		);

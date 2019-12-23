@@ -14,7 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 /*
@@ -131,16 +131,13 @@ public class SpellOnTheHunt extends Spell {
 				Player player = (Player) event.getEntity();
 
 				if (!player.isBlocking()) {
-					DamageUtils.damage(mBoss, player, 42);
+					BossUtils.bossDamage(mBoss, player, 42);
 				} else {
-					DamageUtils.damage(mBoss, player, 25);
+					BossUtils.bossDamage(mBoss, player, 25);
 					player.setCooldown(Material.SHIELD, 20 * 25);
 					MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
 				}
-			} else {
-				DamageUtils.damage(mBoss, (LivingEntity) event.getEntity(), 42);
 			}
-
 		}
 	}
 

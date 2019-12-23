@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -85,7 +85,7 @@ public class SpellBash extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						Vector toPlayerVector = player.getLocation().toVector().subtract(loc.toVector()).normalize();
 						if (direction.dot(toPlayerVector) > 0.33f) {
-							DamageUtils.damage(mBoss, player, 6);
+							BossUtils.bossDamage(mBoss, player, 6);
 							MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 						}
 					}

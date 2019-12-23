@@ -37,7 +37,7 @@ import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellHall
 import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellHellzoneGrenade;
 import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellPhantomOfTheOpera;
 import com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman.SpellSinisterReach;
-import com.playmonumenta.plugins.bosses.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -188,7 +188,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 					if (t % 20 == 0) {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
-							DamageUtils.damagePercent(boss, player, 0.075);
+							BossUtils.bossDamagePercent(boss, player, 0.075);
 							player.setFireTicks(20 * 5);
 						}
 					}
