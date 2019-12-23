@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-for x in nms main bosses; do
+for x in bungee paper; do
 	cd "$SCRIPT_DIR/$x"
 	./upload-build.sh
 	ret=$?
