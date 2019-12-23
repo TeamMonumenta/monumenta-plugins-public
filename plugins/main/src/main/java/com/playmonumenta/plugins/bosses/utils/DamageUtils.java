@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.utils;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
@@ -10,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.events.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 
 public class DamageUtils {
 
@@ -34,36 +33,6 @@ public class DamageUtils {
 			} else {
 				target.damage(event.getDamage());
 			}
-		}
-	}
-
-	private static java.lang.reflect.Method cachedHandleMethod = null;
-	private static java.lang.reflect.Method cachedGetAbsorpMethod = null;
-	private static java.lang.reflect.Method cachedSetAbsorpMethod = null;
-	private static float getAbsorp(LivingEntity target) {
-		try {
-				cachedHandleMethod = target.getClass().getMethod("getHandle");
-			Object handle = cachedHandleMethod.invoke(target);
-
-				cachedGetAbsorpMethod = handle.getClass().getMethod("getAbsorptionHearts");
-				cachedSetAbsorpMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
-			return (Float)cachedGetAbsorpMethod.invoke(handle);
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-			/* If error, return 0 rather than making caller handle the error */
-			return 0;
-		}
-	}
-
-	public static void setAbsorp(LivingEntity target, float value) {
-		try {
-			cachedHandleMethod = target.getClass().getMethod("getHandle");
-			Object handle = cachedHandleMethod.invoke(target);
-
-			cachedSetAbsorpMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
-			cachedSetAbsorpMethod.invoke(handle, Math.max(0f, value));
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -93,7 +62,7 @@ public class DamageUtils {
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled()) {
 			toTake = event.getDamage();
-			float absorp = getAbsorp(target);
+			float absorp = AbsorptionUtils.getAbsorption(target);
 			double adjustedHealth = (target.getHealth() + absorp) - toTake;
 
 			if (adjustedHealth <= 0) {
@@ -102,10 +71,10 @@ public class DamageUtils {
 			} else {
 				if (absorp > 0) {
 					if (absorp - toTake > 0) {
-						setAbsorp(target, (float) (absorp - toTake));
+						AbsorptionUtils.setAbsorption(target, (float) (absorp - toTake));
 						toTake = 0;
 					} else {
-						setAbsorp(target, 0f);
+						AbsorptionUtils.setAbsorption(target, 0f);
 						toTake -= absorp;
 					}
 				}

@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.utils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 
 public class AbsorptionUtils {
 
@@ -12,48 +12,48 @@ public class AbsorptionUtils {
 	private static Method setAbsorptionMethod;
 
 	// Doesn't work for subtracting absorption because newAbsorption makes sure it never drops (in case absorption is higher than maxAmount)
-	public static void addAbsorption(Player player, float amount, float maxAmount) {
-		float absorption = getAbsorption(player);
+	public static void addAbsorption(LivingEntity entity, float amount, float maxAmount) {
+		float absorption = getAbsorption(entity);
 		float newAbsorption = Math.max(absorption, Math.min(absorption + amount, maxAmount));
 		if (newAbsorption != absorption) {
-			setAbsorption(player, newAbsorption);
+			setAbsorption(entity, newAbsorption);
 		}
 	}
 
-	public static void subtractAbsorption(Player player, float amount) {
-		float absorption = getAbsorption(player);
+	public static void subtractAbsorption(LivingEntity entity, float amount) {
+		float absorption = getAbsorption(entity);
 		float newAbsorption = Math.max(absorption - amount, 0);
 		if (newAbsorption != absorption) {
-			setAbsorption(player, newAbsorption);
+			setAbsorption(entity, newAbsorption);
 		}
 	}
 
-	public static void setAbsorption(Player player, float amount) {
-		cacheReflectionMethods(player);
+	public static void setAbsorption(LivingEntity entity, float amount) {
+		cacheReflectionMethods(entity);
 
 		try {
-			setAbsorptionMethod.invoke(handleMethod.invoke(player), amount);
+			setAbsorptionMethod.invoke(handleMethod.invoke(entity), amount);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static float getAbsorption(Player player) {
-		cacheReflectionMethods(player);
+	public static float getAbsorption(LivingEntity entity) {
+		cacheReflectionMethods(entity);
 
 		try {
-			return (Float) getAbsorptionMethod.invoke(handleMethod.invoke(player));
+			return (Float) getAbsorptionMethod.invoke(handleMethod.invoke(entity));
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 			return 0;
 		}
 	}
 
-	private static void cacheReflectionMethods(Player player) {
+	private static void cacheReflectionMethods(LivingEntity entity) {
 		if (handleMethod == null || getAbsorptionMethod == null || setAbsorptionMethod == null) {
 			try {
-				handleMethod = player.getClass().getMethod("getHandle");
-				Object handle = handleMethod.invoke(player);
+				handleMethod = entity.getClass().getMethod("getHandle");
+				Object handle = handleMethod.invoke(entity);
 				getAbsorptionMethod = handle.getClass().getMethod("getAbsorptionHearts");
 				setAbsorptionMethod = handle.getClass().getMethod("setAbsorptionHearts", float.class);
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
