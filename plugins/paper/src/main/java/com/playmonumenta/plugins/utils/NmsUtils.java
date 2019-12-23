@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
 import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
+import net.minecraft.server.v1_13_R2.Vec3D;
 
 public class NmsUtils {
 	public static class ParsedCommandWrapper {
@@ -111,14 +113,12 @@ public class NmsUtils {
 		}
 	}
 
-	public static class CustomDamageSource extends EntityDamageSource {
+	private static class CustomDamageSource extends EntityDamageSource {
 		String mKilledUsingMsg;
-		Entity mDamager;
 
 		public CustomDamageSource(Entity damager, @Nullable String killedUsingMsg) {
 			super("custom", damager);
 
-			mDamager = damager;
 			if (killedUsingMsg == null) {
 				mKilledUsingMsg = "magic";
 			} else {
@@ -134,14 +134,38 @@ public class NmsUtils {
 		}
 	}
 
-	public static void customDamageEntity(org.bukkit.entity.LivingEntity entity, double amount, Player damager) {
+	public static void customDamageEntity(@Nonnull org.bukkit.entity.LivingEntity entity, double amount, @Nonnull Player damager) {
 		customDamageEntity(entity, amount, damager, null);
 	}
 
-	public static void customDamageEntity(org.bukkit.entity.LivingEntity entity, double amount, Player damager, String killedUsingMsg) {
+	public static void customDamageEntity(@Nonnull org.bukkit.entity.LivingEntity entity, double amount, @Nonnull Player damager, @Nullable String killedUsingMsg) {
         DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
 
         ((CraftLivingEntity)entity).getHandle().damageEntity(reason, (float) amount);
+	}
+
+	private static class UnblockableEntityDamageSource extends EntityDamageSource {
+		public UnblockableEntityDamageSource(Entity entity) {
+			super("custom", entity);
+		}
+
+		@Override
+		public Vec3D w() {
+			return null;
+		}
+
+		@Override
+		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
+			String s = "death.attack.mob";
+			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName()});
+		}
+
+	}
+
+	public static void unblockableEntityDamageEntity(@Nonnull org.bukkit.entity.LivingEntity damagee, double amount, @Nonnull org.bukkit.entity.LivingEntity damager) {
+        DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
+
+        ((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);
 	}
 
 	private static Object getPrivateField(String fieldName, Class<?> clazz, Object object) throws NoSuchFieldException, IllegalAccessException {

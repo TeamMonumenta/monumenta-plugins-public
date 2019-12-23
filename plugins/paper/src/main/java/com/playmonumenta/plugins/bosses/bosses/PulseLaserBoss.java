@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -49,13 +48,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25);
 						if (!blocked) {
-							// Check to see if the player is shielding
-							if (player.isBlocking()) {
-								BossUtils.bossDamage(boss, player, 18);
-								player.setCooldown(Material.SHIELD, 6 * 20);
-							} else {
-								BossUtils.bossDamage(boss, player, 18);
-							}
+							BossUtils.bossDamage(boss, player, 18);
 						}
 					})
 		));

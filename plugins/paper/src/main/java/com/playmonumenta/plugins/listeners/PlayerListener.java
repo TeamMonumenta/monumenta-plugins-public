@@ -75,7 +75,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -570,7 +569,7 @@ public class PlayerListener implements Listener {
 	private static final List<Integer> KEEP_EQUIPPED_SLOTS =
 	    Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40);
 
-	private static final int KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 10;
+	private static final double KEPT_ITEM_DURABILITY_DAMAGE_PERCENT = 0.1;
 
 	// The player has died
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -615,17 +614,7 @@ public class PlayerListener implements Listener {
 					// This empty if statement is intentional so it's not included in "else".
 				} else if (result == ItemDeathResult.KEEP_DAMAGED ||
 				           (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
-					// Item is kept on death with a durability loss
-					ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
-					if (meta != null && (meta instanceof Damageable)) {
-						// This item can be damaged - remove some durability from it
-						Damageable dMeta = (Damageable)meta;
-						short maxDurability = item.getType().getMaxDurability();
-						int currentDamage = dMeta.getDamage();
-						dMeta.setDamage(Math.min(maxDurability, currentDamage + (maxDurability * KEPT_ITEM_DURABILITY_DAMAGE_PERCENT) / 100));
-						// Probably redundant, but can't hurt
-						item.setItemMeta(meta);
-					}
+					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
 				} else {
 					// Item is dropped, decide what to do with it.
 					Location location = player.getLocation();

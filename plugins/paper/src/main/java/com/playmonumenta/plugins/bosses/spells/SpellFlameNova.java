@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFlameNova extends SpellBaseAoE {
 
-	public SpellFlameNova(Plugin plugin, Entity launcher, int radius, int time) {
+	public SpellFlameNova(Plugin plugin, LivingEntity launcher, int radius, int time) {
 		super(plugin, launcher, radius, time, 0, false, Sound.BLOCK_FIRE_AMBIENT,
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -34,7 +34,7 @@ public class SpellFlameNova extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
-					BossUtils.bossDamage(null, player, 11);
+					BossUtils.bossDamage(launcher, player, 11);
 					player.setFireTicks(80);
 				}
 			}

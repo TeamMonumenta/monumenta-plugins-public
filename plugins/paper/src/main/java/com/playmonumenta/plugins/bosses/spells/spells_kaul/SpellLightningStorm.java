@@ -80,7 +80,8 @@ public class SpellLightningStorm extends Spell {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 
-		BossUtils.bossDamagePercent(mBoss, player, 0.4);
+		/* Too-high lightning hits you directly and can not be blocked */
+		BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location)null);
 		if (!mWarnedPlayers.contains(player)) {
 			mWarnedPlayers.add(player);
 			player.sendMessage(ChatColor.AQUA

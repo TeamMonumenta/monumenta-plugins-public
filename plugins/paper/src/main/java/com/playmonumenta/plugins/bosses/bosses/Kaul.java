@@ -219,7 +219,8 @@ public class Kaul extends BossAbilityGroup {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
 					return;
 				}
-				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
+				// Damage has no direction so can't be blocked */
+				if (BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location)null)) {
 					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
@@ -831,7 +832,7 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 
-		if (event.getEntity() instanceof Player) {
+		if (event.getEntity() instanceof Player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			Player player = (Player) event.getEntity();
 			if (player.isBlocking()) {
 				player.setCooldown(Material.SHIELD, 20 * 30);

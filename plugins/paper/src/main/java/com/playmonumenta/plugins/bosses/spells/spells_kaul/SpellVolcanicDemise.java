@@ -163,13 +163,15 @@ public class SpellVolcanicDemise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
-							BossUtils.bossDamage(mBoss, player, 100);
-							MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
-						} else if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 42);
-							if (!player.isBlocking()) {
+							BossUtils.bossDamage(mBoss, player, 1000, loc, (event) -> {
 								MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
-							}
+							});
+						} else if (pBox.overlaps(box)) {
+							BossUtils.bossDamage(mBoss, player, 42, loc, (event) -> {
+								if (!event.isPlayerBlocking()) {
+									MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
+								}
+							});
 						}
 					}
 					for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 4)) {

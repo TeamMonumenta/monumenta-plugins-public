@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -19,12 +19,12 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class SpellSmokeBomb extends Spell {
 	private Plugin mPlugin;
 	private Random mRand = new Random();
-	private Entity mLauncher;
+	private LivingEntity mLauncher;
 	private int mRadius;
 	private int mTime;
 	private int w;
 
-	public SpellSmokeBomb(Plugin plugin, Entity launcher, int radius, int time) {
+	public SpellSmokeBomb(Plugin plugin, LivingEntity launcher, int radius, int time) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mRadius = radius;
@@ -49,7 +49,7 @@ public class SpellSmokeBomb extends Spell {
 			@Override
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
-					BossUtils.bossDamage(null, player, 2);
+					BossUtils.bossDamage(mLauncher, player, 2);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1), true);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0), true);
 				}

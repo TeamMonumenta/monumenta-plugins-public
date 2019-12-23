@@ -303,6 +303,10 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		}
 	}
 
+	public LivingEntity getEntity() {
+		return mBoss;
+	}
+
 	@Override
 	public void init() {
 		int bossTargetHp = 0;

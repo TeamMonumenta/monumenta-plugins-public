@@ -55,12 +55,12 @@ public class SpellPhantomOfTheOpera extends Spell {
 						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.15, 0.15, 0.15, 0.15);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0.15, 0.15, 0.15, 0.1);
 						world.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 1.25f);
-						if (!player.isBlocking()) {
-							p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 0));
 
-						}
-
-						BossUtils.bossDamage(mBoss, p, 28);
+						BossUtils.bossDamage(mBoss, p, 28, (event) -> {
+							if (!event.isPlayerBlocking()) {
+								p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 0));
+							}
+						});
 						world.spawnParticle(Particle.SMOKE_LARGE, p.getLocation().add(0, 3.5, 0), 20, 0.4, 0.4, 0.4, 0.1);
 						world.spawnParticle(Particle.SMOKE_NORMAL, p.getLocation().add(0, 3.5, 0), 45, 0.4, 0.4, 0.4, 0.145);
 						world.spawnParticle(Particle.SPELL_WITCH, p.getLocation().add(0, 3.5, 0), 60, 0.4, 0.4, 0.4, 0.1);

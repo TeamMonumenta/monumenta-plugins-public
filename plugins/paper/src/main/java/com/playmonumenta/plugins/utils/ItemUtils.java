@@ -11,8 +11,11 @@ import java.util.Set;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -633,5 +636,54 @@ public class ItemUtils {
 
 	public static boolean isShulkerBox(Material mat) {
 		return shulkerBoxes.contains(mat);
+	}
+
+	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
+		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
+		if (meta != null && (meta instanceof Damageable)) {
+			// This item can be damaged - remove some durability from it
+			Damageable dMeta = (Damageable)meta;
+			short maxDurability = item.getType().getMaxDurability();
+			int currentDamage = dMeta.getDamage();
+			int newDamage = currentDamage + damage;
+			if (canBreak && newDamage > maxDurability) {
+				item.setAmount(0);
+			} else {
+				dMeta.setDamage(Math.min(maxDurability, newDamage));
+				// Probably redundant, but can't hurt
+				item.setItemMeta(meta);
+			}
+		}
+	}
+
+	public static void damageItemPercent(ItemStack item, double damagePercent, boolean canBreak) {
+		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
+		if (meta != null && (meta instanceof Damageable)) {
+			// This item can be damaged - remove some durability from it
+			Damageable dMeta = (Damageable)meta;
+			short maxDurability = item.getType().getMaxDurability();
+			int currentDamage = dMeta.getDamage();
+			int newDamage = (int) (currentDamage + (maxDurability * damagePercent) / 100);
+			if (canBreak && newDamage > maxDurability) {
+				item.setAmount(0);
+			} else {
+				dMeta.setDamage(Math.min(maxDurability, newDamage));
+				// Probably redundant, but can't hurt
+				item.setItemMeta(meta);
+			}
+		}
+	}
+
+	public static void damageShield(Player player, int damage) {
+		PlayerInventory inv = player.getInventory();
+		ItemStack mainHand = inv.getItemInMainHand();
+		if (mainHand != null && mainHand.getType().equals(Material.SHIELD)) {
+			damageItem(mainHand, damage / (mainHand.getEnchantmentLevel(Enchantment.DURABILITY) + 1), true);
+		} else {
+			ItemStack offHand = inv.getItemInMainHand();
+			if (offHand != null && offHand.getType().equals(Material.SHIELD)) {
+				damageItem(offHand, damage / (offHand.getEnchantmentLevel(Enchantment.DURABILITY) + 1), true);
+			}
+		}
 	}
 }

@@ -108,12 +108,9 @@ public class SpellHellzoneGrenade extends Spell {
 
 						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-								if (!player.isBlocking()) {
-									BossUtils.bossDamage(mBoss, player, 35);
-									player.setFireTicks(20 * 3);
-								} else {
-									player.setCooldown(Material.SHIELD, 20 * 12);
-								}
+								BossUtils.bossDamage(mBoss, player, 35);
+								// Shields don't stop fire!
+								player.setFireTicks(20 * 3);
 							}
 
 						}
@@ -130,7 +127,8 @@ public class SpellHellzoneGrenade extends Spell {
 								if (t % 10 == 0) {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-											BossUtils.bossDamagePercent(mBoss, player, 0.05);
+											/* Fire aura can not be blocked */
+											BossUtils.bossDamagePercent(mBoss, player, 0.05, (Location)null);
 											player.setFireTicks(20 * 3);
 										}
 									}

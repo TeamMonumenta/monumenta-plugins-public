@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -104,15 +103,14 @@ public class SpellSinisterReach extends Spell {
 							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
 								if (dir.dot(toVector) > .33) {
-									if (!player.isBlocking()) {
-										BossUtils.bossDamage(mBoss, player, 32);
-										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
-										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
-									} else {
-										player.setCooldown(Material.SHIELD, 20 * 5);
-										MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
-									}
-
+									BossUtils.bossDamage(mBoss, player, 32, (event) -> {
+										if (!event.isPlayerBlocking()) {
+											player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
+											player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
+										} else {
+											MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
+										}
+									});
 								}
 							}
 						}

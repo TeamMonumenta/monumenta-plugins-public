@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.spells_headlesshorseman;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -70,12 +69,11 @@ public class SpellBatBombs extends Spell {
 
 								for (Player player : PlayerUtils.playersInRange(loc, 6)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-										if (!player.isBlocking()) {
-											BossUtils.bossDamage(bat, player, 32);
-											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
-										} else {
-											player.setCooldown(Material.SHIELD, 20 * 8);
-										}
+										BossUtils.bossDamage(mHorseman.getEntity(), player, 32, loc, (event) -> {
+											if (!event.isPlayerBlocking()) {
+												MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
+											}
+										});
 									}
 								}
 							}

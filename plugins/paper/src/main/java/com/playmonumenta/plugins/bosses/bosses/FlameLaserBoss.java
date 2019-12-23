@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -49,14 +48,9 @@ public class FlameLaserBoss extends BossAbilityGroup {
 						loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 						if (!blocked) {
-							// Check to see if the player is shielding
-							if (player.isBlocking()) {
-								BossUtils.bossDamage(boss, player, 12);
-								player.setCooldown(Material.SHIELD, 4 * 20);
-							} else {
-								BossUtils.bossDamage(boss, player, 12);
-								player.setFireTicks(80); //4 seconds
-							}
+							BossUtils.bossDamage(boss, player, 12);
+							// Shields don't stop fire!
+							player.setFireTicks(4 * 20);
 						}
 					})
 		));

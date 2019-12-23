@@ -119,7 +119,7 @@ public class SpellLightningStrike extends Spell {
 						}
 
 						if ((p.getTicksLived() - lastStrikeTime) > NO_STRIKE_PERIOD) {
-							BossUtils.bossDamagePercent(mBoss, p, 0.4);
+							BossUtils.bossDamagePercent(mBoss, p, 0.4, loc);
 
 							/* Store the current time the player was struck */
 							p.setMetadata(LIGHTNING_STRIKE_METAKEY, new FixedMetadataValue(mPlugin, p.getTicksLived()));

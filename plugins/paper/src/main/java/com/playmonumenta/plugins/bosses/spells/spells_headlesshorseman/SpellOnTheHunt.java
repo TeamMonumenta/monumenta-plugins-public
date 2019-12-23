@@ -130,13 +130,11 @@ public class SpellOnTheHunt extends Spell {
 			if (event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
 
-				if (!player.isBlocking()) {
-					BossUtils.bossDamage(mBoss, player, 42);
-				} else {
-					BossUtils.bossDamage(mBoss, player, 25);
-					player.setCooldown(Material.SHIELD, 20 * 25);
-					MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
-				}
+				BossUtils.bossDamage(mBoss, player, 42, (bossEvent) -> {
+					if (!bossEvent.isPlayerBlocking()) {
+						MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
+					}
+				});
 			}
 		}
 	}
