@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -32,6 +33,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellFireball;
 import com.playmonumenta.plugins.bosses.spells.SpellKnockAway;
 import com.playmonumenta.plugins.bosses.spells.SpellMinionResist;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -93,7 +95,7 @@ public class Azacor extends BossAbilityGroup {
 									   BossUtils.bossDamagePercent(mBoss, player, 0.75);
 			                           player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2), true);
 			                       } else {
-			                           Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon tnt " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Fuse:0}");
+									   EntityUtils.summonEntityAt(loc, EntityType.PRIMED_TNT, "{Fuse:0}");
 			                       }
 			                   }),
 			new SpellKnockAway(plugin, boss, 5, 20, 1.5f)

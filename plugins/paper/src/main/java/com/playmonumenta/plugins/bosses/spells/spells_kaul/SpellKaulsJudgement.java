@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -90,9 +91,9 @@ public class SpellKaulsJudgement extends Spell {
 			public void run() {
 				for (Entity e : mBoss.getWorld().getEntities()) {
 					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_SPAWN_TAG)) {
-						Location loc = e.getLocation();
+						Location loc = e.getLocation().add(0, 1, 0);
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0.3, 0.45, 0.3, 1);
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " " + mob);
+						EntityUtils.summonEntityAt(loc, EntityType.ZOMBIE, mob);
 					}
 				}
 			}

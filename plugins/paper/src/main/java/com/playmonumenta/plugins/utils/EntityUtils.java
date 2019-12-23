@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -548,10 +549,18 @@ public class EntityUtils {
 		}
 	}
 
+	public static void summonEntityAt(Location loc, EntityType type, String nbt) {
+		try {
+			getSummonEntityAt(loc, type, nbt);
+		} catch (Exception ex) {
+			Plugin.getInstance().getLogger().warning("Attempted to summon entity " + type.getName() + " but no entity appeared");
+		}
+	}
+
 	/*
 	 * TODO: This is really janky - it *probably* returns the correct entity... but it might not
 	 */
-	public static Entity summonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
+	public static Entity getSummonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
 		String cmd = "summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 

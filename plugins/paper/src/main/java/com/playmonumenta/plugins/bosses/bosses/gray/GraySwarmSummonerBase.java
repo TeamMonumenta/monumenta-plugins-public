@@ -81,7 +81,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 								public void run() {
 									try {
 										summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
-										Entity entity = EntityUtils.summonEntityAt(summonLoc, mobType, mobNBT);
+										Entity entity = EntityUtils.getSummonEntityAt(summonLoc, mobType, mobNBT);
 										if (entity != null && entity instanceof Mob) {
 											Mob mob = (Mob)entity;
 											mob.setTarget(player);

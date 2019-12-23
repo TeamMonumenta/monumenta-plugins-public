@@ -78,7 +78,7 @@ public class SpellAxtalTntThrow extends Spell {
 					Player Target = plist.get(mRand.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation();
 					try {
-						Entity tnt = EntityUtils.summonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
+						Entity tnt = EntityUtils.getSummonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
 						Location pLoc = Target.getLocation();
 						Location tLoc = tnt.getLocation();
 						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());

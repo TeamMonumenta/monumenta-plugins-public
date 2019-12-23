@@ -70,7 +70,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 				(summonLoc, player) -> {
 					try {
 						Location loc = summonLoc.clone().subtract(0, 2.5f, 0);
-						Entity entity = EntityUtils.summonEntityAt(loc, mobType, mobNBT);
+						Entity entity = EntityUtils.getSummonEntityAt(loc, mobType, mobNBT);
 						if (entity != null && entity instanceof Mob) {
 							Mob mob = (Mob)entity;
 							mob.setAI(false);
