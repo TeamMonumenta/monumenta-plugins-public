@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.safezone.SafeZoneManager;
 import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -22,19 +22,12 @@ public class SpellTpBehindRandomPlayer extends Spell {
 	private static final int MAX_RANGE = 80;
 	private static final int TP_DELAY = 50;
 
-	private final com.playmonumenta.plugins.Plugin mMainPlugin;
 	private final Plugin mPlugin;
 	private final Entity mLauncher;
 	private final int mDuration;
 	private final Random mRand = new Random();
 
 	public SpellTpBehindRandomPlayer(Plugin plugin, Entity launcher, int duration) {
-		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaMain")) {
-			mMainPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-		} else {
-			mMainPlugin = null;
-		}
-
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mDuration = duration;
@@ -46,9 +39,9 @@ public class SpellTpBehindRandomPlayer extends Spell {
 		while (!players.isEmpty()) {
 			Player target = players.get(mRand.nextInt(players.size()));
 
-			if (mMainPlugin != null) {
+			if (SafeZoneManager.getInstance() != null) {
 				/* Do not teleport to players in safezones */
-				LocationType zone = mMainPlugin.mSafeZoneManager.getLocationType(target);
+				LocationType zone = SafeZoneManager.getInstance().getLocationType(target);
 				if (zone.equals(LocationType.Capital) || zone.equals(LocationType.SafeZone)) {
 					/* This player is in a safe area - don't tp to them */
 					players.remove(target);

@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class SafeZoneManager {
+	private static SafeZoneManager INSTANCE = null;
+
 	public enum LocationType {
 		None(-1),
 
@@ -40,9 +42,13 @@ public class SafeZoneManager {
 	private ArrayList<SafeZone> mLocationBounds = new ArrayList<SafeZone>();
 	private Plugin mPlugin;
 
-
 	public SafeZoneManager(Plugin plugin) {
 		mPlugin = plugin;
+		INSTANCE = this;
+	}
+
+	public static SafeZoneManager getInstance() {
+		return INSTANCE;
 	}
 
 	/* If sender is non-null, it will be sent debugging information */
