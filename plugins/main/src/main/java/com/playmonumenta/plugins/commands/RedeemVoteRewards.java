@@ -44,8 +44,7 @@ public class RedeemVoteRewards extends GenericCommand {
 
 		private void run(int rewardCount) {
 			if (mPlayer.isOnline() && mPlayer.isValid()) {
-				int val = ScoreboardUtils.getScoreboardValue(mPlayer, mScoreboardName);
-				ScoreboardUtils.setScoreboardValue(mPlayer, mScoreboardName, val + rewardCount);
+				ScoreboardUtils.setScoreboardValue(mPlayer, mScoreboardName, rewardCount);
 				for (FunctionWrapper func : mFunctions) {
 					func.runAs(mPlayer);
 				}
