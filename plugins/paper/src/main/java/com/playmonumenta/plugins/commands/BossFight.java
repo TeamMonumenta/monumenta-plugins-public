@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.bosses.commands;
+package com.playmonumenta.plugins.commands;
 
 import java.util.LinkedHashMap;
 
@@ -28,7 +28,7 @@ public class BossFight {
 		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
 		arguments.put("boss_tag", new DynamicSuggestedStringArgument(() -> { return BossManager.getInstance().listBosses(); }));
 		CommandAPI.getInstance().register("bossfight",
-		                                  CommandPermission.fromString("bossfights.bossfight"),
+		                                  CommandPermission.fromString("monumenta.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateless(sender, (Entity)args[0],
@@ -39,7 +39,7 @@ public class BossFight {
 		/* Second one of these includes coordinate arguments */
 		arguments.put("redstone_pos", new LocationArgument());
 		CommandAPI.getInstance().register("bossfight",
-		                                  CommandPermission.fromString("bossfights.bossfight"),
+		                                  CommandPermission.fromString("monumenta.bossfight"),
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateful(sender, (Entity)args[0],

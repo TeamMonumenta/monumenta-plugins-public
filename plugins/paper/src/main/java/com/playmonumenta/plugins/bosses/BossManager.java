@@ -109,11 +109,10 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayDemonSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
-import com.playmonumenta.plugins.bosses.commands.BossFight;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class BossManager implements Listener {
 
@@ -306,7 +305,6 @@ public class BossManager implements Listener {
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
-		BossFight.register();
 		SpellDetectionCircle.registerCommand(plugin);
 
 		/* When starting up, look for bosses in all current world entities */
@@ -503,7 +501,6 @@ public class BossManager implements Listener {
 			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
-
 	}
 
 	/* Another weird one - used for exorcism potion */

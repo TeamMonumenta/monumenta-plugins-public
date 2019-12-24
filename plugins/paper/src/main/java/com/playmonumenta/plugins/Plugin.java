@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.commands.BossFight;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
@@ -94,10 +95,10 @@ public class Plugin extends JavaPlugin {
 
 	public World mWorld;
 
-	private static Plugin STATIC_PLUGIN_REF = null;
+	private static Plugin INSTANCE = null;
 
 	public static Plugin getInstance() {
-		return STATIC_PLUGIN_REF;
+		return INSTANCE;
 	}
 
 	@Override
@@ -129,6 +130,7 @@ public class Plugin extends JavaPlugin {
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
 		RedeemVoteRewards.register(this);
+		BossFight.register();
 
 		mHttpManager = new HttpManager(this);
 		try {
@@ -145,7 +147,6 @@ public class Plugin extends JavaPlugin {
 		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
 
 		mJunkItemsListener = new JunkItemListener(this);
-		mBossManager = new BossManager(this);
 
 		Bot.register(this);
 		if (mServerProperties.getBroadcastCommandEnabled()) {
@@ -156,7 +157,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
-		STATIC_PLUGIN_REF = this;
+		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
 		mSocketManager = new SocketManager(this, mServerProperties.getSocketHost(),
@@ -179,6 +180,7 @@ public class Plugin extends JavaPlugin {
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
+		mBossManager = new BossManager(this);
 
 		DailyReset.startTimer(this);
 
@@ -289,7 +291,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
-		STATIC_PLUGIN_REF = null;
+		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
 		mTrackingManager.unloadTrackedEntities();
