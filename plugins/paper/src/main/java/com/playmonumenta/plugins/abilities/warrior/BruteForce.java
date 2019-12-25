@@ -45,7 +45,7 @@ public class BruteForce extends Ability {
 					EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
 				}
 				if (!EntityUtils.isBoss(mob)) {
-					MovementUtils.knockAwayConstant(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2);
+					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2);
 				}
 			}
 		}

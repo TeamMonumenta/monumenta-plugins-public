@@ -144,7 +144,7 @@ public class LuminousInfusion extends Ability {
 			} else {
 				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer);
 			}
-			MovementUtils.knockAwayConstant(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
+			MovementUtils.knockAway(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
 		}
 	}
 

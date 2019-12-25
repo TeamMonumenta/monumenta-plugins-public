@@ -73,7 +73,7 @@ public class ManaLance extends Ability {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
 					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE);
-					MovementUtils.knockAwayConstant(mPlayer.getLocation(), mob, 0.25f, 0.25f);
+					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
 					iter.remove();
 					mobs.remove(mob);
 				}

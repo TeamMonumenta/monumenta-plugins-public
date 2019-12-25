@@ -33,6 +33,8 @@ public class SpellEarthsWrath extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
+		Location centerLoc = mBoss.getLocation();
+
 		new BukkitRunnable() {
 			int t = 0;
 			@Override
@@ -65,7 +67,7 @@ public class SpellEarthsWrath extends Spell {
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
 									if (player.getBoundingBox().overlaps(box)) {
 										BossUtils.bossDamage(mBoss, player, 24);
-										MovementUtils.knockAway(mBoss.getLocation(), player, -0.5f, 0.65f);
+										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
 									}
