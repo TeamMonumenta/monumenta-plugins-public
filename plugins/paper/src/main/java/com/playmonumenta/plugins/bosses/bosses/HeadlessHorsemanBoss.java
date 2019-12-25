@@ -323,7 +323,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect give @s minecraft:blindness 2 2");
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Headless Horseman\",\"color\":\"dark_red\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"Scourge of the Isles\",\"color\":\"red\",\"bold\":true}]");
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
