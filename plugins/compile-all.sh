@@ -7,7 +7,7 @@ for x in bungee paper; do
 	./compile.sh
 	ret=$?
 	if [[ $ret -ne 0 ]]; then
-		echo "Upload Failed!" >&2
+		echo "Compile of $x failed!" >&2
 		exit $ret
 	fi
 done

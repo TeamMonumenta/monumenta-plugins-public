@@ -1,0 +1,31 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: git config user.name
+      run: git config --global user.name "Monumenta CI"
+    - name: git config user.email
+      run: git config --global user.email "Monumenta.CI@NotARealEmail.com"
+    - name: Get Paper
+      run: git clone https://github.com/TeamMonumenta/Paper.git
+    - name: Build Paper
+      working-directory: ./Paper
+      run: ./paper jar
+    - name: Build with Maven
+      working-directory: ./plugins
+      run: ./compile-all.sh
