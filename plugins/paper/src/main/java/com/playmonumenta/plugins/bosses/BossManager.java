@@ -305,8 +305,6 @@ public class BossManager implements Listener {
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
-		SpellDetectionCircle.registerCommand(plugin);
-
 		/* When starting up, look for bosses in all current world entities */
 		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {
 			if (!(entity instanceof LivingEntity)) {

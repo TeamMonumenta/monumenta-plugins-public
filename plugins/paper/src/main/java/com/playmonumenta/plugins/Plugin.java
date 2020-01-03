@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.commands.BossFight;
 import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
@@ -131,6 +132,7 @@ public class Plugin extends JavaPlugin {
 		RestartEmptyCommand.register(this);
 		RedeemVoteRewards.register(this);
 		BossFight.register();
+		SpellDetectionCircle.registerCommand(this);
 
 		mHttpManager = new HttpManager(this);
 		try {
@@ -162,7 +164,7 @@ public class Plugin extends JavaPlugin {
 
 		mSocketManager = new SocketManager(this, mServerProperties.getSocketHost(),
 		                                   mServerProperties.getSocketPort(),
-										   mServerProperties.getShardName());
+						   mServerProperties.getShardName());
 		// mSocketManager.open();
 
 		mItemOverrides = new ItemOverrides();
