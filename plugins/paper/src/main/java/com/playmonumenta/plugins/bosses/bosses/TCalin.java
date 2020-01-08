@@ -192,11 +192,7 @@ public class TCalin extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Fangride! You dare test the might of the boss-coder FirelordWeaponry!? Let me show you his efficiency!\",\"color\":\"white\"}]");
-		});
-
-		events.put(75, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You're strong, but this fight is only beginning for you!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Thank you for foolishly opening the way into this town, hero.\",\"color\":\"white\"}]");
 		});
 
 		events.put(50, mBoss -> {
@@ -254,7 +250,11 @@ public class TCalin extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 30, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"You do not understand the power my master has bestowed upon me in less than an hour! Let me show you!\",\"color\":\"white\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Know the true power of the Sons of the Forest!\",\"color\":\"white\"}]");
+		});
+
+		events.put(50, mBoss -> {
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]");
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
@@ -306,7 +306,7 @@ public class TCalin extends BossAbilityGroup {
 	@Override
 	public void death() {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Now you understand... Now... Change my... damn dialogue...\",\"color\":\"white\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"I am defeated... Nature will have its revenge.\",\"color\":\"white\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
