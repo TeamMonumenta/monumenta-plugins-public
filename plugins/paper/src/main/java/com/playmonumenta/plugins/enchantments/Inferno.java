@@ -19,15 +19,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Inferno implements BaseEnchantment {
 
@@ -102,6 +99,7 @@ public class Inferno implements BaseEnchantment {
 		/* Make sure the ticking task is running that periodically validates that a mob is still alive and burning */
 		if (sRunnable == null) {
 			sRunnable = new BukkitRunnable() {
+				@Override
 				public void run() {
 					Iterator<Entry<LivingEntity, InfernoMob>> infernoMobsIter = sTaggedMobs.entrySet().iterator();
 					while (infernoMobsIter.hasNext()) {

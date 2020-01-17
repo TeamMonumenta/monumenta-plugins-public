@@ -17,8 +17,10 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -96,7 +98,13 @@ public class AmplifyingHex extends Ability {
 				                  .filter(effect -> (mob.getPotionEffect(effect) != null))
 				                  .count();
 				int damageMult = (getAbilityScore() == 1) ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
-				if (getAbilityScore() > 1 && mob.getFireTicks() > 0) {
+
+				ConsumingFlames cf = (ConsumingFlames) AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
+
+				if (cf.getAbilityScore() > 1 && mob.getFireTicks() > 0) {
+					debuffCount++;
+				}
+				if (cf.getAbilityScore() > 1 && mob.hasMetadata(Inferno.INFERNO_TAG_METAKEY)) {
 					debuffCount++;
 				}
 				if (mob.hasMetadata("MobIsStunnedByEntityUtils")) {
