@@ -62,7 +62,7 @@ public class WardingRemedyNonApothecary extends Ability {
 
 	private void applyBonusDamage(EntityDamageByEntityEvent event) {
 		mLevel = getWardingRemedyLevel();
-		if (mLevel > 0 && AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+		if (mLevel > 0 && AbsorptionUtils.getAbsorption(mPlayer) >= REMEDY_SHIELD_THRESHOLD) {
 			double multiplier = mLevel == 1 ? REMEDY_1_DAMAGE_MULTIPLIER : REMEDY_2_DAMAGE_MULTIPLIER;
 			Location loc = event.getEntity().getLocation().add(0, 1, 0);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 8, 0.3, 0.5, 0.3);
@@ -82,7 +82,7 @@ public class WardingRemedyNonApothecary extends Ability {
 				if (mLevel == 2) {
 					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
 					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 10, 0.35, 0.4, 0.35, APOTHECARY_LIGHT_COLOR);
-					if (AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+					if (AbsorptionUtils.getAbsorption(mPlayer) >= REMEDY_SHIELD_THRESHOLD) {
 						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 7, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
 					}
 					mSeconds = 0;
@@ -92,7 +92,7 @@ public class WardingRemedyNonApothecary extends Ability {
 				if (mLevel > 0) {
 					AbsorptionUtils.addAbsorption(mPlayer, REMEDY_SHIELD, REMEDY_SHIELD_MAX);
 					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 10, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
-					if (AbsorptionUtils.getAbsorption(mPlayer) > REMEDY_SHIELD_THRESHOLD) {
+					if (AbsorptionUtils.getAbsorption(mPlayer) >= REMEDY_SHIELD_THRESHOLD) {
 						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 0.25, 0), 7, 0.35, 0.4, 0.35, APOTHECARY_DARK_COLOR);
 					}
 				}
