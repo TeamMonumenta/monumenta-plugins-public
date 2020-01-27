@@ -57,6 +57,9 @@ public class PrismaticShield extends Ability {
 			return true;
 		}
 
+		// Put on cooldown before processing results to prevent infinite recursion
+		putOnCooldown();
+
 		// Conditions match - prismatic shield
 		int prismatic = getAbilityScore();
 		int effectLevel = prismatic == 1 ? PRISMATIC_SHIELD_EFFECT_LVL_1 : PRISMATIC_SHIELD_EFFECT_LVL_2;
@@ -75,7 +78,6 @@ public class PrismaticShield extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Prismatic Shield has been activated");
 
-		putOnCooldown();
 		return true;
 	}
 }
