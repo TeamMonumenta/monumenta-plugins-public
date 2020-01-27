@@ -219,7 +219,7 @@ public class EntityListener implements Listener {
 					ProjectileSource source = ((Projectile) damager).getShooter();
 					if (source instanceof Drowned) {
 						ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
-						if (meta != null) {
+						if (meta != null && meta.hasAttributeModifiers()) {
 							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
 							if (modifiers != null) {
 								Iterator<AttributeModifier> iter = modifiers.iterator();
