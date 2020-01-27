@@ -106,6 +106,11 @@ public class SocketManager {
 	}
 
 	public boolean sendPacket(BasePacket packet) {
+		if (mConnecting) {
+			mPlugin.getLogger().warning("Unable to send packet to "+packet.getDestination()+" : "+packet.getOperation()+" - Socket is still connecting");
+			return false;
+		}
+
 		mPlugin.getLogger().fine("Sending packet to "+packet.getDestination()+" : "+packet.getOperation());
 		JsonObject raw = packet.toJson();
 		try {
