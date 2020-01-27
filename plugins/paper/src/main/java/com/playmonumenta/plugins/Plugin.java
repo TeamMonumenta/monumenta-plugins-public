@@ -40,7 +40,6 @@ import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.commands.TransferScores;
 import com.playmonumenta.plugins.commands.TransferServer;
-import com.playmonumenta.plugins.commands.UpdateApartments;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -125,7 +124,6 @@ public class Plugin extends JavaPlugin {
 		Effect.register(this);
 		RemoveTags.register();
 		DeathMsg.register();
-		UpdateApartments.register();
 		TransferScores.register(this);
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
