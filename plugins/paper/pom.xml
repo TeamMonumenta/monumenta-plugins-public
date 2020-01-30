@@ -42,6 +42,10 @@
             <id>jorelali</id>
             <url>https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/</url>
         </repository>
+        <repository>
+            <id>coreprotect</id>
+            <url>http://maven.playpro.com/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -85,6 +89,12 @@
 			<version>4.4</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>net.coreprotect</groupId>
+            <artifactId>coreprotect</artifactId>
+            <version>2.15.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
