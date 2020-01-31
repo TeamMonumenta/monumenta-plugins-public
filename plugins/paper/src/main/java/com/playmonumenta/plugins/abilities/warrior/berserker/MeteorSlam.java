@@ -152,12 +152,12 @@ public class MeteorSlam extends Ability {
 
 			//Wanted to try something new: Particles that have no y velocity and only x and z.
 			//Flame
-			for (int i = 0; i < 120; i++) {
+			for (int i = 0; i < 60; i++) {
 				double x = ThreadLocalRandom.current().nextDouble(-3, 3);
 				double z = ThreadLocalRandom.current().nextDouble(-3, 3);
 				Location to = mPlayer.getLocation().add(x, 0.15, z);
 				Vector dir = LocationUtils.getDirectionTo(to, mPlayer.getLocation().add(0, 0.15, 0));
-				mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), ThreadLocalRandom.current().nextDouble(0.1, 0.4));
+				mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), ThreadLocalRandom.current().nextDouble(0.1, 0.3));
 			}
 		}
 	}
@@ -166,9 +166,9 @@ public class MeteorSlam extends Ability {
 		double radius = getAbilityScore() == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
 		Location loc;
 		if (damagee == null) {
-			loc = mPlayer.getLocation();
+			loc = mPlayer.getLocation().add(0, 0.15, 0);
 		} else {
-			loc = damagee.getLocation();
+			loc = damagee.getLocation().add(0, 0.15, 0);
 		}
 		World world = mPlayer.getWorld();
 
@@ -180,9 +180,9 @@ public class MeteorSlam extends Ability {
 
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
-		world.spawnParticle(Particle.FLAME, loc, 175, 0F, 0F, 0F, 0.175F);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0F, 0F, 0F, 0.3F);
-		world.spawnParticle(Particle.LAVA, loc, 100, radius, 0.25f, radius, 0);
+		world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
+		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
+		world.spawnParticle(Particle.LAVA, loc, 3 * (int)(radius * radius), radius, 0.25f, radius, 0);
 	}
 
 	public double getSlamDamage() {

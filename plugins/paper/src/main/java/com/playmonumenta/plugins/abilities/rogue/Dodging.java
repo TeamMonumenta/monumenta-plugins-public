@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Dodging extends Ability {
 	/*
@@ -82,7 +83,7 @@ public class Dodging extends Ability {
 	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		Projectile proj = (Projectile) event.getDamager();
-		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || event.getFinalDamage() <= 0) {
+		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || EntityUtils.getRealFinalDamage(event) <= 0) {
 			return true;
 		}
 

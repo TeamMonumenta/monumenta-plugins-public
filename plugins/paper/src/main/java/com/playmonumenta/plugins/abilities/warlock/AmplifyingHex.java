@@ -104,10 +104,10 @@ public class AmplifyingHex extends Ability {
 				if (cf.getAbilityScore() > 1 && mob.getFireTicks() > 0) {
 					debuffCount++;
 				}
-				if (cf.getAbilityScore() > 1 && mob.hasMetadata(Inferno.INFERNO_TAG_METAKEY)) {
+				if (cf.getAbilityScore() > 1 && Inferno.mobHasInferno(mPlugin, mob)) {
 					debuffCount++;
 				}
-				if (mob.hasMetadata("MobIsStunnedByEntityUtils")) {
+				if (EntityUtils.isStunned(mob)) {
 					debuffCount++;
 				}
 				if (debuffCount > 0) {

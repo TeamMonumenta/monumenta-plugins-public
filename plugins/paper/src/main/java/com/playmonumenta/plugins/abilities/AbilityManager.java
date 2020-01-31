@@ -205,7 +205,6 @@ public class AbilityManager {
 		                               new NonClericProvisionsPassive(mPlugin, mWorld, mRandom, null),
 
 		                               // All other non-class abilities
-		                               new EvasionEnchant(mPlugin, mWorld, mRandom, null),
 		                               new PvP(mPlugin, mWorld, mRandom, null),
 		                               new PatreonWhite(mPlugin, mWorld, mRandom, null),
 		                               new PatreonGreen(mPlugin, mWorld, mRandom, null),
@@ -371,6 +370,7 @@ public class AbilityManager {
 
 		// These abilities should trigger after all event damage is calculated
 		mReferenceAbilities.addAll(Arrays.asList(
+									   new EvasionEnchant(mPlugin, mWorld, mRandom, null),
 									   new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                               new EscapeDeath(mPlugin, mWorld, mRandom, null)
 		                           ));

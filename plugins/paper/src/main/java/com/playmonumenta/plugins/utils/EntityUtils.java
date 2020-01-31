@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -17,6 +16,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
@@ -43,6 +43,8 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.ZombieHorse;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -394,6 +396,43 @@ public class EntityUtils {
 		}
 
 		return null;
+	}
+
+	// Manually calculates the real final damage dealt to a player, in case of manual event calls or absorption hearts.
+	// Evasion is not accounted for, as evasion modifies the actual event damage.
+	public static double getRealFinalDamage(EntityDamageEvent event) {
+		if (!(event.getEntity() instanceof Player)) {
+			return event.getDamage();
+		}
+
+		Player player = (Player) event.getEntity();
+		DamageCause cause = event.getCause();
+		double damage = event.getDamage();
+		double armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
+		double toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+
+		int protection = 0;
+		ItemStack[] armorContents = player.getInventory().getArmorContents();
+
+		for (int i = 0; i < armorContents.length; i++) {
+			if (armorContents[i] != null) {
+				if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+
+					if (cause == DamageCause.PROJECTILE) {
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE);
+					} else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
+					} else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR || cause == DamageCause.LAVA) {
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FIRE);
+					} else if (cause == DamageCause.FALL) {
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FALL);
+					}
+				}
+			}
+		}
+
+		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25) * (1 - Math.min(20, protection) * 0.04);
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {

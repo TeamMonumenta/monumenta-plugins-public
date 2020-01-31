@@ -42,7 +42,7 @@ public class Riposte extends Ability {
 
 	@Override
 	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (event.getFinalDamage() > 0) { //don't activate if the player wouldn't take damage
+		if (EntityUtils.getRealFinalDamage(event) > 0) { //don't activate if the player wouldn't take damage
 			LivingEntity damager = (LivingEntity) event.getDamager();
 			// First checks that the damage cause was either melee or custom (since entity.damage()
 			// counts as ENTITY_ATTACK), then eliminates 99% of ability attack cases by checking

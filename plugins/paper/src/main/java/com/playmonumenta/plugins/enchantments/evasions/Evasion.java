@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Evasion implements BaseEnchantment {
 
@@ -30,7 +31,7 @@ public class Evasion implements BaseEnchantment {
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
-		if (event.getFinalDamage() > 0) {
+		if (EntityUtils.getRealFinalDamage(event) > 0) {
 			evasion.chance += (8 * level);
 		}
 	}

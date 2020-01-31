@@ -49,8 +49,7 @@ public class ElementalArrows extends Ability {
 			if (damagee instanceof Stray) {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
-			damage += event.getDamage();
-			event.setDamage(0);
+
 			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell, false, true);
 			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, damagee);
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
@@ -63,8 +62,7 @@ public class ElementalArrows extends Ability {
 			if (damagee instanceof Blaze) {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
-			damage += event.getDamage();
-			event.setDamage(0);
+
 			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
 			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 		}

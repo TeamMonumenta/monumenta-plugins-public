@@ -205,6 +205,7 @@ public class EntityListener implements Listener {
 			}
 
 			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
+
 			if (damager instanceof LivingEntity) {
 				if (!mAbilities.PlayerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
@@ -887,7 +888,7 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void BossAbilityDamageEvent(BossAbilityDamageEvent event) {
 		if (event.getDamaged() instanceof Player) {
-			Player player = (Player) event.getDamaged();
+			Player player = event.getDamaged();
 			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
 			mAbilities.BossAbilityDamageEvent(player, event);
 		}
