@@ -70,7 +70,9 @@ public class Virius extends BossAbilityGroup {
 						(Player player, Location loc, boolean blocked) -> {
 							loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
 							loc.getWorld().spawnParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0);
-							BossUtils.bossDamage(boss, player, 20);
+							if (!blocked) {
+								BossUtils.bossDamage(boss, player, 20);
+							}
 						})
 		));
 
