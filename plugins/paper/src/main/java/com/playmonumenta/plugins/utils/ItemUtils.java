@@ -646,10 +646,10 @@ public class ItemUtils {
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
 			int newDamage = currentDamage + damage;
-			if (canBreak && newDamage > maxDurability) {
+			if (canBreak && newDamage > maxDurability - 1) {
 				item.setAmount(0);
 			} else {
-				dMeta.setDamage(Math.min(maxDurability, newDamage));
+				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				// Probably redundant, but can't hurt
 				item.setItemMeta(meta);
 			}
@@ -664,10 +664,10 @@ public class ItemUtils {
 			short maxDurability = item.getType().getMaxDurability();
 			int currentDamage = dMeta.getDamage();
 			int newDamage = (int) (currentDamage + (maxDurability * damagePercent) / 100);
-			if (canBreak && newDamage > maxDurability) {
+			if (canBreak && newDamage > maxDurability - 1) {
 				item.setAmount(0);
 			} else {
-				dMeta.setDamage(Math.min(maxDurability, newDamage));
+				dMeta.setDamage(Math.min(maxDurability - 1, newDamage));
 				// Probably redundant, but can't hurt
 				item.setItemMeta(meta);
 			}
