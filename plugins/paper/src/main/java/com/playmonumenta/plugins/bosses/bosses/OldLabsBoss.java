@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.bosses.spells.spells_oldslabsbos.SpellBash;
 import com.playmonumenta.plugins.bosses.spells.spells_oldslabsbos.SpellWhirlwind;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -173,7 +174,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = PlayerUtils.playersInRange(mSpawnLoc, detectionRange).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hp_del = 160;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

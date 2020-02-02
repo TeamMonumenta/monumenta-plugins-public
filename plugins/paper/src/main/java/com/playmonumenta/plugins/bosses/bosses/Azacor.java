@@ -112,7 +112,7 @@ public class Azacor extends BossAbilityGroup {
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		int player_count = PlayerUtils.playersInRange(mSpawnLoc, detectionRange).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		events.put(100, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?\",\"color\":\"dark_red\"}]");
 			if (player_count >= 3) {
@@ -143,7 +143,7 @@ public class Azacor extends BossAbilityGroup {
 	}
 
 	private void randomMinion(String tellraw) {
-		randomMinion(tellraw, mSpawnLoc, mRand, 100.0 + PlayerUtils.playersInRange(mSpawnLoc, detectionRange).size() * 75.0);
+		randomMinion(tellraw, mSpawnLoc, mRand, 100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0);
 	}
 
 	protected static void randomMinion(String tellraw, Location loc, Random random, double elite_health) {
@@ -165,7 +165,7 @@ public class Azacor extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hp_del = 1024;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

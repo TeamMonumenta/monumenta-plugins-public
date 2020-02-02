@@ -123,7 +123,7 @@ public class Masked extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE).size();
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, DETECTION_RANGE);
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 		int health = (int)((1 - Math.pow(0.5, playerCount)) * MAXIMUM_BASE_HEALTH);
 

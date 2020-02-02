@@ -313,7 +313,7 @@ public class TCalin extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hp_del = 512;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

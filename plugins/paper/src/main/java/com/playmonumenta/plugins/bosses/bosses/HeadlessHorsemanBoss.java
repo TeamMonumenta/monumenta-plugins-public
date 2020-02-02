@@ -310,7 +310,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		int hp_del = 2448;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

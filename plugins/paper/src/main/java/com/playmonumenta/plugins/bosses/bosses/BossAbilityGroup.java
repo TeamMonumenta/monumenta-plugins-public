@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public abstract class BossAbilityGroup {
@@ -86,7 +86,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't run abilities if players aren't present */
-				if (PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty()) {
+				if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
 					return;
 				}
 
@@ -132,7 +132,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't progress if players aren't present */
-				if (PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).isEmpty()) {
+				if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange) < 1) {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;

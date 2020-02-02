@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class CShura_1 extends BossAbilityGroup {
@@ -68,7 +68,7 @@ public class CShura_1 extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange).size();
+		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hp_del = 256;
 		int armor = (int)(Math.sqrt(player_count * 2) - 1);
 		while (player_count > 0) {

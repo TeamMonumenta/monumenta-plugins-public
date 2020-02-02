@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -237,5 +238,13 @@ public class BossUtils {
 			}
 		}
 		return true;
+	}
+
+	public static int getPlayersInRangeForHealthScaling(Entity entity, double radius) {
+		return getPlayersInRangeForHealthScaling(entity.getLocation(), radius);
+	}
+
+	public static int getPlayersInRangeForHealthScaling(Location loc, double radius) {
+		return PlayerUtils.playersInRange(loc, radius, true).size();
 	}
 }
