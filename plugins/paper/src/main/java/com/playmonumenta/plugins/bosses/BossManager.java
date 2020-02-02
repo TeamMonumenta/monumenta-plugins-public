@@ -28,6 +28,7 @@ import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -110,7 +111,6 @@ import com.playmonumenta.plugins.bosses.bosses.gray.GrayGolemSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GrayScarabSummoner;
 import com.playmonumenta.plugins.bosses.bosses.gray.GraySummoned;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -487,6 +487,18 @@ public class BossManager implements Listener {
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {
 				boss.bossPathfind(event);
+			}
+		}
+	}
+
+	@EventHandler
+	public void EntityTargetEvent(EntityTargetEvent event) {
+		if (event.getEntity() instanceof Mob) {
+			Mob entity = (Mob) event.getEntity();
+
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.bossChangedTarget(event);
 			}
 		}
 	}

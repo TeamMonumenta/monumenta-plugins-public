@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -180,6 +181,12 @@ public class Boss {
 	public void bossPathfind(EntityPathfindEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossPathfind(event);
+		}
+	}
+
+	public void bossChangedTarget(EntityTargetEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossChangedTarget(event);
 		}
 	}
 

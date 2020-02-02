@@ -7,7 +7,9 @@ import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -49,6 +51,13 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 		));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
+	}
+
+	/* Only allow mobs with this ability to target players */
+	public void bossChangedTarget(EntityTargetEvent event) {
+		if (!(event.getTarget() instanceof Player)) {
+			event.setCancelled(true);
+		}
 	}
 }
 

@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -231,6 +232,8 @@ public abstract class BossAbilityGroup {
 	public void bossCastAbility(SpellCastEvent event) {};
 
 	public void bossPathfind(EntityPathfindEvent event) {};
+
+	public void bossChangedTarget(EntityTargetEvent event) {};
 
 	/*
 	 * Called only the first time the boss is summoned into the world
