@@ -374,41 +374,60 @@ public class InventoryUtils {
 	public static int removeSpecialItems(Player player, boolean ephemeral_only) {
 		int dropped = 0;
 
-		//  Clear inventory
-		dropped += _removeSpecialItemsFromInventory(player.getInventory(), player.getLocation(), ephemeral_only);
+		Location loc = player.getLocation();
 
-		//  Clear Ender Chest
-		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), player.getLocation(), ephemeral_only);
+		// Inventory
+		dropped += _removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeral_only);
+
+		// Ender Chest
+		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeral_only);
+
+		// Armor slots
+		ItemStack[] items = player.getInventory().getArmorContents();
+		dropped += _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		player.getInventory().setArmorContents(items);
+
+		// Extra slots (offhand, ???)
+		items = player.getInventory().getExtraContents();
+		dropped += _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		player.getInventory().setExtraContents(items);
 
 		return dropped;
 	}
 
-	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeral_only) {
+	private static int _removeSpecialItemsFromInventory(ItemStack[] items, Location loc, boolean ephemeral_only) {
 		int dropped = 0;
 
-		for (ItemStack item : inventory.getContents()) {
-			if (item != null) {
-				if (!ephemeral_only && _containsSpecialLore(item)) {
-					loc.getWorld().dropItem(loc, item);
-					inventory.removeItem(item);
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] != null) {
+				if (!ephemeral_only && _containsSpecialLore(items[i])) {
+					loc.getWorld().dropItem(loc, items[i]);
+					items[i] = null;
 					dropped += 1;
-				} else if (CurseOfEphemerality.isEphemeral(item)) {
-					inventory.removeItem(item);
+				} else if (CurseOfEphemerality.isEphemeral(items[i])) {
+					items[i] = null;
 				} else {
-					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
-						BlockStateMeta meta = (BlockStateMeta)item.getItemMeta();
+					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
+						BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
 							dropped += _removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeral_only);
 
 							meta.setBlockState(shulker);
-							item.setItemMeta(meta);
+							items[i].setItemMeta(meta);
 						}
 					}
 				}
 			}
 		}
 
+		return dropped;
+	}
+
+	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeral_only) {
+		ItemStack[] items = inventory.getContents();
+		int dropped = _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		inventory.setContents(items);
 		return dropped;
 	}
 
