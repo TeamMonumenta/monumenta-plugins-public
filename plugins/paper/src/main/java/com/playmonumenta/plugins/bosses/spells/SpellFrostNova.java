@@ -4,17 +4,18 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFrostNova extends SpellBaseAoE {
 
-	public SpellFrostNova(Plugin plugin, Entity launcher, int radius, int power) {
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float max_damage, float min_damage) {
 		super(plugin, launcher, radius, 80, 0, false, Sound.ENTITY_SNOWBALL_THROW,
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -38,9 +39,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					int pot_pow = (int)(power * ((radius - distance) / radius));
-					// TODO: Convert to boss damage so it can be evaded
-					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));
+					BossUtils.bossDamage(launcher, player, ((max_damage - min_damage) * ((radius - distance) / radius)) + min_damage);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 				}
 			}
