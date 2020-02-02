@@ -69,13 +69,13 @@ public class ShulkerEquipmentListener implements Listener {
 		    event.getWhoClicked() == null ||
 		    !(event.getWhoClicked() instanceof Player) ||
 		    event.getClickedInventory() == null ||
+		    // If it's a player inventory, must be in main inventory
+		    // https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+			(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
+			// Must be a player inventory, ender chest, or regular chest
 		    !(event.getClickedInventory() instanceof PlayerInventory ||
 		      event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
 		      event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
-		    // Must be in main inventory
-		    // https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-		    event.getSlot() < 9 ||
-		    event.getSlot() > 35 ||
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
