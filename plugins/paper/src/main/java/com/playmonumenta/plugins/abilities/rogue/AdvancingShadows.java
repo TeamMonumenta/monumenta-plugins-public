@@ -104,7 +104,7 @@ public class AdvancingShadows extends Ability {
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION,
-			                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, true));
+			                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, true, true));
 
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
