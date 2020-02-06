@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -192,7 +191,7 @@ public class SpellBaseCharge extends Spell {
 
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
-		BoundingBox box = BoundingBox.of(endLoc, 0.15, 0.15, 0.15);
+		BoundingBox box = charger.getBoundingBox();
 		for (int i = 0; i < 200; i++) {
 			box.shift(baseVect);
 			endLoc.add(baseVect);
@@ -202,22 +201,22 @@ public class SpellBaseCharge extends Spell {
 				particle.run(endLoc);
 			}
 
-			List<Block> blocks = new ArrayList<Block>();
-			for (int x = -1; x < 1; x++) {
-				for (int y = -1; y < 1; y++) {
-					for (int z = -1; z < 1; z++) {
-						blocks.add(endLoc.clone().add(x, y, z).getBlock());
+			// Check if the bounding box overlaps with any of the surrounding blocks
+			for (int x = -1; x <= 1 && !cancel; x++) {
+				for (int y = -1; y <= 1 && !cancel; y++) {
+					for (int z = -1; z <= 1 && !cancel; z++) {
+						Block block = endLoc.clone().add(x, y, z).getBlock();
+						// If it overlaps with any, move it back to the last safe location
+						// and terminate the charge before the block.
+						if(block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
+							endLoc.subtract(baseVect);
+							cancel = true;
+						}
 					}
 				}
 			}
 
-			for (Block block : blocks) {
-				if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
-					cancel = true;
-					break;
-				}
-			}
-			if (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid()) {
+			if (!cancel && (endLoc.getBlock().getType().isSolid() || endLoc1.getBlock().getType().isSolid())) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
 				endLoc.subtract(baseVect.multiply(1));
 				// Charge terminated at a block
