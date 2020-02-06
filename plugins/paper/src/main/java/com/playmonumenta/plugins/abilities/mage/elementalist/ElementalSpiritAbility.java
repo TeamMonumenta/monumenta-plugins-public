@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.specializations.objects.ElementalSpirit;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ElementalSpiritAbility extends Ability {
 
@@ -61,8 +62,17 @@ public class ElementalSpiritAbility extends Ability {
 								rotation += 10;
 								double radian1 = Math.toRadians(rotation);
 								loc.add(Math.cos(radian1), Math.sin(t) * 0.5, Math.sin(radian1));
-								mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
-								mWorld.spawnParticle(Particle.SNOWBALL, loc, 1, 0, 0, 0, 0);
+
+								// Don't display particles to player if they're in their face
+								if (loc.clone().subtract(mPlayer.getLocation().add(0, 1, 0)).toVector().normalize().dot(mPlayer.getEyeLocation().getDirection()) > 0.33) {
+									for (Player other : PlayerUtils.playersInRange(mPlayer, 30, false)) {
+										other.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
+										other.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
+									}
+								} else {
+									mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
+									mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
+								}
 
 								if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritAbility.class) == null ||
 									!mPlayer.isOnline() || mPlayer == null || spirit == null || mPlayer.isDead() ||

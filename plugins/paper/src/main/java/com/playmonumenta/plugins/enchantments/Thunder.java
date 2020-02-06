@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Thunder implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";
@@ -40,7 +41,7 @@ public class Thunder implements BaseEnchantment {
 		double rand = mRandom.nextDouble();
 		World world = target.getWorld();
 
-		if (player.getCooledAttackStrength(0) == 1 && rand < level * 0.1) {
+		if (PlayerUtils.isFullyCooled(player) && rand < level * 0.1) {
 			if (EntityUtils.isElite(target)) {
 				EntityUtils.applyStun(plugin, 10, target);
 			} else if (!EntityUtils.isBoss(target)) {

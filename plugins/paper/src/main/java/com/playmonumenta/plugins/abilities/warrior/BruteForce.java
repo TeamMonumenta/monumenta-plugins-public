@@ -33,7 +33,7 @@ public class BruteForce extends Ability {
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (PlayerUtils.isCritical(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.getCooledAttackStrength(0) == 1) {
+		if (PlayerUtils.isCritical(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(event.getDamage() + damageBonus);
 
 			Location loc = event.getEntity().getLocation().add(0, 0.75, 0);

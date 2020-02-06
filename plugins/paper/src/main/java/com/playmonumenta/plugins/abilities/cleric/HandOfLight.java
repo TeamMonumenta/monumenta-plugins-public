@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -46,7 +47,7 @@ public class HandOfLight extends Ability {
 		World world = mPlayer.getWorld();
 		boolean healCaster = AbilityManager.getManager().isPvPEnabled(mPlayer);
 		for (Player p : PlayerUtils.playersInRange(mPlayer, HEALING_RADIUS, healCaster)) {
-			double healAmount = healing == 1 ? 2 + (p.getMaxHealth() * 0.1) : 4 + (p.getMaxHealth() * 0.2);
+			double healAmount = healing == 1 ? 2 + (p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1) : 4 + (p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.2);
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 
 			// Only heal players in the correct direction

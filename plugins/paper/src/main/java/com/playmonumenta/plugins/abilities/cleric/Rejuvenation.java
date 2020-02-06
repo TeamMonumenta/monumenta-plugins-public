@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -43,7 +44,7 @@ public class Rejuvenation extends Ability {
 							//  If this is us or we're allowing anyone to get it.
 							if (p == mPlayer || rejuvenation > 1) {
 								double oldHealth = p.getHealth();
-								PlayerUtils.healPlayer(p, p.getMaxHealth() * 0.05);
+								PlayerUtils.healPlayer(p, p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.05);
 								if (p.getHealth() > oldHealth) {
 									mWorld.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 								}

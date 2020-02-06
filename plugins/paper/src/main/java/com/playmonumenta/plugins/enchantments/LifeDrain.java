@@ -29,14 +29,12 @@ public class LifeDrain implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (player.getCooledAttackStrength(0) == 1) {
-			if (PlayerUtils.isCritical(player)) {
-				PlayerUtils.healPlayer(player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
-				player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
-			} else {
-				PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL * Math.sqrt(level));
-				player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
-			}
+		if (PlayerUtils.isCritical(player)) {
+			PlayerUtils.healPlayer(player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
+			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
+		} else if (PlayerUtils.isFullyCooled(player)) {
+			PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL * Math.sqrt(level));
+			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
 		}
 	}
 }

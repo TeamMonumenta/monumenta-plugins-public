@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +63,34 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 
 public class EntityUtils {
 
+	private static final EnumSet<DamageCause> PHYSICAL_DAMAGE = EnumSet.of(
+			DamageCause.BLOCK_EXPLOSION,
+			DamageCause.ENTITY_ATTACK,
+			DamageCause.ENTITY_EXPLOSION,
+			DamageCause.ENTITY_SWEEP_ATTACK,
+			DamageCause.FALLING_BLOCK,
+			DamageCause.FIRE,
+			DamageCause.HOT_FLOOR,
+			DamageCause.LAVA,
+			DamageCause.LIGHTNING,
+			DamageCause.PROJECTILE,
+			DamageCause.THORNS
+	);
+	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
+			EntityType.ZOMBIE,
+			EntityType.ZOMBIE_VILLAGER,
+			EntityType.PIG_ZOMBIE,
+			EntityType.HUSK,
+		    EntityType.SKELETON,
+		    EntityType.WITHER_SKELETON,
+		    EntityType.STRAY,
+		    EntityType.WITHER,
+		    EntityType.ZOMBIE_HORSE,
+		    EntityType.SKELETON_HORSE,
+		    EntityType.PHANTOM,
+		    EntityType.DROWNED
+	);
+
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable mobsTracker = null;
@@ -119,11 +148,7 @@ public class EntityUtils {
 	}
 
 	public static boolean isUndead(LivingEntity mob) {
-		EntityType type = mob.getType();
-		return type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER || type == EntityType.PIG_ZOMBIE || type == EntityType.HUSK ||
-		       type == EntityType.SKELETON || type == EntityType.WITHER_SKELETON || type == EntityType.STRAY ||
-		       type == EntityType.WITHER || type == EntityType.ZOMBIE_HORSE || type == EntityType.SKELETON_HORSE ||
-		       type == EntityType.PHANTOM || type == EntityType.DROWNED;
+		return UNDEAD_MOBS.contains(mob.getType());
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -350,7 +375,7 @@ public class EntityUtils {
 	 * @param types List of EntityTypes to be returned, defaults to hostile mobs if null
 	 * @return      List of LivingEntity objects of the specified type within the bounding box
 	 */
-	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, Set<EntityType> types) {
+	public static List<LivingEntity> getNearbyMobs(Location loc, double rx, double ry, double rz, EnumSet<EntityType> types) {
 		Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, rx, ry, rz);
 
 		List<LivingEntity> mobs = new ArrayList<LivingEntity>(entities.size());
@@ -383,7 +408,7 @@ public class EntityUtils {
 		return getNearbyMobs(loc, radius, radius, radius);
 	}
 
-	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, Set<EntityType> types) {
+	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, EnumSet<EntityType> types) {
 		return getNearbyMobs(loc, radius, radius, radius, types);
 	}
 
@@ -408,8 +433,13 @@ public class EntityUtils {
 		Player player = (Player) event.getEntity();
 		DamageCause cause = event.getCause();
 		double damage = event.getDamage();
-		double armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
-		double toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+		double armor = 0;
+		double toughness = 0;
+
+		if (PHYSICAL_DAMAGE.contains(cause)) {
+			armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
+			toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+		}
 
 		int protection = 0;
 		ItemStack[] armorContents = player.getInventory().getArmorContents();
@@ -420,19 +450,19 @@ public class EntityUtils {
 					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
 
 					if (cause == DamageCause.PROJECTILE) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE);
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE) * 2;
 					} else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS);
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS) * 2;
 					} else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR || cause == DamageCause.LAVA) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FIRE);
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FIRE) * 2;
 					} else if (cause == DamageCause.FALL) {
-						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FALL);
+						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FALL) * 3;
 					}
 				}
 			}
 		}
 
-		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25) * (1 - Math.min(20, protection) * 0.04);
+		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25) * (1 - Math.min(20.0, protection) / 25);
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {

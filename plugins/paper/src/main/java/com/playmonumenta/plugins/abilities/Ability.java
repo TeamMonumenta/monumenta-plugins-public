@@ -237,7 +237,7 @@ public abstract class Ability {
 		AbilityInfo info = getInfo();
 		if (mPlayer != null && info.scoreboardId != null) {
 			if (mScore == null) {
-				mScore = new Integer(ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId));
+				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
 			}
 			return mScore;
 		}

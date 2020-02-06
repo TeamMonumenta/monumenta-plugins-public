@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -124,7 +125,7 @@ public class EnchantedPrayer extends Ability {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
 				EntityUtils.damageEntity(plugin, le, damage, player);
 			}
-			PlayerUtils.healPlayer(player, player.getMaxHealth() * heal);
+			PlayerUtils.healPlayer(player, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * heal);
 		}
 	}
 }

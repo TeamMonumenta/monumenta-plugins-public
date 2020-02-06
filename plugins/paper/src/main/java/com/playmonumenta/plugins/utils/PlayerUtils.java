@@ -20,8 +20,14 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class PlayerUtils {
+
+	public static boolean isFullyCooled(Player player) {
+		return player.getCooledAttackStrength(0) == 1;
+	}
+
 	public static boolean isCritical(Player player) {
-		return player.getFallDistance() > 0.0F &&
+		return isFullyCooled(player) &&
+			   player.getFallDistance() > 0.0F &&
 		       !player.isOnGround() &&
 		       !player.isInsideVehicle() &&
 		       !player.hasPotionEffect(PotionEffectType.BLINDNESS) &&
