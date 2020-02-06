@@ -57,7 +57,7 @@ public class BoatTracking implements EntityTracking {
 						world.dropItem(boat.getLocation(), new ItemStack(Material.JUNGLE_BOAT));
 						break;
 					case REDWOOD:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.ACACIA_BOAT));
+						world.dropItem(boat.getLocation(), new ItemStack(Material.SPRUCE_BOAT));
 						break;
 					}
 					boatIter.remove();
