@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -67,58 +69,116 @@ public class BodkinBlitz extends Ability {
 			return;
 		}
 
+		mLeftClicks = 0;
+
 		putOnCooldown();
 
-		Vector projectile = mPlayer.getLocation().getDirection().normalize().multiply(0.25);
-		Location loc = mPlayer.getLocation();
-
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
-		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
 
 		new BukkitRunnable() {
-			Location tpLoc = loc;
+			Location boxLoc;
+			Vector shiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
+			BoundingBox loc = mPlayer.getBoundingBox();
 			int j = 0;
 
 			@Override
 			public void run() {
+				// Since the player's bounding box is a bit too close to the ground. This should give players more distance more consistently
+				// (due to how the teleport location is currently determined)
+				loc.shift(0, 0.15, 0);
+				
 				// Fire projectile.
-				for (int i = 0; i < 6; i ++) {
-					loc.add(projectile);
+				for (int i = 0; i < 15; i++) {
+					boxLoc = loc.getCenter().toLocation(mWorld);
+					boxLoc.setDirection(mPlayer.getLocation().getDirection());
 
-					if (!loc.getBlock().getType().isSolid() && !loc.clone().add(0, 1, 0).getBlock().getType().isSolid()) {
-						tpLoc = loc;
-					} else if (!loc.clone().add(0, 1, 0).getBlock().getType().isSolid() && !loc.clone().add(0, 2, 0).getBlock().getType().isSolid()) {
-						tpLoc = loc.clone().add(0, 1, 0);
-					} else {
+					/**
+					 * Going to continue to work on this for next week. What I want is for it to
+					 * teleport smarter: if the bounding box overlaps with a ceiling or floor,
+					 * it will try to reposition to find a suitable location within y +- 0.5.
+					 */
+//					boolean isBlocked = true;
+//					for (int x = -1; x <= 1; x++) {
+//						for (int z = -1; z <= 1; z++) {
+//							for (int y = -1; y <= 1; y++) {
+//								for (int dy = 0; dy < 8; dy++) {
+//									// This condition here just saves us a few checks.
+//									if (isBlocked) {
+//										Block block = boxLoc.clone().add(x, y + dy / 10.0, z).getBlock();
+//										if (!block.getBoundingBox().overlaps(loc) || !block.getType().isSolid()) {
+//											isBlocked = false;
+//											break;
+//										}
+//									}
+//								}
+//							}
+//						}
+//					}
+
+					boolean isBlocked = false;
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							for (int y = -1; y <= 1; y++) {
+								// This condition here just saves us a few checks.
+								if (!isBlocked) {
+									Block block = boxLoc.clone().add(x, y, z).getBlock();
+									if (block.getType().isSolid() && block.getBoundingBox().overlaps(loc)) {
+										isBlocked = true;
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					if (isBlocked) {
 						j = 4;
 						break;
 					}
 
-					mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 5, 0.15, 0.45, 0.1, Bukkit.createBlockData("gray_concrete"));
-					mWorld.spawnParticle(Particle.CRIT, loc.clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 5, 0.15, 0.45, 0.15, 0.01);
+					mWorld.spawnParticle(Particle.FALLING_DUST, boxLoc, 5, 0.15, 0.45, 0.1,
+							Bukkit.createBlockData("gray_concrete"));
+					mWorld.spawnParticle(Particle.CRIT, boxLoc, 4, 0.25, 0.5, 0.25, 0);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 5, 0.15, 0.45, 0.15, 0.01);
+
+					loc.shift(shiftVec);
 
 				}
 				j++;
+				// Each incrementation of j checks for 1.5 blocks, for a max of 4 (6 blocks).
+				// This is so that we can have a small projectile animation.
 
 				// Teleport player
 				if (j >= 4) {
+					Location tpLoc = boxLoc.clone().add(0, -0.85, 0);
+
+					for (int i = 0; i < 10; i++) {
+						if (!tpLoc.getBlock().getType().isSolid()) {
+							tpLoc.subtract(0, 0.1, 0);
+						} else {
+							tpLoc.add(0, 0.3, 0);
+							break;
+						}
+					}
+
 					mPlayer.teleport(tpLoc);
 
-					mWorld.playSound(tpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
-					mWorld.playSound(tpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
-					mWorld.playSound(tpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
-					mWorld.playSound(tpLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
-					mWorld.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
-					mWorld.playSound(tpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
+					mWorld.playSound(boxLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
+					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
+					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
+					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
+					mWorld.playSound(boxLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
+					mWorld.playSound(boxLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
 
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05);
-					mWorld.spawnParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, boxLoc, 30, 0.25, 0.5, 0.25, 0.18);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, boxLoc, 15, 0.25, 0.5, 0.25, 0.04);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, boxLoc, 15, 0.5, 0.5, 0.5, 0);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 50, 0.75, 0.5, 0.75, 0.05);
+					mWorld.spawnParticle(Particle.CRIT, boxLoc, 25, 1, 1, 1, 0.3);
 
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+							new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
 
 					LivingEntity target = EntityUtils.getNearestHostile(mPlayer, 3);
 
@@ -128,7 +188,7 @@ public class BodkinBlitz extends Ability {
 						Location enemyLoc = target.getLocation().add(0, 1.5, 0);
 						Vector beam = LocationUtils.getDirectionTo(enemyLoc, beamLoc).multiply(0.2);
 
-						for (int i = 0; i < 15; i ++) {
+						for (int i = 0; i < 15; i++) {
 							beamLoc.add(beam);
 
 							mWorld.spawnParticle(Particle.SMOKE_LARGE, beamLoc, 3, 0.2, 0.2, 0.2, 0.01);
@@ -154,12 +214,14 @@ public class BodkinBlitz extends Ability {
 
 							new BukkitRunnable() {
 								int i = 0;
+
 								public void run() {
 									if (i >= 100) {
 										mark = null;
 										this.cancel();
 									} else {
-										mWorld.spawnParticle(Particle.SMOKE_LARGE, mark.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.07f);
+										mWorld.spawnParticle(Particle.SMOKE_LARGE,
+												mark.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.07f);
 										i++;
 										if (mark == null) {
 											i = 100;
@@ -191,8 +253,8 @@ public class BodkinBlitz extends Ability {
 	@Override
 	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		EntityDamageEvent e = event.getEntity().getLastDamageCause();
-		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK || e.getCause() == DamageCause.CUSTOM) {
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Killed mob!");
+		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK
+				|| e.getCause() == DamageCause.CUSTOM) {
 			if (event.getEntity() == mark) {
 				LivingEntity mob = event.getEntity();
 				mWorld.playSound(mob.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);
