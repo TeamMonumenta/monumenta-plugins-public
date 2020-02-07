@@ -29,6 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.InstantDrink;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -151,6 +152,8 @@ public class PotionConsumeListener implements Listener {
 			mPotionsConsumed.put(player.getUniqueId(), new ItemStack(item));
 		}
 
+		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
+
 		//Do not reduce potions or place glass bottles if the potion is infinite
 		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			item.setAmount(item.getAmount() - 1);
@@ -212,6 +215,8 @@ public class PotionConsumeListener implements Listener {
 			potion.setItem(item);
 
 		}
+
+		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 
 		//Remove item
 		item.setAmount(item.getAmount() - 1);

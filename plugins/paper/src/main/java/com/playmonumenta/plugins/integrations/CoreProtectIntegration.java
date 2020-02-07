@@ -31,7 +31,7 @@ public class CoreProtectIntegration {
 		return CoreProtect;
 	}
 
-	public void logContainerTransaction(Player player, Location location) {
+	public static void logContainerTransaction(Player player, Location location) {
 		CoreProtectAPI api = getCoreProtect();
 		if (api != null) {
 			api.logContainerTransaction(player.getName(), location);
