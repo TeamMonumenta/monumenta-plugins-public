@@ -80,6 +80,7 @@ public class PotionManager {
 	public void addPotion(Player player, PotionID id, PotionInfo info) {
 		// Instant potions do not need to be tracked
 		if (Constants.POTION_MANAGER_ENABLED
+			&& info != null
 		    && !info.type.equals(PotionEffectType.HARM)
 		    && !info.type.equals(PotionEffectType.HEAL)) {
 

@@ -609,7 +609,10 @@ public class EntityUtils {
 			mob.setVelocity(new Vector(0, 0, 0));
 		}
 
-		creature.setTarget(getNearbyMobs(mob.getLocation(), 8, mob).get(0));
+		List<LivingEntity> nearby = getNearbyMobs(mob.getLocation(), 8, mob);
+		if (nearby.size() > 0) {
+			creature.setTarget(nearby.get(0));
+		}
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
 
 		Integer t = CONFUSED_MOBS.get(mob);

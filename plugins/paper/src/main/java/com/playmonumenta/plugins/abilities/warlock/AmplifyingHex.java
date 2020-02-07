@@ -101,11 +101,13 @@ public class AmplifyingHex extends Ability {
 
 				ConsumingFlames cf = (ConsumingFlames) AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
 
-				if (cf.getAbilityScore() > 1 && mob.getFireTicks() > 0) {
-					debuffCount++;
-				}
-				if (cf.getAbilityScore() > 1 && Inferno.mobHasInferno(mPlugin, mob)) {
-					debuffCount++;
+				if (cf != null)	{
+					if (cf.getAbilityScore() > 1 && mob.getFireTicks() > 0) {
+						debuffCount++;
+					}
+					if (cf.getAbilityScore() > 1 && Inferno.mobHasInferno(mPlugin, mob)) {
+						debuffCount++;
+					}
 				}
 				if (EntityUtils.isStunned(mob)) {
 					debuffCount++;

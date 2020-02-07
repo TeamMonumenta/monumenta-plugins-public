@@ -41,7 +41,7 @@ public class ThrowingKnife implements BaseEnchantment {
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			ItemStack item = event.getItem();
-			if (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW) {
+			if (item != null && (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW)) {
 				if (player.getCooldown(item.getType()) <= 0) {
 					if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 						item.setAmount(item.getAmount() - 1);

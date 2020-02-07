@@ -461,10 +461,13 @@ public class BossManager implements Listener {
 			}
 
 			if (damager instanceof EvokerFangs) {
-				boss = mBosses.get(((EvokerFangs)damager).getOwner().getUniqueId());
-				if (boss != null) {
-					// May cancel the event
-					boss.bossDamagedEntity(event);
+				LivingEntity owner = ((EvokerFangs)damager).getOwner();
+				if (owner != null) {
+					boss = mBosses.get(owner.getUniqueId());
+					if (boss != null) {
+						// May cancel the event
+						boss.bossDamagedEntity(event);
+					}
 				}
 			}
 		}
