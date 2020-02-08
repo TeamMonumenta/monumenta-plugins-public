@@ -26,7 +26,11 @@ public class BossFight {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
 		arguments.put("entity", new EntitySelectorArgument(EntitySelector.ONE_ENTITY));
-		arguments.put("boss_tag", new DynamicSuggestedStringArgument(() -> { return BossManager.getInstance().listBosses(); }));
+		arguments.put("boss_tag", new DynamicSuggestedStringArgument(
+			() -> {
+				return BossManager.getInstance().listBosses();
+			}
+		));
 		CommandAPI.getInstance().register("bossfight",
 		                                  CommandPermission.fromString("monumenta.bossfight"),
 		                                  arguments,
