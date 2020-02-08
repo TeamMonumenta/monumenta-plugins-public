@@ -45,7 +45,7 @@ public class SpellProjectileDeflection extends Spell {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
 			mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, proj.getLocation(), 10, 0, 0, 0, 0.1);
 		}
-	};
+	}
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
@@ -55,7 +55,7 @@ public class SpellProjectileDeflection extends Spell {
 				event.setCancelled(true);
 			}
 		}
-	};
+	}
 
 	@Override
 	public void run() {

@@ -84,31 +84,31 @@ public class SpellBladeDance extends Spell {
 
 					//Ultra flash
 					new BukkitRunnable() {
-						double rotation = 0;
-						Location loc = mCaster.getLocation();
-						double radius = 0;
-						double y = 2.5;
-						double yminus = 0.35;
+						double mRotation = 0;
+						Location mLoc = mCaster.getLocation();
+						double mRadius = 0;
+						double mY = 2.5;
+						double mYminus = 0.35;
 
 						@Override
 						public void run() {
 
-							radius += 1;
+							mRadius += 1;
 							for (int i = 0; i < 15; i += 1) {
-								rotation += 24;
-								double radian1 = Math.toRadians(rotation);
-								loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-								world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
-								loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+								mRotation += 24;
+								double radian1 = Math.toRadians(mRotation);
+								mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+								world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
+								world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+								mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 							}
-							y -= y * yminus;
-							yminus += 0.02;
-							if (yminus >= 1) {
-								yminus = 1;
+							mY -= mY * mYminus;
+							mYminus += 0.02;
+							if (mYminus >= 1) {
+								mYminus = 1;
 							}
-							if (radius >= 7) {
+							if (mRadius >= 7) {
 								this.cancel();
 							}
 

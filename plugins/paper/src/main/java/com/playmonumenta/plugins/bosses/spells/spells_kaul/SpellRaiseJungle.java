@@ -37,7 +37,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  */
 
 public class SpellRaiseJungle extends Spell {
-	private final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
+	private static final String ELEMENTAL = "{CustomName:\"{\\\"text\\\":\\\"Earth Elemental\\\"}\",Health:80.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:coarse_dirt\",Count:1b,tag:{Enchantments:[{lvl:6s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:6302698651954335388L,UUIDLeast:-8389639952570264411L,Amount:14.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:-1762668789229140628L,UUIDLeast:-8025770187519780738L,Amount:0.385d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:80.0d,Name:\"generic.maxHealth\"}]}";
+	private static final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -45,8 +46,7 @@ public class SpellRaiseJungle extends Spell {
 	private double mDetectRange;
 	private int mSummonTime;
 	private double mY;
-	private List<UUID> summoned = new ArrayList<UUID>();
-	private final String elemental = "{CustomName:\"{\\\"text\\\":\\\"Earth Elemental\\\"}\",Health:80.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8683051,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:coarse_dirt\",Count:1b,tag:{Enchantments:[{lvl:6s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:6302698651954335388L,UUIDLeast:-8389639952570264411L,Amount:14.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:-1762668789229140628L,UUIDLeast:-8025770187519780738L,Amount:0.385d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:80.0d,Name:\"generic.maxHealth\"}]}";
+	private List<UUID> mSummoned = new ArrayList<UUID>();
 
 	private int mCooldown;
 	private boolean onCooldown = false;
@@ -105,18 +105,18 @@ public class SpellRaiseJungle extends Spell {
 						sLoc = loc.clone().add(x, 0.25, z);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:husk " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " " + elemental);
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:husk " + spawn.getX() + " " + spawn.getY() + " " + spawn.getZ() + " " + ELEMENTAL);
 					LivingEntity element = null;
 					for (Entity e : spawn.getWorld().getNearbyEntities(spawn, 0.4, 0.4, 0.4)) {
-						if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Zombie && !summoned.contains(e.getUniqueId())) {
+						if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Zombie && !mSummoned.contains(e.getUniqueId())) {
 							element = (LivingEntity) e;
 							break;
 						}
 					}
 					LivingEntity ele = element;
 					Location scLoc = sLoc.clone();
-					if (!summoned.contains(ele.getUniqueId())) {
-						summoned.add(ele.getUniqueId());
+					if (!mSummoned.contains(ele.getUniqueId())) {
+						mSummoned.add(ele.getUniqueId());
 						ele.setAI(false);
 						new BukkitRunnable() {
 							int t = 0;
@@ -152,8 +152,8 @@ public class SpellRaiseJungle extends Spell {
 
 								if (ele.isDead() || !ele.isValid() || ele == null) {
 									this.cancel();
-									summoned.remove(ele.getUniqueId());
-									if (summoned.size() <= 0) {
+									mSummoned.remove(ele.getUniqueId());
+									if (mSummoned.size() <= 0) {
 										new BukkitRunnable() {
 
 											@Override
@@ -180,14 +180,14 @@ public class SpellRaiseJungle extends Spell {
 							}
 						}
 
-						if (mSummonTime <= t && !summoned.isEmpty()) {
+						if (mSummonTime <= t && !mSummoned.isEmpty()) {
 							for (Player player : players) {
 								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 							}
 							this.cancel();
 						}
 
-						if (summoned.isEmpty()) {
+						if (mSummoned.isEmpty()) {
 							this.cancel();
 						}
 					}
@@ -200,7 +200,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (summoned.size() > 0) {
+		if (mSummoned.size() > 0) {
 			event.setDamage(event.getDamage() * 0.4);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
 			mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA);
@@ -209,7 +209,7 @@ public class SpellRaiseJungle extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return summoned.size() <= 0 && !onCooldown;
+		return mSummoned.size() <= 0 && !onCooldown;
 	}
 
 	@Override

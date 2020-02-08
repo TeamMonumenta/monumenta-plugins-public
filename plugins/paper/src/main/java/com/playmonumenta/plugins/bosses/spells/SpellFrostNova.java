@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellFrostNova extends SpellBaseAoE {
 
-	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float max_damage, float min_damage) {
+	public SpellFrostNova(Plugin plugin, LivingEntity launcher, int radius, float maxDamage, float minDamage) {
 		super(plugin, launcher, radius, 80, 0, false, Sound.ENTITY_SNOWBALL_THROW,
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -39,7 +39,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					BossUtils.bossDamage(launcher, player, ((max_damage - min_damage) * ((radius - distance) / radius)) + min_damage);
+					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 				}
 			}

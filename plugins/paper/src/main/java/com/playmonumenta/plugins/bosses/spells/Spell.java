@@ -23,6 +23,7 @@ public abstract class Spell implements Cloneable {
 	public boolean canRun() {
 		return true;
 	}
+
 	public abstract void run();
 
 	/*

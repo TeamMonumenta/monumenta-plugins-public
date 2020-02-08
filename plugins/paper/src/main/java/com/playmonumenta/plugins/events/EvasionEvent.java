@@ -8,14 +8,14 @@ public class EvasionEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private final Player player;
+	private final Player mPlayer;
 
 	public EvasionEvent(Player player) {
-		this.player = player;
+		mPlayer = player;
 	}
 
 	public Player getPlayer() {
-		return player;
+		return mPlayer;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

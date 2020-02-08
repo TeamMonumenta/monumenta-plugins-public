@@ -4,7 +4,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
 
 public class SpellPurgeNegatives extends Spell {
-	private int cooldown = 0;
+	private int mCooldown = 0;
 	private LivingEntity mBoss;
 	private int mTimer;
 
@@ -28,9 +28,9 @@ public class SpellPurgeNegatives extends Spell {
 
 	@Override
 	public void run() {
-		cooldown -= 5;
-		if (cooldown <= 0) {
-			cooldown = mTimer;
+		mCooldown -= 5;
+		if (mCooldown <= 0) {
+			mCooldown = mTimer;
 			for (PotionEffectType type : NEGATIVE_EFFECTS) {
 				mBoss.removePotionEffect(type);
 			}

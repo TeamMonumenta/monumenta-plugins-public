@@ -32,14 +32,14 @@ public class SpellLightningStrike extends Spell {
 	private static final String LIGHTNING_STRIKE_METAKEY = "MonumentaPlayerStruckByKaulLightning";
 	private static final int NO_STRIKE_PERIOD = 60;
 
-	private int cooldown = 0;
+	private int mCooldown = 0;
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private double mRange;
 	private int mTimer;
 	private int mDivisor;
 	private Location mLoc;
-	private Random random = new Random();
+	private Random mRandom = new Random();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	public SpellLightningStrike(Plugin plugin, LivingEntity boss, Location loc, double range, int timer, int divisor) {
@@ -53,15 +53,15 @@ public class SpellLightningStrike extends Spell {
 
 	@Override
 	public void run() {
-		cooldown--;
-		if (cooldown <= 0) {
-			cooldown = (mTimer / 5);
+		mCooldown--;
+		if (mCooldown <= 0) {
+			mCooldown = (mTimer / 5);
 			List<Player> players = PlayerUtils.playersInRange(mLoc, mRange);
 			if (players.size() > 2) {
 				List<Player> toHit = new ArrayList<Player>();
 				int cap = players.size() / mDivisor;
 				for (int i = 0; i < cap; i++) {
-					Player player = players.get(random.nextInt(players.size()));
+					Player player = players.get(mRandom.nextInt(players.size()));
 					if (!toHit.contains(player)) {
 						toHit.add(player);
 					} else {

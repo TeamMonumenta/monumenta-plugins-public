@@ -46,16 +46,16 @@ public class SpellSummonBlazes extends Spell {
 
 		BukkitRunnable loop = new BukkitRunnable() {
 			final int DEFAULT_COUNTDOWN = 45 / PERIOD;
-			final Location loc = mLauncher.getLocation();
+			final Location mLoc = mLauncher.getLocation();
 
-			int countdown = DEFAULT_COUNTDOWN;
-			int count = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(loc, Masked.DETECTION_RANGE).size());;
-			int wavesLeft = SPAWN_CYCLES;
+			int mCountdown = DEFAULT_COUNTDOWN;
+			int mCount = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(mLoc, Masked.DETECTION_RANGE).size());;
+			int mWavesLeft = SPAWN_CYCLES;
 
 			@Override
 			public void run() {
-				Location centerLoc = loc.clone().add(0, 1, 0);
-				mLauncher.teleport(loc);
+				Location centerLoc = mLoc.clone().add(0, 1, 0);
+				mLauncher.teleport(mLoc);
 				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 4f, 2f);
 				for (int j = 0; j < 5; j++) {
 					Location particleLoc = centerLoc.clone().add(((double)(mRand.nextInt(4000) - 2000) / 1000),
@@ -64,22 +64,22 @@ public class SpellSummonBlazes extends Spell {
 					particleLoc.getWorld().spawnParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01);
 				}
 
-				countdown--;
-				if (countdown <= 0) {
-					for (int j = 0; j < count; j++) {
-						Entity blaz = loc.getWorld().spawnEntity(loc, EntityType.BLAZE);
+				mCountdown--;
+				if (mCountdown <= 0) {
+					for (int j = 0; j < mCount; j++) {
+						Entity blaz = mLoc.getWorld().spawnEntity(mLoc, EntityType.BLAZE);
 						double x = 0.5f * Math.cos((double)mRand.nextInt(628) / 100);
 						double z = 0.5f * Math.sin((double)mRand.nextInt(628) / 100);
 						blaz.setVelocity(new Vector(x, 0.3, z));
 					}
 
-					wavesLeft -= 1;
-					if (wavesLeft <= 0) {
+					mWavesLeft -= 1;
+					if (mWavesLeft <= 0) {
 						this.cancel();
 						return;
 					}
 
-					countdown = 2; // Spawn again 2 * PERIOD ticks later
+					mCountdown = 2; // Spawn again 2 * PERIOD ticks later
 				};
 			}
 		};

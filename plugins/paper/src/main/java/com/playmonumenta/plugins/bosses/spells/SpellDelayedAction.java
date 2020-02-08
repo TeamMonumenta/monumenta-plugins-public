@@ -57,7 +57,6 @@ public class SpellDelayedAction extends Spell {
 	public void run() {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
-			Location targetLoc;
 
 			@Override
 			public void run() {

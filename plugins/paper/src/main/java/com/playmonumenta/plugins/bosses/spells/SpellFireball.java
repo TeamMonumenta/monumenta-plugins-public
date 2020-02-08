@@ -70,25 +70,25 @@ public class SpellFireball extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
-			private List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+			private List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 
 			@Override
 			public void run() {
 				mBoss.setAI(false);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
-				for (Player player : players) {
+				for (Player player : mPlayers) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
 				}
 				if (mTicks >= mDelay) {
 					mLaunches++;
 					mTicks = 0;
 
-					players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
+					mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
-						Collections.shuffle(players);
-						for (Player player : players) {
+						Collections.shuffle(mPlayers);
+						for (Player player : mPlayers) {
 							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								launch(player);
 								break;
@@ -96,7 +96,7 @@ public class SpellFireball extends Spell {
 						}
 					} else {
 						// Otherwise target all players within range
-						for (Player player : players) {
+						for (Player player : mPlayers) {
 							launch(player);
 						}
 					}

@@ -40,9 +40,10 @@ public class SpellWhirlwind extends Spell {
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.5f, 1.5f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 4));
 		new BukkitRunnable() {
-			int t = 0;
-			double radius = 4;
-			double bladeDamageRadius = 4;
+			int mTicks = 0;
+			double mRadius = 4;
+			double mBladeDamageRadius = 4;
+
 			@Override
 			public void run() {
 
@@ -50,20 +51,20 @@ public class SpellWhirlwind extends Spell {
 
 				mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.125);
 				mWorld.spawnParticle(Particle.CRIT, loc, 8, 0.1, 0.1, 0.1, 0.6);
-				if (t % 2 == 0) {
+				if (mTicks % 2 == 0) {
 
 					for (int i = 0; i < 15; i += 1) {
 						double radian1 = Math.toRadians(24 * i);
-						loc.add(Math.cos(radian1) * radius, 0.1, Math.sin(radian1) * radius);
+						loc.add(Math.cos(radian1) * mRadius, 0.1, Math.sin(radian1) * mRadius);
 						mWorld.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.025);
 						mWorld.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0.25);
-						loc.subtract(Math.cos(radian1) * radius, 0.1, Math.sin(radian1) * radius);
+						loc.subtract(Math.cos(radian1) * mRadius, 0.1, Math.sin(radian1) * mRadius);
 
 					}
 				}
 
-				t++;
-				if (t >= 25) {
+				mTicks++;
+				if (mTicks >= 25) {
 					this.cancel();
 
 					List<Player> playersNearby = PlayerUtils.playersInRange(loc, 40);
@@ -85,11 +86,11 @@ public class SpellWhirlwind extends Spell {
 								sin += 0.1;
 								y = 1 + Math.sin(sin);
 								double radian1 = Math.toRadians(rotation);
-								loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+								loc.add(Math.cos(radian1) * mRadius, y, Math.sin(radian1) * mRadius);
 								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025);
 								mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025);
 								mWorld.spawnParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2);
-								loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+								loc.subtract(Math.cos(radian1) * mRadius, y, Math.sin(radian1) * mRadius);
 
 								/*
 								 * Check if this hits a player
@@ -99,7 +100,7 @@ public class SpellWhirlwind extends Spell {
 								while (iter.hasNext()) {
 									Player player = iter.next();
 
-									if (player.getLocation().distance(loc) < bladeDamageRadius) {
+									if (player.getLocation().distance(loc) < mBladeDamageRadius) {
 										BossUtils.bossDamage(mBoss, player, 6);
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.65f);
 										iter.remove();

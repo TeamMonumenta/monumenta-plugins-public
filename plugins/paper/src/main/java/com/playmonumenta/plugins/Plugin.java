@@ -213,13 +213,13 @@ public class Plugin extends JavaPlugin {
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			int ticks = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
-				final boolean oneHertz = (ticks % 20) == 0;
-				final boolean twoHertz = (ticks % 10) == 0;
-				final boolean fourHertz = (ticks % 5) == 0;
+				final boolean oneHertz = (mTicks % 20) == 0;
+				final boolean twoHertz = (mTicks % 10) == 0;
+				final boolean fourHertz = (mTicks % 5) == 0;
 				final boolean twentyHertz = true;
 
 				if (oneHertz) {
@@ -241,7 +241,7 @@ public class Plugin extends JavaPlugin {
 				if (fourHertz) {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
-							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, oneHertz, ticks);
+							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, oneHertz, mTicks);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -273,7 +273,7 @@ public class Plugin extends JavaPlugin {
 					}
 				}
 
-				ticks = (ticks + 1) % Constants.TICKS_PER_SECOND;
+				mTicks = (mTicks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
 

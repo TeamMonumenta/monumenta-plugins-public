@@ -21,10 +21,10 @@ public class SpellIceBreak extends Spell {
 		mLauncher = launcher;
 	}
 
-	private Random rand = new Random();
-	private Set<Block> iceBlocks = new HashSet<Block>();
-	private Set<Block> frostedBlocks = new HashSet<Block>();
-	private Set<Block> brokenBlocks = new HashSet<Block>();
+	private Random mRand = new Random();
+	private Set<Block> mIceBlocks = new HashSet<Block>();
+	private Set<Block> mFrostedBlocks = new HashSet<Block>();
+	private Set<Block> mBrokenBlocks = new HashSet<Block>();
 
 	@Override
 	public void run() {
@@ -41,7 +41,7 @@ public class SpellIceBreak extends Spell {
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 					if (material == Material.ICE || material == Material.BLUE_ICE || material == Material.PACKED_ICE) {
-						iceBlocks.add(testloc.getBlock());
+						mIceBlocks.add(testloc.getBlock());
 					}
 				}
 			}
@@ -50,42 +50,42 @@ public class SpellIceBreak extends Spell {
 		Location locationBelow = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1, loc.getZ());
 
 		// If the mob is on top of frosted ice, dont break yet.
-		if (!frostedBlocks.contains(locationBelow.getBlock())) {
+		if (!mFrostedBlocks.contains(locationBelow.getBlock())) {
 
 			// Break the frosted blocks
-			for (Block block : frostedBlocks) {
+			for (Block block : mFrostedBlocks) {
 				// Dont break a block when its right around an icebreak boss's feet.
-				boolean Break = true;
+				boolean shouldBreak = true;
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(block.getLocation(), 1.2)) {
 					if (mob.getScoreboardTags().contains("boss_icebreak")) {
-						Break = false;
+						shouldBreak = false;
 						break;
 					}
 				}
-				if (Break) {
+				if (shouldBreak) {
 					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.3f, 0.9f);
 					block.getLocation().getWorld().spawnParticle(Particle.WATER_SPLASH, block.getLocation(), 10, 1, 1, 1, 0.03);
 					block.setType(Material.AIR);
-					brokenBlocks.add(block);
+					mBrokenBlocks.add(block);
 				}
 			}
-			for (Block block : brokenBlocks) {
-				frostedBlocks.remove(block);
+			for (Block block : mBrokenBlocks) {
+				mFrostedBlocks.remove(block);
 			}
-			brokenBlocks.clear();
+			mBrokenBlocks.clear();
 
 			// Make the new frosted blocks
-			for (Block block : iceBlocks) {
+			for (Block block : mIceBlocks) {
 				// Randomise a bit to make it look better.
-				if (rand.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
+				if (mRand.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
 					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.1f, 0.9f);
 					block.getLocation().getWorld().spawnParticle(Particle.CLOUD, block.getLocation(), 10, 1, 1, 1, 0.03);
 					block.setType(Material.FROSTED_ICE);
-					frostedBlocks.add(block);
+					mFrostedBlocks.add(block);
 				}
 			}
 		}
-		iceBlocks.clear();
+		mIceBlocks.clear();
 	}
 
 	@Override

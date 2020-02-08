@@ -112,6 +112,7 @@ public interface BaseEnchantment {
 	 * they have any levels of this property (This only applies for MELEE attacks)
 	 */
 	default public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+
 	/*
 	 * The onKill() method will be called whenever the player kills something
 	 * while they have any levels of this property

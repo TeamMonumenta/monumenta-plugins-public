@@ -69,8 +69,8 @@ public class SpellBaseBolt extends Spell {
 	private int mDelay;
 	private int mDuration;
 	private double mVelocity;
-	private double mDetect_range;
-	private double mHitbox_radius;
+	private double mDetectRange;
+	private double mHitboxRadius;
 	private final boolean mSingleTarget;
 	private final boolean mStopOnFirstHit;
 	private final int mShots;
@@ -112,8 +112,8 @@ public class SpellBaseBolt extends Spell {
 		mDelay = delay;
 		mDuration = duration;
 		mVelocity = velocity;
-		mDetect_range = detectRange;
-		mHitbox_radius = hitboxRadius;
+		mDetectRange = detectRange;
+		mHitboxRadius = hitboxRadius;
 		mSingleTarget = singleTarget;
 		mStopOnFirstHit = stopOnFirstHit;
 		mShots = shots;
@@ -126,23 +126,23 @@ public class SpellBaseBolt extends Spell {
 
 	@Override
 	public void run() {
-		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange).size() > 0) {
 			new BukkitRunnable() {
-				int t = 0;
+				int mTicks = 0;
 				@Override
 				public void run() {
-					t++;
-					mTickAction.run(mCaster, t);
+					mTicks++;
+					mTickAction.run(mCaster, mTicks);
 
 					if (mCaster.isDead() || mCaster == null) {
 						this.cancel();
 						return;
 					}
 
-					if (t >= mDelay) {
+					if (mTicks >= mDelay) {
 						this.cancel();
 
-						List<Player> players = PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range);
+						List<Player> players = PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange);
 						if (players.size() > 0) {
 							if (mSingleTarget) {
 								if (mCaster instanceof Mob) {
@@ -173,12 +173,12 @@ public class SpellBaseBolt extends Spell {
 	private void launchBolt(Player player) {
 		mCastAction.run(mCaster);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				new BukkitRunnable() {
-					BoundingBox box = BoundingBox.of(mCaster.getEyeLocation(), mHitbox_radius, mHitbox_radius, mHitbox_radius);
+					BoundingBox box = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
 					Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1, 0), mCaster.getEyeLocation());
 					Location detLoc = mCaster.getLocation();
 					List<Player> players = PlayerUtils.playersInRange(detLoc, 75);
@@ -213,7 +213,7 @@ public class SpellBaseBolt extends Spell {
 					}
 				}.runTaskTimer(mPlugin, 0, 1);
 
-				if (t >= mShots) {
+				if (mTicks >= mShots) {
 					this.cancel();
 				}
 			}
@@ -224,7 +224,7 @@ public class SpellBaseBolt extends Spell {
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
 	public int duration() {
-		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetect_range).size() > 0) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange).size() > 0) {
 			return mDelay + (20 * 5);
 		} else {
 			return 1;

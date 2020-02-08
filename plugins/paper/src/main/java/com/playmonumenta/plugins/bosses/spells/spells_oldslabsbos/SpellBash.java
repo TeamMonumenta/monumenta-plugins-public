@@ -41,13 +41,13 @@ public class SpellBash extends Spell {
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
 		mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.75f);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.175);
 				mWorld.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, 0.025);
-				if (t >= 25) {
+				if (mTicks >= 25) {
 					this.cancel();
 					Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
 					Vector direction = LocationUtils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);

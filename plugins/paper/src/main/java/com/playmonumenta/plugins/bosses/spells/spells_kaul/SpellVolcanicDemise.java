@@ -41,12 +41,12 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  *
  */
 public class SpellVolcanicDemise extends Spell {
-	private ThreadLocalRandom rand = ThreadLocalRandom.current();
-	private Random random = new Random();
+	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private double mRange;
 	private Location mCenter;
+
 	public SpellVolcanicDemise(Plugin plugin, LivingEntity boss, double range, Location center) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -64,16 +64,16 @@ public class SpellVolcanicDemise extends Spell {
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t += 2;
-				float fTick = t;
+				mTicks += 2;
+				float fTick = mTicks;
 				float ft = fTick / 25;
 				world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005);
 				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
-				if (t >= 20 * 2) {
+				if (mTicks >= 20 * 2) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
@@ -93,14 +93,14 @@ public class SpellVolcanicDemise extends Spell {
 								}
 							}
 							for (int j = 0; j < 4; j++) {
-								rainMeteor(mCenter.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange)), players, 40);
+								rainMeteor(mCenter.clone().add(mRand.nextDouble(-mRange, mRange), 0, mRand.nextDouble(-mRange, mRange)), players, 40);
 							}
 
 							// Target one random player. Have a meteor rain nearby them.
 							if (players.size() >= 1) {
-								Player rPlayer = players.get(random.nextInt(players.size()));
+								Player rPlayer = players.get(mRand.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-8, 8), 0, rand.nextDouble(-8, 8)), players, 40);
+								rainMeteor(loc.add(mRand.nextDouble(-8, 8), 0, mRand.nextDouble(-8, 8)), players, 40);
 							}
 
 							if (i >= 25) {
@@ -148,7 +148,7 @@ public class SpellVolcanicDemise extends Spell {
 				}
 				Location particle = loc.clone().add(0, y, 0);
 				world.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
-				if (random.nextBoolean()) {
+				if (mRand.nextBoolean()) {
 					world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
 				}
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
@@ -175,7 +175,7 @@ public class SpellVolcanicDemise extends Spell {
 						}
 					}
 					for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 4)) {
-						if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) {
+						if (mRand.nextBoolean() && mRand.nextBoolean() && mRand.nextBoolean()) {
 							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 								block.setType(Material.NETHERRACK);
 							} else if (block.getType() == Material.NETHERRACK) {

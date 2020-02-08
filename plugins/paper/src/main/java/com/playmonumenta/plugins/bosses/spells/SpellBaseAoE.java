@@ -120,8 +120,8 @@ public class SpellBaseAoE extends Spell {
 			return;
 		}
 		new BukkitRunnable() {
-			float j = 0;
-			double radius = mRadius;
+			float mTicks = 0;
+			double mCurrentRadius = mRadius;
 
 			@Override
 			public void run() {
@@ -131,38 +131,38 @@ public class SpellBaseAoE extends Spell {
 					this.cancel();
 					return;
 				}
-				j++;
+				mTicks++;
 				mChargeAuraAction.run(loc.clone().add(0, 1, 0));
-				if (j <= (mDuration - 5) && j % mSoundDensity == 0) {
-					world.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (j / 100));
+				if (mTicks <= (mDuration - 5) && mTicks % mSoundDensity == 0) {
+					world.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (mTicks / 100));
 				}
 				for (double i = 0; i < 360; i += 15) {
 					double radian1 = Math.toRadians(i);
-					loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+					loc.add(Math.cos(radian1) * mCurrentRadius, 0, Math.sin(radian1) * mCurrentRadius);
 					mChargeCircleAction.run(loc);
-					loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+					loc.subtract(Math.cos(radian1) * mCurrentRadius, 0, Math.sin(radian1) * mCurrentRadius);
 				}
-				radius -= (mRadius / ((double) mDuration));
-				if (radius <= 0) {
+				mCurrentRadius -= (mRadius / ((double) mDuration));
+				if (mCurrentRadius <= 0) {
 					this.cancel();
 					mDealDamageAction.run(loc);
 					mOutburstAction.run(loc);
 
 					new BukkitRunnable() {
 						Location loc = mLauncher.getLocation();
-						double radius = 0;
+						double mBurstRadius = 0;
 						@Override
 						public void run() {
 							for (int j = 0; j < 2; j++) {
-								radius += 1.5;
+								mBurstRadius += 1.5;
 								for (double i = 0; i < 360; i += 15) {
 									double radian1 = Math.toRadians(i);
-									loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+									loc.add(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
 									mCircleOutburstAction.run(loc);
-									loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+									loc.subtract(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
 								}
 							}
-							if (radius >= mRadius) {
+							if (mBurstRadius >= mRadius) {
 								this.cancel();
 							}
 						}

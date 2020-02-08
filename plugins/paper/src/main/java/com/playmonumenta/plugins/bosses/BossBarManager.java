@@ -17,6 +17,7 @@ public class BossBarManager {
 	public interface BossHealthAction {
 		void run(LivingEntity boss);
 	}
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;

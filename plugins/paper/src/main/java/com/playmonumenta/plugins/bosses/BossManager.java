@@ -311,7 +311,7 @@ public class BossManager implements Listener {
 				continue;
 			}
 
-			ProcessEntity((LivingEntity)entity);
+			processEntity((LivingEntity)entity);
 		}
 	}
 
@@ -320,7 +320,7 @@ public class BossManager implements Listener {
 	 *******************************************************************************/
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void EntitySpawnEvent(EntitySpawnEvent event) {
+	public void entitySpawnEvent(EntitySpawnEvent event) {
 		if (!event.isCancelled()) {
 			Entity entity = event.getEntity();
 
@@ -328,23 +328,23 @@ public class BossManager implements Listener {
 				return;
 			}
 
-			ProcessEntity((LivingEntity)entity);
+			processEntity((LivingEntity)entity);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void ChunkLoadEvent(ChunkLoadEvent event) {
+	public void chunkLoadEvent(ChunkLoadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (!(entity instanceof LivingEntity)) {
 				continue;
 			}
 
-			ProcessEntity((LivingEntity)entity);
+			processEntity((LivingEntity)entity);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void ChunkUnloadEvent(ChunkUnloadEvent event) {
+	public void chunkUnloadEvent(ChunkUnloadEvent event) {
 		if (!event.isCancelled()) {
 			Entity[] entities = event.getChunk().getEntities();
 
@@ -359,7 +359,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void EntityDeathEvent(EntityDeathEvent event) {
+	public void entityDeathEvent(EntityDeathEvent event) {
 		if (!event.isCancelled()) {
 			Entity entity = event.getEntity();
 			if (!(entity instanceof LivingEntity)) {
@@ -383,7 +383,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
 		if (proj != null && !event.isCancelled()) {
 			ProjectileSource shooter = proj.getShooter();
@@ -398,7 +398,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void ProjectileHitEvent(ProjectileHitEvent event) {
+	public void projectileHitEvent(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
 		if (proj != null) {
 			ProjectileSource shooter = proj.getShooter();
@@ -419,7 +419,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
+	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		// Make a copy so it can be iterated while bosses modify the actual list
 		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
 			Boss boss = mBosses.get(entity.getUniqueId());
@@ -430,7 +430,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PotionSplashEvent(PotionSplashEvent event) {
+	public void potionSplashEvent(PotionSplashEvent event) {
 		// Make a copy so it can be iterated while bosses modify the actual list
 		for (LivingEntity entity : new ArrayList<LivingEntity>(event.getAffectedEntities())) {
 			Boss boss = mBosses.get(entity.getUniqueId());
@@ -441,7 +441,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
 
@@ -474,7 +474,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void SpellCastEvent(SpellCastEvent event) {
+	public void spellCastEvent(SpellCastEvent event) {
 		LivingEntity boss = event.getBoss();
 		Boss b = mBosses.get(boss.getUniqueId());
 		if (b != null) {
@@ -483,7 +483,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler
-	public void EntityPathfindEvent(EntityPathfindEvent event) {
+	public void entityPathfindEvent(EntityPathfindEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();
 
@@ -495,7 +495,7 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler
-	public void EntityTargetEvent(EntityTargetEvent event) {
+	public void entityTargetEvent(EntityTargetEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();
 
@@ -508,7 +508,7 @@ public class BossManager implements Listener {
 
 	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerDeathEvent(PlayerDeathEvent event) {
+	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
 			event.setDeathMessage(player.getName() + " was snowballed by " + player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString());
@@ -518,7 +518,7 @@ public class BossManager implements Listener {
 
 	/* Another weird one - used for exorcism potion */
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void LingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
+	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
 		if (event.getEntityType() == EntityType.LINGERING_POTION) {
 			LingeringPotion potEntity = event.getEntity();
 			if (InventoryUtils.testForItemWithLore(potEntity.getItem(), "Exorcism")) {
@@ -631,7 +631,7 @@ public class BossManager implements Listener {
 		mBosses.put(targetEntity.getUniqueId(), boss);
 	}
 
-	private void ProcessEntity(LivingEntity entity) {
+	private void processEntity(LivingEntity entity) {
 		/* This should never happen */
 		if (mBosses.get(entity.getUniqueId()) != null) {
 			mPlugin.getLogger().log(Level.WARNING, "ProcessEntity: Attempted to add boss that was already tracked!");

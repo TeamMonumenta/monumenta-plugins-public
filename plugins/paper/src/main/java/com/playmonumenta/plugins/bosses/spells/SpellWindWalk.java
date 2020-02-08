@@ -29,12 +29,12 @@ public class SpellWindWalk extends Spell {
 		world.spawnParticle(Particle.SMOKE_NORMAL, mCaster.getLocation(), 90, 0.25, 0.45, 0.25, 0.1);
 		world.spawnParticle(Particle.CLOUD, mCaster.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mCaster.getLocation(), 2, 0.3, 0, 0.3, 0);
-				if (t >= 20 * 8 || mCaster.isDead() || !mCaster.isValid()) {
+				if (mTicks >= 20 * 8 || mCaster.isDead() || !mCaster.isValid()) {
 					this.cancel();
 				}
 			}

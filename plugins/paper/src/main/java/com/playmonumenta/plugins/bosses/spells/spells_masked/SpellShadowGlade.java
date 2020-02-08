@@ -51,11 +51,6 @@ public class SpellShadowGlade extends Spell {
 		}
 	}
 
-	@Override
-	public int duration() {
-		return 200; // 10 seconds
-	}
-
 	private void run(Location zoneStart) {
 		final int PERIOD = 4;
 		List<Player> pList = PlayerUtils.playersInRange(zoneStart, 40);
@@ -96,5 +91,10 @@ public class SpellShadowGlade extends Spell {
 
 		loop.runTaskTimer(mPlugin, 4, 4);
 		mActiveRunnables.add(loop);
+	}
+
+	@Override
+	public int duration() {
+		return 200; // 10 seconds
 	}
 }

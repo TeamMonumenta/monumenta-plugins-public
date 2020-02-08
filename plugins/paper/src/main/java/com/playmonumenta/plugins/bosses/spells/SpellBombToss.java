@@ -49,10 +49,10 @@ public class SpellBombToss extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 
 		BukkitRunnable task = new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				mTNTList.clear();
 
 				// TODO: Add particles
@@ -63,7 +63,7 @@ public class SpellBombToss extends Spell {
 						break;
 					}
 				}
-				if (t >= mLobs) {
+				if (mTicks >= mLobs) {
 					this.cancel();
 				}
 			}
