@@ -47,6 +47,7 @@ public class MobListener implements Listener {
 	public MobListener(Plugin plugin) {
 		mPlugin = plugin;
 	}
+
 	@EventHandler(priority = EventPriority.HIGH)
 	void creatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();

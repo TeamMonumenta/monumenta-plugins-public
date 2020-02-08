@@ -25,7 +25,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class ShatteredEquipmentListener implements Listener {
 	private Plugin mPlugin;
-	private ItemStack item;
 
 	public ShatteredEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -37,7 +36,7 @@ public class ShatteredEquipmentListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();
-			item = event.getItem();
+			ItemStack item = event.getItem();
 			if (ItemUtils.isItemShattered(item)) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				event.setUseItemInHand(Event.Result.DENY);

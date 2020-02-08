@@ -91,20 +91,6 @@ public class ShulkerInventory {
 	 * This is done by looping through the entire parent inventory looking for the open Shulker Box.
 	 * Note that the actual update does not occur until the following server tick. This is to account
 	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
-	 * This does not close the player's inventory automatically.
-	 *
-	 * @return True if the Shulker Box still exists in the parent inventory.
-	 * @see #updateShulker(boolean)
-	 */
-	boolean closeShulker() {
-		return updateShulker(true);
-	}
-
-	/**
-	 * Update the Shulker Box ItemStack in the parent inventory to match the current contents.
-	 * This is done by looping through the entire parent inventory looking for the open Shulker Box.
-	 * Note that the actual update does not occur until the following server tick. This is to account
-	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
 	 *
 	 * @param unlock True if the Shulker Box should be unlocked after this update.
 	 * @return True if the Shulker Box still exists in the parent inventory.
@@ -132,6 +118,20 @@ public class ShulkerInventory {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Update the Shulker Box ItemStack in the parent inventory to match the current contents.
+	 * This is done by looping through the entire parent inventory looking for the open Shulker Box.
+	 * Note that the actual update does not occur until the following server tick. This is to account
+	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
+	 * This does not close the player's inventory automatically.
+	 *
+	 * @return True if the Shulker Box still exists in the parent inventory.
+	 * @see #updateShulker(boolean)
+	 */
+	boolean closeShulker() {
+		return updateShulker(true);
 	}
 
 	/**

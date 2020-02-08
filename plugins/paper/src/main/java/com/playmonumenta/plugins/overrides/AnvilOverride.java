@@ -50,17 +50,17 @@ public class AnvilOverride extends BaseOverride {
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, 1.0f, 1.0f);
 			new BukkitRunnable() {
 				int mTicks = 0;
-				Location loc = block.getLocation().add(0.5, 1.1, 0.5);
+				Location mParticleLoc = block.getLocation().add(0.5, 1.1, 0.5);
 				@Override
 				public void run() {
 					mTicks++;
 					if (mTicks >= 3) {
 						this.cancel();
-						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
-						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
+						world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
+						world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
+						world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 					} else {
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
+						world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 					}
 				}
 

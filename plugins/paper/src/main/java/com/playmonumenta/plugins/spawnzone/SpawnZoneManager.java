@@ -22,7 +22,7 @@ public class SpawnZoneManager {
 
 	public SpawnZoneManager(Plugin plugin) {
 		mPlugin = plugin;
-		_initPOIs();
+		initPOIs();
 	}
 
 	public void applySpawnEffect(Plugin plugin, Entity entity) {
@@ -62,7 +62,7 @@ public class SpawnZoneManager {
 		}
 	}
 
-	private void _initPOIs() {
+	private void initPOIs() {
 
 		// Test Case - Zombies on Sudowoodo Island get Slowness & 5 HP
 		// Removed for now as I don't have the properties in yet.

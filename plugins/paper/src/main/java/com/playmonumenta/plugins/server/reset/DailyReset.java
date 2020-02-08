@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DailyReset {
 	private static BukkitRunnable mRunnable = null;
+
 	public static void startTimer(Plugin plugin) {
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			new BukkitRunnable() {
@@ -104,13 +105,13 @@ public class DailyReset {
 				player.removeScoreboardTag("horseman_daily_artifact");
 
 				/* Reset the player's access to the Patreon shrine (if applicable) */
-				int Patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
-				int ShrinePower = (Patreon >= 20) ? 2 : ((Patreon >= 10) ? 1 : 0);
-				ScoreboardUtils.setScoreboardValue(player, "ShrinePower", ShrinePower);
+				int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
+				int shrinePower = (patreon >= 20) ? 2 : ((patreon >= 10) ? 1 : 0);
+				ScoreboardUtils.setScoreboardValue(player, "ShrinePower", shrinePower);
 
-				if (ShrinePower >= 1) {
+				if (shrinePower >= 1) {
 					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "Your ability to activate the Sierhaven shrine has been restored");
-					if (ShrinePower == 1) {
+					if (shrinePower == 1) {
 						player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine once each day");
 					} else {
 						player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine twice (or two effects) each day");

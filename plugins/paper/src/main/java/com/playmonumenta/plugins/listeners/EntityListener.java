@@ -780,7 +780,7 @@ public class EntityListener implements Listener {
 
 				/* Don't let the player interact with the world when transferring */
 				if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-					_removePotionDataFromArrow(arrow);
+					removePotionDataFromArrow(arrow);
 					return;
 				}
 
@@ -789,7 +789,7 @@ public class EntityListener implements Listener {
 					Vector from = arrow.getLocation().toVector();
 
 					if (to.subtract(from).dot(player.getLocation().getDirection()) < 0) {
-						_removePotionDataFromArrow(arrow);
+						removePotionDataFromArrow(arrow);
 					}
 				}
 
@@ -828,7 +828,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private void _removePotionDataFromArrow(TippedArrow arrow) {
+	private void removePotionDataFromArrow(TippedArrow arrow) {
 		PotionData data = new PotionData(PotionType.AWKWARD);
 		arrow.setBasePotionData(data);
 

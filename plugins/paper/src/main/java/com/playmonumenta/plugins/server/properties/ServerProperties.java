@@ -115,7 +115,7 @@ public class ServerProperties {
 		try {
 			String content = FileUtils.readFile(fileLocation);
 			if (content != null && content != "") {
-				_loadFromString(plugin, content, sender);
+				loadFromString(plugin, content, sender);
 			}
 		} catch (FileNotFoundException e) {
 			plugin.getLogger().info("Properties.json file does not exist - using default values");
@@ -130,7 +130,7 @@ public class ServerProperties {
 		}
 	}
 
-	private void _loadFromString(Plugin plugin, String content, CommandSender sender) throws Exception {
+	private void loadFromString(Plugin plugin, String content, CommandSender sender) throws Exception {
 		if (content != null && content != "") {
 			try {
 				Gson gson = new Gson();
@@ -138,28 +138,28 @@ public class ServerProperties {
 				//  Load the file - if it exists, then let's start parsing it.
 				JsonObject object = gson.fromJson(content, JsonObject.class);
 				if (object != null) {
-					mDailyResetEnabled           = _getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
-					mJoinMessagesEnabled         = _getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled         = _getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
-					mIsTownWorld                 = _getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
-					mBroadcastCommandEnabled     = _getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
-					mPlotSurvivalMinHeight       = _getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mSocketPort                  = _getPropertyValueInt(plugin, object, "socketPort", mSocketPort);
+					mDailyResetEnabled           = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
+					mJoinMessagesEnabled         = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
+					mTransferDataEnabled         = getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
+					mIsTownWorld                 = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
+					mBroadcastCommandEnabled     = getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
+					mPlotSurvivalMinHeight       = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
+					mSocketPort                  = getPropertyValueInt(plugin, object, "socketPort", mSocketPort);
 
-					mIsSleepingEnabled           = _getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
-					mKeepLowTierInventory        = _getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
-					mClassSpecializationsEnabled = _getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
-					mAuditMessagesEnabled        = _getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
+					mIsSleepingEnabled           = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
+					mKeepLowTierInventory        = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
+					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
+					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
 
-					mShardName                   = _getPropertyValueString(plugin, object, "shardName", mShardName);
-					mSocketHost                  = _getPropertyValueString(plugin, object, "socketHost", mSocketHost);
+					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
+					mSocketHost                  = getPropertyValueString(plugin, object, "socketHost", mSocketHost);
 
-					mAllowedTransferTargets      = _getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
-					mForbiddenItemLore           = _getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
+					mAllowedTransferTargets      = getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
+					mForbiddenItemLore           = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
-					mUnbreakableBlocks           = _getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
-					mAlwaysPickupMats            = _getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
-					mNamedPickupMats             = _getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
+					mUnbreakableBlocks           = getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);
+					mAlwaysPickupMats            = getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
+					mNamedPickupMats             = getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
 
 					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
 
@@ -179,7 +179,7 @@ public class ServerProperties {
 		}
 	}
 
-	private boolean _getPropertyValueBool(Plugin plugin, JsonObject object, String properyName, boolean defaultVal) {
+	private boolean getPropertyValueBool(Plugin plugin, JsonObject object, String properyName, boolean defaultVal) {
 		boolean value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -192,7 +192,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private int _getPropertyValueInt(Plugin plugin, JsonObject object, String properyName, int defaultVal) {
+	private int getPropertyValueInt(Plugin plugin, JsonObject object, String properyName, int defaultVal) {
 		int value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -205,7 +205,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private String _getPropertyValueString(Plugin plugin, JsonObject object, String properyName, String defaultVal) {
+	private String getPropertyValueString(Plugin plugin, JsonObject object, String properyName, String defaultVal) {
 		String value = defaultVal;
 
 		JsonElement element = object.get(properyName);
@@ -218,7 +218,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private Set<String> _getPropertyValueStringSet(Plugin plugin, JsonObject object, String properyName) {
+	private Set<String> getPropertyValueStringSet(Plugin plugin, JsonObject object, String properyName) {
 		Set<String> value = new HashSet<>();
 
 		JsonElement element = object.get(properyName);
@@ -238,7 +238,7 @@ public class ServerProperties {
 		return value;
 	}
 
-	private EnumSet<Material> _getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender) {
+	private EnumSet<Material> getPropertyValueMaterialList(Plugin plugin, JsonObject object, String propertyName, CommandSender sender) {
 		EnumSet<Material> value = EnumSet.noneOf(Material.class);
 
 		JsonElement element = object.get(propertyName);

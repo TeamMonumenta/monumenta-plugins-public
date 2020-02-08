@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class TwoHanded implements BaseEnchantment{
 	private static String PROPERTY_NAME = ChatColor.RED + "Two Handed";
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

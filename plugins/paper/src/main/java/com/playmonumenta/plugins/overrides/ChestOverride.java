@@ -121,7 +121,7 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		} else if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (!_breakable(block)) {
+		} else if (!breakable(block)) {
 			MessagingUtils.sendActionBarMessage(plugin, player, "This block can not be broken!");
 			return false;
 		} else if (GraveUtils.isGrave(block)) {
@@ -147,7 +147,7 @@ public class ChestOverride extends BaseOverride {
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
 		if (!command_chest(block)) {
 			return false;
-		} else if (!_breakable(block)) {
+		} else if (!breakable(block)) {
 			return false;
 		} else if (GraveUtils.isGrave(block)) {
 			if (ChestUtils.isEmpty(block)) {
@@ -169,7 +169,7 @@ public class ChestOverride extends BaseOverride {
 		return true;
 	}
 
-	protected static boolean _breakable(Block block) {
+	protected static boolean breakable(Block block) {
 		Block blockUnder = block.getLocation().add(0, -1, 0).getBlock();
 		if (blockUnder != null && blockUnder.getType() == Material.BARRIER) {
 			return false;

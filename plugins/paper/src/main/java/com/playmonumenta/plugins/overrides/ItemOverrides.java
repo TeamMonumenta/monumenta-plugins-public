@@ -284,7 +284,7 @@ public class ItemOverrides {
 
 	// Returns eventCancelled = true if disallowed, otherwise false
 	@SuppressWarnings({"unused"})
-	private boolean _safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
+	private boolean safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
 		boolean eventCancelled = false;
 
 		// Prevent players from breaking blocks in safezones from outside of them
@@ -325,7 +325,7 @@ public class ItemOverrides {
 		}
 
 		// NOTE: This is disabled because while functionally nicer, players don't like it
-		//eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, event.getBlockPlaced());
+		//eventCancelled |= safezoneDisallowsBlockChange(plugin, player, event.getBlockPlaced());
 
 		return !eventCancelled;
 	}
@@ -345,7 +345,7 @@ public class ItemOverrides {
 		}
 
 		// NOTE: This is disabled because, while functionally nicer, players don't like it
-		//eventCancelled |= _safezoneDisallowsBlockChange(plugin, player, block);
+		//eventCancelled |= safezoneDisallowsBlockChange(plugin, player, block);
 
 		return !eventCancelled;
 	}

@@ -266,9 +266,9 @@ public class LocationUtils {
 		boolean collides = true;
 
 		// Coördinates inside the block, adjusted for negative values
-		double X = (loc.getX() % 1 + 1) % 1;
-		double Y = (loc.getY() % 1 + 1) % 1;
-		double Z = (loc.getZ() % 1 + 1) % 1;
+		double x = (loc.getX() % 1 + 1) % 1;
+		double y = (loc.getY() % 1 + 1) % 1;
+		double z = (loc.getZ() % 1 + 1) % 1;
 
 		switch (block.getType()) {
 
@@ -283,95 +283,95 @@ public class LocationUtils {
 			collides = false;
 			break;
 		case SOUL_SAND:
-			if (Y > (15.0 / 16.0)) {
+			if (y > (15.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case GRASS_PATH:
-			if (Y > (15.0 / 16.0)) {
+			if (y > (15.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case FARMLAND:
-			if (Y > (15.0 / 16.0)) {
+			if (y > (15.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case END_PORTAL_FRAME:
-			if (Y > (13.0 / 16.0)) {
+			if (y > (13.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case CONDUIT:
-			if (Y > (11.0 / 16.0) || Y < (5.0 / 16.0)
-			    || X > (11.0 / 16.0) || X < (5.0 / 16.0)
-			    || Z > (11.0 / 16.0) || Z < (5.0 / 16.0)) {
+			if (y > (11.0 / 16.0) || y < (5.0 / 16.0)
+			    || x > (11.0 / 16.0) || x < (5.0 / 16.0)
+			    || z > (11.0 / 16.0) || z < (5.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case ENCHANTING_TABLE:
-			if (Y > (12.0 / 16.0)) {
+			if (y > (12.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case DAYLIGHT_DETECTOR:
-			if (Y > (6.0 / 16.0)) {
+			if (y > (6.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case BREWING_STAND:
-			if (Y > (2.0 / 16.0)
-			    && (X > (9.0 / 16.0) || X < (7.0 / 16.0))
-			    && Z > (9.0 / 16.0) || Z < (7.0 / 16.0)) {
+			if (y > (2.0 / 16.0)
+			    && (x > (9.0 / 16.0) || x < (7.0 / 16.0))
+			    && z > (9.0 / 16.0) || z < (7.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case CHEST:
-			if (Y > (15.0 / 16.0)
-			    || X > (15.0 / 16.0) || X < ((1.0) / 16.0)
-			    || Z > (15.0 / 16.0) || Z < (1.0 / 16.0)) {
+			if (y > (15.0 / 16.0)
+			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case TRAPPED_CHEST:
-			if (Y > (15.0 / 16.0)
-			    || X > (15.0 / 16.0) || X < ((1.0) / 16.0)
-			    || Z > (15.0 / 16.0) || Z < (1.0 / 16.0)) {
+			if (y > (15.0 / 16.0)
+			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case ENDER_CHEST:
-			if (Y > (15.0 / 16.0)
-			    || X > (15.0 / 16.0) || X < ((1.0) / 16.0)
-			    || Z > (15.0 / 16.0) || Z < (1.0 / 16.0)) {
+			if (y > (15.0 / 16.0)
+			    || x > (15.0 / 16.0) || x < ((1.0) / 16.0)
+			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case DRAGON_EGG:
-			if (X > (15.0 / 16.0) || X < (1.0 / 16.0)
-			    || Z > (15.0 / 16.0) || Z < (1.0 / 16.0)) {
+			if (x > (15.0 / 16.0) || x < (1.0 / 16.0)
+			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
 		case HOPPER:
-			if (Y < (4.0 / 16.0) ||
-			    (Y < (10.0 / 16.0) &&
-			     (X > (12.0 / 16.0) || X < (4.0 / 16.0)
-			      || Z > (12.0 / 16.0) || Z < (4.0 / 16.0)))) {
+			if (y < (4.0 / 16.0) ||
+			    (y < (10.0 / 16.0) &&
+			     (x > (12.0 / 16.0) || x < (4.0 / 16.0)
+			      || z > (12.0 / 16.0) || z < (4.0 / 16.0)))) {
 				collides = false;
 			}
 			break;
 		case SNOW:
 			int layers = ((Snow) block.getBlockData()).getLayers();
-			if (Y > (2 * layers / 16.0)) {
+			if (y > (2 * layers / 16.0)) {
 				collides = false;
 			}
 			break;
 		case CAKE:
 			int bites = ((Cake) block.getBlockData()).getBites();
-			if (Y > (7.0 / 16.0)
-			    || X > (15.0 / 16.0) || X < ((1.0 + 2 * bites) / 16.0)
-			    || Z > (15.0 / 16.0) || Z < (1.0 / 16.0)) {
+			if (y > (7.0 / 16.0)
+			    || x > (15.0 / 16.0) || x < ((1.0 + 2 * bites) / 16.0)
+			    || z > (15.0 / 16.0) || z < (1.0 / 16.0)) {
 				collides = false;
 			}
 			break;
@@ -379,39 +379,39 @@ public class LocationUtils {
 		case PISTON_HEAD:
 			BlockFace pistonface = ((Directional) block.getBlockData()).getFacing();
 			if (pistonface == BlockFace.EAST) {
-				if (X < (12.0 / 16.0) &&
-				    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-				     || Z > (10.0 / 16.0) || Z < (6.0 / 16.0))) {
+				if (x < (12.0 / 16.0) &&
+				    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+				     || z > (10.0 / 16.0) || z < (6.0 / 16.0))) {
 					collides = false;
 				}
 			} else if (pistonface == BlockFace.WEST) {
-				if (X > (4.0 / 16.0) &&
-				    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-				     || Z > (10.0 / 16.0) || Z < (6.0 / 16.0))) {
+				if (x > (4.0 / 16.0) &&
+				    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+				     || z > (10.0 / 16.0) || z < (6.0 / 16.0))) {
 					collides = false;
 				}
 			} else if (pistonface == BlockFace.NORTH) {
-				if (Z > (4.0 / 16.0) &&
-				    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-				     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+				if (z > (4.0 / 16.0) &&
+				    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+				     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 					collides = false;
 				}
 			} else if (pistonface == BlockFace.SOUTH) {
-				if (Z < (12.0 / 16.0) &&
-				    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-				     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+				if (z < (12.0 / 16.0) &&
+				    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+				     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 					collides = false;
 				}
 			} else if (pistonface == BlockFace.UP) {
-				if (Y < (12.0 / 16.0) &&
-				    (Z > (10.0 / 16.0) || Z < (6.0 / 16.0)
-				     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+				if (y < (12.0 / 16.0) &&
+				    (z > (10.0 / 16.0) || z < (6.0 / 16.0)
+				     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 					collides = false;
 				}
 			} else if (pistonface == BlockFace.DOWN) {
-				if (Y > (4.0 / 16.0) &&
-				    (Z > (10.0 / 16.0) || Z < (6.0 / 16.0)
-				     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+				if (y > (4.0 / 16.0) &&
+				    (z > (10.0 / 16.0) || z < (6.0 / 16.0)
+				     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 					collides = false;
 				}
 			}
@@ -595,22 +595,22 @@ public class LocationUtils {
 		default:
 			if (block.getBlockData() instanceof Slab) {
 				if (((Slab) block.getBlockData()).getType() == Type.BOTTOM) {
-					if (Y > 0.5) {
+					if (y > 0.5) {
 						collides = false;
 					}
 				} else if (((Slab) block.getBlockData()).getType() == Type.TOP) {
-					if (Y < 0.5) {
+					if (y < 0.5) {
 						collides = false;
 					}
 				}
 			} else if (block.getBlockData() instanceof Stairs) {
 				Stairs stair = ((Stairs) block.getBlockData());
 				if (stair.getHalf() == Half.BOTTOM) {
-					if (Y > 0.5) {
+					if (y > 0.5) {
 						collides = false;
 					}
 				} else if (stair.getHalf() == Half.TOP) {
-					if (Y < 0.5) {
+					if (y < 0.5) {
 						collides = false;
 					}
 				}
@@ -622,7 +622,7 @@ public class LocationUtils {
 					        && stair.getShape() == Shape.INNER_RIGHT)
 					    || (stair.getFacing() == BlockFace.EAST
 					        && stair.getShape() == Shape.INNER_LEFT)) {
-						if (Z < 0.5) {
+						if (z < 0.5) {
 							collides = true;
 						}
 					}
@@ -631,7 +631,7 @@ public class LocationUtils {
 					        && stair.getShape() == Shape.INNER_RIGHT)
 					    || (stair.getFacing() == BlockFace.WEST
 					        && stair.getShape() == Shape.INNER_LEFT)) {
-						if (Z > 0.5) {
+						if (z > 0.5) {
 							collides = true;
 						}
 					}
@@ -640,7 +640,7 @@ public class LocationUtils {
 					        && stair.getShape() == Shape.INNER_RIGHT)
 					    || (stair.getFacing() == BlockFace.NORTH
 					        && stair.getShape() == Shape.INNER_LEFT)) {
-						if (X < 0.5) {
+						if (x < 0.5) {
 							collides = true;
 						}
 					}
@@ -649,7 +649,7 @@ public class LocationUtils {
 					        && stair.getShape() == Shape.INNER_RIGHT)
 					    || (stair.getFacing() == BlockFace.SOUTH
 					        && stair.getShape() == Shape.INNER_LEFT)) {
-						if (X > 0.5) {
+						if (x > 0.5) {
 							collides = true;
 						}
 					}
@@ -658,65 +658,65 @@ public class LocationUtils {
 					     && stair.getShape() == Shape.OUTER_RIGHT)
 					    || (stair.getFacing() == BlockFace.EAST
 					        && stair.getShape() == Shape.OUTER_LEFT)) {
-						if (Z < 0.5 && X > 0.5) {
+						if (z < 0.5 && x > 0.5) {
 							collides = true;
 						}
 					} else if ((stair.getFacing() == BlockFace.EAST
 					            && stair.getShape() == Shape.OUTER_RIGHT)
 					           || (stair.getFacing() == BlockFace.SOUTH
 					               && stair.getShape() == Shape.OUTER_LEFT)) {
-						if (Z > 0.5 && X > 0.5) {
+						if (z > 0.5 && x > 0.5) {
 							collides = true;
 						}
 					} else if ((stair.getFacing() == BlockFace.SOUTH
 					            && stair.getShape() == Shape.OUTER_RIGHT)
 					           || (stair.getFacing() == BlockFace.WEST
 					               && stair.getShape() == Shape.OUTER_LEFT)) {
-						if (Z > 0.5 && X < 0.5) {
+						if (z > 0.5 && x < 0.5) {
 							collides = true;
 						}
 					} else if ((stair.getFacing() == BlockFace.WEST
 					            && stair.getShape() == Shape.OUTER_RIGHT)
 					           || (stair.getFacing() == BlockFace.NORTH
 					               && stair.getShape() == Shape.OUTER_LEFT)) {
-						if (Z < 0.5 && X < 0.5) {
+						if (z < 0.5 && x < 0.5) {
 							collides = true;
 						}
 					}
 				}
 			} else if (block.getBlockData() instanceof GlassPane || block.getType() == Material.IRON_BARS) {
 				MultipleFacing pane = ((MultipleFacing) block.getBlockData());
-				if (Z > (9.0 / 16.0)
-				    || Z < (7.0 / 16.0)
-				    || X > (9.0 / 16.0)
-				    || X < (7.0 / 16.0)) {
+				if (z > (9.0 / 16.0)
+				    || z < (7.0 / 16.0)
+				    || x > (9.0 / 16.0)
+				    || x < (7.0 / 16.0)) {
 					collides = false;
 				}
 				if (!collides && pane.hasFace(BlockFace.NORTH)) {
-					if (Z < (9.0 / 16.0)
-					    && X > (7.0 / 16.0)
-					    && X < (9.0 / 16.0)) {
+					if (z < (9.0 / 16.0)
+					    && x > (7.0 / 16.0)
+					    && x < (9.0 / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && pane.hasFace(BlockFace.SOUTH)) {
-					if (Z > (7.0 / 16.0)
-					    && X > (7.0 / 16.0)
-					    && X < (9.0 / 16.0)) {
+					if (z > (7.0 / 16.0)
+					    && x > (7.0 / 16.0)
+					    && x < (9.0 / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && pane.hasFace(BlockFace.EAST)) {
-					if (X > (7.0 / 16.0)
-					    && Z > (7.0 / 16.0)
-					    && Z < (9.0 / 16.0)) {
+					if (x > (7.0 / 16.0)
+					    && z > (7.0 / 16.0)
+					    && z < (9.0 / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && pane.hasFace(BlockFace.WEST)) {
-					if (X < (9.0 / 16.0)
-					    && Z > (7.0 / 16.0)
-					    && Z < (9.0 / 16.0)) {
+					if (x < (9.0 / 16.0)
+					    && z > (7.0 / 16.0)
+					    && z < (9.0 / 16.0)) {
 						collides = true;
 					}
 				}
@@ -727,37 +727,37 @@ public class LocationUtils {
 					width = 8;
 				}
 				Fence fence = ((Fence) block.getBlockData());
-				if (Z > ((8.0 + width / 2) / 16.0)
-				    || Z < ((8.0 - width / 2) / 16.0)
-				    || X > ((8.0 + width / 2) / 16.0)
-				    || X < ((8.0 - width / 2) / 16.0)) {
+				if (z > ((8.0 + width / 2) / 16.0)
+				    || z < ((8.0 - width / 2) / 16.0)
+				    || x > ((8.0 + width / 2) / 16.0)
+				    || x < ((8.0 - width / 2) / 16.0)) {
 					collides = false;
 				}
 				if (!collides && fence.hasFace(BlockFace.NORTH)) {
-					if (Z < ((8.0 + width / 2) / 16.0)
-					    && X > ((8.0 - width / 2) / 16.0)
-					    && X < ((8.0 + width / 2) / 16.0)) {
+					if (z < ((8.0 + width / 2) / 16.0)
+					    && x > ((8.0 - width / 2) / 16.0)
+					    && x < ((8.0 + width / 2) / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && fence.hasFace(BlockFace.SOUTH)) {
-					if (Z > ((8.0 - width / 2) / 16.0)
-					    && X > ((8.0 - width / 2) / 16.0)
-					    && X < ((8.0 + width / 2) / 16.0)) {
+					if (z > ((8.0 - width / 2) / 16.0)
+					    && x > ((8.0 - width / 2) / 16.0)
+					    && x < ((8.0 + width / 2) / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && fence.hasFace(BlockFace.EAST)) {
-					if (X > ((8.0 - width / 2) / 16.0)
-					    && Z > ((8.0 - width / 2) / 16.0)
-					    && Z < ((8.0 + width / 2) / 16.0)) {
+					if (x > ((8.0 - width / 2) / 16.0)
+					    && z > ((8.0 - width / 2) / 16.0)
+					    && z < ((8.0 + width / 2) / 16.0)) {
 						collides = true;
 					}
 				}
 				if (!collides && fence.hasFace(BlockFace.EAST)) {
-					if (X < ((8.0 + width / 2) / 16.0)
-					    && Z > ((8.0 - width / 2) / 16.0)
-					    && Z < ((8.0 + width / 2) / 16.0)) {
+					if (x < ((8.0 + width / 2) / 16.0)
+					    && z > ((8.0 - width / 2) / 16.0)
+					    && z < ((8.0 + width / 2) / 16.0)) {
 						collides = true;
 					}
 				}
@@ -765,44 +765,44 @@ public class LocationUtils {
 				Gate gate = ((Gate) block.getBlockData());
 				boolean open = gate.isOpen();
 				BlockFace face = gate.getFacing();
-				if (Y < (5.0 / 16.0)) {
+				if (y < (5.0 / 16.0)) {
 					collides = false;
 				}
 				if (!open) {
 					if (face == BlockFace.NORTH || face == BlockFace.SOUTH) {
-						if (Z > (9.0 / 16.0)
-						    || Z < (7.0 / 16.0)) {
+						if (z > (9.0 / 16.0)
+						    || z < (7.0 / 16.0)) {
 							collides = false;
 						}
 					} else {
-						if (X > (9.0 / 16.0)
-						    || X < (7.0 / 16.0)) {
+						if (x > (9.0 / 16.0)
+						    || x < (7.0 / 16.0)) {
 							collides = false;
 						}
 					}
 				} else {
 					if (face == BlockFace.NORTH) {
-						if (!(Z < (9.0 / 16.0)
-						      && (X < (2.0 / 16.0)
-						          || X > (14.0 / 16.0)))) {
+						if (!(z < (9.0 / 16.0)
+						      && (x < (2.0 / 16.0)
+						          || x > (14.0 / 16.0)))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.SOUTH) {
-						if (!(Z > (7.0 / 16.0)
-						      && (X < (2.0 / 16.0)
-						          || X > (14.0 / 16.0)))) {
+						if (!(z > (7.0 / 16.0)
+						      && (x < (2.0 / 16.0)
+						          || x > (14.0 / 16.0)))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.EAST) {
-						if (!(X > (7.0 / 16.0)
-						      && (Z < (2.0 / 16.0)
-						          || Z > (14.0 / 16.0)))) {
+						if (!(x > (7.0 / 16.0)
+						      && (z < (2.0 / 16.0)
+						          || z > (14.0 / 16.0)))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.WEST) {
-						if (!(X < (9.0 / 16.0)
-						      && (Z < (2.0 / 16.0)
-						          || Z > (14.0 / 16.0)))) {
+						if (!(x < (9.0 / 16.0)
+						      && (z < (2.0 / 16.0)
+						          || z > (14.0 / 16.0)))) {
 							collides = false;
 						}
 					}
@@ -812,29 +812,29 @@ public class LocationUtils {
 				boolean open = trapdoor.isOpen();
 				if (!open) {
 					if (trapdoor.getHalf() == Half.TOP) {
-						if (Y < (13.0 / 16.0)) {
+						if (y < (13.0 / 16.0)) {
 							collides = false;
 						}
 					} else {
-						if (Y > (3.0 / 16.0)) {
+						if (y > (3.0 / 16.0)) {
 							collides = false;
 						}
 					}
 				} else {
 					if (trapdoor.getFacing() == BlockFace.NORTH) {
-						if (Z < (13.0 / 16.0)) {
+						if (z < (13.0 / 16.0)) {
 							collides = false;
 						}
 					} else if (trapdoor.getFacing() == BlockFace.SOUTH) {
-						if (Z > (3.0 / 16.0)) {
+						if (z > (3.0 / 16.0)) {
 							collides = false;
 						}
 					} else if (trapdoor.getFacing() == BlockFace.EAST) {
-						if (X > (3.0 / 16.0)) {
+						if (x > (3.0 / 16.0)) {
 							collides = false;
 						}
 					} else if (trapdoor.getFacing() == BlockFace.WEST) {
-						if (X < (13.0 / 16.0)) {
+						if (x < (13.0 / 16.0)) {
 							collides = false;
 						}
 					}
@@ -858,19 +858,19 @@ public class LocationUtils {
 					face = BlockFace.WEST;
 				}
 				if (face == BlockFace.EAST) {
-					if (X > (3.0 / 16.0)) {
+					if (x > (3.0 / 16.0)) {
 						collides = false;
 					}
 				} else if (face == BlockFace.WEST) {
-					if (X < (13.0 / 16.0)) {
+					if (x < (13.0 / 16.0)) {
 						collides = false;
 					}
 				} else if (face == BlockFace.NORTH) {
-					if (Z < (13.0 / 16.0)) {
+					if (z < (13.0 / 16.0)) {
 						collides = false;
 					}
 				} else if (face == BlockFace.SOUTH) {
-					if (Z > (3.0 / 16.0)) {
+					if (z > (3.0 / 16.0)) {
 						collides = false;
 					}
 				}
@@ -879,45 +879,45 @@ public class LocationUtils {
 				if (piston.isExtended()) {
 					BlockFace face = piston.getFacing();
 					if (face == BlockFace.EAST) {
-						if (X > (12.0 / 16.0) &&
-						    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-						     || Z > (10.0 / 16.0) || Z < (6.0 / 16.0))) {
+						if (x > (12.0 / 16.0) &&
+						    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+						     || z > (10.0 / 16.0) || z < (6.0 / 16.0))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.WEST) {
-						if (X < (4.0 / 16.0) &&
-						    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-						     || Z > (10.0 / 16.0) || Z < (6.0 / 16.0))) {
+						if (x < (4.0 / 16.0) &&
+						    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+						     || z > (10.0 / 16.0) || z < (6.0 / 16.0))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.NORTH) {
-						if (Z < (4.0 / 16.0) &&
-						    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-						     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+						if (z < (4.0 / 16.0) &&
+						    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+						     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.SOUTH) {
-						if (Z > (12.0 / 16.0) &&
-						    (Y > (10.0 / 16.0) || Y < (6.0 / 16.0)
-						     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+						if (z > (12.0 / 16.0) &&
+						    (y > (10.0 / 16.0) || y < (6.0 / 16.0)
+						     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.UP) {
-						if (Y > (12.0 / 16.0) &&
-						    (Z > (10.0 / 16.0) || Z < (6.0 / 16.0)
-						     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+						if (y > (12.0 / 16.0) &&
+						    (z > (10.0 / 16.0) || z < (6.0 / 16.0)
+						     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 							collides = false;
 						}
 					} else if (face == BlockFace.DOWN) {
-						if (Y < (4.0 / 16.0) &&
-						    (Z > (10.0 / 16.0) || Z < (6.0 / 16.0)
-						     || X > (10.0 / 16.0) || X < (6.0 / 16.0))) {
+						if (y < (4.0 / 16.0) &&
+						    (z > (10.0 / 16.0) || z < (6.0 / 16.0)
+						     || x > (10.0 / 16.0) || x < (6.0 / 16.0))) {
 							collides = false;
 						}
 					}
 				}
 			} else if (block.getBlockData() instanceof Bed) {
-				if (Y > (9.0 / 16.0)) {
+				if (y > (9.0 / 16.0)) {
 					collides = false;
 				}
 			} else if (block.getType() == Material.ANVIL
@@ -925,37 +925,37 @@ public class LocationUtils {
 			           || block.getType() == Material.DAMAGED_ANVIL) {
 				BlockFace face = ((Directional) block.getBlockData()).getFacing();
 				if (face == BlockFace.EAST || face == BlockFace.WEST) {
-					if (Y < (4.0 / 16.0) &&
-					    (Z > (14.0 / 16.0) || Z < (2.0 / 16.0)
-					     || X > (14.0 / 16.0) || X < (2.0 / 16.0))) {
+					if (y < (4.0 / 16.0) &&
+					    (z > (14.0 / 16.0) || z < (2.0 / 16.0)
+					     || x > (14.0 / 16.0) || x < (2.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (4.0 / 16.0) && Y < (5.0 / 16.0)) &&
-					           (Z > (12.0 / 16.0) || Z < (4.0 / 16.0)
-					            || X > (13.0 / 16.0) || X < (3.0 / 16.0))) {
+					} else if ((y >= (4.0 / 16.0) && y < (5.0 / 16.0)) &&
+					           (z > (12.0 / 16.0) || z < (4.0 / 16.0)
+					            || x > (13.0 / 16.0) || x < (3.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (5.0 / 16.0) && Y < (10.0 / 16.0)) &&
-					           (Z > (10.0 / 16.0) || Z < (6.0 / 16.0)
-					            || X > (12.0 / 16.0) || X < (4.0 / 16.0))) {
+					} else if ((y >= (5.0 / 16.0) && y < (10.0 / 16.0)) &&
+					           (z > (10.0 / 16.0) || z < (6.0 / 16.0)
+					            || x > (12.0 / 16.0) || x < (4.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (10.0 / 16.0)) &&
-					           (Z > (13.0 / 16.0) || Z < (3.0 / 16.0))) {
+					} else if ((y >= (10.0 / 16.0)) &&
+					           (z > (13.0 / 16.0) || z < (3.0 / 16.0))) {
 						collides = false;
 					}
 				} else {
-					if (Y < (4.0 / 16.0) &&
-					    (X > (14.0 / 16.0) || X < (2.0 / 16.0)
-					     || Z > (14.0 / 16.0) || Z < (2.0 / 16.0))) {
+					if (y < (4.0 / 16.0) &&
+					    (x > (14.0 / 16.0) || x < (2.0 / 16.0)
+					     || z > (14.0 / 16.0) || z < (2.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (4.0 / 16.0) && Y < (5.0 / 16.0)) &&
-					           (X > (12.0 / 16.0) || X < (4.0 / 16.0)
-					            || Z > (13.0 / 16.0) || Z < (3.0 / 16.0))) {
+					} else if ((y >= (4.0 / 16.0) && y < (5.0 / 16.0)) &&
+					           (x > (12.0 / 16.0) || x < (4.0 / 16.0)
+					            || z > (13.0 / 16.0) || z < (3.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (5.0 / 16.0) && Y < (10.0 / 16.0)) &&
-					           (X > (10.0 / 16.0) || X < (6.0 / 16.0)
-					            || Z > (12.0 / 16.0) || Z < (4.0 / 16.0))) {
+					} else if ((y >= (5.0 / 16.0) && y < (10.0 / 16.0)) &&
+					           (x > (10.0 / 16.0) || x < (6.0 / 16.0)
+					            || z > (12.0 / 16.0) || z < (4.0 / 16.0))) {
 						collides = false;
-					} else if ((Y >= (10.0 / 16.0)) &&
-					           (X > (13.0 / 16.0) || X < (3.0 / 16.0))) {
+					} else if ((x >= (10.0 / 16.0)) &&
+					           (x > (13.0 / 16.0) || x < (3.0 / 16.0))) {
 						collides = false;
 					}
 				}

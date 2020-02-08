@@ -34,9 +34,11 @@ public class PotionManager {
 			this.mValue = value;
 			this.mName = name;
 		}
+
 		public int getValue()       {
 			return mValue;
 		}
+
 		public String getName()     {
 			return mName;
 		}

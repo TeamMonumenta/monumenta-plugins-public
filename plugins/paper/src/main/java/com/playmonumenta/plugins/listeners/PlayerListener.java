@@ -913,13 +913,13 @@ public class PlayerListener implements Listener {
 
 					// Create a deferred task to eject player and teleport them after a short sleep
 					new BukkitRunnable() {
-						Integer tick = 0;
+						Integer mTicks = 0;
 						@Override
 						public void run() {
 							GameMode mode;
 							final int BED_TELE_TIME = 20 * 3;
 
-							if (++tick == BED_TELE_TIME) {
+							if (++mTicks == BED_TELE_TIME) {
 								// Abort, player got out of bed early
 								if (player.isSleeping() == false) {
 									this.cancel();
@@ -937,7 +937,7 @@ public class PlayerListener implements Listener {
 
 								// Set player's gamemode back to whatever it was
 								player.setGameMode(mode);
-							} else if (tick >= BED_TELE_TIME + 1) {
+							} else if (mTicks >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc);
 
 								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
