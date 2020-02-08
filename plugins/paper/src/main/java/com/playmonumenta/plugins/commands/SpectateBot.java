@@ -37,20 +37,20 @@ public class SpectateBot extends GenericCommand implements Listener {
 	public static final int DISTANCE_VELOCITY_ADJUST_PERIOD = 20;
 
 	private static class SpectateContext {
-		public final double yawVelocity = 0.1;
-		public final double pitchVelocity = 0.05;
+		public final double mYawVelocity = 0.1;
+		public final double mPitchVelocity = 0.05;
 
-		public double distanceVelocity = 0;
-		public double yaw = 0;
-		public double pitch = 180;
-		public double distance = MAX_RADIUS;
-		public Player target = null;
-		public Location lastTargetLoc;
-		public final Player spectator;
+		public double mDistanceVelocity = 0;
+		public double mYaw = 0;
+		public double mPitch = 180;
+		public double mDistance = MAX_RADIUS;
+		public Player mTarget = null;
+		public Location mLastTargetLoc;
+		public final Player mSpectator;
 
 		public SpectateContext(Player player) {
-			spectator = player;
-			lastTargetLoc = player.getLocation();
+			mSpectator = player;
+			mLastTargetLoc = player.getLocation();
 		}
 	}
 
@@ -109,55 +109,55 @@ public class SpectateBot extends GenericCommand implements Listener {
 							Map.Entry<Player, SpectateContext> entry = it.next();
 							SpectateContext ctx = entry.getValue();
 
-							if (ctx.target == null || !ctx.target.isOnline()) {
-								ctx.target = getPlayerToSpectate(ctx.spectator);
-								if (ctx.target == null) {
-									ctx.spectator.sendMessage(ChatColor.RED + "No player to spectate");
+							if (ctx.mTarget == null || !ctx.mTarget.isOnline()) {
+								ctx.mTarget = getPlayerToSpectate(ctx.mSpectator);
+								if (ctx.mTarget == null) {
+									ctx.mSpectator.sendMessage(ChatColor.RED + "No player to spectate");
 									it.remove();
 									continue;
 								} else {
-									ctx.spectator.sendMessage(ChatColor.RED + "Now spectating: " + ctx.target.getName());
+									ctx.mSpectator.sendMessage(ChatColor.RED + "Now spectating: " + ctx.mTarget.getName());
 								}
 							}
 
 							/* Rolling average target location - 49 parts previous location, 1 part new location */
-							Location targetRawLoc = ctx.target.getLocation();
-							Location targetLoc = ctx.lastTargetLoc.multiply(49.0d).add(targetRawLoc).multiply(0.02d);
+							Location targetRawLoc = ctx.mTarget.getLocation();
+							Location targetLoc = ctx.mLastTargetLoc.multiply(49.0d).add(targetRawLoc).multiply(0.02d);
 
 							/* Compute the camera aiming location */
-							Location cameraLoc = computeLoc(ctx.distance, ctx.yaw, ctx.pitch, targetLoc);
+							Location cameraLoc = computeLoc(ctx.mDistance, ctx.mYaw, ctx.mPitch, targetLoc);
 
 							/* Compute where the camera should look */
 							Vector lookVect = targetLoc.toVector().subtract(cameraLoc.toVector()).normalize();
 							cameraLoc.setDirection(lookVect);
 
 							/* Move the spectator and adjust their facing direction */
-							ctx.spectator.teleport(cameraLoc);
+							ctx.mSpectator.teleport(cameraLoc);
 
 							/* Compute the next location */
-							ctx.yaw += ctx.yawVelocity;
-							ctx.pitch += ctx.pitchVelocity;
+							ctx.mYaw += ctx.mYawVelocity;
+							ctx.mPitch += ctx.mPitchVelocity;
 
 							/* Adjust forward/outer zoom velocity every second */
 							if (mTicks >= DISTANCE_VELOCITY_ADJUST_PERIOD) {
 								mTicks = 0;
 								if (LocationUtils.hasLineOfSight(targetRawLoc, cameraLoc)) {
-									ctx.distanceVelocity = DISTANCE_VELOCITY;
+									ctx.mDistanceVelocity = DISTANCE_VELOCITY;
 								} else {
-									ctx.distanceVelocity = -DISTANCE_VELOCITY;
+									ctx.mDistanceVelocity = -DISTANCE_VELOCITY;
 								}
 							}
-							ctx.distance += ctx.distanceVelocity;
-							if (ctx.distance > MAX_RADIUS) {
-								ctx.distance = MAX_RADIUS;
-							} else if (ctx.distance < MIN_RADIUS) {
-								ctx.distance = MIN_RADIUS;
+							ctx.mDistance += ctx.mDistanceVelocity;
+							if (ctx.mDistance > MAX_RADIUS) {
+								ctx.mDistance = MAX_RADIUS;
+							} else if (ctx.mDistance < MIN_RADIUS) {
+								ctx.mDistance = MIN_RADIUS;
 							}
 
 							/* Adjust the player's velocity towards the next location to try to reduce screen jitter */
-							Location nextCameraLoc = computeLoc(ctx.distance, ctx.yaw, ctx.pitch, targetLoc);
+							Location nextCameraLoc = computeLoc(ctx.mDistance, ctx.mYaw, ctx.mPitch, targetLoc);
 
-							ctx.spectator.setVelocity(nextCameraLoc.toVector().subtract(cameraLoc.toVector()).multiply(10.0d * TICK_PERIOD / 20.0d));
+							ctx.mSpectator.setVelocity(nextCameraLoc.toVector().subtract(cameraLoc.toVector()).multiply(10.0d * TICK_PERIOD / 20.0d));
 						}
 
 						mTicks++;
@@ -176,7 +176,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void PlayerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
+	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
 		if (!event.isCancelled()) {
 			Player player = event.getPlayer();
 
@@ -188,7 +188,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerQuitEvent(PlayerQuitEvent event) {
+	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 
 		// If the player leaves the game remove them from the list

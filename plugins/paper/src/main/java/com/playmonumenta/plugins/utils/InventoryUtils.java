@@ -330,7 +330,7 @@ public class InventoryUtils {
 
 	public static void removeRandomEquipment(Random rand, LivingEntity mob, Integer piecesToRemove) {
 		int[] equipment = { 0, 1, 2, 3 };
-		_shuffleArray(rand, equipment);
+		shuffleArray(rand, equipment);
 
 		EntityEquipment gear = mob.getEquipment();
 
@@ -371,36 +371,36 @@ public class InventoryUtils {
 		}
 	}
 
-	public static int removeSpecialItems(Player player, boolean ephemeral_only) {
+	public static int removeSpecialItems(Player player, boolean ephemeralOnly) {
 		int dropped = 0;
 
 		Location loc = player.getLocation();
 
 		// Inventory
-		dropped += _removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeral_only);
+		dropped += removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeralOnly);
 
 		// Ender Chest
-		dropped += _removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeral_only);
+		dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly);
 
 		// Armor slots
 		ItemStack[] items = player.getInventory().getArmorContents();
-		dropped += _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		player.getInventory().setArmorContents(items);
 
 		// Extra slots (offhand, ???)
 		items = player.getInventory().getExtraContents();
-		dropped += _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		player.getInventory().setExtraContents(items);
 
 		return dropped;
 	}
 
-	private static int _removeSpecialItemsFromInventory(ItemStack[] items, Location loc, boolean ephemeral_only) {
+	private static int removeSpecialItemsFromInventory(ItemStack[] items, Location loc, boolean ephemeralOnly) {
 		int dropped = 0;
 
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
-				if (!ephemeral_only && _containsSpecialLore(items[i])) {
+				if (!ephemeralOnly && containsSpecialLore(items[i])) {
 					loc.getWorld().dropItem(loc, items[i]);
 					items[i] = null;
 					dropped += 1;
@@ -411,7 +411,7 @@ public class InventoryUtils {
 						BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
 							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
-							dropped += _removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeral_only);
+							dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly);
 
 							meta.setBlockState(shulker);
 							items[i].setItemMeta(meta);
@@ -424,14 +424,14 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int _removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeral_only) {
+	private static int removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeralOnly) {
 		ItemStack[] items = inventory.getContents();
-		int dropped = _removeSpecialItemsFromInventory(items, loc, ephemeral_only);
+		int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		inventory.setContents(items);
 		return dropped;
 	}
 
-	private static boolean _containsSpecialLore(ItemStack item) {
+	private static boolean containsSpecialLore(ItemStack item) {
 		return  testForItemWithLore(item, "D4 Key") ||
 		        testForItemWithLore(item, "D5 Key") ||
 		        testForItemWithLore(item, "D6 Key") ||
@@ -482,7 +482,7 @@ public class InventoryUtils {
 		       || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
-	static void _shuffleArray(Random rand, int[] ar) {
+	static void shuffleArray(Random rand, int[] ar) {
 		for (int i = ar.length - 1; i > 0; i--) {
 			int index = rand.nextInt(i + 1);
 			// Simple swap

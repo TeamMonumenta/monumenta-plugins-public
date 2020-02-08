@@ -18,13 +18,13 @@ public class PlayerPotionInfo {
 	private final HashMap<PotionEffectType, PotionMap> mPotionInfo = new HashMap<PotionEffectType, PotionMap>();
 
 	public void addPotionInfo(Player player, PotionID id, PotionInfo info) {
-		PotionMap type = mPotionInfo.get(info.type);
+		PotionMap type = mPotionInfo.get(info.mType);
 		if (type != null) {
 			type.addPotionMap(player, id, info);
 		} else {
-			PotionMap newMap = new PotionMap(info.type);
+			PotionMap newMap = new PotionMap(info.mType);
 			newMap.addPotionMap(player, id, info);
-			mPotionInfo.put(info.type, newMap);
+			mPotionInfo.put(info.mType, newMap);
 		}
 	}
 

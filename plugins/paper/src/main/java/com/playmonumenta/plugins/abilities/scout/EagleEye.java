@@ -59,16 +59,16 @@ public class EagleEye extends Ability {
 			                        new PotionEffect(PotionEffectType.UNLUCK, EAGLE_EYE_DURATION, eagleLevel, true, false));
 
 			new BukkitRunnable() {
-				int t = 0;
+				int mTicks = 0;
 
 				@Override
 				public void run() {
-					t++;
+					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
 						mPlugin.mTimers.updateCooldown(mPlayer, Spells.EAGLE_EYE, 20 * 2);
 						this.cancel();
 					}
-					if (t >= EAGLE_EYE_DURATION) {
+					if (mTicks >= EAGLE_EYE_DURATION) {
 						this.cancel();
 					}
 				}

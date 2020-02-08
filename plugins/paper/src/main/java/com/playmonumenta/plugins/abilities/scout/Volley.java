@@ -86,37 +86,37 @@ public class Volley extends Ability {
 				}
 
 				for (Projectile proj : projectiles) {
-					Arrow _arrow = (Arrow)proj;
+					Arrow projArrow = (Arrow)proj;
 
 					proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
-					if (tArrowData != null && _arrow instanceof TippedArrow) {
-						((TippedArrow)_arrow).setBasePotionData(tArrowData);
+					if (tArrowData != null && projArrow instanceof TippedArrow) {
+						((TippedArrow)projArrow).setBasePotionData(tArrowData);
 					}
 
-					_arrow.setCritical(arrow.isCritical());
-					_arrow.setFireTicks(arrow.getFireTicks());
-					_arrow.setKnockbackStrength(arrow.getKnockbackStrength());
-					_arrow.setDamage(arrow.getDamage());
+					projArrow.setCritical(arrow.isCritical());
+					projArrow.setFireTicks(arrow.getFireTicks());
+					projArrow.setKnockbackStrength(arrow.getKnockbackStrength());
+					projArrow.setDamage(arrow.getDamage());
 					if (arrow.hasMetadata("ArrowQuickdraw")) {
 						// Manually register these tags because volley doesn't for some reason
-						_arrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
-						if (AbilityUtils.getArrowBaseDamage(_arrow) == 0) {
-							AbilityUtils.setArrowBaseDamage(mPlugin, _arrow, AbilityUtils.getArrowBaseDamage(arrow));
+						projArrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
+						if (AbilityUtils.getArrowBaseDamage(projArrow) == 0) {
+							AbilityUtils.setArrowBaseDamage(mPlugin, projArrow, AbilityUtils.getArrowBaseDamage(arrow));
 						}
 					}
 					double multiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
-					AbilityUtils.multiplyArrowFinalDamageMultiplier(mPlugin, _arrow, multiplier);
+					AbilityUtils.multiplyArrowFinalDamageMultiplier(mPlugin, projArrow, multiplier);
 					// Manually register these tags because volley doesn't for some reason
-					if (AbilityUtils.getArrowBonusDamage(_arrow) == 0) {
-						AbilityUtils.addArrowBonusDamage(mPlugin, _arrow, AbilityUtils.getArrowBonusDamage(arrow));
+					if (AbilityUtils.getArrowBonusDamage(projArrow) == 0) {
+						AbilityUtils.addArrowBonusDamage(mPlugin, projArrow, AbilityUtils.getArrowBonusDamage(arrow));
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
 
 					//Fire: How stupid of me. I completely forgot we can call Bukkit Events on our OWN
-					ProjectileLaunchEvent event = new ProjectileLaunchEvent(_arrow);
+					ProjectileLaunchEvent event = new ProjectileLaunchEvent(projArrow);
 					Bukkit.getPluginManager().callEvent(event);
 				}
 

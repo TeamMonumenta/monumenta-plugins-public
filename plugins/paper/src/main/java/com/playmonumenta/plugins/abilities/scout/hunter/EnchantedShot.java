@@ -46,7 +46,7 @@ public class EnchantedShot extends Ability {
 	private static final Particle.DustOptions ENCHANTED_ARROW_COLOR = new Particle.DustOptions(Color.fromRGB(225, 255, 219), 2.0f);
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 
-	private boolean active = false;
+	private boolean mActive = false;
 
 	public EnchantedShot(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -59,11 +59,11 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (!active && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
+		if (!mActive && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ENCHANTED_ARROW)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (InventoryUtils.isBowItem(mainHand)) {
 				Player player = mPlayer;
-				active = true;
+				mActive = true;
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
 				new BukkitRunnable() {
 					int t = 0;
@@ -71,8 +71,8 @@ public class EnchantedShot extends Ability {
 					public void run() {
 						t++;
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
-						if (!active || t >= 20 * 5) {
-							active = false;
+						if (!mActive || t >= 20 * 5) {
+							mActive = false;
 							this.cancel();
 						}
 					}
@@ -83,10 +83,10 @@ public class EnchantedShot extends Ability {
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
-		if (active && arrow.isCritical()) {
+		if (mActive && arrow.isCritical()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
-			active = false;
+			mActive = false;
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1.5, 1.5, 1.5);
 			double damage = getAbilityScore() == 1 ? ENCHANTED_1_DAMAGE : ENCHANTED_2_DAMAGE;
 

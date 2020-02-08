@@ -70,7 +70,7 @@ public class IronTincture extends Ability {
 		putOnCooldown();
 
 		new BukkitRunnable() {
-			int tinctureDecay = 0;
+			int mTinctureDecay = 0;
 
 			@Override
 			public void run() {
@@ -99,8 +99,8 @@ public class IronTincture extends Ability {
 					return;
 				}
 
-				tinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (tinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || tincture == null || !tincture.isValid() || tincture.isDead()) {
+				mTinctureDecay += IRON_TINCTURE_TICK_PERIOD;
+				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || tincture == null || !tincture.isValid() || tincture.isDead()) {
 					tincture.remove();
 					this.cancel();
 
@@ -125,23 +125,23 @@ public class IronTincture extends Ability {
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 		mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
 		new BukkitRunnable() {
-			double rotation = 0;
-			double y = 0.15;
-			double radius = 1.15;
+			double mRotation = 0;
+			double mY = 0.15;
+			double mRadius = 1.15;
 			@Override
 			public void run() {
 				Location loc = player.getLocation();
-				rotation += 15;
-				y += 0.175;
+				mRotation += 15;
+				mY += 0.175;
 				for (int i = 0; i < 3; i++) {
-					double degree = Math.toRadians(rotation + (i * 120));
-					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					double degree = Math.toRadians(mRotation + (i * 120));
+					loc.add(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
-					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					loc.subtract(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 				}
 
-				if (y >= 1.8) {
+				if (mY >= 1.8) {
 					this.cancel();
 				}
 			}

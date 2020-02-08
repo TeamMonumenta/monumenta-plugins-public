@@ -113,51 +113,51 @@ public class PotionUtils {
 
 		public static final PotionInfo LUCK = new PotionInfo(PotionEffectType.LUCK, MINUTES_5, 0, false, true);
 
+		public PotionEffectType mType;
+		public int mDuration;
+		public int mAmplifier;
+		public boolean mAmbient;
+		public boolean mShowParticles;
+
 		public PotionInfo() {
 		}
 
 		public PotionInfo(PotionEffect effect) {
-			type = effect.getType();
-			duration = effect.getDuration();
-			amplifier = effect.getAmplifier();
-			ambient = effect.isAmbient();
-			showParticles = effect.hasParticles();
+			mType = effect.getType();
+			mDuration = effect.getDuration();
+			mAmplifier = effect.getAmplifier();
+			mAmbient = effect.isAmbient();
+			mShowParticles = effect.hasParticles();
 		}
 
-		public PotionInfo(PotionEffectType _type, int _duration, int _amplifier, boolean _ambient,
-		                  boolean _showParticles) {
-			type = _type;
-			duration = _duration;
-			amplifier = _amplifier;
-			ambient = _ambient;
-			showParticles = _showParticles;
+		public PotionInfo(PotionEffectType type, int duration, int amplifier, boolean ambient,
+		                  boolean showParticles) {
+			mType = type;
+			mDuration = duration;
+			mAmplifier = amplifier;
+			mAmbient = ambient;
+			mShowParticles = showParticles;
 
 		}
-
-		public PotionEffectType type;
-		public int duration;
-		public int amplifier;
-		public boolean ambient;
-		public boolean showParticles;
 
 		public JsonObject getAsJsonObject() {
 			JsonObject potionInfoObject = new JsonObject();
 
-			potionInfoObject.addProperty("type", type.getName());
-			potionInfoObject.addProperty("duration", duration);
-			potionInfoObject.addProperty("amplifier", amplifier);
-			potionInfoObject.addProperty("ambient", ambient);
-			potionInfoObject.addProperty("show_particles", showParticles);
+			potionInfoObject.addProperty("type", mType.getName());
+			potionInfoObject.addProperty("duration", mDuration);
+			potionInfoObject.addProperty("amplifier", mAmplifier);
+			potionInfoObject.addProperty("ambient", mAmbient);
+			potionInfoObject.addProperty("show_particles", mShowParticles);
 
 			return potionInfoObject;
 		}
 
 		public void loadFromJsonObject(JsonObject object) throws Exception {
-			type = PotionEffectType.getByName(object.get("type").getAsString());
-			duration = object.get("duration").getAsInt();
-			amplifier = object.get("amplifier").getAsInt();
-			ambient = object.get("ambient").getAsBoolean();
-			showParticles = object.get("show_particles").getAsBoolean();
+			mType = PotionEffectType.getByName(object.get("type").getAsString());
+			mDuration = object.get("duration").getAsInt();
+			mAmplifier = object.get("amplifier").getAsInt();
+			mAmbient = object.get("ambient").getAsBoolean();
+			mShowParticles = object.get("show_particles").getAsBoolean();
 		}
 	}
 
@@ -208,7 +208,7 @@ public class PotionUtils {
 	}
 
 	public static void apply(LivingEntity entity, PotionInfo info) {
-		entity.addPotionEffect(new PotionEffect(info.type, info.duration, info.amplifier, info.ambient, info.showParticles));
+		entity.addPotionEffect(new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient, info.mShowParticles));
 	}
 
 	public static List<PotionEffect> getEffects(ItemStack item) {
@@ -226,8 +226,8 @@ public class PotionUtils {
 		if (data != null) {
 			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, 1);
 			if (info != null) {
-				PotionEffect effect = new PotionEffect(info.type, info.duration, info.amplifier, info.ambient,
-				                                       info.showParticles);
+				PotionEffect effect = new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient,
+				                                       info.mShowParticles);
 				effectsList.add(effect);
 			}
 		}
@@ -290,17 +290,6 @@ public class PotionUtils {
 		return false;
 	}
 
-	public static void clearNegatives(Plugin plugin, Player player) {
-		for (PotionEffectType type : NEGATIVE_EFFECTS) {
-			if (player.hasPotionEffect(type)) {
-				PotionEffect effect = player.getPotionEffect(type);
-				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
-					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
-				}
-			}
-		}
-	}
-
 	public static boolean hasNegativeEffects(PotionEffectType type) {
 		String name = type.getName();
 		for (PotionEffectType testType : NEGATIVE_EFFECTS) {
@@ -310,6 +299,17 @@ public class PotionUtils {
 		}
 
 		return false;
+	}
+
+	public static void clearNegatives(Plugin plugin, Player player) {
+		for (PotionEffectType type : NEGATIVE_EFFECTS) {
+			if (player.hasPotionEffect(type)) {
+				PotionEffect effect = player.getPotionEffect(type);
+				if (effect.getDuration() < Constants.THIRTY_MINUTES) {
+					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
+				}
+			}
+		}
 	}
 
 	public static void applyPotion(Entity applier, LivingEntity applied, PotionEffect effect) {
@@ -359,10 +359,10 @@ public class PotionUtils {
 
 			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
 			//Check then add health
-			if (info != null && info.type.equals(PotionEffectType.HEAL)) {
-				PlayerUtils.healPlayer(player, 2 * Math.pow(2, info.amplifier + 1));
-			} else if (info != null && info.type.equals(PotionEffectType.HARM)) {
-				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.amplifier + 1), null);
+			if (info != null && info.mType.equals(PotionEffectType.HEAL)) {
+				PlayerUtils.healPlayer(player, 2 * Math.pow(2, info.mAmplifier + 1));
+			} else if (info != null && info.mType.equals(PotionEffectType.HARM)) {
+				EntityUtils.damageEntity(plugin, player, 3 * Math.pow(2, info.mAmplifier + 1), null);
 			} else {
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);
 			}

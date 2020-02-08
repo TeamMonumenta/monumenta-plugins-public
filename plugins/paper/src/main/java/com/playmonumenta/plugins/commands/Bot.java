@@ -28,7 +28,6 @@ import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
 public class Bot {
 	private static final InetSocketAddress SOCKET_ADDR = new InetSocketAddress("127.0.0.1", 8765);
 	private static final int BUF_SIZE = 8096;
-	private static final boolean DEBUG = true;
 	private static final int TICK_PERIOD = 40;
 	private static final int IDLE_TIMEOUT_TICKS = 20 * 60 * 3;
 
@@ -119,11 +118,8 @@ public class Bot {
 							return;
 						}
 
-						if (DEBUG) player.sendMessage("Ticking");
 						/* Sent a request - got any messages yet? NON-BLOCKING! */
 						if (selector.selectNow() != 0) {
-							if (DEBUG) player.sendMessage("Something to do");
-
 							Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 							while (iterator.hasNext()) {
 								// This is a wrapper for the request
@@ -133,11 +129,9 @@ public class Bot {
 								iterator.remove();
 
 								if (key.isConnectable()) {
-									if (DEBUG) player.sendMessage("Can connect!");
 									SocketChannel client = (SocketChannel)key.channel();
 									if (client.finishConnect()) {
 										mConnected = true;
-										if (DEBUG) player.sendMessage("Successfully connected");
 
 										mNoMessageTicks = 0;
 
@@ -146,10 +140,6 @@ public class Bot {
 
 										ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
 										channel.write(buffer);
-
-										if (DEBUG) player.sendMessage("Connected and sent request");
-									} else {
-										if (DEBUG) player.sendMessage("Connecting failed");
 									}
 								}
 
@@ -159,8 +149,6 @@ public class Bot {
 
 									int len = client.read(mReadBuffer);
 									if (len > 0) {
-										if (DEBUG) player.sendMessage("Read something! : " + Integer.toString(len));
-
 										mNoMessageTicks = 0;
 
 										// Important to make buffer readable apparently
@@ -169,8 +157,6 @@ public class Bot {
 										String message = StandardCharsets.UTF_8.decode(mReadBuffer).toString();
 
 										Gson gson = new Gson();
-
-										if (DEBUG) plugin.getLogger().warning(message);
 
 										JsonObject object = gson.fromJson(message, JsonObject.class);
 										if (!object.has("result")) {
@@ -182,13 +168,9 @@ public class Bot {
 											channel.close();
 											this.cancel();
 										}
-									} else {
-										if (DEBUG) player.sendMessage("Read nothing?");
 									}
 								}
 							}
-						} else {
-							if (DEBUG) player.sendMessage("Nothing to do");
 						}
 					} catch (IOException e) {
 						player.sendMessage(ChatColor.RED + "Bot command failed (protocol error)");

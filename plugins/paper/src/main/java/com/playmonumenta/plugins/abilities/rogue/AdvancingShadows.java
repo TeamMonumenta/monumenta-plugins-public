@@ -30,8 +30,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class AdvancingShadows extends Ability {
 
-	private LivingEntity target = null;
-
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
 	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
@@ -40,6 +38,8 @@ public class AdvancingShadows extends Ability {
 	private static final int ADVANCING_SHADOWS_STRENGTH_DURATION = 5 * 20;
 	private static final int ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL = 1;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
+
+	private LivingEntity mTarget = null;
 
 	public AdvancingShadows(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -52,7 +52,7 @@ public class AdvancingShadows extends Ability {
 	@Override
 	public void cast(Action action) {
 
-		LivingEntity entity = target;
+		LivingEntity entity = mTarget;
 		if (entity != null) {
 			int advancingShadows = getAbilityScore();
 			Vector dir = LocationUtils.getDirectionTo(entity.getLocation(), mPlayer.getLocation());
@@ -118,7 +118,7 @@ public class AdvancingShadows extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0);
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05);
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.1f);
-			target = null;
+			mTarget = null;
 			putOnCooldown();
 		}
 	}
@@ -148,7 +148,7 @@ public class AdvancingShadows extends Ability {
 				if (rayEntities != null && !rayEntities.isEmpty()) {
 					for (LivingEntity t : rayEntities) {
 						if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
-							target = t;
+							mTarget = t;
 							return true;
 						}
 					}

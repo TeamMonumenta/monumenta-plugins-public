@@ -31,10 +31,11 @@ public class SerializationUtils {
 
 	private static String deserializeStringFromLore(List<String> lore) {
 		String retval = "";
-		for (String str : lore)
+		for (String str : lore) {
 			if (str.startsWith(SERIALCONST)) {
 				retval += str.substring(SERIALCONST.length());
 			}
+		}
 		return retval;
 	}
 

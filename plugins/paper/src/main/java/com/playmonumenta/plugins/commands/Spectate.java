@@ -87,7 +87,7 @@ public class Spectate implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void PlayerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
+	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
 		if (!event.isCancelled()) {
 			Player player = event.getPlayer();
 
@@ -99,7 +99,7 @@ public class Spectate implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerQuitEvent(PlayerQuitEvent event) {
+	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 
 		// Put player back where they were before when they log out

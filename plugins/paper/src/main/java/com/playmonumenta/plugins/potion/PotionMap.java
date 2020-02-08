@@ -38,7 +38,7 @@ public class PotionMap {
 	}
 
 	private void addPotionMap(PotionID id, PotionInfo newPotionInfo) {
-		Integer amplifier = newPotionInfo.amplifier;
+		Integer amplifier = newPotionInfo.mAmplifier;
 
 		TreeMap<Integer, PotionInfo> trackedPotionInfo = mPotionMap.get(id);
 		if (trackedPotionInfo == null) {
@@ -52,27 +52,27 @@ public class PotionMap {
 			// If the current "best" negative effect is less than this new one, track it
 			// Make sure the last effect has had a chance to trigger before refreshing it
 			if (bestEffect == null
-			    || bestEffect.amplifier < newPotionInfo.amplifier
-			    || (bestEffect.amplifier == newPotionInfo.amplifier
-			        && bestEffect.duration < newPotionInfo.duration
-			        && (newPotionInfo.type != PotionEffectType.POISON
-			            || newPotionInfo.duration - bestEffect.duration >= 25 / (bestEffect.amplifier + 1) + 1)
-			        && (newPotionInfo.type != PotionEffectType.WITHER
-			            || newPotionInfo.duration - bestEffect.duration >= 40 / (bestEffect.amplifier + 1) + 1))) {
+			    || bestEffect.mAmplifier < newPotionInfo.mAmplifier
+			    || (bestEffect.mAmplifier == newPotionInfo.mAmplifier
+			        && bestEffect.mDuration < newPotionInfo.mDuration
+			        && (newPotionInfo.mType != PotionEffectType.POISON
+			            || newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
+			        && (newPotionInfo.mType != PotionEffectType.WITHER
+			            || newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 
 			// Remove all lower-level effects than this new one
-			for (int i = newPotionInfo.amplifier - 1; i >= 0; i--) {
+			for (int i = newPotionInfo.mAmplifier - 1; i >= 0; i--) {
 				trackedPotionInfo.remove(i);
 			}
 		} else {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
-			    || (currentInfo.duration < newPotionInfo.duration
-			        && (currentInfo.type != PotionEffectType.REGENERATION
-			            || newPotionInfo.duration - currentInfo.duration >= 50 / (currentInfo.amplifier + 1) + 1))) {
+			    || (currentInfo.mDuration < newPotionInfo.mDuration
+			        && (currentInfo.mType != PotionEffectType.REGENERATION
+			            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
@@ -111,8 +111,8 @@ public class PotionMap {
 				while (potionInfoIter.hasNext()) {
 					PotionInfo info = potionInfoIter.next().getValue();
 
-					info.duration -= ticks;
-					if (info.duration <= 0) {
+					info.mDuration -= ticks;
+					if (info.mDuration <= 0) {
 						effectWoreOff = true;
 						potionInfoIter.remove();
 					}
@@ -142,10 +142,10 @@ public class PotionMap {
 
 				if (bestEffect == null) {
 					bestEffect = info;
-				} else if (info.amplifier > bestEffect.amplifier) {
+				} else if (info.mAmplifier > bestEffect.mAmplifier) {
 					bestEffect = info;
-				} else if (info.amplifier == bestEffect.amplifier &&
-				           info.duration > bestEffect.duration) {
+				} else if (info.mAmplifier == bestEffect.mAmplifier &&
+				           info.mDuration > bestEffect.mDuration) {
 					bestEffect = info;
 				}
 			}
@@ -160,9 +160,9 @@ public class PotionMap {
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
 		if (currentVanillaEffect != null) {
 			if (bestEffect == null
-			    || currentVanillaEffect.getDuration() > (bestEffect.duration + 20)
-			    || currentVanillaEffect.getDuration() < (bestEffect.duration - 20)
-			    || bestEffect.amplifier != currentVanillaEffect.getAmplifier()) {
+			    || currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20)
+			    || currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20)
+			    || bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
 
 				// The current effect must be removed because the "best" effect is either less than it
 				// OR the same strength but less duration
@@ -172,8 +172,8 @@ public class PotionMap {
 
 		if (bestEffect != null) {
 			// Effects over 100 "mask" all other effects of that type
-			if (bestEffect.amplifier < 100) {
-				PotionEffect effect = new PotionEffect(mType, bestEffect.duration, bestEffect.amplifier, bestEffect.ambient, bestEffect.showParticles);
+			if (bestEffect.mAmplifier < 100) {
+				PotionEffect effect = new PotionEffect(mType, bestEffect.mDuration, bestEffect.mAmplifier, bestEffect.mAmbient, bestEffect.mShowParticles);
 				player.addPotionEffect(effect);
 			}
 		}

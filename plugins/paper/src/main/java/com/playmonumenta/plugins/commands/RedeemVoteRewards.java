@@ -53,6 +53,7 @@ public class RedeemVoteRewards extends GenericCommand {
 	}
 
 	private static final Map<UUID, PendingRewardContext> mPendingRewards = new HashMap<UUID, PendingRewardContext>();
+
 	public static void register(Plugin plugin) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 

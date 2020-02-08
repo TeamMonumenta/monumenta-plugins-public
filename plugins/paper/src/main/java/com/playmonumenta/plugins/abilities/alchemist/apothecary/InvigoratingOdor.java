@@ -68,15 +68,15 @@ public class InvigoratingOdor extends Ability {
 
 	public void createAura(Location loc, double radius) {
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
-				if (t >= INVIGORATING_AURA_DURATION) {
+				if (mTicks >= INVIGORATING_AURA_DURATION) {
 					this.cancel();
 				}
 
-				if (t == 0) {
+				if (mTicks == 0) {
 					mWorld.spawnParticle(Particle.END_ROD, loc, 35, 0.3, 0.3, 0.3, 0.1);
 					mWorld.spawnParticle(Particle.SPELL, loc, 35, radius / 2, 0.15, radius / 2);
 				}
@@ -92,7 +92,7 @@ public class InvigoratingOdor extends Ability {
 					}
 				}
 
-				t += 5;
+				mTicks += 5;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
 	}

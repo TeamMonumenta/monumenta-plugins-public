@@ -76,13 +76,13 @@ public class AlchemicalAmalgam extends Ability {
 		putOnCooldown();
 
 		new BukkitRunnable() {
-			Location loc = mPlayer.getEyeLocation();
-			BoundingBox box = BoundingBox.of(loc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
-			Vector increment = loc.getDirection().multiply(AMALGAM_MOVE_SPEED);
+			Location mLoc = mPlayer.getEyeLocation();
+			BoundingBox mBox = BoundingBox.of(mLoc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
+			Vector mIncrement = mLoc.getDirection().multiply(AMALGAM_MOVE_SPEED);
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
-			List<Player> players = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
+			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
+			List<Player> mPlayers = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
 
 			int t = 0;
 			double degree = 0;
@@ -90,20 +90,20 @@ public class AlchemicalAmalgam extends Ability {
 
 			@Override
 			public void run() {
-				box.shift(increment);
-				loc.add(increment);
-				Iterator<LivingEntity> mobIter = mobs.iterator();
+				mBox.shift(mIncrement);
+				mLoc.add(mIncrement);
+				Iterator<LivingEntity> mobIter = mMobs.iterator();
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
-					if (box.overlaps(mob.getBoundingBox())) {
+					if (mBox.overlaps(mob.getBoundingBox())) {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
 						mobIter.remove();
 					}
 				}
-				Iterator<Player> playerIter = players.iterator();
+				Iterator<Player> playerIter = mPlayers.iterator();
 				while (playerIter.hasNext()) {
 					Player player = playerIter.next();
-					if (box.overlaps(player.getBoundingBox())) {
+					if (mBox.overlaps(player.getBoundingBox())) {
 						AbsorptionUtils.addAbsorption(player, mShield, AMALGAM_MAX_SHIELD);
 						playerIter.remove();
 					}
@@ -114,39 +114,39 @@ public class AlchemicalAmalgam extends Ability {
 				for (int i = 0; i < 2; i++) {
 					double radian1 = Math.toRadians(degree + (i * 180));
 					vec = new Vector(Math.cos(radian1) * 0.325, 0, Math.sin(radian1) * 0.325);
-					vec = VectorUtils.rotateXAxis(vec, -loc.getPitch() + 90);
-					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch() + 90);
+					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-					Location l = loc.clone().add(vec);
+					Location l = mLoc.clone().add(vec);
 					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_LIGHT_COLOR);
 					mWorld.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 0.1, 0.1, APOTHECARY_DARK_COLOR);
 				}
-				mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 0.35, 0.35, 0.35, 1);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 5, 0.35, 0.35, 0.35, 1);
+				mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1);
+				mWorld.spawnParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1);
 
-				if (!reverse && (LocationUtils.collidesWithSolid(loc, loc.getBlock()) || t >= AMALGAM_MAX_DURATION)) {
-					mobs = EntityUtils.getNearbyMobs(loc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
-					players = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
+				if (!reverse && (LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || t >= AMALGAM_MAX_DURATION)) {
+					mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
+					mPlayers = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
 					reverse = true;
 				}
 
 				if (reverse) {
 					if (t <= 0) {
 						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
-						mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
+						mWorld.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
 						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);
 						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 25, 0.35, 0.5, 0.35, APOTHECARY_LIGHT_COLOR);
 						this.cancel();
 					}
 
-					// The increment is calculated by the distance to the player divided by the number of increments left
-					increment = mPlayer.getEyeLocation().toVector().subtract(loc.toVector()).multiply(1.0 / t);
+					// The mIncrement is calculated by the distance to the player divided by the number of increments left
+					mIncrement = mPlayer.getEyeLocation().toVector().subtract(mLoc.toVector()).multiply(1.0 / t);
 
 					// To make the particles function without rewriting the particle code, manually calculate and set pitch and yaw
-					double x = increment.getX();
-					double y = increment.getY();
-					double z = increment.getZ();
+					double x = mIncrement.getX();
+					double y = mIncrement.getY();
+					double z = mIncrement.getZ();
 					// As long as Z is nonzero, we won't get division by 0
 					if (z == 0) {
 						z = 0.0001;
@@ -156,8 +156,8 @@ public class AlchemicalAmalgam extends Ability {
 					if (z < 0) {
 						yaw += 180;
 					}
-					loc.setPitch(pitch);
-					loc.setYaw(yaw);
+					mLoc.setPitch(pitch);
+					mLoc.setYaw(yaw);
 
 					t--;
 				} else {

@@ -59,24 +59,24 @@ public class AdrenalSerum extends Ability {
 	public void cast(Action action) {
 		mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.45, 0.45, 0.45, 0.025);
 		new BukkitRunnable() {
-			double rotation = 0;
-			double y = 0.15;
-			double radius = 1;
+			double mRotation = 0;
+			double mY = 0.15;
+			double mRadius = 1;
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation();
-				rotation += 17;
-				y += 0.2;
+				mRotation += 17;
+				mY += 0.2;
 				for (int i = 0; i < 3; i++) {
-					double degree = Math.toRadians(rotation + (i * 120));
-					loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					double degree = Math.toRadians(mRotation + (i * 120));
+					loc.add(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.025);
 					mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, ADRENAL_SERUM_COLOR);
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0.1, 0.1, 0.1, 0);
-					loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+					loc.subtract(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 				}
 
-				if (y >= 1.8) {
+				if (mY >= 1.8) {
 					this.cancel();
 				}
 			}
@@ -110,23 +110,23 @@ public class AdrenalSerum extends Ability {
 					BlockData fallingDustData = Material.RED_NETHER_BRICKS.createBlockData();
 					mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().add(0, 1, 0), 45, 0.4, 0.45, 0.24, fallingDustData);
 					new BukkitRunnable() {
-						double rotation = 0;
-						double y = 1.9;
-						double radius = 1;
+						double mRotation = 0;
+						double mY = 1.9;
+						double mRadius = 1;
 						@Override
 						public void run() {
 							Location loc = mPlayer.getLocation();
-							rotation += 17;
-							y -= 0.2;
+							mRotation += 17;
+							mY -= 0.2;
 							for (int i = 0; i < 3; i++) {
-								double degree = Math.toRadians(rotation + (i * 120));
-								loc.add(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+								double degree = Math.toRadians(mRotation + (i * 120));
+								loc.add(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 								mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, ADRENAL_SERUM_COLOR);
 								mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0.1, 0.1, 0.1, 0);
-								loc.subtract(Math.cos(degree) * radius, y, Math.sin(degree) * radius);
+								loc.subtract(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
 							}
 
-							if (y <= 0) {
+							if (mY <= 0) {
 								this.cancel();
 							}
 						}

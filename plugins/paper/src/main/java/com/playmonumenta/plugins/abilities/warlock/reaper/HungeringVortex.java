@@ -114,7 +114,7 @@ public class HungeringVortex extends Ability {
 				for (LivingEntity mob : mobs) {
 					// Release suction on hit mobs for half a second
 					if (mob.getNoDamageTicks() > mob.getMaximumNoDamageTicks() - 10) {
-						MovementUtils.PullTowards(mPlayer, mob, velocity);
+						MovementUtils.pullTowards(mPlayer, mob, velocity);
 						// This means MovementUtils is being screwy and I'm too lazy to change MovementUtils
 						if (mob.getVelocity().getY() > 0.4) {
 							mob.setVelocity(mob.getVelocity().setY(-0.1));

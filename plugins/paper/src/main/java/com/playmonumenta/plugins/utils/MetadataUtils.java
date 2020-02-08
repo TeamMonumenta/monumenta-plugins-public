@@ -54,16 +54,16 @@ public class MetadataUtils {
 	}
 
 	public static void removeAllMetadata(Plugin plugin) {
-		_removeAllMetadataHelper("getEntityMetadata", plugin.getServer(), plugin);
-		_removeAllMetadataHelper("getPlayerMetadata", plugin.getServer(), plugin);
-		_removeAllMetadataHelper("getWorldMetadata", plugin.getServer(), plugin);
+		removeAllMetadataHelper("getEntityMetadata", plugin.getServer(), plugin);
+		removeAllMetadataHelper("getPlayerMetadata", plugin.getServer(), plugin);
+		removeAllMetadataHelper("getWorldMetadata", plugin.getServer(), plugin);
 		for (World world : Bukkit.getWorlds()) {
-			_removeAllMetadataHelper("getBlockMetadata", world, plugin);
+			removeAllMetadataHelper("getBlockMetadata", world, plugin);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> void _removeAllMetadataHelper(String getMetaMethodName, Object obj, Plugin plugin) {
+	private static <T> void removeAllMetadataHelper(String getMetaMethodName, Object obj, Plugin plugin) {
 		MetadataStoreBase<T> metaStore = null;
 		Map<String, Map<Plugin, MetadataValue>> metaMap = null;
 

@@ -71,7 +71,7 @@ public class Dodging extends Ability {
 		}
 
 		// See if we should dodge. If false, allow the event to proceed normally
-		if (!_dodge()) {
+		if (!dodge()) {
 			return true;
 		}
 		event.setDuration(0);
@@ -87,7 +87,7 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		if (!_dodge()) {
+		if (!dodge()) {
 			return true;
 		}
 		return false;
@@ -100,7 +100,7 @@ public class Dodging extends Ability {
 		if ((event.getEntity().getShooter() instanceof Player) || mPlayer.isBlocking()) {
 			return true;
 		}
-		if (!_dodge()) {
+		if (!dodge()) {
 			return true;
 		}
 
@@ -119,13 +119,13 @@ public class Dodging extends Ability {
 		if (!(event.getEntity().getShooter() instanceof LivingEntity) || event.getEntity().getShooter() instanceof Player) {
 			return true;
 		}
-		if (!_dodge()) {
+		if (!dodge()) {
 			return true;
 		}
 		return false;
 	}
 
-	private boolean _dodge() {
+	private boolean dodge() {
 		if (mTriggerTick == mPlayer.getTicksLived()) {
 			// Dodging was activated this tick - allow it
 			return true;

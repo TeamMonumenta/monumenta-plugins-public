@@ -544,7 +544,7 @@ public class ItemUtils {
 
 	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
-		meta.addCustomEffect(new PotionEffect(info.type, info.duration, info.amplifier, false, true), false);
+		meta.addCustomEffect(new PotionEffect(info.mType, info.mDuration, info.mAmplifier, false, true), false);
 		potion.setItemMeta(meta);
 	}
 

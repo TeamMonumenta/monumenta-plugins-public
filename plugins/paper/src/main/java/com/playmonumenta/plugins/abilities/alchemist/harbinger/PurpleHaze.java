@@ -44,17 +44,18 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class PurpleHaze extends Ability {
 
 	public static class HazedMob {
-		public Player triggeredBy;
-		public LivingEntity mob;
-		public int duration;
-		public int ticksLeft;
-		public int transfers;
+		public Player mTriggeredBy;
+		public LivingEntity mMob;
+		public int mDuration;
+		public int mTicksLeft;
+		public int mTransfers;
+
 		public HazedMob(LivingEntity mob, Player triggeredBy, int duration, int transfers) {
-			this.mob = mob;
-			this.triggeredBy = triggeredBy;
-			this.ticksLeft = duration;
-			this.duration = duration;
-			this.transfers = transfers;
+			this.mMob = mob;
+			this.mTriggeredBy = triggeredBy;
+			this.mTicksLeft = duration;
+			this.mDuration = duration;
+			this.mTransfers = transfers;
 		}
 	}
 
@@ -94,16 +95,16 @@ public class PurpleHaze extends Ability {
 					if (counter % 20 == 0) {
 						for (Map.Entry<UUID, HazedMob> entry : mHazedMobs.entrySet()) {
 							HazedMob e = entry.getValue();
-							LivingEntity damagee = e.mob;
+							LivingEntity damagee = e.mMob;
 							// Since purple haze damage has to stack with any other damage, EntityUtils.damageEntity()
 							// might not see it as intentional damage stacking, so iFrames need to be set manually.
 							int ticks = damagee.getNoDamageTicks();
 							damagee.setNoDamageTicks(0);
 							Vector v = damagee.getVelocity();
-							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.triggeredBy, null, false /* do not register CustomDamageEvent */);
+							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, null, false /* do not register CustomDamageEvent */);
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
-							PotionUtils.applyPotion(e.triggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
+							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 							Location loc = damagee.getLocation();
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 10, 0, 0.2, 0, 0.0001);
 							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
@@ -116,10 +117,10 @@ public class PurpleHaze extends Ability {
 					while (iter.hasNext()) {
 						Map.Entry<UUID, HazedMob> e = iter.next();
 						HazedMob hazer = e.getValue();
-						hazer.ticksLeft--;
-						if (hazer.ticksLeft <= 0 || hazer.mob.isDead()) {
-							if (hazer.mob.isDead()) {
-								Location loc = hazer.mob.getLocation();
+						hazer.mTicksLeft--;
+						if (hazer.mTicksLeft <= 0 || hazer.mMob.isDead()) {
+							if (hazer.mMob.isDead()) {
+								Location loc = hazer.mMob.getLocation();
 								// Perhaps a ball of purple haze going from the dead mob to the next instead?
 
 								mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 40, 2, 1, 2, 0.0001);
@@ -128,7 +129,7 @@ public class PurpleHaze extends Ability {
 								mWorld.playSound(loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.0f, 2.0f);
 								mWorld.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.55f, 1.5f);
 
-								for (int i = 0; i < hazer.transfers; i++) {
+								for (int i = 0; i < hazer.mTransfers; i++) {
 									double closest = PURPLE_HAZE_RADIUS + 1;
 									LivingEntity closestMob = null;
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PURPLE_HAZE_RADIUS)) {
@@ -141,13 +142,13 @@ public class PurpleHaze extends Ability {
 									}
 
 									if (closestMob != null) {
-										HazedMob hazed = new HazedMob(closestMob, hazer.triggeredBy, hazer.duration, hazer.transfers);
-										newHazedMobs.put(hazed.mob.getUniqueId(), hazed);
-										Location loc2 = hazed.mob.getLocation();
+										HazedMob hazed = new HazedMob(closestMob, hazer.mTriggeredBy, hazer.mDuration, hazer.mTransfers);
+										newHazedMobs.put(hazed.mMob.getUniqueId(), hazed);
+										Location loc2 = hazed.mMob.getLocation();
 										mWorld.spawnParticle(Particle.SPELL_WITCH, loc2.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
 
-										Location hazedLoc = hazed.mob.getEyeLocation();
-										Location hazerLoc = hazer.mob.getEyeLocation();
+										Location hazedLoc = hazed.mMob.getEyeLocation();
+										Location hazerLoc = hazer.mMob.getEyeLocation();
 										Vector dir = LocationUtils.getDirectionTo(hazedLoc, hazerLoc);
 										for (int j = 0; j < 50; j++) {
 											hazerLoc.add(dir.clone().multiply(0.1));
@@ -164,7 +165,7 @@ public class PurpleHaze extends Ability {
 									}
 								}
 
-								AbilityUtils.addAlchemistPotions(hazer.triggeredBy, 1);
+								AbilityUtils.addAlchemistPotions(hazer.mTriggeredBy, 1);
 							}
 							iter.remove();
 						}
@@ -219,7 +220,7 @@ public class PurpleHaze extends Ability {
 			HazedMob hazed = new HazedMob(entity, mPlayer, purpleHaze == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION,
 			                              purpleHaze == 1 ? PURPLE_HAZE_1_TRANSFERS : PURPLE_HAZE_2_TRANSFERS);
 			mHazedMobs.put(entity.getUniqueId(), hazed);
-			Location loc = hazed.mob.getLocation();
+			Location loc = hazed.mMob.getLocation();
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 0.5f, 0.5f);
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.5f);

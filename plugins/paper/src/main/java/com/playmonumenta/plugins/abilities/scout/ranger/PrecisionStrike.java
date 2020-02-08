@@ -47,7 +47,7 @@ public class PrecisionStrike extends Ability {
 	private static final int PRECISION_STRIKE_2_VULNERABILITY_LEVEL = 5;
 	private static final int PRECISION_STRIKE_COOLDOWN = 6 * 20;
 
-	private LivingEntity hitMob;
+	private LivingEntity mHitMob;
 
 	public PrecisionStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -101,7 +101,7 @@ public class PrecisionStrike extends Ability {
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					if (!le.isDead()) {
 						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer, null, true, mInfo.linkedSpell);
-						hitMob = le;
+						mHitMob = le;
 						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
 						if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 							EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, le);
@@ -111,7 +111,7 @@ public class PrecisionStrike extends Ability {
 						mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
 
 						if (getAbilityScore() == 2) {
-							for (LivingEntity e : EntityUtils.getNearbyMobs(hitMob.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
+							for (LivingEntity e : EntityUtils.getNearbyMobs(mHitMob.getLocation(), PRECISION_STRIKE_STUN_RADIUS, mPlayer)) {
 								EntityUtils.applyStun(mPlugin, PRECISION_STRIKE_STUN_DURATION, e);
 							}
 						}

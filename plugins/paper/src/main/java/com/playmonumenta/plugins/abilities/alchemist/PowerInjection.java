@@ -33,7 +33,7 @@ public class PowerInjection extends Ability {
 	private static final int POWER_INJECTION_COOLDOWN = 30 * 20;
 	private static final Particle.DustOptions PI_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.2f);
 
-	private Player targetPlayer;
+	private Player mTargetPlayer;
 
 	public PowerInjection(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -54,11 +54,11 @@ public class PowerInjection extends Ability {
 			mWorld.spawnParticle(Particle.CRIT, loc, 1, 0.2, 0.2, 0.2, 0.35);
 			mWorld.spawnParticle(Particle.FLAME, loc, 2, 0.11, 0.11, 0.11, 0.025);
 
-			if (loc.distance(targetPlayer.getLocation().add(0, 1, 0)) < 1.25) {
+			if (loc.distance(mTargetPlayer.getLocation().add(0, 1, 0)) < 1.25) {
 				break;
 			}
 		}
-		Location tLoc = targetPlayer.getLocation().add(0, 1, 0);
+		Location tLoc = mTargetPlayer.getLocation().add(0, 1, 0);
 		mWorld.spawnParticle(Particle.FLAME, tLoc, 15, 0.4, 0.45, 0.4, 0.025);
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, tLoc, 50, 0.25, 0.45, 0.25, 0.001);
 		mWorld.spawnParticle(Particle.REDSTONE, tLoc, 45, 0.4, 0.45, 0.4, PI_COLOR);
@@ -71,9 +71,9 @@ public class PowerInjection extends Ability {
 		mWorld.spawnParticle(Particle.FLAME, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection().multiply(0.75)), 20, 0, 0, 0, 0.25);
 		int effectLvl = powerInjection == 1 ? POWER_INJECTION_1_STRENGTH_EFFECT_LVL : POWER_INJECTION_2_STRENGTH_EFFECT_LVL;
 
-		mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
+		mPlugin.mPotionManager.addPotion(mTargetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, POWER_INJECTION_DURATION, effectLvl, false, true));
 		if (powerInjection > 1) {
-			mPlugin.mPotionManager.addPotion(targetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
+			mPlugin.mPotionManager.addPotion(mTargetPlayer, PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_EFFECT_LVL, false, true));
 		}
 
 		putOnCooldown();
@@ -83,9 +83,9 @@ public class PowerInjection extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.testForItemWithName(inMainHand, "Alchemist's Potion")) {
-			LivingEntity targetEntity = EntityUtils.GetEntityAtCursor(mPlayer, POWER_INJECTION_RANGE, true, true, true);
+			LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, POWER_INJECTION_RANGE, true, true, true);
 			if (targetEntity != null && targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) {
-				targetPlayer = (Player) targetEntity;
+				mTargetPlayer = (Player) targetEntity;
 				return true;
 			}
 		}

@@ -77,7 +77,7 @@ public class GraspingClaws extends Ability {
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS, mPlayer)) {
 				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
-				MovementUtils.PullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
+				MovementUtils.pullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
 			}
 

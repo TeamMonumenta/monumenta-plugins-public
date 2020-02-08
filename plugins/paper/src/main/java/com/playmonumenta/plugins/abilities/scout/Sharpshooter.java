@@ -36,13 +36,13 @@ public class Sharpshooter extends Ability {
 		mInfo.scoreboardId = "Sharpshooter";
 	}
 
-	private int sharpshot = 0;
-	private int t = 0;
+	private int mSharpshot = 0;
+	private int mTicks = 0;
 
 	@Override
 	public boolean PlayerShotArrowEvent(Arrow arrow) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "SharpshooterBonusDamageRegistrationTick")) {
-			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, sharpshot);
+			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, mSharpshot);
 		}
 		return true;
 	}
@@ -51,21 +51,21 @@ public class Sharpshooter extends Ability {
 	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		// Only increment sharpshot if the arrow is critical and not from volley
 		if (arrow.isCritical() && !arrow.hasMetadata("Volley")) {
-			t = 0;
+			mTicks = 0;
 
-			if (sharpshot <= 0) {
+			if (mSharpshot <= 0) {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						t++;
+						mTicks++;
 
-						if (t >= SHARPSHOOTER_DECAY_TIMER) {
-							t = 0;
-							sharpshot--;
-							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + sharpshot);
+						if (mTicks >= SHARPSHOOTER_DECAY_TIMER) {
+							mTicks = 0;
+							mSharpshot--;
+							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + mSharpshot);
 						}
 
-						if (sharpshot <= 0) {
+						if (mSharpshot <= 0) {
 							this.cancel();
 						}
 					}
@@ -75,18 +75,18 @@ public class Sharpshooter extends Ability {
 
 			int max = getAbilityScore() == 1 ? SHARPSHOOTER_1_MAX_BONUS : SHARPSHOOTER_2_MAX_BONUS;
 			int increment = getAbilityScore() == 1 ? SHARPSHOOTER_1_INCREMENT : SHARPSHOOTER_2_INCREMENT;
-			sharpshot += increment;
-			if (sharpshot > max) {
-				sharpshot = max;
+			mSharpshot += increment;
+			if (mSharpshot > max) {
+				mSharpshot = max;
 			}
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + sharpshot);
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + mSharpshot);
 		}
 
 		return true;
 	}
 
 	public int getSharpshot() {
-		return sharpshot;
+		return mSharpshot;
 	}
 
 }

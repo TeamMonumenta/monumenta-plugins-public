@@ -24,20 +24,21 @@ import com.playmonumenta.plugins.abilities.Ability;
 
 public class FinishingBlow extends Ability {
 
-	public static class Counter {
-		LivingEntity mob;
-		int ticksLeft = FINISHING_BLOW_DURATION;
-		Counter(LivingEntity mob) {
-			this.mob = mob;
-		}
-	}
-
 	private static final Particle.DustOptions FINISHING_BLOW_COLOR = new Particle.DustOptions(Color.fromRGB(168, 0, 0), 1.0f);
 	private static final int FINISHING_BLOW_DURATION = 20 * 5;
 	private static final int FINISHING_BLOW_1_DAMAGE = 3;
 	private static final int FINISHING_BLOW_2_DAMAGE = 6;
 	private static final int FINISHING_BLOW_DAMAGE_MULTIPLIER = 2;
 	private static final double FINISHING_BLOW_THRESHOLD = 0.5;
+
+	public static class Counter {
+		LivingEntity mMob;
+		int mTicksLeft = FINISHING_BLOW_DURATION;
+
+		Counter(LivingEntity mob) {
+			mMob = mob;
+		}
+	}
 
 	private Map<UUID, Counter> mMarkedMobs = new HashMap<UUID, Counter>();
 	private int mDamageBonus;
@@ -54,13 +55,13 @@ public class FinishingBlow extends Ability {
 			Iterator<Map.Entry<UUID, Counter>> iter = mMarkedMobs.entrySet().iterator();
 			while (iter.hasNext()) {
 				Counter counter = iter.next().getValue();
-				counter.ticksLeft -= 5;
+				counter.mTicksLeft -= 5;
 
-				Location loc = counter.mob.getLocation().add(0, 1, 0);
+				Location loc = counter.mMob.getLocation().add(0, 1, 0);
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.5, 0.25, 0.02);
 				mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.5, 0.25, 0);
 
-				if (counter.ticksLeft <= 0 || counter.mob.isDead() || !counter.mob.isValid()) {
+				if (counter.mTicksLeft <= 0 || counter.mMob.isDead() || !counter.mMob.isValid()) {
 					iter.remove();
 				}
 			}

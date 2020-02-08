@@ -47,17 +47,17 @@ public class ClaimRaffle {
 		}
 	}
 
-	public static void queryResponseReceived(Plugin plugin, UUID uuid, boolean claim_reward, boolean eligible) {
+	public static void queryResponseReceived(Plugin plugin, UUID uuid, boolean claimReward, boolean eligible) {
 		Player player = plugin.getPlayer(uuid);
 		if (player == null || !player.isOnline()) {
-			if (claim_reward && eligible) {
+			if (claimReward && eligible) {
 				/* This player tried to claim a reward then disappeared - send back the reward to bungee */
 				plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
 			}
 			return;
 		}
 
-		if (claim_reward && eligible) {
+		if (claimReward && eligible) {
 			try {
 				CommandUtils.enchantify(player, player, "Gilded", "Gilded by");
 			} catch (CommandSyntaxException ex) {
@@ -65,7 +65,7 @@ public class ClaimRaffle {
 				plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
 				player.sendMessage(ChatColor.RED + ex.getMessage());
 			}
-		} else if (!claim_reward && eligible) {
+		} else if (!claimReward && eligible) {
 			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(plugin, 0));
 			player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");
 			player.sendMessage(ChatColor.GREEN + "The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while it is anywhere in your inventory.");

@@ -34,11 +34,12 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class SwiftCuts extends Ability {
 
 	public static class Counter {
-		public LivingEntity mob;
-		public int ticksLeftRefractory = SWIFT_CUTS_REFRACTORY;
-		public boolean isMarked = true;
+		public LivingEntity mMob;
+		public int mTicksLeftRefractory = SWIFT_CUTS_REFRACTORY;
+		public boolean mIsMarked = true;
+
 		public Counter(LivingEntity mob) {
-			this.mob = mob;
+			mMob = mob;
 		}
 	}
 
@@ -66,13 +67,13 @@ public class SwiftCuts extends Ability {
 			Iterator<Map.Entry<UUID, Counter>> iter = mMarkedMobs.entrySet().iterator();
 			while (iter.hasNext()) {
 				Counter counter = iter.next().getValue();
-				if (!counter.isMarked) {
-					counter.ticksLeftRefractory -= 5;
+				if (!counter.mIsMarked) {
+					counter.mTicksLeftRefractory -= 5;
 				}
 
-				mWorld.spawnParticle(Particle.FALLING_DUST, counter.mob.getLocation().add(0, 1, 0), 1, 0.35, 0.45, 0.35, Material.GRAVEL.createBlockData());
+				mWorld.spawnParticle(Particle.FALLING_DUST, counter.mMob.getLocation().add(0, 1, 0), 1, 0.35, 0.45, 0.35, Material.GRAVEL.createBlockData());
 
-				if (counter.ticksLeftRefractory <= 0 || counter.mob.isDead() || !counter.mob.isValid()) {
+				if (counter.mTicksLeftRefractory <= 0 || counter.mMob.isDead() || !counter.mMob.isValid()) {
 					iter.remove();
 				}
 			}
@@ -97,11 +98,11 @@ public class SwiftCuts extends Ability {
 				mMarkedMobs.put(uuid, new Counter(mob));
 			} else {
 				Counter counter = mMarkedMobs.get(uuid);
-				if (counter.isMarked) {
+				if (counter.mIsMarked) {
 					Location loc = mob.getLocation().add(0, 1, 0);
 					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1.5f);
 					mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 3, 0.35, 0.45, 0.35, 0.001);
-					counter.isMarked = false;
+					counter.mIsMarked = false;
 					event.setDamage(event.getDamage() + mDamageBonus);
 					PotionUtils.applyPotion(mPlayer, mob,
 											new PotionEffect(PotionEffectType.UNLUCK, SWIFT_CUTS_VULNERABILITY_DURATION, mVulnerabilityAmplifier));

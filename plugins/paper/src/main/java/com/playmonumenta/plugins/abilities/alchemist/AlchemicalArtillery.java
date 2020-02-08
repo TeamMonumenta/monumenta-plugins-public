@@ -62,15 +62,15 @@ public class AlchemicalArtillery extends Ability {
 				mActive = true;
 				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
 				new BukkitRunnable() {
-					int t = 0;
+					int mTicks = 0;
 					@Override
 					public void run() {
-						t++;
+						mTicks++;
 						mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 1, 0.25, 0, 0.25, 0);
-						if (t == 3) {
+						if (mTicks == 3) {
 							mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_TRAPDOOR_OPEN, 1, 2.5f);
 						}
-						if (!mActive || t > ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD) {
+						if (!mActive || mTicks > ALCHEMICAL_ARTILLERY_ACTIVITY_PERIOD) {
 							mActive = false;
 							this.cancel();
 						}

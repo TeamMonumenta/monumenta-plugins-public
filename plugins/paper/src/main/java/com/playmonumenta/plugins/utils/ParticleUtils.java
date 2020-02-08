@@ -25,15 +25,15 @@ public class ParticleUtils {
 
 	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, Collection<Map.Entry<Double, SpawnParticleAction>> particles) {
 		new BukkitRunnable() {
-			double currentRad = 0;
+			double mCurrentRadius = 0;
 
 			public void run() {
-				currentRad += radius / ticks;
+				mCurrentRadius += radius / ticks;
 
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / (7 * radius)) {
-					double x = currentRad * Math.cos(theta);
+					double x = mCurrentRadius * Math.cos(theta);
 					double y = (PARTICLE_RAND.nextDouble() - 0.5) * height;
-					double z = currentRad * Math.sin(theta);
+					double z = mCurrentRadius * Math.sin(theta);
 					loc.add(x, y, z);
 
 					for (Map.Entry<Double, SpawnParticleAction> particle : particles) {
@@ -44,7 +44,7 @@ public class ParticleUtils {
 
 					loc.subtract(x, y, z);
 				}
-				if (currentRad >= radius) {
+				if (mCurrentRadius >= radius) {
 					this.cancel();
 				}
 			}
@@ -54,43 +54,43 @@ public class ParticleUtils {
 
 	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
 		new BukkitRunnable() {
-			double t = Math.PI / 4;
-			Location loc = entity.getLocation();
-			World world = loc.getWorld();
-			Vector direction = entity.getEyeLocation().getDirection().setY(0).normalize();
+			double mCurrentRadius = Math.PI / 4;
+			Location mLoc = entity.getLocation();
+			World mWorld = mLoc.getWorld();
+			Vector mDirection = entity.getEyeLocation().getDirection().setY(0).normalize();
 
 			public void run() {
-				t = t + 0.25 * Math.PI;
+				mCurrentRadius = mCurrentRadius + 0.25 * Math.PI;
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / 64) {
-					double x = t * Math.cos(theta);
-					double y = 2 * Math.exp(-0.1 * t) * Math.sin(t) + 0.5;
-					double z = t * Math.sin(theta);
-					loc.add(x, y, z);
+					double x = mCurrentRadius * Math.cos(theta);
+					double y = 2 * Math.exp(-0.1 * mCurrentRadius) * Math.sin(mCurrentRadius) + 0.5;
+					double z = mCurrentRadius * Math.sin(theta);
+					mLoc.add(x, y, z);
 
-					Vector toParticle = loc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
+					Vector toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (direction.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent1) {
-						world.spawnParticle(type1, loc, 1);
+					if (mDirection.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent1) {
+						mWorld.spawnParticle(type1, mLoc, 1);
 					}
 
-					loc.subtract(x, y, z);
+					mLoc.subtract(x, y, z);
 
 					theta = theta + Math.PI / 64;
 
-					x = t * Math.cos(theta);
-					y = 2 * Math.exp(-0.1 * t) * Math.sin(t) + 1.5;
-					z = t * Math.sin(theta);
-					loc.add(x, y, z);
+					x = mCurrentRadius * Math.cos(theta);
+					y = 2 * Math.exp(-0.1 * mCurrentRadius) * Math.sin(mCurrentRadius) + 1.5;
+					z = mCurrentRadius * Math.sin(theta);
+					mLoc.add(x, y, z);
 
-					toParticle = loc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
+					toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (direction.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent2) {
-						world.spawnParticle(type2, loc, 1);
+					if (mDirection.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent2) {
+						mWorld.spawnParticle(type2, mLoc, 1);
 					}
 
-					loc.subtract(x, y, z);
+					mLoc.subtract(x, y, z);
 				}
-				if (t > radius) {
+				if (mCurrentRadius > radius) {
 					this.cancel();
 				}
 			}

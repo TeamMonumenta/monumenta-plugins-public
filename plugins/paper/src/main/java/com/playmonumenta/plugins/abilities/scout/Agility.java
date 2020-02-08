@@ -20,18 +20,18 @@ public class Agility extends Ability {
 	private static final int AGILITY_1_DAMAGE_BONUS = 1;
 	private static final int AGILITY_2_DAMAGE_BONUS = 2;
 
-	private final int damageBonus;
+	private final int mDamageBonus;
 
 	public Agility(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "Agility";
-		damageBonus = getAbilityScore() == 1 ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
+		mDamageBonus = getAbilityScore() == 1 ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
 	}
 
 	@Override
 	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() ==  DamageCause.ENTITY_ATTACK) {
-			event.setDamage(event.getDamage() + damageBonus);
+			event.setDamage(event.getDamage() + mDamageBonus);
 		}
 
 		return true;

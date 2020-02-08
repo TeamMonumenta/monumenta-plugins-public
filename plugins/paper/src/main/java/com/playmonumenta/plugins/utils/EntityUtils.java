@@ -97,11 +97,11 @@ public class EntityUtils {
 
 	private static void startTracker(Plugin plugin) {
 		mobsTracker = new BukkitRunnable() {
-			int rotation = 0;
+			int mRotation = 0;
 
 			@Override
 			public void run() {
-				rotation += 20;
+				mRotation += 20;
 
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> confusedIter = CONFUSED_MOBS.entrySet().iterator();
@@ -111,7 +111,7 @@ public class EntityUtils {
 					LivingEntity mob = stunned.getKey();
 					STUNNED_MOBS.put(mob, stunned.getValue() - 1);
 
-					double angle = Math.toRadians(rotation);
+					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
 					l.add(Math.cos(angle) * 0.5, mob.getHeight(), Math.sin(angle) * 0.5);
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR);
@@ -127,7 +127,7 @@ public class EntityUtils {
 					Mob mob = (Mob) confused.getKey();
 					CONFUSED_MOBS.put(mob, confused.getValue() - 1);
 
-					double angle = Math.toRadians(rotation);
+					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
 					l.add(Math.cos(angle) * 0.5, mob.getHeight() + 0.25, Math.sin(angle) * 0.5);
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
@@ -242,7 +242,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static LivingEntity GetEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
+	public static LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
 		ArrayList<LivingEntity> entities = new ArrayList<LivingEntity>();
 		for (Entity e : en) {
@@ -267,7 +267,9 @@ public class EntityUtils {
 			return null;
 		}
 
-		int bx, by, bz;
+		int bx;
+		int by;
+		int bz;
 
 		while (bi.hasNext()) {
 			Block b = bi.next();

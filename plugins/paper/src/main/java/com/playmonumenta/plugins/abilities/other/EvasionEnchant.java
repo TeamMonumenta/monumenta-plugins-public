@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class EvasionEnchant extends Ability {
-	public double chance = 0;
+	public double mChance = 0;
 	private int mLastActivationTick = 0;
 
 	public EvasionEnchant(Plugin plugin, World world, Random random, Player player) {
@@ -43,8 +43,8 @@ public class EvasionEnchant extends Ability {
 	private double evade(Player player, double damage) {
 		double changedDamage = damage;
 		Location loc = player.getLocation().add(0, 1, 0);
-		if (chance >= 200 || chance >= 100 && mPlayer.getHealth() <= damage / 2) {
-			chance -= 200;
+		if (mChance >= 200 || mChance >= 100 && mPlayer.getHealth() <= damage / 2) {
+			mChance -= 200;
 			changedDamage *= 0.25;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);
@@ -57,8 +57,8 @@ public class EvasionEnchant extends Ability {
 			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
-		} else if (chance >= 100 || chance >= 50 && mPlayer.getHealth() <= damage) {
-			chance -= 100;
+		} else if (mChance >= 100 || mChance >= 50 && mPlayer.getHealth() <= damage) {
+			mChance -= 100;
 			changedDamage *= 0.5;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);

@@ -51,7 +51,7 @@ public class MovementUtils {
 		}
 	}
 
-	public static void PullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
+	public static void pullTowards(Entity awayFromEntity, LivingEntity target, float speed) {
 		if (EntityUtils.isBoss(target)) {
 			return;
 		}
