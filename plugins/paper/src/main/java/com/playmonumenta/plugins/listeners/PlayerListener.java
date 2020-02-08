@@ -619,6 +619,31 @@ public class PlayerListener implements Listener {
 					// Item is dropped, decide what to do with it.
 					Location location = player.getLocation();
 					Item droppedItem = player.getWorld().dropItemNaturally(location, item);
+					// Make sure items don't float away unless they're in water
+					new BukkitRunnable() {
+						int numTicks = 0;
+
+						@Override
+						public void run() {
+							if (droppedItem != null && droppedItem.isValid()) {
+								Location dLoc = droppedItem.getLocation();
+								if (!dLoc.getBlock().isLiquid() && dLoc.getY() > location.getY() + 2) {
+									droppedItem.teleport(location);
+								}
+							} else {
+								this.cancel();
+							}
+
+							// Very infrequently check if the item is still actually there
+							numTicks++;
+							if (numTicks > 30) {
+								numTicks = 0;
+								if (!EntityUtils.isStillLoaded(droppedItem)) {
+									this.cancel();
+								}
+							}
+						}
+					}.runTaskTimer(Plugin.getInstance(), 1 * 20, 1 * 20);
 					if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
 						droppedItem.setInvulnerable(true);
 					} else {
