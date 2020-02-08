@@ -26,7 +26,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
  * chosen either immediately afterward OR the time after that). Etc.
  */
 public class SpellManager {
-	private Map < Class<?>, Spell > mReadySpells;
+	private Map<Class<? extends Spell>, Spell> mReadySpells;
 	private final Queue<Spell> mCooldownSpells;
 	private final int mCooldown;
 	private Spell mLastCasted;
@@ -43,7 +43,7 @@ public class SpellManager {
 		 * Need a new copy of the list because the passed-in version doesn't
 		 * support removing during iteration... Weird
 		 */
-		mReadySpells = new HashMap <Class<?>, Spell> ();
+		mReadySpells = new HashMap<Class<? extends Spell>, Spell>();
 		for (Spell spell : spells) {
 			mReadySpells.put(spell.getClass(), spell);
 		}
@@ -86,7 +86,7 @@ public class SpellManager {
 		return 20;
 	}
 
-	public int forceCastSpell(Class<?> spell) {
+	public int forceCastSpell(Class<? extends Spell> spell) {
 		if (mLastCasted != null) {
 			mLastCasted.cancel();
 			mLastCasted = null;
