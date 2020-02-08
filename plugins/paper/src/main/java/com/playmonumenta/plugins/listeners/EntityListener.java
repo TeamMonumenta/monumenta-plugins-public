@@ -522,7 +522,7 @@ public class EntityListener implements Listener {
 			ItemStack offhand = ((Player) entity).getInventory().getItemInOffHand();
 			//If one hand has a shattered totem, do not resurrect
 			if (mainhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(mainhand) ||
-				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(offhand) ) {
+				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(offhand)) {
 				event.setCancelled(true);
 			}
 			new BukkitRunnable() {

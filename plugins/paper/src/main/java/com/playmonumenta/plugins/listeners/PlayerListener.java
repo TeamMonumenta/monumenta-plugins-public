@@ -449,8 +449,8 @@ public class PlayerListener implements Listener {
 		}
 		//If item contains curse of ephemerality, prevent from putting in other inventories
 		//Checks for player inevntory unless it's a shift click
-		if (event.getWhoClicked() instanceof Player && ( event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor()) && !(event.getClickedInventory() instanceof PlayerInventory)
-				|| event.getCurrentItem() != null && CurseOfEphemerality.isEphemeral(event.getCurrentItem()) && ( event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) )) {
+		if (event.getWhoClicked() instanceof Player && (event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor()) && !(event.getClickedInventory() instanceof PlayerInventory)
+				|| event.getCurrentItem() != null && CurseOfEphemerality.isEphemeral(event.getCurrentItem()) && (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT))) {
 			event.setCancelled(true);
 		}
 	}

@@ -43,7 +43,7 @@ public class SpellManager {
 		 * Need a new copy of the list because the passed-in version doesn't
 		 * support removing during iteration... Weird
 		 */
-		mReadySpells = new HashMap < Class<?>, Spell > ();
+		mReadySpells = new HashMap <Class<?>, Spell> ();
 		for (Spell spell : spells) {
 			mReadySpells.put(spell.getClass(), spell);
 		}

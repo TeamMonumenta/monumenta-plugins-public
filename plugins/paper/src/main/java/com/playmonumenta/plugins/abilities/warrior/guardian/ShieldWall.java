@@ -82,7 +82,7 @@ public class ShieldWall extends Ability {
 				@Override
 				public void run() {
 					if (mRightClicks > 0) {
-						mRightClicks --;
+						mRightClicks--;
 					}
 					this.cancel();
 				}

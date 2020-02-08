@@ -24,13 +24,13 @@ public class SpellChangeArrow extends Spell {
 
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();
 		if (rand == 0) {
-			meta.addCustomEffect(new PotionEffect(PotionEffectType.WITHER, 60, 1) , false);
+			meta.addCustomEffect(new PotionEffect(PotionEffectType.WITHER, 60, 1), false);
 		} else if (rand == 1) {
-			meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1) , false);
+			meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1), false);
 		} else if (rand == 2) {
-			meta.addCustomEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0) , false);
+			meta.addCustomEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0), false);
 		} else if (rand == 3) {
-			meta.addCustomEffect(new PotionEffect(PotionEffectType.WEAKNESS, 80, 0) , false);
+			meta.addCustomEffect(new PotionEffect(PotionEffectType.WEAKNESS, 80, 0), false);
 		}
 		stack.setItemMeta(meta);
 		return stack;
