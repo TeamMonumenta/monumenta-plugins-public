@@ -65,7 +65,7 @@ public class EagleEye extends Ability {
 				public void run() {
 					t++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.UpdateCooldown(mPlayer, Spells.EAGLE_EYE, 20 * 2);
+						mPlugin.mTimers.updateCooldown(mPlayer, Spells.EAGLE_EYE, 20 * 2);
 						this.cancel();
 					}
 					if (t >= EAGLE_EYE_DURATION) {

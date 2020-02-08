@@ -44,7 +44,7 @@ public class WorldListener implements Listener {
 
 	//  A Chunk Loaded.
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void ChunkLoadEvent(ChunkLoadEvent event) {
+	public void chunkLoadEvent(ChunkLoadEvent event) {
 		Entity[] entities = event.getChunk().getEntities();
 
 		for (Entity entity : entities) {
@@ -82,7 +82,7 @@ public class WorldListener implements Listener {
 	                                                     );
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void StructureGrowEvent(StructureGrowEvent event) {
+	public void structureGrowEvent(StructureGrowEvent event) {
 		List<BlockState> blockStates = event.getBlocks();
 
 		ListIterator<BlockState> iter = blockStates.listIterator();
@@ -162,7 +162,7 @@ public class WorldListener implements Listener {
 	// Block Dispense Event
 	// Cancel dispensers/droppers dropping specific items
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BlockDispenseEvent(BlockDispenseEvent event) {
+	public void blockDispenseEvent(BlockDispenseEvent event) {
 		Block block = event.getBlock();
 		ItemStack dispensed = event.getItem();
 		if (event.isCancelled()) {
@@ -177,7 +177,7 @@ public class WorldListener implements Listener {
 
 	// Block Dispense Armor Event
 	@EventHandler(priority = EventPriority.HIGH)
-	public void BlockDispenseArmorEvent(BlockDispenseArmorEvent event) {
+	public void blockDispenseArmorEvent(BlockDispenseArmorEvent event) {
 		// Cancel dispensers equipping shattered armor to a player
 		if (ItemUtils.isItemShattered(event.getItem())) {
 			if (event.getTargetEntity() instanceof Player) {
@@ -193,7 +193,7 @@ public class WorldListener implements Listener {
 
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BlockFormEvent(BlockFormEvent event) {
+	public void blockFormEvent(BlockFormEvent event) {
 		Material blockType = event.getNewState().getType();
 		if (blockType == null) {
 			blockType = Material.AIR;

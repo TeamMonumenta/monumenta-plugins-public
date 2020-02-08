@@ -76,7 +76,7 @@ public class ViciousCombos extends Ability {
 							timeReduction *= 2;
 						}
 
-						mPlugin.mTimers.UpdateCooldowns(mPlayer, timeReduction);
+						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
 
 						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.5f);
 						mWorld.spawnParticle(Particle.CRIT, loc, 50, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, VICIOUS_COMBOS_RANGE, 0.25);

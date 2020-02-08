@@ -44,7 +44,7 @@ public class SagesInsight extends Ability {
 		for (int i = 0; i < abilities.length; i++) {
 			if (abilities[i] != null) {
 				int cooldownReduction = (int)(abilities[i].getInfo().cooldown * cooldownReductionPercent);
-				mPlugin.mTimers.UpdateCooldown(mPlayer, abilities[i].getInfo().linkedSpell, cooldownReduction);
+				mPlugin.mTimers.updateCooldown(mPlayer, abilities[i].getInfo().linkedSpell, cooldownReduction);
 			}
 		}
 		return true;

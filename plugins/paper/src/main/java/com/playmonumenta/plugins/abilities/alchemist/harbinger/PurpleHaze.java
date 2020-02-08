@@ -189,10 +189,10 @@ public class PurpleHaze extends Ability {
 				// Basically makes sure if the target is in LoS and if there is a path.
 				Location eyeLoc = mPlayer.getEyeLocation();
 				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), PURPLE_HAZE_RANGE);
-				ray.throughBlocks = false;
-				ray.throughNonOccluding = false;
+				ray.mThroughBlocks = false;
+				ray.mThroughNonOccluding = false;
 				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
-					ray.targetPlayers = true;
+					ray.mTargetPlayers = true;
 				}
 
 				RaycastData data = ray.shootRaycast();

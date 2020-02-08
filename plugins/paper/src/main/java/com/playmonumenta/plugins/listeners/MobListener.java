@@ -48,7 +48,7 @@ public class MobListener implements Listener {
 		mPlugin = plugin;
 	}
 	@EventHandler(priority = EventPriority.HIGH)
-	void CreatureSpawnEvent(CreatureSpawnEvent event) {
+	void creatureSpawnEvent(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
 
 		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_WITHER ||
@@ -105,7 +105,7 @@ public class MobListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	void SpawnerSpawnEvent(SpawnerSpawnEvent event) {
+	void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
 
 		/* This can apparently happen sometimes...? */
@@ -131,7 +131,7 @@ public class MobListener implements Listener {
 
 	/* Prevent fire from catching in towns */
 	@EventHandler(priority = EventPriority.LOWEST)
-	void BlockIgniteEvent(BlockIgniteEvent event) {
+	void blockIgniteEvent(BlockIgniteEvent event) {
 		if (event.isCancelled()) {
 			// Don't waste time if cancelled somewhere else
 			return;
@@ -155,7 +155,7 @@ public class MobListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityDeathEvent(EntityDeathEvent event) {
+	public void entityDeathEvent(EntityDeathEvent event) {
 		Entity entity = event.getEntity();
 		boolean shouldGenDrops = true;
 
@@ -229,7 +229,7 @@ public class MobListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void EntityZapEvent(EntityZapEvent event) {
+	public void entityZapEvent(EntityZapEvent event) {
 		if (event.getEntityType().equals(EntityType.VILLAGER)) {
 			event.setCancelled(true);
 		}

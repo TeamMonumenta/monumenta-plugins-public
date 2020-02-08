@@ -49,12 +49,12 @@ public class AnvilOverride extends BaseOverride {
 			World world = loc.getWorld();
 			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, 1.0f, 1.0f);
 			new BukkitRunnable() {
-				int t = 0;
+				int mTicks = 0;
 				Location loc = block.getLocation().add(0.5, 1.1, 0.5);
 				@Override
 				public void run() {
-					t++;
-					if (t >= 3) {
+					mTicks++;
+					if (mTicks >= 3) {
 						this.cancel();
 						world.spawnParticle(Particle.BLOCK_DUST, loc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
 						world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
@@ -72,18 +72,18 @@ public class AnvilOverride extends BaseOverride {
 		} else {
 			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");
 			if (!block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
+				Location loc = block.getLocation().add(0.5, 1.2, 0.5);
+				World world = loc.getWorld();
 				new BukkitRunnable() {
-					Location loc = block.getLocation().add(0.5, 1.2, 0.5);
-					World world = loc.getWorld();
-					int t = 0;
+					int mTicks = 0;
 					@Override
 					public void run() {
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0);
-						t++;
+						mTicks++;
 						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) || block == null) {
 							this.cancel();
 						}
-						if (t >= 20 * 4) {
+						if (mTicks >= 20 * 4) {
 							this.cancel();
 							block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 						}

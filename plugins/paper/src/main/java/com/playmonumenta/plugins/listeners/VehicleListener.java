@@ -24,17 +24,17 @@ public class VehicleListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleCreateEvent(VehicleCreateEvent event) {
+	public void vehicleCreateEvent(VehicleCreateEvent event) {
 		mPlugin.mTrackingManager.addEntity(event.getVehicle());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleDestroyEvent(VehicleDestroyEvent event) {
+	public void vehicleDestroyEvent(VehicleDestroyEvent event) {
 		mPlugin.mTrackingManager.removeEntity(event.getVehicle());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleEntityCollisionEvent(VehicleEntityCollisionEvent event) {
+	public void vehicleEntityCollisionEvent(VehicleEntityCollisionEvent event) {
 		Entity entity = event.getEntity();
 		Vehicle vehicle = event.getVehicle();
 
@@ -52,7 +52,7 @@ public class VehicleListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void VehicleEnterEvent(VehicleEnterEvent event) {
+	public void vehicleEnterEvent(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
 		Vehicle vehicle = event.getVehicle();
 

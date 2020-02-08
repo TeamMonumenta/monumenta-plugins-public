@@ -34,7 +34,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// Player interacts with a block in the world
 	// via left-click, right-click, or stepping on a pressure plate
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerInteractEvent(PlayerInteractEvent event) {
+	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();
 			item = event.getItem();
@@ -47,7 +47,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// Player right-clicks an entity
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item;
 		if (event.getHand() == EquipmentSlot.HAND) {
@@ -63,7 +63,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// One entity attacks another
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof  Player) {
 			Player player = (Player) event.getDamager();
 			if (ItemUtils.isItemShattered(player.getInventory().getItemInMainHand())) {
@@ -74,7 +74,7 @@ public class ShatteredEquipmentListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void InventoryClickEvent(InventoryClickEvent event) {
+	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			Inventory inventory = event.getClickedInventory();
@@ -118,7 +118,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// If an item is being dragged in an inventory
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void InventoryDragEvent(InventoryDragEvent event) {
+	public void inventoryDragEvent(InventoryDragEvent event) {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			// Check if the player tried to be sneaky and drag shattered armor into a slot
@@ -136,7 +136,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (ItemUtils.isItemShattered(event.getOffHandItem())) {
 			MessagingUtils.sendActionBarMessage(mPlugin, event.getPlayer(), "Shattered items must be reforged before use");
 			event.setCancelled(true);
@@ -146,7 +146,7 @@ public class ShatteredEquipmentListener implements Listener {
 	// Block Dispense Event
 	// Cancel dispensers/droppers dropping specific items
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BlockDispenseEvent(BlockDispenseEvent event) {
+	public void blockDispenseEvent(BlockDispenseEvent event) {
 		if (ItemUtils.isItemShattered(event.getItem())) {
 			event.setCancelled(true);
 		}
@@ -154,7 +154,7 @@ public class ShatteredEquipmentListener implements Listener {
 
 	// Block Dispense Armor Event
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BlockDispenseArmorEvent(BlockDispenseArmorEvent event) {
+	public void blockDispenseArmorEvent(BlockDispenseArmorEvent event) {
 		// Cancel dispensers equipping shattered armor to a player
 		if (ItemUtils.isItemShattered(event.getItem())) {
 			if (event.getTargetEntity() instanceof Player) {

@@ -22,31 +22,31 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ElementalSpirit {
 
-	private final Player player;
+	private final Player mPlayer;
 
 	private World mWorld;
-	private List<LivingEntity> hurt = new ArrayList<LivingEntity>();
-	private MagicType magic = MagicType.FIRE;
+	private List<LivingEntity> mHurt = new ArrayList<LivingEntity>();
+	private MagicType mMagic = MagicType.FIRE;
 
 	public ElementalSpirit(Player player) {
-		this.player = player;
+		this.mPlayer = player;
 		this.mWorld = player.getWorld();
 	}
 
 	public Player getPlayer() {
-		return player;
+		return mPlayer;
 	}
 
 	public void setMagicType(MagicType type) {
-		this.magic = type;
+		this.mMagic = type;
 	}
 
 	public MagicType getMagicType() {
-		return magic;
+		return mMagic;
 	}
 
 	public List<LivingEntity> getHurt() {
-		return hurt;
+		return mHurt;
 	}
 
 	/*
@@ -73,9 +73,9 @@ public class ElementalSpirit {
 	 * (4s cooldown)
 	 */
 	public void damage(Player damager, LivingEntity tar, Location loc) {
-		int elementalSpirit = ScoreboardUtils.getScoreboardValue(player, "ElementalSpirit");
+		int elementalSpirit = ScoreboardUtils.getScoreboardValue(mPlayer, "ElementalSpirit");
 
-		if (magic == MagicType.FIRE) {
+		if (mMagic == MagicType.FIRE) {
 			mWorld.spawnParticle(Particle.FLAME, loc, 50, 0.1, 0.1, 0.1, 0.25);
 			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.1, 0.1, 0.1, 0.1);
 			loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.25f);
@@ -97,8 +97,8 @@ public class ElementalSpirit {
 						loc.add(permDir);
 					}
 
-					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9, player)) {
-						EntityUtils.damageEntity(Plugin.getInstance(), e, dmg, player);
+					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9, mPlayer)) {
+						EntityUtils.damageEntity(Plugin.getInstance(), e, dmg, mPlayer);
 						EntityUtils.applyFire(Plugin.getInstance(), 20 * 5, e);
 					}
 					mWorld.spawnParticle(Particle.FLAME, loc, 11, 0.75, 0.75, 0.75, 0.025);
@@ -107,7 +107,7 @@ public class ElementalSpirit {
 						if (loc.distance(LocationUtils.getEntityCenter(tar)) < 1) {
 							Vector dir = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(tar), loc);
 							permDir = dir;
-							EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
+							EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, mPlayer);
 							mWorld.spawnParticle(Particle.FLAME, loc, 50, 0.1, 0.1, 0.1, 0.25);
 							mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.1, 0.1, 0.1, 0.1);
 							loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.25f);
@@ -123,7 +123,7 @@ public class ElementalSpirit {
 				}
 
 			}.runTaskTimer(Plugin.getInstance(), 0, 1);
-		} else if (magic == MagicType.ICE) {
+		} else if (mMagic == MagicType.ICE) {
 			mWorld.spawnParticle(Particle.SNOWBALL, loc, 25, 0.1, 0.1, 0.1, 0.025);
 			mWorld.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.2);
 			loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
@@ -143,7 +143,7 @@ public class ElementalSpirit {
 
 						if (loc.distance(LocationUtils.getEntityCenter(tar)) < 1) {
 							this.cancel();
-							EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
+							EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, mPlayer);
 							mWorld.spawnParticle(Particle.SNOWBALL, loc, 25, 0.1, 0.1, 0.1, 0.025);
 							mWorld.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.2);
 							loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
@@ -153,7 +153,7 @@ public class ElementalSpirit {
 								@Override
 								public void run() {
 									t++;
-									EntityUtils.damageEntity(Plugin.getInstance(), tar, linger, player);
+									EntityUtils.damageEntity(Plugin.getInstance(), tar, linger, mPlayer);
 									mWorld.spawnParticle(Particle.SNOWBALL, tar.getLocation().add(0, 1, 0), 25, 0.1,
 									                     0.1, 0.1, 0.025);
 									mWorld.spawnParticle(Particle.CLOUD, tar.getLocation().add(0, 1, 0), 10, 0.1, 0.1,
@@ -172,7 +172,7 @@ public class ElementalSpirit {
 				}
 
 			}.runTaskTimer(Plugin.getInstance(), 0, 1);
-		} else if (magic == MagicType.ARCANE) {
+		} else if (mMagic == MagicType.ARCANE) {
 			double dmg = elementalSpirit == 1 ? 4 : 8;
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0.1, 0.1, 0.1, 0.025);
 			mWorld.spawnParticle(Particle.DRAGON_BREATH, loc, 20, 0.1, 0.1, 0.1, 0.15);
@@ -188,8 +188,8 @@ public class ElementalSpirit {
 					                     0.2);
 					loc.getWorld().playSound(LocationUtils.getEntityCenter(tar), Sound.ENTITY_GENERIC_EXPLODE, 1,
 					                         1.25f);
-					EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, player);
-					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3, player)) {
+					EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, mPlayer);
+					for (LivingEntity e : EntityUtils.getNearbyMobs(LocationUtils.getEntityCenter(tar), 3, mPlayer)) {
 						EntityUtils.applyFire(Plugin.getInstance(), 20 * 3, e);
 						e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1, false, true));
 					}

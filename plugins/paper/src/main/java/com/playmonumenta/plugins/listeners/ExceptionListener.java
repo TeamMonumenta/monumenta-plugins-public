@@ -19,7 +19,7 @@ public class ExceptionListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void ServerExceptionEvent(ServerExceptionEvent event) {
+	public void serverExceptionEvent(ServerExceptionEvent event) {
 		ServerException exception = event.getException();
 
 		if (exception instanceof ServerSchedulerException) {

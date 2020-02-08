@@ -110,8 +110,8 @@ public class ShieldBash extends Ability {
 				if (mPlayer.isHandRaised()) {
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), SHIELD_BASH_RANGE);
-					ray.throughBlocks = false;
-					ray.throughNonOccluding = false;
+					ray.mThroughBlocks = false;
+					ray.mThroughNonOccluding = false;
 
 					RaycastData data = ray.shootRaycast();
 

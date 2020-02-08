@@ -21,7 +21,7 @@ public class CooldownTimers {
 		mTimers = new HashMap<UUID, HashMap<Spells, Integer>>();
 	}
 
-	public void RegisterCooldown(Player player, Spells spell, Integer cooldownTime) {
+	public void registerCooldown(Player player, Spells spell, Integer cooldownTime) {
 		HashMap<Spells, Integer> cd = new HashMap<Spells, Integer>();
 		cd.put(spell, cooldownTime);
 		mTimers.put(player.getUniqueId(), cd);
@@ -45,7 +45,7 @@ public class CooldownTimers {
 		return true;
 	}
 
-	public void AddCooldown(UUID playerID, Spells spell, Integer cooldownTime) {
+	public void addCooldown(UUID playerID, Spells spell, Integer cooldownTime) {
 		// First let's investigate whether this player already has existing cooldowns.
 		HashMap<Spells, Integer> player = mTimers.get(playerID);
 		// Is there a player already storing cooldowns?
@@ -68,7 +68,7 @@ public class CooldownTimers {
 		}
 	}
 
-	public void UpdateCooldowns(Integer ticks) {
+	public void updateCooldowns(Integer ticks) {
 		//  Our set of player cooldowns is broken down into a Hashmap of Hashmaps.
 		//  Because of this, we first loop through each player (UUID), than we loop
 		//  through their different ability ID's.
@@ -108,7 +108,7 @@ public class CooldownTimers {
 	 * @param player The player whose cooldown ticks will be updated
 	 * @param ticks The cooldown reduction in ticks
 	 */
-	public void UpdateCooldowns(Player player, Integer ticks) {
+	public void updateCooldowns(Player player, Integer ticks) {
 		HashMap<Spells, Integer> cds = mTimers.get(player.getUniqueId());
 
 		if (cds != null) {
@@ -131,7 +131,7 @@ public class CooldownTimers {
 		}
 	}
 
-	public void UpdateCooldown(Player player, Spells spell, Integer ticks) {
+	public void updateCooldown(Player player, Spells spell, Integer ticks) {
 		HashMap<Spells, Integer> cds = mTimers.get(player.getUniqueId());
 
 		if (cds != null && cds.containsKey(spell)) {

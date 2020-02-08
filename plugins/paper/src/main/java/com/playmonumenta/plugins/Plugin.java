@@ -232,7 +232,7 @@ public class Plugin extends JavaPlugin {
 				if (twoHertz) {
 					//  Update cooldowns.
 					try {
-						mTimers.UpdateCooldowns(Constants.HALF_TICKS_PER_SECOND);
+						mTimers.updateCooldowns(Constants.HALF_TICKS_PER_SECOND);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

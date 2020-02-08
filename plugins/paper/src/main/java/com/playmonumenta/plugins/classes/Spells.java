@@ -121,13 +121,13 @@ public enum Spells {
 	//Apothecary
 	ALCHEMICAL_AMALGAM("Alchemical Amalgam");
 
-	private final String name;
+	private final String mName;
 
 	Spells(String name) {
-		this.name = name;
+		this.mName = name;
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 }

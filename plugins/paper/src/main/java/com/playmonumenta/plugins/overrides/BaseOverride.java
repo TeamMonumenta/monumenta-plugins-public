@@ -14,6 +14,7 @@ public class BaseOverride {
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		return true;
 	}
+
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		return true;
 	}
@@ -21,6 +22,7 @@ public class BaseOverride {
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		return true;
 	}
+
 	public boolean leftClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		return true;
 	}
@@ -32,9 +34,11 @@ public class BaseOverride {
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
 		return true;
 	}
+
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
 		return true;
 	}
+
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
 		return true;
 	}

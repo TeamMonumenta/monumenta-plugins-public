@@ -87,7 +87,7 @@ public class BodkinBlitz extends Ability {
 				// Since the player's bounding box is a bit too close to the ground. This should give players more distance more consistently
 				// (due to how the teleport location is currently determined)
 				loc.shift(0, 0.15, 0);
-				
+
 				// Fire projectile.
 				for (int i = 0; i < 15; i++) {
 					boxLoc = loc.getCenter().toLocation(mWorld);
@@ -263,7 +263,7 @@ public class BodkinBlitz extends Ability {
 				mWorld.spawnParticle(Particle.SMOKE_LARGE, mob.getLocation(), 30, 0.25, 0.5, 0.25, 0.2f);
 				mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.35, 0.5, 0.35, 0f);
 
-				mPlugin.mTimers.UpdateCooldowns(mPlayer, 200);
+				mPlugin.mTimers.updateCooldowns(mPlayer, 200);
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cooldown refreshed!");
 
 				mark = null;

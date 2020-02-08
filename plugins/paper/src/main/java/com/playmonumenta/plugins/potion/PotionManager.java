@@ -28,17 +28,17 @@ public class PotionManager {
 		ITEM(4, "ITEM"),
 		ALL(5, "ALL");
 
-		private int value;
-		private String name;
+		private int mValue;
+		private String mName;
 		private PotionID(int value, String name)    {
-			this.value = value;
-			this.name = name;
+			this.mValue = value;
+			this.mName = name;
 		}
 		public int getValue()       {
-			return value;
+			return mValue;
 		}
 		public String getName()     {
-			return name;
+			return mName;
 		}
 
 		public static PotionID getFromString(String name) {

@@ -87,7 +87,7 @@ public abstract class Ability {
 		AbilityInfo info = getInfo();
 		if (info.linkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
-				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), info.linkedSpell, info.cooldown);
+				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.linkedSpell, info.cooldown);
 				PlayerUtils.callAbilityCastEvent(mPlayer, info.linkedSpell);
 			}
 		}

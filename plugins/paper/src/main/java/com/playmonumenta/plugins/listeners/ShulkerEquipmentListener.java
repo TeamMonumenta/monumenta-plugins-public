@@ -56,7 +56,7 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void InventoryClickEvent(InventoryClickEvent event) {
+	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||
@@ -113,7 +113,7 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void BlockDispenseEvent(BlockDispenseEvent event) {
+	public void blockDispenseEvent(BlockDispenseEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}

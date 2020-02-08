@@ -141,7 +141,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntityCombustByEntityEvent(EntityCombustByEntityEvent event) {
+	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		// Record the time of the player who sets a mob on fire
 		// Used to prevent arcane strike from counting mobs on fire that were
 		// set on fire by the same hit that triggered arcane strike
@@ -178,7 +178,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void CustomDamageEvent(CustomDamageEvent event) {
+	public void customDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
 			mAbilities.PlayerDealtCustomDamageEvent((Player)event.getDamager(), event);
 		}
@@ -186,7 +186,7 @@ public class EntityListener implements Listener {
 
 	//  An Entity hit another Entity.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -387,7 +387,7 @@ public class EntityListener implements Listener {
 
 	// Entity Hurt Event.
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntityDamageEvent(EntityDamageEvent event) {
+	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
 
@@ -464,7 +464,7 @@ public class EntityListener implements Listener {
 
 	// Entity interacts with something
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntityInteractEvent(EntityInteractEvent event) {
+	public void entityInteractEvent(EntityInteractEvent event) {
 		Material material = event.getBlock().getType();
 
 		if (ENTITY_UNINTERACTABLE_MATS.contains(material)) {
@@ -483,7 +483,7 @@ public class EntityListener implements Listener {
 
 	// Hanging Entity hurt by another entity.
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void HangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
+	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
 		// If hurt by a player in adventure mode we want to prevent the break;
@@ -515,7 +515,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void EntityResurrectEvent(EntityResurrectEvent event) {
+	public void entityResurrectEvent(EntityResurrectEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
 			ItemStack mainhand = ((Player) entity).getInventory().getItemInMainHand();
@@ -536,14 +536,14 @@ public class EntityListener implements Listener {
 
 	// Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntitySpawnEvent(EntitySpawnEvent event) {
+	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
 	}
 
 	// Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
 		ProjectileSource shooter = proj.getShooter();
 		if (shooter != null && shooter instanceof Player && ((Player)shooter).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -601,7 +601,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PotionSplashEvent(PotionSplashEvent event) {
+	public void potionSplashEvent(PotionSplashEvent event) {
 		ThrownPotion potion = event.getPotion();
 		ProjectileSource source = potion.getShooter();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
@@ -655,7 +655,7 @@ public class EntityListener implements Listener {
 
 	// Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void AreaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
+	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		AreaEffectCloud cloud = event.getEntity();
 		ProjectileSource source = cloud.getSource();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
@@ -699,7 +699,7 @@ public class EntityListener implements Listener {
 
 	// Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void EntityExplodeEvent(EntityExplodeEvent event) {
+	public void entityExplodeEvent(EntityExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
 		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getLocation());
 		if (zone != LocationType.None) {
@@ -734,7 +734,7 @@ public class EntityListener implements Listener {
 
 	// Cancel explosions in safezones
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BlockExplodeEvent(BlockExplodeEvent event) {
+	public void blockExplodeEvent(BlockExplodeEvent event) {
 		// Cancel the event immediately if within a safezone
 		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getBlock().getLocation());
 		if (zone != LocationType.None) {
@@ -762,13 +762,13 @@ public class EntityListener implements Listener {
 
 	// Never generate new trades
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void VillagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
+	public void villagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
 		event.setCancelled(true);
 	}
 
 	//  An Arrow hit something.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void ProjectileHitEvent(ProjectileHitEvent event) {
+	public void projectileHitEvent(ProjectileHitEvent event) {
 		EntityType type = event.getEntityType();
 
 		Entity entity = event.getHitEntity();
@@ -842,7 +842,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned((LivingEntity) event.getEntity())
 		                                              || EntityUtils.isConfused((LivingEntity) event.getEntity()))) {
 			event.setCancelled(true);
@@ -855,7 +855,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void PotionEffectApplyEvent(PotionEffectApplyEvent event) {
+	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity applied = event.getApplied();
 		LivingEntity applier = (LivingEntity) event.getApplier();
 
@@ -871,7 +871,7 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void EntityChangeBlockEvent(EntityChangeBlockEvent event) {
+	public void entityChangeBlockEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 		if (event.getEntity() instanceof Wither) {
 			event.setCancelled(true);
@@ -879,14 +879,14 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler
-	public void EntityDismountEvent(EntityDismountEvent event) {
+	public void entityDismountEvent(EntityDismountEvent event) {
 		if (event.getDismounted() instanceof ArmorStand) {
 			event.getDismounted().remove();
 		}
 	}
 
 	@EventHandler
-	public void BossAbilityDamageEvent(BossAbilityDamageEvent event) {
+	public void bossAbilityDamageEvent(BossAbilityDamageEvent event) {
 		if (event.getDamaged() instanceof Player) {
 			Player player = event.getDamaged();
 			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
@@ -896,14 +896,14 @@ public class EntityListener implements Listener {
 
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void ItemDespawnEvent(ItemDespawnEvent event) {
+	public void itemDespawnEvent(ItemDespawnEvent event) {
 		Item entity = event.getEntity();
 		GraveUtils.destroyItemEntity(entity);
 	}
 
 	// Fires any time any entity is deleted.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof Item) {
 			// Check if an item entity was destroyed by the void.
 			Item entity = (Item) event.getEntity();

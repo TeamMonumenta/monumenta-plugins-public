@@ -49,7 +49,7 @@ public class ShulkerShortcutListener implements Listener {
 	 * @see InventoryClickEvent
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryClickEvent(InventoryClickEvent event) {
+	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -148,7 +148,7 @@ public class ShulkerShortcutListener implements Listener {
 	 * @see InventoryDragEvent
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void InventoryDragEvent(InventoryDragEvent event) {
+	public void inventoryDragEvent(InventoryDragEvent event) {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
 			if (event.getView().getTopInventory().getType() == InventoryType.SHULKER_BOX && // Player has Shulker open
@@ -174,7 +174,7 @@ public class ShulkerShortcutListener implements Listener {
 	 * @see InventoryCloseEvent
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void InventoryCloseEvent(InventoryCloseEvent event) {
+	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
 			mPlugin.mShulkerInventoryManager.closeShulker(player);
@@ -188,7 +188,7 @@ public class ShulkerShortcutListener implements Listener {
 	 * @see BlockDispenseEvent
 	 */
 	@EventHandler(priority = EventPriority.LOW)
-	public void BlockDispenseEvent(BlockDispenseEvent event) {
+	public void blockDispenseEvent(BlockDispenseEvent event) {
 		if (!event.isCancelled() &&
 			ItemUtils.isShulkerBox(event.getItem().getType()) &&
 			mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem())) {
@@ -203,7 +203,7 @@ public class ShulkerShortcutListener implements Listener {
 	 * @see BlockPlaceEvent
 	 */
 	@EventHandler(priority = EventPriority.LOW)
-	public void BlockPlaceEvent(BlockPlaceEvent event) {
+	public void blockPlaceEvent(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getBlockPlaced();
 		if (!event.isCancelled() &&

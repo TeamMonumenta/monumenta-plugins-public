@@ -128,7 +128,7 @@ public class DeathsTouch extends Ability {
 		}
 		if (mInfo.linkedSpell != null) {
 			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-				mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 20 * 5);
+				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 20 * 5);
 				PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.linkedSpell);
 			}
 		}

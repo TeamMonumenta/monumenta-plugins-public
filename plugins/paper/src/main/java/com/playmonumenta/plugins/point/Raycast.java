@@ -16,42 +16,42 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 
 public class Raycast {
 
-	private final Vector dir;
+	private final Vector mDir;
 
-	public int iterations = 10;
-	public double hitRange = 0.5;
-	public double dirMultiplier = 1;
-	public double distanceCheck = 1;
+	public int mIterations = 10;
+	public double mHitRange = 0.5;
+	public double mDirMultiplier = 1;
+	public double mDistanceCheck = 1;
 
-	public boolean targetPlayers = false;
-	public boolean targetNonPlayers = true;
-	public boolean throughBlocks = false;
-	public boolean throughNonOccluding = false;
-	public boolean noIterations = false;
+	public boolean mTargetPlayers = false;
+	public boolean mTargetNonPlayers = true;
+	public boolean mThroughBlocks = false;
+	public boolean mThroughNonOccluding = false;
+	public boolean mNoIterations = false;
 
-	public Particle particle = null;
+	public Particle mParticle = null;
 
-	public boolean precision = false;
-	public int precisionTicks = 0;
+	public boolean mPrecision = false;
+	public int mPrecisionTicks = 0;
 
 	//Locations
-	private final Location start;
-	private Location end = null;
+	private final Location mStart;
+	private Location mEnd = null;
 
 	public Raycast(Location p1, Location p2) {
-		this.dir = LocationUtils.getDirectionTo(p2, p1);
-		this.start = p1;
-		this.end = p2;
+		this.mDir = LocationUtils.getDirectionTo(p2, p1);
+		this.mStart = p1;
+		this.mEnd = p2;
 
 		//If we're going from one point to another,
 		//ignore using iteration by default.
-		this.noIterations = true;
+		this.mNoIterations = true;
 	}
 
 	public Raycast(Location start, Vector dir, int iterations) {
-		this.dir = dir;
-		this.iterations = iterations;
-		this.start = start;
+		this.mDir = dir;
+		this.mIterations = iterations;
+		this.mStart = start;
 	}
 
 	/**
@@ -63,36 +63,36 @@ public class Raycast {
 		double dist = 0;
 		RaycastData data = new RaycastData();
 		List<LivingEntity> entities = data.getEntities();
-		if (end != null) {
-			dist = start.distance(end);
+		if (mEnd != null) {
+			dist = mStart.distance(mEnd);
 		}
 		while (true) {
 			// safety for reaching the end of the ray as precision ends.
-			if (!noIterations && !precision) {
-				if (i >= iterations) {
+			if (!mNoIterations && !mPrecision) {
+				if (i >= mIterations) {
 					break;
 				}
 			}
 
 			// spawn particles along the ray if desired.
-			if (particle != null) {
-				start.getWorld().spawnParticle(particle, start, 1, 0, 0, 0, 0.0001);
+			if (mParticle != null) {
+				mStart.getWorld().spawnParticle(mParticle, mStart, 1, 0, 0, 0, 0.0001);
 			}
 
-			start.add(dir.clone().multiply(dirMultiplier));
-			if (!data.getBlocks().contains(start.getBlock())) {
-				data.getBlocks().add(start.getBlock());
+			mStart.add(mDir.clone().multiply(mDirMultiplier));
+			if (!data.getBlocks().contains(mStart.getBlock())) {
+				data.getBlocks().add(mStart.getBlock());
 			}
 
-			if (!throughBlocks) {
-				Block block = start.getBlock();
+			if (!mThroughBlocks) {
+				Block block = mStart.getBlock();
 
 				// breakRay: determines if the ray should collide and end on this block.
-				boolean breakRay = LocationUtils.collidesWithSolid(start, block);
+				boolean breakRay = LocationUtils.collidesWithSolid(mStart, block);
 				if (breakRay) {
-					if (!throughNonOccluding) {
+					if (!mThroughNonOccluding) {
 						break;
-					} else if (start.getBlock().getType().isOccluding()) {
+					} else if (mStart.getBlock().getType().isOccluding()) {
 						break;
 					}
 				}
@@ -100,26 +100,26 @@ public class Raycast {
 				// Much higher precision is needed when going through semi-solid blocks.
 				// When the unprecise ray reaches a semisolid block without colliding, the ray will retrace
 				// both the previous and the next two steps with pixel precision to verify the result.
-				if (precision == false && (block.getType().isSolid()
+				if (mPrecision == false && (block.getType().isSolid()
 				                           || block.getBlockData() instanceof Snow
 				                           || block.getBlockData() instanceof Bed)) {
-					start.subtract(dir.clone().multiply(dirMultiplier));
-					precision = true;
-					precisionTicks = 49;
-					if (!noIterations) {
-						if (iterations - i < 3) {
-							precisionTicks = (iterations - i) * 16 + 1;
+					mStart.subtract(mDir.clone().multiply(mDirMultiplier));
+					mPrecision = true;
+					mPrecisionTicks = 49;
+					if (!mNoIterations) {
+						if (mIterations - i < 3) {
+							mPrecisionTicks = (mIterations - i) * 16 + 1;
 						}
 						i = i + 3;
 					}
-					dirMultiplier = (1.0 / 16.0);
+					mDirMultiplier = (1.0 / 16.0);
 				}
 			}
 
-			for (Entity e : start.getWorld().getNearbyEntities(start, hitRange, hitRange, hitRange)) {
+			for (Entity e : mStart.getWorld().getNearbyEntities(mStart, mHitRange, mHitRange, mHitRange)) {
 				if (e instanceof LivingEntity) {
 					//  Make sure we should be targeting this entity.
-					if ((targetPlayers && (e instanceof Player)) || (targetNonPlayers && (!(e instanceof Player)))) {
+					if ((mTargetPlayers && (e instanceof Player)) || (mTargetNonPlayers && (!(e instanceof Player)))) {
 						if (!entities.contains(e)) {
 							data.getEntities().add((LivingEntity)e);
 						}
@@ -127,31 +127,31 @@ public class Raycast {
 				}
 			}
 
-			if (end != null) {
-				if (start.distance(end) < distanceCheck) {
+			if (mEnd != null) {
+				if (mStart.distance(mEnd) < mDistanceCheck) {
 					break;
 				}
 
 				//This is to prevent an infinite loop should somehow
 				//the raycast goes further past the end point.
-				if (start.distance(end) > dist) {
+				if (mStart.distance(mEnd) > dist) {
 					break;
 				} else {
-					dist = start.distance(end);
+					dist = mStart.distance(mEnd);
 				}
 			}
 
-			if (!noIterations && !precision) {
+			if (!mNoIterations && !mPrecision) {
 				i++;
-				if (i >= iterations) {
+				if (i >= mIterations) {
 					break;
 				}
 			}
-			if (precision) {
-				precisionTicks--;
-				if (precisionTicks <= 0) {
-					dirMultiplier = 1.0;
-					precision = false;
+			if (mPrecision) {
+				mPrecisionTicks--;
+				if (mPrecisionTicks <= 0) {
+					mDirMultiplier = 1.0;
+					mPrecision = false;
 				}
 			}
 		}

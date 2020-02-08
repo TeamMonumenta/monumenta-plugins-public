@@ -105,7 +105,7 @@ public class IronTincture extends Ability {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.AddCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 0);
+					mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 0);
 				}
 			}
 

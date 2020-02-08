@@ -48,7 +48,7 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void DrinkablePotionEvent(InventoryClickEvent event) {
+	public void drinkablePotionEvent(InventoryClickEvent event) {
 
 		if (
 		    // Must not be cancelled
@@ -171,7 +171,7 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void ThrowablePotionEvent(InventoryClickEvent event) {
+	public void throwablePotionEvent(InventoryClickEvent event) {
 		if (
 		    // Must not be cancelled
 		    event.isCancelled() ||

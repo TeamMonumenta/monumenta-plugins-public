@@ -119,7 +119,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerJoinEvent(PlayerJoinEvent event) {
+	public void playerJoinEvent(PlayerJoinEvent event) {
 		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
 			event.setJoinMessage("");
 		}
@@ -139,7 +139,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void PlayerQuitEvent(PlayerQuitEvent event) {
+	public void playerQuitEvent(PlayerQuitEvent event) {
 		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
 			event.setQuitMessage("");
 		}
@@ -158,7 +158,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void PlayerInteractEvent(PlayerInteractEvent event) {
+	public void playerInteractEvent(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
@@ -244,7 +244,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void BlockPlaceEvent(BlockPlaceEvent event) {
+	public void blockPlaceEvent(BlockPlaceEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -264,7 +264,7 @@ public class PlayerListener implements Listener {
 
 	// Player interacts with an entity (not triggered on armor stands for some reason
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		World world = player.getWorld();
 
@@ -337,7 +337,7 @@ public class PlayerListener implements Listener {
 
 	// Player interacts with an armor stand
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
 		World world = player.getWorld();
 		ArmorStand armorStand = event.getRightClicked();
@@ -360,13 +360,13 @@ public class PlayerListener implements Listener {
 
 	// The Player swapped their current selected item.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
+	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// The player dropped an item.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerDropItemEvent(PlayerDropItemEvent event) {
+	public void playerDropItemEvent(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
@@ -381,7 +381,7 @@ public class PlayerListener implements Listener {
 
 	// An entity picked up an item
 	@EventHandler(priority = EventPriority.HIGH)
-	public void EntityPickupItemEvent(EntityPickupItemEvent event) {
+	public void entityPickupItemEvent(EntityPickupItemEvent event) {
 		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
 			Player player = (Player)event.getEntity();
 
@@ -398,13 +398,13 @@ public class PlayerListener implements Listener {
 
 	// An item on the player breaks.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerItemBreakEvent(PlayerItemBreakEvent event) {
+	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// If an inventory interaction happened.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryClickEvent(InventoryClickEvent event) {
+	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -457,7 +457,7 @@ public class PlayerListener implements Listener {
 
 	// If an item is being dragged in an inventory
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryDragEvent(InventoryDragEvent event) {
+	public void inventoryDragEvent(InventoryDragEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -480,7 +480,7 @@ public class PlayerListener implements Listener {
 
 	// The player opened an inventory
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryOpenEvent(InventoryOpenEvent event) {
+	public void inventoryOpenEvent(InventoryOpenEvent event) {
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
 
@@ -503,7 +503,7 @@ public class PlayerListener implements Listener {
 	// ...Because there's a known bug with the stupid Item Property stuff and the InventoryClickEvent stuff...
 	// The player inventory is closed
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryCloseEvent(InventoryCloseEvent event) {
+	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
 		if (holder != null && holder instanceof Player) {
@@ -535,7 +535,7 @@ public class PlayerListener implements Listener {
 
 	// Something interacts with an inventory
 	@EventHandler(priority = EventPriority.HIGH)
-	public void InventoryInteractEvent(InventoryInteractEvent event) {
+	public void inventoryInteractEvent(InventoryInteractEvent event) {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
 
@@ -553,13 +553,13 @@ public class PlayerListener implements Listener {
 
 	// Player changed hand items
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
+	public void playerChangedMainHandEvent(PlayerChangedMainHandEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
 	}
 
 	// Player swapped hand items
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+	public void playerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -573,7 +573,7 @@ public class PlayerListener implements Listener {
 
 	// The player has died
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerDeathEvent(PlayerDeathEvent event) {
+	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
 
@@ -690,7 +690,7 @@ public class PlayerListener implements Listener {
 
 	// The player has respawned.
 	@EventHandler(priority = EventPriority.HIGH)
-	public void PlayerRespawnEvent(PlayerRespawnEvent event) {
+	public void playerRespawnEvent(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
 		final String name = player.getName();
 
@@ -712,7 +712,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerFishEvent(PlayerFishEvent event) {
+	public void playerFishEvent(PlayerFishEvent event) {
 		Player player = event.getPlayer();
 
 		/* Don't let the player interact with the world when transferring */
@@ -733,7 +733,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
 		AbilityManager.getManager().PlayerItemConsumeEvent(player, event);
 
@@ -785,7 +785,7 @@ public class PlayerListener implements Listener {
 
 	// An item has taken damage.
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) {
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		ItemStack item = event.getItem();
 		AbilityManager.getManager().PlayerItemDamageEvent(event.getPlayer(), event);
 
@@ -817,7 +817,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void PlayerExpChangeEvent(PlayerExpChangeEvent event) {
+	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
 
 		/* Don't let the player interact with the world when transferring */
@@ -830,7 +830,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerTeleportEvent(PlayerTeleportEvent event) {
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
@@ -852,7 +852,7 @@ public class PlayerListener implements Listener {
 	 * the player to after a short delay
 	 */
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerBedEnterEvent(PlayerBedEnterEvent event) {
+	public void playerBedEnterEvent(PlayerBedEnterEvent event) {
 		Player player = event.getPlayer();
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
@@ -959,7 +959,7 @@ public class PlayerListener implements Listener {
 	 * Prevent players from passing through 1-thick barriers using beds
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerBedLeaveEvent(PlayerBedLeaveEvent event) {
+	public void playerBedLeaveEvent(PlayerBedLeaveEvent event) {
 		Player player = event.getPlayer();
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
@@ -971,7 +971,7 @@ public class PlayerListener implements Listener {
 	                                                      Material.LINGERING_POTION);
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void BrewEvent(BrewEvent event) {
+	public void brewEvent(BrewEvent event) {
 		BrewerInventory inv = event.getContents();
 		ItemStack ingred = inv.getIngredient();
 		ItemStack[] cont = inv.getStorageContents();
@@ -1019,7 +1019,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
 
 		if (event.isSneaking()) {
@@ -1053,7 +1053,7 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void PlayerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
+	public void playerGameModeChangeEvent(PlayerGameModeChangeEvent event) {
 		if (!event.isCancelled()) {
 			Player player = event.getPlayer();
 
@@ -1070,13 +1070,13 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler
-	public void AbilityCastEvent(AbilityCastEvent event) {
+	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		AbilityManager.getManager().AbilityCastEvent(player, event);
 	}
 
 	@EventHandler
-	public void BlockBreakEvent(BlockBreakEvent event) {
+	public void blockBreakEvent(BlockBreakEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
@@ -1092,13 +1092,13 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler
-	public void EvasionEvent(EvasionEvent event) {
+	public void evasionEvent(EvasionEvent event) {
 		Player player = event.getPlayer();
 		mPlugin.mTrackingManager.mPlayers.onEvade(mPlugin, player, event);
 	}
 
 	@EventHandler
-	public void PlayerAnimationEvent(PlayerAnimationEvent event) {
+	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		AbilityManager.getManager().PlayerAnimationEvent(player, event);
 	}

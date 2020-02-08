@@ -8,15 +8,15 @@ import org.bukkit.entity.LivingEntity;
 
 public class RaycastData {
 
-	private List<LivingEntity> entities = new ArrayList<LivingEntity>();
-	private List<Block> blocks = new ArrayList<Block>();
+	private List<LivingEntity> mEntities = new ArrayList<LivingEntity>();
+	private List<Block> mBlocks = new ArrayList<Block>();
 
 	public List<LivingEntity> getEntities() {
-		return entities;
+		return mEntities;
 	}
 
 	public List<Block> getBlocks() {
-		return blocks;
+		return mBlocks;
 	}
 
 

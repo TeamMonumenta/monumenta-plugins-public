@@ -136,10 +136,10 @@ public class AdvancingShadows extends Ability {
 				// a path.
 				Location eyeLoc = mPlayer.getEyeLocation();
 				Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
-				ray.throughBlocks = false;
-				ray.throughNonOccluding = false;
+				ray.mThroughBlocks = false;
+				ray.mThroughNonOccluding = false;
 				if (AbilityManager.getManager().isPvPEnabled(mPlayer)) {
-					ray.targetPlayers = true;
+					ray.mTargetPlayers = true;
 				}
 
 				RaycastData data = ray.shootRaycast();
