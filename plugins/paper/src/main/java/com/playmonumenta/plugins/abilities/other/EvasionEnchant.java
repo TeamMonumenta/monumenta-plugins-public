@@ -24,19 +24,19 @@ public class EvasionEnchant extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 		return true;
 	}
 
 	@Override
-	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 		return true;
 	}
 
 	@Override
-	public void PlayerDamagedByBossEvent(BossAbilityDamageEvent event) {
+	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) {
 		event.setDamage(evade(mPlayer, event.getDamage()));
 	}
 

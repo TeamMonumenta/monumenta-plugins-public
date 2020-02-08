@@ -37,7 +37,7 @@ public class Skirmisher extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int surrounding = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8).size();
 

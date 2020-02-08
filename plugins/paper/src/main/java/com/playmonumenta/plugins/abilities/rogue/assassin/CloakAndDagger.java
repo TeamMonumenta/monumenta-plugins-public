@@ -129,7 +129,7 @@ public class CloakAndDagger extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (active && mTickAttacked != mPlayer.getTicksLived() && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			active = false;
 			if (mPlayer.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() <= 400) {
@@ -141,7 +141,7 @@ public class CloakAndDagger extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (cloak < mMaxStacks) {
 			if (EntityUtils.isElite(event.getEntity())) {
 				cloak = Math.min(mMaxStacks, cloak + CLOAK_STACKS_ON_ELITE_KILL);
@@ -153,7 +153,7 @@ public class CloakAndDagger extends Ability {
 	}
 
 	@Override
-	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
 		if (active) {
 			event.setCancelled(true);
 			event.setTarget(null);

@@ -37,7 +37,7 @@ public class EnfeeblingElixir extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
 			int enfeeblingElixir = getAbilityScore();
 			LivingEntity damagee = (LivingEntity) event.getEntity();

@@ -32,7 +32,7 @@ public class PatreonGreen extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			if (mNoSelfParticles) {
 				for (Player other : PlayerUtils.playersInRange(mPlayer, 30, false)) {

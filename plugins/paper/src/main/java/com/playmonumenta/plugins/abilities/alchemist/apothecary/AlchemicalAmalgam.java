@@ -84,9 +84,9 @@ public class AlchemicalAmalgam extends Ability {
 			List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, mPlayer);
 			List<Player> mPlayers = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
 
-			int t = 0;
-			double degree = 0;
-			boolean reverse = false;
+			int mTicks = 0;
+			double mDegree = 0;
+			boolean mReverse = false;
 
 			@Override
 			public void run() {
@@ -109,10 +109,10 @@ public class AlchemicalAmalgam extends Ability {
 					}
 				}
 
-				degree += 12;
+				mDegree += 12;
 				Vector vec;
 				for (int i = 0; i < 2; i++) {
-					double radian1 = Math.toRadians(degree + (i * 180));
+					double radian1 = Math.toRadians(mDegree + (i * 180));
 					vec = new Vector(Math.cos(radian1) * 0.325, 0, Math.sin(radian1) * 0.325);
 					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch() + 90);
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
@@ -124,14 +124,14 @@ public class AlchemicalAmalgam extends Ability {
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 5, 0.35, 0.35, 0.35, 1);
 				mWorld.spawnParticle(Particle.SPELL_WITCH, mLoc, 5, 0.35, 0.35, 0.35, 1);
 
-				if (!reverse && (LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || t >= AMALGAM_MAX_DURATION)) {
+				if (!mReverse && (LocationUtils.collidesWithSolid(mLoc, mLoc.getBlock()) || mTicks >= AMALGAM_MAX_DURATION)) {
 					mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
 					mPlayers = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
-					reverse = true;
+					mReverse = true;
 				}
 
-				if (reverse) {
-					if (t <= 0) {
+				if (mReverse) {
+					if (mTicks <= 0) {
 						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
 						mWorld.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
@@ -141,7 +141,7 @@ public class AlchemicalAmalgam extends Ability {
 					}
 
 					// The mIncrement is calculated by the distance to the player divided by the number of increments left
-					mIncrement = mPlayer.getEyeLocation().toVector().subtract(mLoc.toVector()).multiply(1.0 / t);
+					mIncrement = mPlayer.getEyeLocation().toVector().subtract(mLoc.toVector()).multiply(1.0 / mTicks);
 
 					// To make the particles function without rewriting the particle code, manually calculate and set pitch and yaw
 					double x = mIncrement.getX();
@@ -159,9 +159,9 @@ public class AlchemicalAmalgam extends Ability {
 					mLoc.setPitch(pitch);
 					mLoc.setYaw(yaw);
 
-					t--;
+					mTicks--;
 				} else {
-					t++;
+					mTicks++;
 				}
 			}
 

@@ -35,6 +35,8 @@ public class GraspingClaws extends Ability {
 	private static final int GRASPING_CLAWS_DURATION = 8 * 20;
 	private static final int GRASPING_CLAWS_COOLDOWN = 16 * 20;
 
+	private Arrow arrow = null;
+
 	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
 		mInfo.scoreboardId = "GraspingClaws";
@@ -43,7 +45,6 @@ public class GraspingClaws extends Ability {
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;
 	}
-	private Arrow arrow = null;
 
 	@Override
 	public void cast(Action action) {
@@ -58,7 +59,7 @@ public class GraspingClaws extends Ability {
 	}
 
 	@Override
-	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
+	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		if (this.arrow != null && this.arrow == arrow) {
 			this.arrow = null;
 			Location loc = arrow.getLocation();

@@ -48,7 +48,7 @@ public class Channeling extends Ability {
 	}
 
 	@Override
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		if(mLastSpellCast != null && event.getAbility() == Spells.ARCANE_STRIKE) {
 			//Do not replace previous with arcane strike
 		} else {
@@ -58,7 +58,7 @@ public class Channeling extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mLastSpellCast != null && event.getEntity() instanceof LivingEntity && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(event.getDamage() + mDamage);
 			LivingEntity mob = (LivingEntity) event.getEntity();

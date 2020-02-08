@@ -191,9 +191,9 @@ public class MobListener implements Listener {
 			if (player != null) {
 				//  Player kills a mob
 				mPlugin.mTrackingManager.mPlayers.onKill(mPlugin, player, entity, event);
-				AbilityManager.getManager().EntityDeathEvent(player, event, shouldGenDrops);
+				AbilityManager.getManager().entityDeathEvent(player, event, shouldGenDrops);
 				for (Player p : PlayerUtils.playersInRange(livingEntity.getLocation(), 20)) {
-					AbilityManager.getManager().EntityDeathRadiusEvent(p, event, shouldGenDrops);
+					AbilityManager.getManager().entityDeathRadiusEvent(p, event, shouldGenDrops);
 				}
 			}
 

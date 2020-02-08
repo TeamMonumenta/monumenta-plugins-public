@@ -31,7 +31,7 @@ public class WarlockPassive extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		if (EntityUtils.isHostileMob(killedEntity)) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();

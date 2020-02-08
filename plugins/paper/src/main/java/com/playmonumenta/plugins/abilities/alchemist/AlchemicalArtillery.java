@@ -81,7 +81,7 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
+	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		if (arrow.hasMetadata(ALCHEMICAL_ARTILLERY_METAKEY)) {
 			// Must remove metadata or the arrow could bounce and go boom x2
 			arrow.removeMetadata(ALCHEMICAL_ARTILLERY_METAKEY, mPlugin);
@@ -127,7 +127,7 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (mActive) {
 			if (AbilityUtils.removeAlchemistPotions(mPlayer, mCost)) {
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);

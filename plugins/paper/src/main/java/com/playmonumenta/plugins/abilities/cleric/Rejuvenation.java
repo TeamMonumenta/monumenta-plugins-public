@@ -26,7 +26,7 @@ public class Rejuvenation extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			//  Don't trigger this if dead!
 			if (!mPlayer.isDead()) {

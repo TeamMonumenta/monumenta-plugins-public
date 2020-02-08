@@ -104,7 +104,7 @@ public class Disengage extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
+	public boolean playerDamagedEvent(EntityDamageEvent event) {
 		/* Reduce falling damage if player is still falling or they landed very recently */
 		if (event.getCause().equals(DamageCause.FALL)
 		    && (mStillInAir || ((mPlayer.getTicksLived() - mLandedTick) < 5))) {

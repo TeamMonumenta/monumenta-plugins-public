@@ -18,9 +18,11 @@ public class BasePacket {
 	public Boolean hasDestination() {
 		return mDestination != null && !mDestination.isEmpty();
 	}
+
 	public boolean hasOperation() {
 		return mOperation != null && !mOperation.isEmpty();
 	}
+
 	public boolean hasData() {
 		return mData != null && mData.size() != 0;
 	}
@@ -28,12 +30,15 @@ public class BasePacket {
 	public String getDestination() {
 		return mDestination;
 	}
+
 	public String getOperation() {
 		return mOperation;
 	}
+
 	public JsonObject getData() {
 		return mData;
 	}
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		if (hasDestination()) {

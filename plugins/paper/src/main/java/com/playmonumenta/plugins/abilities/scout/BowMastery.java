@@ -23,7 +23,7 @@ public class BowMastery extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
 		double bonusDamage = getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "BowMasteryBonusDamageRegistrationTick")) {

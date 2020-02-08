@@ -40,7 +40,7 @@ public class HallowedBeam extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		Player player = mPlayer;
 		LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
 		if (e != null && EntityUtils.isUndead(e)) {

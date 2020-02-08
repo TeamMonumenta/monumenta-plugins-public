@@ -47,7 +47,7 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (!mPlayer.isSneaking()
 		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */

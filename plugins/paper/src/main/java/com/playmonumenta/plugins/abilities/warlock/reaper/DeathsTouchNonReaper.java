@@ -49,7 +49,7 @@ public class DeathsTouchNonReaper extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		if (event.getEntity().hasMetadata("DeathsTouchBuffDuration")) {
 			List<PotionEffectType> effects = getOppositeEffects(event.getEntity());
 			int duration = event.getEntity().getMetadata("DeathsTouchBuffDuration").get(0).asInt();

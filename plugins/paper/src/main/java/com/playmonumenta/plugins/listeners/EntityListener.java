@@ -171,7 +171,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			if (!mAbilities.PlayerCombustByEntityEvent(player, event)) {
+			if (!mAbilities.playerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
 			}
 		}
@@ -180,7 +180,7 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void customDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
-			mAbilities.PlayerDealtCustomDamageEvent((Player)event.getDamager(), event);
+			mAbilities.playerDealtCustomDamageEvent((Player)event.getDamager(), event);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class EntityListener implements Listener {
 			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
 
 			if (damager instanceof LivingEntity) {
-				if (!mAbilities.PlayerDamagedByLivingEntityEvent(player, event)) {
+				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
 					event.setCancelled(true);
 				}
 				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
@@ -237,7 +237,7 @@ public class EntityListener implements Listener {
 					}
 				}
 
-				if (!mAbilities.PlayerDamagedByProjectileEvent(player, event)) {
+				if (!mAbilities.playerDamagedByProjectileEvent(player, event)) {
 					damager.remove();
 					event.setCancelled(true);
 				}
@@ -291,7 +291,7 @@ public class EntityListener implements Listener {
 						Celestial.modifyDamage(player, event);
 					}
 
-					if (!mAbilities.LivingEntityDamagedByPlayerEvent(player, event)) {
+					if (!mAbilities.livingEntityDamagedByPlayerEvent(player, event)) {
 						event.setCancelled(true);
 					}
 
@@ -328,7 +328,7 @@ public class EntityListener implements Listener {
 					AttributeBowDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
 
 					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (!mAbilities.LivingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
+					if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
 						damager.remove();
 						event.setCancelled(true);
 					}
@@ -414,7 +414,7 @@ public class EntityListener implements Listener {
 				}
 			}
 
-			if (!mAbilities.PlayerDamagedEvent(player, event)) {
+			if (!mAbilities.playerDamagedEvent(player, event)) {
 				event.setCancelled(true);
 			}
 
@@ -578,7 +578,7 @@ public class EntityListener implements Listener {
 				}
 			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
 				Arrow arrow = (Arrow)proj;
-				if (!mAbilities.PlayerShotArrowEvent(player, arrow)) {
+				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
 
@@ -588,12 +588,12 @@ public class EntityListener implements Listener {
 				AbilityUtils.setArrowVelocityDamageMultiplier(mPlugin, arrow);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				SplashPotion potion = (SplashPotion)proj;
-				if (!mAbilities.PlayerThrewSplashPotionEvent(player, potion)) {
+				if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
 					event.setCancelled(true);
 				}
 			} else if (event.getEntityType() == EntityType.LINGERING_POTION) {
 				LingeringPotion potion = (LingeringPotion)proj;
-				if (!mAbilities.PlayerThrewLingeringPotionEvent(player, potion)) {
+				if (!mAbilities.playerThrewLingeringPotionEvent(player, potion)) {
 					event.setCancelled(true);
 				}
 			}
@@ -622,7 +622,7 @@ public class EntityListener implements Listener {
 
 		/* If a player threw this potion, trigger applicable abilities (potentially cancelling or modifying the event!) */
 		if (source instanceof Player) {
-			if (!mAbilities.PlayerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
+			if (!mAbilities.playerSplashPotionEvent((Player)source, affectedEntities, potion, event)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -635,7 +635,7 @@ public class EntityListener implements Listener {
 		 */
 		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
 			if (entity instanceof Player) {
-				if (!mAbilities.PlayerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
+				if (!mAbilities.playerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -774,7 +774,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getHitEntity();
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player)entity;
-			mAbilities.PlayerHitByProjectileEvent(player, event);
+			mAbilities.playerHitByProjectileEvent(player, event);
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
 
@@ -812,7 +812,7 @@ public class EntityListener implements Listener {
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
 				Player player = (Player)source;
-				mAbilities.ProjectileHitEvent(player, event, arrow);
+				mAbilities.projectileHitEvent(player, event, arrow);
 			}
 		}
 
@@ -850,7 +850,7 @@ public class EntityListener implements Listener {
 		}
 		if (event.getTarget() instanceof Player) {
 			Player player = (Player) event.getTarget();
-			mAbilities.EntityTargetLivingEntityEvent(player, event);
+			mAbilities.entityTargetLivingEntityEvent(player, event);
 		}
 	}
 
@@ -866,7 +866,7 @@ public class EntityListener implements Listener {
 
 		if (applier instanceof Player) {
 			Player player = (Player) applier;
-			mAbilities.PotionEffectApplyEvent(player, event);
+			mAbilities.potionEffectApplyEvent(player, event);
 		}
 	}
 
@@ -890,7 +890,7 @@ public class EntityListener implements Listener {
 		if (event.getDamaged() instanceof Player) {
 			Player player = event.getDamaged();
 			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
-			mAbilities.BossAbilityDamageEvent(player, event);
+			mAbilities.bossAbilityDamageEvent(player, event);
 		}
 	}
 

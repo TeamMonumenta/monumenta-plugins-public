@@ -73,7 +73,7 @@ public class EerieEminence extends Ability {
 	}
 
 	@Override
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		if (event.getAbility() == Spells.GRASPING_CLAWS) {
 			debuffs.add(new DebuffElement(PotionEffectType.SLOW, PotionEffectType.SPEED, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.CONSUMING_FLAMES) {
@@ -88,7 +88,7 @@ public class EerieEminence extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			double radius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
 

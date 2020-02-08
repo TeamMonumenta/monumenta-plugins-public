@@ -45,7 +45,7 @@ public class CounterStrike extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		// Prevent ranged mob abilities from triggering Counter Strike
 		if (event.getEntity().getBoundingBox().expand(COUNTER_STRIKE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
 
@@ -78,7 +78,7 @@ public class CounterStrike extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mActive && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mActive = false;
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
@@ -131,7 +131,7 @@ public class CounterStrike extends Ability {
 	}
 
 	@Override
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		if (event.getAbility() == Spells.RIPOSTE) {
 			activate();
 		}

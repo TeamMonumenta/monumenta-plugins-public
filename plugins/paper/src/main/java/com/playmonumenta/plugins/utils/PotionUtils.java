@@ -242,19 +242,6 @@ public class PotionUtils {
 		return effectsList;
 	}
 
-	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
-		if (effect.getType().equals(PotionEffectType.HEAL)) {
-			double health = player.getHealth();
-			double healthToAdd = 4 * (effect.getAmplifier() + 1);
-
-			health = Math.min(health + healthToAdd, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-
-			player.setHealth(health);
-		} else {
-			plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
-		}
-	}
-
 	public static boolean hasPositiveEffects(Collection<PotionEffect> effects) {
 		for (PotionEffect effect : effects) {
 			if (hasPositiveEffects(effect.getType())) {
@@ -309,6 +296,19 @@ public class PotionUtils {
 					plugin.mPotionManager.removePotion(player, PotionID.ALL, type);
 				}
 			}
+		}
+	}
+
+	public static void applyPotion(Plugin plugin, Player player, PotionEffect effect) {
+		if (effect.getType().equals(PotionEffectType.HEAL)) {
+			double health = player.getHealth();
+			double healthToAdd = 4 * (effect.getAmplifier() + 1);
+
+			health = Math.min(health + healthToAdd, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+
+			player.setHealth(health);
+		} else {
+			plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
 		}
 	}
 

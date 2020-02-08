@@ -36,7 +36,7 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		int elementalArrows = getAbilityScore();
 		int damage = elementalArrows == 1 ? ELEMENTAL_ARROWS_1_DAMAGE : ELEMENTAL_ARROWS_2_DAMAGE;
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
@@ -71,7 +71,7 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (mPlayer.isSneaking()) {
 			arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
 			arrow.setFireTicks(0);

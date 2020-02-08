@@ -27,7 +27,7 @@ public class MagePassive extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && InventoryUtils.isWandItem(mainHand)) {
 			event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
@@ -36,7 +36,7 @@ public class MagePassive extends Ability {
 	}
 
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player) {
 			event.setDamage(event.getDamage() * 1.15);
 		}

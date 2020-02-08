@@ -35,7 +35,7 @@ public class PinningShot extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		// Thw metadata for a pinned enemy is removed in the ScoutPassive class where damage is calculated
 		if (!damagee.hasMetadata("PinningShotEnemyHasBeenPinned")) {
 			damagee.setMetadata("PinningShotEnemyHasBeenPinned", new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));

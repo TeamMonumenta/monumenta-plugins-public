@@ -44,14 +44,14 @@ public class BlasphemousAura extends Ability {
 	}
 
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity damagee = event.getDamaged();
 		int amp = getAbilityScore() == 1 ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
 		PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, amp, false, true));
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (getAbilityScore() > 1) {
 			GraspingClaws gc = (GraspingClaws) AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
 			DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);

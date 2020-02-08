@@ -68,7 +68,7 @@ public class HungeringVortex extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {
 			event.setDamage(event.getDamage() + mPlayer.getMetadata(HUNGERING_VORTEX_METAKEY).get(0).asDouble());
 		}
@@ -155,9 +155,9 @@ public class HungeringVortex extends Ability {
 
 		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
 		double damageMax = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX : HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX;
-		double extra_dam = Math.min(damageMax, mobs.size()) * damageInc;
+		double extraDamage = Math.min(damageMax, mobs.size()) * damageInc;
 
-		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extra_dam));
+		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extraDamage));
 		new BukkitRunnable() {
 			@Override
 			public void run() {

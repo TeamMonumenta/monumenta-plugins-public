@@ -30,7 +30,7 @@ public class SagesInsight extends Ability {
 	}
 
 	@Override
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		Ability[] abilities = {
 			AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneStrike.class),
 			AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class),

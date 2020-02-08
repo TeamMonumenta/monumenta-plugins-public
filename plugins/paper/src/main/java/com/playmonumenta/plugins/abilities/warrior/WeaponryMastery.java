@@ -32,7 +32,7 @@ public class WeaponryMastery extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
@@ -48,11 +48,11 @@ public class WeaponryMastery extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		PlayerItemHeldEvent(mPlayer.getInventory().getItemInMainHand(), null);
+		playerItemHeldEvent(mPlayer.getInventory().getItemInMainHand(), null);
 	}
 
 	@Override
-	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
+	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
 		//  Player has an sword in their mainHand.
 		if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 1000000, 0, true, false));

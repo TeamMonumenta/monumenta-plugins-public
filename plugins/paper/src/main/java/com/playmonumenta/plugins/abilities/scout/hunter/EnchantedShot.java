@@ -66,12 +66,12 @@ public class EnchantedShot extends Ability {
 				mActive = true;
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.45f);
 				new BukkitRunnable() {
-					int t = 0;
+					int mTicks = 0;
 					@Override
 					public void run() {
-						t++;
+						mTicks++;
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 4, 0.25, 0, 0.25, 0);
-						if (!mActive || t >= 20 * 5) {
+						if (!mActive || mTicks >= 20 * 5) {
 							mActive = false;
 							this.cancel();
 						}
@@ -82,7 +82,7 @@ public class EnchantedShot extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (mActive && arrow.isCritical()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);

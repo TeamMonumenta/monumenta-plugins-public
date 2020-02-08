@@ -40,7 +40,7 @@ public class CursedWound extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			BlockData fallingDustData = Material.ANVIL.createBlockData();

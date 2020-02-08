@@ -157,7 +157,7 @@ public class Spellshock extends Ability {
 	}
 
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		LivingEntity mob = event.getDamaged();
 
 		// If the mob has static, trigger it, otherwise, apply it
@@ -171,7 +171,7 @@ public class Spellshock extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity mob = (LivingEntity) event.getEntity();
 		if (!mPendingStaticMobs.contains(mob) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mPendingStaticMobs.add(mob);

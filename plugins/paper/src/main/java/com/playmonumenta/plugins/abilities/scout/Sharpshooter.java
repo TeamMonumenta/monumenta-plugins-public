@@ -40,7 +40,7 @@ public class Sharpshooter extends Ability {
 	private int mTicks = 0;
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "SharpshooterBonusDamageRegistrationTick")) {
 			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, mSharpshot);
 		}
@@ -48,7 +48,7 @@ public class Sharpshooter extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		// Only increment sharpshot if the arrow is critical and not from volley
 		if (arrow.isCritical() && !arrow.hasMetadata("Volley")) {
 			mTicks = 0;

@@ -36,7 +36,7 @@ public class SplitArrow extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (arrow.isCritical()) {
 			double damage = getAbilityScore() == 1 ? SPLIT_ARROW_1_DAMAGE : SPLIT_ARROW_2_DAMAGE;
 			damage += AbilityUtils.getArrowBonusDamage(arrow);

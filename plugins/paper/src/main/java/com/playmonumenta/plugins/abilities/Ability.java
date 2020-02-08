@@ -108,90 +108,90 @@ public abstract class Ability {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		return true;
 	}
 
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
+	public boolean playerDamagedEvent(EntityDamageEvent event) {
 		return true;
 	}
 
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
+	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
 		return true;
 	}
 
-	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
+	public boolean playerCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		return true;
 	}
 
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		return true;
 	}
 
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		return true;
 	}
 
-	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
 		return true;
 	}
 
-	public boolean PlayerThrewLingeringPotionEvent(LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(LingeringPotion potion) {
 		return true;
 	}
 
-	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
+	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                           ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
 	// Called when entities are hit by a potion a player threw
-	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
+	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
 
-	public void EntityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
 
-	public double EntityDeathRadius() {
+	public double entityDeathRadius() {
 		return 0;
 	}
 
-	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
+	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
 
-	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
+	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
 
-	public void PlayerExtendedSneakEvent() { }
+	public void playerExtendedSneakEvent() { }
 
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) { }
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) { }
 
-	public void EntityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
+	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
 
-	public void PotionApplyEvent(PotionEffectApplyEvent event) { }
+	public void potionApplyEvent(PotionEffectApplyEvent event) { }
 
-	public void PlayerDeathEvent(PlayerDeathEvent event) { }
+	public void playerDeathEvent(PlayerDeathEvent event) { }
 
-	public void PlayerAnimationEvent(PlayerAnimationEvent event) { }
+	public void playerAnimationEvent(PlayerAnimationEvent event) { }
 
-	public void PlayerDamagedByBossEvent(BossAbilityDamageEvent event) { }
+	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) { }
 
-	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) { }
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) { }
 
-	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) { }
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) { }
 
 	//---------------------------------------------------------------------------------------------------------------
 
@@ -216,7 +216,7 @@ public abstract class Ability {
 		return false;
 	}
 
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {}
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {}
 
 	//---------------------------------------------------------------------------------------------------------------
 	/*

@@ -38,7 +38,7 @@ public class CluckingPotions extends Ability {
 	}
 
 	@Override
-	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
 		if (InventoryUtils.testForItemWithName(potion.getItem(), "Jar of Clucks")) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.CLOUD);
 			potion.setMetadata("CluckingPotion", new FixedMetadataValue(mPlugin, 0));
@@ -47,7 +47,7 @@ public class CluckingPotions extends Ability {
 	}
 
 	@Override
-	public boolean PlayerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
+	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("CluckingPotion")) {
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {

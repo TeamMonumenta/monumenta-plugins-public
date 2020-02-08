@@ -34,7 +34,7 @@ public class GrowingRage extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		double maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		int healthThreshold = (int) Math.min(GROWING_RAGE_MAX_INCREASES, (int)((maxHealth - mPlayer.getHealth()) / GROWING_RAGE_HEALTH_THRESHOLD));
 		if (healthThreshold != mHealthThreshold) {
@@ -44,7 +44,7 @@ public class GrowingRage extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(event.getDamage() * damagePercent);
 		}

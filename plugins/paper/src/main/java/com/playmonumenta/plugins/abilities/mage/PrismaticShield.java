@@ -56,7 +56,7 @@ public class PrismaticShield extends Ability {
 	 * into two pieces for the trigger order to be correct.
 	 */
 	@Override
-	public boolean PlayerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		if (event.isCancelled()) {
 			return true;
 		}
@@ -69,7 +69,7 @@ public class PrismaticShield extends Ability {
 	 * Works against all types of damage
 	 */
 	@Override
-	public boolean PlayerDamagedEvent(EntityDamageEvent event) {
+	public boolean playerDamagedEvent(EntityDamageEvent event) {
 		// Do not process cancelled damage events
 		if (event.isCancelled() || event instanceof EntityDamageByEntityEvent) {
 			return true;

@@ -97,7 +97,7 @@ public class LuminousInfusion extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		DamageCause cause = event.getCause();
 		if (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.CUSTOM) {
 			LivingEntity le = (LivingEntity) event.getEntity();
@@ -116,7 +116,7 @@ public class LuminousInfusion extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (mActive && EntityUtils.isUndead(damagee)) {
 			execute(damagee, event);
 		}

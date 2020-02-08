@@ -251,7 +251,7 @@ public class BodkinBlitz extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		EntityDamageEvent e = event.getEntity().getLastDamageCause();
 		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK
 				|| e.getCause() == DamageCause.CUSTOM) {

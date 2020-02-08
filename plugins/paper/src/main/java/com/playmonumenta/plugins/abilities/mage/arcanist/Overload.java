@@ -36,7 +36,7 @@ public class Overload extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			Set<Spells> cds = mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId());
 			if (cds != null) {
@@ -48,7 +48,7 @@ public class Overload extends Ability {
 	}
 
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		Set<Spells> cds = mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId());
 		if (cds != null) {
 			event.setDamage(event.getDamage() + mDamage * cds.size());

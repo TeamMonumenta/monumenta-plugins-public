@@ -451,10 +451,10 @@ public class AbilityManager {
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
 
-	public boolean AbilityCastEvent(Player player, AbilityCastEvent event) {
+	public boolean abilityCastEvent(Player player, AbilityCastEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.AbilityCastEvent(event)) {
+				if (!abil.abilityCastEvent(event)) {
 					return false;
 				}
 			}
@@ -462,7 +462,7 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean LivingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(Player player, EntityDamageByEntityEvent event) {
 		// Use the counter instead of scoreboard name because some "abilities" do not have a scoreboard
 		int i = 0;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
@@ -474,7 +474,7 @@ public class AbilityManager {
 				    && !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
 					return true;
 				}
-				if (!abil.LivingEntityDamagedByPlayerEvent(event)) {
+				if (!abil.livingEntityDamagedByPlayerEvent(event)) {
 					return false;
 				}
 			}
@@ -482,10 +482,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerDamagedEvent(Player player, EntityDamageEvent event) {
+	public boolean playerDamagedEvent(Player player, EntityDamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerDamagedEvent(event)) {
+				if (!abil.playerDamagedEvent(event)) {
 					return false;
 				}
 			}
@@ -493,10 +493,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerDamagedByLivingEntityEvent(event)) {
+				if (!abil.playerDamagedByLivingEntityEvent(event)) {
 					return false;
 				}
 			}
@@ -504,10 +504,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerDamagedByProjectileEvent(event)) {
+				if (!abil.playerDamagedByProjectileEvent(event)) {
 					return false;
 				}
 			}
@@ -515,10 +515,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerCombustByEntityEvent(Player player, EntityCombustByEntityEvent event) {
+	public boolean playerCombustByEntityEvent(Player player, EntityCombustByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerCombustByEntityEvent(event)) {
+				if (!abil.playerCombustByEntityEvent(event)) {
 					return false;
 				}
 			}
@@ -526,10 +526,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean LivingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.LivingEntityShotByPlayerEvent(arrow, damagee, event)) {
+				if (!abil.livingEntityShotByPlayerEvent(arrow, damagee, event)) {
 					return false;
 				}
 			}
@@ -537,10 +537,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerShotArrowEvent(Player player, Arrow arrow) {
+	public boolean playerShotArrowEvent(Player player, Arrow arrow) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerShotArrowEvent(arrow)) {
+				if (!abil.playerShotArrowEvent(arrow)) {
 					return false;
 				}
 			}
@@ -548,10 +548,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerThrewSplashPotionEvent(Player player, SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(Player player, SplashPotion potion) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerThrewSplashPotionEvent(potion)) {
+				if (!abil.playerThrewSplashPotionEvent(potion)) {
 					return false;
 				}
 			}
@@ -559,10 +559,10 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean PlayerThrewLingeringPotionEvent(Player player, LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(Player player, LingeringPotion potion) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerThrewLingeringPotionEvent(potion)) {
+				if (!abil.playerThrewLingeringPotionEvent(potion)) {
 					return false;
 				}
 			}
@@ -570,86 +570,86 @@ public class AbilityManager {
 		return true;
 	}
 
-	public void PlayerItemConsumeEvent(Player player, PlayerItemConsumeEvent event) {
+	public void playerItemConsumeEvent(Player player, PlayerItemConsumeEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerItemConsumeEvent(event);
+				abil.playerItemConsumeEvent(event);
 			}
 		}
 	}
 
-	public void PlayerItemDamageEvent(Player player, PlayerItemDamageEvent event) {
+	public void playerItemDamageEvent(Player player, PlayerItemDamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerItemDamageEvent(event);
+				abil.playerItemDamageEvent(event);
 			}
 		}
 	}
 
-	public void EntityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.EntityDeathEvent(event, shouldGenDrops);
+				abil.entityDeathEvent(event, shouldGenDrops);
 			}
 		}
 	}
 
-	public void EntityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (event.getEntity().getLocation().distance(player.getLocation()) <= abil.EntityDeathRadius()) {
-					abil.EntityDeathRadiusEvent(event, shouldGenDrops);
+				if (event.getEntity().getLocation().distance(player.getLocation()) <= abil.entityDeathRadius()) {
+					abil.entityDeathRadiusEvent(event, shouldGenDrops);
 				}
 			}
 		}
 	}
 
-	public void PlayerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+	public void playerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerItemHeldEvent(mainHand, offHand);
+				abil.playerItemHeldEvent(mainHand, offHand);
 			}
 		}
 	}
 
-	public void ProjectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
+	public void projectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.ProjectileHitEvent(event, arrow);
+				abil.projectileHitEvent(event, arrow);
 			}
 		}
 	}
 
-	public void BossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {
+	public void bossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerDamagedByBossEvent(event);
+				abil.playerDamagedByBossEvent(event);
 			}
 		}
 	}
 
-	public void PlayerExtendedSneakEvent(Player player) {
+	public void playerExtendedSneakEvent(Player player) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerExtendedSneakEvent();
+				abil.playerExtendedSneakEvent();
 			}
 		}
 	}
 
-	public void PlayerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
+	public void playerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerHitByProjectileEvent(event);
+				abil.playerHitByProjectileEvent(event);
 			}
 		}
 	}
 
-	public boolean PlayerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {
 		boolean re = true;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerSplashPotionEvent(affectedEntities, potion, event)) {
+				if (!abil.playerSplashPotionEvent(affectedEntities, potion, event)) {
 					re = false;
 				}
 			}
@@ -657,12 +657,12 @@ public class AbilityManager {
 		return re;
 	}
 
-	public boolean PlayerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
+	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 	                                           ThrownPotion potion, PotionSplashEvent event) {
 		boolean re = true;
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				if (!abil.PlayerSplashedByPotionEvent(affectedEntities, potion, event)) {
+				if (!abil.playerSplashedByPotionEvent(affectedEntities, potion, event)) {
 					re = false;
 				}
 			}
@@ -670,15 +670,15 @@ public class AbilityManager {
 		return re;
 	}
 
-	public void PeriodicTrigger(Player player, boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(Player player, boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PeriodicTrigger(fourHertz, twoHertz, oneSecond, ticks);
+				abil.periodicTrigger(fourHertz, twoHertz, oneSecond, ticks);
 			}
 		}
 	}
 
-	public void PlayerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
+	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			AbilityInfo info = abil.getInfo();
 			if (info.trigger != null) {
@@ -714,42 +714,42 @@ public class AbilityManager {
 		}
 	}
 
-	public void PlayerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerDealtCustomDamageEvent(event);
+				abil.playerDealtCustomDamageEvent(event);
 			}
 		}
 	}
 
-	public void EntityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
+	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.EntityTargetLivingEntityEvent(event);
+				abil.entityTargetLivingEntityEvent(event);
 			}
 		}
 	}
 
-	public void PotionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
+	public void potionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PotionApplyEvent(event);
+				abil.potionApplyEvent(event);
 			}
 		}
 	}
 
-	public void PlayerDeathEvent(Player player, PlayerDeathEvent event) {
+	public void playerDeathEvent(Player player, PlayerDeathEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast()) {
-				abil.PlayerDeathEvent(event);
+				abil.playerDeathEvent(event);
 			}
 		}
 	}
 
-	public void PlayerAnimationEvent(Player player, PlayerAnimationEvent event) {
+	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			if (abil.canCast() && event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-				abil.PlayerAnimationEvent(event);
+				abil.playerAnimationEvent(event);
 			}
 		}
 	}

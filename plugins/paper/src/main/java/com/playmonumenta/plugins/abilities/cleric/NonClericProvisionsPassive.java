@@ -55,21 +55,21 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public void PlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		if (testRandomChance()) {
 			event.setReplacement(event.getItem());
 		}
 	}
 
 	@Override
-	public void PlayerItemDamageEvent(PlayerItemDamageEvent event) {
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		if (testRandomChance()) {
 			event.setDamage(0);
 		}
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (testRandomChance()) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
@@ -77,7 +77,7 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
 		if (testRandomChance()) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}
@@ -85,7 +85,7 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean PlayerThrewLingeringPotionEvent(LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(LingeringPotion potion) {
 		if (testRandomChance()) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}

@@ -47,7 +47,7 @@ public class Rampage extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		timeToNextDecrement = 0;
 		if (rampageKillStreak < (getAbilityScore() == 1 ? RAMPAGE_1_KILL_LIMIT : RAMPAGE_2_KILL_LIMIT)) {
 			rampageKillStreak++;
@@ -58,7 +58,7 @@ public class Rampage extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (rampageKillStreak > 0) {
 			timeToNextDecrement += ticks;
 			if (timeToNextDecrement >= rampageKillStreakTime) {
@@ -90,7 +90,7 @@ public class Rampage extends Ability {
 
 	// Increase damage
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			event.setDamage(event.getDamage() + rampageKillStreak / RAMPAGE_KILL_THRESHOLD);
 		}

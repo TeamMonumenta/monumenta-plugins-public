@@ -36,7 +36,7 @@ public class HeavenlyBoon extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		int heavenlyBoon = getAbilityScore();
 		if (shouldGenDrops) {
@@ -94,7 +94,7 @@ public class HeavenlyBoon extends Ability {
 	 * affectedEntities list so they don't get potion effects applied to them twice
 	 */
 	@Override
-	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
+	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion,
 	                                           PotionSplashEvent event) {
 		boolean hasPositiveEffects = PotionUtils.hasPositiveEffects(PotionUtils.getEffects(potion.getItem()));
 

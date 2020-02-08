@@ -36,7 +36,7 @@ public class AlchemistPotions extends Ability {
 	}
 
 	@Override
-	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
 		if (InventoryUtils.testForItemWithName(potion.getItem(), "Alchemist's Potion")) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
@@ -45,7 +45,7 @@ public class AlchemistPotions extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int newPot = 1;
 		if (mRandom.nextDouble() < 0.50) {
 			newPot++;

@@ -30,7 +30,7 @@ public class RoguePassive extends Ability {
 	}
 
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
 			Entity damagee = event.getDamaged();
 

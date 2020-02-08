@@ -64,7 +64,7 @@ public class Dodging extends Ability {
 	}
 
 	@Override
-	public boolean PlayerCombustByEntityEvent(EntityCombustByEntityEvent event) {
+	public boolean playerCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		// Don't proc on Fire Aspect
 		if (!(event.getCombuster() instanceof Projectile)) {
 			return true;
@@ -80,7 +80,7 @@ public class Dodging extends Ability {
 
 
 	@Override
-	public boolean PlayerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		Projectile proj = (Projectile) event.getDamager();
 		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || EntityUtils.getRealFinalDamage(event) <= 0) {
@@ -95,7 +95,7 @@ public class Dodging extends Ability {
 
 
 	@Override
-	public boolean PlayerHitByProjectileEvent(ProjectileHitEvent event) {
+	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		if ((event.getEntity().getShooter() instanceof Player) || mPlayer.isBlocking()) {
 			return true;
@@ -114,7 +114,7 @@ public class Dodging extends Ability {
 	}
 
 	@Override
-	public boolean PlayerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
+	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
 	                                           ThrownPotion potion, PotionSplashEvent event) {
 		if (!(event.getEntity().getShooter() instanceof LivingEntity) || event.getEntity().getShooter() instanceof Player) {
 			return true;

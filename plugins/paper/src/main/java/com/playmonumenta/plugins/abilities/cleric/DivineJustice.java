@@ -29,7 +29,7 @@ public class DivineJustice extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damagee = (LivingEntity)event.getEntity();
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isUndead(damagee)) {
 			event.setDamage(event.getDamage() + DIVINE_JUSTICE_DAMAGE);
@@ -48,7 +48,7 @@ public class DivineJustice extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		LivingEntity killedEntity = event.getEntity();
 		if (getAbilityScore() > 1
 		    && killedEntity.getLastDamageCause() != null

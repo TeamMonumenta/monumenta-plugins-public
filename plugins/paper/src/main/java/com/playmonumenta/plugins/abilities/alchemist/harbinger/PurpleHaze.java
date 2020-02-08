@@ -59,8 +59,6 @@ public class PurpleHaze extends Ability {
 		}
 	}
 
-	private LivingEntity target = null;
-
 	private static final int PURPLE_HAZE_1_DURATION = 8 * 20;
 	private static final int PURPLE_HAZE_2_DURATION = 10 * 20;
 	private static final int PURPLE_HAZE_1_COOLDOWN = 40 * 20;
@@ -75,6 +73,8 @@ public class PurpleHaze extends Ability {
 	private static Map<UUID, HazedMob> newHazedMobs = new HashMap<UUID, HazedMob>();
 
 	private static BukkitRunnable mRunnable = null;
+
+	private LivingEntity mTarget = null;
 
 	public PurpleHaze(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -202,7 +202,7 @@ public class PurpleHaze extends Ability {
 				if (rayEntities != null && !rayEntities.isEmpty()) {
 					for (LivingEntity t : rayEntities) {
 						if (!t.getUniqueId().equals(mPlayer.getUniqueId()) && t.isValid() && !t.isDead() && EntityUtils.isHostileMob(t)) {
-							target = t;
+							mTarget = t;
 							return true;
 						}
 					}
@@ -214,7 +214,7 @@ public class PurpleHaze extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		LivingEntity entity = target;
+		LivingEntity entity = mTarget;
 		int purpleHaze = getAbilityScore();
 		if (entity != null && !mHazedMobs.containsKey(entity.getUniqueId())) {
 			HazedMob hazed = new HazedMob(entity, mPlayer, purpleHaze == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION,
@@ -226,6 +226,6 @@ public class PurpleHaze extends Ability {
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.5f);
 			putOnCooldown();
 		}
-		target = null;
+		mTarget = null;
 	}
 }

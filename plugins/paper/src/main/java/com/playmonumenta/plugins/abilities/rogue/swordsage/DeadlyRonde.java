@@ -57,7 +57,7 @@ public class DeadlyRonde extends Ability {
 	}
 
 	@Override
-	public boolean AbilityCastEvent(AbilityCastEvent event) {
+	public boolean abilityCastEvent(AbilityCastEvent event) {
 		/* Re-up the duration every time an ability is cast */
 		if (activeRunnable != null) {
 			activeRunnable.cancel();
@@ -98,7 +98,7 @@ public class DeadlyRonde extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (activeRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();

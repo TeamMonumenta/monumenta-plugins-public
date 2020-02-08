@@ -94,14 +94,14 @@ public class AdrenalSerum extends Ability {
 		}
 
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
-				t++;
+				mTicks++;
 				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, ADRENAL_SERUM_COLOR);
 
-				if (t > ADRENAL_SERUM_DURATION) {
+				if (mTicks > ADRENAL_SERUM_DURATION) {
 					EntityUtils.damageEntity(mPlugin, mPlayer, ADRENAL_SERUM_DAMAGE, null);
 
 					this.cancel();
@@ -139,7 +139,7 @@ public class AdrenalSerum extends Ability {
 	}
 
 	@Override
-	public boolean PlayerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
 		// This is sufficient because we are already checking conditions in runCheck()
 		potion.remove();
 		putOnCooldown();

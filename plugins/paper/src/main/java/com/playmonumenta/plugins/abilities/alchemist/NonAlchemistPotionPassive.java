@@ -28,7 +28,7 @@ public class NonAlchemistPotionPassive extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		for (Player player : PlayerUtils.playersInRange(mPlayer, 12, false)) {
 			if (AbilityManager.getManager().getPlayerAbility(player, GruesomeAlchemy.class) != null
 			    || AbilityManager.getManager().getPlayerAbility(player, BrutalAlchemy.class) != null) {

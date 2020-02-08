@@ -35,7 +35,7 @@ public class PvP extends Ability {
 	}
 
 	@Override
-	public void PlayerDeathEvent(PlayerDeathEvent event) {
+	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = mPlayer;
 		if (player.getKiller() != null) {
 			event.setReviveHealth(player.getMaxHealth());

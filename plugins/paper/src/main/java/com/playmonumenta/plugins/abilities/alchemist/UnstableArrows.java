@@ -46,7 +46,7 @@ public class UnstableArrows extends Ability {
 	}
 
 	@Override
-	public void ProjectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
+	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 		if (mUnstableArrow != null && arrow == mUnstableArrow) {
 			arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 			putOnCooldown();
@@ -111,7 +111,7 @@ public class UnstableArrows extends Ability {
 	}
 
 	@Override
-	public boolean PlayerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(Arrow arrow) {
 		// Can't use runCheck for this because player doesn't need to be sneaking when arrow lands
 		if (mPlayer.isSneaking()) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);

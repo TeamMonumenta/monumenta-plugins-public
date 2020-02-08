@@ -31,7 +31,7 @@ public class ElementalSpiritAbility extends Ability {
 	private ElementalSpirit spirit = null;
 
 	@Override
-	public void PlayerDealtCustomDamageEvent(CustomDamageEvent event) {
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
 		if (spirit != null) {
 			MagicType type = event.getMagicType();
 			if (type == MagicType.FIRE || type == MagicType.ARCANE || type == MagicType.ICE) {
@@ -42,7 +42,7 @@ public class ElementalSpiritAbility extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		Player player = mPlayer;
 		if (oneSecond) {
 			int elementalSpirit = getAbilityScore();

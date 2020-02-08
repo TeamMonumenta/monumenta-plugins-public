@@ -50,7 +50,7 @@ public class FinishingBlow extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
 			Iterator<Map.Entry<UUID, Counter>> iter = mMarkedMobs.entrySet().iterator();
 			while (iter.hasNext()) {
@@ -69,7 +69,7 @@ public class FinishingBlow extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		if (arrow.isCritical() && damagee instanceof LivingEntity) {
 			mMarkedMobs.put(damagee.getUniqueId(), new Counter(damagee));
 		}
@@ -77,7 +77,7 @@ public class FinishingBlow extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && mMarkedMobs.containsKey(event.getEntity().getUniqueId())) {
 			LivingEntity mob = (LivingEntity) event.getEntity();
 			mMarkedMobs.remove(mob.getUniqueId());

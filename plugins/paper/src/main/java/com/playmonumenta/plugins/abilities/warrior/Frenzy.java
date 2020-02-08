@@ -26,7 +26,7 @@ public class Frenzy extends Ability {
 	}
 
 	@Override
-	public void EntityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int frenzy = getAbilityScore();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!InventoryUtils.isPickaxeItem(mainHand)) {
@@ -53,7 +53,7 @@ public class Frenzy extends Ability {
 	}
 
 	@Override
-	public void PlayerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
+	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
 		if (InventoryUtils.isPickaxeItem(mainHand)) {
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.FAST_DIGGING);

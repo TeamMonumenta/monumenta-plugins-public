@@ -172,7 +172,7 @@ public class PlayerListener implements Listener {
 		}
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
-		AbilityManager.getManager().PlayerInteractEvent(player, action, item, mat);
+		AbilityManager.getManager().playerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides
@@ -517,7 +517,7 @@ public class PlayerListener implements Listener {
 			ItemStack mainHand = player.getInventory().getItemInMainHand();
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
-			AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
+			AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
@@ -578,7 +578,7 @@ public class PlayerListener implements Listener {
 
 
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
-		AbilityManager.getManager().PlayerDeathEvent(player, event);
+		AbilityManager.getManager().playerDeathEvent(player, event);
 
 		if (player.getHealth() > 0) {
 			return;
@@ -705,7 +705,7 @@ public class PlayerListener implements Listener {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
 				ItemStack offHand = player.getInventory().getItemInOffHand();
 
-				AbilityManager.getManager().PlayerItemHeldEvent(player, mainHand, offHand);
+				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 		}, 0);
@@ -735,7 +735,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
 		Player player = event.getPlayer();
-		AbilityManager.getManager().PlayerItemConsumeEvent(player, event);
+		AbilityManager.getManager().playerItemConsumeEvent(player, event);
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -787,7 +787,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		ItemStack item = event.getItem();
-		AbilityManager.getManager().PlayerItemDamageEvent(event.getPlayer(), event);
+		AbilityManager.getManager().playerItemDamageEvent(event.getPlayer(), event);
 
 		int damage = event.getDamage();
 		/*
@@ -1032,7 +1032,7 @@ public class PlayerListener implements Listener {
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
 					() -> {
-						AbilityManager.getManager().PlayerExtendedSneakEvent(player);
+						AbilityManager.getManager().playerExtendedSneakEvent(player);
 						player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
 					}, 20);
 
@@ -1072,7 +1072,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
-		AbilityManager.getManager().AbilityCastEvent(player, event);
+		AbilityManager.getManager().abilityCastEvent(player, event);
 	}
 
 	@EventHandler
@@ -1100,6 +1100,6 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
-		AbilityManager.getManager().PlayerAnimationEvent(player, event);
+		AbilityManager.getManager().playerAnimationEvent(player, event);
 	}
 }

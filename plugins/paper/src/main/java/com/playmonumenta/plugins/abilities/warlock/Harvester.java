@@ -19,7 +19,7 @@ public class Harvester extends Ability {
 	}
 
 	@Override
-	public void EntityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		int level = getAbilityScore();
 		World world = mPlayer.getWorld();
 		mPlugin.mTimers.updateCooldowns(mPlayer, 10);
@@ -30,7 +30,7 @@ public class Harvester extends Ability {
 	}
 
 	@Override
-	public double EntityDeathRadius() {
+	public double entityDeathRadius() {
 		return 8;
 	}
 

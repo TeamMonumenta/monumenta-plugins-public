@@ -56,7 +56,7 @@ public class ThuribleProcession extends Ability {
 	}
 
 	@Override
-	public boolean LivingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 
 		//If on cooldown, do not cast
 		if (!canCast()) {
@@ -83,7 +83,7 @@ public class ThuribleProcession extends Ability {
 	}
 
 	@Override
-	public void PeriodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (!canCast()) {
 			return;
 		}

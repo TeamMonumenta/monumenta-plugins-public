@@ -241,7 +241,7 @@ public class Plugin extends JavaPlugin {
 				if (fourHertz) {
 					for (Player player : mTrackingManager.mPlayers.getPlayers()) {
 						try {
-							mAbilityManager.PeriodicTrigger(player, fourHertz, twoHertz, oneHertz, mTicks);
+							mAbilityManager.periodicTrigger(player, fourHertz, twoHertz, oneHertz, mTicks);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

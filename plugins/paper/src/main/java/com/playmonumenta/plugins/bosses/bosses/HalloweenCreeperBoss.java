@@ -81,7 +81,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		// Reduce the damage but don't cancel the hit
 		event.setDamage(0);
-	};
+	}
 
 	@Override
 	public void unload() {

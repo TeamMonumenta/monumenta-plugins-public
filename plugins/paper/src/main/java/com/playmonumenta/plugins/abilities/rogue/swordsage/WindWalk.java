@@ -79,8 +79,8 @@ public class WindWalk extends Ability {
 		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 90, 0.25, 0.45, 0.25, 0.1);
 		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 		Vector direction = mPlayer.getLocation().getDirection();
-		Vector y_velocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
-		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(y_velocity));
+		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
+		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 		new BukkitRunnable() {
 			List<LivingEntity> mobsAlreadyHit = new ArrayList<LivingEntity>();
 			@Override
