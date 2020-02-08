@@ -340,29 +340,26 @@ public class InventoryUtils {
 				return;
 			}
 
-			//  Head Slot
 			if (equipment[i] == 0) {
+				// Head Slot
 				if (gear.getHelmet().getType() != Material.AIR) {
 					gear.setHelmet(new ItemStack(Material.AIR));
 					removedCount++;
 				}
-			}
-			//  Chestplate
-			else if (equipment[i] == 1) {
+			} else if (equipment[i] == 1) {
+				// Chestplate
 				if (gear.getChestplate().getType() != Material.AIR) {
 					gear.setChestplate(new ItemStack(Material.AIR));
 					removedCount++;
 				}
-			}
-			//  Legs
-			else if (equipment[i] == 2) {
+			} else if (equipment[i] == 2) {
+				// Legs
 				if (gear.getLeggings().getType() != Material.AIR) {
 					gear.setLeggings(new ItemStack(Material.AIR));
 					removedCount++;
 				}
-			}
-			//  Boots
-			else if (equipment[i] == 3) {
+			} else if (equipment[i] == 3) {
+				// Boots
 				if (gear.getBoots().getType() != Material.AIR) {
 					gear.setBoots(new ItemStack(Material.AIR));
 					removedCount++;

@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
-public class TwoHanded implements BaseEnchantment{
+public class TwoHanded implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.RED + "Two Handed";
 
 	@Override

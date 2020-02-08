@@ -65,7 +65,7 @@ public class Exorcism  extends Ability {
 				} else if (effect.getType().equals(PotionEffectType.FAST_DIGGING)) {
 					debuffs.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
-					debuffs.add(new PotionEffect(PotionEffectType.UNLUCK, EXORCISM_DURATION, (effect.getAmplifier()*2)+1));
+					debuffs.add(new PotionEffect(PotionEffectType.UNLUCK, EXORCISM_DURATION, (effect.getAmplifier()*2) + 1));
 				} else if (effect.getType().equals(PotionEffectType.FIRE_RESISTANCE)) {
 					onFire = true;
 				}

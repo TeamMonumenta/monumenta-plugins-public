@@ -37,6 +37,6 @@ public class GraySummoned extends BossAbilityGroup {
 
 			}
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
-		};
+		}
 	}
 }

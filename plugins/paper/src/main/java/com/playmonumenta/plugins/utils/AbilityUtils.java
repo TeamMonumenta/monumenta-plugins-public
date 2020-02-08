@@ -197,9 +197,9 @@ public class AbilityUtils {
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, POTION_REFUNDED_METAKEY)) {
 			ItemStack item = potion.getItem();
 			if (mainHand != null && mainHand.isSimilar(item)) {
-				mainHand.setAmount(mainHand.getAmount()+1);
+				mainHand.setAmount(mainHand.getAmount() + 1);
 			} else if (offHand != null && offHand.isSimilar(item)) {
-				offHand.setAmount(offHand.getAmount()+1);
+				offHand.setAmount(offHand.getAmount() + 1);
 			}
 		}
 	}

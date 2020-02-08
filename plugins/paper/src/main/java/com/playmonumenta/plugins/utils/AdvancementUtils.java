@@ -25,7 +25,7 @@ public class AdvancementUtils {
 			AdvancementProgress progress = player.getAdvancementProgress(advancement);
 			JsonElement awardedCriteria = gson.toJsonTree(progress.getAwardedCriteria(), progress.getAwardedCriteria().getClass());
 			if (awardedCriteria.isJsonArray()) {
-				returnData.add(advancement.getKey().getNamespace()+":"+advancement.getKey().getKey(), awardedCriteria);
+				returnData.add(advancement.getKey().getNamespace() + ":" + advancement.getKey().getKey(), awardedCriteria);
 			}
 		}
 		return returnData;

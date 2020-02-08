@@ -108,7 +108,7 @@ public class DeathsTouch extends Ability {
 						@Override
 						public void run() {
 							t++;
-							if(target != null) {
+							if (target != null) {
 								mPlayer.spawnParticle(Particle.SPELL_MOB, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
 								mPlayer.spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
 							}

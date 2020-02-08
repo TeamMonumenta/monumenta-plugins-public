@@ -36,9 +36,8 @@ public class CooldownTimers {
 			if (ability == null) {
 				return false;
 			}
-		}
-		//  No player, means no cooldown.
-		else {
+		} else {
+			// No player, means no cooldown.
 			return false;
 		}
 

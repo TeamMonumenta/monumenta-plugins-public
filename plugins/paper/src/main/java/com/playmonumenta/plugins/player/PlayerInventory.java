@@ -189,9 +189,10 @@ public class PlayerInventory {
 			return; //Only ever updates on InventoryCloseEvent if shift clicks have been made
 		} else {
 
+			// Sets mHasShiftClicked to false after updating entire inventory
 			if (mHasShiftClicked && event instanceof InventoryCloseEvent) {
 				mHasShiftClicked = false;
-			}//Sets mHasShiftClicked to false after updating entire inventory
+			}
 
 			// Swap current and previous lists
 			mPreviousProperties = new HashMap<BaseEnchantment, Integer>();

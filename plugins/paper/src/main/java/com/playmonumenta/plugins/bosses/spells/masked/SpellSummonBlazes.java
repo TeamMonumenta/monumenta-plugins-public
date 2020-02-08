@@ -80,7 +80,7 @@ public class SpellSummonBlazes extends Spell {
 					}
 
 					mCountdown = 2; // Spawn again 2 * PERIOD ticks later
-				};
+				}
 			}
 		};
 

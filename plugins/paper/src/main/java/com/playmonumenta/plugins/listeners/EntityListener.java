@@ -486,8 +486,8 @@ public class EntityListener implements Listener {
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
-		// If hurt by a player in adventure mode we want to prevent the break;
 		if (damager instanceof Player) {
+			// If hurt by a player in adventure mode we want to prevent the break;
 			Player player = (Player)damager;
 
 			/* Don't let the player interact with the world when transferring */
@@ -499,9 +499,8 @@ public class EntityListener implements Listener {
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
 			}
-		}
-		// If hurt by an arrow from a player in adventure mode.
-		else if (damager instanceof Arrow || damager instanceof TippedArrow) {
+		} else if (damager instanceof Arrow || damager instanceof TippedArrow) {
+			// If hurt by an arrow from a player in adventure mode.
 			Arrow arrow = (Arrow)damager;
 
 			ProjectileSource source = arrow.getShooter();

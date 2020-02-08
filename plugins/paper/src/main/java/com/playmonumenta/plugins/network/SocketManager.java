@@ -46,13 +46,13 @@ public class SocketManager {
 	public SocketManager(Plugin plugin, String host, int port, String shardName) {
 		mPlugin = plugin;
 		mName = shardName;
-		mRunnable = new BukkitRunnable(){
+		mRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				connect(host, port);
 			}
 		};
-		mHeart = new BukkitRunnable(){
+		mHeart = new BukkitRunnable() {
 			@Override
 			public void run() {
 				heartbeat();
@@ -107,11 +107,11 @@ public class SocketManager {
 
 	public boolean sendPacket(BasePacket packet) {
 		if (mConnecting) {
-			mPlugin.getLogger().warning("Unable to send packet to "+packet.getDestination()+" : "+packet.getOperation()+" - Socket is still connecting");
+			mPlugin.getLogger().warning("Unable to send packet to " + packet.getDestination() + " : " + packet.getOperation() + " - Socket is still connecting");
 			return false;
 		}
 
-		mPlugin.getLogger().fine("Sending packet to "+packet.getDestination()+" : "+packet.getOperation());
+		mPlugin.getLogger().fine("Sending packet to " + packet.getDestination() + " : " + packet.getOperation());
 		JsonObject raw = packet.toJson();
 		try {
 			Streams.write(raw, mOutput);
@@ -140,14 +140,14 @@ public class SocketManager {
 		int attempts = 0;
 		while (mSocketEnabled) {
 			mConnecting = true;
-			mPlugin.getLogger().fine("Attempt "+attempts+" connecting to socket on "+address+":"+port);
+			mPlugin.getLogger().fine("Attempt " + attempts + " connecting to socket on " + address + ":" + port);
 			try {
 				mSocket = new Socket(address, port);
 				mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
 				mOutput = new JsonWriter(new OutputStreamWriter(mSocket.getOutputStream()));
 				mInput.setLenient(true); //  Both streams need to be lenient for the sockets to work.
 				mOutput.setLenient(true); // Even if the JSON is perfect, the socket will fail if not lenient.
-				mPlugin.getLogger().info("Connected to socket after "+attempts+" attempts");
+				mPlugin.getLogger().info("Connected to socket after " + attempts + " attempts");
 				attempts = 0;
 				mConnecting = false;
 				sendPacket(new BungeeHandshakePacket(mName));

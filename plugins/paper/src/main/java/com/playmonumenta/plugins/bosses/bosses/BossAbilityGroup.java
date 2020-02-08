@@ -163,7 +163,7 @@ public abstract class BossAbilityGroup {
 		mTaskIDactive = scheduler.scheduleSyncRepeatingTask(plugin, active, spellDelay, 2L);
 	}
 
-	public void forceCastSpell(Class<?> spell) {
+	public void forceCastSpell(Class<? extends Spell> spell) {
 		if (mActiveSpells != null) {
 			mNextActiveTimer = mActiveSpells.forceCastSpell(spell);
 			Spell sp = mActiveSpells.getLastCastedSpell();

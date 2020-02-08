@@ -43,7 +43,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
 					List <Player> targets = PlayerUtils.playersInRange(boss.getLocation(), PLAYER_RANGE);
 					Collections.shuffle(targets);
-					switch(targets.size()) {
+					switch (targets.size()) {
 					case 0:
 					case 1:
 					case 2:

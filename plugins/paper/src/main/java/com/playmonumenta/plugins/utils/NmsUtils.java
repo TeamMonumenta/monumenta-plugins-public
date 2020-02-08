@@ -47,7 +47,7 @@ public class NmsUtils {
 
 	public static ParsedCommandWrapper parseCommand(String cmd) throws Exception {
 		//Need to make sure command does not have the / at the start - this breaks the Parser
-		if(cmd.charAt(0) == '/') {
+		if (cmd.charAt(0) == '/') {
 			cmd = cmd.substring(1);
 		}
 

@@ -36,7 +36,7 @@ public class DailyReset {
 	}
 
 	private static int getDailyVersion() {
-		return (int)((System.currentTimeMillis()-25200000) / 86400000);
+		return (int)((System.currentTimeMillis() - 25200000) / 86400000);
 	}
 
 	private static void updateApartments(Plugin plugin) {

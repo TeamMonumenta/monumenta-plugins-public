@@ -469,8 +469,8 @@ public class PlayerListener implements Listener {
 		if (event.getWhoClicked() instanceof Player && event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor())) {
 			event.setCancelled(true);
 		} else if (event.getNewItems() != null) {
-			for(Map.Entry<Integer, ItemStack> iter : event.getNewItems().entrySet()) {
-				if(CurseOfEphemerality.isEphemeral(iter.getValue())) {
+			for (Map.Entry<Integer, ItemStack> iter : event.getNewItems().entrySet()) {
+				if (CurseOfEphemerality.isEphemeral(iter.getValue())) {
 					event.setCancelled(true);
 					return;
 				}

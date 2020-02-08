@@ -45,7 +45,7 @@ public class CreateGuild {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
-	                        String guildName, String guildTag, Collection<Player> founders) throws CommandSyntaxException{
+	                        String guildName, String guildTag, Collection<Player> founders) throws CommandSyntaxException {
 
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);

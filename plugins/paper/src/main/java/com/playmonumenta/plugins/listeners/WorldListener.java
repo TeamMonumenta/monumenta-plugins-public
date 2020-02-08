@@ -186,7 +186,7 @@ public class WorldListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if(event.getTargetEntity() instanceof Player) {
+		if (event.getTargetEntity() instanceof Player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getTargetEntity(), event);
 		}
 	}

@@ -12,10 +12,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
-public class Sustenance implements BaseEnchantment{
+public class Sustenance implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Sustenance";
 
 	@Override

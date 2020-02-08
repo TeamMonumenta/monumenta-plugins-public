@@ -208,7 +208,7 @@ public class SpellBaseCharge extends Spell {
 						Block block = endLoc.clone().add(x, y, z).getBlock();
 						// If it overlaps with any, move it back to the last safe location
 						// and terminate the charge before the block.
-						if(block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
+						if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
 							endLoc.subtract(baseVect);
 							cancel = true;
 						}

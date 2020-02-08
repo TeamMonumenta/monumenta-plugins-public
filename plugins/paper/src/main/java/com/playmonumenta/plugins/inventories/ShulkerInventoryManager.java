@@ -83,7 +83,7 @@ public class ShulkerInventoryManager {
 				}
 			}
 			player.closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);
-			shulkerBox.setLock("ShulkerShortcut:"+player.getUniqueId());
+			shulkerBox.setLock("ShulkerShortcut:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
 			shulkerItem.setItemMeta(shulkerMeta);
 			ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, shulkerItem);
@@ -142,11 +142,11 @@ public class ShulkerInventoryManager {
 					}
 				} else {
 					player.sendMessage(ERROR_SHULKER_LOCKED);
-					player.sendMessage("[DEBUG] Shulker Lock: "+lock);
+					player.sendMessage("[DEBUG] Shulker Lock: " + lock);
 					return -2;
 				}
 			}
-			shulkerBox.setLock("ShulkerDeposit:"+player.getUniqueId());
+			shulkerBox.setLock("ShulkerDeposit:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
 			shulkerItem.setItemMeta(shulkerMeta);
 			ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, shulkerItem, 1);
