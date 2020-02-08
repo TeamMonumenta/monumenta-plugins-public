@@ -386,8 +386,6 @@ public class ItemUtils {
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
 		if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.DESTROY;
-		} else if (item.containsEnchantment(Enchantment.BINDING_CURSE)) {
-			return ItemDeathResult.LOSE;
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:
@@ -397,7 +395,7 @@ public class ItemUtils {
 			case ONE:
 			case TWO:
 			case THREE:
-				if (Plugin.getInstance().mServerProperties.getKeepLowTierInventory()) {
+				if (Plugin.getInstance().mServerProperties.getKeepLowTierInventory() && !(item.containsEnchantment(Enchantment.BINDING_CURSE))) {
 					return ItemDeathResult.KEEP_EQUIPPED;
 				} else {
 					return ItemDeathResult.LOSE;
