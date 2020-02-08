@@ -101,7 +101,7 @@ public class EerieEminence extends Ability {
 				if (getAbilityScore() > 1) {
 					for (Player player : PlayerUtils.playersInRange(mPlayer, radius, true)) {
 						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-						                                 new PotionEffect(entry.getBuff(), EERIE_EFFECT_LINGER_DURATION, 0, true, false));
+						                                 new PotionEffect(entry.getBuff(), EERIE_EFFECT_LINGER_DURATION, 0, true, true));
 					}
 				}
 				// 5 ticks because it triggers on four hertz.
