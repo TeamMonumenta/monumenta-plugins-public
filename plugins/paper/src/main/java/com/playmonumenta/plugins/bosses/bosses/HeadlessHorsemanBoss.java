@@ -215,6 +215,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	}
 
 	private boolean mAggro = true;
+
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		if (mAggro) {
@@ -310,13 +311,13 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		int hp_del = 2448;
-		int armor = (int)(Math.sqrt(player_count * 2) - 1);
-		while (player_count > 0) {
-			bossTargetHp = bossTargetHp + hp_del;
-			hp_del = hp_del / 2 + 32;
-			player_count--;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		int hpDelta = 2448;
+		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
+		while (playerCount > 0) {
+			bossTargetHp = bossTargetHp + hpDelta;
+			hpDelta = hpDelta / 2 + 32;
+			playerCount--;
 		}
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);

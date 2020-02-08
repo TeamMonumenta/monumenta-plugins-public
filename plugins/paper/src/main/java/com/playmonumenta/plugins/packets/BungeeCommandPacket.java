@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.Plugin;
  */
 public class BungeeCommandPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.Command";
+
 	/**
 	 * Create a new packet containing a command.
 	 * This command will be sent only to bungee.

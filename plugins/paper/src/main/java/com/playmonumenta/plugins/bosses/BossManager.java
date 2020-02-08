@@ -147,6 +147,7 @@ public class BossManager implements Listener {
 	static final Map<String, StatelessBossConstructor> mStatelessBosses;
 	static final Map<String, StatefulBossConstructor> mStatefulBosses;
 	static final Map<String, BossDeserializer> mBossDeserializers;
+
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();

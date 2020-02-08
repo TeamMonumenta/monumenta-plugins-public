@@ -38,8 +38,8 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
-					int pot_pow = (int)(power * ((radius - distance) / radius));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, pot_pow));
+					int potionPower = (int)(power * ((radius - distance) / radius));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, potionPower));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30, 1));
 				}
 			}

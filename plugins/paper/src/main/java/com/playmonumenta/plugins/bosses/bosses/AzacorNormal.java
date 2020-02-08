@@ -107,16 +107,16 @@ public class AzacorNormal extends BossAbilityGroup {
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		events.put(100, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?\",\"color\":\"dark_red\"}]");
-			if (player_count >= 3) {
+			if (playerCount >= 3) {
 				randomMinion("");
 			}
 		});
 		events.put(50, (mBoss) -> {
 			randomMinion("tellraw @s [\"\",{\"text\":\"Foolish mortals! Your efforts mean nothing. You cannot stop me. You will fall, just like the rest.\",\"color\":\"dark_red\"}]");
-			if (player_count >= 3) {
+			if (playerCount >= 3) {
 				randomMinion("");
 			}
 		});
@@ -133,13 +133,13 @@ public class AzacorNormal extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hp_del = 512;
-		int armor = (int)(Math.sqrt(player_count * 2) - 1);
-		while (player_count > 0) {
-			bossTargetHp = bossTargetHp + hp_del;
-			hp_del = hp_del / 2;
-			player_count--;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		int hpDelta = 512;
+		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
+		while (playerCount > 0) {
+			bossTargetHp = bossTargetHp + hpDelta;
+			hpDelta = hpDelta / 2;
+			playerCount--;
 		}
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);

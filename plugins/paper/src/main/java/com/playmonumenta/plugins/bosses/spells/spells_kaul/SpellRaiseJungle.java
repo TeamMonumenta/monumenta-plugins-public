@@ -50,6 +50,7 @@ public class SpellRaiseJungle extends Spell {
 
 	private int mCooldown;
 	private boolean onCooldown = false;
+
 	public SpellRaiseJungle(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -205,7 +206,7 @@ public class SpellRaiseJungle extends Spell {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
 			mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA);
 		}
-	};
+	}
 
 	@Override
 	public boolean canRun() {

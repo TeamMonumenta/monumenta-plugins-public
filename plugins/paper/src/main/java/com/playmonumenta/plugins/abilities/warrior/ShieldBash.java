@@ -41,26 +41,30 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_RANGE = 4;
 
 	public static class PlayerWithShieldBash {
-		public Player player;
-		public boolean isShielding = false;
-		public boolean wasShielding = false;
+		public Player mPlayer;
+		private boolean mIsShielding = false;
+		private boolean mWasShielding = false;
+
 		public PlayerWithShieldBash(Player player) {
-			this.player = player;
+			mPlayer = player;
 		}
+
 		public void updateStatus() {
-			ItemStack offHand = player.getInventory().getItemInOffHand();
-			ItemStack mainHand = player.getInventory().getItemInMainHand();
-			wasShielding = isShielding;
+			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			mWasShielding = mIsShielding;
 			// Check for no bows because drawing them counts as raising your hand
-			isShielding = (player.isBlocking() || player.isHandRaised())
-			              && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
-			              && (offHand.getType() != Material.BOW || mainHand.getType() != Material.BOW);
+			mIsShielding = (mPlayer.isBlocking() || mPlayer.isHandRaised())
+			               && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
+			               && (offHand.getType() != Material.BOW || mainHand.getType() != Material.BOW);
 		}
+
 		public boolean startedShielding() {
-			return isShielding && !wasShielding;
+			return mIsShielding && !mWasShielding;
 		}
+
 		public boolean stoppedShielding() {
-			return !isShielding && wasShielding;
+			return !mIsShielding && mWasShielding;
 		}
 	}
 
@@ -91,7 +95,7 @@ public class ShieldBash extends Ability {
 
 						p.updateStatus();
 
-						if (AbilityManager.getManager().getPlayerAbility(p.player, ShieldBash.class) == null) {
+						if (AbilityManager.getManager().getPlayerAbility(p.mPlayer, ShieldBash.class) == null) {
 							iter.remove();
 						}
 					}

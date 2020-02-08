@@ -24,6 +24,7 @@ spans out 6 blocks, knocking back all players, dealing 18 damage, and applying S
 public class SpellEarthenRupture extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
+
 	public SpellEarthenRupture(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;

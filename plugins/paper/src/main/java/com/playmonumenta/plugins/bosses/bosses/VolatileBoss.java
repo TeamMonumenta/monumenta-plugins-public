@@ -36,5 +36,5 @@ public class VolatileBoss extends BossAbilityGroup {
 		if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION) && !(event.getDamager() instanceof Firework)) {
 			mBoss.explode();
 		}
-	};
+	}
 }

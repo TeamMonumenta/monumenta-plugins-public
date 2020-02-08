@@ -21,6 +21,7 @@ public class SpellPurgeNegatives extends Spell {
 		PotionEffectType.LEVITATION,
 		PotionEffectType.UNLUCK
 	};
+
 	public SpellPurgeNegatives(LivingEntity boss, int timer) {
 		mBoss = boss;
 		mTimer = timer;

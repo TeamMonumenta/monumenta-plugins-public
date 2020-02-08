@@ -70,16 +70,16 @@ public class SpellAxtalTntThrow extends Spell {
 
 	private void launch() {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_launch = new Runnable() {
+		Runnable singleLaunch = new Runnable() {
 			@Override
 			public void run() {
 				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100);
 				if (plist.size() >= 1) {
-					Player Target = plist.get(mRand.nextInt(plist.size()));
+					Player target = plist.get(mRand.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation();
 					try {
 						Entity tnt = EntityUtils.getSummonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");
-						Location pLoc = Target.getLocation();
+						Location pLoc = target.getLocation();
 						Location tLoc = tnt.getLocation();
 						Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
 						vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
@@ -91,7 +91,7 @@ public class SpellAxtalTntThrow extends Spell {
 			}
 		};
 		for (int i = 0; i < mCount; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, single_launch, 40 + i * mCooldown);
+			scheduler.scheduleSyncDelayedTask(mPlugin, singleLaunch, 40 + i * mCooldown);
 		}
 	}
 }

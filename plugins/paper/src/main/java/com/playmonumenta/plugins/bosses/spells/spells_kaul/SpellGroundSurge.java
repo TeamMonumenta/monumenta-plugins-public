@@ -31,6 +31,7 @@ public class SpellGroundSurge extends Spell {
 	private LivingEntity mBoss;
 	private double mRange;
 	private final Random random = new Random();
+
 	public SpellGroundSurge(Plugin plugin, LivingEntity boss, double range) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -142,56 +143,56 @@ public class SpellGroundSurge extends Spell {
 										new BukkitRunnable() {
 											Player _tPlayer = tPlayer;
 											BoundingBox box = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
-											int j = 0;
-											int hits = 0;
-											List<UUID> hit = new ArrayList<UUID>();
+											int mTicks = 0;
+											int mHits = 0;
+											List<UUID> mHit = new ArrayList<UUID>();
 											@Override
 											public void run() {
-												j++;
-												Location _bLoc = box.getCenter().toLocation(world);
-												Vector dir = LocationUtils.getDirectionTo(_tPlayer.getLocation(), _bLoc).setY(0).normalize();
+												mTicks++;
+												Location innerBoxLoc = box.getCenter().toLocation(world);
+												Vector dir = LocationUtils.getDirectionTo(_tPlayer.getLocation(), innerBoxLoc).setY(0).normalize();
 												box.shift(dir.clone().multiply(0.7));
-												if (_bLoc.getBlock().getType().isSolid()) {
-													_bLoc.add(0, 1, 0);
-													if (_bLoc.getBlock().getType().isSolid()) {
+												if (innerBoxLoc.getBlock().getType().isSolid()) {
+													innerBoxLoc.add(0, 1, 0);
+													if (innerBoxLoc.getBlock().getType().isSolid()) {
 														this.cancel();
-														_bLoc.subtract(0, 1, 0);
+														innerBoxLoc.subtract(0, 1, 0);
 													}
 												}
-												if (!_bLoc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
-													_bLoc.subtract(0, 1, 0);
-													if (!_bLoc.getBlock().getType().isSolid()) {
-														_bLoc.subtract(0, 1, 0);
-														if (!_bLoc.getBlock().getType().isSolid()) {
+												if (!innerBoxLoc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
+													innerBoxLoc.subtract(0, 1, 0);
+													if (!innerBoxLoc.getBlock().getType().isSolid()) {
+														innerBoxLoc.subtract(0, 1, 0);
+														if (!innerBoxLoc.getBlock().getType().isSolid()) {
 															this.cancel();
 														}
 													}
 												}
-												_bLoc.add(0, 1, 0);
-												world.playSound(_bLoc, Sound.BLOCK_STONE_BREAK, 0f, 1);
+												innerBoxLoc.add(0, 1, 0);
+												world.playSound(innerBoxLoc, Sound.BLOCK_STONE_BREAK, 0f, 1);
 												//Have particles with collision show only for the player who's targetted.
 												//This is to prevent lag from the numerous other surges that have these same
 												//Particles
-												player.spawnParticle(Particle.BLOCK_DUST, _bLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
-												world.spawnParticle(Particle.FLAME, _bLoc, 6, 0.2, 0.2, 0.2, 0.075);
-												player.spawnParticle(Particle.LAVA, _bLoc, 1, 0.2, 0.2, 0.2, 0.25);
+												player.spawnParticle(Particle.BLOCK_DUST, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
+												world.spawnParticle(Particle.FLAME, innerBoxLoc, 6, 0.2, 0.2, 0.2, 0.075);
+												player.spawnParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25);
 												for (Player _player : players) {
 													if (_player.getBoundingBox().overlaps(box)
 															&& !_player.getUniqueId().equals(player.getUniqueId())
-															&& !hit.contains(_player.getUniqueId())) {
-														hit.add(_player.getUniqueId());
+															&& !mHit.contains(_player.getUniqueId())) {
+														mHit.add(_player.getUniqueId());
 														BossUtils.bossDamage(mBoss, _player, 18);
 														_player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(mBoss.getLocation(), _player, 0.175f, 0.85f);
-														world.spawnParticle(Particle.SMOKE_LARGE, _bLoc, 10, 0, 0, 0, 0.2);
-														world.spawnParticle(Particle.FLAME, _bLoc, 50, 0, 0, 0, 0.25);
-														world.playSound(_bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
-														hits++;
-														j = 0;
-														if (hits < players.size() && hits <= 2) {
+														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);
+														world.spawnParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25);
+														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
+														mHits++;
+														mTicks = 0;
+														if (mHits < players.size() && mHits <= 2) {
 															int attempts = 0;
 															_tPlayer = players.get(random.nextInt(players.size()));
-															while (hit.contains(_tPlayer.getUniqueId())) {
+															while (mHit.contains(_tPlayer.getUniqueId())) {
 																//A rare case can occur where the loop has gone through all of the possible
 																//players, but they have been hit. Add an attempt integer to make sure that
 																//it does not cause an infinite loop.
@@ -208,7 +209,7 @@ public class SpellGroundSurge extends Spell {
 														}
 													}
 												}
-												if (j >= 20 * 1.25) {
+												if (mTicks >= 20 * 1.25) {
 													this.cancel();
 												}
 											}

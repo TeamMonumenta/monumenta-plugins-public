@@ -16,6 +16,7 @@ public class SpellSkyFlare extends Spell {
 	private LivingEntity mBoss;
 	private Location mFloor;
 	private int t;
+
 	public SpellSkyFlare(LivingEntity boss) {
 		mBoss = boss;
 		mFloor = mBoss.getLocation().subtract(0, 1, 0);
@@ -43,7 +44,6 @@ public class SpellSkyFlare extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

@@ -69,7 +69,7 @@ public class SpellKnockAway extends Spell {
 	private void animation(Location loc) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-		Runnable anim_loop = new Runnable() {
+		Runnable animLoop = new Runnable() {
 			@Override
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
@@ -80,7 +80,7 @@ public class SpellKnockAway extends Spell {
 			}
 		};
 
-		Runnable anim_loop2 = new Runnable() {
+		Runnable animLoop2 = new Runnable() {
 			@Override
 			public void run() {
 				Location lloc = mLauncher.getLocation();
@@ -106,10 +106,10 @@ public class SpellKnockAway extends Spell {
 		};
 
 		for (int i = 0; i < mTime; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i);
+			scheduler.scheduleSyncDelayedTask(mPlugin, animLoop, i);
 		}
 		for (int i = 0; i < 6; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop2, i + mTime);
+			scheduler.scheduleSyncDelayedTask(mPlugin, animLoop2, i + mTime);
 		}
 	}
 }

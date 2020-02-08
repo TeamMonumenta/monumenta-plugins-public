@@ -35,6 +35,7 @@ public class SpellHallowsEnd extends Spell {
 	private boolean mHit;
 	private boolean mCooldown;
 	private HeadlessHorsemanBoss mHorseman;
+
 	public SpellHallowsEnd(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;

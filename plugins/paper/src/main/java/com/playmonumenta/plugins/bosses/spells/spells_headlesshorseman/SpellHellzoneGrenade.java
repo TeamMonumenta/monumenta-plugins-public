@@ -39,6 +39,7 @@ public class SpellHellzoneGrenade extends Spell {
 	private double mRange;
 	private Location mCenter;
 	private HeadlessHorsemanBoss mHorseman;
+
 	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;

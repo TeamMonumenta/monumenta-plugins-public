@@ -40,6 +40,7 @@ public class HandOfLight extends Ability {
 		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
+
 	@Override
 	public void cast(Action action) {
 		int healing = getAbilityScore();

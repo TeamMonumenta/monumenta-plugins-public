@@ -1,4 +1,5 @@
 package com.playmonumenta.plugins.bosses.events;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

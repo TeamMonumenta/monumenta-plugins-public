@@ -83,7 +83,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 				}
 			}
 		}
-	};
+	}
 
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		event.getAffectedEntities().remove(mBoss);

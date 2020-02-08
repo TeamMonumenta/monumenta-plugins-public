@@ -42,6 +42,7 @@ public class SpellLightningStrike extends Spell {
 	private Random mRandom = new Random();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
+
 	public SpellLightningStrike(Plugin plugin, LivingEntity boss, Location loc, double range, int timer, int divisor) {
 		mPlugin = plugin;
 		mBoss = boss;

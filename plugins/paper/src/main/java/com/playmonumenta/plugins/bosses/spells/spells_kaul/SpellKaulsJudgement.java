@@ -270,7 +270,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void EntityDamageEvent(EntityDamageEvent event) {
+	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 
 		if (damagee instanceof Player) {
@@ -288,7 +288,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void PlayerQuitEvent(PlayerQuitEvent event) {
+	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 
 		if (mOrigPlayerLocs.containsKey(player)) {

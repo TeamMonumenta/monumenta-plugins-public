@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
  */
 public class ShardCommandPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Shard.Command";
+
 	/**
 	 * Create a new packet containing a command.
 	 * This command will be sent to a single shard

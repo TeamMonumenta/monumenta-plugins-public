@@ -25,11 +25,11 @@ import com.playmonumenta.plugins.commands.ClaimRaffle;
 public class BungeeCheckRaffleEligibilityPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.CheckRaffleEligibility";
 
-	public BungeeCheckRaffleEligibilityPacket(UUID playerUUID, boolean claimReward, boolean add_back) {
+	public BungeeCheckRaffleEligibilityPacket(UUID playerUUID, boolean claimReward, boolean addBack) {
 		super(null, PacketOperation, new JsonObject());
 		mData.addProperty("playerUUID", playerUUID.toString());
 		mData.addProperty("claimReward", claimReward);
-		mData.addProperty("eligible", add_back);
+		mData.addProperty("eligible", addBack);
 	}
 
 	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {

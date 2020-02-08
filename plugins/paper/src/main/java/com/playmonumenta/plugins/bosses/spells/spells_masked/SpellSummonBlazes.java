@@ -49,7 +49,7 @@ public class SpellSummonBlazes extends Spell {
 			final Location mLoc = mLauncher.getLocation();
 
 			int mCountdown = DEFAULT_COUNTDOWN;
-			int mCount = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(mLoc, Masked.DETECTION_RANGE).size());;
+			int mCount = Math.min(MAX_BLAZES_PER_SPAWN, PlayerUtils.playersInRange(mLoc, Masked.DETECTION_RANGE).size());
 			int mWavesLeft = SPAWN_CYCLES;
 
 			@Override

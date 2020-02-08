@@ -225,7 +225,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 		}
 
 		for (int t = 0; t < 3; t++) {
-			int summon_radius = 5;
+			int summonRadius = 5;
 
 			final String mobdata;
 			switch (t) {
@@ -244,7 +244,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 			}
 
 			new BukkitRunnable() {
-				Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
+				Location loc = mBoss.getLocation().add(rand.nextInt(summonRadius), 1.5, rand.nextInt(summonRadius));
 				double rotation = 0;
 				double radius = 4;
 				@Override
@@ -319,13 +319,13 @@ public class SwordsageRichter extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int bossTargetHp = 0;
-		int player_count = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hp_del = 650;
-		int armor = (int)(Math.sqrt(player_count * 2) - 1);
-		while (player_count > 0) {
-			bossTargetHp = bossTargetHp + hp_del;
-			hp_del = hp_del / 2;
-			player_count--;
+		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		int hpDelta = 650;
+		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
+		while (playerCount > 0) {
+			bossTargetHp = bossTargetHp + hpDelta;
+			hpDelta = hpDelta / 2;
+			playerCount--;
 		}
 		mBoss.addScoreboardTag("Boss");
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);

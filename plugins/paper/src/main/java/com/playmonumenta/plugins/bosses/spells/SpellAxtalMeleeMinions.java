@@ -55,11 +55,11 @@ public class SpellAxtalMeleeMinions extends Spell {
 	public void spawn() {
 		Location loc = mLauncher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable single_spawn = new Runnable() {
+		Runnable singleSpawn = new Runnable() {
 			@Override
 			public void run() {
-				int nb_to_spawn = mCount + (mRand.nextInt(2 * mScope) - mScope);
-				for (int j = 0; j < nb_to_spawn; j++) {
+				int numberToSpawn = mCount + (mRand.nextInt(2 * mScope) - mScope);
+				for (int j = 0; j < numberToSpawn; j++) {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"\\\"Soul\\\"\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skeleton_skull\",Count:1b}],Attributes:[{Name:generic.maxHealth,Base:11},{Name:generic.attackDamage,Base:6}],Health:11.0f,DeathLootTable:\"minecraft:empty\",Team:\"Tlax\",ActiveEffects:[{Id:14b,Amplifier:1b,Duration:999999},{Id:20b,Amplifier:0b,Duration:999999}],Silent:1b}");
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
@@ -72,14 +72,14 @@ public class SpellAxtalMeleeMinions extends Spell {
 			}
 		};
 		for (int i = 0; i < mRepeats; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, single_spawn, 40 + 15 * i);
+			scheduler.scheduleSyncDelayedTask(mPlugin, singleSpawn, 40 + 15 * i);
 		}
 	}
 
 	public void animation() {
 		Location loc = mLauncher.getLocation();
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable anim_loop = new Runnable() {
+		Runnable animLoop = new Runnable() {
 			@Override
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
@@ -89,7 +89,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 			}
 		};
 		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, anim_loop, i * 3);
+			scheduler.scheduleSyncDelayedTask(mPlugin, animLoop, i * 3);
 		}
 	}
 }

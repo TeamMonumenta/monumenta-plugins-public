@@ -17,10 +17,10 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 public class AuraSmallFatigueBoss extends BossAbilityGroup {
 	public static final String identityTag = "aura_fatigue";
 	public static final int detectionRange = 40;
+	private static final Particle.DustOptions FATIGUE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 232, 160), 2f);
 
 	LivingEntity mBoss;
 
-	private static final Particle.DustOptions FATIGUE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 232, 160), 2f);
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new AuraSmallFatigueBoss(plugin, boss);
 	}

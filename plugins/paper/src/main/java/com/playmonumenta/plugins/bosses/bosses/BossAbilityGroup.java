@@ -240,14 +240,14 @@ public abstract class BossAbilityGroup {
 	 *
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
-	public void init() {};
+	public void init() {}
 
 	/*
 	 * Called when the boss dies
 	 *
 	 * Useful to use setblock or a command to trigger post-fight logic
 	 */
-	public void death() {};
+	public void death() {}
 
 	/*
 	 * Called when the mob is unloading and we need to save its metadata
