@@ -90,7 +90,7 @@ public class TransferServer extends GenericCommand {
 		}
 	}
 
-	private static void sendPlayer(Plugin plugin, CommandSender sender, Collection<Player>players,
+	private static void sendPlayer(Plugin plugin, CommandSender sender, Collection<Player> players,
 	                               String server, boolean sendPlayerStuff) {
 		if (plugin.mServerProperties == null) {
 			return;

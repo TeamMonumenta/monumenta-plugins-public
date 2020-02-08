@@ -35,7 +35,7 @@ public class LuckPermsIntegration {
 				Group group = lp.getGroup(userNode.getGroupName());
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
-						Entry<String, String>meta = groupChildNode.getMeta();
+						Entry<String, String> meta = groupChildNode.getMeta();
 						if (meta.getKey().equals("guildname")) {
 							return group;
 						}
@@ -54,7 +54,7 @@ public class LuckPermsIntegration {
 
 		for (Node groupChildNode : group.getNodes().values()) {
 			if (groupChildNode.isMeta()) {
-				Entry<String, String>meta = groupChildNode.getMeta();
+				Entry<String, String> meta = groupChildNode.getMeta();
 				if (meta.getKey().equals("guildname")) {
 					return meta.getValue();
 				}
@@ -68,7 +68,7 @@ public class LuckPermsIntegration {
 		// Remove all the other guildtp meta nodes
 		for (Node groupChildNode : group.getNodes().values()) {
 			if (groupChildNode.isMeta()) {
-				Entry<String, String>meta = groupChildNode.getMeta();
+				Entry<String, String> meta = groupChildNode.getMeta();
 				if (meta.getKey().equals("guildtp")) {
 					group.unsetPermission(groupChildNode);
 				}
@@ -91,7 +91,7 @@ public class LuckPermsIntegration {
 		try {
 			for (Node groupChildNode : group.getNodes().values()) {
 				if (groupChildNode.isMeta()) {
-					Entry<String, String>meta = groupChildNode.getMeta();
+					Entry<String, String> meta = groupChildNode.getMeta();
 					if (meta.getKey().equals("guildtp")) {
 						return LocationUtils.locationFromString(world, meta.getValue());
 					}

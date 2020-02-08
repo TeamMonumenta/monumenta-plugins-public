@@ -302,7 +302,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class <? extends Arrow > arrowClass) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends Arrow> arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch() + (float)rotation.getX());
@@ -318,7 +318,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class <? extends Arrow > arrowClass) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends Arrow> arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);

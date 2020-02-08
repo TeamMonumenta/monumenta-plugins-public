@@ -25,7 +25,7 @@ public class BossBarManager {
 	private final BossBar mBar;
 	private int mEventCursor;
 
-	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction>events) {
+	public BossBarManager(Plugin plugin, LivingEntity boss, int range, BarColor color, BarStyle style, Map<Integer, BossHealthAction> events) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;

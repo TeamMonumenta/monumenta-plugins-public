@@ -86,8 +86,8 @@ public class PlayerInventory {
 	}
 
 	private static void runOffhandFunction(Plugin plugin, String functionFolder, Material type,
-	                                       Set<Material>noFunctionSet,
-	                                       Map<Material, NmsUtils.ParsedCommandWrapper>functionMap,
+	                                       Set<Material> noFunctionSet,
+	                                       Map<Material, NmsUtils.ParsedCommandWrapper> functionMap,
 	                                       Player player) {
 		if (type != null && !noFunctionSet.contains(type)) {
 			// This particular material either hasn't been tested yet or it has a corresponding function

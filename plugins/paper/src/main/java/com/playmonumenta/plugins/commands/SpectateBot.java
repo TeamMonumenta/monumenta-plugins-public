@@ -104,7 +104,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 
 					@Override
 					public void run() {
-						Iterator<Map.Entry<Player, SpectateContext>>it = mSpectators.entrySet().iterator();
+						Iterator<Map.Entry<Player, SpectateContext>> it = mSpectators.entrySet().iterator();
 						while (it.hasNext()) {
 							Map.Entry<Player, SpectateContext> entry = it.next();
 							SpectateContext ctx = entry.getValue();

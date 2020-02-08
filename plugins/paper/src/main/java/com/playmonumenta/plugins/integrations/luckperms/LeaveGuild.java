@@ -50,7 +50,7 @@ public class LeaveGuild {
 
 				for (Node groupChildNode : group.getNodes().values()) {
 					if (groupChildNode.isMeta()) {
-						Entry<String, String>meta = groupChildNode.getMeta();
+						Entry<String, String> meta = groupChildNode.getMeta();
 						if (meta.getKey().equals("guildname")) {
 							guildName = meta.getValue();
 							guildFound = true;

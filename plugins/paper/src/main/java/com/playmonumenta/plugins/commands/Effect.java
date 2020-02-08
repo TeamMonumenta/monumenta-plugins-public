@@ -108,7 +108,7 @@ public class Effect {
 		);
 	}
 
-	private static void giveEffect(Plugin plugin, CommandSender sender, Collection<Entity>entities,
+	private static void giveEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
 	                               PotionEffectType type, int seconds, int amplifier, boolean hideParticles) {
 		PotionManager manager = plugin.mPotionManager;
 
@@ -130,7 +130,7 @@ public class Effect {
 		                   " to entities for " + Integer.toString(seconds) + "s");
 	}
 
-	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity>entities,
+	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
 	                                PotionEffectType type) {
 		PotionManager manager = plugin.mPotionManager;
 

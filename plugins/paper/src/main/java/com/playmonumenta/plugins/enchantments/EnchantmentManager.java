@@ -164,7 +164,7 @@ public class EnchantmentManager implements Listener {
 	/*
 	 * Updates the custom enchants for only the specific slot
 	 */
-	public void updateItemProperties(int index, Map<BaseEnchantment, Integer>propertyMap, Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap, Player player, Plugin plugin) {
+	public void updateItemProperties(int index, Map<BaseEnchantment, Integer> propertyMap, Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap, Player player, Plugin plugin) {
 		try {
 
 			final PlayerInventory inv = player.getInventory();
@@ -248,7 +248,7 @@ public class EnchantmentManager implements Listener {
 	 *
 	 * NOTE: propertyMap should already be clear'ed and the properties removed from the player
 	 */
-	public void getItemProperties(Map<BaseEnchantment, Integer>propertyMap, Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap, Player player) {
+	public void getItemProperties(Map<BaseEnchantment, Integer> propertyMap, Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap, Player player) {
 		final PlayerInventory inv = player.getInventory();
 
 		/* Step over the slots for which we have item properties */

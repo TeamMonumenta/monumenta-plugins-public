@@ -44,7 +44,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 			new SpellBaseSummon(plugin, SUMMON_TIME, TIME_BETWEEN_CASTS, PLAYER_RADIUS, SPAWNS_PER_PLAYER, false,
 				() -> {
 					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
-					List <Player> targets = PlayerUtils.playersInRange(boss.getLocation(), 20);
+					List<Player> targets = PlayerUtils.playersInRange(boss.getLocation(), 20);
 					Collections.shuffle(targets);
 					switch (targets.size()) {
 					case 0:
