@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 public class StringUtils {
-	static public String ticksToTime(int ticks) {
+	public static String ticksToTime(int ticks) {
 		int minutes = ((ticks / 20) / 60);
 		int seconds = ((ticks - ((minutes * 60) * 20))) / 20;
 

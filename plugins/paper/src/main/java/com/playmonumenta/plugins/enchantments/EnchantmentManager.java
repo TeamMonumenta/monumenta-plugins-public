@@ -148,17 +148,16 @@ public class EnchantmentManager implements Listener {
 			return new int[] {40};
 		case ARMOR:
 			return new int[] {36, 37, 38, 39};
-		case NONE:
-			return null;
 		case INVENTORY:
 			int[] indexes = new int[41];
 			for (int i = 0; i <= 40; i++) {
 				indexes[i] = i;
 			}
 			return indexes;
+		case NONE:
+		default:
+			return null;
 		}
-
-		return null;
 	}
 
 	/*
@@ -219,8 +218,8 @@ public class EnchantmentManager implements Listener {
 
 	private static void updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item,
 	                               Player player, BaseEnchantment property,
-	                               Map<BaseEnchantment, Integer>propertyMap,
-	                               Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
+	                               Map<BaseEnchantment, Integer> propertyMap,
+	                               Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap) {
 		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
 			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
 			return;
@@ -258,7 +257,7 @@ public class EnchantmentManager implements Listener {
 
 			if (slotProperties != null && !(slotProperties.isEmpty())) {
 				/* Step over the item(s) the player has in that slot */
-				int indexes[] = getItems(inv, slot);
+				int[] indexes = getItems(inv, slot);
 				if (indexes == null) {
 					continue;
 				}

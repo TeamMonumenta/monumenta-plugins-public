@@ -21,8 +21,8 @@ import java.util.UUID;
  * @see com.playmonumenta.plugins.inventories.ShulkerInventory
  */
 public class ShulkerInventoryManager {
-	private final static String ERROR_SHULKER_LOCKED = String.format("%s%sThis shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD);
-	private final static String ERROR_SHULKER_ALREADY_OPEN = String.format("%s%sThis shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD);
+	private static final String ERROR_SHULKER_LOCKED = String.format("%s%sThis shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD);
+	private static final String ERROR_SHULKER_ALREADY_OPEN = String.format("%s%sThis shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD);
 	private final Plugin mPlugin;
 	private final HashMap<UUID, ShulkerInventory> mInventories = new HashMap<>();
 	private final HashMap<UUID, ShulkerInventory> mDepositInventories = new HashMap<>();

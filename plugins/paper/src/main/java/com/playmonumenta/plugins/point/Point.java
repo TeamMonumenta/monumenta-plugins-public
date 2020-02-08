@@ -29,7 +29,7 @@ public class Point {
 
 	public static Point fromString(CommandSender sender, String str) throws Exception {
 		// Remove parenthesis, then split on either , or space or both together
-		String strArray[] = str.replaceAll("[()]", "").split("[, ]+");
+		String[] strArray = str.replaceAll("[()]", "").split("[, ]+");
 		if (strArray.length != 3) {
 			if (sender != null) {
 				sender.sendMessage(ChatColor.RED + "Failed to parse string '" + str +

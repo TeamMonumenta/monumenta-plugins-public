@@ -25,14 +25,14 @@ import com.playmonumenta.plugins.utils.NetworkUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PlayerData {
-	static private Map<UUID, String> PLAYER_DATA_CACHE = new ConcurrentSkipListMap<UUID, String>();
+	private static Map<UUID, String> PLAYER_DATA_CACHE = new ConcurrentSkipListMap<UUID, String>();
 
 	/**
 	 * Saves player data to a file
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Plugin plugin, Player player) {
+	public static void savePlayerData(Plugin plugin, Player player) {
 		String playerdata = null;
 		try {
 			playerdata = convertToString(plugin, player);
@@ -49,7 +49,7 @@ public class PlayerData {
 	 *
 	 * Prints a warning and stacktrace to the log if player data is not saved successfully
 	 */
-	static public void savePlayerData(Plugin plugin, UUID playerUUID, String writeContent) {
+	public static void savePlayerData(Plugin plugin, UUID playerUUID, String writeContent) {
 		if (writeContent == null || writeContent.isEmpty()) {
 			plugin.getLogger().severe("writeContent for player '" + playerUUID + "' is null or empty!");
 			return;
@@ -76,7 +76,7 @@ public class PlayerData {
 	/**
 	 * Makes a backup of the playerdata file and then removes it from the primary location
 	 */
-	static public void removePlayerDataFile(Plugin plugin, Player player) {
+	public static void removePlayerDataFile(Plugin plugin, Player player) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 		final String backupFileLocation = plugin.getDataFolder() + File.separator + "backup_players" + File.separator + player.getUniqueId() + ".json";
 
@@ -104,7 +104,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static public String convertToString(Plugin plugin, Player player) throws Exception {
+	public static String convertToString(Plugin plugin, Player player) throws Exception {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		JsonObject root = new JsonObject();
@@ -150,7 +150,7 @@ public class PlayerData {
 	 * Main function for initializing player data when they join the server
 	 * Either loads data from previously saved file or from the player themselves
 	 */
-	static public void initializePlayer(Plugin plugin, Player player) {
+	public static void initializePlayer(Plugin plugin, Player player) {
 		String transferContent = null;
 
 		/*
@@ -214,7 +214,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static private String getTransferPlayerData(Plugin plugin, Player player) throws Exception {
+	private static String getTransferPlayerData(Plugin plugin, Player player) throws Exception {
 		final String fileLocation = plugin.getDataFolder() + File.separator + "players" + File.separator + player.getUniqueId() + ".json";
 
 		String content = null;
@@ -245,7 +245,7 @@ public class PlayerData {
 	 *
 	 * @throws Exception on error
 	 */
-	static private void applyTransferPlayerData(Plugin plugin, Player player, String content) throws Exception {
+	private static void applyTransferPlayerData(Plugin plugin, Player player, String content) throws Exception {
 		if (content == null || content.isEmpty()) {
 			throw new Exception("Specified player content is null or empty!");
 		}

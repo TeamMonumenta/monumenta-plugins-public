@@ -32,7 +32,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks
-	private final static List<Vector> ADJACENT_OFFSETS = Arrays.asList(
+	private static final List<Vector> ADJACENT_OFFSETS = Arrays.asList(
 	                                                         new Vector(1, 0, 0),
 	                                                         new Vector(-1, 0, 0),
 	                                                         new Vector(0, -1, 0),
@@ -40,7 +40,7 @@ public class ChestOverride extends BaseOverride {
 	                                                         new Vector(0, 0, -1)
 	                                                     );
 	// Convenience list of offsets to get adjacent blocks
-	private final static EnumSet<Material> GRAVITY_BLOCKS = EnumSet.of(
+	private static final EnumSet<Material> GRAVITY_BLOCKS = EnumSet.of(
 			Material.SAND,
 			Material.RED_SAND,
 			Material.GRAVEL,

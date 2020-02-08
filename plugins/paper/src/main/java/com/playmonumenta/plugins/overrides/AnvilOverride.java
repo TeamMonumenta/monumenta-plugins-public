@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AnvilOverride extends BaseOverride {
-	final static String REPAIR_OBJECTIVE = "RepairT";
+	private static final String REPAIR_OBJECTIVE = "RepairT";
 
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item,

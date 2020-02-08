@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class ServerProperties {
-	private final static String FILE_NAME = "Properties.json";
+	private static final String FILE_NAME = "Properties.json";
 
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;

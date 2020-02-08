@@ -34,7 +34,7 @@ public interface BaseEnchantment {
 	/*
 	 * Returns whether the property can have negative values (attributes)
 	 */
-	default public boolean negativeLevelsAllowed() {
+	public default boolean negativeLevelsAllowed() {
 		return false;
 	}
 
@@ -43,14 +43,14 @@ public interface BaseEnchantment {
 	 * If true, uses enchant levels (I, II, III, etc.)
 	 * If false, always return level 1 for the item when the enchant is found
 	 */
-	default public boolean useEnchantLevels() {
+	public default boolean useEnchantLevels() {
 		return true;
 	}
 
 	/*
 	 * Describes which slots this property is valid in
 	 */
-	default public EnumSet<ItemSlot> validSlots() {
+	public default EnumSet<ItemSlot> validSlots() {
 		return EnumSet.noneOf(ItemSlot.class);
 	}
 
@@ -58,7 +58,7 @@ public interface BaseEnchantment {
 	 * Computes what level the given item is for this particular ItemProperty.
 	 * If the item does not have this property, it should return 0
 	 */
-	default public int getLevelFromItem(ItemStack item) {
+	public default int getLevelFromItem(ItemStack item) {
 		return InventoryUtils.getCustomEnchantLevel(item, getProperty(), useEnchantLevels());
 	}
 
@@ -67,7 +67,7 @@ public interface BaseEnchantment {
 	 * If the item does not have this property, it should return 0
 	 * This variant is useful for soulbound items
 	 */
-	default public int getLevelFromItem(ItemStack item, Player player) {
+	public default int getLevelFromItem(ItemStack item, Player player) {
 		// By default ignore the player
 		return getLevelFromItem(item);
 	}
@@ -77,7 +77,7 @@ public interface BaseEnchantment {
 	 * If the item does not have this property, it should return 0
 	 * This variant is useful for regeneration
 	 */
-	default public int getLevelFromItem(ItemStack item, Player player, ItemSlot slot) {
+	public default int getLevelFromItem(ItemStack item, Player player, ItemSlot slot) {
 		// By default ignore the slot
 		return getLevelFromItem(item, player);
 	}
@@ -86,7 +86,7 @@ public interface BaseEnchantment {
 	 * applyProperty will be called every time the player changes their inventory
 	 * and the player matches this ItemProperty
 	 */
-	default public void applyProperty(Plugin plugin, Player player, int level) { }
+	public default void applyProperty(Plugin plugin, Player player, int level) { }
 
 	/*
 	 * removeProperty will be called every time the player changes their inventory
@@ -96,69 +96,69 @@ public interface BaseEnchantment {
 	 * TODO: Modify this so it is only called when the item effect should actually
 	 * be removed
 	 */
-	default public void removeProperty(Plugin plugin, Player player) { }
+	public default void removeProperty(Plugin plugin, Player player) { }
 
 	/*
 	 * Runs whenever the player changes their inventory and equipment is updated
 	 */
-	default public void onEquipmentUpdate(Plugin plugin, Player player) { }
+	public default void onEquipmentUpdate(Plugin plugin, Player player) { }
 
 
 	/* This method will be called four times per second */
-	default public void tick(Plugin plugin, World world, Player player, int level) { }
+	public default void tick(Plugin plugin, World world, Player player, int level) { }
 
 	/*
 	 * The onAttack() method will be called whenever the player damages something while
 	 * they have any levels of this property (This only applies for MELEE attacks)
 	 */
-	default public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	public default void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
 
 	/*
 	 * The onKill() method will be called whenever the player kills something
 	 * while they have any levels of this property
 	 */
-	default public void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) { }
+	public default void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) { }
 
 	/*
 	 * The onDamage() method will be called whenever the player damages something, no
 	 * matter the cause of damage.
 	 */
-	default public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	public default void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
 
-	default public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) { }
+	public default void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) { }
 
-	default public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) { }
+	public default void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) { }
 
-	default public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) { }
+	public default void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) { }
 
-	default public void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) { }
+	public default void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) { }
 
-	default public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) { }
+	public default void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) { }
 
 	/*
 	 * The onShootAttack() method will be called whenever the player damages something with a projectile while
 	 * they have any levels of this property
 	 */
-	default public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile target, ProjectileLaunchEvent event) { }
+	public default void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile target, ProjectileLaunchEvent event) { }
 
-	default public void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
+	public default void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
 
-	default public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) { }
+	public default void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) { }
 
-	default public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) { }
+	public default void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) { }
 
-	default public void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) { }
+	public default void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) { }
 
 	/*
 	 * Triggers when an item entity spawns in the world (possibly a player dropped item)
 	 *
 	 * IMPORTANT - To use this, you must also override hasOnSpawn() to return true
 	 */
-	default public boolean hasOnSpawn() {
+	public default boolean hasOnSpawn() {
 		return false;
 	}
 
-	default public void onSpawn(Plugin plugin, Item item, int level) { }
+	public default void onSpawn(Plugin plugin, Item item, int level) { }
 
 	/*
 	 * TODO: Add an onRightClick() method so you can make items that cast spells
