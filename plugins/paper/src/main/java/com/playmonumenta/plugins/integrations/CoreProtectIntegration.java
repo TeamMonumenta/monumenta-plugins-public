@@ -18,17 +18,17 @@ public class CoreProtectIntegration {
 		}
 
 		// Check that the API is enabled
-		CoreProtectAPI CoreProtect = ((CoreProtect) plugin).getAPI();
-		if (CoreProtect.isEnabled() == false) {
+		CoreProtectAPI coreProtect = ((CoreProtect) plugin).getAPI();
+		if (coreProtect.isEnabled() == false) {
 			return null;
 		}
 
 		// Check that a compatible version of the API is loaded
-		if (CoreProtect.APIVersion() < 6) {
+		if (coreProtect.APIVersion() < 6) {
 			return null;
 		}
 
-		return CoreProtect;
+		return coreProtect;
 	}
 
 	public static void logContainerTransaction(Player player, Location location) {

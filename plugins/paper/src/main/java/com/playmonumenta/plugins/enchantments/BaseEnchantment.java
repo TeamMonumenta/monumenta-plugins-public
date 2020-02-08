@@ -156,6 +156,7 @@ public interface BaseEnchantment {
 	default public boolean hasOnSpawn() {
 		return false;
 	}
+
 	default public void onSpawn(Plugin plugin, Item item, int level) { }
 
 	/*

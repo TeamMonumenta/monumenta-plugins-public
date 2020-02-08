@@ -81,20 +81,20 @@ public class ElementalSpirit {
 			loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.25f);
 			double dmg = elementalSpirit == 1 ? 5 : 10;
 			new BukkitRunnable() {
-				Vector permDir = null;
-				int t = 0;
+				Vector mPermDir = null;
+				int mTicks = 0;
 
 				@Override
 				public void run() {
 
-					if (permDir == null) {
+					if (mPermDir == null) {
 						Vector dir = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(tar), loc);
 						loc.add(dir);
 						if (tar.isDead()) {
-							permDir = dir;
+							mPermDir = dir;
 						}
 					} else {
-						loc.add(permDir);
+						loc.add(mPermDir);
 					}
 
 					for (LivingEntity e : EntityUtils.getNearbyMobs(loc, 0.9, mPlayer)) {
@@ -103,19 +103,19 @@ public class ElementalSpirit {
 					}
 					mWorld.spawnParticle(Particle.FLAME, loc, 11, 0.75, 0.75, 0.75, 0.025);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.75, 0.75, 0.75, 0.025);
-					if (permDir == null) {
+					if (mPermDir == null) {
 						if (loc.distance(LocationUtils.getEntityCenter(tar)) < 1) {
 							Vector dir = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(tar), loc);
-							permDir = dir;
+							mPermDir = dir;
 							EntityUtils.damageEntity(Plugin.getInstance(), tar, dmg, mPlayer);
 							mWorld.spawnParticle(Particle.FLAME, loc, 50, 0.1, 0.1, 0.1, 0.25);
 							mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.1, 0.1, 0.1, 0.1);
 							loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.25f);
 						}
 					}
-					if (permDir != null) {
-						t++;
-						if (t >= 40) {
+					if (mPermDir != null) {
+						mTicks++;
+						if (mTicks >= 40) {
 							this.cancel();
 						}
 					}
@@ -148,18 +148,18 @@ public class ElementalSpirit {
 							mWorld.spawnParticle(Particle.CLOUD, loc, 10, 0.1, 0.1, 0.1, 0.2);
 							loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
 							new BukkitRunnable() {
-								int t = 0;
+								int mTicks = 0;
 
 								@Override
 								public void run() {
-									t++;
+									mTicks++;
 									EntityUtils.damageEntity(Plugin.getInstance(), tar, linger, mPlayer);
 									mWorld.spawnParticle(Particle.SNOWBALL, tar.getLocation().add(0, 1, 0), 25, 0.1,
 									                     0.1, 0.1, 0.025);
 									mWorld.spawnParticle(Particle.CLOUD, tar.getLocation().add(0, 1, 0), 10, 0.1, 0.1,
 									                     0.1, 0.2);
 									loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1.35f);
-									if (t >= 3 || tar.isDead()) {
+									if (mTicks >= 3 || tar.isDead()) {
 										this.cancel();
 									}
 								}

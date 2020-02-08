@@ -93,7 +93,7 @@ public class Gilded implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
-			int numTicks = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
@@ -104,9 +104,9 @@ public class Gilded implements BaseEnchantment {
 				item.getWorld().spawnParticle(Particle.REDSTONE, item.getLocation(), 1, 0.1, 0.1, 0.1, GILDED_1_COLOR);
 
 				// Very infrequently check if the item is still actually there
-				numTicks++;
-				if (numTicks > 100) {
-					numTicks = 0;
+				mTicks++;
+				if (mTicks > 100) {
+					mTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}

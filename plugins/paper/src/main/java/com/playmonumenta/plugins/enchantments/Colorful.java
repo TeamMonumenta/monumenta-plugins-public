@@ -22,15 +22,15 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  */
 public class Colorful implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Colorful";
+	private static final List<Color> colors = new ArrayList<>(Arrays.asList(
+			Color.LIME,
+			Color.PURPLE,
+			Color.WHITE,
+			Color.RED
+		));
 
-	private int ticks = 0;
-
-	List<Color> colors = new ArrayList<>(Arrays.asList(
-	                                         Color.LIME,
-	                                         Color.PURPLE,
-	                                         Color.WHITE,
-	                                         Color.RED
-	                                     ));
+	// The more people have this enchant, the faster it will change
+	private int mTicks = 0;
 
 	@Override
 	public String getProperty() {
@@ -52,11 +52,11 @@ public class Colorful implements BaseEnchantment {
 
 	@Override
 	public void tick(Plugin plugin, World world, Player player, int level) {
-		ticks++;
+		mTicks++;
 
 		int modulo = 10; //once a minute
 
-		if (ticks % modulo == 0) {
+		if (mTicks % modulo == 0) {
 			PlayerInventory inv = player.getInventory();
 			for (ItemStack item : inv.getArmorContents()) {
 				if (item != null) {

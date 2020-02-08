@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
  */
 public class Clucking implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Clucking";
-	private static final int droppedTickPeriod = 60;
+	private static final int DROPPED_TICK_PERIOD = 60;
 
 	/* This is shared by all instances */
 	private static int staticTicks = 0;
@@ -69,7 +69,7 @@ public class Clucking implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
-			int numTicks = 0;
+			int mNumTicks = 0;
 
 			@Override
 			public void run() {
@@ -80,14 +80,14 @@ public class Clucking implements BaseEnchantment {
 				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_CHICKEN_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
 
 				// Very infrequently check if the item is still actually there
-				numTicks++;
-				if (numTicks > 60) {
-					numTicks = 0;
+				mNumTicks++;
+				if (mNumTicks > 60) {
+					mNumTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10, droppedTickPeriod);
+		}.runTaskTimer(plugin, 10, DROPPED_TICK_PERIOD);
 	}
 }

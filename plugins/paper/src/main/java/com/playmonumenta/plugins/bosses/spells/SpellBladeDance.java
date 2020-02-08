@@ -34,8 +34,8 @@ public class SpellBladeDance extends Spell {
 		world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 		world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0);
 		new BukkitRunnable() {
-			int i = 0;
-			float pitch = 0;
+			int mIndex = 0;
+			float mPitch = 0;
 			@Override
 			public void run() {
 				if (mCaster.isDead() || !mCaster.isValid()) {
@@ -43,10 +43,10 @@ public class SpellBladeDance extends Spell {
 					return;
 				}
 
-				i += 2;
+				mIndex += 2;
 				world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0);
-				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, pitch);
-				pitch += 0.2;
+				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
+				mPitch += 0.2;
 				new BukkitRunnable() {
 					Location loc1 = mCaster.getLocation().add(6, 6, 6);
 					Location loc2 = mCaster.getLocation().add(-6, -1, -6);
@@ -78,7 +78,7 @@ public class SpellBladeDance extends Spell {
 
 				}.runTaskTimer(mPlugin, 0, 1);
 
-				if (i >= 40) {
+				if (mIndex >= 40) {
 					mCaster.setInvulnerable(false);
 					this.cancel();
 

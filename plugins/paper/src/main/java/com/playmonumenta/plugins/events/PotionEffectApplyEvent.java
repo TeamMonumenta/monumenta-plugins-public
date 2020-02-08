@@ -11,41 +11,41 @@ public class PotionEffectApplyEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private boolean isCancelled;
-	private Entity applier;
-	private LivingEntity applied;
-	private PotionEffect effect;
+	private final Entity mApplier;
+	private final LivingEntity mApplied;
+	private PotionEffect mEffect;
+	private boolean mIsCancelled;
 
 	public PotionEffectApplyEvent(Entity applier, LivingEntity applied, PotionEffect effect) {
-		this.applier = applier;
-		this.applied = applied;
-		this.effect = effect;
+		mApplier = applier;
+		mApplied = applied;
+		mEffect = effect;
 	}
 
 	public PotionEffect getEffect() {
-		return effect;
+		return mEffect;
 	}
 
 	public LivingEntity getApplied() {
-		return applied;
+		return mApplied;
 	}
 
 	public Entity getApplier() {
-		return applier;
+		return mApplier;
 	}
 
 	public void setEffect(PotionEffect effect) {
-		this.effect = effect;
+		mEffect = effect;
 	}
 
 	@Override
 	public boolean isCancelled() {
-		return isCancelled;
+		return mIsCancelled;
 	}
 
 	@Override
 	public void setCancelled(boolean arg0) {
-		this.isCancelled = arg0;
+		this.mIsCancelled = arg0;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

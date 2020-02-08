@@ -140,7 +140,7 @@ public class EnchantmentManager implements Listener {
 		}
 	}
 
-	private static int[] _getItems(PlayerInventory inv, ItemSlot slot) {
+	private static int[] getItems(PlayerInventory inv, ItemSlot slot) {
 		switch (slot) {
 		case MAINHAND:
 			return new int[] {inv.getHeldItemSlot()};
@@ -203,24 +203,24 @@ public class EnchantmentManager implements Listener {
 			if (slot != null) {
 				//Adds in the new custom enchants at the index only
 				for (BaseEnchantment property : mProperties.get(slot)) {
-					_updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
+					updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 				}
 			}
 
 			slot = ItemSlot.INVENTORY;
 			//Checks for inventory enchants too, since all slots use them, so always checks regardless of above
 			for (BaseEnchantment property : mProperties.get(slot)) {
-				_updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
+				updateItem(plugin, index, slot, item, player, property, propertyMap, inventoryMap);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static void _updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item,
-	                                Player player, BaseEnchantment property,
-	                                Map<BaseEnchantment, Integer>propertyMap,
-	                                Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
+	private static void updateItem(Plugin plugin, int index, ItemSlot slot, ItemStack item,
+	                               Player player, BaseEnchantment property,
+	                               Map<BaseEnchantment, Integer>propertyMap,
+	                               Map<Integer, Map<BaseEnchantment, Integer>>inventoryMap) {
 		if ((slot == ItemSlot.OFFHAND || slot == ItemSlot.MAINHAND) && item != null && ItemUtils.isWearable(item.getType())) {
 			// Prevents armor items being held in mainhand / offhand counting towards enchantment level
 			return;
@@ -258,7 +258,7 @@ public class EnchantmentManager implements Listener {
 
 			if (slotProperties != null && !(slotProperties.isEmpty())) {
 				/* Step over the item(s) the player has in that slot */
-				int indexes[] = _getItems(inv, slot);
+				int indexes[] = getItems(inv, slot);
 				if (indexes == null) {
 					continue;
 				}
@@ -317,7 +317,7 @@ public class EnchantmentManager implements Listener {
 	 * Chunk loading an item entity also counts as spawning
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void ChunkLoadEvent(ChunkLoadEvent event) {
+	public void chunkLoadEvent(ChunkLoadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (entity instanceof Item) {
 				checkSpawnedItem((Item)entity);

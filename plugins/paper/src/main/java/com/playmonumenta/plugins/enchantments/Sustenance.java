@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Sustenance implements BaseEnchantment{
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Sustenance";
+
 	@Override
 	public String getProperty() {
 		return PROPERTY_NAME;

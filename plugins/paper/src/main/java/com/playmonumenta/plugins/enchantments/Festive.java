@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Festive implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Festive";
-	private static final int tickPeriod = 5;
+	private static final int TICK_PERIOD = 5;
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
 	private static final Particle.DustOptions FESTIVE_GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
 	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
@@ -75,8 +75,8 @@ public class Festive implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
-			int numTicks = 0;
-			World world = item.getWorld();
+			int mTicks = 0;
+			World mWorld = item.getWorld();
 			@Override
 			public void run() {
 				if (item == null || item.isDead()) {
@@ -84,19 +84,19 @@ public class Festive implements BaseEnchantment {
 				}
 
 				final Location loc = item.getLocation().add(0, 0.15, 0);
-				world.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-				world.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-				world.spawnParticle(Particle.SNOWBALL, loc, 3, 0.2, 0.2, 0.2, 0);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
+				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
+				mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0.2, 0.2, 0.2, 0);
 
 				// Very infrequently check if the item is still actually there
-				numTicks++;
-				if (numTicks > 100) {
-					numTicks = 0;
+				mTicks++;
+				if (mTicks > 100) {
+					mTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10, tickPeriod);
+		}.runTaskTimer(plugin, 10, TICK_PERIOD);
 	}
 }

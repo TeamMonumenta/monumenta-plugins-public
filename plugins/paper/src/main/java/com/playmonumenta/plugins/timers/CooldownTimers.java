@@ -74,20 +74,20 @@ public class CooldownTimers {
 		//  through their different ability ID's.
 		Iterator<Entry<UUID, HashMap<Spells, Integer>>> playerIter = mTimers.entrySet().iterator();
 		while (playerIter.hasNext()) {
-			Entry<UUID, HashMap<Spells, Integer>> player = playerIter.next();
+			Entry<UUID, HashMap<Spells, Integer>> element = playerIter.next();
 
-			Iterator<Entry<Spells, Integer>> abilityIter = player.getValue().entrySet().iterator();
+			Iterator<Entry<Spells, Integer>> abilityIter = element.getValue().entrySet().iterator();
 			while (abilityIter.hasNext()) {
 				Entry<Spells, Integer> cooldown = abilityIter.next();
 
-				Player _player = mPlugin.getPlayer(player.getKey());
-				if (_player != null && _player.isOnline()) {
+				Player player = mPlugin.getPlayer(element.getKey());
+				if (player != null && player.isOnline()) {
 					//  Update the cooldown time, if it's not over, set the value, else remove it.
 					int time = cooldown.getValue() - ticks;
 					if (time <= 0) {
 						Spells spell = cooldown.getKey();
 
-						MessagingUtils.sendActionBarMessage(mPlugin, _player, spell.getName() + " is now off cooldown!");
+						MessagingUtils.sendActionBarMessage(mPlugin, player, spell.getName() + " is now off cooldown!");
 
 						abilityIter.remove();
 					} else {
@@ -97,7 +97,7 @@ public class CooldownTimers {
 			}
 
 			//  If this player no longer has any more cooldowns for them, remove the player.
-			if (player.getValue().isEmpty()) {
+			if (element.getValue().isEmpty()) {
 				playerIter.remove();
 			}
 		}

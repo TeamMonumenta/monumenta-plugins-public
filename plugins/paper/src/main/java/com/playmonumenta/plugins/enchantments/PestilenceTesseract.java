@@ -49,7 +49,7 @@ public class PestilenceTesseract implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
-			int numTicks = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
@@ -64,15 +64,15 @@ public class PestilenceTesseract implements BaseEnchantment {
 					mob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 600, 1, false, true));
 				}
 
-				numTicks++;
+				mTicks++;
 
-				if (numTicks >= MAX_LIFETIME_SECONDS * Constants.TICKS_PER_SECOND / TICK_PERIOD) {
+				if (mTicks >= MAX_LIFETIME_SECONDS * Constants.TICKS_PER_SECOND / TICK_PERIOD) {
 					item.remove();
 					this.cancel();
 				}
 
 				// Very infrequently check if the item is still actually there
-				if (numTicks % 100 == 0) {
+				if (mTicks % 100 == 0) {
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}

@@ -15,8 +15,8 @@ public class Hope implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hope";
 
 	/* How much longer an item lasts per level */
-	private static final int extraMinutesPerLevel = 5;
-	private static final int tickPeriod = 6;
+	private static final int EXTRA_MINUTES_PER_LEVEL = 5;
+	private static final int TICK_PERIOD = 6;
 
 	@Override
 	public String getProperty() {
@@ -54,13 +54,13 @@ public class Hope implements BaseEnchantment {
 			ageField = entityItem.getClass().getDeclaredField("age");
 			ageField.setAccessible(true);
 
-			ageField.set(entityItem, -1 * extraMinutesPerLevel * Constants.TICKS_PER_MINUTE * level);
+			ageField.set(entityItem, -1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * level);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 
 		new BukkitRunnable() {
-			int numTicks = 0;
+			int mNumTicks = 0;
 
 			@Override
 			public void run() {
@@ -70,14 +70,14 @@ public class Hope implements BaseEnchantment {
 				}
 
 				// Very infrequently check if the item is still actually there
-				numTicks++;
-				if (numTicks > 100) {
-					numTicks = 0;
+				mNumTicks++;
+				if (mNumTicks > 100) {
+					mNumTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10, tickPeriod);
+		}.runTaskTimer(plugin, 10, TICK_PERIOD);
 	}
 }

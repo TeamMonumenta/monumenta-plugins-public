@@ -11,31 +11,32 @@ public class AbilityCastEvent extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	public boolean isCancelled;
+	private boolean mIsCancelled;
 
-	private Player caster;
-	private Spells spell;
+	private final Player mCaster;
+	private final Spells mSpell;
+
 	public AbilityCastEvent(Player caster, Spells spell) {
-		this.caster = caster;
-		this.spell = spell;
+		mCaster = caster;
+		mSpell = spell;
 	}
 
 	public Player getCaster() {
-		return caster;
+		return mCaster;
 	}
 
 	public Spells getAbility() {
-		return spell;
+		return mSpell;
 	}
 
 	@Override
 	public boolean isCancelled() {
-		return isCancelled;
+		return mIsCancelled;
 	}
 
 	@Override
-	public void setCancelled(boolean arg0) {
-		this.isCancelled = arg0;
+	public void setCancelled(boolean cancelled) {
+		this.mIsCancelled = cancelled;
 	}
 
 	// Mandatory Event Methods (If you remove these, I'm 99% sure the event will break)

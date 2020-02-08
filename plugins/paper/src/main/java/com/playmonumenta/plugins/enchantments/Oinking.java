@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
  */
 public class Oinking implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Oinking";
-	private static final int droppedTickPeriod = 60;
+	private static final int DROPPED_TICK_PERIOD = 60;
 
 	/* This is shared by all instances */
 	private static int staticTicks = 0;
@@ -69,7 +69,7 @@ public class Oinking implements BaseEnchantment {
 	@Override
 	public void onSpawn(Plugin plugin, Item item, int level) {
 		new BukkitRunnable() {
-			int numTicks = 0;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
@@ -80,14 +80,14 @@ public class Oinking implements BaseEnchantment {
 				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
 
 				// Very infrequently check if the item is still actually there
-				numTicks++;
-				if (numTicks > 200) {
-					numTicks = 0;
+				mTicks++;
+				if (mTicks > 200) {
+					mTicks = 0;
 					if (!EntityUtils.isStillLoaded(item)) {
 						this.cancel();
 					}
 				}
 			}
-		}.runTaskTimer(plugin, 10, droppedTickPeriod);
+		}.runTaskTimer(plugin, 10, DROPPED_TICK_PERIOD);
 	}
 }

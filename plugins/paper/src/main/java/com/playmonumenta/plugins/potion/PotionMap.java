@@ -37,7 +37,7 @@ public class PotionMap {
 		mIsNegative = PotionUtils.hasNegativeEffects(type);
 	}
 
-	private void _addPotionMap(PotionID id, PotionInfo newPotionInfo) {
+	private void addPotionMap(PotionID id, PotionInfo newPotionInfo) {
 		Integer amplifier = newPotionInfo.amplifier;
 
 		TreeMap<Integer, PotionInfo> trackedPotionInfo = mPotionMap.get(id);
@@ -81,7 +81,7 @@ public class PotionMap {
 	}
 
 	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
-		_addPotionMap(id, newPotionInfo);
+		addPotionMap(id, newPotionInfo);
 
 		applyBestPotionEffect(player, true);
 	}
@@ -234,7 +234,7 @@ public class PotionMap {
 						PotionInfo info = new PotionInfo();
 						info.loadFromJsonObject(element.getAsJsonObject());
 
-						_addPotionMap(id, info);
+						addPotionMap(id, info);
 					}
 				}
 			}

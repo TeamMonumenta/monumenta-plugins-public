@@ -49,13 +49,13 @@ public class SocketManager {
 		mRunnable = new BukkitRunnable(){
 			@Override
 			public void run() {
-				_connect(host, port);
+				connect(host, port);
 			}
 		};
 		mHeart = new BukkitRunnable(){
 			@Override
 			public void run() {
-				_heartbeat();
+				heartbeat();
 			}
 		};
 
@@ -124,19 +124,19 @@ public class SocketManager {
 				mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
 				e.printStackTrace();
 			}
-			_reconnect();
+			reconnect();
 			return false;
 		}
 	}
 
-	private void _heartbeat() {
+	private void heartbeat() {
 		if (mHeartbeatEnabled) {
 			sendPacket(new BungeeHeartbeatPacket());
 		}
 	}
 
 
-	private void _connect(String address, int port) {
+	private void connect(String address, int port) {
 		int attempts = 0;
 		while (mSocketEnabled) {
 			mConnecting = true;
@@ -242,7 +242,7 @@ public class SocketManager {
 		}
 	}
 
-	private void _reconnect() {
+	private void reconnect() {
 		if (mSocketEnabled && !mConnecting) {
 			// Close the socket
 			if (mSocket != null) {

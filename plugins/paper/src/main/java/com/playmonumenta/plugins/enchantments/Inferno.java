@@ -29,14 +29,14 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class Inferno implements BaseEnchantment {
 
 	public static class InfernoMob {
-		public Player triggeredBy;
-		public int level;
-		public double fireResistantDamage;
+		public Player mTriggeredBy;
+		public int mLevel;
+		public double mFireResistantDamage;
 
 		public InfernoMob(Player triggeredBy, int level) {
-			this.triggeredBy = triggeredBy;
-			this.level = level;
-			this.fireResistantDamage = (level + 1) / 2.0;
+			this.mTriggeredBy = triggeredBy;
+			this.mLevel = level;
+			this.mFireResistantDamage = (level + 1) / 2.0;
 		}
 	}
 
@@ -132,11 +132,11 @@ public class Inferno implements BaseEnchantment {
 						// If the mob hasn't taken a fire tick in the past second, then give it a manual damage tick
 						// This is either caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
 						if (ticksLived - mob.getMetadata(FIRE_TICK_METAKEY).get(0).asInt() > 20) {
-							double damage = EntityUtils.isFireResistant(mob) == true ? value.fireResistantDamage : value.level;
+							double damage = EntityUtils.isFireResistant(mob) == true ? value.mFireResistantDamage : value.mLevel;
 							mob.setNoDamageTicks(0);
 							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 							Vector velocity = mob.getVelocity();
-							EntityUtils.damageEntity(plugin, mob, damage, value.triggeredBy);
+							EntityUtils.damageEntity(plugin, mob, damage, value.mTriggeredBy);
 							mob.setVelocity(velocity);
 							mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 						}
@@ -179,7 +179,7 @@ public class Inferno implements BaseEnchantment {
 	 */
 	public static void onFireTick(LivingEntity mob, EntityDamageEvent event) {
 		if (sTaggedMobs.containsKey(mob)) {
-			Integer infernoValue = sTaggedMobs.get(mob).level;
+			Integer infernoValue = sTaggedMobs.get(mob).mLevel;
 			if (infernoValue != null) {
 				mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(Plugin.getInstance(), mob.getTicksLived()));
 				mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);

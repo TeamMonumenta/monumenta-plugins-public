@@ -26,16 +26,15 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class DivineAura implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Divine Aura";
 	private static final String TAG_TO_DISABLE = "NoDivineAura";
-	private static final Random rand = new Random();
-	/* This is shared by all instances */
-	private static int STATIC_TICKS = 0;
+	private static final Random RAND = new Random();
 	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
+	private static int STATIC_TICKS = 0;
 
 	// A little easter egg for my friends.
 
 	//UUIDS
-	private UUID neodymeowm = UUID.fromString("58be4bdf-c21d-402e-81db-93de5a89e8af");
-	public String[] neo_lines = new String[] {
+	private UUID mNeodymeowm = UUID.fromString("58be4bdf-c21d-402e-81db-93de5a89e8af");
+	public String[] mNeoLines = new String[] {
 		"Thank you, my friends...",
 		"You're Neo... The youngling who brings innocence to them...",
 		"Waaaaaaaaaaaaaaaaaaaaarrrrrrrrrrrr...",
@@ -43,8 +42,8 @@ public class DivineAura implements BaseEnchantment {
 		"What a dorl...",
 		":WeaponryNeoHuggle:..."
 	};
-	private UUID corpe_ = UUID.fromString("391a5ea1-1145-4df1-b8a2-ca23f36ddb9f");
-	public String[] corpe_lines = new String[] {
+	private UUID mCorpe = UUID.fromString("391a5ea1-1145-4df1-b8a2-ca23f36ddb9f");
+	public String[] mCorpeLines = new String[] {
 		"Thank you, my friends...",
 		"Corpe, right...? Your comedic craziness is more loved by the group than you think...",
 		"GANG GANG...",
@@ -52,8 +51,8 @@ public class DivineAura implements BaseEnchantment {
 		"TR1 vid wen... It's in the makings...",
 		"I save all my females... underground... for later use..."
 	};
-	private UUID spy21dd = UUID.fromString("13ac1c8f-bdf4-4d8b-ba62-66ade197d031");
-	public String[] spy_lines = new String[] {
+	private UUID mSpy21dd = UUID.fromString("13ac1c8f-bdf4-4d8b-ba62-66ade197d031");
+	public String[] mSpyLines = new String[] {
 		"Thank you, my friends...",
 		"You're Spy... A true memelord and friend, you are to them...",
 		"WELCOME TO THE RICE FIELDS...!!!!!!",
@@ -61,8 +60,8 @@ public class DivineAura implements BaseEnchantment {
 		"Shuriken Toss when... That's a good question...",
 		"Your memes are trash. Please consider the following: Delete Account..."
 	};
-	private UUID redvam = UUID.fromString("ddeb7bca-36f1-46b0-a2eb-2fac0851e238");
-	public String[] red_lines = new String[] {
+	private UUID mRedvam = UUID.fromString("ddeb7bca-36f1-46b0-a2eb-2fac0851e238");
+	public String[] mRedLines = new String[] {
 		"Thank you, my friends...",
 		"You must be Red... They appreciate you being with them, you know...?",
 		"Firebutt...!",
@@ -71,8 +70,8 @@ public class DivineAura implements BaseEnchantment {
 		"Hehe... \nFire: U-Uh, Corpe help me out here..."
 	};
 
-	private UUID fire = UUID.fromString("b2ace1aa-4ecd-4f15-a4df-c95801db21f7");
-	public String[] fire_lines = new String[] {
+	private UUID mFire = UUID.fromString("b2ace1aa-4ecd-4f15-a4df-c95801db21f7");
+	public String[] mFireLines = new String[] {
 		"Thank you, my friends...",
 		"Fire, huh...? And why are you making lines for yourself in the code...?",
 		"*Sharply inhales* BA-...",
@@ -165,20 +164,20 @@ public class DivineAura implements BaseEnchantment {
 				STATIC_TICKS = 0;
 
 				UUID uuid = player.getUniqueId();
-				if (uuid.equals(neodymeowm)) {
-					String m = neo_lines[rand.nextInt(6)];
+				if (uuid.equals(mNeodymeowm)) {
+					String m = mNeoLines[RAND.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-				} else if (uuid.equals(corpe_)) {
-					String m = corpe_lines[rand.nextInt(6)];
+				} else if (uuid.equals(mCorpe)) {
+					String m = mCorpeLines[RAND.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-				} else if (uuid.equals(spy21dd)) {
-					String m = spy_lines[rand.nextInt(6)];
+				} else if (uuid.equals(mSpy21dd)) {
+					String m = mSpyLines[RAND.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-				} else if (uuid.equals(redvam)) {
-					String m = red_lines[rand.nextInt(6)];
+				} else if (uuid.equals(mRedvam)) {
+					String m = mRedLines[RAND.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
-				} else if (uuid.equals(fire)) {
-					String m = fire_lines[rand.nextInt(6)];
+				} else if (uuid.equals(mFire)) {
+					String m = mFireLines[RAND.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				}
 			}
