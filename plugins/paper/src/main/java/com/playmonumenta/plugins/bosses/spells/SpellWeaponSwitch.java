@@ -23,6 +23,10 @@ public class SpellWeaponSwitch extends Spell {
 		ItemStack curItem = mLauncher.getEquipment().getItemInMainHand();
 		ItemStack offItem = mLauncher.getEquipment().getItemInOffHand();
 
+		if (curItem == null || offItem == null) {
+			return;
+		}
+
 		if (mLauncher.getLocation().distance(target.getLocation()) > 6) {
 			// Switch to ranged weapon if not already equipped
 
