@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -247,7 +248,7 @@ public abstract class BossAbilityGroup {
 	 *
 	 * Useful to use setblock or a command to trigger post-fight logic
 	 */
-	public void death() {}
+	public void death(EntityDeathEvent event) {}
 
 	/*
 	 * Called when the mob is unloading and we need to save its metadata

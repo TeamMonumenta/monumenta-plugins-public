@@ -14,6 +14,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -133,7 +134,7 @@ public class CAxtal extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death() {
+	public void death(EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"It ends at last... Is this what freedom feels like?..\",\"color\":\"dark_red\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

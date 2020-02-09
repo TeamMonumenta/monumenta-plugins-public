@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -432,7 +433,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death() {
+	public void death(EntityDeathEvent event) {
 		World world = mBoss.getWorld();
 		mBoss.setHealth(800);
 		changePhase(null, null, null);

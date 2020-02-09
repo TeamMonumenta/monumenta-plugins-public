@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -216,10 +217,10 @@ public class Boss {
 		}.runTaskLater(mPlugin, 0);
 	}
 
-	public void death() {
+	public void death(EntityDeathEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.mDead = true;
-			ability.death();
+			ability.death(event);
 		}
 	}
 }

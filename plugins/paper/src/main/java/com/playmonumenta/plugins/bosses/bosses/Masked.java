@@ -16,6 +16,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -133,7 +134,7 @@ public class Masked extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death() {
+	public void death(EntityDeathEvent event) {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, DEATH_DIALOG_COMMAND);

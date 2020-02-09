@@ -84,6 +84,7 @@ import com.playmonumenta.plugins.bosses.bosses.InvisibleBoss;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.bosses.LivingBladeBoss;
 import com.playmonumenta.plugins.bosses.bosses.Masked;
+import com.playmonumenta.plugins.bosses.bosses.NoExperienceBoss;
 import com.playmonumenta.plugins.bosses.bosses.OldLabsBoss;
 import com.playmonumenta.plugins.bosses.bosses.Orangyboi;
 import com.playmonumenta.plugins.bosses.bosses.PlayerDamageOnlyBoss;
@@ -206,6 +207,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> new PunchResistBoss(p, e));
 		mStatelessBosses.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> new EvokerNoVex(p, e));
 		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> new HalloweenCreeperBoss(p, e));
+		mStatelessBosses.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> new NoExperienceBoss(p, e));
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -296,6 +298,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e) -> OldLabsBoss.deserialize(p, e));
 		mBossDeserializers.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> HalloweenCreeperBoss.deserialize(p, e));
 		mBossDeserializers.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e) -> HeadlessHorsemanBoss.deserialize(p, e));
+		mBossDeserializers.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> NoExperienceBoss.deserialize(p, e));
 	}
 
 	/********************************************************************************
@@ -372,7 +375,7 @@ public class BossManager implements Listener {
 
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {
-				boss.death();
+				boss.death(event);
 				if (((LivingEntity) entity).getHealth() <= 0) {
 					boss.unload();
 

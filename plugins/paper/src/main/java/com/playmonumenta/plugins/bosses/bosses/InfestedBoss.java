@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -38,7 +39,7 @@ public class InfestedBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death() {
+	public void death(EntityDeathEvent event) {
 		// Spell triggered when the boss dies
 		new SpellDelayedAction(mPlugin, mBoss.getLocation(), 60,
 		                       // Sound effect when boss dies
