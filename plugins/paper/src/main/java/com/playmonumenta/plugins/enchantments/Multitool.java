@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Multitool - Level one allows you to swap the tool
@@ -41,23 +42,25 @@ public class Multitool implements BaseEnchantment {
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
 			level = this.getLevelFromItem(item);
 			if (level > 0) {
-				String[] str = item.getType().toString().split("_");
-				if (InventoryUtils.isAxeItem(item)) {
-					Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
-					item.setType(mat);
-				} else if (InventoryUtils.isShovelItem(item)) {
-					if (level > 1) {
-						Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
+				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
+					String[] str = item.getType().toString().split("_");
+					if (InventoryUtils.isAxeItem(item)) {
+						Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
 						item.setType(mat);
-					} else {
+					} else if (InventoryUtils.isShovelItem(item)) {
+						if (level > 1) {
+							Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
+							item.setType(mat);
+						} else {
+							Material mat = Material.valueOf(str[0] + "_" + "AXE");
+							item.setType(mat);
+						}
+					} else if (InventoryUtils.isPickaxeItem(item)) {
 						Material mat = Material.valueOf(str[0] + "_" + "AXE");
 						item.setType(mat);
 					}
-				} else if (InventoryUtils.isPickaxeItem(item)) {
-					Material mat = Material.valueOf(str[0] + "_" + "AXE");
-					item.setType(mat);
+					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
 				}
-				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
 			}
 		}
 	}
