@@ -7,11 +7,13 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.safezone.SafeZoneManager;
@@ -71,24 +73,52 @@ public class SpellTpBehindRandomPlayer extends Spell {
 					return;
 				}
 
+				// set newloc to target and slightly elevate it
 				Location newloc = target.getLocation();
+				newloc.setY(target.getLocation().getY() + 0.1f);
 				World world = mLauncher.getWorld();
-				Vector vect = newloc.getDirection().multiply(-3.0f);
-				newloc.add(vect).setY(target.getLocation().getY() + 0.1f);
-				// dont teleport into a wall, teleport as close as possible instead
-				double distance = 3;
-				while (newloc.getBlock().getType().isSolid() && distance >= -1) {
-					newloc.add(newloc.getDirection().multiply(0.2));
-					distance -= 0.2;
-					// make sure its not partly clipped in the wall
-					if (!newloc.getBlock().getType().isSolid()) {
-						newloc.add(newloc.getDirection().multiply(0.35));
-						distance -= 0.35;
+				// Move half a block at a time
+				Vector vect = newloc.getDirection().multiply(-0.5f);
+				// Back up vector
+				Vector vectR = newloc.getDirection().multiply(0.2f);
+				vect.setY(0);
+				// don't teleport into/through a wall, teleport as close as possible instead
+				boolean safe = true;
+				boolean cancel = false;
+				BoundingBox box = mLauncher.getBoundingBox();
+				box.shift(newloc.clone().subtract(mLauncher.getLocation()));
+				for (int i = 0; i < 6; i++) {
+					newloc.add(vect);
+					box.shift(vect);
+					int j = 0;
+					do {
+						j++;
+						safe = true;
+						// Check if the entity overlaps with any of the surrounding blocks
+						for (int x = -1; x <= 1 && safe; x++) {
+							for (int y = -1; y <= 1 && safe; y++) {
+								for (int z = -1; z <= 1 && safe; z++) {
+									Block block = newloc.clone().add(x, y, z).getBlock();
+									// If it overlaps with any, move it closer to target
+									if (block.getBoundingBox().overlaps(box) && !block.isLiquid()) {
+										newloc.add(vectR);
+										box.shift(vectR);
+										safe = false;
+										cancel = true;
+									}
+								}
+							}
+						}
+						// Keep looping until we're either safe, or we've backed up too far
+					} while (!safe && j < 16);
+					// If we backed up too far, tp to target directly.
+					if (j > 15) {
+						newloc = target.getLocation();
+						cancel = true;
+					} else if (cancel) {
+						// If we had to back up, stop going forwards
+						break;
 					}
-				}
-				// failsafe in case the mob somehow tries to teleport through solid chunks of ground
-				if (distance < -1) {
-					newloc = target.getLocation();
 				}
 				world.spawnParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
 				world.spawnParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
