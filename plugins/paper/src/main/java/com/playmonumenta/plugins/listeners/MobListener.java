@@ -5,8 +5,6 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
@@ -32,10 +30,11 @@ import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
@@ -69,15 +68,11 @@ public class MobListener implements Listener {
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
-		    EntityUtils.isHostileMob(event.getEntity())) {
-			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(event.getEntity());
-			if (locType.equals(LocationType.Capital) ||
-			    locType.equals(LocationType.SafeZone)) {
-				Location loc = entity.getLocation();
-
+		    EntityUtils.isHostileMob(entity)) {
+			if (ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
 				// Cancel spawning unless this is from a dispenser in a plot
 				if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-				    || !loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType().equals(Material.SPONGE)) {
+				    || !ZoneUtils.inPlot(entity, mPlugin.mServerProperties.getIsTownWorld())) {
 					event.setCancelled(true);
 					return;
 				}
@@ -141,7 +136,7 @@ public class MobListener implements Listener {
 		Block block = event.getBlock();
 
 		// If the block is within a safezone, cancel the ignition unless it was from a player in creative mode
-		if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
+		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 			if (event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL)) {
 				Player player = event.getPlayer();
 				if (player != null && player.getGameMode() != GameMode.ADVENTURE) {

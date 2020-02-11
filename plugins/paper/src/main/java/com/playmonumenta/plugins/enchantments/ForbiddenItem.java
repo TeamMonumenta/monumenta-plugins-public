@@ -12,8 +12,9 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class ForbiddenItem implements BaseEnchantment {
 	public static final PotionEffect FORBIDDEN_ITEM_WEAKNESS_EFFECT = new PotionEffect(PotionEffectType.WEAKNESS, 60, 50, true, false);
@@ -42,9 +43,8 @@ public class ForbiddenItem implements BaseEnchantment {
 		// Forbidden items are different from the others - it applies effects only for a short duration
 		// and doesn't remove them when you switch off
 		GameMode playerMode = player.getGameMode();
-		LocationType playerLocType = plugin.mSafeZoneManager.getLocationType(player);
-		if ((playerMode.equals(GameMode.SURVIVAL) && !playerLocType.equals(LocationType.Capital))
-		    || (playerMode.equals(GameMode.ADVENTURE) && playerLocType.equals(LocationType.AdventureZone))) {
+		if ((playerMode.equals(GameMode.SURVIVAL) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE))
+		    || (playerMode.equals(GameMode.ADVENTURE) && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE))) {
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);

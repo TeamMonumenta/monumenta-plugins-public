@@ -56,11 +56,11 @@ import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
+import com.playmonumenta.plugins.listeners.ZonePropertyListener;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.safezone.SafeZoneManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
@@ -85,7 +85,6 @@ public class Plugin extends JavaPlugin {
 	public PotionManager mPotionManager;
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
-	public SafeZoneManager mSafeZoneManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
 	private BossManager mBossManager;
 
@@ -140,7 +139,6 @@ public class Plugin extends JavaPlugin {
 			err.printStackTrace();
 		}
 
-		mSafeZoneManager = new SafeZoneManager(this);
 		mServerProperties.load(this, null);
 
 		mEnchantmentManager = new EnchantmentManager(this);
@@ -204,6 +202,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShulkerEquipmentListener(this), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
+		manager.registerEvents(new ZonePropertyListener(), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);

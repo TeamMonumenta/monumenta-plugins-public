@@ -33,10 +33,11 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PlayerTracking implements EntityTracking {
 	Plugin mPlugin = null;
@@ -189,9 +190,6 @@ public class PlayerTracking implements EntityTracking {
 			Player player = entry.getKey();
 			PlayerInventory inventory = entry.getValue();
 
-			boolean inSafeZone = false;
-			boolean inCapital = false;
-			boolean applyEffects = true;
 			GameMode mode = player.getGameMode();
 
 			if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
@@ -200,7 +198,7 @@ public class PlayerTracking implements EntityTracking {
 
 				// First we'll check if the player is too high, if so they shouldn't be here.
 				if (loc.mY >= 255 && player.isOnGround()) {
-					// Double check to make sure their on the ground as it can trigger a false positive.
+					// Double check to make sure they're on the ground as it can trigger a false positive.
 					Block below = world.getBlockAt(location.subtract(0, 1, 0));
 					if (below != null && below.getType() == Material.AIR) {
 						continue;
@@ -208,44 +206,34 @@ public class PlayerTracking implements EntityTracking {
 
 					PlayerUtils.awardStrike(mPlugin, player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
-					LocationType zone = mPlugin.mSafeZoneManager.getLocationType(player);
-					inSafeZone = (zone != LocationType.None);
-					inCapital = (zone == LocationType.Capital);
-					applyEffects = (zone == LocationType.Capital || zone == LocationType.SafeZone);
+					if (ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+						boolean isInPlot = ZoneUtils.inPlot(location, mPlugin.mServerProperties.getIsTownWorld());
 
-					if (inSafeZone) {
-						if (zone == LocationType.Capital) {
-							Material mat = world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType();
-							boolean neededMat = mat == Material.SPONGE;
-
-							if (mode == GameMode.SURVIVAL && !neededMat) {
-								player.setGameMode(GameMode.ADVENTURE);
-							} else if (mode == GameMode.ADVENTURE && neededMat
-							           && loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
-							           && ScoreboardUtils.getScoreboardValue(player, "Prestige") >= 3) {
-								player.setGameMode(GameMode.SURVIVAL);
-							}
-						} else if (mode == GameMode.SURVIVAL) {
+						if (mode == GameMode.SURVIVAL && !isInPlot) {
 							player.setGameMode(GameMode.ADVENTURE);
+						} else if (mode == GameMode.ADVENTURE && isInPlot
+									&& loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
+									&& ScoreboardUtils.getScoreboardValue(player, "Prestige") >= 3) {
+							player.setGameMode(GameMode.SURVIVAL);
 						}
 					}
 				}
 
 				// Give potion effects to those in a City;
-				if (inSafeZone) {
-					if (applyEffects) {
-						if (inCapital) {
-							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
-						} else {
-							mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SPEED_MASK_EFFECT);
-						}
-
-						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTANCE_EFFECT);
-						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
-						mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
-					}
-				} else if (mode == GameMode.ADVENTURE) {
-					player.setGameMode(GameMode.SURVIVAL);
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPEED_2)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
+				}
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.MASK_SPEED)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SPEED_MASK_EFFECT);
+				}
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_RESISTANCE_EFFECT);
+				}
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SATURATION_2)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_SATURATION_EFFECT);
+				}
+				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.MASK_JUMP_BOOST)) {
+					mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
 				}
 			}
 

@@ -19,9 +19,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 /*
 * Sneak right click (without a bow) to leap backwards 6 ish blocks from your
@@ -57,8 +58,7 @@ public class Disengage extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
-		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
 			return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
 			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() && !inMainHand.getType().isEdible()

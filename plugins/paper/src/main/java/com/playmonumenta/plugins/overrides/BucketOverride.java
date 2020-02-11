@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Cow;
@@ -10,14 +11,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class BucketOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (player.getGameMode() == GameMode.SURVIVAL && (plugin.mSafeZoneManager.getLocationType(player) == LocationType.Capital)) {
+		} else if (player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
 			return true;
 		}
 
@@ -42,8 +44,9 @@ public class BucketOverride extends BaseOverride {
 		if (blockType.equals(Material.AIR) || dispensed == null) {
 			return false;
 		} else if (blockType.equals(Material.DISPENSER)) {
-			if (plugin.mSafeZoneManager.isInPlot(block.getLocation())) {
-				return true;
+			Location blockLoc = block.getLocation();
+			if (ZoneUtils.hasZoneProperty(blockLoc, ZoneProperty.PLOTS_POSSIBLE)) {
+				return ZoneUtils.inPlot(blockLoc, plugin.mServerProperties.getIsTownWorld());
 			} else {
 				return false;
 			}

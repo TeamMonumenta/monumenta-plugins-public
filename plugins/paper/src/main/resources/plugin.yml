@@ -2,7 +2,7 @@ name: Monumenta
 main: com.playmonumenta.plugins.Plugin
 version: 0.0.1
 api-version: 1.13
-depend: [CommandAPI]
+depend: [CommandAPI,ScriptedQuests]
 softdepend: [PlaceholderAPI,ChestSort,LuckPerms,CoreProtect]
 commands:
   testnoscore:

@@ -161,8 +161,6 @@ public class ServerProperties {
 					mAlwaysPickupMats            = getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender);
 					mNamedPickupMats             = getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender);
 
-					plugin.mSafeZoneManager.reload(object.get("locationBounds"), sender);
-
 					if (sender != null) {
 						sender.sendMessage(ChatColor.GOLD + "Successfully reloaded monumenta configuration");
 					}

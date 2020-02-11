@@ -15,7 +15,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.safezone.SafeZoneManager;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -77,8 +78,7 @@ public class Spectate implements Listener {
 			} else {
 				CommandAPI.fail(ChatColor.RED + "You can not use this command in spectator mode");
 			}
-		} else if (plugin.mSafeZoneManager.getLocationType(player).equals(SafeZoneManager.LocationType.Capital)
-		           || plugin.mSafeZoneManager.getLocationType(player).equals(SafeZoneManager.LocationType.SafeZone)) {
+		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE)) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
 		} else {

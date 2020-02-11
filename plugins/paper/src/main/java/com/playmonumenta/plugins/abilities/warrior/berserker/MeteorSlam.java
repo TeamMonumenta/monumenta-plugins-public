@@ -24,11 +24,12 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 /*
  * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
@@ -119,8 +120,7 @@ public class MeteorSlam extends Ability {
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
-		if (locType == LocationType.Capital || locType == LocationType.SafeZone ||
+		if (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES) ||
 		    InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) ||
 		    InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock() ||
 		    inMainHand.getType().isEdible()) {

@@ -17,10 +17,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 
 public class UnstableArrows extends Ability {
@@ -91,8 +92,7 @@ public class UnstableArrows extends Ability {
 						// Custom knockback function because this is unreliable as is with weird arrow location calculations
 						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
 							&& mPlayer.getLocation().distance(explodeLoc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
-							LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
-							if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+							if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 								Vector dir = mPlayer.getLocation().subtract(explodeLoc.toVector()).toVector();
 								dir.setY(dir.getY() / 1.5).normalize().multiply(2);
 								dir.setY(dir.getY() + 0.5);

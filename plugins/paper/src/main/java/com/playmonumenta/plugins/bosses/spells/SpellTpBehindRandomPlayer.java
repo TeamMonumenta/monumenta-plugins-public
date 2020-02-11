@@ -16,9 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import com.playmonumenta.plugins.safezone.SafeZoneManager;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class SpellTpBehindRandomPlayer extends Spell {
 	private static final int MAX_RANGE = 80;
@@ -41,17 +41,10 @@ public class SpellTpBehindRandomPlayer extends Spell {
 		while (!players.isEmpty()) {
 			Player target = players.get(mRand.nextInt(players.size()));
 
-			if (SafeZoneManager.getInstance() != null) {
-				/* Do not teleport to players in safezones */
-				LocationType zone = SafeZoneManager.getInstance().getLocationType(target);
-				if (zone.equals(LocationType.Capital) || zone.equals(LocationType.SafeZone)) {
-					/* This player is in a safe area - don't tp to them */
-					players.remove(target);
-				} else {
-					launch(target);
-					animation(target);
-					break;
-				}
+			/* Do not teleport to players in safezones */
+			if (ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+				/* This player is in a safe area - don't tp to them */
+				players.remove(target);
 			} else {
 				launch(target);
 				animation(target);

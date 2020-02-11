@@ -90,7 +90,6 @@ import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -100,6 +99,8 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
@@ -274,7 +275,7 @@ public class EntityListener implements Listener {
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE
-				&& world.getBlockAt(damagee.getLocation().getBlockX(), 10, damagee.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+				&& ZoneUtils.inPlot(damagee, mPlugin.mServerProperties.getIsTownWorld())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -307,7 +308,7 @@ public class EntityListener implements Listener {
 
 				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 				if (player.getGameMode() == GameMode.ADVENTURE
-					&& world.getBlockAt(damagee.getLocation().getBlockX(), 10, damagee.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+					&& ZoneUtils.inPlot(damagee, mPlugin.mServerProperties.getIsTownWorld())) {
 					damager.remove();
 					event.setCancelled(true);
 					return;
@@ -406,8 +407,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			LocationType locType = mPlugin.mSafeZoneManager.getLocationType(player.getLocation());
-			if (locType == LocationType.Capital || locType == LocationType.SafeZone) {
+			if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.RESIST_5)) {
 				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
 					event.setCancelled(true);
 					return;
@@ -696,12 +696,11 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	// Cancel explosions in safezones
+	// Cancel explosions in adventure zones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		// Cancel the event immediately if within a safezone
-		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getLocation());
-		if (zone != LocationType.None) {
+		// Cancel the event immediately if within a adventure zone
+		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -717,8 +716,8 @@ public class EntityListener implements Listener {
 		while (iter.hasNext()) {
 			Block block = iter.next();
 
-			// If any block damaged by an explosion is with a safezone, cancel the explosion
-			if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
+			// If any block damaged by an explosion is with a adventure zone, cancel the explosion
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -731,12 +730,11 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	// Cancel explosions in safezones
+	// Cancel explosions in adventure zones
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
-		// Cancel the event immediately if within a safezone
-		LocationType zone = mPlugin.mSafeZoneManager.getLocationType(event.getBlock().getLocation());
-		if (zone != LocationType.None) {
+		// Cancel the event immediately if within a zone with no explosions
+		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -745,8 +743,8 @@ public class EntityListener implements Listener {
 		while (iter.hasNext()) {
 			Block block = iter.next();
 
-			// If any block damaged by an explosion is with a safezone, cancel the explosion
-			if (mPlugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None) {
+			// If any block damaged by an explosion is with a adventure zone, cancel the explosion
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				event.setCancelled(true);
 				return;
 			}

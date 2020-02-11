@@ -4,9 +4,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -17,7 +15,9 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class ItemOverrides {
 	/*
@@ -289,13 +289,10 @@ public class ItemOverrides {
 
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (plugin.mSafeZoneManager.getLocationType(block.getLocation()) != LocationType.None &&
-			    plugin.mSafeZoneManager.getLocationType(player.getLocation()) == LocationType.None) {
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
+			    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
-				Location testLocation = block.getLocation();
-				testLocation.setY(10.0);
-				Material testMaterial = testLocation.getBlock().getType();
-				if (testMaterial != Material.SPONGE && testMaterial != Material.OBSIDIAN) {
+				if (!ZoneUtils.inPlot(block.getLocation(), plugin.mServerProperties.getIsTownWorld())) {
 					eventCancelled = true;
 				}
 			}

@@ -94,7 +94,6 @@ import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -106,6 +105,8 @@ import com.playmonumenta.plugins.utils.ItemUtils.ItemDeathResult;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
@@ -163,7 +164,6 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
-		World world = player.getWorld();
 
 		/* Don't let the player interact with the world when transferring */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
@@ -201,7 +201,7 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-				    && world.getBlockAt(location.getBlockX(), 10, location.getBlockZ()).getType() == Material.SPONGE) {
+				    && ZoneUtils.inPlot(location, mPlugin.mServerProperties.getIsTownWorld())) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
@@ -266,11 +266,10 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
-		World world = player.getWorld();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -291,7 +290,7 @@ public class PlayerListener implements Listener {
 
 			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE
-			    && world.getBlockAt(frame.getLocation().getBlockX(), 10, frame.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+			    && ZoneUtils.inPlot(frame, mPlugin.mServerProperties.getIsTownWorld())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -339,12 +338,11 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
-		World world = player.getWorld();
 		ArmorStand armorStand = event.getRightClicked();
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -352,7 +350,7 @@ public class PlayerListener implements Listener {
 
 		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
 		if (player.getGameMode() == GameMode.ADVENTURE
-		    && world.getBlockAt(armorStand.getLocation().getBlockX(), 10, armorStand.getLocation().getBlockZ()).getType() == Material.SPONGE) {
+		    && ZoneUtils.inPlot(armorStand, mPlugin.mServerProperties.getIsTownWorld())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -371,7 +369,7 @@ public class PlayerListener implements Listener {
 
 		/* Don't let the player do this when transferring or if in a restricted zone */
 		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 		        && player.getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
@@ -387,7 +385,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 			        && player.getGameMode() != GameMode.CREATIVE)) {
 				event.setCancelled(true);
 				return;
@@ -491,7 +489,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 			        && player.getGameMode() != GameMode.CREATIVE
 			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
@@ -525,8 +523,7 @@ public class PlayerListener implements Listener {
 			if (ChestUtils.isEmpty(chest)
 			    && (GraveUtils.isGrave(chest)
 			        || (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest")))) {
-				LocationType locationType = mPlugin.mSafeZoneManager.getLocationType(chest.getLocation());
-				if (locationType != LocationType.None) {
+				if (!ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 					chest.getBlock().breakNaturally();
 				}
 			}
@@ -541,7 +538,7 @@ public class PlayerListener implements Listener {
 
 			/* Don't let the player do this when transferring or if in a restricted zone */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (mPlugin.mSafeZoneManager.getLocationType(player) == LocationType.RestrictedZone
+			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
 			        && player.getGameMode() != GameMode.CREATIVE
 			        && player.getGameMode() != GameMode.SPECTATOR)) {
 				event.setCancelled(true);
@@ -808,7 +805,7 @@ public class PlayerListener implements Listener {
 			}
 
 			// Players that get resistance from safezones don't take armor damage
-			if (damage < 0 || !mPlugin.mSafeZoneManager.locationAllowsEquipmentDamage(event.getPlayer())) {
+			if (damage < 0 || ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				damage = 0;
 			}
 

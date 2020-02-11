@@ -25,11 +25,12 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 /*
  * Bodyguard: Blocking while looking directly at another player
@@ -144,10 +145,9 @@ public class Bodyguard extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
 		}
 		return false;

@@ -19,10 +19,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.safezone.SafeZoneManager.LocationType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 /*
 * Sprint right click (without a bow) to execute a fast dash that launches the
@@ -61,8 +62,7 @@ public class PrecisionStrike extends Ability {
 	public boolean runCheck() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		LocationType locType = mPlugin.mSafeZoneManager.getLocationType(mPlayer.getLocation());
-		if (locType != LocationType.Capital && locType != LocationType.SafeZone) {
+		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
 			return mPlayer.isSprinting() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
 			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() &&
