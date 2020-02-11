@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -21,6 +22,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 public class Boss {
 	private final Plugin mPlugin;
 	private final List<BossAbilityGroup> mAbilities;
+	private Entity mLastHitBy;
 
 	public Boss(Plugin plugin, BossAbilityGroup ability) {
 		mPlugin = plugin;
@@ -222,5 +224,13 @@ public class Boss {
 			ability.mDead = true;
 			ability.death(event);
 		}
+	}
+
+	public Entity getLastHitBy() {
+		return mLastHitBy;
+	}
+
+	public void setLastHitBy(Entity getLastHitBy) {
+		this.mLastHitBy = getLastHitBy;
 	}
 }

@@ -26,6 +26,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -70,6 +72,7 @@ import com.playmonumenta.plugins.bosses.bosses.FireballBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameLaserBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameNovaBoss;
 import com.playmonumenta.plugins.bosses.bosses.FloatBoss;
+import com.playmonumenta.plugins.bosses.bosses.FocusFireBoss;
 import com.playmonumenta.plugins.bosses.bosses.FrostNovaBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericBoss;
 import com.playmonumenta.plugins.bosses.bosses.HalloweenCreeperBoss;
@@ -208,6 +211,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> new EvokerNoVex(p, e));
 		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> new HalloweenCreeperBoss(p, e));
 		mStatelessBosses.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> new NoExperienceBoss(p, e));
+		mStatelessBosses.put(FocusFireBoss.identityTag, (Plugin p, LivingEntity e) -> new FocusFireBoss(p, e));
+
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		mStatefulBosses = new HashMap<String, StatefulBossConstructor>();
@@ -299,6 +304,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> HalloweenCreeperBoss.deserialize(p, e));
 		mBossDeserializers.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e) -> HeadlessHorsemanBoss.deserialize(p, e));
 		mBossDeserializers.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> NoExperienceBoss.deserialize(p, e));
+		mBossDeserializers.put(FocusFireBoss.identityTag, (Plugin p, LivingEntity e) -> FocusFireBoss.deserialize(p, e));
+
 	}
 
 	/********************************************************************************
@@ -448,6 +455,21 @@ public class BossManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
+	public void entityDamageEvent(EntityDamageEvent event) {
+		if (event.getCause() == DamageCause.FIRE_TICK) {
+			Entity damagee = event.getEntity();
+			if (damagee != null && !event.isCancelled()) {
+				Boss boss = mBosses.get(damagee.getUniqueId());
+				if (boss != null && boss.getLastHitBy() != null) {
+					// May cancel the event
+					EntityDamageByEntityEvent newEvent = new EntityDamageByEntityEvent(boss.getLastHitBy(), damagee, DamageCause.FIRE_TICK, event.getDamage());
+					boss.bossDamagedByEntity(newEvent);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
@@ -457,6 +479,12 @@ public class BossManager implements Listener {
 			if (boss != null) {
 				// May cancel the event
 				boss.bossDamagedByEntity(event);
+				if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof Entity) {
+					Entity e = (Entity) ((Projectile) damager).getShooter();
+					boss.setLastHitBy(e);
+				} else {
+					boss.setLastHitBy(damager);
+				}
 			}
 		}
 
@@ -475,6 +503,13 @@ public class BossManager implements Listener {
 						// May cancel the event
 						boss.bossDamagedEntity(event);
 					}
+				}
+			}
+			if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof LivingEntity) {
+				boss = mBosses.get(((LivingEntity) ((Projectile) damager).getShooter()).getUniqueId());
+				if (boss != null) {
+					// May cancel the event
+					boss.bossDamagedEntity(event);
 				}
 			}
 		}
