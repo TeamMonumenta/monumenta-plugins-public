@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class ThrowingKnife implements BaseEnchantment {
 
+	private static final String METADATA_KEY = "ThrowingKnife";
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Throwing Knife";
 	private static final double ARROW_VELOCITY = 3.25;
 
@@ -35,6 +37,10 @@ public class ThrowingKnife implements BaseEnchantment {
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
+	}
+
+	public static boolean isThrowingKnife(Arrow arrow) {
+		return arrow.hasMetadata(METADATA_KEY);
 	}
 
 	@Override
@@ -53,10 +59,12 @@ public class ThrowingKnife implements BaseEnchantment {
 						Arrow arrow = player.launchProjectile(Arrow.class);
 						arrow.setVelocity(dir.clone().multiply(ARROW_VELOCITY));
 						arrow.setCritical(true);
+						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 					} else if (item.getType() == Material.SPECTRAL_ARROW) {
 						Arrow arrow = player.launchProjectile(SpectralArrow.class);
 						arrow.setVelocity(dir.clone().multiply(ARROW_VELOCITY));
 						arrow.setCritical(true);
+						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 					} else if (item.getType() == Material.TIPPED_ARROW) {
 						PotionMeta meta = (PotionMeta) item.getItemMeta();
 						TippedArrow arrow = player.launchProjectile(TippedArrow.class);
@@ -68,6 +76,7 @@ public class ThrowingKnife implements BaseEnchantment {
 						}
 						arrow.setVelocity(dir.clone().multiply(ARROW_VELOCITY));
 						arrow.setCritical(true);
+						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 						arrow.setPickupStatus(PickupStatus.DISALLOWED);
 					}
 

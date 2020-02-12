@@ -87,6 +87,7 @@ import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -322,6 +323,11 @@ public class EntityListener implements Listener {
 						 * If we don't return, then the side effects of LivingEntityShotByPlayerEvent() will
 						 * still occur (e.g. wither) despite the damage event being canceled.
 						 */
+						return;
+					}
+
+					// If arrow is a throwing knife, skip added damage calculations.
+					if (ThrowingKnife.isThrowingKnife(arrow)) {
 						return;
 					}
 
