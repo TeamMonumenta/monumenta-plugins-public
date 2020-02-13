@@ -834,9 +834,11 @@ public class PlayerListener implements Listener {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-		    || cause.equals(TeleportCause.ENDER_PEARL)
 		    || cause.equals(TeleportCause.END_GATEWAY)
 		    || cause.equals(TeleportCause.END_PORTAL)
+		    || (cause.equals(TeleportCause.ENDER_PEARL)
+		        && (ZoneUtils.hasZoneProperty(event.getFrom(), ZoneProperty.ADVENTURE_MODE)
+		            || ZoneUtils.hasZoneProperty(event.getTo(), ZoneProperty.ADVENTURE_MODE)))
 		    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;

@@ -23,6 +23,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Drowned;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
@@ -578,6 +579,23 @@ public class EntityListener implements Listener {
 					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
+					event.setCancelled(true);
+					return;
+				}
+			} else if (event.getEntityType() == EntityType.ENDER_PEARL) {
+				EnderPearl origPearl = (EnderPearl)proj;
+				ItemStack itemInMainHand = player.getEquipment().getItemInMainHand();
+				ItemStack itemInOffHand = player.getEquipment().getItemInOffHand();
+
+				// Check if the player has an infinity ender pearl in main or off hand
+				if (((itemInMainHand.getType().equals(Material.ENDER_PEARL)) &&
+				     (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0)) ||
+				    ((itemInOffHand.getType().equals(Material.ENDER_PEARL)) &&
+				     (itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0))) {
+
+					EnderPearl newPearl = (EnderPearl)mWorld.spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
+					newPearl.setShooter(player);
+					newPearl.setVelocity(origPearl.getVelocity());
 					event.setCancelled(true);
 					return;
 				}
