@@ -249,4 +249,7 @@ public abstract class Ability {
 		obj.addProperty("score", getAbilityScore());
 		return obj;
 	}
+
+	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */
+	public void invalidate() { }
 }

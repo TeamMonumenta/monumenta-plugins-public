@@ -85,7 +85,7 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
 import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
-import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritAbility;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpirit;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
@@ -292,7 +292,7 @@ public class AbilityManager {
 			                               /********** MAGE **********/
 			                               // ELEMENTALIST
 										   // Starfall up above
-			                               new ElementalSpiritAbility(mPlugin, mWorld, mRandom, null),
+			                               new ElementalSpirit(mPlugin, mWorld, mRandom, null),
 			                               new Blizzard(mPlugin, mWorld, mRandom, null),
 
 			                               // MAGE SWORDSMAN
@@ -399,6 +399,11 @@ public class AbilityManager {
 		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
+
+		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
+		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+			abil.invalidate();
+		}
 
 		List<Ability> abilities = new ArrayList<Ability>();
 

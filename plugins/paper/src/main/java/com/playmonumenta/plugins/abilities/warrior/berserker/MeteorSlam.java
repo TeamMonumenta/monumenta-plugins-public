@@ -62,6 +62,7 @@ public class MeteorSlam extends Ability {
 	private double mFallDistance = 0;
 	private boolean mCanTrigger = false;
 	private final Plugin mPlugin;
+	private final BukkitRunnable mRunnable;
 
 	public MeteorSlam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player);
@@ -73,7 +74,7 @@ public class MeteorSlam extends Ability {
 		mInfo.ignoreCooldown = true;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
-		new BukkitRunnable() {
+		mRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (player == null ||
@@ -95,7 +96,8 @@ public class MeteorSlam extends Ability {
 					mFallDistance = player.getFallDistance();
 				}
 			}
-		}.runTaskTimer(plugin, 0, 1);
+		};
+		mRunnable.runTaskTimer(plugin, 0, 1);
 	}
 
 	@Override
@@ -192,4 +194,10 @@ public class MeteorSlam extends Ability {
 		return Math.min(8, mFallDistance) * dmgMultLow + Math.max(0, (mFallDistance - 8)) * dmgMultHigh;
 	}
 
+	@Override
+	public void invalidate() {
+		if (mRunnable != null && mRunnable.isCancelled()) {
+			mRunnable.cancel();
+		}
+	}
 }

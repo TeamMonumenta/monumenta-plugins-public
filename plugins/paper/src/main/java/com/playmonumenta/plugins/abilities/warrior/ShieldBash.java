@@ -147,4 +147,9 @@ public class ShieldBash extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD;
 	}
+
+	@Override
+	public void invalidate() {
+		mPlayersWithShieldBash.remove(mPlayer.getUniqueId());
+	}
 }
