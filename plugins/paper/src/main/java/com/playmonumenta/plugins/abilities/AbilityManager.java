@@ -400,8 +400,10 @@ public class AbilityManager {
 		player.setInvulnerable(false);
 
 		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			abil.invalidate();
+		if (mAbilities.containsKey(player.getUniqueId())) {
+			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+				abil.invalidate();
+			}
 		}
 
 		List<Ability> abilities = new ArrayList<Ability>();
