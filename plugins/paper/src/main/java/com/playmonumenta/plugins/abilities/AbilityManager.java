@@ -30,7 +30,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -487,200 +486,139 @@ public class AbilityManager {
 		return true;
 	}
 
-	public boolean playerDamagedEvent(Player player, EntityDamageEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerDamagedEvent(event)) {
+	@FunctionalInterface
+	private interface CastArgumentNoReturn {
+		void run(Ability ability);
+	}
+
+	@FunctionalInterface
+	private interface CastArgumentWithReturn {
+		boolean run(Ability ability);
+	}
+
+	private void conditionalCast(Player player, CastArgumentNoReturn func) {
+		for (Ability ability : getPlayerAbilities(player).getAbilities()) {
+			if (ability.canCast()) {
+				func.run(ability);
+			}
+		}
+	}
+
+	private boolean conditionalCastCancellable(Player player, CastArgumentWithReturn func) {
+		for (Ability ability : getPlayerAbilities(player).getAbilities()) {
+			if (ability.canCast()) {
+				if (!func.run(ability)) {
 					return false;
 				}
 			}
 		}
 		return true;
+	}
+
+	public boolean playerDamagedEvent(Player player, EntityDamageEvent event) {
+		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedEvent(event));
 	}
 
 	public boolean playerDamagedByLivingEntityEvent(Player player, EntityDamageByEntityEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerDamagedByLivingEntityEvent(event)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedByLivingEntityEvent(event));
 	}
 
 	public boolean playerDamagedByProjectileEvent(Player player, EntityDamageByEntityEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerDamagedByProjectileEvent(event)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.playerDamagedByProjectileEvent(event));
 	}
 
 	public boolean playerCombustByEntityEvent(Player player, EntityCombustByEntityEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerCombustByEntityEvent(event)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.playerCombustByEntityEvent(event));
 	}
 
 	public boolean livingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.livingEntityShotByPlayerEvent(arrow, damagee, event)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.livingEntityShotByPlayerEvent(arrow, damagee, event));
 	}
 
 	public boolean playerShotArrowEvent(Player player, Arrow arrow) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerShotArrowEvent(arrow)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.playerShotArrowEvent(arrow));
 	}
 
 	public boolean playerThrewSplashPotionEvent(Player player, SplashPotion potion) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerThrewSplashPotionEvent(potion)) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return conditionalCastCancellable(player, (ability) -> ability.playerThrewSplashPotionEvent(potion));
 	}
 
 	public boolean playerThrewLingeringPotionEvent(Player player, LingeringPotion potion) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerThrewLingeringPotionEvent(potion)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	public void playerItemConsumeEvent(Player player, PlayerItemConsumeEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerItemConsumeEvent(event);
-			}
-		}
-	}
-
-	public void playerItemDamageEvent(Player player, PlayerItemDamageEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerItemDamageEvent(event);
-			}
-		}
-	}
-
-	public void entityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.entityDeathEvent(event, shouldGenDrops);
-			}
-		}
-	}
-
-	public void entityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (event.getEntity().getLocation().distance(player.getLocation()) <= abil.entityDeathRadius()) {
-					abil.entityDeathRadiusEvent(event, shouldGenDrops);
-				}
-			}
-		}
-	}
-
-	public void playerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerItemHeldEvent(mainHand, offHand);
-			}
-		}
-	}
-
-	public void projectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.projectileHitEvent(event, arrow);
-			}
-		}
-	}
-
-	public void bossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerDamagedByBossEvent(event);
-			}
-		}
-	}
-
-	public void playerExtendedSneakEvent(Player player) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerExtendedSneakEvent();
-			}
-		}
-	}
-
-	public void playerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerHitByProjectileEvent(event);
-			}
-		}
+		return conditionalCastCancellable(player, (ability) -> ability.playerThrewLingeringPotionEvent(potion));
 	}
 
 	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 	                                       ThrownPotion potion, PotionSplashEvent event) {
-		boolean re = true;
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerSplashPotionEvent(affectedEntities, potion, event)) {
-					re = false;
-				}
-			}
-		}
-		return re;
+		return conditionalCastCancellable(player, (ability) -> ability.playerSplashPotionEvent(affectedEntities, potion, event));
 	}
 
 	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
 	                                           ThrownPotion potion, PotionSplashEvent event) {
-		boolean re = true;
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				if (!abil.playerSplashedByPotionEvent(affectedEntities, potion, event)) {
-					re = false;
-				}
+		return conditionalCastCancellable(player, (ability) -> ability.playerSplashedByPotionEvent(affectedEntities, potion, event));
+	}
+
+	public void playerItemConsumeEvent(Player player, PlayerItemConsumeEvent event) {
+		conditionalCast(player, (ability) -> ability.playerItemConsumeEvent(event));
+	}
+
+	public void playerItemDamageEvent(Player player, PlayerItemDamageEvent event) {
+		conditionalCast(player, (ability) -> ability.playerItemDamageEvent(event));
+	}
+
+	public void entityDeathEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+		conditionalCast(player, (ability) -> ability.entityDeathEvent(event, shouldGenDrops));
+	}
+
+	public void entityDeathRadiusEvent(Player player, EntityDeathEvent event, boolean shouldGenDrops) {
+		conditionalCast(player, (ability) -> {
+			if (event.getEntity().getLocation().distance(player.getLocation()) <= ability.entityDeathRadius()) {
+				ability.entityDeathRadiusEvent(event, shouldGenDrops);
 			}
-		}
-		return re;
+		});
+	}
+
+	public void playerItemHeldEvent(Player player, ItemStack mainHand, ItemStack offHand) {
+		conditionalCast(player, (ability) -> ability.playerItemHeldEvent(mainHand, offHand));
+	}
+
+	public void projectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
+		conditionalCast(player, (ability) -> ability.projectileHitEvent(event, arrow));
+	}
+
+	public void bossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {
+		conditionalCast(player, (ability) -> ability.playerDamagedByBossEvent(event));
+	}
+
+	public void playerExtendedSneakEvent(Player player) {
+		conditionalCast(player, (ability) -> ability.playerExtendedSneakEvent());
+	}
+
+	public void playerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
+		conditionalCast(player, (ability) -> ability.playerHitByProjectileEvent(event));
 	}
 
 	public void periodicTrigger(Player player, boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.periodicTrigger(fourHertz, twoHertz, oneSecond, ticks);
-			}
-		}
+		conditionalCast(player, (ability) -> ability.periodicTrigger(fourHertz, twoHertz, oneSecond, ticks));
+	}
+
+	public void playerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
+		conditionalCast(player, (ability) -> ability.playerDealtCustomDamageEvent(event));
+	}
+
+	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
+		conditionalCast(player, (ability) -> ability.entityTargetLivingEntityEvent(event));
+	}
+
+	public void potionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
+		conditionalCast(player, (ability) -> ability.potionApplyEvent(event));
+	}
+
+	public void playerDeathEvent(Player player, PlayerDeathEvent event) {
+		conditionalCast(player, (ability) -> ability.playerDeathEvent(event));
+	}
+
+	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
+		conditionalCast(player, (ability) -> ability.playerAnimationEvent(event));
 	}
 
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
@@ -715,46 +653,6 @@ public class AbilityManager {
 				} else if (info.trigger == AbilityTrigger.ALL) {
 					abil.cast(action);
 				}
-			}
-		}
-	}
-
-	public void playerDealtCustomDamageEvent(Player player, CustomDamageEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerDealtCustomDamageEvent(event);
-			}
-		}
-	}
-
-	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.entityTargetLivingEntityEvent(event);
-			}
-		}
-	}
-
-	public void potionEffectApplyEvent(Player player, PotionEffectApplyEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.potionApplyEvent(event);
-			}
-		}
-	}
-
-	public void playerDeathEvent(Player player, PlayerDeathEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast()) {
-				abil.playerDeathEvent(event);
-			}
-		}
-	}
-
-	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			if (abil.canCast() && event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-				abil.playerAnimationEvent(event);
 			}
 		}
 	}

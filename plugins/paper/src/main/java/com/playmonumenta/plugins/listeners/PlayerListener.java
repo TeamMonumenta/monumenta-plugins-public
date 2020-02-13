@@ -47,6 +47,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -1099,6 +1100,8 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
-		AbilityManager.getManager().playerAnimationEvent(player, event);
+		if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
+			AbilityManager.getManager().playerAnimationEvent(player, event);
+		}
 	}
 }
