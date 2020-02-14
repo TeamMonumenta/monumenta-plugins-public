@@ -9,7 +9,8 @@ public enum MagicType {
 	PHYSICAL,
 	DARK_MAGIC,
 	ALCHEMY,
-	NONE;
+	NONE,
+	HOLY;
 
 
 }

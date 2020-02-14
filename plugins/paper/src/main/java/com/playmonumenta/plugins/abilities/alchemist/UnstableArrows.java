@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -82,7 +83,7 @@ public class UnstableArrows extends Ability {
 						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(explodeLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
-							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer);
+							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY);
 							MovementUtils.knockAwayRealistic(explodeLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
 							if (bp != null) {
 								bp.apply(mob);

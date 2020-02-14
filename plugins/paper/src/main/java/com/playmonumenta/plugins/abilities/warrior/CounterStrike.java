@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -61,7 +62,7 @@ public class CounterStrike extends Ability {
 				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer);
+					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */);
 				}
 			}
 

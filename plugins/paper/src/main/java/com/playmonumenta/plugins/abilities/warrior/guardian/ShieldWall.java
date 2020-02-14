@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -148,7 +149,7 @@ public class ShieldWall extends Ability {
 								if (!mobsAlreadyHit.contains(le)) {
 									mobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
-									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer);
+									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY);
 									if (knockback) {
 										MovementUtils.knockAway(loc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);

@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -136,7 +137,7 @@ public class Inferno implements BaseEnchantment {
 							mob.setNoDamageTicks(0);
 							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 							Vector velocity = mob.getVelocity();
-							EntityUtils.damageEntity(plugin, mob, damage, value.mTriggeredBy);
+							EntityUtils.damageEntity(plugin, mob, damage, value.mTriggeredBy, MagicType.ALCHEMY /* Use a better type here */);
 							mob.setVelocity(velocity);
 							mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 						}

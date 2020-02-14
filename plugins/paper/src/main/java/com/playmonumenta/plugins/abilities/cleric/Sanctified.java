@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -39,7 +40,7 @@ public class Sanctified extends Ability {
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getDamager();
 		if (EntityUtils.isUndead(damager) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer);
+			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer, MagicType.HOLY);
 
 			MovementUtils.knockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
 

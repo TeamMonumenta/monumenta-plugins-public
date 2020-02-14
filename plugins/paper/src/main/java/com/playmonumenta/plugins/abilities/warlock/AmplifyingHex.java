@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -113,7 +114,7 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 				}
 				if (debuffCount > 0) {
-					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player);
+					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player, MagicType.DARK_MAGIC);
 					MovementUtils.knockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
 				}
 			}

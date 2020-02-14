@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -75,7 +76,7 @@ public class ConsumingFlames extends Ability {
 			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
 			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob);
 
-			EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player);
+			EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player, MagicType.DARK_MAGIC);
 			effect = true;
 		}
 

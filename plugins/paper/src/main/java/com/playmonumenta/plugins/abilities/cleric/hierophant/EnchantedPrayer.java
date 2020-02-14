@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -123,7 +124,7 @@ public class EnchantedPrayer extends Ability {
 			double damage = enchantedPrayer == 1 ? 5 : 10;
 			double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-				EntityUtils.damageEntity(plugin, le, damage, player);
+				EntityUtils.damageEntity(plugin, le, damage, player, MagicType.HOLY);
 			}
 			PlayerUtils.healPlayer(player, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * heal);
 		}

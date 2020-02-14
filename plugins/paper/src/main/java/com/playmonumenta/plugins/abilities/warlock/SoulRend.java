@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -67,7 +68,7 @@ public class SoulRend extends Ability {
 				if (dp != null && dp.isActive()) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SOUL_REND_RADIUS)) {
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
-						EntityUtils.damageEntity(mPlugin, mob, heal / 2, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, heal / 2, mPlayer, MagicType.DARK_MAGIC);
 					}
 				} else {
 					if (soulRend > 1) {

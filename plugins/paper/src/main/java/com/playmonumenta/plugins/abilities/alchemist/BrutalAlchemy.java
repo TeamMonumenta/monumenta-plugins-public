@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -48,7 +49,7 @@ public class BrutalAlchemy extends Ability {
 	}
 
 	public void apply(LivingEntity mob) {
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY);
 		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, mWitherDuration, 1, false, true));
 	}
 

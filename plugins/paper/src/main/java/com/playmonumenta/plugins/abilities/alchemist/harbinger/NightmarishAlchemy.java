@@ -13,6 +13,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
@@ -55,7 +56,7 @@ public class NightmarishAlchemy extends Ability {
 	}
 
 	public boolean apply(LivingEntity mob, int size, boolean guaranteedApplicationApplied) {
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY);
 		if (mob instanceof Mob) {
 			if (mRandom.nextFloat() < NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE || !guaranteedApplicationApplied && size >= 5) {
 				EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, mob);

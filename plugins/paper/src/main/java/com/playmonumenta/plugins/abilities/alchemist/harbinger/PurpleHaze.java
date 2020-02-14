@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -101,7 +102,7 @@ public class PurpleHaze extends Ability {
 							int ticks = damagee.getNoDamageTicks();
 							damagee.setNoDamageTicks(0);
 							Vector v = damagee.getVelocity();
-							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, null, false /* do not register CustomDamageEvent */);
+							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */);
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));

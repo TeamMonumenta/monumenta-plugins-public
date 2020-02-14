@@ -245,6 +245,10 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				}
 			}
+			if (event.getCause() == DamageCause.THORNS && MetadataUtils.happenedThisTick(mPlugin, damagee, "LastMagicUseTime", 0)) {
+				// Check that thorns isn't being caused by 'magic'; if it is, cancel the damage
+				event.setCancelled(true);
+			}
 		} else {
 			//  Don't hurt Villagers!
 			if (damagee instanceof Villager) {

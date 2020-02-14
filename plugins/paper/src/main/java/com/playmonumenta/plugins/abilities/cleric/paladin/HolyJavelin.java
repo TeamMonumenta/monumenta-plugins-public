@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
@@ -86,9 +87,9 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY);
 					} else {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY);
 					}
 					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob);
 					iter.remove();

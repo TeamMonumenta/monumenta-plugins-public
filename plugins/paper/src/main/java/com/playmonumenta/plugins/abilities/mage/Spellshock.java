@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -118,7 +119,7 @@ public class Spellshock extends Ability {
 						// will not see it as intentional damage stacking, so iFrames need to be set manually
 						damagee.setNoDamageTicks(0);
 						Vector velocity = damagee.getVelocity();
-						EntityUtils.damageEntity(plugin, damagee, damage, damager, null, false /* do not register CustomDamageEvent */);
+						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */);
 						damagee.setVelocity(velocity);
 						if (abilityScore > 1) {
 							EntityUtils.applyStun(plugin, SPELL_SHOCK_STUN_DURATION, damagee);

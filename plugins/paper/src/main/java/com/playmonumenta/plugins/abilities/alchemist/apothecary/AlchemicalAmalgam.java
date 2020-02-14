@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -96,7 +97,7 @@ public class AlchemicalAmalgam extends Ability {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox.overlaps(mob.getBoundingBox())) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY);
 						mobIter.remove();
 					}
 				}

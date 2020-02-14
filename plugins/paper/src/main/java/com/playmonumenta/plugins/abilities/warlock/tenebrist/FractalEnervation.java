@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -141,7 +142,7 @@ public class FractalEnervation extends Ability {
 				mob.addPotionEffect(new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 			}
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
-			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
+			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer, MagicType.DARK_MAGIC);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
 		}

@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -63,7 +64,7 @@ public class InvigoratingOdor extends Ability {
 	}
 
 	public void apply(LivingEntity le) {
-		EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer);
+		EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer, MagicType.ALCHEMY);
 	}
 
 	public void createAura(Location loc, double radius) {

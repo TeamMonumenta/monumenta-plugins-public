@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -90,7 +91,7 @@ public class Exorcism  extends Ability {
 					int ticks = mob.getNoDamageTicks();
 					mob.setNoDamageTicks(0);
 					Vector v = mob.getVelocity();
-					EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, null, false /* do not register CustomDamageEvent */);
+					EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, MagicType.DARK_MAGIC, false /* do not register CustomDamageEvent */);
 					mob.setVelocity(v);
 					mob.setNoDamageTicks(ticks);
 					EntityUtils.applyFire(mPlugin, EXORCISM_DURATION, mob);

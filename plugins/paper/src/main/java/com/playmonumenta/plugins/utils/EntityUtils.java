@@ -502,6 +502,9 @@ public class EntityUtils {
 				// Applies DamageCause.ENTITY_ATTACK
 				target.damage(damage, damager);
 			} else if (damager instanceof Player) {
+				if (magicType != null && !magicType.equals(MagicType.PHYSICAL) && !magicType.equals(MagicType.NONE)) {
+					MetadataUtils.checkOnceThisTick(plugin, damager, "LastMagicUseTime");
+				}
 				// Applies DamageCause.CUSTOM
 				NmsUtils.customDamageEntity(target, damage, (Player) damager, "magic");
 			} else {
