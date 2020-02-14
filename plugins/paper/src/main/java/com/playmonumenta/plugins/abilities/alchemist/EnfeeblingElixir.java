@@ -30,7 +30,7 @@ public class EnfeeblingElixir extends Ability {
 	private static final int ENFEEBLING_RADIUS = 3;
 
 	public EnfeeblingElixir(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Enfeebling Elixir");
 		mInfo.linkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.scoreboardId = "EnfeeblingElixir";
 		mInfo.cooldown = ENFEEBLING_COOLDOWN;

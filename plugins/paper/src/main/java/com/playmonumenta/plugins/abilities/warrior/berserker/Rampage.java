@@ -41,7 +41,7 @@ public class Rampage extends Ability {
 	private int timeToNextDecrement = 0;
 
 	public Rampage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Rampage");
 		mInfo.scoreboardId = "Rampage";
 		rampageKillStreakTime = getAbilityScore() == 1 ? RAMPAGE_1_KILL_TIMER : RAMPAGE_2_KILL_TIMER;
 	}

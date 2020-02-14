@@ -22,7 +22,7 @@ public class ClericPassive extends Ability {
 	private int timer = 0;
 
 	public ClericPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

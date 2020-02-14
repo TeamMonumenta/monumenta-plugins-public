@@ -54,7 +54,7 @@ public class Dodging extends Ability {
 	private int mTriggerTick = 0;
 
 	public Dodging(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Dodging");
 		mInfo.linkedSpell = Spells.DODGING;
 		mInfo.scoreboardId = "Dodging";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!

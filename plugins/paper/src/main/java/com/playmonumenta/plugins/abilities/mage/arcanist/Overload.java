@@ -30,7 +30,7 @@ public class Overload extends Ability {
 	private int mDamage;
 
 	public Overload(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Overload");
 		mInfo.scoreboardId = "Overload";
 		mDamage = getAbilityScore() == 1 ? OVERLOAD_1_DAMAGE : OVERLOAD_2_DAMAGE;
 	}

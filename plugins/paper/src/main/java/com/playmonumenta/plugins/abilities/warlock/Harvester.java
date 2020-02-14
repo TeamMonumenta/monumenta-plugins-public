@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class Harvester extends Ability {
 
 	public Harvester(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Harvester");
 		mInfo.scoreboardId = "Harvester";
 	}
 

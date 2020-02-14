@@ -16,7 +16,7 @@ public class WarriorPassive extends Ability {
 	private static final double PASSIVE_KNOCKBACK_RESISTANCE = 0.2;
 
 	public WarriorPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

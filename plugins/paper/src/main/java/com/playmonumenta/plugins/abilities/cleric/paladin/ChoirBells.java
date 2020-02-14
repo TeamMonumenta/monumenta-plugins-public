@@ -44,7 +44,7 @@ public class ChoirBells extends Ability {
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
 
 	public ChoirBells(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Choir Bells");
 		mInfo.linkedSpell = Spells.CHOIR_BELLS;
 		mInfo.scoreboardId = "ChoirBells";
 		mInfo.cooldown = getAbilityScore() == 1 ? CHOIR_BELLS_1_COOLDOWN : CHOIR_BELLS_2_COOLDOWN;

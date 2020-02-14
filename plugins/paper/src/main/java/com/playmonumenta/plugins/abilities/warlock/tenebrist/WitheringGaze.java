@@ -43,7 +43,7 @@ public class WitheringGaze extends Ability {
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
 
 	public WitheringGaze(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Withering Gaze");
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
 		mInfo.cooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;

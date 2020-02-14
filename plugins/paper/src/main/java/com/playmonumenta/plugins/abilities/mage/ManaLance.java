@@ -36,7 +36,7 @@ public class ManaLance extends Ability {
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
 	public ManaLance(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Mana Lance");
 		mInfo.linkedSpell = Spells.MANA_LANCE;
 		mInfo.scoreboardId = "ManaLance";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!

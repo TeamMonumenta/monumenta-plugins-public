@@ -52,7 +52,7 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 
 	public ShieldWall(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Shield Wall");
 		mInfo.scoreboardId = "ShieldWall";
 		mInfo.cooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.linkedSpell = Spells.SHIELD_WALL;

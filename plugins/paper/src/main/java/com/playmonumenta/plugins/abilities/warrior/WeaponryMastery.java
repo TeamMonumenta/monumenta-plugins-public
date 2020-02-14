@@ -25,7 +25,7 @@ public class WeaponryMastery extends Ability {
 	private final double damageBonusSword;
 
 	public WeaponryMastery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Weapon Mastery");
 		mInfo.scoreboardId = "WeaponMastery";
 		damageBonusAxe = getAbilityScore() == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
 		damageBonusSword = getAbilityScore() == 1 ? 0 : WEAPON_MASTERY_SWORD_2_DAMAGE;

@@ -43,7 +43,7 @@ public class BodkinBlitz extends Ability {
 	private LivingEntity mark;
 
 	public BodkinBlitz(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Bodkin Blitz");
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
 		mInfo.cooldown = BODKINBLITZ_COOLDOWN;

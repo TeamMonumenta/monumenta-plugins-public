@@ -48,7 +48,7 @@ public class HolyJavelin extends Ability {
 	private int mDamageUndead;
 
 	public HolyJavelin(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Holy Javelin");
 		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.scoreboardId = "HolyJavelin";
 		mInfo.cooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;

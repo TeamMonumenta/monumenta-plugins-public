@@ -74,7 +74,7 @@ public class ShieldBash extends Ability {
 	private int mStunDuration;
 
 	public ShieldBash(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Shield Bash");
 		mInfo.linkedSpell = Spells.SHIELD_BASH;
 		mInfo.scoreboardId = "ShieldBash";
 		mInfo.cooldown = SHIELD_BASH_COOLDOWN;

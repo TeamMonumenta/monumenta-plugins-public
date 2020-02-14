@@ -44,7 +44,7 @@ public class Starfall extends Ability {
 	private int mPrimedTick = -1;
 
 	public Starfall(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Starfall");
 		mInfo.linkedSpell = Spells.STARFALL;
 		mInfo.scoreboardId = "Starfall";
 		mInfo.cooldown = getAbilityScore() == 1 ? STARFALL_1_COOLDOWN : STARFALL_2_COOLDOWN;

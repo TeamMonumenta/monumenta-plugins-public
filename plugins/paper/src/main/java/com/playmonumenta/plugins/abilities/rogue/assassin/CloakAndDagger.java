@@ -63,7 +63,7 @@ public class CloakAndDagger extends Ability {
 	private int cloakOnActivation = 0;
 
 	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Cload and Dagger");
 		mInfo.scoreboardId = "CloakAndDagger";
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.cooldown = 0;

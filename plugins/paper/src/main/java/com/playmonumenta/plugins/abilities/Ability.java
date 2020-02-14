@@ -39,14 +39,24 @@ public abstract class Ability {
 	protected final Random mRandom;
 	protected final AbilityInfo mInfo;
 	protected final Player mPlayer;
+	protected final String mDisplayName;
 	private Integer mScore = null;
 
-	public Ability(Plugin plugin, World world, Random random, Player player) {
+	public Ability(Plugin plugin, World world, Random random, Player player, String displayName) {
 		mPlugin = plugin;
 		mWorld = world;
 		mRandom = random;
 		mPlayer = player;
+		mDisplayName = displayName;
 		mInfo = new AbilityInfo();
+	}
+
+	public String getDisplayName() {
+		return mDisplayName;
+	}
+
+	public String getScoreboard() {
+		return mInfo.scoreboardId;
 	}
 
 	/**

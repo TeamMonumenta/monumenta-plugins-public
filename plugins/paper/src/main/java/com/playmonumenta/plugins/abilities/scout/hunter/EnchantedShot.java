@@ -49,7 +49,7 @@ public class EnchantedShot extends Ability {
 	private boolean mActive = false;
 
 	public EnchantedShot(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Enchanted Arrow");
 		mInfo.scoreboardId = "EnchantedArrow";
 		mInfo.linkedSpell = Spells.ENCHANTED_ARROW;
 		mInfo.cooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;

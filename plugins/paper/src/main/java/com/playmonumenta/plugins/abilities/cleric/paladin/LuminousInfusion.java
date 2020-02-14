@@ -47,7 +47,7 @@ public class LuminousInfusion extends Ability {
 	private boolean mActive = false;
 
 	public LuminousInfusion(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Luminous Infusion");
 		mInfo.linkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.scoreboardId = "LuminousInfusion";
 		mInfo.cooldown = LUMINOUS_INFUSION_COOLDOWN;

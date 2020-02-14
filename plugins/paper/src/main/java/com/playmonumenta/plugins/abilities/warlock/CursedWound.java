@@ -33,7 +33,7 @@ public class CursedWound extends Ability {
 	private final int damageBonus;
 
 	public CursedWound(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Cursed Wound");
 		mInfo.scoreboardId = "CursedWound";
 		damageBonus = getAbilityScore() == 1 ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
 

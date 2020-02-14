@@ -22,7 +22,7 @@ public class BasiliskPoison extends Ability {
 	private static final int BASILISK_POISON_2_DURATION = 6 * 20;
 
 	public BasiliskPoison(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Basilisk Poison");
 		mInfo.scoreboardId = "BasiliskPoison";
 	}
 

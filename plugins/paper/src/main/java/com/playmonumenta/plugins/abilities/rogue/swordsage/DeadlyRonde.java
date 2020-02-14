@@ -52,7 +52,7 @@ public class DeadlyRonde extends Ability {
 	int rondeStacks = 0;
 
 	public DeadlyRonde(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Deadly Ronde");
 		mInfo.scoreboardId = "DeadlyRonde";
 	}
 

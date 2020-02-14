@@ -31,7 +31,7 @@ public class HeavenlyBoon extends Ability {
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0.3;
 
 	public HeavenlyBoon(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Heavenly Boon");
 		mInfo.scoreboardId = "HeavenlyBoon";
 	}
 

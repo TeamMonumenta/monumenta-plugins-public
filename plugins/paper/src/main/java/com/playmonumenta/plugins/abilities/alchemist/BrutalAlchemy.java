@@ -27,7 +27,7 @@ public class BrutalAlchemy extends Ability {
 	private int mWitherDuration;
 
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Brutal Alchemy");
 		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
 		mDamage = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
 		mWitherDuration = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;

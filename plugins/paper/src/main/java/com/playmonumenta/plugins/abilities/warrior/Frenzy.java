@@ -21,7 +21,7 @@ public class Frenzy extends Ability {
 	private static final int FRENZY_DURATION = 5 * 20;
 
 	public Frenzy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Frenzy");
 		mInfo.scoreboardId = "Frenzy";
 	}
 

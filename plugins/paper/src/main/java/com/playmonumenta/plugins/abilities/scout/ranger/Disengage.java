@@ -47,7 +47,7 @@ public class Disengage extends Ability {
 	private int mLandedTick = 0;
 
 	public Disengage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Disengage");
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
 		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;

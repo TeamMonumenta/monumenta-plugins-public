@@ -39,7 +39,7 @@ public class AdrenalSerum extends Ability {
 	private static final Particle.DustOptions ADRENAL_SERUM_COLOR = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 
 	public AdrenalSerum(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Adrenal Serum");
 		mInfo.linkedSpell = Spells.ADRENAL_SERUM;
 		mInfo.scoreboardId = "AdrenalSerum";
 		mInfo.cooldown = ADRENAL_SERUM_COOLDOWN;

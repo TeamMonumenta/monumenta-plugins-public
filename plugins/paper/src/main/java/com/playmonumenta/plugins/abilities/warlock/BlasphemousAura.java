@@ -39,7 +39,7 @@ public class BlasphemousAura extends Ability {
 	private int oldBonus = 0;
 
 	public BlasphemousAura(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Blasphemous Aura");
 		mInfo.scoreboardId = "BlasphemousAura";
 	}
 

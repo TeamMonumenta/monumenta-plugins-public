@@ -42,7 +42,7 @@ public class AdvancingShadows extends Ability {
 	private LivingEntity mTarget = null;
 
 	public AdvancingShadows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Advancing Shadows");
 		mInfo.linkedSpell = Spells.ADVANCING_SHADOWS;
 		mInfo.scoreboardId = "AdvancingShadows";
 		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;

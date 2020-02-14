@@ -37,7 +37,7 @@ public class CounterStrike extends Ability {
 	private boolean mActive = false;
 
 	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Counter Strike");
 		mInfo.scoreboardId = "CounterStrike";
 		mInfo.linkedSpell = Spells.COUNTER_STRIKE;
 		mInfo.cooldown = COUNTER_STRIKE_COOLDOWN;

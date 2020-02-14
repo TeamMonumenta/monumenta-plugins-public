@@ -43,7 +43,7 @@ public class DaggerThrow extends Ability {
 	private int mVulnAmplifier;
 
 	public DaggerThrow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Dagger Throw");
 		mInfo.linkedSpell = Spells.DAGGER_THROW;
 		mInfo.scoreboardId = "DaggerThrow";
 		mInfo.cooldown = DAGGER_THROW_COOLDOWN;

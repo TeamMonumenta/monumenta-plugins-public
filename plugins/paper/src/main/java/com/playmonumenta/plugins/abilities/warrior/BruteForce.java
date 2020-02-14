@@ -26,7 +26,7 @@ public class BruteForce extends Ability {
 	private final double damageBonus;
 
 	public BruteForce(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Brute Force");
 		mInfo.scoreboardId = "BruteForce";
 		damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
 	}

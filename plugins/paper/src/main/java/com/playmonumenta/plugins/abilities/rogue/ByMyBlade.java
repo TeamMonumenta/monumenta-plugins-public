@@ -36,7 +36,7 @@ public class ByMyBlade extends Ability {
 	private int mDamageBonus;
 
 	public ByMyBlade(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "By My Blade");
 		mInfo.linkedSpell = Spells.BY_MY_BLADE;
 		mInfo.scoreboardId = "ByMyBlade";
 		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;

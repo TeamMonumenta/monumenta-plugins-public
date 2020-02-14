@@ -32,7 +32,7 @@ public class Skirmisher extends Ability {
 	private static final int SKIRMISHER_2_THRESHOLD = 4;
 
 	public Skirmisher(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Skirmisher");
 		mInfo.scoreboardId = "Skirmisher";
 	}
 

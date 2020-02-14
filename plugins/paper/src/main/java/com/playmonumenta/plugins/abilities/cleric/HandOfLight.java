@@ -34,7 +34,7 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 
 	public HandOfLight(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Hand of Light");
 		mInfo.linkedSpell = Spells.HEALING;
 		mInfo.scoreboardId = "Healing";
 		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;

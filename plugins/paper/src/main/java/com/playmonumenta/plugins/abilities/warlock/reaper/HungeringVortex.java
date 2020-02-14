@@ -59,7 +59,7 @@ public class HungeringVortex extends Ability {
 	 */
 
 	public HungeringVortex(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Hungering Vortex");
 		mInfo.scoreboardId = "HungeringVortex";
 		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
 		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;

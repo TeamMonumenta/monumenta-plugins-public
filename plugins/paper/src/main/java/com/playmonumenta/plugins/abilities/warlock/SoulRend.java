@@ -30,7 +30,7 @@ public class SoulRend extends Ability {
 	private static final double SOUL_REND_HEAL_MULTIPLIER = 0.2;
 
 	public SoulRend(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Soul Rend");
 		mInfo.scoreboardId = "SoulRend";
 		mInfo.linkedSpell = Spells.SOUL_REND;
 		mInfo.cooldown = getAbilityScore() == 1 ? SOUL_REND_1_COOLDOWN : SOUL_REND_2_COOLDOWN;

@@ -20,7 +20,7 @@ public class EvasionEnchant extends Ability {
 	private int mLastActivationTick = 0;
 
 	public EvasionEnchant(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

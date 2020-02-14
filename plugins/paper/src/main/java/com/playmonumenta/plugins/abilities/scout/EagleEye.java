@@ -29,7 +29,7 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_RADIUS = 20;
 
 	public EagleEye(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Eagle Eye");
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
 		mInfo.scoreboardId = "Tinkering"; // lmao
 		mInfo.cooldown = EAGLE_EYE_COOLDOWN;

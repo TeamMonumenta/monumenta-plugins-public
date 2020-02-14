@@ -47,7 +47,7 @@ public class FlashSword extends Ability {
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
 	public FlashSword(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Flash Sword");
 		mInfo.scoreboardId = "FlashSword";
 		mInfo.linkedSpell = Spells.FSWORD;
 		mInfo.cooldown = FSWORD_COOLDOWN;

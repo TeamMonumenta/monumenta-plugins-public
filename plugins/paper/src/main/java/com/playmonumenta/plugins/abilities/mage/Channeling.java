@@ -42,7 +42,7 @@ public class Channeling extends Ability {
 	private Spells mLastSpellCast;
 
 	public Channeling(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Channeling");
 		mInfo.scoreboardId = "Channeling";
 		mDamage = getAbilityScore() == 1 ? CHANNELING_1_DAMAGE : CHANNELING_2_DAMAGE;
 	}

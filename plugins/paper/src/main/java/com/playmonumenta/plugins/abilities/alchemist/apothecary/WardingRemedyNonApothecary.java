@@ -36,7 +36,7 @@ public class WardingRemedyNonApothecary extends Ability {
 	private int mSeconds = 0;
 
 	public WardingRemedyNonApothecary(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

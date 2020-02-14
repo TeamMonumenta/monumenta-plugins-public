@@ -31,7 +31,7 @@ public class CoupDeGrace extends Ability {
 	private final double threshold;
 
 	public CoupDeGrace(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Coup de Grace");
 		mInfo.scoreboardId = "CoupDeGrace";
 		threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
 	}

@@ -28,7 +28,7 @@ public class GrowingRage extends Ability {
 	private int mHealthThreshold = 0;
 
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Growing Rage");
 		mInfo.scoreboardId = "GrowingRage";
 		damagePercent = 1 + (getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT);
 	}

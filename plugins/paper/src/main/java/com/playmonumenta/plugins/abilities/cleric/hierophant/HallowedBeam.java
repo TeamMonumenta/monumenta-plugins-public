@@ -33,7 +33,7 @@ public class HallowedBeam extends Ability {
 	private static final double HALLOWED_DAMAGE_EXPLOSION = 20;
 
 	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Hallowed Beam");
 		mInfo.scoreboardId = "HallowedBeam";
 		mInfo.linkedSpell = Spells.HALLOWED_BEAM;
 		mInfo.cooldown = 20 * 20;

@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 public class WardingRemedy extends Ability {
 
 	public WardingRemedy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Warding Remedy");
 		mInfo.scoreboardId = "WardingRemedy";
 	}
 

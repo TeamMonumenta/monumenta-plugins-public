@@ -23,7 +23,7 @@ public class Agility extends Ability {
 	private final int mDamageBonus;
 
 	public Agility(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Agility");
 		mInfo.scoreboardId = "Agility";
 		mDamageBonus = getAbilityScore() == 1 ? AGILITY_1_DAMAGE_BONUS : AGILITY_2_DAMAGE_BONUS;
 	}

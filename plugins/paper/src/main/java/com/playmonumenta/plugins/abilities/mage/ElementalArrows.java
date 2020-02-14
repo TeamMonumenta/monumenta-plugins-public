@@ -30,7 +30,7 @@ public class ElementalArrows extends Ability {
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
 	public ElementalArrows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Elemental Arrows");
 		mInfo.linkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.scoreboardId = "Elemental";
 	}

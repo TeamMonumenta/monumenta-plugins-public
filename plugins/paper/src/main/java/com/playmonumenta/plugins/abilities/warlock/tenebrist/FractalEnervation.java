@@ -51,7 +51,7 @@ public class FractalEnervation extends Ability {
 	private int damageBonus;
 
 	public FractalEnervation(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Fractal Enervation");
 		mInfo.scoreboardId = "Fractal";
 		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

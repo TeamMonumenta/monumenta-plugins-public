@@ -17,7 +17,7 @@ public class Swiftness extends Ability {
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 
 	public Swiftness(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Swiftness");
 		mInfo.scoreboardId = "Swiftness";
 	}
 

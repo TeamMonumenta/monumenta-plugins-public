@@ -44,7 +44,7 @@ public class FinishingBlow extends Ability {
 	private int mDamageBonus;
 
 	public FinishingBlow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Finishing Blow");
 		mInfo.scoreboardId = "FinishingBlow";
 		mDamageBonus = getAbilityScore() == 1 ? FINISHING_BLOW_1_DAMAGE : FINISHING_BLOW_2_DAMAGE;
 	}

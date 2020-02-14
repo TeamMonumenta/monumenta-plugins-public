@@ -39,7 +39,7 @@ public class FrostNova extends Ability {
 	private int mSlownessAmplifier;
 
 	public FrostNova(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Frost Nova");
 		mInfo.linkedSpell = Spells.FROST_NOVA;
 		mInfo.scoreboardId = "FrostNova";
 		mInfo.cooldown = FROST_NOVA_COOLDOWN;

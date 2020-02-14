@@ -46,7 +46,7 @@ public class AlchemicalArtillery extends Ability {
 	private boolean mActive = false;
 
 	public AlchemicalArtillery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Alchemical Artillery");
 		mInfo.linkedSpell = Spells.ALCHEMICAL_ARTILLERY;
 		mInfo.scoreboardId = "Artillery";
 		mInfo.cooldown = 0;

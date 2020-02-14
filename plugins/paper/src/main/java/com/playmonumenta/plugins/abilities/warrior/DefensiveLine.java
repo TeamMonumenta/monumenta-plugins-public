@@ -33,7 +33,7 @@ public class DefensiveLine extends Ability {
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
 	public DefensiveLine(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Defensive Line");
 		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.scoreboardId = "DefensiveLine";
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!

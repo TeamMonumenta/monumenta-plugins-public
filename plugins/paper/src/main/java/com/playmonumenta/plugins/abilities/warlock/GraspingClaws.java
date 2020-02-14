@@ -38,7 +38,7 @@ public class GraspingClaws extends Ability {
 	private Arrow arrow = null;
 
 	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Grasping Claws");
 		mInfo.scoreboardId = "GraspingClaws";
 		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
 		mInfo.cooldown = GRASPING_CLAWS_COOLDOWN;

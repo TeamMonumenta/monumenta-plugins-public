@@ -51,7 +51,7 @@ public class PrecisionStrike extends Ability {
 	private LivingEntity mHitMob;
 
 	public PrecisionStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Precision Strike");
 		mInfo.linkedSpell = Spells.PRECISION_STRIKE;
 		mInfo.scoreboardId = "PrecisionStrike";
 		mInfo.cooldown = PRECISION_STRIKE_COOLDOWN;

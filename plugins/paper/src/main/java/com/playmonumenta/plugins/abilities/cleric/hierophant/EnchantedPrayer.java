@@ -38,7 +38,7 @@ public class EnchantedPrayer extends Ability {
 	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 18;
 
 	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Enchanted Prayer");
 		mInfo.scoreboardId = "EPrayer";
 		mInfo.linkedSpell = Spells.ENCHANTED_PRAYER;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

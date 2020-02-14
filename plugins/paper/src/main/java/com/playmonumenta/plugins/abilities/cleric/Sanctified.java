@@ -30,7 +30,7 @@ public class Sanctified extends Ability {
 	private int mDamage;
 
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Santified Armor");
 		mInfo.scoreboardId = "Sanctified";
 		mDamage = getAbilityScore() == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
 	}

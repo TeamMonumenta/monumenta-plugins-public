@@ -45,7 +45,7 @@ public class BladeDance extends Ability {
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Blade Dance");
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
 		mInfo.cooldown = 20 * 20;

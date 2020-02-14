@@ -34,7 +34,7 @@ public class Riposte extends Ability {
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
 	public Riposte(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Riposte");
 		mInfo.linkedSpell = Spells.RIPOSTE;
 		mInfo.scoreboardId = "Obliteration";
 		mInfo.cooldown = RIPOSTE_COOLDOWN;

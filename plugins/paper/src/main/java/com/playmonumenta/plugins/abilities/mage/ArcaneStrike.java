@@ -42,7 +42,7 @@ public class ArcaneStrike extends Ability {
 	private final int mDamageBonusAffected;
 
 	public ArcaneStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Arcane Strike");
 		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.scoreboardId = "ArcaneStrike";
 		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;

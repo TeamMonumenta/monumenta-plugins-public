@@ -52,7 +52,7 @@ public class WindWalk extends Ability {
 	private int mLeftClicks = 0;
 
 	public WindWalk(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Wind Walk");
 		mInfo.linkedSpell = Spells.WIND_WALK;
 		mInfo.scoreboardId = "WindWalk";
 		mInfo.cooldown = WIND_WALK_COOLDOWN;

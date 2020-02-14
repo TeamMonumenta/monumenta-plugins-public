@@ -25,7 +25,7 @@ public class SagesInsight extends Ability {
 	private static final double ARCANIST_2_COOLDOWN_REDUCTION_PERCENT = 0.10;
 
 	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Sage's Insight");
 		mInfo.scoreboardId = "SagesInsight";
 	}
 

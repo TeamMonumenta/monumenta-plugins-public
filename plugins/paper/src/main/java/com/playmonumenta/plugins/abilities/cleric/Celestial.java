@@ -33,7 +33,7 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
 	public Celestial(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Celestial Blessing");
 		mInfo.linkedSpell = Spells.CELESTIAL_BLESSING;
 		mInfo.scoreboardId = "Celestial";
 		mInfo.cooldown = CELESTIAL_COOLDOWN;

@@ -18,7 +18,7 @@ public class BowMastery extends Ability {
 	private static final int BOW_MASTER_2_DAMAGE = 6;
 
 	public BowMastery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Bow Mastery");
 		mInfo.scoreboardId = "BowMastery";
 	}
 

@@ -34,7 +34,7 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0;
 
 	public ViciousCombos(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Vicious Combos");
 		mInfo.scoreboardId = "ViciousCombos";
 	}
 

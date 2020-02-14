@@ -68,7 +68,7 @@ public class EerieEminence extends Ability {
 	private List<DebuffElement> debuffs = new ArrayList<DebuffElement>();
 
 	public EerieEminence(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Eerie Eminence");
 		mInfo.scoreboardId = "EerieEminence";
 	}
 

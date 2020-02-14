@@ -34,7 +34,7 @@ public class Exorcism  extends Ability {
 	private static final int EXORCISM_2_COOLDOWN = 15 * 20;
 
 	public Exorcism(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Exorcism");
 		mInfo.linkedSpell = Spells.EXORCISM;
 		mInfo.scoreboardId = "Exorcism";
 		mInfo.cooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;

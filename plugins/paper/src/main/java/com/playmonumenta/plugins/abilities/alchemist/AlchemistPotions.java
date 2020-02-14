@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class AlchemistPotions extends Ability {
 
 	public AlchemistPotions(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	/*

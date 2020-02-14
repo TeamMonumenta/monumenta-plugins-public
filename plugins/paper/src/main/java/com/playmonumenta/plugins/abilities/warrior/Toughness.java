@@ -16,7 +16,7 @@ public class Toughness extends Ability {
 	public static final int TOUGHNESS_2_HEALTH_BOOST = 8;
 
 	public Toughness(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Toughness");
 		mInfo.scoreboardId = "Toughness";
 		if (player != null) {
 			AttributeInstance maxHealth = mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH);

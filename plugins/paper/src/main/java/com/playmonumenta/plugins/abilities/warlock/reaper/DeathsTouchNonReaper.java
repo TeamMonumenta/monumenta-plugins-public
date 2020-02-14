@@ -23,7 +23,7 @@ public class DeathsTouchNonReaper extends Ability {
 	 */
 
 	public DeathsTouchNonReaper(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

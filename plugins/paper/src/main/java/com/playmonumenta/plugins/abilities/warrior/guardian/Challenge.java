@@ -48,7 +48,7 @@ public class Challenge extends Ability {
 	private int armorMax;
 
 	public Challenge(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Challenge");
 		mInfo.scoreboardId = "Challenge";
 		mInfo.cooldown = CHALLENGE_COOLDOWN;
 		mInfo.linkedSpell = Spells.CHALLENGE;

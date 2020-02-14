@@ -53,7 +53,7 @@ public class Bodyguard extends Ability {
 	private static final int BODYGUARD_STUN_DURATION = 3 * 20;
 
 	public Bodyguard(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Bodyguard");
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.linkedSpell = Spells.BODYGUARD;
 		mInfo.cooldown = BODYGUARD_COOLDOWN;

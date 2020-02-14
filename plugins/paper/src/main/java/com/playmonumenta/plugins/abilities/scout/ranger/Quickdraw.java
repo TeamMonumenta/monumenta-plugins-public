@@ -45,7 +45,7 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 
 	public Quickdraw(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Quickdraw");
 		mInfo.linkedSpell = Spells.QUICKDRAW;
 		mInfo.scoreboardId = "Quickdraw";
 		mInfo.cooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;

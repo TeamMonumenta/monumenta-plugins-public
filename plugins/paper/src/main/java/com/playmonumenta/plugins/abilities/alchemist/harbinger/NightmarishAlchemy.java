@@ -31,7 +31,7 @@ public class NightmarishAlchemy extends Ability {
 	private int mDamage;
 
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Nightmarish Alchemy");
 		mInfo.scoreboardId = "Nightmarish";
 		mDamage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 	}

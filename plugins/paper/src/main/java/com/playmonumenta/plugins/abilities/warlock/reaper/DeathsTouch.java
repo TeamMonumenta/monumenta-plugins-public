@@ -51,7 +51,7 @@ public class DeathsTouch extends Ability {
 	private int mRightClicks = 0;
 
 	public DeathsTouch(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Death's Touch");
 		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.scoreboardId = "DeathsTouch";
 		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;

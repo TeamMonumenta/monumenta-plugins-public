@@ -23,7 +23,7 @@ public class GruesomeAlchemy extends Ability {
 	public static final String GRUESOME_ALCHEMY_SCOREBOARD = "GruesomeAlchemy";
 
 	public GruesomeAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Gruesome Alchemy");
 		mInfo.scoreboardId = GRUESOME_ALCHEMY_SCOREBOARD;
 	}
 

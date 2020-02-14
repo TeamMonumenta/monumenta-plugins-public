@@ -443,6 +443,11 @@ public class AbilityManager {
 		return getPlayerAbilities(player).getAbility(cls);
 	}
 
+	/* Do not modify the returned data! */
+	public List<Ability> getReferenceAbilities() {
+		return mReferenceAbilities;
+	}
+
 	/* Convenience method */
 	public boolean isPvPEnabled(Player player) {
 		return getPlayerAbilities(player).getAbility(PvP.class) != null;
@@ -659,10 +664,7 @@ public class AbilityManager {
 		}
 	}
 
-	//---------------------------------------------------------------------------------------------------------------
-
-	//Private methods
-	private AbilityCollection getPlayerAbilities(Player player) {
+	public AbilityCollection getPlayerAbilities(Player player) {
 		if (!mAbilities.containsKey(player.getUniqueId())) {
 			updatePlayerAbilities(player);
 		}

@@ -34,7 +34,7 @@ public class MagmaShield extends Ability {
 	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
 
 	public MagmaShield(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Magma Shield");
 		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.scoreboardId = "Magma";
 		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;

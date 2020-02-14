@@ -21,7 +21,7 @@ public class Rejuvenation extends Ability {
 	private int timer = 0;
 
 	public Rejuvenation(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Rejuvenation");
 		mInfo.scoreboardId = "Rejuvenation";
 	}
 

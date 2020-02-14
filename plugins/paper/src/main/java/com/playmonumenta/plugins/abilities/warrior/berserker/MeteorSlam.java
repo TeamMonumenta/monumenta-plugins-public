@@ -65,7 +65,7 @@ public class MeteorSlam extends Ability {
 	private final BukkitRunnable mRunnable;
 
 	public MeteorSlam(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Meteor Slam");
 		mPlugin = plugin;
 
 		mInfo.linkedSpell = Spells.METEOR_SLAM;

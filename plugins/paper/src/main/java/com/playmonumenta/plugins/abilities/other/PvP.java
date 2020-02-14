@@ -27,7 +27,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class PvP extends Ability {
 
 	public PvP(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 
 		if (player != null) {
 			player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);

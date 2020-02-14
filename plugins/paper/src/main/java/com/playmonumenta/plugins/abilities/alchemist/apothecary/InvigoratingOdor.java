@@ -40,7 +40,7 @@ public class InvigoratingOdor extends Ability {
 	private int mDamage;
 
 	public InvigoratingOdor(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Invigorating Odor");
 		mInfo.scoreboardId = "InvigoratingOdor";
 		mDamage = getAbilityScore() == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE;
 	}

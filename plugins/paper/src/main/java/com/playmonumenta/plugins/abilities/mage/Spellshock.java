@@ -63,7 +63,7 @@ public class Spellshock extends Ability {
 	private static BukkitRunnable mRunnable = null;
 
 	public Spellshock(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Spellshock");
 		mInfo.scoreboardId = "SpellShock";
 		/*
 		 * Only one runnable ever exists for spellshock - it is a global list, not tied to any individual players

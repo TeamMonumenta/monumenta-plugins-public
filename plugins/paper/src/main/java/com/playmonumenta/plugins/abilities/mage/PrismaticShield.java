@@ -41,7 +41,7 @@ public class PrismaticShield extends Ability {
 	private final int mDamage;
 
 	public PrismaticShield(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Prismatic Shield");
 		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.scoreboardId = "Prismatic";
 		mInfo.cooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;

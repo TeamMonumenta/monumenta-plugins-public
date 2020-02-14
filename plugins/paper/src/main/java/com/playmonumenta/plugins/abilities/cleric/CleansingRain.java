@@ -33,7 +33,7 @@ public class CleansingRain extends Ability {
 	private static final double CLEANSING_ANGLE = 50.0;
 
 	public CleansingRain(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Cleansing Rain");
 		mInfo.linkedSpell = Spells.CLEANSING;
 		mInfo.scoreboardId = "Cleansing";
 		mInfo.cooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;

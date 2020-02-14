@@ -15,7 +15,7 @@ public class PatreonGreen extends Ability {
 	private boolean mNoSelfParticles = false;
 
 	public PatreonGreen(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 
 		if (player != null) {
 			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");

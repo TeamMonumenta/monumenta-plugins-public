@@ -31,7 +31,7 @@ public class IronTincture extends Ability {
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	public IronTincture(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Iron Tincture");
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
 		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown

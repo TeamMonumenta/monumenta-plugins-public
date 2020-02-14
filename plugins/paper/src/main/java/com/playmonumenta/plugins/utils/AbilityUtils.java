@@ -203,4 +203,118 @@ public class AbilityUtils {
 			}
 		}
 	}
+
+	public static String getClass(Player player) {
+		int classVal = ScoreboardUtils.getScoreboardValue(player, "Class");
+		switch (classVal) {
+		case 1:
+			return "Mage";
+		case 2:
+			return "Warrior";
+		case 3:
+			return "Cleric";
+		case 4:
+			return "Rogue";
+		case 5:
+			return "Alchemist";
+		case 6:
+			return "Scout";
+		case 7:
+			return "Warlock";
+		default:
+			return "???";
+		}
+	}
+
+	public static int getClass(String str) {
+		switch (str) {
+		case "Mage":
+			return 1;
+		case "Warrior":
+			return 2;
+		case "Cleric":
+			return 3;
+		case "Rogue":
+			return 4;
+		case "Alchemist":
+			return 5;
+		case "Scout":
+			return 6;
+		case "Warlock":
+			return 7;
+		default:
+			return 0;
+		}
+	}
+
+	public static String getSpec(Player player) {
+		int classVal = ScoreboardUtils.getScoreboardValue(player, "Specialization");
+		switch (classVal) {
+		case 1:
+			return "Arcanist";
+		case 2:
+			return "Elementalist";
+		case 3:
+			return "Berserker";
+		case 4:
+			return "Guardian";
+		case 5:
+			return "Paladin";
+		case 6:
+			return "Hierophant";
+		case 7:
+			return "Swordsage";
+		case 8:
+			return "Assassin";
+		case 9:
+			return "Harbinger";
+		case 10:
+			return "Apothecary";
+		case 11:
+			return "Ranger";
+		case 12:
+			return "Hunter";
+		case 13:
+			return "Reaper";
+		case 14:
+			return "Tenebrist";
+		default:
+			return "No Spec";
+		}
+	}
+
+	public static int getSpec(String str) {
+		switch (str) {
+		case "Arcanist":
+			return 1;
+		case "Elementalist":
+			return 2;
+		case "Berserker":
+			return 3;
+		case "Guardian":
+			return 4;
+		case "Paladin":
+			return 5;
+		case "Hierophant":
+			return 6;
+		case "Swordsage":
+			return 7;
+		case "Assassin":
+			return 8;
+		case "Harbinger":
+			return 9;
+		case "Apothecary":
+			return 10;
+		case "Ranger":
+			return 11;
+		case "Hunter":
+			return 12;
+		case "Reaper":
+			return 13;
+		case "Tenebrist":
+			return 14;
+		default:
+			return 0;
+		}
+	}
 }

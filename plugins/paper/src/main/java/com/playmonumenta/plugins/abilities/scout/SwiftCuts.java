@@ -55,7 +55,7 @@ public class SwiftCuts extends Ability {
 	private int mDamageBonus;
 
 	public SwiftCuts(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Swift Cuts");
 		mInfo.scoreboardId = "SwiftCuts";
 		mVulnerabilityAmplifier = getAbilityScore() == 1 ? SWIFT_CUTS_1_VULNERABILITY_AMPLIFIER : SWIFT_CUTS_2_VULNERABILITY_AMPLIFIER;
 		mDamageBonus = getAbilityScore() == 1 ? SWIFT_CUTS_1_DAMAGE : SWIFT_CUTS_2_DAMAGE;

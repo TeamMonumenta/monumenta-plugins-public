@@ -35,7 +35,7 @@ public class Smokescreen extends Ability {
 	private int mWeaknessAmplifier;
 
 	public Smokescreen(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Smoke Screen");
 		mInfo.linkedSpell = Spells.SMOKESCREEN;
 		mInfo.scoreboardId = "SmokeScreen";
 		mInfo.cooldown = SMOKESCREEN_COOLDOWN;

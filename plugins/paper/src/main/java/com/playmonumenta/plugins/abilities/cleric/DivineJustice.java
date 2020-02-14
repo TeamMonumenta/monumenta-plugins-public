@@ -24,7 +24,7 @@ public class DivineJustice extends Ability {
 	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
 
 	public DivineJustice(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Divine Justice");
 		mInfo.scoreboardId = "DivineJustice";
 	}
 

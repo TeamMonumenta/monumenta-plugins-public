@@ -32,7 +32,7 @@ public class Sharpshooter extends Ability {
 	private static final int SHARPSHOOTER_2_INCREMENT = 2;
 
 	public Sharpshooter(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Sharpshooter");
 		mInfo.scoreboardId = "Sharpshooter";
 	}
 

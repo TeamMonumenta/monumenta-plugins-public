@@ -48,7 +48,7 @@ public class Blizzard extends Ability {
 	private static final int BLIZZARD_2_COOLDOWN = 15;
 
 	public Blizzard(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Blizzard");
 		mInfo.scoreboardId = "Blizzard";
 		mInfo.linkedSpell = Spells.BLIZZARD;
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;

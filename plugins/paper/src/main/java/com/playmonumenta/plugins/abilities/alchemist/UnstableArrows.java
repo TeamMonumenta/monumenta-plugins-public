@@ -36,7 +36,7 @@ public class UnstableArrows extends Ability {
 	private Arrow mUnstableArrow = null;
 
 	public UnstableArrows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Unstable Arrows");
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
 		if (player != null && ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {

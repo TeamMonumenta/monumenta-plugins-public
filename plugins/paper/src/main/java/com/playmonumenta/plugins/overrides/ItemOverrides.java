@@ -191,6 +191,7 @@ public class ItemOverrides {
 		mItems.put(Material.CHEST, chestOverride);
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
+		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
 		mItems.put(Material.ANVIL, new AnvilOverride());
 		mItems.put(Material.CHIPPED_ANVIL, new AnvilOverride());

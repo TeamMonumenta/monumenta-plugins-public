@@ -43,7 +43,7 @@ public class DarkPact extends Ability {
 	private boolean active = false;
 
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Dark Pact");
 		mInfo.scoreboardId = "DarkPact";
 		mInfo.cooldown = DARK_PACT_COOLDOWN;
 		mInfo.linkedSpell = Spells.DARK_PACT;

@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 public class SacredProvisions extends Ability {
 
 	public SacredProvisions(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Sacred Provisions");
 		mInfo.scoreboardId = "SacredProvisions";
 	}
 }

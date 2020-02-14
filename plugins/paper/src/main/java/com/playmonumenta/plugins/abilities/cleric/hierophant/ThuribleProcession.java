@@ -49,7 +49,7 @@ public class ThuribleProcession extends Ability {
 	private int buffs = 0;
 
 	public ThuribleProcession(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Thurible Procession");
 		mInfo.scoreboardId = "Thurible";
 		mInfo.cooldown = 20 * THURIBLE_COOLDOWN;
 		mInfo.linkedSpell = Spells.THURIBLE_PROCESSION;

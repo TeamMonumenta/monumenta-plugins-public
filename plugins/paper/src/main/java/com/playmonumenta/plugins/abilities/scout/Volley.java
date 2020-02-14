@@ -33,7 +33,7 @@ public class Volley extends Ability {
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 2.0;
 
 	public Volley(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Volley");
 		mInfo.linkedSpell = Spells.VOLLEY;
 		mInfo.scoreboardId = "Volley";
 		mInfo.cooldown = VOLLEY_COOLDOWN;

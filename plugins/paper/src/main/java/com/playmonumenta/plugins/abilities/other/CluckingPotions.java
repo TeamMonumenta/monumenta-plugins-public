@@ -29,7 +29,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  */
 public class CluckingPotions extends Ability {
 	public CluckingPotions(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, null);
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class SplitArrow extends Ability {
 	private static final double SPLIT_ARROW_CHAIN_RANGE = 5;
 
 	public SplitArrow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Split Arrow");
 		mInfo.scoreboardId = "SplitArrow";
 	}
 

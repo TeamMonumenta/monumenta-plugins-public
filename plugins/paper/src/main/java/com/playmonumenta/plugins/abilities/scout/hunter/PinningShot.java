@@ -30,7 +30,7 @@ public class PinningShot extends Ability {
 	private static final double PINNING_SHOT_DAMAGE_MULTIPLIER = 1.3;
 
 	public PinningShot(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Pinning Shot");
 		mInfo.scoreboardId = "PinningShot";
 	}
 

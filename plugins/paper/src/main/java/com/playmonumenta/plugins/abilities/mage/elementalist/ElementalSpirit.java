@@ -210,7 +210,7 @@ public class ElementalSpirit extends Ability {
 	private Spirit mSpirit = null;
 
 	public ElementalSpirit(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Elemental Spirit");
 		mInfo.scoreboardId = "ElementalSpirit";
 		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT;
 		mInfo.cooldown = 20 * 8;

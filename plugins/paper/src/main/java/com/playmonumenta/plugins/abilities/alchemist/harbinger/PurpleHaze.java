@@ -77,7 +77,7 @@ public class PurpleHaze extends Ability {
 	private LivingEntity mTarget = null;
 
 	public PurpleHaze(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Purple Haze");
 		mInfo.linkedSpell = Spells.PURPLE_HAZE;
 		mInfo.scoreboardId = "PurpleHaze";
 		mInfo.cooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;

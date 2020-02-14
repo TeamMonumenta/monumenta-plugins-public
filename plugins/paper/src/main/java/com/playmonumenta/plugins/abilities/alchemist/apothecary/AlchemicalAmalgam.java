@@ -55,7 +55,7 @@ public class AlchemicalAmalgam extends Ability {
 	private int mShield;
 
 	public AlchemicalAmalgam(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Alchemical Amalgam");
 		mInfo.scoreboardId = "Alchemical";
 		mInfo.cooldown = 20 * 30;
 		mInfo.linkedSpell = Spells.ALCHEMICAL_AMALGAM;

@@ -37,7 +37,7 @@ public class EscapeDeath extends Ability {
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
 
 	public EscapeDeath(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Escape Death");
 		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.scoreboardId = "EscapeDeath";
 		mInfo.cooldown = ESCAPE_DEATH_COOLDOWN;

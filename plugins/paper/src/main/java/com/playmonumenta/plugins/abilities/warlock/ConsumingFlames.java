@@ -31,7 +31,7 @@ public class ConsumingFlames extends Ability {
 	private static final int CONSUMING_FLAMES_COOLDOWN = 10 * 20;
 
 	public ConsumingFlames(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player);
+		super(plugin, world, random, player, "Consuming Flames");
 		mInfo.scoreboardId = "ConsumingFlames";
 		mInfo.linkedSpell = Spells.CONSUMING_FLAMES;
 		mInfo.cooldown = CONSUMING_FLAMES_COOLDOWN;
