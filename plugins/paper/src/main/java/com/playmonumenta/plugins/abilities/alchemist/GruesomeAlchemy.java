@@ -19,7 +19,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 public class GruesomeAlchemy extends Ability {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
 	private static final int GRUESOME_ALCHEMY_VULN = 4; //25%
-	private static final int GRUESOME_ALCHEMY_SLOW = 2;
+	private static final int GRUESOME_ALCHEMY_SLOW = 1;
 	public static final String GRUESOME_ALCHEMY_SCOREBOARD = "GruesomeAlchemy";
 
 	public GruesomeAlchemy(Plugin plugin, World world, Random random, Player player) {
