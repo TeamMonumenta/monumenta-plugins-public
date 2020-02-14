@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -89,7 +90,7 @@ public class SpellFireball extends Spell {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(mPlayers);
 						for (Player player : mPlayers) {
-							if (LocationUtils.hasLineOfSight(mBoss, player)) {
+							if (!player.getGameMode().equals(GameMode.CREATIVE) && LocationUtils.hasLineOfSight(mBoss, player)) {
 								launch(player);
 								break;
 							}
@@ -97,7 +98,9 @@ public class SpellFireball extends Spell {
 					} else {
 						// Otherwise target all players within range
 						for (Player player : mPlayers) {
-							launch(player);
+							if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+								launch(player);
+							}
 						}
 					}
 				}

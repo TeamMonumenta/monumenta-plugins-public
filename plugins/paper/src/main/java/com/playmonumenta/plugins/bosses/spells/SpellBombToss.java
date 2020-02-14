@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -58,7 +59,7 @@ public class SpellBombToss extends Spell {
 				// TODO: Add particles
 				Collections.shuffle(players);
 				for (Player player : players) {
-					if (LocationUtils.hasLineOfSight(mBoss, player)) {
+					if (!player.getGameMode().equals(GameMode.CREATIVE) && LocationUtils.hasLineOfSight(mBoss, player)) {
 						launch(player);
 						break;
 					}
