@@ -1068,11 +1068,16 @@ public class PlayerListener implements Listener {
 					}
 				}.runTaskLater(mPlugin, 0);
 			}
-			if (event.getNewGameMode().equals(GameMode.SURVIVAL) && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)) {
+			boolean isTownWorld = mPlugin.mServerProperties.getIsTownWorld();
+			if (event.getNewGameMode().equals(GameMode.SURVIVAL)
+			    && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+			    && !ZoneUtils.inPlot(player, isTownWorld)) {
 				event.setCancelled(true);
 				player.setGameMode(GameMode.ADVENTURE);
 			}
-			if (event.getNewGameMode().equals(GameMode.ADVENTURE) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)) {
+			if (event.getNewGameMode().equals(GameMode.ADVENTURE)
+			    && (!ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
+			        || ZoneUtils.inPlot(player, isTownWorld))) {
 				event.setCancelled(true);
 				player.setGameMode(GameMode.SURVIVAL);
 			}
