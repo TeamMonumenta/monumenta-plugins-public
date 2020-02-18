@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -42,9 +41,7 @@ public class ForbiddenItem implements BaseEnchantment {
 	public void applyProperty(Plugin plugin, Player player, int level) {
 		// Forbidden items are different from the others - it applies effects only for a short duration
 		// and doesn't remove them when you switch off
-		GameMode playerMode = player.getGameMode();
-		if ((playerMode.equals(GameMode.SURVIVAL) && !ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE))
-		    || (playerMode.equals(GameMode.ADVENTURE) && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE))) {
+		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
