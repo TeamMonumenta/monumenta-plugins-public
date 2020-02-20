@@ -18,9 +18,10 @@ public class WitherHitBoss extends BossAbilityGroup {
 		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
 	}
 
+	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		LivingEntity target = (LivingEntity) event.getEntity();
-		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 40, 1, false, true));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 80, 1, false, true));
 	}
 }
 

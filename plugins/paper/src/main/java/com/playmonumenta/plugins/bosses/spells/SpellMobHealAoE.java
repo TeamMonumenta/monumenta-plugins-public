@@ -20,7 +20,7 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 		super(plugin, launcher, 14, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.spawnParticle(Particle.SPELL_INSTANT, loc, 25, 3.5, 3.5, 3.5);
+				world.spawnParticle(Particle.SPELL_INSTANT, loc, 5, 3.5, 3.5, 3.5);
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -30,8 +30,8 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 				World world = loc.getWorld();
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 3, 1.25f);
 				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3, 2f);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.5, null, true);
-				world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 125, 3.5, 3.5, 3.5, 0.5, null, true);
+				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5, 0, 0, 0, 0.5, null, true);
+				world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 3.5, 3.5, 3.5, 0.5, null, true);
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
@@ -52,7 +52,7 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 							le.setHealth(hp);
 						}
 						World world = loc.getWorld();
-						world.spawnParticle(Particle.FIREWORKS_SPARK, le.getLocation().add(0, 1, 0), 25, 0.25, 0.5, 0.25, 0.3);
+						world.spawnParticle(Particle.FIREWORKS_SPARK, le.getLocation().add(0, 1, 0), 5, 0.25, 0.5, 0.25, 0.3);
 						world.spawnParticle(Particle.HEART, le.getLocation().add(0, 1, 0), 5, 0.4, 0.5, 0.4);
 					}
 				}

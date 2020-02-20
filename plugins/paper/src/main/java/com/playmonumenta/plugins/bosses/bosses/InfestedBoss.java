@@ -41,7 +41,7 @@ public class InfestedBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		// Spell triggered when the boss dies
-		new SpellDelayedAction(mPlugin, mBoss.getLocation(), 60,
+		new SpellDelayedAction(mPlugin, mBoss.getLocation(), 25,
 		                       // Sound effect when boss dies
 		                       (Location loc) -> {
 		                           loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_DEATH, 1f, 0.65f);
@@ -54,10 +54,10 @@ public class InfestedBoss extends BossAbilityGroup {
 		                       // Maggots spawn
 		                       (Location loc) -> {
 		                           loc.getWorld().playSound(loc, Sound.ENTITY_SLIME_DEATH, 1f, 0.1f);
-		                           loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc.clone().add(0, -1, 0), 50, 0.6, 0.6, 0.6, 0);
+		                           loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc.clone().add(0, -1, 0), 20, 0.6, 0.6, 0.6, 0);
 		                           //TODO: Raise location up to avoid spawning in blocks?
 		                           for (int i = 0; i < 4; i++) {
-		                               Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:silverfish " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Maggot\\\"}\",Health:12.0f,Attributes:[{Base:12.0d,Name:\"generic.maxHealth\"}],ActiveEffects:[{Ambient:1b,ShowIcon:1b,ShowParticles:1b,Duration:72000,Id:5b,Amplifier:1b}]}");
+		                               Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:silverfish " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Maggot\\\"}\",Health:25.0f,Attributes:[{Base:25.0d,Name:\"generic.maxHealth\"}],HandItems:[{id:\"minecraft:diamond_sword\",Count:1b,tag:{AttributeModifiers:[{UUIDMost:-333297535166493057L,UUIDLeast:-5147864146781586208L,Amount:8.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:6450165871249213567L,UUIDLeast:-4838301806280773784L,Amount:0.02d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}},{}]}");
 		                           }
 		                       }).run();
 	}
