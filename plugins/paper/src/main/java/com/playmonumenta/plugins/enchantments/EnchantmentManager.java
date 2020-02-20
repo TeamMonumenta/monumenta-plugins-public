@@ -106,6 +106,7 @@ public class EnchantmentManager implements Listener {
 		init.add(new JunglesNourishment());
 		init.add(new Adrenaline());
 		init.add(new Sustenance());
+		init.add(new Eruption());
 
 		// Curses
 		init.add(new CurseOfCorruption());
