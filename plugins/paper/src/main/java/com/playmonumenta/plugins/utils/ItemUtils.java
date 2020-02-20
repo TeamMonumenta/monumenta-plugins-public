@@ -275,7 +275,7 @@ public class ItemUtils {
 		LOSE, // Item is dropped on death, lost when destroyed
 		SAFE, // Item is dropped on death, placed in grave when destroyed, does not shatter
 		SHATTER, // Item is dropped on death, placed in grave when destroyed, does shatter
-		DESTROY, // Item is destroyed on death, like Curse of Vanishing
+		SHATTER_NOW, // Item is shattered on death, like Curse of Vanishing
 	}
 
 	public static ItemRegion getItemRegion(ItemStack item) {
@@ -385,7 +385,7 @@ public class ItemUtils {
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
 		if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-			return ItemDeathResult.DESTROY;
+			return ItemDeathResult.SHATTER_NOW;
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:
@@ -571,7 +571,8 @@ public class ItemUtils {
 	public static boolean shatterItem(ItemStack item) {
 		if (item != null) {
 			List<String> lore = item.getLore();
-			if (getItemDeathResult(item) == ItemDeathResult.SHATTER && !isItemShattered(item)) {
+			if ((getItemDeathResult(item) == ItemDeathResult.SHATTER || getItemDeathResult(item) == ItemDeathResult.SHATTER_NOW)
+					&& !isItemShattered(item)) {
 				if (lore == null) {
 					lore = new ArrayList<String>();
 				}

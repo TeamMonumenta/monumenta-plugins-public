@@ -620,9 +620,11 @@ public class PlayerListener implements Listener {
 					continue;
 				}
 				ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-				if (result == ItemDeathResult.DESTROY) {
-					// Item has Curse of Vanishing. It should be deleted
-					inv.clear(slot);
+				if (result == ItemDeathResult.SHATTER_NOW) {
+					// Item has Curse of Vanishing. It should be shattered
+					Location location = player.getLocation();
+					ItemUtils.shatterItem(item);
+					player.getWorld().dropItemNaturally(location, item);
 				} else if (result == ItemDeathResult.KEEP) {
 					// Item is kept with no durability loss
 					// This empty if statement is intentional so it's not included in "else".
