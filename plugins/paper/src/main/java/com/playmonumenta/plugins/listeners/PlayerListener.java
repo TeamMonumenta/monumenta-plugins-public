@@ -399,6 +399,18 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, event.getPlayer(), event);
+
+		// If an item breaks, attempt to shatter it
+		ItemStack iStack = event.getBrokenItem();
+		ItemUtils.shatterItem(iStack);
+		if (ItemUtils.isItemShattered(iStack)) {
+			// If the item shatters, drop it on the player with instant pickup, if inv full for some reason - grave the item
+			Player player = event.getPlayer();
+			Location location = player.getLocation();
+			Item item = player.getWorld().dropItemNaturally(location, iStack);
+			GraveUtils.setGraveScoreboard(item, player, location);
+			item.setPickupDelay(0);
+		}
 	}
 
 	// If an inventory interaction happened.
@@ -660,9 +672,7 @@ public class PlayerListener implements Listener {
 					}
 					if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER) &&
 					    !player.getScoreboardTags().contains("DisableGraves")) {
-						droppedItem.addScoreboardTag("PlayerDeath");
-						droppedItem.addScoreboardTag(String.format("PlayerDeathLocation;%d;%d;%d", location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-						droppedItem.addScoreboardTag(String.format("PlayerDeathUsername;%s", player.getName()));
+						GraveUtils.setGraveScoreboard(droppedItem, player, location);
 					}
 					droppedItems.add(droppedItem);
 					inv.clear(slot);

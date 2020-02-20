@@ -97,6 +97,12 @@ public class GraveUtils {
 		return false;
 	}
 
+	public static void setGraveScoreboard(Item item, Player player, Location location) {
+		item.addScoreboardTag("PlayerDeath");
+		item.addScoreboardTag(String.format("PlayerDeathLocation;%d;%d;%d", location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+		item.addScoreboardTag(String.format("PlayerDeathUsername;%s", player.getName()));
+	}
+
 	// Check if a block is a grave
 	public static boolean isGrave(Block block) {
 		return block != null && block.getState() instanceof Chest && isGrave((Chest) block.getState());
