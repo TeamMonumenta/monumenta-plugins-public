@@ -134,8 +134,10 @@ public class PlayerListener implements Listener {
 			public void run() {
 				Player player = event.getPlayer();
 
-				mPlugin.mTrackingManager.addEntity(player);
-				DailyReset.handle(mPlugin, player);
+				if (player.isOnline()) {
+					mPlugin.mTrackingManager.addEntity(player);
+					DailyReset.handle(mPlugin, player);
+				}
 			}
 		}.runTaskLater(mPlugin, 20);
 	}
