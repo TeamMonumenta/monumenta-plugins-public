@@ -625,6 +625,8 @@ public class PlayerListener implements Listener {
 					Location location = player.getLocation();
 					ItemUtils.shatterItem(item);
 					player.getWorld().dropItemNaturally(location, item);
+					// This still needs to happen so the player doesn't respawn with the item.
+					inv.clear(slot);
 				} else if (result == ItemDeathResult.KEEP) {
 					// Item is kept with no durability loss
 					// This empty if statement is intentional so it's not included in "else".
