@@ -25,25 +25,26 @@ public class EvasionEnchant extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(evade(mPlayer, event.getDamage()));
+		event.setDamage(evade(mPlayer, event.getDamage(), event.getFinalDamage()));
 		return true;
 	}
 
 	@Override
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(evade(mPlayer, event.getDamage()));
+		event.setDamage(evade(mPlayer, event.getDamage(), event.getFinalDamage()));
 		return true;
 	}
 
 	@Override
 	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) {
-		event.setDamage(evade(mPlayer, event.getDamage()));
+		// We don't have a good way to calculate final damage of this yet
+		event.setDamage(evade(mPlayer, event.getDamage(), event.getDamage()));
 	}
 
-	private double evade(Player player, double damage) {
+	private double evade(Player player, double damage, double finalDamage) {
 		double changedDamage = damage;
 		Location loc = player.getLocation().add(0, 1, 0);
-		if (mChance >= 200 || mChance >= 100 && mPlayer.getHealth() <= damage / 2) {
+		if (mChance >= 200 || mChance >= 100 && mPlayer.getHealth() <= finalDamage / 2) {
 			mChance -= 200;
 			changedDamage *= 0.25;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
@@ -57,7 +58,7 @@ public class EvasionEnchant extends Ability {
 			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
-		} else if (mChance >= 100 || mChance >= 50 && mPlayer.getHealth() <= damage) {
+		} else if (mChance >= 100 || mChance >= 50 && mPlayer.getHealth() <= finalDamage) {
 			mChance -= 100;
 			changedDamage *= 0.5;
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
