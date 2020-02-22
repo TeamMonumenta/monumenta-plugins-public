@@ -4,7 +4,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 for x in bungee paper; do
 	cd "$SCRIPT_DIR/$x"
-	./upload-build.sh
+	./upload-stage.sh
 	ret=$?
 	if [[ $ret -ne 0 ]]; then
 		echo "Upload Failed!" >&2
