@@ -27,6 +27,7 @@ import net.minecraft.server.v1_13_R2.EntityCreature;
 import net.minecraft.server.v1_13_R2.EntityDamageSource;
 import net.minecraft.server.v1_13_R2.EntityInsentient;
 import net.minecraft.server.v1_13_R2.EntityLiving;
+import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
 import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
@@ -86,6 +87,12 @@ public class NmsUtils {
 		CommandDispatcher<CommandListenerWrapper> brigadierDispatcher = dispatcher.a();
 
 		brigadierDispatcher.execute(new ParseResults<CommandListenerWrapper>(pr.getContext().withSource(playerContext), pr.getStartIndex(), pr.getReader(), pr.getExceptions()));
+	}
+
+	public static void resetPlayerIdleTimer(Player player) {
+		CraftPlayer p = (CraftPlayer)player;
+		EntityPlayer playerHandle = p.getHandle();
+		playerHandle.resetIdleTimer();
 	}
 
 	private static Class<?> itemClazz = null;

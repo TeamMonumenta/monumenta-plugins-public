@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +25,7 @@ import org.bukkit.util.Vector;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -35,15 +37,20 @@ public class SpectateBot extends GenericCommand implements Listener {
 	public static final double DISTANCE_VELOCITY = 0.05;
 	public static final int TICK_PERIOD = 1;
 	public static final int DISTANCE_VELOCITY_ADJUST_PERIOD = 20;
+	public static final double MAX_PITCH = 80;
+	public static final double MIN_PITCH = 5;
+	public static final Random RAND = new Random();
+	public static final int AUTO_PLAYER_SWITCH_TICKS = 3600;
 
 	private static class SpectateContext {
-		public final double mYawVelocity = 0.1;
-		public final double mPitchVelocity = 0.05;
+		public double mYawVelocity = 0.1;
+		public double mPitchVelocity = 0.07;
 
 		public double mDistanceVelocity = 0;
 		public double mYaw = 0;
-		public double mPitch = 180;
+		public double mPitch = 20;
 		public double mDistance = MAX_RADIUS;
+		public int mTimeSinceLastSwitch = 0;
 		public Player mTarget = null;
 		public Location mLastTargetLoc;
 		public final Player mSpectator;
@@ -84,10 +91,12 @@ public class SpectateBot extends GenericCommand implements Listener {
 	}
 
 	private static Location computeLoc(double distance, double yaw, double pitch, Location targetLoc) {
+		Vector vec = new Vector(Math.cos(Math.toRadians(yaw)),
+		                        Math.sin(Math.toRadians(pitch)),
+								Math.sin(Math.toRadians(yaw)));
+
 		Location cameraLoc = targetLoc.clone();
-		cameraLoc = cameraLoc.add(distance * -Math.sin(yaw*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)),
-								  distance * -Math.sin((pitch)*(Math.PI/180)),
-								  -distance * Math.cos((yaw)*(Math.PI/180)) * Math.cos((pitch)*(Math.PI/180)));
+		cameraLoc = cameraLoc.add(vec.normalize().multiply(distance));
 		return cameraLoc;
 	}
 
@@ -109,7 +118,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 							Map.Entry<Player, SpectateContext> entry = it.next();
 							SpectateContext ctx = entry.getValue();
 
-							if (ctx.mTarget == null || !ctx.mTarget.isOnline()) {
+							if (ctx.mTarget == null || !ctx.mTarget.isOnline() || ctx.mTimeSinceLastSwitch > AUTO_PLAYER_SWITCH_TICKS) {
 								ctx.mTarget = getPlayerToSpectate(ctx.mSpectator);
 								if (ctx.mTarget == null) {
 									ctx.mSpectator.sendMessage(ChatColor.RED + "No player to spectate");
@@ -117,7 +126,22 @@ public class SpectateBot extends GenericCommand implements Listener {
 									continue;
 								} else {
 									ctx.mSpectator.sendMessage(ChatColor.RED + "Now spectating: " + ctx.mTarget.getName());
+									ctx.mTimeSinceLastSwitch = 0;
+									ctx.mLastTargetLoc = ctx.mTarget.getLocation();
+									ctx.mSpectator.teleport(ctx.mLastTargetLoc);
 								}
+							}
+
+							ctx.mTimeSinceLastSwitch++;
+
+							/*
+							 * Periodically skip a tick to allow the player to download the world
+							 * Skip the first many ticks when switching targets
+							 */
+							if (ctx.mTimeSinceLastSwitch < 100 || RAND.nextInt(200) == 0) {
+								/* Make sure the player won't get idle kicked */
+								NmsUtils.resetPlayerIdleTimer(ctx.mSpectator);
+								continue;
 							}
 
 							/* Rolling average target location - 49 parts previous location, 1 part new location */
@@ -138,7 +162,13 @@ public class SpectateBot extends GenericCommand implements Listener {
 							ctx.mYaw += ctx.mYawVelocity;
 							ctx.mPitch += ctx.mPitchVelocity;
 
-							/* Adjust forward/outer zoom velocity every second */
+							if (ctx.mPitch <= MIN_PITCH) {
+								ctx.mPitchVelocity = Math.abs(ctx.mPitchVelocity);
+							} else if (ctx.mPitch >= MAX_PITCH) {
+								ctx.mPitchVelocity = -Math.abs(ctx.mPitchVelocity);
+							}
+
+							/* Adjust forward/outer zoom velocity at a slower rate */
 							if (mTicks >= DISTANCE_VELOCITY_ADJUST_PERIOD) {
 								mTicks = 0;
 								if (LocationUtils.hasLineOfSight(targetRawLoc, cameraLoc)) {

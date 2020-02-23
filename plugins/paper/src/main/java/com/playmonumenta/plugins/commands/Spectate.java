@@ -27,13 +27,13 @@ public class Spectate implements Listener {
 
 	private Plugin mPlugin;
 
-	private static class SpectateContext {
+	protected static class SpectateContext {
 		private final Plugin mPlugin;
 		private final Location mLoc;
 		private final GameMode mMode;
 		private final boolean mIsFlying;
 
-		private SpectateContext(Plugin plugin, Player player) {
+		protected SpectateContext(Plugin plugin, Player player) {
 			mPlugin = plugin;
 			mLoc = player.getLocation();
 			mMode = player.getGameMode();
@@ -44,7 +44,7 @@ public class Spectate implements Listener {
 		}
 
 		// Put player back and remove this metadata from them
-		private void restore(Player player) {
+		protected void restore(Player player) {
 			player.teleport(mLoc);
 			player.setGameMode(mMode);
 			player.setFlying(mIsFlying);
@@ -70,7 +70,7 @@ public class Spectate implements Listener {
 		                                  });
 	}
 
-	private static void run(Plugin plugin, Player player) throws CommandSyntaxException {
+	public static boolean run(Plugin plugin, Player player) throws CommandSyntaxException {
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			if (player.hasMetadata(SPECTATE_METAKEY)) {
 				// Put player back where they were before when they log out
@@ -81,9 +81,12 @@ public class Spectate implements Listener {
 		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE)) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
+			// Succeeded in making this player a spectator
+			return true;
 		} else {
 			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a safezone");
 		}
+		return false;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -91,7 +94,7 @@ public class Spectate implements Listener {
 		if (!event.isCancelled()) {
 			Player player = event.getPlayer();
 
-			// If the player switches out of spectator for
+			// If the player switches out of spectator
 			if (!event.getNewGameMode().equals(GameMode.SPECTATOR)) {
 				player.removeMetadata(SPECTATE_METAKEY, mPlugin);
 			}
