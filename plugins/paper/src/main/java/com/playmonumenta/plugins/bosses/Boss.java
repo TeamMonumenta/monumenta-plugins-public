@@ -193,6 +193,10 @@ public class Boss {
 		}
 	}
 
+	public List<BossAbilityGroup> getAbilities() {
+		return new ArrayList<BossAbilityGroup>(mAbilities);
+	}
+
 	public void unload() {
 		/* NOTE
 		 *

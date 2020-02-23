@@ -472,6 +472,20 @@ public class BossManager implements Listener {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T extends BossAbilityGroup> T getBoss(Entity entity, Class<T> cls) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			for (BossAbilityGroup ability : boss.getAbilities()) {
+				if (cls.isInstance(ability)) {
+					return (T)ability;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
 		Entity damagee = event.getEntity();
