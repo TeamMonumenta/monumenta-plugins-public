@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -88,7 +89,7 @@ public class Varcosa extends BossAbilityGroup {
 						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0);
 
 						if (!blocked) {
-							BossUtils.bossDamage(boss, player, 16);
+							BossUtils.bossDamage(boss, player, 30);
 							// Shields don't stop fire!
 							player.setFireTicks(4 * 20);
 						}
@@ -106,16 +107,16 @@ public class Varcosa extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"&6[Varcosa] &fYarharhar! Thank ye fer comin’ and seein’ me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Yarharhar! Thank ye fer comin’ and seein’ me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
 		});
 		events.put(50, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"&6[Varcosa] &fI will hang ye out to dry!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "I will hang ye out to dry!\",\"color\":\"purple\"}]");
 		});
 		events.put(25, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"&6[Varcosa] &fYarharhar! Do ye feel it as well? That holy fleece? It be waitin’ fer me!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Yarharhar! Do ye feel it as well? That holy fleece? It be waitin’ fer me!\",\"color\":\"purple\"}]");
 		});
 		events.put(10, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"&6[Varcosa] &fI be too close ter be stoppin’ now! Me greed will never die!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "I be too close ter be stoppin’ now! Me greed will never die!\",\"color\":\"purple\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -124,9 +125,9 @@ public class Varcosa extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 1500;
+		int bossTargetHp = 500;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 1000;
+		int hpDelta = 2000;
 		int armor = (0);
 		while (playerCount > 0) {
 			bossTargetHp = bossTargetHp + hpDelta;
@@ -147,7 +148,7 @@ public class Varcosa extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"&6[Varcosa] &fYe thought I be the one in control here? Yarharhar! N’argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Ye thought I be the one in control here? Yarharhar! N’argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 }
