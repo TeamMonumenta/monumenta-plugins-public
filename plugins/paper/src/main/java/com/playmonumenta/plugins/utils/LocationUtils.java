@@ -162,15 +162,20 @@ public class LocationUtils {
 		int range = (int)fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 
-		BlockIterator bi = new BlockIterator(fromLocation.getWorld(), fromLocation.toVector(), direction, 0, range);
+		try {
+			BlockIterator bi = new BlockIterator(fromLocation.getWorld(), fromLocation.toVector(), direction, 0, range);
 
-		while (bi.hasNext()) {
-			Block b = bi.next();
+			while (bi.hasNext()) {
+				Block b = bi.next();
 
-			//  If we want to check Line of sight we want to make sure the the blocks are transparent.
-			if (LocationUtils.isLosBlockingBlock(b.getType())) {
-				return false;
+				//  If we want to check Line of sight we want to make sure the the blocks are transparent.
+				if (LocationUtils.isLosBlockingBlock(b.getType())) {
+					return false;
+				}
 			}
+		} catch (IllegalStateException e) {
+			/* Sometimes when chunks aren't loaded at exactly the right time this can happen */
+			return false;
 		}
 
 		return true;

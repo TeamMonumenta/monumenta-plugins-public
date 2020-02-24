@@ -107,7 +107,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 		} else {
 			mSpectators.put(player, new SpectateContext(player));
 
-			if (mRunnable == null) {
+			if (mRunnable == null || mRunnable.isCancelled()) {
 				mRunnable = new BukkitRunnable() {
 					int mTicks = 0;
 
