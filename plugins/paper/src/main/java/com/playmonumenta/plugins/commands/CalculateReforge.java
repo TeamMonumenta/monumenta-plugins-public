@@ -27,6 +27,13 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 
+/*
+ * NOTICE!
+ * If this enchantment gets changed, make sure someone updates the Python item replacement code to match!
+ * Constants and new enchantments included!
+ * This most likely means @NickNackGus or @Combustible
+ * If this does not happen, your changes will NOT persist across weekly updates!
+ */
 public class CalculateReforge extends GenericCommand {
 
 	public static ItemStack mCXP = null;

@@ -20,6 +20,13 @@ import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.ItemStackArgument;
 
+/*
+ * NOTICE!
+ * If this enchantment gets changed, make sure someone updates the Python item replacement code to match!
+ * Constants and new enchantments included!
+ * This most likely means @NickNackGus or @Combustible
+ * If this does not happen, your changes will NOT persist across weekly updates!
+ */
 public class GiveSoulbound extends GenericCommand {
 	@SuppressWarnings("unchecked")
 	public static void register() {

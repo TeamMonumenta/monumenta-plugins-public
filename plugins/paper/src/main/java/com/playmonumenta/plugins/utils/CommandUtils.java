@@ -141,6 +141,13 @@ public class CommandUtils {
 		enchantify(sender, player, enchantment, null);
 	}
 
+	/*
+	 * NOTICE!
+	 * If this method gets changed, make sure someone updates the Python item replacement code to match!
+	 * Constants and new enchantments included!
+	 * This most likely means @NickNackGus or @Combustible
+	 * If this does not happen, your changes will NOT persist across weekly updates!
+	 */
 	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws CommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
