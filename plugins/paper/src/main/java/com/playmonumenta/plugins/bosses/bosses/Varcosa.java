@@ -107,16 +107,16 @@ public class Varcosa extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Yarharhar! Thank ye fer comin’ and seein’ me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Thank ye fer comin’ and seein’ me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
 		});
 		events.put(50, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "I will hang ye out to dry!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I will hang ye out to dry!\",\"color\":\"purple\"}]");
 		});
 		events.put(25, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Yarharhar! Do ye feel it as well? That holy fleece? It be waitin’ fer me!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Do ye feel it as well? That holy fleece? It be waitin’ fer me!\",\"color\":\"purple\"}]");
 		});
 		events.put(10, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "I be too close ter be stoppin’ now! Me greed will never die!\",\"color\":\"purple\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I be too close ter be stoppin’ now! Me greed will never die!\",\"color\":\"purple\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -148,7 +148,7 @@ public class Varcosa extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Varcosa] " + ChatColor.GRAY + "Ye thought I be the one in control here? Yarharhar! N’argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Ye thought I be the one in control here? Yarharhar! N’argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 }
