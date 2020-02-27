@@ -50,6 +50,9 @@ public class Disengage extends Ability {
 		super(plugin, world, random, player, "Disengage");
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
+		mInfo.mShorthandName = "Dis";
+		mInfo.mDescriptions.add("Right-clicking while shifted while not holding a bow, food, trident, potion, compass, or block causes you to leap backwards 6 blocks. Non-boss/elite enemies within melee range of your previous position are stunned for 4 seconds. If you land after being propelled by this skill's effect fall damage is calculated as if you fell for half as many blocks as you actually fell for. This can not be used in towns. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Enemies in melee range when you activate this skill take 10 damage.");
 		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

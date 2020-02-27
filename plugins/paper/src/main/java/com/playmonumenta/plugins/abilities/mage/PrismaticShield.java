@@ -44,6 +44,9 @@ public class PrismaticShield extends Ability {
 		super(plugin, world, random, player, "Prismatic Shield");
 		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.scoreboardId = "Prismatic";
+		mInfo.mShorthandName = "PS";
+		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back and take 3 damage. (cooldown: 80 seconds).");
+		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks now take 6 damage.");
 		mInfo.cooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
 		mAmplifier = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_AMPLIFIER : PRISMATIC_SHIELD_2_AMPLIFIER;
 		mDuration = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;

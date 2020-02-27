@@ -37,6 +37,9 @@ public class HandOfLight extends Ability {
 		super(plugin, world, random, player, "Hand of Light");
 		mInfo.linkedSpell = Spells.HEALING;
 		mInfo.scoreboardId = "Healing";
+		mInfo.mShorthandName = "HoL";
+		mInfo.mDescriptions.add("When you block while sneaking, you heal all OTHER players in a 12 block range in front of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Cooldown: 14 seconds.");
+		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health, and the cooldown is reduced to 10 seconds.");
 		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

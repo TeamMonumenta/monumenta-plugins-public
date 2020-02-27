@@ -58,6 +58,9 @@ public class AlchemicalAmalgam extends Ability {
 	public AlchemicalAmalgam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Alchemical Amalgam");
 		mInfo.scoreboardId = "Alchemical";
+		mInfo.mShorthandName = "AAm";
+		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30 seconds.");
+		mInfo.mDescriptions.add("Absorption health added is increased to 3 and damage is increased to 16.");
 		mInfo.cooldown = 20 * 30;
 		mInfo.linkedSpell = Spells.ALCHEMICAL_AMALGAM;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

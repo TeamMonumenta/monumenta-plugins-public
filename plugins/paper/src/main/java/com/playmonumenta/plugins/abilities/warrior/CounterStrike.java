@@ -40,6 +40,9 @@ public class CounterStrike extends Ability {
 	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Counter Strike");
 		mInfo.scoreboardId = "CounterStrike";
+		mInfo.mShorthandName = "CS";
+		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
+		mInfo.mDescriptions.add("Damage is increased to 12. The passive part of the skill's damage is increased to 12.");
 		mInfo.linkedSpell = Spells.COUNTER_STRIKE;
 		mInfo.cooldown = COUNTER_STRIKE_COOLDOWN;
 		mInfo.ignoreCooldown = true;

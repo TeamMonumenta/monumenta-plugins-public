@@ -47,6 +47,9 @@ public class Starfall extends Ability {
 		super(plugin, world, random, player, "Starfall");
 		mInfo.linkedSpell = Spells.STARFALL;
 		mInfo.scoreboardId = "Starfall";
+		mInfo.mShorthandName = "SF";
+		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 18 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 16s.");
+		mInfo.mDescriptions.add("Damage is increased to 26. Cooldown is reduced to 12s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? STARFALL_1_COOLDOWN : STARFALL_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

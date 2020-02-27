@@ -36,6 +36,9 @@ public class ViciousCombos extends Ability {
 	public ViciousCombos(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Vicious Combos");
 		mInfo.scoreboardId = "ViciousCombos";
+		mInfo.mShorthandName = "VC";
+		mInfo.mDescriptions.add("While holding two swords, Right Click: Teleport in front of target hostile enemy within 10 blocks and gaining 5 seconds of Strength 2 (Cooldown 20s)");
+		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
 	}
 
 	@Override

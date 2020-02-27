@@ -34,6 +34,9 @@ public class Skirmisher extends Ability {
 	public Skirmisher(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Skirmisher");
 		mInfo.scoreboardId = "Skirmisher";
+		mInfo.mShorthandName = "Sk";
+		mInfo.mDescriptions.add("When there are 3 or fewer enemies within 8 blocks of you, deal an additional 3 melee damage.");
+		mInfo.mDescriptions.add("When there are 4 or fewer enemies within 8 blocks of you, deal an additional 5 melee damage.");
 	}
 
 	@Override

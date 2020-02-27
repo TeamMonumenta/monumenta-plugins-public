@@ -27,6 +27,9 @@ public class SagesInsight extends Ability {
 	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Sage's Insight");
 		mInfo.scoreboardId = "SagesInsight";
+		mInfo.mShorthandName = "SI";
+		mInfo.mDescriptions.add("Whenever the user casts a spell the cooldowns of other equipped spells are reduced by 5%.");
+		mInfo.mDescriptions.add("Cooldown reduction upon casting a spell is increased to 10%");
 	}
 
 	@Override

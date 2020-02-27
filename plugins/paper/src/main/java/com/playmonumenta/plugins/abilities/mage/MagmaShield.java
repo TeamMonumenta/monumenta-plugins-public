@@ -37,6 +37,9 @@ public class MagmaShield extends Ability {
 		super(plugin, world, random, player, "Magma Shield");
 		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.scoreboardId = "Magma";
+		mInfo.mShorthandName = "MS";
+		mInfo.mDescriptions.add("When you block while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 7 damage and setting them on fire. You must hold a wand to trigger this effect. (Cooldown: 12 s)");
+		mInfo.mDescriptions.add("The damage is increased to 14.");
 		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

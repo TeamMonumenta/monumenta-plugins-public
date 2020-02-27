@@ -50,6 +50,9 @@ public class Challenge extends Ability {
 	public Challenge(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Challenge");
 		mInfo.scoreboardId = "Challenge";
+		mInfo.mShorthandName = "Ch";
+		mInfo.mDescriptions.add("Left-clicking while shifted makes all enemies within 12 blocks target you. You gain Absorption 1 and 0.5 armor per affected mob (max: 4) for 10s. Cooldown: 20s.");
+		mInfo.mDescriptions.add("You gain Absorption II and 1 armor per mob instead to a max of 8.");
 		mInfo.cooldown = CHALLENGE_COOLDOWN;
 		mInfo.linkedSpell = Spells.CHALLENGE;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

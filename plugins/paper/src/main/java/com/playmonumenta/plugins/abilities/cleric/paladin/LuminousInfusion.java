@@ -51,6 +51,9 @@ public class LuminousInfusion extends Ability {
 		super(plugin, world, random, player, "Luminous Infusion");
 		mInfo.linkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.scoreboardId = "LuminousInfusion";
+		mInfo.mShorthandName = "LI";
+		mInfo.mDescriptions.add("Sneak and right-click while looking at the ground to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage (Cooldown: 15 seconds).");
+		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal +5 damage.");
 		mInfo.cooldown = LUMINOUS_INFUSION_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.ignoreCooldown = true;

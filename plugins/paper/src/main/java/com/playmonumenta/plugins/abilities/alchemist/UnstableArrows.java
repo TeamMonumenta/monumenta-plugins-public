@@ -40,6 +40,9 @@ public class UnstableArrows extends Ability {
 		super(plugin, world, random, player, "Unstable Arrows");
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
+		mInfo.mShorthandName = "UA";
+		mInfo.mDescriptions.add("When you crouch and fire an arrow it will begin to hiss on landing. 3s later it explodes, dealing 15 damage to mobs within a four block radius. If you have skill points in Basilisk Poison enemies caught in the explosion will be affected by it. Cooldown: 16 seconds. You can toggle whether the explosion will apply knockback to you or not in the P.E.B.");
+		mInfo.mDescriptions.add("The damage is increased to 24");
 		if (player != null && ScoreboardUtils.getScoreboardValue(player, "RocketJumper") == 9001) {
 			mInfo.cooldown = 0;
 		} else {

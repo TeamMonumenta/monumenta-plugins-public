@@ -24,6 +24,9 @@ public class BasiliskPoison extends Ability {
 	public BasiliskPoison(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Basilisk Poison");
 		mInfo.scoreboardId = "BasiliskPoison";
+		mInfo.mShorthandName = "BP";
+		mInfo.mDescriptions.add("Equips your arrows with a noxious mixture that afflicts targets with 7s of Wither II.");
+		mInfo.mDescriptions.add("The debuff is improved to 6s of Wither III.");
 	}
 
 	@Override

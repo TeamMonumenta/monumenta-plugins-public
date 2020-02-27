@@ -65,6 +65,9 @@ public class CloakAndDagger extends Ability {
 	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Cload and Dagger");
 		mInfo.scoreboardId = "CloakAndDagger";
+		mInfo.mShorthandName = "CnD";
+		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills give you five stacks. Stacks are capped at 8. When you shift right click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of invisibility (Mobs won't target you) and (1.5)(X) extra damage on your next attack while invisible where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this. Attacking with a sword or switching to any weapon that is not a sword cancels invisibility. If invisibility expires without attacking, you suffer from Mining Fatigue 2 for 5 seconds.");
+		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2.5)(X) where X is the number of stacks you have upon activating this skill.");
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.cooldown = 0;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

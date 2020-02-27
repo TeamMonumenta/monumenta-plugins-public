@@ -57,6 +57,9 @@ public class Dodging extends Ability {
 		super(plugin, world, random, player, "Dodging");
 		mInfo.linkedSpell = Spells.DODGING;
 		mInfo.scoreboardId = "Dodging";
+		mInfo.mShorthandName = "Dg";
+		mInfo.mDescriptions.add("Blocks an arrow or blaze fireball that would have hit you. Cooldown: 12 s.");
+		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain 15 s of Speed I.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.cooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		// NOTE: This skill will get events even when it is on cooldown!

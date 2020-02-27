@@ -51,6 +51,9 @@ public class AmplifyingHex extends Ability {
 	public AmplifyingHex(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Amplifying Hex");
 		mInfo.scoreboardId = "AmplifyingHex";
+		mInfo.mShorthandName = "AH";
+		mInfo.mDescriptions.add("If you left-click with a scythe while sneaking, you fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have. (Cooldown: 12s)");
+		mInfo.mDescriptions.add("The damage is increased to 7 damage per debuff. The cooldown is reduced to 10 seconds.");
 		mInfo.linkedSpell = Spells.AMPLIFYING;
 		mInfo.cooldown = (getAbilityScore() == 1) ? AMPLIFYING_1_COOLDOWN : AMPLIFYING_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

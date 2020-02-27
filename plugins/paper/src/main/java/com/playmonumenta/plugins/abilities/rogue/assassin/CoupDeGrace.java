@@ -33,6 +33,9 @@ public class CoupDeGrace extends Ability {
 	public CoupDeGrace(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Coup de Grace");
 		mInfo.scoreboardId = "CoupDeGrace";
+		mInfo.mShorthandName = "CdG";
+		mInfo.mDescriptions.add("If you melee attack a non-boss enemy and they get under 15% health they die instantly.");
+		mInfo.mDescriptions.add("The health threshold is increased to 25%.");
 		threshold = getAbilityScore() == 1 ? COUP_1_THRESHOLD : COUP_2_THRESHOLD;
 	}
 

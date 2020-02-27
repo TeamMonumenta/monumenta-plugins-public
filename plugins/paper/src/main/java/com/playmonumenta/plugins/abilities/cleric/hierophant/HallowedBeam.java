@@ -36,6 +36,9 @@ public class HallowedBeam extends Ability {
 	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Hallowed Beam");
 		mInfo.scoreboardId = "HallowedBeam";
+		mInfo.mShorthandName = "HB";
+		mInfo.mDescriptions.add("Firing a fully-drawn bow while shifted, while pointing directly at a non-boss undead, will instantly deal 42 damage to the undead instead of consuming an arrow. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The targeted undead explodes dealing 22 damage to undead within a 5 block radius. All affected enemies gain slowness 4 for 3s.");
 		mInfo.linkedSpell = Spells.HALLOWED_BEAM;
 		mInfo.cooldown = 20 * 20;
 	}

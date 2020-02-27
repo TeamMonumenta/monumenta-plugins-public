@@ -55,6 +55,9 @@ public class Bodyguard extends Ability {
 	public Bodyguard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Bodyguard");
 		mInfo.scoreboardId = "Bodyguard";
+		mInfo.mShorthandName = "Bg";
+		mInfo.mDescriptions.add("Blocking while looking directly at another player makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Both you and the other player gain +4 armor and Absorption 2 for 8s instead. Additionally affected mobs are stunned for 3s.");
 		mInfo.linkedSpell = Spells.BODYGUARD;
 		mInfo.cooldown = BODYGUARD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

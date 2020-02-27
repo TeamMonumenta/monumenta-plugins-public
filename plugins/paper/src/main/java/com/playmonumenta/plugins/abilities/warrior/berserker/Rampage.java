@@ -43,6 +43,9 @@ public class Rampage extends Ability {
 	public Rampage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Rampage");
 		mInfo.scoreboardId = "Rampage";
+		mInfo.mShorthandName = "Rmp";
+		mInfo.mDescriptions.add("Each mob killed adds 1 stack of Rampage. Stacks decay by 1 every 8 seconds and cap at 10. Gain 1 armor and 1 damage every 2 stacks.");
+		mInfo.mDescriptions.add("Stack decay time increased to 10 seconds and cap at 16. Earn Regeneration 1 above 5 stacks and Regeneration 2 above 10 stacks.");
 		rampageKillStreakTime = getAbilityScore() == 1 ? RAMPAGE_1_KILL_TIMER : RAMPAGE_2_KILL_TIMER;
 	}
 

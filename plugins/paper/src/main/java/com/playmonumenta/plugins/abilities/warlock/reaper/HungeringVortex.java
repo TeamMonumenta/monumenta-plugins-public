@@ -61,6 +61,9 @@ public class HungeringVortex extends Ability {
 	public HungeringVortex(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Hungering Vortex");
 		mInfo.scoreboardId = "HungeringVortex";
+		mInfo.mShorthandName = "HV";
+		mInfo.mDescriptions.add("Right-clicking while shifted while looking down pulls all mobs in a 7 block radius towards you, afflicting them with Slowness 1 for 8s. This draws the aggro of all mobs pulled and increases your melee damage by 1 for every affected enemy up to a maximum of 6 bonus damage for 8s. In addition you gain Resistance 1 for 4 seconds on activation. This skill only goes on cooldown if at least one mob is affected. Cooldown: 18s.");
+		mInfo.mDescriptions.add("You afflict enemies with Slowness 2 for 8s instead. In addition your melee damage increases by 2 for each affected enemy up to a maximum of 12 bonus damage for 8s. You also gain Resistance 2 for 4 seconds on activation.");
 		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
 		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

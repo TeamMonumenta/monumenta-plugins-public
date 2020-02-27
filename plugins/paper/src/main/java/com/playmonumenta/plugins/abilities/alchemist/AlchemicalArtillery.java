@@ -49,6 +49,9 @@ public class AlchemicalArtillery extends Ability {
 		super(plugin, world, random, player, "Alchemical Artillery");
 		mInfo.linkedSpell = Spells.ALCHEMICAL_ARTILLERY;
 		mInfo.scoreboardId = "Artillery";
+		mInfo.mShorthandName = "AAr";
+		mInfo.mDescriptions.add("Left click with a bow without shifting to prime your next arrow shot within 5 seconds. Shooting a primed arrow consumes 4 Alchemist Potions and applies all potion abilities and Basilisk Poison in a 3 block radius of where the arrow lands.");
+		mInfo.mDescriptions.add("The cost is reduced to 3 potions and the radius is increased to 4 blocks.");
 		mInfo.cooldown = 0;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mRadius = getAbilityScore() == 1 ? ALCHEMICAL_ARTILLERY_1_RADIUS : ALCHEMICAL_ARTILLERY_2_RADIUS;

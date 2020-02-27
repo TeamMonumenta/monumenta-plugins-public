@@ -36,6 +36,9 @@ public class DefensiveLine extends Ability {
 		super(plugin, world, random, player, "Defensive Line");
 		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.scoreboardId = "DefensiveLine";
+		mInfo.mShorthandName = "DL";
+		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain Resistance II for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 50 seconds.");
+		mInfo.mDescriptions.add("The cooldown is decreased to 30 seconds. In addition mobs that are knocked back are given 10 seconds of Weakness 1.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
 		mInfo.cooldown = getAbilityScore() == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

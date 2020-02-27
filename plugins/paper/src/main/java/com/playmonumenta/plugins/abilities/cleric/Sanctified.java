@@ -33,6 +33,9 @@ public class Sanctified extends Ability {
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Santified Armor");
 		mInfo.scoreboardId = "Sanctified";
+		mInfo.mShorthandName = "Sa";
+		mInfo.mDescriptions.add("Whenever an undead enemy hits you with a melee attack, it takes 5 damage and it is knocked away from you.");
+		mInfo.mDescriptions.add("Increases the damage to 7 and afflicts affected enemies with 10 s of Slowness I.");
 		mDamage = getAbilityScore() == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
 	}
 

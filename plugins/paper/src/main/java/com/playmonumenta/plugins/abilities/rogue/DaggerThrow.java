@@ -46,6 +46,9 @@ public class DaggerThrow extends Ability {
 		super(plugin, world, random, player, "Dagger Throw");
 		mInfo.linkedSpell = Spells.DAGGER_THROW;
 		mInfo.scoreboardId = "DaggerThrow";
+		mInfo.mShorthandName = "DT";
+		mInfo.mDescriptions.add("Sneaking and right-clicking while holding two swords throws out three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown 15s");
+		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
 		mInfo.cooldown = DAGGER_THROW_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;

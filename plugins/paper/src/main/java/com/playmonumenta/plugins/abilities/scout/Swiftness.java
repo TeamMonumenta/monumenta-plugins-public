@@ -19,6 +19,9 @@ public class Swiftness extends Ability {
 	public Swiftness(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Swiftness");
 		mInfo.scoreboardId = "Swiftness";
+		mInfo.mShorthandName = "Swf";
+		mInfo.mDescriptions.add("You gain permanent Speed I.");
+		mInfo.mDescriptions.add("In addition, you gain Jump Boost III while you are not inside a town.");
 	}
 
 	@Override

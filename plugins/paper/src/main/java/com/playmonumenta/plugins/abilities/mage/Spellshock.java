@@ -66,6 +66,9 @@ public class Spellshock extends Ability {
 	public Spellshock(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Spellshock");
 		mInfo.scoreboardId = "SpellShock";
+		mInfo.mShorthandName = "SS";
+		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
+		mInfo.mDescriptions.add("Damage is increased to 5 and enemies are stunned for 0.5 seconds. Additionally, gain speed 1 for 6 seconds whenever a spellshock is triggered.");
 		/*
 		 * Only one runnable ever exists for spellshock - it is a global list, not tied to any individual players
 		 * At least one player must be a mage for this to start running. Once started, it runs forever.

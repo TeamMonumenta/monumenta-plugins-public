@@ -42,6 +42,9 @@ public class AdrenalSerum extends Ability {
 		super(plugin, world, random, player, "Adrenal Serum");
 		mInfo.linkedSpell = Spells.ADRENAL_SERUM;
 		mInfo.scoreboardId = "AdrenalSerum";
+		mInfo.mShorthandName = "AS";
+		mInfo.mDescriptions.add("Throwing an Alchemist Potion while shifted instead consumes a potion to buff the user. The user gains 15s of Regeneration 2, Strength 1, and Speed 1, but when the effect ends they take 4 damage. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The user also gains Resistance 1 and Haste 2.");
 		mInfo.cooldown = ADRENAL_SERUM_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

@@ -77,6 +77,9 @@ public class ShieldBash extends Ability {
 		super(plugin, world, random, player, "Shield Bash");
 		mInfo.linkedSpell = Spells.SHIELD_BASH;
 		mInfo.scoreboardId = "ShieldBash";
+		mInfo.mShorthandName = "SB";
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to stun them for 1 second (Cooldown: 5 seconds).");
+		mInfo.mDescriptions.add("Stun duration is increased to 2 seconds.");
 		mInfo.cooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mStunDuration = getAbilityScore() == 1 ? SHIELD_BASH_1_STUN : SHIELD_BASH_2_STUN;

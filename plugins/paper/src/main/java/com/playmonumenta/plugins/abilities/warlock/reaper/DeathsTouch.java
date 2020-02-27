@@ -54,6 +54,9 @@ public class DeathsTouch extends Ability {
 		super(plugin, world, random, player, "Death's Touch");
 		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.scoreboardId = "DeathsTouch";
+		mInfo.mShorthandName = "DT";
+		mInfo.mDescriptions.add("Double right-clicking marks the enemy you are looking at as the reaper's next victim. If you do not correctly aim at a mob this skill goes on cooldown for 5s and it does nothing. If you or another player kills that enemy, the player that killed it is granted 15s of level 1 buffs contrary to the debuffs affecting it. Weakness > Strength. Slowness > Speed. Fire > Fire Resistance. Wither/Poison > Regeneration. Mining Fatigue > Haste. Blindness > Night Vision. Cooldown: 25s.");
+		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead. The cooldown is reduced to 15s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

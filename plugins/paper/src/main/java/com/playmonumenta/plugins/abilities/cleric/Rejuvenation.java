@@ -23,6 +23,9 @@ public class Rejuvenation extends Ability {
 	public Rejuvenation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Rejuvenation");
 		mInfo.scoreboardId = "Rejuvenation";
+		mInfo.mShorthandName = "Rjv";
+		mInfo.mDescriptions.add("You regenerate 5% of your max health every 3 seconds.");
+		mInfo.mDescriptions.add("All other players in a 12 block radius also regenerate 5% of their max health every 3 seconds.");
 	}
 
 	@Override

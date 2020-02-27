@@ -32,6 +32,9 @@ public class EagleEye extends Ability {
 		super(plugin, world, random, player, "Eagle Eye");
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
 		mInfo.scoreboardId = "Tinkering"; // lmao
+		mInfo.mShorthandName = "EE";
+		mInfo.mDescriptions.add("When you left-click while sneaking you reveal all enemies in a 20 block range in front of you, giving them the glowing effect for 10 seconds. Affected enemies have 20% Vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by 2 seconds. This skill can not be activated if you have a pickaxe in your mainhand. Cooldown 24s.");
+		mInfo.mDescriptions.add("The effect is increased to 35% Vulnerability.");
 		mInfo.cooldown = EAGLE_EYE_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}

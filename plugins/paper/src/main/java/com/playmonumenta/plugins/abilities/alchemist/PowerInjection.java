@@ -39,6 +39,9 @@ public class PowerInjection extends Ability {
 		super(plugin, world, random, player, "Power Injection");
 		mInfo.linkedSpell = Spells.POWER_INJECTION;
 		mInfo.scoreboardId = "PowerInjection";
+		mInfo.mShorthandName = "PI";
+		mInfo.mDescriptions.add("Left-clicking, while looking at another player within 16 blocks, while holding an Alchemist Potion gives that player 20 seconds of Strength II. Cooldown 30s");
+		mInfo.mDescriptions.add("The buff is increased to Strength III and Speed I.");
 		mInfo.cooldown = POWER_INJECTION_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}

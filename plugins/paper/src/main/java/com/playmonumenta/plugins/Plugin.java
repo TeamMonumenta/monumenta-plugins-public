@@ -35,6 +35,8 @@ import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.RestartEmptyCommand;
+import com.playmonumenta.plugins.commands.SkillDescription;
+import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TestNoScore;
@@ -130,6 +132,8 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this);
 		BossFight.register();
 		SpellDetectionCircle.registerCommand(this);
+		SkillDescription.register(this);
+		SkillSummary.register(this);
 
 		mHttpManager = new HttpManager(this);
 		try {

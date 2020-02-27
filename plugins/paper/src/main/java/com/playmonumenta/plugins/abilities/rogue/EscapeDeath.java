@@ -40,6 +40,9 @@ public class EscapeDeath extends Ability {
 		super(plugin, world, random, player, "Escape Death");
 		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.scoreboardId = "EscapeDeath";
+		mInfo.mShorthandName = "ED";
+		mInfo.mDescriptions.add("When your health drops below 5 hearts, you throw a paralyzing grenade, afflicting all nearby enemies (5 blocks) with Slowness V and Weakness III for 5 s. (cooldown: 90 s).");
+		mInfo.mDescriptions.add("When this skill is triggered, you gain 5 s of Absorption II as well as 8 s of Speed II and Jump Boost III");
 		mInfo.cooldown = ESCAPE_DEATH_COOLDOWN;
 	}
 

@@ -46,6 +46,9 @@ public class BodkinBlitz extends Ability {
 		super(plugin, world, random, player, "Bodkin Blitz");
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
+		mInfo.mShorthandName = "BB";
+		mInfo.mDescriptions.add("Left-click quickly three times while holding two swords to teleport 6 blocks forwards. Upon teleporting, strike the nearest enemy within 3 blocks, dealing them 25 damage. Cooldown: 25 seconds.");
+		mInfo.mDescriptions.add("Bodkin Blitz now deals 30 damage and marks the target for up to 5 seconds. Killing a marked enemy refreshes the cooldown of Bodkin Blitz by 10 seconds.");
 		mInfo.cooldown = BODKINBLITZ_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;

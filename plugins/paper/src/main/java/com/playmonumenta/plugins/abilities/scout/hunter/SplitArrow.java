@@ -33,6 +33,9 @@ public class SplitArrow extends Ability {
 	public SplitArrow(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Split Arrow");
 		mInfo.scoreboardId = "SplitArrow";
+		mInfo.mShorthandName = "SA";
+		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 6 damage. Any effects the arrows might have are also applied.");
+		mInfo.mDescriptions.add("Damage to the second target is increased to 10.");
 	}
 
 	@Override

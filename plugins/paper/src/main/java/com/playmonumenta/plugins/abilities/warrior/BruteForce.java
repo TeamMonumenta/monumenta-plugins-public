@@ -28,6 +28,9 @@ public class BruteForce extends Ability {
 	public BruteForce(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Brute Force");
 		mInfo.scoreboardId = "BruteForce";
+		mInfo.mShorthandName = "BF";
+		mInfo.mDescriptions.add("When you critically strike, you deal 2 damage to all enemies near your target and knock them back.");
+		mInfo.mDescriptions.add("The damage is increased to 5.");
 		damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
 	}
 

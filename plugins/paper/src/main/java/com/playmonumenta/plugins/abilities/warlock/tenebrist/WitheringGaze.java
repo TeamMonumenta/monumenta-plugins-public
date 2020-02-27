@@ -45,6 +45,9 @@ public class WitheringGaze extends Ability {
 	public WitheringGaze(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Withering Gaze");
 		mInfo.scoreboardId = "WitheringGaze";
+		mInfo.mShorthandName = "WG";
+		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned (bosses are given Slowness 3 instead) and given Wither 3 for 5 seconds. Cooldown: 30 seconds.");
+		mInfo.mDescriptions.add("Stun and Wither last for 7 seconds. Cooldown: 20 seconds.");
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
 		mInfo.cooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

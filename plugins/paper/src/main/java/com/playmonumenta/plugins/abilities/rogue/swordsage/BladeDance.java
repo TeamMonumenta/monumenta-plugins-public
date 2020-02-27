@@ -47,6 +47,9 @@ public class BladeDance extends Ability {
 	public BladeDance(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Blade Dance");
 		mInfo.scoreboardId = "BladeDance";
+		mInfo.mShorthandName = "BD";
+		mInfo.mDescriptions.add("Right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack, with a radius of four blocks, that deals 10 damage to and afflicts Weakness III to all enemies hit for 5 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("The area attack now deals 16 damage and afflicts Weakness IV");
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
 		mInfo.cooldown = 20 * 20;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

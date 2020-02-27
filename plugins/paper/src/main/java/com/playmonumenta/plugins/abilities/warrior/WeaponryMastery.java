@@ -27,6 +27,9 @@ public class WeaponryMastery extends Ability {
 	public WeaponryMastery(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Weapon Mastery");
 		mInfo.scoreboardId = "WeaponMastery";
+		mInfo.mShorthandName = "WM";
+		mInfo.mDescriptions.add("You gain Resistance I while holding a sword. Deal +3 damage while using an axe.");
+		mInfo.mDescriptions.add("Instead deal +6 damage with an axe and gain an additional +2 damage while using a sword.");
 		damageBonusAxe = getAbilityScore() == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
 		damageBonusSword = getAbilityScore() == 1 ? 0 : WEAPON_MASTERY_SWORD_2_DAMAGE;
 	}

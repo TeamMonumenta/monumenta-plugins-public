@@ -212,6 +212,9 @@ public class ElementalSpirit extends Ability {
 	public ElementalSpirit(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Elemental Spirit");
 		mInfo.scoreboardId = "ElementalSpirit";
+		mInfo.mShorthandName = "ES";
+		mInfo.mDescriptions.add("You are accompanied by a spirit of elemental energy. Upon using a spell, the spirit will rush towards the nearest enemy hit with the spell. The effects differ between types of spells. Fire: the spirit will rush towards that enemy dealing 5 damage to every enemy it passes through. Upon reaching its target it continues for 2 seconds. Ice: The spirit rushes to the enemy and deals 7 damage when it arrives. It then does 2 extra damage every second there for 3 seconds. Arcane: The spirit warps to the enemy dealing 4 damage to the target and gives all enemies within 3 blocks of that target Slowness 2 and lights them on fire for 3 seconds. Cooldown: 8s.");
+		mInfo.mDescriptions.add("Fire: Now does 10 damage to each enemy hit. Ice: Now does 10 damage to the target and does 3 damage every second for 3 seconds. Arcane: Now does 8 damage to its target.");
 		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT;
 		mInfo.cooldown = 20 * 8;
 	}

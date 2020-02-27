@@ -16,6 +16,9 @@ public class Harvester extends Ability {
 	public Harvester(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Harvester");
 		mInfo.scoreboardId = "Harvester";
+		mInfo.mShorthandName = "HotD";
+		mInfo.mDescriptions.add("Whenever an enemy dies within 8 blocks of you, reduce the cooldown of your skills by .5s.");
+		mInfo.mDescriptions.add("You also heal for 5% of your max health when an enemy dies within 8 blocks of you.");
 	}
 
 	@Override

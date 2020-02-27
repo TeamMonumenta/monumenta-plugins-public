@@ -42,6 +42,9 @@ public class FrostNova extends Ability {
 		super(plugin, world, random, player, "Frost Nova");
 		mInfo.linkedSpell = Spells.FROST_NOVA;
 		mInfo.scoreboardId = "FrostNova";
+		mInfo.mShorthandName = "FN";
+		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 8 seconds of Slowness 2. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
+		mInfo.mDescriptions.add("Increases the damage to 8 and Slowness 4. Bosses and Elites are hit with 8 seconds of Slowness 2 and 8 damage instead.");
 		mInfo.cooldown = FROST_NOVA_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;

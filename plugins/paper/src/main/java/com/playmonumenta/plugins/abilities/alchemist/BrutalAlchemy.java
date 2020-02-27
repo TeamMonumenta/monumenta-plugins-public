@@ -30,6 +30,9 @@ public class BrutalAlchemy extends Ability {
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Brutal Alchemy");
 		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
+		mInfo.mShorthandName = "BA";
+		mInfo.mDescriptions.add("Killing a mob gives you an Alchemist's Potion. Your Alchemist's Potions deal 3 magic damage and 4s of Wither II. The first skill point spent on either Gruesome Alchemy or Brutal Alchemy will give you a potion per kill and a 30% chance of getting a second potion.");
+		mInfo.mDescriptions.add("Your Alchemist's Potions now deal 5 magic damage and 6s of Wither II");
 		mDamage = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
 		mWitherDuration = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
 	}

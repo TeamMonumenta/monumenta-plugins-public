@@ -33,6 +33,9 @@ public class EnfeeblingElixir extends Ability {
 		super(plugin, world, random, player, "Enfeebling Elixir");
 		mInfo.linkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.scoreboardId = "EnfeeblingElixir";
+		mInfo.mShorthandName = "EE";
+		mInfo.mDescriptions.add("When you crouch and attack a mob all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 5s. You gain Jump Boost II and Speed 1 for 6s. Cooldown 15s.");
+		mInfo.mDescriptions.add("The knockback increases by 50%, all effects are applied for 9 s, Weakness I and Speed I are both increased to II, and the cooldown decreases to 10s.");
 		mInfo.cooldown = ENFEEBLING_COOLDOWN;
 	}
 

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities;
 import java.util.Collection;
 import java.util.Random;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LingeringPotion;
@@ -39,7 +41,6 @@ public abstract class Ability {
 	protected final Random mRandom;
 	protected final AbilityInfo mInfo;
 	protected final Player mPlayer;
-	protected final String mDisplayName;
 	private Integer mScore = null;
 
 	public Ability(Plugin plugin, World world, Random random, Player player, String displayName) {
@@ -47,12 +48,12 @@ public abstract class Ability {
 		mWorld = world;
 		mRandom = random;
 		mPlayer = player;
-		mDisplayName = displayName;
 		mInfo = new AbilityInfo();
+		mInfo.mDisplayName = displayName;
 	}
 
 	public String getDisplayName() {
-		return mDisplayName;
+		return mInfo.mDisplayName;
 	}
 
 	public String getScoreboard() {
@@ -254,8 +255,19 @@ public abstract class Ability {
 		return 0;
 	}
 
+	public ComponentBuilder getLevelHover(boolean useShorthand) {
+		return mInfo.getLevelHover(getAbilityScore(), useShorthand);
+	}
+
 	public JsonObject getAsJsonObject() {
-		JsonObject obj = mInfo.getAsJsonObject();
+		return getAsJsonObject(false);
+	}
+
+	public JsonObject getAsJsonObject(boolean fullDetails) {
+		JsonObject obj = mInfo.getAsJsonObject(fullDetails);
+		if (fullDetails) {
+			obj.addProperty("javaClassName", getClass().getName());
+		}
 		obj.addProperty("score", getAbilityScore());
 		return obj;
 	}

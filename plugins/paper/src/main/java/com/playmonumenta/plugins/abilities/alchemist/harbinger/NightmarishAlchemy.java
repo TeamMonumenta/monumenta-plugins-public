@@ -34,6 +34,9 @@ public class NightmarishAlchemy extends Ability {
 	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Nightmarish Alchemy");
 		mInfo.scoreboardId = "Nightmarish";
+		mInfo.mShorthandName = "Nm";
+		mInfo.mDescriptions.add("Your Alchemist Potions deal +3 damage. Non-boss enemies hit have a 10% chance to attack other enemies for 4s.");
+		mInfo.mDescriptions.add("Your Alchemist Potions deal +7 damage instead and the chance of confusing enemies is increased to 20%.");
 		mDamage = getAbilityScore() == 1 ? NIGHTMARISH_ALCHEMY_1_DAMAGE : NIGHTMARISH_ALCHEMY_2_DAMAGE;
 	}
 

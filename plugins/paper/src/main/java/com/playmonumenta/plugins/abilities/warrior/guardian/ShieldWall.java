@@ -55,6 +55,9 @@ public class ShieldWall extends Ability {
 	public ShieldWall(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Shield Wall");
 		mInfo.scoreboardId = "ShieldWall";
+		mInfo.mShorthandName = "SW";
+		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown is reduced to 20s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
 		mInfo.linkedSpell = Spells.SHIELD_WALL;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

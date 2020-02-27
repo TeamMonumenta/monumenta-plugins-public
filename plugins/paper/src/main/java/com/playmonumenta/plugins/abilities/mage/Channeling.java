@@ -44,6 +44,9 @@ public class Channeling extends Ability {
 	public Channeling(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Channeling");
 		mInfo.scoreboardId = "Channeling";
+		mInfo.mShorthandName = "Ch";
+		mInfo.mDescriptions.add("After casting a spell, your next melee attack deals 3 extra damage. In addition it will have a bonus effect based on the type of spell used. Fire spells set the enemy on fire for 4s, ice spells slow the enemy for 4s, and arcane spells weaken the enemy for 4s.");
+		mInfo.mDescriptions.add("Bonus damage is increased to 6.");
 		mDamage = getAbilityScore() == 1 ? CHANNELING_1_DAMAGE : CHANNELING_2_DAMAGE;
 	}
 

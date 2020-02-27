@@ -70,6 +70,9 @@ public class MeteorSlam extends Ability {
 
 		mInfo.linkedSpell = Spells.METEOR_SLAM;
 		mInfo.scoreboardId = "MeteorSlam";
+		mInfo.mShorthandName = "MS";
+		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 3 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 7s.");
+		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 5 seconds.");
 		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 		mInfo.ignoreCooldown = true;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

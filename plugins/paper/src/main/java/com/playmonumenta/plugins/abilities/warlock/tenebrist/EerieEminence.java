@@ -70,6 +70,9 @@ public class EerieEminence extends Ability {
 	public EerieEminence(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Eerie Eminence");
 		mInfo.scoreboardId = "EerieEminence";
+		mInfo.mShorthandName = "EE";
+		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Weakness. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block range, and continues for 4s after they leave the AoE.");
+		mInfo.mDescriptions.add("The range is increased to 8. In addition it provides the opposite effect to players in range. Slowness > Speed. Weakness > Strength. Mining Fatigue > Haste. Wither > Regeneration.");
 	}
 
 	@Override

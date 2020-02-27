@@ -20,6 +20,9 @@ public class BowMastery extends Ability {
 	public BowMastery(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Bow Mastery");
 		mInfo.scoreboardId = "BowMastery";
+		mInfo.mShorthandName = "BM";
+		mInfo.mDescriptions.add("Your arrows deal up to 3 extra damage scaling with the charge level of your bow.");
+		mInfo.mDescriptions.add("The extra damage is increased to up to 6.");
 	}
 
 	@Override

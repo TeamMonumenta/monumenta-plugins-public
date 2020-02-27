@@ -25,6 +25,9 @@ public class GruesomeAlchemy extends Ability {
 	public GruesomeAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Gruesome Alchemy");
 		mInfo.scoreboardId = GRUESOME_ALCHEMY_SCOREBOARD;
+		mInfo.mShorthandName = "GA";
+		mInfo.mDescriptions.add("Killing a mob gives you an Alchemist's Potion. Your Alchemist's Potions give 8s of Slowness II. The first skill point spent on either Gruesome Alchemy or Brutal Alchemy will give you a potion per kill and a 30% chance of getting a second potion.");
+		mInfo.mDescriptions.add("Your Alchemist's Potions now give 25% Vulnerability");
 	}
 
 	@Override

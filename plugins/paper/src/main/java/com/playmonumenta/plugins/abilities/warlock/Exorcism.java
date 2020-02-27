@@ -38,6 +38,9 @@ public class Exorcism  extends Ability {
 		super(plugin, world, random, player, "Exorcism");
 		mInfo.linkedSpell = Spells.EXORCISM;
 		mInfo.scoreboardId = "Exorcism";
+		mInfo.mShorthandName = "Ex";
+		mInfo.mDescriptions.add("Right clicking while looking down removes all your debuffs and applies them to enemies within 12 blocks of you. (Cooldown: 25s)");
+		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

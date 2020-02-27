@@ -48,6 +48,9 @@ public class Quickdraw extends Ability {
 		super(plugin, world, random, player, "Quickdraw");
 		mInfo.linkedSpell = Spells.QUICKDRAW;
 		mInfo.scoreboardId = "Quickdraw";
+		mInfo.mShorthandName = "Qd";
+		mInfo.mDescriptions.add("Left-clicking, while not sneaking, with a bow instantly fires an arrow that deals 15 damage (Skill bonuses, but not enchantments apply) and inflicts Slowness 3 for 2 seconds. This skill can trigger Volley if you have skill points in Volley. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Damage increases to 24 and cooldown is reduced to 8s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;

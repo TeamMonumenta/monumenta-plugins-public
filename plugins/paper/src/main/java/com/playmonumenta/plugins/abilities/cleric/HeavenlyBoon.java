@@ -33,6 +33,9 @@ public class HeavenlyBoon extends Ability {
 	public HeavenlyBoon(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Heavenly Boon");
 		mInfo.scoreboardId = "HeavenlyBoon";
+		mInfo.mShorthandName = "HB";
+		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 6% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
+		mInfo.mDescriptions.add("The chance to be splashed upon killing an Undead increases to 10%, the effect potions can now also be Strength and Resistance, and the durations of each are greater.");
 	}
 
 	@Override

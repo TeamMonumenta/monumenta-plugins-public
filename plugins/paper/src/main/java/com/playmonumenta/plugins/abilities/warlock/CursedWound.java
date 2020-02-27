@@ -35,6 +35,9 @@ public class CursedWound extends Ability {
 	public CursedWound(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Cursed Wound");
 		mInfo.scoreboardId = "CursedWound";
+		mInfo.mShorthandName = "CW";
+		mInfo.mDescriptions.add("Hitting an enemy with a scythe gives 6s of Wither II. In addition, scythe attacks deal +1 damage.");
+		mInfo.mDescriptions.add("If you critically hit with a scythe, enemies within 3 blocks of the target also take 6s of Wither II. Additionally, your scythe attacks deal +2 damage.");
 		damageBonus = getAbilityScore() == 1 ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
 
 	}

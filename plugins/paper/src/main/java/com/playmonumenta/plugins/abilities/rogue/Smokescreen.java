@@ -38,6 +38,9 @@ public class Smokescreen extends Ability {
 		super(plugin, world, random, player, "Smoke Screen");
 		mInfo.linkedSpell = Spells.SMOKESCREEN;
 		mInfo.scoreboardId = "SmokeScreen";
+		mInfo.mShorthandName = "Smk";
+		mInfo.mDescriptions.add("When you attack with a melee weapon while sneaking, you release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. (Cooldown: 20 s)");
+		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
 		mInfo.cooldown = SMOKESCREEN_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_SLOWNESS_AMPLIFIER : SMOKESCREEN_2_SLOWNESS_AMPLIFIER;

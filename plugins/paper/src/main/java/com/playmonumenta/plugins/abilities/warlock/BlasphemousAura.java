@@ -41,6 +41,9 @@ public class BlasphemousAura extends Ability {
 	public BlasphemousAura(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Blasphemous Aura");
 		mInfo.scoreboardId = "BlasphemousAura";
+		mInfo.mShorthandName = "BA";
+		mInfo.mDescriptions.add("When you hit an enemy with a skill other than Blasphemous Aura they gain 15% vulnerability for 5 seconds.");
+		mInfo.mDescriptions.add("The vulnerability given is increased to 25% and the warlock gains +1 armor and +.5 armor toughness for every ability they have on cooldown lasting until skills come off cooldown.");
 	}
 
 	@Override

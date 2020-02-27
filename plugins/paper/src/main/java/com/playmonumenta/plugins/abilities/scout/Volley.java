@@ -36,6 +36,9 @@ public class Volley extends Ability {
 		super(plugin, world, random, player, "Volley");
 		mInfo.linkedSpell = Spells.VOLLEY;
 		mInfo.scoreboardId = "Volley";
+		mInfo.mShorthandName = "Vly";
+		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15 s). Only one arrow is consumed, and each arrow deals 50% bonus damage.");
+		mInfo.mDescriptions.add("Increases the number of Arrows to 10 and enhances the bonus damage to 100%.");
 		mInfo.cooldown = VOLLEY_COOLDOWN;
 
 		/*

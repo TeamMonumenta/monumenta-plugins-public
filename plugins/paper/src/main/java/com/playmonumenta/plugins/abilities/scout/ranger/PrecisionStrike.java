@@ -54,6 +54,9 @@ public class PrecisionStrike extends Ability {
 		super(plugin, world, random, player, "Precision Strike");
 		mInfo.linkedSpell = Spells.PRECISION_STRIKE;
 		mInfo.scoreboardId = "PrecisionStrike";
+		mInfo.mShorthandName = "PSt";
+		mInfo.mDescriptions.add("Sprint right-clicking while not holding a bow, food, trident, potion, or block executes a fast dash that launches the user a short distance. The user stops at the first enemy hit dealing 6 damage and applying 20% Vulnerability for 3 seconds. The hit enemy is also stunned for 1 second. If the ground is hit before an enemy nothing happens. Cooldown: 6s.");
+		mInfo.mDescriptions.add("Damage is increased to 10. Vulnerability is increased to 30%. All mobs in a 3 block radius from the enemy you hit are stunned for 1 second.");
 		mInfo.cooldown = PRECISION_STRIKE_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}

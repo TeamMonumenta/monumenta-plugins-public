@@ -52,6 +52,9 @@ public class HolyJavelin extends Ability {
 		super(plugin, world, random, player, "Holy Javelin");
 		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.scoreboardId = "HolyJavelin";
+		mInfo.mShorthandName = "HJ";
+		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks dealing 10 damage to undead and 5 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 7s.");
+		mInfo.mDescriptions.add("Damage is increased to 20 to undead and 10 to all others.");
 		mInfo.cooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;

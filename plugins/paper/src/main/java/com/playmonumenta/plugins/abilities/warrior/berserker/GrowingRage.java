@@ -30,6 +30,9 @@ public class GrowingRage extends Ability {
 	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Growing Rage");
 		mInfo.scoreboardId = "GrowingRage";
+		mInfo.mShorthandName = "GR";
+		mInfo.mDescriptions.add("You do 10% more damage with non-skill based melee damage. Every 2 hearts you fall below your maximum health, gain another 5% more damage, to a maximum of 40% total.");
+		mInfo.mDescriptions.add("The damage bonus is increased to 30%, to a maximum of 60%.");
 		damagePercent = 1 + (getAbilityScore() == 1 ? GROWING_RAGE_1_DAMAGE_PERCENT : GROWING_RAGE_2_DAMAGE_PERCENT);
 	}
 

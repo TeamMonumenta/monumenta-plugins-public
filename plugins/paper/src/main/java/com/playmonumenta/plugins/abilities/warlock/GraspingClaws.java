@@ -41,6 +41,9 @@ public class GraspingClaws extends Ability {
 	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Grasping Claws");
 		mInfo.scoreboardId = "GraspingClaws";
+		mInfo.mShorthandName = "GC";
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 6 block radius are given Slowness 3 for 8 seconds and take 3 damage. (Cooldown: 16s)");
+		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, the arrow's radius is increased to 8.");
 		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
 		mInfo.cooldown = GRASPING_CLAWS_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

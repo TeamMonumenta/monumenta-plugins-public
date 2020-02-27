@@ -81,6 +81,9 @@ public class PurpleHaze extends Ability {
 		super(plugin, world, random, player, "Purple Haze");
 		mInfo.linkedSpell = Spells.PURPLE_HAZE;
 		mInfo.scoreboardId = "PurpleHaze";
+		mInfo.mShorthandName = "PH";
+		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an Alchemist's Potion and the effects transfer to a mob up to 5 blocks from the target that died. Cooldown: 40s.");
+		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Purple Haze now spreads to two nearby mobs. Cooldown reduced to 30 seconds.");
 		mInfo.cooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		/*

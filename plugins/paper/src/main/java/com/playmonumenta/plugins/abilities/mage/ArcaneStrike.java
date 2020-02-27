@@ -45,6 +45,9 @@ public class ArcaneStrike extends Ability {
 		super(plugin, world, random, player, "Arcane Strike");
 		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.scoreboardId = "ArcaneStrike";
+		mInfo.mShorthandName = "AS";
+		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 5 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
+		mInfo.mDescriptions.add("The damage is increased to 8. Mobs that are on fire or slowed take 4 additional damage.");
 		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 		mDamageBonusAffected = getAbilityScore() == 1 ? ARCANE_STRIKE_1_BONUS_DAMAGE : ARCANE_STRIKE_2_BONUS_DAMAGE;

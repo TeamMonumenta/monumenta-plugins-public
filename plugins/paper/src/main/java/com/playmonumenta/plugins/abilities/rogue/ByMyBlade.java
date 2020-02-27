@@ -39,6 +39,9 @@ public class ByMyBlade extends Ability {
 		super(plugin, world, random, player, "By My Blade");
 		mInfo.linkedSpell = Spells.BY_MY_BLADE;
 		mInfo.scoreboardId = "ByMyBlade";
+		mInfo.mShorthandName = "BmB";
+		mInfo.mDescriptions.add("While holding two swords, critical strikes give Haste II for 4 seconds and deal 12 additional damage. (Cooldown 10s)");
+		mInfo.mDescriptions.add("This buff is increased to Haste IV and critical strikes deal 24 additional damage instead.");
 		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;
 		mHasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;

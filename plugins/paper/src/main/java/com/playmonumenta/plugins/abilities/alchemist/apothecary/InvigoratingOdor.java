@@ -43,6 +43,9 @@ public class InvigoratingOdor extends Ability {
 	public InvigoratingOdor(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Invigorating Odor");
 		mInfo.scoreboardId = "InvigoratingOdor";
+		mInfo.mShorthandName = "IO";
+		mInfo.mDescriptions.add("Alchemist Potions deal 2 additional damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players for 10 seconds.");
+		mInfo.mDescriptions.add("Alchemist Potions deal 4 additional damage instead and Resistance I is added to the aura.");
 		mDamage = getAbilityScore() == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE;
 	}
 

@@ -49,6 +49,9 @@ public class FlashSword extends Ability {
 	public FlashSword(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Flash Sword");
 		mInfo.scoreboardId = "FlashSword";
+		mInfo.mShorthandName = "FS";
+		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 10s.");
+		mInfo.mDescriptions.add("You instead do 7 damage 3 times.");
 		mInfo.linkedSpell = Spells.FSWORD;
 		mInfo.cooldown = FSWORD_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

@@ -41,6 +41,9 @@ public class EnchantedPrayer extends Ability {
 	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Enchanted Prayer");
 		mInfo.scoreboardId = "EPrayer";
+		mInfo.mShorthandName = "EP";
+		mInfo.mDescriptions.add("Right-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee attack deals an additional 7 damage while healing the player for 2 hp. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 4 hp.");
 		mInfo.linkedSpell = Spells.ENCHANTED_PRAYER;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.cooldown = ENCHANTED_PRAYER_COOLDOWN;

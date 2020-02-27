@@ -34,6 +34,9 @@ public class ConsumingFlames extends Ability {
 	public ConsumingFlames(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Consuming Flames");
 		mInfo.scoreboardId = "ConsumingFlames";
+		mInfo.mShorthandName = "CF";
+		mInfo.mDescriptions.add("Crouching and right-clicking while not looking down while holding a scythe knocks back, weakens, and ignites mobs within 3 blocks of you for 7s doing 1 damage. (Cooldown: 10s)");
+		mInfo.mDescriptions.add("The radius is increased to 7 blocks. If you weaken any mob, you also gain fire resistance for 7s. Amplifying Hex now counts fire and inferno as a debuff.");
 		mInfo.linkedSpell = Spells.CONSUMING_FLAMES;
 		mInfo.cooldown = CONSUMING_FLAMES_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;

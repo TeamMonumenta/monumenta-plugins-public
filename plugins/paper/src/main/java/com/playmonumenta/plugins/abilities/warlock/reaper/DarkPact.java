@@ -45,6 +45,9 @@ public class DarkPact extends Ability {
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Dark Pact");
 		mInfo.scoreboardId = "DarkPact";
+		mInfo.mShorthandName = "DaP";
+		mInfo.mDescriptions.add("Sprint left-clicking greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage at half its normal amount. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
+		mInfo.mDescriptions.add("You deal 80% more melee damage instead. Scythe attacks also cleave for 50% of the damage dealt in a 1.5 block radius from the mob hit.");
 		mInfo.cooldown = DARK_PACT_COOLDOWN;
 		mInfo.linkedSpell = Spells.DARK_PACT;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

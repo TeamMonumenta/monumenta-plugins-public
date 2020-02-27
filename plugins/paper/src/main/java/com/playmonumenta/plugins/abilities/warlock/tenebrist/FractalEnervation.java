@@ -54,6 +54,9 @@ public class FractalEnervation extends Ability {
 	public FractalEnervation(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Fractal Enervation");
 		mInfo.scoreboardId = "Fractal";
+		mInfo.mShorthandName = "FE";
+		mInfo.mDescriptions.add("Double right-clicking fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s. In addition for that 12s all debuffs on the enemy increase by 1 effect level. The beam then instantly spreads to all enemies in a 3 block radius. Affected enemies take 5 damage. It will continue spreading until it doesn't find any new targets. Cooldown: 16s.");
+		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks and affected enemies take 12 damage. Additionally cooldown is reduced to 13s.");
 		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 16 : 20 * 13;
