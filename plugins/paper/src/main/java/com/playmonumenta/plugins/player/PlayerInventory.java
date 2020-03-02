@@ -1,14 +1,9 @@
 package com.playmonumenta.plugins.player;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -39,14 +34,8 @@ import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
-import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class PlayerInventory {
-	private Set<Material> mNoOffhandFunctionMats = EnumSet.noneOf(Material.class);
-	private Set<Material> mNoOffhandRemoveFunctionMats = EnumSet.noneOf(Material.class);
-	private Map<Material, NmsUtils.ParsedCommandWrapper> mOffhandFunctions = new EnumMap<>(Material.class);
-	private Map<Material, NmsUtils.ParsedCommandWrapper> mOffhandRemoveFunctions = new EnumMap<>(Material.class);
-
 	/*
 	 * This list contains all of a player's currently valid item properties,
 	 * including ones that are on duplicate specialized lists below
@@ -62,9 +51,6 @@ public class PlayerInventory {
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mHasShiftClicked = false;
-
-	private Material mPrevOffhandMat = null;
-	private List<String> mPrevOffhandLore = null;
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player, null);
@@ -85,60 +71,7 @@ public class PlayerInventory {
 		}
 	}
 
-	private static void runOffhandFunction(Plugin plugin, String functionFolder, Material type,
-	                                       Set<Material> noFunctionSet,
-	                                       Map<Material, NmsUtils.ParsedCommandWrapper> functionMap,
-	                                       Player player) {
-		if (type != null && !noFunctionSet.contains(type)) {
-			// This particular material either hasn't been tested yet or it has a corresponding function
-
-			if (!functionMap.containsKey(type)) {
-				// Don't have this function cached - need to see if it exists and cache it
-				String cmd = "function " + functionFolder + "/" + type.toString().toLowerCase();
-				try {
-					plugin.getLogger().info("Parsing command: '" + cmd + "'");
-					functionMap.put(type, NmsUtils.parseCommand(cmd));
-				} catch (Exception e) {
-					plugin.getLogger().info("Failed to parse buyback command '" + cmd + "' : " + e.getMessage());
-
-					// This function doesn't exist - mark it as such and never try again
-					noFunctionSet.add(type);
-				}
-			}
-
-			NmsUtils.ParsedCommandWrapper cmd = functionMap.get(type);
-			if (cmd != null) {
-				try {
-					NmsUtils.runParsedCommand(cmd, player);
-				} catch (Exception e) {
-					plugin.getLogger().warning("Failed to run cached offhand command: " + e.getMessage());
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
-		//Runs offhand check for things like crystalizers
-		if (event == null || event instanceof PlayerSwapHandItemsEvent || event instanceof InventoryClickEvent) {
-			// Offhand item change detection if the parsed command worked
-			ItemStack offhand = player.getInventory().getItemInOffHand();
-
-			Material type = null;
-			if (offhand != null) {
-				type = offhand.getType();
-			}
-
-			if (type != mPrevOffhandMat || (offhand.hasItemMeta() && offhand.getItemMeta().hasLore() && !offhand.getItemMeta().getLore().equals(mPrevOffhandLore))) {
-				runOffhandFunction(plugin, "monumenta:on_offhand_remove", mPrevOffhandMat, mNoOffhandRemoveFunctionMats, mOffhandRemoveFunctions, player);
-
-				mPrevOffhandMat = type;
-				mPrevOffhandLore = offhand.hasItemMeta() && offhand.getItemMeta().hasLore() ? offhand.getItemMeta().getLore() : null;
-
-				runOffhandFunction(plugin, "monumenta:on_offhand", type, mNoOffhandFunctionMats, mOffhandFunctions, player);
-			}
-		}
-
 		//Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent) {
 			if (((InventoryClickEvent) event).isShiftClick()) {
