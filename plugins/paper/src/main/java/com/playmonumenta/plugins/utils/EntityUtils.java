@@ -133,7 +133,12 @@ public class EntityUtils {
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
 
 					if (mob.getTarget() == null) {
-						mob.setTarget(getNearbyMobs(mob.getLocation(), 8, mob).get(0));
+						List<LivingEntity> nearbyMobs = getNearbyMobs(mob.getLocation(), 8, mob);
+						if (nearbyMobs.size() > 0) {
+							Location mobLoc = mob.getLocation();
+							nearbyMobs.sort((e1, e2) -> e1.getLocation().distance(mobLoc) <= e2.getLocation().distance(mobLoc) ? 1 : -1);
+							mob.setTarget(nearbyMobs.get(0));
+						}
 					}
 
 					if (confused.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
@@ -630,7 +635,7 @@ public class EntityUtils {
 		try {
 			getSummonEntityAt(loc, type, nbt);
 		} catch (Exception ex) {
-			Plugin.getInstance().getLogger().warning("Attempted to summon entity " + type.getName() + " but no entity appeared");
+			Plugin.getInstance().getLogger().warning("Attempted to summon entity " + type.toString() + " but no entity appeared");
 		}
 	}
 
