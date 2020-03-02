@@ -559,7 +559,7 @@ public class EntityUtils {
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 
-	public static boolean isStunned(LivingEntity mob) {
+	public static boolean isStunned(Entity mob) {
 		return STUNNED_MOBS.containsKey(mob);
 	}
 
@@ -596,7 +596,7 @@ public class EntityUtils {
 
 	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 
-	public static boolean isConfused(LivingEntity mob) {
+	public static boolean isConfused(Entity mob) {
 		return CONFUSED_MOBS.containsKey(mob);
 	}
 

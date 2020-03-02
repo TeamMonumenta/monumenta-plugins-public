@@ -373,7 +373,7 @@ public class BossManager implements Listener {
 					continue;
 				}
 
-				unload((LivingEntity)entity);
+				unload((LivingEntity)entity, false);
 			}
 		}
 	}
@@ -390,7 +390,7 @@ public class BossManager implements Listener {
 			if (boss != null) {
 				boss.death(event);
 				if (((LivingEntity) entity).getHealth() <= 0) {
-					boss.unload();
+					boss.unload(false);
 
 					/*
 					 * Remove special serialization data from drops. Should not be
@@ -619,17 +619,17 @@ public class BossManager implements Listener {
 	 * Public Methods
 	 *******************************************************************************/
 
-	public void unload(LivingEntity entity) {
+	public void unload(LivingEntity entity, boolean shuttingDown) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
-			boss.unload();
+			boss.unload(shuttingDown);
 			mBosses.remove(entity.getUniqueId());
 		}
 	}
 
-	public void unloadAll() {
+	public void unloadAll(boolean shuttingDown) {
 		for (Map.Entry<UUID, Boss> entry : mBosses.entrySet()) {
-			entry.getValue().unload();
+			entry.getValue().unload(shuttingDown);
 		}
 		mBosses.clear();
 	}

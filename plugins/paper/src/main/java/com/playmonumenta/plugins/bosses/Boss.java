@@ -197,7 +197,7 @@ public class Boss {
 		return new ArrayList<BossAbilityGroup>(mAbilities);
 	}
 
-	public void unload() {
+	public void unload(boolean shuttingDown) {
 		/* NOTE
 		 *
 		 * Unload will cause state to be serialized to the mob's equipment. This is fine if
@@ -211,16 +211,18 @@ public class Boss {
 			ability.unload();
 		}
 
-		/*
-		 * Clear mAbilities the next available chance - this prevents ConcurrentModificationException's
-		 * when the boss dies or is unloaded as a result of abilities
-		 */
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mAbilities.clear();
-			}
-		}.runTaskLater(mPlugin, 0);
+		if (!shuttingDown) {
+			/*
+			 * Clear mAbilities the next available chance - this prevents ConcurrentModificationException's
+			 * when the boss dies or is unloaded as a result of abilities
+			 */
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mAbilities.clear();
+				}
+			}.runTaskLater(mPlugin, 0);
+		}
 	}
 
 	public void death(EntityDeathEvent event) {

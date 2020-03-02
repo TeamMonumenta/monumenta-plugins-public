@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -85,7 +86,7 @@ public class PlayerUtils {
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.getLocation().distance(loc) < range && player.getGameMode() != GameMode.SPECTATOR
-			    && player.getHealth() > 0 && !player.hasMetadata("CloakAndDaggerPlayerIsInvisible")) {
+			    && player.getHealth() > 0 && !CloakAndDagger.isInvisible(player)) {
 				out.add(player);
 			}
 		}

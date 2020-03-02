@@ -32,6 +32,7 @@ import com.playmonumenta.plugins.enchantments.InstantDrink;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class PotionConsumeListener implements Listener {
@@ -65,6 +66,7 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a drinkable potion or glass bottle in empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
+		    ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.POTION) ||
 		      event.getCurrentItem().getType().equals(Material.GLASS_BOTTLE))
 		) {
@@ -117,7 +119,7 @@ public class PotionConsumeListener implements Listener {
 		PotionMeta meta = (PotionMeta)event.getCurrentItem().getItemMeta();
 		int instantDrinkLevel = InventoryUtils.getCustomEnchantLevel(item, InstantDrink.PROPERTY_NAME, false);
 
-		if (meta.getEnchantLevel(Enchantment.LUCK) > 0) {
+		if (PotionUtils.isLuckPotion(meta)) {
 			Location loc = player.getLocation();
 			loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Luck potions can no longer be consumed");
@@ -188,10 +190,10 @@ public class PotionConsumeListener implements Listener {
 		    // Must be a click on a shulker box with an empty hand
 		    (event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
 		    event.getCurrentItem() == null ||
+			ItemUtils.isItemShattered(event.getCurrentItem()) ||
 		    !(event.getCurrentItem().getType().equals(Material.SPLASH_POTION) ||
 		      event.getCurrentItem().getType().equals(Material.LINGERING_POTION))
 		) {
-
 			// Nope!
 			return;
 		}

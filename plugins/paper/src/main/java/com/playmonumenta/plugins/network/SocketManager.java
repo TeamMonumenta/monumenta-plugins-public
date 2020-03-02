@@ -221,13 +221,10 @@ public class SocketManager {
 				}
 			} catch (IOException e) {
 				mPlugin.getLogger().warning("Socket Error: Connection");
-				e.printStackTrace();
 			} catch (JsonParseException e) {
 				mPlugin.getLogger().warning("Socket Error: JSON Parse");
-				e.printStackTrace();
 			} catch (Exception e) {
 				mPlugin.getLogger().warning("Socket Error: Misc");
-				e.printStackTrace();
 			}
 			if (mSocketEnabled) {
 				// Something went wrong. Socket will retry, but let's wait.

@@ -29,7 +29,9 @@ public class AbilityEvasion implements BaseEnchantment {
 	@Override
 	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
 		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
-		evasion.mChance += (16 * level);
+		if (evasion != null) {
+			evasion.mChance += (16 * level);
+		}
 	}
 
 }

@@ -300,7 +300,7 @@ public class Plugin extends JavaPlugin {
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
 		mSocketManager.close();
-		mBossManager.unloadAll();
+		mBossManager.unloadAll(true);
 		MetadataUtils.removeAllMetadata(this);
 	}
 

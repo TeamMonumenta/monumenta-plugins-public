@@ -125,7 +125,7 @@ public abstract class BossAbilityGroup {
 					mPlugin.getLogger().warning("Boss is missing but still registered as an active boss. Unloading...");
 					BossManager mgr = BossManager.getInstance();
 					if (mgr != null) {
-						BossManager.getInstance().unload(mBoss);
+						BossManager.getInstance().unload(mBoss, false);
 					}
 					// Just in case for some reason the boss is no longer registered with the manager...
 					unload();

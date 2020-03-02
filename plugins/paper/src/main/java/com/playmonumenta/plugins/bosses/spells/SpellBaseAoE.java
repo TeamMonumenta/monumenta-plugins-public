@@ -13,6 +13,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 /*
  * About damn time someone fixed this crappy ability.
  */
@@ -109,7 +111,6 @@ public class SpellBaseAoE extends Spell {
 	@Override
 	public void run() {
 
-		World world = mLauncher.getWorld();
 		if (!mCanMoveWhileCasting) {
 			((LivingEntity) mLauncher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
 		}
@@ -122,19 +123,20 @@ public class SpellBaseAoE extends Spell {
 		new BukkitRunnable() {
 			float mTicks = 0;
 			double mCurrentRadius = mRadius;
+			World mWorld = mLauncher.getWorld();
 
 			@Override
 			public void run() {
 				Location loc = mLauncher.getLocation();
 
-				if (mLauncher.isDead() || !mLauncher.isValid() || mLauncher.hasMetadata("MobIsStunnedByEntityUtils")) {
+				if (mLauncher.isDead() || !mLauncher.isValid() || EntityUtils.isStunned(mLauncher)) {
 					this.cancel();
 					return;
 				}
 				mTicks++;
 				mChargeAuraAction.run(loc.clone().add(0, 1, 0));
 				if (mTicks <= (mDuration - 5) && mTicks % mSoundDensity == 0) {
-					world.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (mTicks / 100));
+					mWorld.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (mTicks / 100));
 				}
 				for (double i = 0; i < 360; i += 15) {
 					double radian1 = Math.toRadians(i);

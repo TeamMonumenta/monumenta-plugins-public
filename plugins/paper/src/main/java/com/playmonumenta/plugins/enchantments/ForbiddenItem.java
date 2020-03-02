@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -44,7 +45,9 @@ public class ForbiddenItem implements BaseEnchantment {
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_SLOWNESS_EFFECT);
 			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_WEAKNESS_EFFECT);
-			plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
+			if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+				plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, FORBIDDEN_ITEM_BLINDNESS_EFFECT);
+			}
 			MessagingUtils.sendActionBarMessage(plugin, player, ChatColor.stripColor(mPropertyName).replace(" :", "") + " items can not be used here!");
 		}
 	}

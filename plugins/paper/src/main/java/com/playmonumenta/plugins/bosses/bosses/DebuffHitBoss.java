@@ -22,16 +22,18 @@ public class DebuffHitBoss extends BossAbilityGroup {
 	}
 
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		int rand = mRand.nextInt(4);
-		LivingEntity target = (LivingEntity) event.getEntity();
-		if (rand == 0) {
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, false, true));
-		} else if (rand == 1) {
-			target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, false, true));
-		} else if (rand == 2) {
-			target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60, 0, false, true));
-		} else if (rand == 3) {
-			target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, false, true));
+		if (event.getEntity() instanceof LivingEntity) {
+			LivingEntity target = (LivingEntity) event.getEntity();
+			int rand = mRand.nextInt(4);
+			if (rand == 0) {
+				target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, false, true));
+			} else if (rand == 1) {
+				target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, false, true));
+			} else if (rand == 2) {
+				target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 60, 0, false, true));
+			} else if (rand == 3) {
+				target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 60, 0, false, true));
+			}
 		}
 	}
 }

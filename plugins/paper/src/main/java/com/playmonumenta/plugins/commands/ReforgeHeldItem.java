@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,10 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.commands.CalculateReforge;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 
@@ -60,8 +56,12 @@ public class ReforgeHeldItem extends GenericCommand {
 						inventory.removeItem(hxp);
 						inventory.removeItem(cxp);
 					} else {
-						player.sendMessage("You can't afford that");
-						CommandAPI.fail("Player doesn't have enough currency");
+						if (sender != player) {
+							player.sendMessage(ChatColor.RED + "You can't afford that");
+							CommandAPI.fail("Player doesn't have enough currency");
+						} else {
+							CommandAPI.fail("You can't afford that");
+						}
 						return;
 					}
 				} else if (region == ItemRegion.CELSIAN_ISLES) {
@@ -76,8 +76,12 @@ public class ReforgeHeldItem extends GenericCommand {
 						inventory.removeItem(hcs);
 						inventory.removeItem(ccs);
 					} else {
-						player.sendMessage("You can't afford that");
-						CommandAPI.fail("Player doesn't have enough currency");
+						if (sender != player) {
+							player.sendMessage(ChatColor.RED + "You can't afford that");
+							CommandAPI.fail("Player doesn't have enough currency");
+						} else {
+							CommandAPI.fail("You can't afford that");
+						}
 						return;
 					}
 				} else {
@@ -87,12 +91,22 @@ public class ReforgeHeldItem extends GenericCommand {
 				}
 				ItemUtils.reforgeItem(item);
 				player.sendMessage("Your item has been reforged!");
-				sender.sendMessage("Successfully reforged the player's held item");
+				if (sender != player) {
+					sender.sendMessage("Successfully reforged the player's held item");
+				}
 			} else {
-				CommandAPI.fail("Player must have a Shattered item in their main hand!");
+				if (sender != player) {
+					CommandAPI.fail("Player must have a Shattered item in their main hand!");
+				} else {
+					CommandAPI.fail("You must have a Shattered item in your main hand!");
+				}
 			}
 		} else {
-			CommandAPI.fail("Player doesn't have the metadata tag to use this command");
+			if (sender != player) {
+				CommandAPI.fail("Player doesn't have the metadata tag to use this command");
+			} else {
+				CommandAPI.fail("You don't have the metadata tag to use this command");
+			}
 		}
 	}
 }

@@ -33,9 +33,11 @@ public class SpellProjectileDeflection extends Spell {
 					((Arrow) deflected).setCritical(((Arrow) proj).isCritical());
 					if (deflected instanceof TippedArrow) {
 						TippedArrow arrow = (TippedArrow) deflected;
-						arrow.setBasePotionData(((TippedArrow) proj).getBasePotionData());
-						for (PotionEffect effect : ((TippedArrow) proj).getCustomEffects()) {
-							arrow.addCustomEffect(effect, true);
+						if (((TippedArrow) proj).getBasePotionData() != null) {
+							arrow.setBasePotionData(((TippedArrow) proj).getBasePotionData());
+							for (PotionEffect effect : ((TippedArrow) proj).getCustomEffects()) {
+								arrow.addCustomEffect(effect, true);
+							}
 						}
 					}
 				}

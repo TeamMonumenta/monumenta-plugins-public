@@ -105,7 +105,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 						player.updateInventory();
 						event.setCancelled(true);
-						InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+						InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 					}
 				}
 			}

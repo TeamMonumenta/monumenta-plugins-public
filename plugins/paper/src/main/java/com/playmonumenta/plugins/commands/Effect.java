@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -134,7 +136,9 @@ public class Effect {
 	                                PotionEffectType type) {
 		PotionManager manager = plugin.mPotionManager;
 
+		World world = null;
 		for (Entity e : entities) {
+			world = e.getWorld();
 			if (e instanceof Player && manager != null) {
 				// This is a player - use the potion manager
 				Player player = (Player)e;
@@ -162,10 +166,12 @@ public class Effect {
 			}
 		}
 
-		if (type == null) {
-			sender.sendMessage("Cleared all effects from entities");
-		} else {
-			sender.sendMessage("Cleared " + type.toString() + " effect from entities");
+		if (world != null && world.getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK)) {
+			if (type == null) {
+				sender.sendMessage("Cleared all effects from entities");
+			} else {
+				sender.sendMessage("Cleared " + type.toString() + " effect from entities");
+			}
 		}
 	}
 }

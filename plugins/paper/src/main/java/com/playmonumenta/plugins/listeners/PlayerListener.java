@@ -759,10 +759,14 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		if (event.getItem().getItemMeta() instanceof PotionMeta) {
-			PotionMeta meta = (PotionMeta) event.getItem().getItemMeta();
+		/* Don't let players consume shattered items */
+		if (ItemUtils.isItemShattered(event.getItem())) {
+			event.setCancelled(true);
+			return;
+		}
 
-			if (meta.getEnchantLevel(Enchantment.LUCK) > 0) {
+		if (event.getItem().getItemMeta() instanceof PotionMeta) {
+			if (PotionUtils.isLuckPotion((PotionMeta)event.getItem().getItemMeta())) {
 				Location loc = player.getLocation();
 				loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Luck potions can no longer be consumed");

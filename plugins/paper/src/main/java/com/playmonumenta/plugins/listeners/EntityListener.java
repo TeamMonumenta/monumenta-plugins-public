@@ -195,7 +195,6 @@ public class EntityListener implements Listener {
 		}
 		Entity damagee = event.getEntity();
 		Entity damager = event.getDamager();
-		World world = damager.getWorld();
 
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
@@ -882,8 +881,22 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity applied = event.getApplied();
-		LivingEntity applier = (LivingEntity) event.getApplier();
 
+		LivingEntity applier;
+		if (event.getApplier() instanceof Projectile) {
+			Projectile proj = (Projectile)event.getApplier();
+			if (proj.getShooter() != null && (proj.getShooter() instanceof LivingEntity)) {
+				applier = (LivingEntity) proj.getShooter();
+			} else {
+				return;
+			}
+		} else if (event.getApplier() instanceof LivingEntity) {
+			applier = (LivingEntity) event.getApplier();
+		} else {
+			return;
+		}
+
+		/* Mark as applying slowness so arcane strike won't activate this tick */
 		if (applier instanceof Player && !applied.hasPotionEffect(PotionEffectType.SLOW)
 		    && event.getEffect().getType() == PotionEffectType.SLOW) {
 			MetadataUtils.checkOnceThisTick(mPlugin, applied, Constants.ENTITY_SLOWED_NONCE_METAKEY);

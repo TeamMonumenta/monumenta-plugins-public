@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -188,7 +189,7 @@ public class SpellBaseLaser extends Spell {
 					blocked = !(LocationUtils.hasLineOfSight(launLoc, target.getEyeLocation()));
 				}
 
-				if ((blocked && mStopWhenBlocked) || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
+				if ((blocked && mStopWhenBlocked) || EntityUtils.isStunned(mBoss)) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;

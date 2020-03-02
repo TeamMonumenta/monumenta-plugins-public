@@ -59,7 +59,7 @@ public class SpellTpBehindRandomPlayer extends Spell {
 	}
 
 	private void launch(Player target) {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (target.getLocation().distance(mLauncher.getLocation()) > MAX_RANGE) {
@@ -123,13 +123,16 @@ public class SpellTpBehindRandomPlayer extends Spell {
 					((Mob)mLauncher).setTarget(target);
 				}
 			}
-		}.runTaskLater(mPlugin, TP_DELAY);
+		};
+
+		runnable.runTaskLater(mPlugin, TP_DELAY);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void animation(Player target) {
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -142,6 +145,8 @@ public class SpellTpBehindRandomPlayer extends Spell {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 }

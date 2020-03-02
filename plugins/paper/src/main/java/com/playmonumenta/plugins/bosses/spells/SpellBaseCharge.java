@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -266,7 +267,7 @@ public class SpellBaseCharge extends Spell {
 			Player mTarget = target;
 			@Override
 			public void run() {
-				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
+				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || EntityUtils.isStunned(mBoss)) {
 					this.cancel();
 					return;
 				}
@@ -318,7 +319,7 @@ public class SpellBaseCharge extends Spell {
 
 			@Override
 			public void run() {
-				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || mBoss.hasMetadata("MobIsStunnedByEntityUtils")) {
+				if (!mBoss.isValid() || mBoss.isDead() || mBoss == null || EntityUtils.isStunned(mBoss)) {
 					this.cancel();
 					return;
 				}
