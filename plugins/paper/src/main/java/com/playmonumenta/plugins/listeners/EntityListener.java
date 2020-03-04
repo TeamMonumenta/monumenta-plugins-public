@@ -683,7 +683,6 @@ public class EntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
 		AreaEffectCloud cloud = event.getEntity();
-		ProjectileSource source = cloud.getSource();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
 		// Never apply effects to villagers
@@ -697,13 +696,6 @@ public class EntityListener implements Listener {
 
 		/* Don't let the player interact with the world when transferring */
 		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
-
-		// Class effects from splashing potion
-		if (source instanceof Player) {
-			//Player player = (Player)source;
-
-			//mPlugin.getClass(player).AreaEffectCloudApplyEvent(affectedEntities, player);
-		}
 
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;

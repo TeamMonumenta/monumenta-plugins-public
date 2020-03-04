@@ -101,7 +101,7 @@ public class SpellHellzoneGrenade extends Spell {
 					world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
 					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 						fallingBlock.remove();
-						fallingBlock.getLocation().getBlock().setType(Material.AIR);;
+						fallingBlock.getLocation().getBlock().setType(Material.AIR);
 						world.spawnParticle(Particle.FLAME, fallingBlock.getLocation(), 150, 0, 0, 0, 0.165);
 						world.spawnParticle(Particle.SMOKE_LARGE, fallingBlock.getLocation(), 65, 0, 0, 0, 0.1);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);

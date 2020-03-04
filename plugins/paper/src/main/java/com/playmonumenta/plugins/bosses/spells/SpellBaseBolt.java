@@ -134,7 +134,7 @@ public class SpellBaseBolt extends Spell {
 					mTicks++;
 					mTickAction.run(mCaster, mTicks);
 
-					if (mCaster.isDead() || mCaster == null) {
+					if (mCaster == null || mCaster.isDead()) {
 						this.cancel();
 						return;
 					}
@@ -207,7 +207,7 @@ public class SpellBaseBolt extends Spell {
 						i++;
 						mParticleAction.run(loc);
 
-						if (i >= mDuration || mCaster.isDead() || mCaster == null) {
+						if (i >= mDuration || mCaster == null || mCaster.isDead()) {
 							this.cancel();
 						}
 					}

@@ -15,12 +15,9 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
-
-import net.md_5.bungee.api.ChatColor;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ChestUtils;
@@ -29,6 +26,8 @@ import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks
@@ -85,7 +84,7 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		if (!player.getGameMode().equals(GameMode.SPECTATOR) && !command_chest(block)) {
+		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR) && !command_chest(block)) {
 			return false;
 		}
 

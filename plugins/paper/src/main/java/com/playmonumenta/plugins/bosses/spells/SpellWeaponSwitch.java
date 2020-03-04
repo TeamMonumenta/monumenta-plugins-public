@@ -30,9 +30,8 @@ public class SpellWeaponSwitch extends Spell {
 		if (mLauncher.getLocation().distance(target.getLocation()) > 6) {
 			// Switch to ranged weapon if not already equipped
 
-			if (curItem.getType().equals(Material.BOW) || curItem.getType().equals(Material.TRIDENT)) {
-				// Don't need to do anything - already have a ranged item equipped
-			} else if (offItem.getType().equals(Material.BOW) || offItem.getType().equals(Material.TRIDENT)) {
+			if (!(curItem.getType().equals(Material.BOW) || curItem.getType().equals(Material.TRIDENT))
+				&& (offItem.getType().equals(Material.BOW) || offItem.getType().equals(Material.TRIDENT))) {
 				// Need to switch hands - offhand is ranged
 				mLauncher.getEquipment().setItemInMainHand(offItem);
 				mLauncher.getEquipment().setItemInOffHand(curItem);
@@ -42,9 +41,7 @@ public class SpellWeaponSwitch extends Spell {
 
 			if (curItem.getType().equals(Material.BOW) || curItem.getType().equals(Material.TRIDENT)) {
 				// Need to switch - using a ranged weapon currently
-				if (offItem.getType().equals(Material.BOW) || offItem.getType().equals(Material.TRIDENT)) {
-					// Off hand is also ranged - no reason to do anything
-				} else {
+				if (!(offItem.getType().equals(Material.BOW) || offItem.getType().equals(Material.TRIDENT))) {
 					// Need to switch hands - offhand is not ranged and mainhand is
 					mLauncher.getEquipment().setItemInMainHand(offItem);
 					mLauncher.getEquipment().setItemInOffHand(curItem);

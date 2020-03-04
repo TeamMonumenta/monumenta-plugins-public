@@ -79,11 +79,11 @@ public class NmsUtils {
 		}
 	}
 
-	public static void customDamageEntity(@Nonnull org.bukkit.entity.LivingEntity entity, double amount, @Nonnull Player damager) {
+	public static void customDamageEntity(@Nonnull LivingEntity entity, double amount, @Nonnull Player damager) {
 		customDamageEntity(entity, amount, damager, null);
 	}
 
-	public static void customDamageEntity(@Nonnull org.bukkit.entity.LivingEntity entity, double amount, @Nonnull Player damager, @Nullable String killedUsingMsg) {
+	public static void customDamageEntity(@Nonnull LivingEntity entity, double amount, @Nonnull Player damager, @Nullable String killedUsingMsg) {
         DamageSource reason = new CustomDamageSource(((CraftHumanEntity) damager).getHandle(), killedUsingMsg);
 
         ((CraftLivingEntity)entity).getHandle().damageEntity(reason, (float) amount);
@@ -107,7 +107,7 @@ public class NmsUtils {
 
 	}
 
-	public static void unblockableEntityDamageEntity(@Nonnull org.bukkit.entity.LivingEntity damagee, double amount, @Nonnull org.bukkit.entity.LivingEntity damager) {
+	public static void unblockableEntityDamageEntity(@Nonnull LivingEntity damagee, double amount, @Nonnull LivingEntity damager) {
         DamageSource reason = new UnblockableEntityDamageSource(damager == null ? null : ((CraftLivingEntity) damager).getHandle());
 
         ((CraftLivingEntity)damagee).getHandle().damageEntity(reason, (float) amount);

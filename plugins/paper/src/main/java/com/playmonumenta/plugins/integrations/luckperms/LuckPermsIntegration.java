@@ -22,10 +22,10 @@ public class LuckPermsIntegration {
 
 		CreateGuild.register(plugin, lp);
 		JoinGuild.register(plugin, lp);
-		PromoteGuild.register(plugin, lp);
+		PromoteGuild.register(lp);
 		LeaveGuild.register(plugin, lp);
 		TestGuild.register(plugin, lp);
-		TeleportGuild.register(plugin, lp);
+		TeleportGuild.register(lp);
 		SetGuildTeleport.register(plugin, lp);
 	}
 
@@ -98,7 +98,7 @@ public class LuckPermsIntegration {
 				}
 			}
 		} catch (Exception e) {
-			// Pass
+			return null;
 		}
 
 		return null;

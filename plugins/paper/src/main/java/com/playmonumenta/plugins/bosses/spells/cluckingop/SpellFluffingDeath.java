@@ -62,18 +62,18 @@ public class SpellFluffingDeath extends Spell {
 							i++;
 
 							for (int j = 0; j < 3; j++) {
-								rainMeteor(mStartLoc.clone().add(rand.nextDouble(-mRange, mRange), -1.25, rand.nextDouble(-mRange, mRange)), players, 30);
+								rainMeteor(mStartLoc.clone().add(rand.nextDouble(-mRange, mRange), -1.25, rand.nextDouble(-mRange, mRange)), 30);
 							}
 
 							//Target one random player. Have a meteor rain nearby them.
 							if (players.size() > 1) {
 								Player rPlayer = players.get(random.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), players, 30);
+								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), 30);
 							} else if (players.size() == 1) {
 								Player rPlayer = players.get(0);
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), players, 30);
+								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), 30);
 							}
 
 							if (i >= 20) {
@@ -89,7 +89,7 @@ public class SpellFluffingDeath extends Spell {
 		}.runTaskTimer(mPlugin, 0, 2);
 	}
 
-	private void rainMeteor(Location loc, List<Player> players, double spawnY) {
+	private void rainMeteor(Location loc, double spawnY) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			double y = spawnY;

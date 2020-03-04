@@ -97,7 +97,7 @@ public class EnchantedPrayer extends Ability {
 						this.cancel();
 					}
 
-					if (t >= ENCHANTED_PRAYER_COOLDOWN || p.isDead() || !p.isOnline() || p == null) {
+					if (t >= ENCHANTED_PRAYER_COOLDOWN || p == null || p.isDead() || !p.isOnline()) {
 						this.cancel();
 						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
 					}

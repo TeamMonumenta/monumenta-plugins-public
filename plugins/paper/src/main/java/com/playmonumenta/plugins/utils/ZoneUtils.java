@@ -24,7 +24,7 @@ public class ZoneUtils {
 
 		private final String mPropertyName;
 
-		private ZoneProperty(String propertyName) {
+		ZoneProperty(String propertyName) {
 			mPropertyName = propertyName;
 		}
 

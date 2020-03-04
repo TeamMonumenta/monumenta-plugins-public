@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;

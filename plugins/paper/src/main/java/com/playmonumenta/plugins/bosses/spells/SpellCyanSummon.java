@@ -8,7 +8,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -19,7 +18,7 @@ public class SpellCyanSummon extends Spell {
 
 	private final LivingEntity mBoss;
 
-	public SpellCyanSummon(Plugin plugin, LivingEntity boss) {
+	public SpellCyanSummon(LivingEntity boss) {
 		mBoss = boss;
 	}
 

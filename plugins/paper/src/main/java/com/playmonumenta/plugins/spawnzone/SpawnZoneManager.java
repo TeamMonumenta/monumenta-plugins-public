@@ -30,28 +30,26 @@ public class SpawnZoneManager {
 		for (SpawnZone zone : mZones) {
 			if (zone.withinZone(entity.getLocation())) {
 				for (SpawnEffect effect : zone.getSpawnEffects()) {
-					if (true) { //(zone.getZoneShardID() == shardID) {
-						if (entity.getType() == effect.getEntityType()) {
-							LivingEntity creature = (LivingEntity)entity;
-							String name = creature.getCustomName();
-							String goalName = effect.getName();
+					if (entity.getType() == effect.getEntityType()) {
+						LivingEntity creature = (LivingEntity)entity;
+						String name = creature.getCustomName();
+						String goalName = effect.getName();
 
-							if ((name == null && goalName == "DEFAULT") || name.contains(goalName)) {
-								SpawnEffectType type = effect.getEffectType();
-								if (type == SpawnEffectType.Health) {
-									double addHealth = effect.getValue();
+						if ((name == null && goalName == "DEFAULT") || name.contains(goalName)) {
+							SpawnEffectType type = effect.getEffectType();
+							if (type == SpawnEffectType.Health) {
+								double addHealth = effect.getValue();
 
-									AttributeInstance att = creature.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-									double maxHealth = att.getBaseValue();
+								AttributeInstance att = creature.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+								double maxHealth = att.getBaseValue();
 
-									att.setBaseValue(maxHealth + addHealth);
-									creature.setHealth(maxHealth + addHealth);
-								} else if (type == SpawnEffectType.Potion) {
-									List<PotionEffect> potionList = effect.getPotionEffects();
-									if (potionList.size() > 0) {
-										for (PotionEffect currentPot : potionList) {
-											creature.addPotionEffect(currentPot);
-										}
+								att.setBaseValue(maxHealth + addHealth);
+								creature.setHealth(maxHealth + addHealth);
+							} else if (type == SpawnEffectType.Potion) {
+								List<PotionEffect> potionList = effect.getPotionEffects();
+								if (potionList.size() > 0) {
+									for (PotionEffect currentPot : potionList) {
+										creature.addPotionEffect(currentPot);
 									}
 								}
 							}

@@ -250,20 +250,6 @@ public class ScoreboardUtils {
 			newTeam.setColor(ChatColor.valueOf(color));
 
 			// Note - team member list not used here
-		} else if (currentTeam != null) {
-			/*
-			 * TODO:
-			 *
-			 * Maybe we want this eventually, but not yet. It would clear the teams for
-			 * players who aren't on region_1 when it is added, which is bad
-			 */
-			//  // If no team info was sent but player on a team remove player from team
-			//  currentTeam.removeEntry(player.getName());
-
-			//  // If the team is empty, remove it
-			//  if (currentTeam.getSize() <= 0) {
-			//      currentTeam.unregister();
-			//  }
 		}
 	}
 

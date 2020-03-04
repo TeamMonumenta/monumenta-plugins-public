@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,11 +27,11 @@ public class ReforgeInventory extends GenericCommand {
 
 	public static void register() {
 		registerPlayerCommand("reforgeinventory", "monumenta.command.reforgeinventory", (sender, player) -> {
-			run(sender, player);
+			run(player);
 		});
 	}
 
-	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(Player player) throws CommandSyntaxException {
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			// Get the cost to reforge the entire inventory

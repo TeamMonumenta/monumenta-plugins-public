@@ -5,11 +5,9 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.playmonumenta.plugins.Plugin;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -23,7 +21,7 @@ import me.lucko.luckperms.api.LuckPermsApi;
 
 public class TeleportGuild {
 	@SuppressWarnings("unchecked")
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(LuckPermsApi lp) {
 		// teleportguild <guildname> <player>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
@@ -32,20 +30,19 @@ public class TeleportGuild {
 
 		CommandAPI.getInstance().register("teleportguild", perms, arguments, (sender, args) -> {
 			for (Player player : (List<Player>)args[0]) {
-				run(plugin, lp, sender, player, null);
+				run(lp, player, null);
 			}
 		});
 
 		arguments.put("guild name", new TextArgument());
 		CommandAPI.getInstance().register("teleportguild", perms, arguments, (sender, args) -> {
 			for (Player player : (List<Player>)args[0]) {
-				run(plugin, lp, sender, player, (String)args[1]);
+				run(lp, player, (String)args[1]);
 			}
 		});
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
-	                        Player player, String guildName) throws CommandSyntaxException {
+	private static void run(LuckPermsApi lp, Player player, String guildName) throws CommandSyntaxException {
 
 		Group group = null;
 

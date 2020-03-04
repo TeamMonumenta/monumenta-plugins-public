@@ -4,11 +4,9 @@ import java.util.LinkedHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -22,7 +20,7 @@ import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
 
 public class PromoteGuild {
-	public static void register(Plugin plugin, LuckPermsApi lp) {
+	public static void register(LuckPermsApi lp) {
 		// promoteguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
 
@@ -30,11 +28,11 @@ public class PromoteGuild {
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 
 		CommandAPI.getInstance().register("promoteguild", perms, arguments, (sender, args) -> {
-			run(plugin, lp, sender, (Player) args[0]);
+			run(lp, (Player) args[0]);
 		});
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(LuckPermsApi lp, Player player) throws CommandSyntaxException {
 		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuild == null || currentGuildName == null) {

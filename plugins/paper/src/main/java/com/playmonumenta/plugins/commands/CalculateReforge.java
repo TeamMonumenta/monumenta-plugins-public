@@ -8,7 +8,6 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
@@ -22,10 +21,11 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.TextComponent;
 
 /*
  * NOTICE!
@@ -43,12 +43,12 @@ public class CalculateReforge extends GenericCommand {
 
 	public static void register() {
 		registerPlayerCommand("calculatereforge", "monumenta.command.calculatereforge", (sender, player) -> {
-			run(sender, player);
+			run(player);
 		});
 	}
 
 	@SuppressWarnings("deprecation")
-	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(Player player) throws CommandSyntaxException {
 		// #region Loot Table extraction
 		// Grab currency items from the loot tables so we can scan for and remove them from players' inventories.
 		if (mCXP == null || mHXP == null || mCCS == null || mHCS == null) {

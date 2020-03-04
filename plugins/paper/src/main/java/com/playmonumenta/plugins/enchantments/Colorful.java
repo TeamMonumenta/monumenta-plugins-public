@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  */
 public class Colorful implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Colorful";
-	private static final List<Color> colors = new ArrayList<>(Arrays.asList(
+	private static final List<Color> COLORS = new ArrayList<>(Arrays.asList(
 			Color.LIME,
 			Color.PURPLE,
 			Color.WHITE,
@@ -63,15 +63,13 @@ public class Colorful implements BaseEnchantment {
 					if (getLevelFromItem(item) > 0) { //if armor piece has colorful and right type
 						LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
 						int index = 0;
-						try {
-							index = colors.indexOf(meta.getColor()) + 1;
-							if (index == colors.size()) {
+						if (COLORS.contains(meta.getColor())) {
+							index = COLORS.indexOf(meta.getColor()) + 1;
+							if (index == COLORS.size()) {
 								index = 0;
 							}
-						} catch (Exception e) {
-							// Nothing to do
 						}
-						meta.setColor(colors.get(index));
+						meta.setColor(COLORS.get(index));
 						item.setItemMeta(meta);
 					}
 				}

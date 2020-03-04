@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,13 +39,13 @@ public class GiveSoulbound extends GenericCommand {
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      for (Player player : (Collection<Player>)args[0]) {
-												  give(sender, player, (ItemStack)args[1]);
+												  give(player, (ItemStack)args[1]);
 		                                      }
 		                                  }
 		);
 	}
 
-	private static void give(CommandSender sender, Player player, ItemStack stack) {
+	private static void give(Player player, ItemStack stack) {
 		ItemMeta meta = null;
 		if (stack.hasItemMeta()) {
 			meta = stack.getItemMeta();

@@ -280,7 +280,7 @@ public class ItemOverrides {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
-		return (override != null) ? override.rightClickEntityInteraction(plugin, player, clickedEntity, itemInHand) : true;
+		return (override == null) || override.rightClickEntityInteraction(plugin, player, clickedEntity, itemInHand);
 	}
 
 	// Returns eventCancelled = true if disallowed, otherwise false

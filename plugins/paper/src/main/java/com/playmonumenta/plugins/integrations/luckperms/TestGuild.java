@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import java.util.LinkedHashMap;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -29,11 +28,11 @@ public class TestGuild {
 		arguments.put("guild name", new TextArgument());
 
 		CommandAPI.getInstance().register("testguild", perms, arguments, (sender, args) -> {
-			run(plugin, lp, sender, (String) args[1], (Player) args[0]);
+			run(lp, (String) args[1], (Player) args[0]);
 		});
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, String guildName, Player player) throws CommandSyntaxException {
+	private static void run(LuckPermsApi lp, String guildName, Player player) throws CommandSyntaxException {
 		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 

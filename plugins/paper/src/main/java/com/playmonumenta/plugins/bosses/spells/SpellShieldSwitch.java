@@ -36,9 +36,7 @@ public class SpellShieldSwitch extends Spell {
 		if (target == null || mLauncher.getLocation().distance(target.getLocation()) > 8) {
 			// Switch to shield if not already equipped
 
-			if (curItem.getType().equals(Material.SHIELD)) {
-				// Don't need to do anything - already have a shield equipped
-			} else if (offItem.getType().equals(Material.SHIELD)) {
+			if (!curItem.getType().equals(Material.SHIELD) && offItem.getType().equals(Material.SHIELD)) {
 				// Need to switch hands - offhand is shield
 				mLauncher.getEquipment().setItemInMainHand(offItem);
 				mLauncher.getEquipment().setItemInOffHand(curItem);
@@ -48,9 +46,7 @@ public class SpellShieldSwitch extends Spell {
 
 			if (curItem.getType().equals(Material.SHIELD)) {
 				// Need to switch - using a shield currently
-				if (offItem.getType().equals(Material.SHIELD)) {
-					// Off hand is a shield - no reason to do anything
-				} else {
+				if (!offItem.getType().equals(Material.SHIELD)) {
 					// Need to switch hands - offhand is not a shield and mainhand is
 					mLauncher.getEquipment().setItemInMainHand(offItem);
 					mLauncher.getEquipment().setItemInOffHand(curItem);

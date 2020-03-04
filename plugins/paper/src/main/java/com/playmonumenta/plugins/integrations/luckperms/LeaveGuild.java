@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -34,11 +33,11 @@ public class LeaveGuild {
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 
 		CommandAPI.getInstance().register("leaveguild", perms, arguments, (sender, args) -> {
-			run(plugin, lp, sender, (Player) args[0]);
+			run(plugin, lp, (Player) args[0]);
 		});
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws CommandSyntaxException {
 		// Set scores and permissions
 		ScoreboardUtils.setScoreboardValue(player, "Founder", 0);
 

@@ -44,15 +44,15 @@ public class YellowTesseractOverride extends BaseOverride {
 
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return interaction(plugin, player, action, item);
+		return interaction(player, action, item);
 	}
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		return interaction(plugin, player, action, item);
+		return interaction(player, action, item);
 	}
 
-	private boolean interaction(Plugin plugin, Player player, Action action, ItemStack item) {
+	private boolean interaction(Player player, Action action, ItemStack item) {
 		if (player == null) {
 			return true;
 		}

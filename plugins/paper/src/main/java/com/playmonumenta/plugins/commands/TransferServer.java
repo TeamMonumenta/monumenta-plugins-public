@@ -62,7 +62,7 @@ public class TransferServer extends GenericCommand {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      sendPlayer(plugin, sender, (Collection<Player>)args[0],
+		                                      sendPlayer(plugin, (Collection<Player>)args[0],
 		                                                 (String)args[1], true);
 		                                  }
 		);
@@ -76,7 +76,7 @@ public class TransferServer extends GenericCommand {
 		                                  perms,
 		                                  arguments,
 		                                  (sender, args) -> {
-		                                      sendPlayer(plugin, sender, (Collection<Player>)args[0],
+		                                      sendPlayer(plugin, (Collection<Player>)args[0],
 		                                                 (String)args[1], (Boolean)args[2]);
 		                                  }
 		);
@@ -90,8 +90,7 @@ public class TransferServer extends GenericCommand {
 		}
 	}
 
-	private static void sendPlayer(Plugin plugin, CommandSender sender, Collection<Player> players,
-	                               String server, boolean sendPlayerStuff) {
+	private static void sendPlayer(Plugin plugin, Collection<Player> players, String server, boolean sendPlayerStuff) {
 		if (plugin.mServerProperties == null) {
 			return;
 		}

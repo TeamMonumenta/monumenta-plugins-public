@@ -151,7 +151,7 @@ public class SpellRaiseJungle extends Spell {
 									}
 								}
 
-								if (ele.isDead() || !ele.isValid() || ele == null) {
+								if (ele == null || ele.isDead() || !ele.isValid()) {
 									this.cancel();
 									mSummoned.remove(ele.getUniqueId());
 									if (mSummoned.size() <= 0) {

@@ -4,11 +4,11 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 public interface EntityTracking {
-	public void addEntity(Entity entity);
+	void addEntity(Entity entity);
 
-	public void removeEntity(Entity entity);
+	void removeEntity(Entity entity);
 
-	public void unloadTrackedEntities();
+	void unloadTrackedEntities();
 
-	public void update(World world, int ticks);
+	void update(World world, int ticks);
 }

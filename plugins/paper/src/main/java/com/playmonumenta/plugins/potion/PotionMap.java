@@ -83,7 +83,7 @@ public class PotionMap {
 	public void addPotionMap(Player player, PotionID id, PotionInfo newPotionInfo) {
 		addPotionMap(id, newPotionInfo);
 
-		applyBestPotionEffect(player, true);
+		applyBestPotionEffect(player);
 	}
 
 	public void removePotionMap(Player player, PotionID id) {
@@ -95,7 +95,7 @@ public class PotionMap {
 			mPotionMap.remove(id);
 		}
 
-		applyBestPotionEffect(player, false);
+		applyBestPotionEffect(player);
 	}
 
 	public void updatePotionStatus(Player player, int ticks) {
@@ -126,7 +126,7 @@ public class PotionMap {
 
 		//  If a timer wears out, run another check to make sure the best potion effect is applied.
 		if (effectWoreOff) {
-			applyBestPotionEffect(player, true);
+			applyBestPotionEffect(player);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class PotionMap {
 		return bestEffect;
 	}
 
-	private void applyBestPotionEffect(Player player, boolean logOnRemove) {
+	private void applyBestPotionEffect(Player player) {
 		PotionInfo bestEffect = getBestEffect();
 
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
