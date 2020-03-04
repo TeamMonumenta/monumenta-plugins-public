@@ -95,7 +95,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.10.0</version>
+                    <version>3.13.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -116,11 +116,15 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
                     <targetJdk>1.8</targetJdk>
-                </configuration>
+                    <format>txt</format>
+					<rulesets>
+						<ruleset>${basedir}/pmd-ruleset.xml</ruleset>
+					</rulesets>
+				</configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -159,7 +163,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
+					<configLocation>${basedir}/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
         </plugins>
