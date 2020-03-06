@@ -16,6 +16,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -125,15 +126,10 @@ public class Varcosa extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 500;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 2000;
+		int bossTargetHp = 1500;
+
 		int armor = (0);
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
+
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
@@ -150,5 +146,39 @@ public class Varcosa extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Ye thought I be the one in control here? Yarharhar! N’argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+	}
+
+	//Reduce damage taken for each player by a percent
+	@Override
+	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+		double damage = event.getDamage();
+		switch (BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange)) {
+			case 2:
+				damage *= .7; //2142 hp
+				break;
+			case 3:
+				damage *= .6; //2500 hp
+				break;
+			case 4:
+				damage *= .55; //2730 hp
+				break;
+			case 5:
+				damage *= .5; //3000 hp
+				break;
+			case 6:
+				damage *= .475; //3157 hp
+				break;
+			case 7:
+				damage *= .45; //3333 hp
+				break;
+			case 8:
+				damage *= .44; //3409 hp
+				break;
+			default:
+				damage *= 1;
+				break;
+		}
+		mBoss.damage(damage, event.getDamager());
+
 	}
 }
