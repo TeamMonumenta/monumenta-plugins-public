@@ -178,7 +178,7 @@ public class Varcosa extends BossAbilityGroup {
 				damage *= 1;
 				break;
 		}
-		mBoss.damage(damage, event.getDamager());
+		event.setDamage(damage);
 
 	}
 }

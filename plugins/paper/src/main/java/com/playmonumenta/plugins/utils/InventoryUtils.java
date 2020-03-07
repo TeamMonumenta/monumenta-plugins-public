@@ -432,6 +432,7 @@ public class InventoryUtils {
 		return  testForItemWithLore(item, "D4 Key") ||
 		        testForItemWithLore(item, "D5 Key") ||
 		        testForItemWithLore(item, "D6 Key") ||
+		        testForItemWithLore(item, "D11 Key") ||
 		        testForItemWithLore(item, "DN Key");
 	}
 
