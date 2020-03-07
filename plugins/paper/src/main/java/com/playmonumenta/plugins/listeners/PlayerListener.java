@@ -95,6 +95,7 @@ import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -122,7 +123,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
+		if (ServerProperties.getJoinMessagesEnabled() == false) {
 			event.setJoinMessage("");
 		}
 
@@ -144,7 +145,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		if (mPlugin.mServerProperties.getJoinMessagesEnabled() == false) {
+		if (ServerProperties.getJoinMessagesEnabled() == false) {
 			event.setQuitMessage("");
 		}
 
@@ -204,7 +205,7 @@ public class PlayerListener implements Listener {
 			if (block != null) {
 				Location location = block.getLocation();
 				if (player.getGameMode() == GameMode.ADVENTURE
-				    && ZoneUtils.inPlot(location, mPlugin.mServerProperties.getIsTownWorld())) {
+				    && ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld())) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}
@@ -293,7 +294,7 @@ public class PlayerListener implements Listener {
 
 			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE
-			    && ZoneUtils.inPlot(frame, mPlugin.mServerProperties.getIsTownWorld())) {
+			    && ZoneUtils.inPlot(frame, ServerProperties.getIsTownWorld())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -353,7 +354,7 @@ public class PlayerListener implements Listener {
 
 		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
 		if (player.getGameMode() == GameMode.ADVENTURE
-		    && ZoneUtils.inPlot(armorStand, mPlugin.mServerProperties.getIsTownWorld())) {
+		    && ZoneUtils.inPlot(armorStand, ServerProperties.getIsTownWorld())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1088,7 +1089,7 @@ public class PlayerListener implements Listener {
 					}
 				}.runTaskLater(mPlugin, 0);
 			}
-			boolean isTownWorld = mPlugin.mServerProperties.getIsTownWorld();
+			boolean isTownWorld = ServerProperties.getIsTownWorld();
 			if (event.getNewGameMode().equals(GameMode.SURVIVAL)
 			    && ZoneUtils.hasZoneProperty(player, ZoneProperty.ADVENTURE_MODE)
 			    && !ZoneUtils.inPlot(player, isTownWorld)) {

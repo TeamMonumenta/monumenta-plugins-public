@@ -30,6 +30,7 @@ import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -72,7 +73,7 @@ public class MobListener implements Listener {
 			if (ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
 				// Cancel spawning unless this is from a dispenser in a plot
 				if (!event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-				    || !ZoneUtils.inPlot(entity, mPlugin.mServerProperties.getIsTownWorld())) {
+				    || !ZoneUtils.inPlot(entity, ServerProperties.getIsTownWorld())) {
 					event.setCancelled(true);
 					return;
 				}

@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -293,7 +294,7 @@ public class ItemOverrides {
 			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
 			    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
-				if (!ZoneUtils.inPlot(block.getLocation(), plugin.mServerProperties.getIsTownWorld())) {
+				if (!ZoneUtils.inPlot(block.getLocation(), ServerProperties.getIsTownWorld())) {
 					eventCancelled = true;
 				}
 			}
@@ -338,7 +339,7 @@ public class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-		    plugin.mServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+		    ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
 			eventCancelled |= true;
 		}
 

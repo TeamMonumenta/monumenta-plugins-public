@@ -26,7 +26,6 @@ public class SpawnZoneManager {
 	}
 
 	public void applySpawnEffect(Plugin plugin, Entity entity) {
-		//int shardID = plugin.mServerProperties.getShardZoneID();
 		for (SpawnZone zone : mZones) {
 			if (zone.withinZone(entity.getLocation())) {
 				for (SpawnEffect effect : zone.getSpawnEffects()) {

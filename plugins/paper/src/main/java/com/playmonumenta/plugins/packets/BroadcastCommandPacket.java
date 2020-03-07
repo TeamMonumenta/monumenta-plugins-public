@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 public class BroadcastCommandPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Broadcast.Command";
@@ -22,7 +23,7 @@ public class BroadcastCommandPacket extends BasePacket {
 		}
 		String command = packet.getData().get("command").getAsString();
 
-		if (plugin.mServerProperties.getBroadcastCommandEnabled() == true
+		if (ServerProperties.getBroadcastCommandEnabled() == true
 		    || command.startsWith("say")
 		    || command.startsWith("msg")
 		    || command.startsWith("tell")

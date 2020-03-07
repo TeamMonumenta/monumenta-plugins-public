@@ -8,6 +8,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DailyReset {
@@ -78,7 +79,7 @@ public class DailyReset {
 
 
 	public static void handle(Plugin plugin, Player player) {
-		if (plugin.mServerProperties.getDailyResetEnabled() && player != null) {
+		if (ServerProperties.getDailyResetEnabled() && player != null) {
 			//  Test to see if the player's Daily version is different than the servers.
 			int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion");
 			if (dailyVersion != getDailyVersion()) {

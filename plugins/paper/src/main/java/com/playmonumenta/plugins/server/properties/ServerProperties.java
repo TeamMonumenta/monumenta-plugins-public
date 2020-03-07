@@ -21,6 +21,9 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 public class ServerProperties {
 	private static final String FILE_NAME = "Properties.json";
 
+	/* Only the most recent instance of this is used */
+	private static ServerProperties INSTANCE = null;
+
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
 	private boolean mTransferDataEnabled = true;
@@ -38,78 +41,123 @@ public class ServerProperties {
 	private String mShardName = "default_settings";
 	private String mSocketHost = "bungee";
 
-	public Set<String> mAllowedTransferTargets = new HashSet<>();
-	public Set<String> mForbiddenItemLore = new HashSet<>();
+	private Set<String> mAllowedTransferTargets = new HashSet<>();
+	private Set<String> mForbiddenItemLore = new HashSet<>();
 
 	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 	private EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
-	public boolean getDailyResetEnabled() {
-		return mDailyResetEnabled;
+	public ServerProperties() {
+		INSTANCE = this;
 	}
 
-	public boolean getJoinMessagesEnabled() {
-		return mJoinMessagesEnabled;
+	/*
+	 * Ensures that INSTANCE is non null
+	 * If it is null, creates a default instance with default values
+	 */
+	private static void ensureInstance() {
+		if (INSTANCE == null) {
+			new ServerProperties();
+		}
 	}
 
-	public boolean getTransferDataEnabled() {
-		return mTransferDataEnabled;
+	public static boolean getDailyResetEnabled() {
+		ensureInstance();
+		return INSTANCE.mDailyResetEnabled;
 	}
 
-	public boolean getIsTownWorld() {
-		return mIsTownWorld;
+	public static boolean getJoinMessagesEnabled() {
+		ensureInstance();
+		return INSTANCE.mJoinMessagesEnabled;
 	}
 
-	public boolean getBroadcastCommandEnabled() {
-		return mBroadcastCommandEnabled;
+	public static boolean getTransferDataEnabled() {
+		ensureInstance();
+		return INSTANCE.mTransferDataEnabled;
 	}
 
-	public int getPlotSurvivalMinHeight() {
-		return mPlotSurvivalMinHeight;
+	public static boolean getIsTownWorld() {
+		ensureInstance();
+		return INSTANCE.mIsTownWorld;
 	}
 
-	public int getSocketPort() {
-		return mSocketPort;
+	public static boolean getBroadcastCommandEnabled() {
+		ensureInstance();
+		return INSTANCE.mBroadcastCommandEnabled;
 	}
 
-	public boolean getIsSleepingEnabled() {
-		return mIsSleepingEnabled;
+	public static int getPlotSurvivalMinHeight() {
+		ensureInstance();
+		return INSTANCE.mPlotSurvivalMinHeight;
 	}
 
-	public boolean getKeepLowTierInventory() {
-		return mKeepLowTierInventory;
+	public static int getSocketPort() {
+		ensureInstance();
+		return INSTANCE.mSocketPort;
 	}
 
-	public boolean getClassSpecializationsEnabled() {
-		return mClassSpecializationsEnabled;
+	public static boolean getIsSleepingEnabled() {
+		ensureInstance();
+		return INSTANCE.mIsSleepingEnabled;
 	}
 
-	public boolean getAuditMessagesEnabled() {
-		return mAuditMessagesEnabled;
+	public static boolean getKeepLowTierInventory() {
+		ensureInstance();
+		return INSTANCE.mKeepLowTierInventory;
 	}
 
-	public String getShardName() {
-		return mShardName;
+	public static boolean getClassSpecializationsEnabled() {
+		ensureInstance();
+		return INSTANCE.mClassSpecializationsEnabled;
 	}
 
-	public String getSocketHost() {
-		return mSocketHost;
+	public static boolean getAuditMessagesEnabled() {
+		ensureInstance();
+		return INSTANCE.mAuditMessagesEnabled;
 	}
 
-	public Set<Material> getUnbreakableBlocks() {
-		return mUnbreakableBlocks;
+	public static String getShardName() {
+		ensureInstance();
+		return INSTANCE.mShardName;
 	}
 
-	public Set<Material> getAlwaysPickupMats() {
-		return mAlwaysPickupMats;
+	public static String getSocketHost() {
+		ensureInstance();
+		return INSTANCE.mSocketHost;
 	}
 
-	public Set<Material> getNamedPickupMats() {
-		return mNamedPickupMats;
+	public static Set<String> getAllowedTransferTargets() {
+		ensureInstance();
+		return INSTANCE.mAllowedTransferTargets;
 	}
 
-	public void load(Plugin plugin, CommandSender sender) {
+	public static Set<String> getForbiddenItemLore() {
+		ensureInstance();
+		return INSTANCE.mForbiddenItemLore;
+	}
+
+	public static Set<Material> getUnbreakableBlocks() {
+		ensureInstance();
+		return INSTANCE.mUnbreakableBlocks;
+	}
+
+	public static Set<Material> getAlwaysPickupMats() {
+		ensureInstance();
+		return INSTANCE.mAlwaysPickupMats;
+	}
+
+	public static Set<Material> getNamedPickupMats() {
+		ensureInstance();
+		return INSTANCE.mNamedPickupMats;
+	}
+
+	public static void load(Plugin plugin, CommandSender sender) {
+		ensureInstance();
+		INSTANCE.loadInternal(plugin, sender);
+	}
+
+	private void loadInternal(Plugin plugin, CommandSender sender) {
 		final String fileLocation = plugin.getDataFolder() + File.separator + FILE_NAME;
 
 		try {

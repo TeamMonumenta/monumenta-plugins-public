@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -101,9 +102,9 @@ public class JunkItemListener implements Listener {
 
 	private boolean isInteresting(ItemStack item) {
 		return item.getAmount() >= JUNK_ITEM_SIZE_THRESHOLD
-		       || mPlugin.mServerProperties.getAlwaysPickupMats().contains(item.getType())
+		       || ServerProperties.getAlwaysPickupMats().contains(item.getType())
 		       || (item.hasItemMeta() && (item.getItemMeta().hasLore() ||
 					                      (item.getItemMeta().hasDisplayName()
-										   && mPlugin.mServerProperties.getNamedPickupMats().contains(item.getType()))));
+										   && ServerProperties.getNamedPickupMats().contains(item.getType()))));
 	}
 }

@@ -10,6 +10,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NetworkUtils;
 
@@ -91,21 +92,17 @@ public class TransferServer extends GenericCommand {
 	}
 
 	private static void sendPlayer(Plugin plugin, Collection<Player> players, String server, boolean sendPlayerStuff) {
-		if (plugin.mServerProperties == null) {
-			return;
-		}
-
 		for (Player player : players) {
 			/* Error if target server is not allowed */
-			if (!(plugin.mServerProperties.mAllowedTransferTargets.isEmpty()
-				  || plugin.mServerProperties.mAllowedTransferTargets.contains(server))) {
+			if (!(ServerProperties.getAllowedTransferTargets().isEmpty()
+				  || ServerProperties.getAllowedTransferTargets().contains(server))) {
 				error(player, "You may not transfer to that server from here!");
-				error(player, "Allowed servers are: " + plugin.mServerProperties.mAllowedTransferTargets.toString());
+				error(player, "Allowed servers are: " + ServerProperties.getAllowedTransferTargets().toString());
 				continue;
 			}
 
 			/* Can only send stuff if requested AND server properties allows it */
-			sendPlayerStuff = sendPlayerStuff && plugin.mServerProperties.getTransferDataEnabled();
+			sendPlayerStuff = sendPlayerStuff && ServerProperties.getTransferDataEnabled();
 
 			/* Don't let the player transfer again if their inventory is still locked */
 			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {

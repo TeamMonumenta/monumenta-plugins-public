@@ -79,7 +79,6 @@ public class Plugin extends JavaPlugin {
 	public Random mRandom = null;
 	int mPeriodicTimer = -1;
 
-	public ServerProperties mServerProperties = new ServerProperties();
 	public EnchantmentManager mEnchantmentManager;
 	public JunkItemListener mJunkItemsListener;
 	public HttpManager mHttpManager;
@@ -143,15 +142,15 @@ public class Plugin extends JavaPlugin {
 			err.printStackTrace();
 		}
 
-		mServerProperties.load(this, null);
+		ServerProperties.load(this, null);
 
 		mEnchantmentManager = new EnchantmentManager(this);
-		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
+		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
 
 		mJunkItemsListener = new JunkItemListener(this);
 
 		Bot.register(this);
-		if (mServerProperties.getBroadcastCommandEnabled()) {
+		if (ServerProperties.getBroadcastCommandEnabled()) {
 			BroadcastCommand.register(this);
 		}
 	}
@@ -162,9 +161,9 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
-		mSocketManager = new SocketManager(this, mServerProperties.getSocketHost(),
-		                                   mServerProperties.getSocketPort(),
-						   mServerProperties.getShardName());
+		mSocketManager = new SocketManager(this, ServerProperties.getSocketHost(),
+		                                   ServerProperties.getSocketPort(),
+										   ServerProperties.getShardName());
 		// mSocketManager.open();
 
 		mItemOverrides = new ItemOverrides();
@@ -193,8 +192,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new Spectate(this), this);
 		manager.registerEvents(new SpectateBot(this), this);
 
-		if (mServerProperties.getAuditMessagesEnabled()) {
-			manager.registerEvents(new AuditListener(this, mServerProperties.getShardName()), this);
+		if (ServerProperties.getAuditMessagesEnabled()) {
+			manager.registerEvents(new AuditListener(this, ServerProperties.getShardName()), this);
 		}
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
@@ -310,7 +309,7 @@ public class Plugin extends JavaPlugin {
 
 	/* Sender will be sent debugging info if non-null */
 	public void reloadMonumentaConfig(CommandSender sender) {
-		mServerProperties.load(this, sender);
-		mEnchantmentManager.load(mServerProperties.mForbiddenItemLore);
+		ServerProperties.load(this, sender);
+		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
 	}
 }

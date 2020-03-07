@@ -33,6 +33,7 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -207,12 +208,12 @@ public class PlayerTracking implements EntityTracking {
 					PlayerUtils.awardStrike(mPlugin, player, "breaking rule #5, leaving the bounds of the map.");
 				} else {
 					if (ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-						boolean isInPlot = ZoneUtils.inPlot(location, mPlugin.mServerProperties.getIsTownWorld());
+						boolean isInPlot = ZoneUtils.inPlot(location, ServerProperties.getIsTownWorld());
 
 						if (mode == GameMode.SURVIVAL && !isInPlot) {
 							player.setGameMode(GameMode.ADVENTURE);
 						} else if (mode == GameMode.ADVENTURE && isInPlot
-									&& loc.mY > mPlugin.mServerProperties.getPlotSurvivalMinHeight()
+									&& loc.mY > ServerProperties.getPlotSurvivalMinHeight()
 									&& ScoreboardUtils.getScoreboardValue(player, "Prestige") >= 3) {
 							player.setGameMode(GameMode.SURVIVAL);
 						}

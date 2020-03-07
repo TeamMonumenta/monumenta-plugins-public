@@ -23,7 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
 import net.md_5.bungee.api.ChatColor;
@@ -395,7 +395,7 @@ public class ItemUtils {
 			case ONE:
 			case TWO:
 			case THREE:
-				if (Plugin.getInstance().mServerProperties.getKeepLowTierInventory() && !(item.containsEnchantment(Enchantment.BINDING_CURSE))) {
+				if (ServerProperties.getKeepLowTierInventory() && !(item.containsEnchantment(Enchantment.BINDING_CURSE))) {
 					return ItemDeathResult.KEEP_EQUIPPED;
 				} else {
 					return ItemDeathResult.LOSE;

@@ -158,6 +158,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -185,7 +186,7 @@ public class AbilityManager {
 		mReferenceAbilities = new ArrayList<Ability>();
 		// Damage multiplying skills must come before damage bonus skills
 
-		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
+		if (ServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(Arrays.asList(
 			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
 			                               new DarkPact(mPlugin, mWorld, mRandom, null),
@@ -286,7 +287,7 @@ public class AbilityManager {
 		                               new AlchemistPotions(mPlugin, mWorld, mRandom, null)
 		                           ));
 
-		if (mPlugin.mServerProperties.getClassSpecializationsEnabled()) {
+		if (ServerProperties.getClassSpecializationsEnabled()) {
 			mReferenceAbilities.addAll(Arrays.asList(
 			                               /********** MAGE **********/
 			                               // ELEMENTALIST

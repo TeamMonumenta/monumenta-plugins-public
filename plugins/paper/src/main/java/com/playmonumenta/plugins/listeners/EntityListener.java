@@ -92,6 +92,7 @@ import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -280,7 +281,7 @@ public class EntityListener implements Listener {
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 			if (player.getGameMode() == GameMode.ADVENTURE
-				&& ZoneUtils.inPlot(damagee, mPlugin.mServerProperties.getIsTownWorld())) {
+				&& ZoneUtils.inPlot(damagee, ServerProperties.getIsTownWorld())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -313,7 +314,7 @@ public class EntityListener implements Listener {
 
 				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 				if (player.getGameMode() == GameMode.ADVENTURE
-					&& ZoneUtils.inPlot(damagee, mPlugin.mServerProperties.getIsTownWorld())) {
+					&& ZoneUtils.inPlot(damagee, ServerProperties.getIsTownWorld())) {
 					damager.remove();
 					event.setCancelled(true);
 					return;
@@ -742,7 +743,7 @@ public class EntityListener implements Listener {
 			}
 
 			// If this block is "unbreakable" than we want to remove it from the list.
-			if (mPlugin.mServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
+			if (ServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
 			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}
@@ -769,7 +770,7 @@ public class EntityListener implements Listener {
 			}
 
 			// If this block is "unbreakable" than we want to remove it from the list.
-			if (mPlugin.mServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
+			if (ServerProperties.getUnbreakableBlocks().contains(block.getType()) ||
 			    !mPlugin.mItemOverrides.blockExplodeInteraction(mPlugin, block)) {
 				iter.remove();
 			}

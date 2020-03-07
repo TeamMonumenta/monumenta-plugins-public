@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
@@ -46,7 +47,7 @@ public class BucketOverride extends BaseOverride {
 		} else if (blockType.equals(Material.DISPENSER)) {
 			Location blockLoc = block.getLocation();
 			if (ZoneUtils.hasZoneProperty(blockLoc, ZoneProperty.PLOTS_POSSIBLE)) {
-				return ZoneUtils.inPlot(blockLoc, plugin.mServerProperties.getIsTownWorld());
+				return ZoneUtils.inPlot(blockLoc, ServerProperties.getIsTownWorld());
 			} else {
 				return false;
 			}
