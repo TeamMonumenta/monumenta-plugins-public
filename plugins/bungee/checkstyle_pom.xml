@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.playmonumenta</groupId>
-    <artifactId>monumenta</artifactId>
+    <artifactId>monumenta-bungeecord</artifactId>
     <version>dev</version>
 
     <properties>

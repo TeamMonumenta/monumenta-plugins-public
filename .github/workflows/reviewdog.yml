@@ -19,21 +19,28 @@ jobs:
         echo ::add-path::$HOME/bin
 
     # Checkstyle
-    - name: Run checkstyle
+    - name: Run checkstyle (paper)
       working-directory: ./plugins/paper
+      run: mvn checkstyle:checkstyle -f checkstyle_pom.xml
+    - name: Run checkstyle (bungee)
+      working-directory: ./plugins/bungee
       run: mvn checkstyle:checkstyle -f checkstyle_pom.xml
     - name: Run reviewdog
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cat plugins/paper/target/checkstyle-result.xml | reviewdog -f=checkstyle -name="checkstyle" -reporter=github-pr-check
+        cat plugins/paper/target/checkstyle-result.xml | reviewdog -f=checkstyle -name="checkstyle (paper)" -reporter=github-pr-check
+        cat plugins/bungee/target/checkstyle-result.xml | reviewdog -f=checkstyle -name="checkstyle (bungee)" -reporter=github-pr-check
 
     # PMD
-    - name: Run pmd
+    - name: Run pmd (paper)
       working-directory: ./plugins/paper
+      run: mvn pmd:pmd -f checkstyle_pom.xml
+    - name: Run pmd (bungee)
+      working-directory: ./plugins/bungee
       run: mvn pmd:pmd -f checkstyle_pom.xml
     - name: Run reviewdog
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cat plugins/paper/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
+        cat plugins/bungee/target/pmd.txt plugins/paper/target/pmd.txt | reviewdog -efm="%f:%l:	%m" -name="pmd" -reporter=github-pr-check
