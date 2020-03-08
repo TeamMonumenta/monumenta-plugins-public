@@ -19,28 +19,26 @@ public class BungeeGetVotesUnclaimedPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.GetVotesUnclaimed";
 
 	public BungeeGetVotesUnclaimedPacket(UUID playerUUID, int count) {
-		super(null, PacketOperation, new JsonObject());
-		mData.addProperty("playerUUID", playerUUID.toString());
-		mData.addProperty("votesUnclaimed", count);
+		super("bungee", PacketOperation);
+		getData().addProperty("playerUUID", playerUUID.toString());
+		getData().addProperty("votesUnclaimed", count);
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		if (!packet.hasData() ||
-		    !packet.getData().has("playerUUID") ||
-		    !packet.getData().get("playerUUID").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("playerUUID").isString()) {
+	public static void handlePacket(Plugin plugin, JsonObject data) throws Exception {
+		if (!data.has("playerUUID") ||
+		    !data.get("playerUUID").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("playerUUID").isString()) {
 			throw new Exception("GetVotesUnclaimedPacket failed to parse required string field 'playerUUID'");
 		}
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("votesUnclaimed") ||
-		    !packet.getData().get("votesUnclaimed").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("votesUnclaimed").isNumber()) {
+		if (!data.has("votesUnclaimed") ||
+		    !data.get("votesUnclaimed").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("votesUnclaimed").isNumber()) {
 			throw new Exception("GetVotesUnclaimedPacket failed to parse required int field 'votesUnclaimed'");
 		}
 
-		UUID uuid = UUID.fromString(packet.getData().get("playerUUID").getAsString());
-		int count = packet.getData().get("votesUnclaimed").getAsInt();
+		UUID uuid = UUID.fromString(data.get("playerUUID").getAsString());
+		int count = data.get("votesUnclaimed").getAsInt();
 
 		/* Handle on the main thread */
 		Bukkit.getScheduler().callSyncMethod(plugin, () -> {

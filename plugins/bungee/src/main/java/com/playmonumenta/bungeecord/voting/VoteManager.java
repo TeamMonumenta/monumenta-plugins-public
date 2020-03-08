@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import com.playmonumenta.bungeecord.listeners.NameListener;
-import com.playmonumenta.bungeecord.network.ClientSocket;
 import com.vexsoftware.votifier.bungee.events.VotifierEvent;
 import com.vexsoftware.votifier.model.Vote;
 
@@ -194,25 +193,25 @@ public class VoteManager implements Listener {
 		}
 	}
 
-	public static void gotShardVoteCountRequest(ClientSocket client, UUID uuid, int votesUnclaimed) {
+	public static void gotShardVoteCountRequest(String senderName, UUID uuid, int votesUnclaimed) {
 		if (MANAGER != null) {
 			VoteContext context = MANAGER.mContexts.get(uuid);
 			if (context == null) {
 				MANAGER.mPlugin.getLogger().warning("Got vote count request for player " + uuid.toString() + " who has no vote context");
 				return;
 			}
-			context.gotShardVoteCountRequest(client, uuid, votesUnclaimed);
+			context.gotShardVoteCountRequest(senderName, uuid, votesUnclaimed);
 		}
 	}
 
-	public static void gotShardRaffleEligibilityRequest(ClientSocket client, UUID uuid, boolean claimReward, boolean eligible) {
+	public static void gotShardRaffleEligibilityRequest(String senderName, UUID uuid, boolean claimReward, boolean eligible) {
 		if (MANAGER != null) {
 			VoteContext context = MANAGER.mContexts.get(uuid);
 			if (context == null) {
 				MANAGER.mPlugin.getLogger().warning("Got raffle eligibility request for player " + uuid.toString() + " who has no vote context");
 				return;
 			}
-			context.gotShardRaffleEligibilityRequest(client, uuid, claimReward, eligible);
+			context.gotShardRaffleEligibilityRequest(senderName, uuid, claimReward, eligible);
 		}
 	}
 

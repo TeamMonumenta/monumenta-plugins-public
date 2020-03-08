@@ -18,18 +18,17 @@ public class ShardCommandPacket extends BasePacket {
 	 * @param command
 	 */
 	public ShardCommandPacket(String targetShard, String command) {
-		super(targetShard, PacketOperation, new JsonObject());
-		mData.addProperty("command", command);
+		super(targetShard, PacketOperation);
+		getData().addProperty("command", command);
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		if (!packet.hasData() ||
-		    !packet.getData().has("command") ||
-		    !packet.getData().get("command").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("command").isString()) {
+	public static void handlePacket(Plugin plugin, JsonObject data) throws Exception {
+		if (!data.has("command") ||
+		    !data.get("command").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("command").isString()) {
 			throw new Exception("CommandPacket failed to parse required string field 'command'");
 		}
-		String command = packet.getData().get("command").getAsString();
+		String command = data.get("command").getAsString();
 		plugin.getLogger().info("Executing received command '" + command + "'");
 
 		/* Call this on the main thread */

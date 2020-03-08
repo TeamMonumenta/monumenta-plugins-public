@@ -9,6 +9,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.plugins.utils.CommandUtils;
 
@@ -38,11 +39,11 @@ public class ClaimRaffle {
 	private static void run(Plugin plugin, Player player) throws CommandSyntaxException {
 		if (player.hasMetadata(CONFIRMED_METAKEY)) {
 			// This player is running this command twice, to gild an item. And they had a credit to gild with earlier
-			plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), true, false));
+			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), true, false));
 			plugin.getLogger().info("Requested raffle redeem for " + player.getName());
 		} else {
 			// This player is running this command for the first time - send a request to bungee to query eligibility
-			plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, false));
+			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, false));
 			plugin.getLogger().info("Requested raffle eligibility for " + player.getName());
 		}
 	}
@@ -52,7 +53,7 @@ public class ClaimRaffle {
 		if (player == null || !player.isOnline()) {
 			if (claimReward && eligible) {
 				/* This player tried to claim a reward then disappeared - send back the reward to bungee */
-				plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
+				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
 			}
 			return;
 		}
@@ -62,7 +63,7 @@ public class ClaimRaffle {
 				CommandUtils.enchantify(player, player, "Gilded", "Gilded by");
 			} catch (CommandSyntaxException ex) {
 				/* Failed to claim reward - send back the reward to bungee */
-				plugin.mSocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
+				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
 				player.sendMessage(ChatColor.RED + ex.getMessage());
 			}
 		} else if (!claimReward && eligible) {

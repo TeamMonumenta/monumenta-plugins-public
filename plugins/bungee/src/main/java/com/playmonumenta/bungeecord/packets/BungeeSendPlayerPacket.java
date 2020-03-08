@@ -3,65 +3,60 @@ package com.playmonumenta.bungeecord.packets;
 import java.util.UUID;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.bungeecord.network.ClientSocket;
-import com.playmonumenta.bungeecord.network.SocketManager;
+import com.playmonumenta.bungeecord.Main;
 
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeSendPlayerPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.SendPlayer";
 
-	public BungeeSendPlayerPacket(String newServer, String playerName, UUID playerUUID) {
-		super(null, PacketOperation, new JsonObject());
-		mData.addProperty("newServer", newServer);
-		mData.addProperty("playerName", playerName);
-		mData.addProperty("playerUUID", playerUUID.toString());
+	public BungeeSendPlayerPacket() throws Exception {
+		super();
 	}
 
-	public static void handlePacket(SocketManager manager, ClientSocket client, BasePacket packet) throws Exception {
+	public static void handlePacket(Main main, String source, JsonObject data) throws Exception {
 		// Message contains just player name, destination server, and player's UUID
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("newServer") ||
-		    !packet.getData().get("newServer").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("newServer").isString()) {
+		if (!data.has("newServer") ||
+		    !data.get("newServer").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("newServer").isString()) {
 			throw new Exception("BungeeGetServerList missing required field 'newServer'");
 		}
-		if (!packet.hasData() ||
-		    !packet.getData().has("playerName") ||
-		    !packet.getData().get("playerName").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("playerName").isString()) {
+		if (!data.has("playerName") ||
+		    !data.get("playerName").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("playerName").isString()) {
 			throw new Exception("BungeeGetServerList missing required field 'playerName'");
 		}
-		if (!packet.hasData() ||
-		    !packet.getData().has("playerUUID") ||
-		    !packet.getData().get("playerUUID").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("playerUUID").isString()) {
+		if (!data.has("playerUUID") ||
+		    !data.get("playerUUID").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("playerUUID").isString()) {
 			throw new Exception("BungeeGetServerList missing required field 'playerUUID'");
 		}
 
-		String newServer = packet.getData().get("newServer").getAsString();
-		String playerName = packet.getData().get("playerName").getAsString();
-		UUID playerUUID = UUID.fromString(packet.getData().get("playerUUID").getAsString());
+		String newServer = data.get("newServer").getAsString();
+		String playerName = data.get("playerName").getAsString();
+		UUID playerUUID = UUID.fromString(data.get("playerUUID").getAsString());
 
 		if (newServer == null || playerName == null || playerUUID == null || newServer.length() <= 0 || playerName.length() <= 0) {
-			manager.mMain.getLogger().warning("Got transfer message from '" + client.getName() + "' with invalid arguments");
+			main.getLogger().warning("Got transfer message from '" + source + "' with invalid arguments");
 			return;
 		}
 
 		// Get and validate the destination server
-		ServerInfo serverInfo = manager.mProxy.getServers().get(newServer);
+		ProxyServer proxy = ProxyServer.getInstance();
+		ServerInfo serverInfo = proxy.getServers().get(newServer);
 		if (serverInfo == null) {
-			manager.mMain.getLogger().warning("Cannot transfer player from '" + client.getName() + "' to unknown destination '" + newServer + "'");
+			main.getLogger().warning("Cannot transfer player from '" + source + "' to unknown destination '" + newServer + "'");
 			return;
 		}
 
 		// Get and validate the player
-		ProxiedPlayer playerInfo = manager.mProxy.getPlayer(playerUUID);
+		ProxiedPlayer playerInfo = proxy.getPlayer(playerUUID);
 		if (playerInfo == null) {
-			manager.mMain.getLogger().warning("Cannot transfer unknown player '" + playerName + "' from '" + client.getName() + "' to '" + newServer + "'");
+			main.getLogger().warning("Cannot transfer unknown player '" + playerName + "' from '" + source + "' to '" + newServer + "'");
 			return;
 		}
 
@@ -69,7 +64,7 @@ public class BungeeSendPlayerPacket extends BasePacket {
 		playerInfo.connect(serverInfo, new Callback<Boolean>() {
 			@Override
 			public void done(Boolean arg0, Throwable arg1) {
-				manager.mMain.getLogger().info("Transferred '" + playerName + "' to '" + newServer + "'");
+				main.getLogger().info("Transferred '" + playerName + "' to '" + newServer + "'");
 			}
 		});
 

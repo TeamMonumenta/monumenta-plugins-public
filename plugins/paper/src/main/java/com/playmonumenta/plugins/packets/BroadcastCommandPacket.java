@@ -10,18 +10,18 @@ public class BroadcastCommandPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Broadcast.Command";
 
 	public BroadcastCommandPacket(String command) {
-		super("*", PacketOperation, new JsonObject());
-		mData.addProperty("command", command);
+		/* TODO: Some kind of timeout */
+		super("*", PacketOperation);
+		getData().addProperty("command", command);
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		if (!packet.hasData() ||
-		    !packet.getData().has("command") ||
-		    !packet.getData().get("command").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("command").isString()) {
+	public static void handlePacket(Plugin plugin, JsonObject data) throws Exception {
+		if (!data.has("command") ||
+		    !data.get("command").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("command").isString()) {
 			throw new Exception("CommandPacket failed to parse required string field 'command'");
 		}
-		String command = packet.getData().get("command").getAsString();
+		String command = data.get("command").getAsString();
 
 		if (ServerProperties.getBroadcastCommandEnabled() == true
 		    || command.startsWith("say")

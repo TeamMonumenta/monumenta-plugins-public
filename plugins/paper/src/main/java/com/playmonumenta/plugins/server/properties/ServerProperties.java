@@ -31,7 +31,6 @@ public class ServerProperties {
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
 	private int mPlotSurvivalMinHeight = 256;
-	private int mSocketPort = 9576;
 
 	private boolean mIsSleepingEnabled = true;
 	private boolean mKeepLowTierInventory = false;
@@ -39,7 +38,7 @@ public class ServerProperties {
 	private boolean mAuditMessagesEnabled = true;
 
 	private String mShardName = "default_settings";
-	private String mSocketHost = "bungee";
+	private String mRabbitHost = "rabbitmq";
 
 	private Set<String> mAllowedTransferTargets = new HashSet<>();
 	private Set<String> mForbiddenItemLore = new HashSet<>();
@@ -92,11 +91,6 @@ public class ServerProperties {
 		return INSTANCE.mPlotSurvivalMinHeight;
 	}
 
-	public static int getSocketPort() {
-		ensureInstance();
-		return INSTANCE.mSocketPort;
-	}
-
 	public static boolean getIsSleepingEnabled() {
 		ensureInstance();
 		return INSTANCE.mIsSleepingEnabled;
@@ -122,9 +116,9 @@ public class ServerProperties {
 		return INSTANCE.mShardName;
 	}
 
-	public static String getSocketHost() {
+	public static String getRabbitHost() {
 		ensureInstance();
-		return INSTANCE.mSocketHost;
+		return INSTANCE.mRabbitHost;
 	}
 
 	public static Set<String> getAllowedTransferTargets() {
@@ -192,7 +186,6 @@ public class ServerProperties {
 					mIsTownWorld                 = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
 					mBroadcastCommandEnabled     = getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
 					mPlotSurvivalMinHeight       = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
-					mSocketPort                  = getPropertyValueInt(plugin, object, "socketPort", mSocketPort);
 
 					mIsSleepingEnabled           = getPropertyValueBool(plugin, object, "isSleepingEnabled", mIsSleepingEnabled);
 					mKeepLowTierInventory        = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
@@ -200,7 +193,7 @@ public class ServerProperties {
 					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
 
 					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
-					mSocketHost                  = getPropertyValueString(plugin, object, "socketHost", mSocketHost);
+					mRabbitHost                  = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
 
 					mAllowedTransferTargets      = getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mForbiddenItemLore           = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");

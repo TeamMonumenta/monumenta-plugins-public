@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -76,7 +77,7 @@ public class RedeemVoteRewards extends GenericCommand {
 		mPendingRewards.put(player.getUniqueId(), context);
 
 		// Count = 0 means request count
-		plugin.mSocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(player.getUniqueId(), 0));
+		SocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(player.getUniqueId(), 0));
 
 		plugin.getLogger().info("Requested vote rewards for " + player.getName());
 	}
@@ -88,7 +89,7 @@ public class RedeemVoteRewards extends GenericCommand {
 			context.run(rewardCount);
 			mPendingRewards.remove(uuid);
 		} else if (rewardCount > 0) {
-			plugin.mSocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(uuid, rewardCount));
+			SocketManager.sendPacket(new BungeeGetVotesUnclaimedPacket(uuid, rewardCount));
 			plugin.getLogger().info("Sending " + Integer.toString(rewardCount) + " votes back to bungee for " + uuid.toString());
 		}
 	}

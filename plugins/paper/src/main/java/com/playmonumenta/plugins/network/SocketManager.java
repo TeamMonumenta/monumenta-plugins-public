@@ -1,279 +1,203 @@
 package com.playmonumenta.plugins.network;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.google.gson.JsonElement;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.packets.BasePacket;
 import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
 import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.plugins.packets.BungeeCommandPacket;
-import com.playmonumenta.plugins.packets.BungeeErrorPacket;
 import com.playmonumenta.plugins.packets.BungeeGetServerListPacket;
 import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
-import com.playmonumenta.plugins.packets.BungeeHandshakePacket;
-import com.playmonumenta.plugins.packets.BungeeHeartbeatPacket;
 import com.playmonumenta.plugins.packets.BungeeSendPlayerPacket;
 import com.playmonumenta.plugins.packets.ShardCommandPacket;
-import com.playmonumenta.plugins.packets.ShardErrorPacket;
 import com.playmonumenta.plugins.packets.ShardTransferPlayerDataPacket;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DeliverCallback;
 
 public class SocketManager {
-	private String mName;
-	private Plugin mPlugin;
-	private Socket mSocket = null;
-	private boolean mConnecting = false;
-	private boolean mSocketEnabled = true;
-	private boolean mHeartbeatEnabled = false;
-	private JsonReader mInput = null;
-	private JsonWriter mOutput = null;
-	private BukkitTask mHeartTask;
-	private BukkitTask mAsyncTask;
-	private BukkitRunnable mHeart;
-	private BukkitRunnable mRunnable;
+	private static final String CONSUMER_TAG = "consumerTag";
+	private static final String BROADCAST_EXCHANGE_NAME = "broadcast";
 
-	public SocketManager(Plugin plugin, String host, int port, String shardName) {
+	private static SocketManager INSTANCE = null;
+
+	private final Gson mGson = new Gson();
+	private final Plugin mPlugin;
+	private final BukkitRunnable mRunnable;
+	private final BukkitTask mTask;
+	private final Channel mChannel;
+
+	public SocketManager(Plugin plugin) throws Exception {
 		mPlugin = plugin;
-		mName = shardName;
+
+		String shardName = ServerProperties.getShardName();
+
+		ConnectionFactory factory = new ConnectionFactory();
+		factory.setHost(ServerProperties.getRabbitHost());
+		Connection connection = factory.newConnection();
+		mChannel = connection.createChannel();
+
+		/* Declare a broadcast exchange which routes messages to all attached queues */
+		mChannel.exchangeDeclare(BROADCAST_EXCHANGE_NAME, "fanout");
+		/* Declare the queue for this shard */
+		mChannel.queueDeclare(shardName, false, false, false, null);
+		/* Bind the queue to the exchange */
+		mChannel.queueBind(shardName, BROADCAST_EXCHANGE_NAME, "");
+
+		/* Consumer to receive messages */
+		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+			String message = new String(delivery.getBody(), "UTF-8");
+
+			try {
+				doWork(message);
+			} catch (Exception ex) {
+				mPlugin.getLogger().warning("Failed to handle rabbit message '" + message + "'");
+				ex.printStackTrace();
+			} finally {
+				mChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+			}
+		};
+
 		mRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				connect(host, port);
+				try {
+					mChannel.basicConsume(shardName, false, CONSUMER_TAG, deliverCallback, shutdownCallback -> { /* TODO */ });
+				} catch (Exception ex) {
+					/* TODO: Better error? This will kill the shard... */
+					ex.printStackTrace();
+				}
 			}
 		};
-		mHeart = new BukkitRunnable() {
-			@Override
-			public void run() {
-				heartbeat();
-			}
-		};
+		mTask = mRunnable.runTaskAsynchronously(mPlugin);
 
-		mAsyncTask = mRunnable.runTaskAsynchronously(mPlugin); // Start the loop
-		mHeartTask = mHeart.runTaskTimerAsynchronously(mPlugin, 30 * 20, 30 * 20); // Send a heartbeat every 30 seconds
+		INSTANCE = this;
 	}
 
-	public void close() {
-		mSocketEnabled = false;
-		if (mAsyncTask != null) {
-			mAsyncTask.cancel();
-			mAsyncTask = null;
+	private void doWork(String task) throws Exception {
+		JsonObject obj = null;
+		try {
+			obj = mGson.fromJson(task, JsonObject.class);
+		} catch (JsonParseException e) {
+			obj = null;
 		}
-		if (mHeartTask != null) {
-			mHeartTask.cancel();
-			mHeartTask = null;
+		if (obj == null) {
+			mPlugin.getLogger().warning("Failed to parse rabbit message as json: " + task);
+			return;
 		}
-		if (mSocket != null) {
-			try {
-				mSocket.close();
-			} catch (Exception e) {
-				//TODO: handle exception
-				mPlugin.getLogger().warning("Error attempting to close socket");
-				e.printStackTrace();
-			}
-			mSocket = null;
+
+		if (!obj.has("op") || !obj.get("op").isJsonPrimitive() || !obj.get("op").getAsJsonPrimitive().isString()) {
+			mPlugin.getLogger().warning("Rabbit message missing 'op': " + task);
+			return;
 		}
-		if (mInput != null) {
-			try {
-				mInput.close();
-			} catch (Exception e) {
-				//TODO: handle exception
-				mPlugin.getLogger().warning("Error attempting to close socket input stream");
-				e.printStackTrace();
-			}
-			mInput = null;
+		if (!obj.has("source") || !obj.get("source").isJsonPrimitive() || !obj.get("source").getAsJsonPrimitive().isString()) {
+			mPlugin.getLogger().warning("Rabbit message missing 'source': " + task);
+			return;
 		}
-		if (mOutput != null) {
-			try {
-				mOutput.close();
-			} catch (Exception e) {
-				//TODO: handle exception
-				mPlugin.getLogger().warning("Error attempting to close socket output stream");
-				e.printStackTrace();
-			}
-			mOutput = null;
+		if (!obj.has("data") || !obj.get("data").isJsonObject()) {
+			mPlugin.getLogger().warning("Rabbit message missing 'data': " + task);
+			return;
+		}
+		String op = obj.get("op").getAsString();
+		String source = obj.get("source").getAsString();
+		JsonObject data = obj.get("data").getAsJsonObject();
+
+		/* TODO: Make this debug later */
+		mPlugin.getLogger().info("Processing message from=" + source + " op=" + op);
+
+		switch (op) {
+			case BroadcastCommandPacket.PacketOperation:
+				BroadcastCommandPacket.handlePacket(mPlugin, data);
+				break;
+			case BungeeCommandPacket.PacketOperation:
+				BungeeCommandPacket.handlePacket(mPlugin, data);
+				break;
+			case BungeeGetServerListPacket.PacketOperation:
+				BungeeGetServerListPacket.handlePacket(mPlugin, data);
+				break;
+			case BungeeSendPlayerPacket.PacketOperation:
+				BungeeSendPlayerPacket.handlePacket(mPlugin, data);
+				break;
+			case ShardCommandPacket.PacketOperation:
+				ShardCommandPacket.handlePacket(mPlugin, data);
+				break;
+			case ShardTransferPlayerDataPacket.PacketOperation:
+				ShardTransferPlayerDataPacket.handlePacket(mPlugin, data);
+				break;
+			case BungeeGetVotesUnclaimedPacket.PacketOperation:
+				BungeeGetVotesUnclaimedPacket.handlePacket(mPlugin, data);
+				break;
+			case BungeeCheckRaffleEligibilityPacket.PacketOperation:
+				BungeeCheckRaffleEligibilityPacket.handlePacket(mPlugin, data);
+				break;
+			default:
+				mPlugin.getLogger().warning("Received unknown rabbit op: " + op);
+				break;
 		}
 	}
 
-	public boolean sendPacket(BasePacket packet) {
-		if (mConnecting) {
-			mPlugin.getLogger().warning("Unable to send packet to " + packet.getDestination() + " : " + packet.getOperation() + " - Socket is still connecting");
+	public void stop() {
+		try {
+			mChannel.basicCancel(CONSUMER_TAG);
+		} catch (Exception ex) {
+			mPlugin.getLogger().info("Failed to cancel rabbit consumer");
+		}
+		try {
+			mTask.cancel();
+		} catch (Exception ex) {
+			mPlugin.getLogger().info("Failed to cancel async rabbit consumer task");
+		}
+	}
+
+	public static boolean sendPacket(BasePacket packet) {
+		if (INSTANCE == null) {
+			return false;
+		}
+		return INSTANCE.sendPacketInternal(packet);
+	}
+
+	private boolean sendPacketInternal(BasePacket packet) {
+		if (!packet.hasDestination()) {
+			mPlugin.getLogger().warning("Can't send packet with no destination!");
+			return false;
+		} else if (!packet.hasOperation()) {
+			mPlugin.getLogger().warning("Can't send packet with no operation!");
 			return false;
 		}
 
-		mPlugin.getLogger().fine("Sending packet to " + packet.getDestination() + " : " + packet.getOperation());
+		/* Used in case the specific packet type overrides properties like expiration / time to live */
+		AMQP.BasicProperties properties = packet.getProperties();
+
 		JsonObject raw = packet.toJson();
 		try {
-			Streams.write(raw, mOutput);
-			mOutput.flush();
+			byte[] msg = raw.toString().getBytes(StandardCharsets.UTF_8);
+
+			if (packet.getDestination().equals("*")) {
+				/* Broadcast packet - send to the broadcast exchange to route to all queues */
+				mChannel.basicPublish(BROADCAST_EXCHANGE_NAME, "", properties, msg);
+			} else {
+				/* Non-broadcast packet - send to the default exchange, routing to the appropriate queue */
+				mChannel.basicPublish("", packet.getDestination(), properties, msg);
+			}
+
+			/* TODO: Make this debug later */
+			mPlugin.getLogger().info("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
+
 			return true;
 		} catch (Exception e) {
-			if (packet.hasOperation() && packet.getOperation().equals(BungeeHeartbeatPacket.PacketOperation)) {
-				mPlugin.getLogger().fine("Error sending heartbeat packet, socket is likely dead. Reconnecting");
-			} else {
-				mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
-				e.printStackTrace();
-			}
-			reconnect();
+			mPlugin.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
+			e.printStackTrace();
 			return false;
-		}
-	}
-
-	private void heartbeat() {
-		if (mHeartbeatEnabled) {
-			sendPacket(new BungeeHeartbeatPacket());
-		}
-	}
-
-
-	private void connect(String address, int port) {
-		int attempts = 0;
-		while (mSocketEnabled) {
-			mConnecting = true;
-			mPlugin.getLogger().fine("Attempt " + attempts + " connecting to socket on " + address + ":" + port);
-			try {
-				mSocket = new Socket(address, port);
-				mInput = new JsonReader(new InputStreamReader(mSocket.getInputStream()));
-				mOutput = new JsonWriter(new OutputStreamWriter(mSocket.getOutputStream()));
-				mInput.setLenient(true); //  Both streams need to be lenient for the sockets to work.
-				mOutput.setLenient(true); // Even if the JSON is perfect, the socket will fail if not lenient.
-				mPlugin.getLogger().info("Connected to socket after " + attempts + " attempts");
-				attempts = 0;
-				mConnecting = false;
-				sendPacket(new BungeeHandshakePacket(mName));
-				mHeartbeatEnabled = true;
-				while (mSocketEnabled) {
-					JsonElement raw = Streams.parse(mInput);
-					if (raw != null && raw.isJsonObject()) {
-						JsonObject rawData = raw.getAsJsonObject();
-						String dest = null;
-						String op = null;
-						JsonObject data = null;
-						if (rawData.has("dest") &&
-						    rawData.get("dest").isJsonPrimitive() &&
-						    rawData.get("dest").getAsJsonPrimitive().isString()) {
-							dest = rawData.get("dest").getAsString();
-						}
-						if (rawData.has("op") &&
-						    rawData.get("op").isJsonPrimitive() &&
-						    rawData.get("op").getAsJsonPrimitive().isString()) {
-							op = rawData.get("op").getAsString();
-						}
-						if (rawData.has("data") &&
-						    rawData.get("data").isJsonObject()) {
-							data = rawData.getAsJsonObject("data");
-						}
-						BasePacket compiled = new BasePacket(dest, op, data);
-						if (op != null) {
-							switch (op) {
-								case BasePacket.PacketOperation:
-									BasePacket.handlePacket(mPlugin, compiled);
-									break;
-								case BroadcastCommandPacket.PacketOperation:
-									BroadcastCommandPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeCommandPacket.PacketOperation:
-									BungeeCommandPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeErrorPacket.PacketOperation:
-									BungeeErrorPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeGetServerListPacket.PacketOperation:
-									BungeeGetServerListPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeSendPlayerPacket.PacketOperation:
-									BungeeSendPlayerPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeHeartbeatPacket.PacketOperation:
-									BungeeHeartbeatPacket.handlePacket(mPlugin, compiled);
-									break;
-								case ShardCommandPacket.PacketOperation:
-									ShardCommandPacket.handlePacket(mPlugin, compiled);
-									break;
-								case ShardErrorPacket.PacketOperation:
-									ShardErrorPacket.handlePacket(mPlugin, compiled);
-									break;
-								case ShardTransferPlayerDataPacket.PacketOperation:
-									ShardTransferPlayerDataPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeGetVotesUnclaimedPacket.PacketOperation:
-									BungeeGetVotesUnclaimedPacket.handlePacket(mPlugin, compiled);
-									break;
-								case BungeeCheckRaffleEligibilityPacket.PacketOperation:
-									BungeeCheckRaffleEligibilityPacket.handlePacket(mPlugin, compiled);
-									break;
-								default:
-									mPlugin.getLogger().warning(mName + " received unknown packet: " + op);
-									break;
-							}
-						}
-					}
-				}
-			} catch (IOException e) {
-				mPlugin.getLogger().warning("Socket Error: Connection");
-			} catch (JsonParseException e) {
-				mPlugin.getLogger().warning("Socket Error: JSON Parse");
-			} catch (Exception e) {
-				mPlugin.getLogger().warning("Socket Error: Misc");
-			}
-			if (mSocketEnabled) {
-				// Something went wrong. Socket will retry, but let's wait.
-				try {
-					Thread.sleep(Math.min(attempts, 10) * 1000);
-				} catch (Exception e2) {
-					mPlugin.getLogger().warning("Error, can't sleep: ");
-					e2.printStackTrace();
-				}
-				attempts++;
-			}
-		}
-	}
-
-	private void reconnect() {
-		if (mSocketEnabled && !mConnecting) {
-			// Close the socket
-			if (mSocket != null) {
-				try {
-					mSocket.close();
-				} catch (Exception e) {
-					//TODO: handle exception
-					mPlugin.getLogger().warning("Error attempting to close socket");
-					e.printStackTrace();
-				}
-				mSocket = null;
-			}
-			// Closing the socket should also close input, but let's be safe
-			if (mInput != null) {
-				try {
-					mInput.close();
-				} catch (Exception e) {
-					//TODO: handle exception
-					mPlugin.getLogger().warning("Error attempting to close socket input stream");
-					e.printStackTrace();
-				}
-				mInput = null;
-			}
-			// Closing the socket should also close output, but let's be safe
-			if (mOutput != null) {
-				try {
-					mOutput.close();
-				} catch (Exception e) {
-					//TODO: handle exception
-					mPlugin.getLogger().warning("Error attempting to close socket output stream");
-					e.printStackTrace();
-				}
-				mOutput = null;
-			}
 		}
 	}
 }

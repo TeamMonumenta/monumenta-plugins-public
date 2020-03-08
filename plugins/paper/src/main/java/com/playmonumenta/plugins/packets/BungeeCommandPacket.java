@@ -15,11 +15,11 @@ public class BungeeCommandPacket extends BasePacket {
 	 * @param command
 	 */
 	public BungeeCommandPacket(String command) {
-		super(null, PacketOperation, new JsonObject());
-		mData.addProperty("command", command);
+		super("bungee", PacketOperation);
+		getData().addProperty("command", command);
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
+	public static void handlePacket(Plugin plugin, JsonObject data) throws Exception {
 		throw new Exception("BungeeCommandPacket cannot be handled by shards.");
 	}
 }

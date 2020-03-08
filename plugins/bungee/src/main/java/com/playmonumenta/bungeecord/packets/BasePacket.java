@@ -1,55 +1,70 @@
 package com.playmonumenta.bungeecord.packets;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.bungeecord.network.ClientSocket;
-import com.playmonumenta.bungeecord.network.SocketManager;
 
-public class BasePacket {
-	public static final String PacketOperation = "Do.Not.Use.This.Packet";
-	protected String mDestination;
-	protected String mOperation;
-	protected JsonObject mData;
+public abstract class BasePacket {
+	private final String mSource;
+	private final String mDestination;
+	private final String mOperation;
+	private final JsonObject mData;
 
-	public BasePacket(String destination, String operation, JsonObject data) {
+	public BasePacket(String destination, String operation) {
+		mSource = "bungee";
 		mDestination = destination;
 		mOperation = operation;
-		mData = data;
+		mData = new JsonObject();
 	}
 
-	public Boolean hasDestination() {
+	public BasePacket() throws Exception {
+		throw new Exception("This shard can't generate this packet");
+	}
+
+	public boolean hasSource() {
+		return mSource != null && !mSource.isEmpty();
+	}
+
+	public boolean hasDestination() {
 		return mDestination != null && !mDestination.isEmpty();
 	}
+
 	public boolean hasOperation() {
 		return mOperation != null && !mOperation.isEmpty();
 	}
+
 	public boolean hasData() {
 		return mData != null && mData.size() != 0;
+	}
+
+	public String getSource() {
+		return mSource;
 	}
 
 	public String getDestination() {
 		return mDestination;
 	}
+
 	public String getOperation() {
 		return mOperation;
 	}
+
 	public JsonObject getData() {
 		return mData;
 	}
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
+		if (hasSource()) {
+			json.addProperty("source", mSource);
+		}
 		if (hasDestination()) {
-			json.addProperty("dest", getDestination());
+			json.addProperty("dest", mDestination);
 		}
 		if (hasOperation()) {
-			json.addProperty("op", getOperation());
+			json.addProperty("op", mOperation);
 		}
 		if (hasData()) {
-			json.add("data", getData());
+			json.add("data", mData);
 		}
 		return json;
-	}
-
-	public static void handlePacket(SocketManager manager, ClientSocket client, BasePacket packet) throws Exception {
-		throw new Exception("BasePacket cannot be handled by bungee");
 	}
 }

@@ -26,37 +26,34 @@ public class BungeeCheckRaffleEligibilityPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.CheckRaffleEligibility";
 
 	public BungeeCheckRaffleEligibilityPacket(UUID playerUUID, boolean claimReward, boolean addBack) {
-		super(null, PacketOperation, new JsonObject());
-		mData.addProperty("playerUUID", playerUUID.toString());
-		mData.addProperty("claimReward", claimReward);
-		mData.addProperty("eligible", addBack);
+		super("bungee", PacketOperation);
+		getData().addProperty("playerUUID", playerUUID.toString());
+		getData().addProperty("claimReward", claimReward);
+		getData().addProperty("eligible", addBack);
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		if (!packet.hasData() ||
-		    !packet.getData().has("playerUUID") ||
-		    !packet.getData().get("playerUUID").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("playerUUID").isString()) {
+	public static void handlePacket(Plugin plugin, JsonObject data) throws Exception {
+		if (!data.has("playerUUID") ||
+		    !data.get("playerUUID").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("playerUUID").isString()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required string field 'playerUUID'");
 		}
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("claimReward") ||
-		    !packet.getData().get("claimReward").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("claimReward").isBoolean()) {
+		if (!data.has("claimReward") ||
+		    !data.get("claimReward").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("claimReward").isBoolean()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required int field 'claimReward'");
 		}
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("eligible") ||
-		    !packet.getData().get("eligible").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("eligible").isBoolean()) {
+		if (!data.has("eligible") ||
+		    !data.get("eligible").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("eligible").isBoolean()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required int field 'eligible'");
 		}
 
-		UUID uuid = UUID.fromString(packet.getData().get("playerUUID").getAsString());
-		boolean claimReward = packet.getData().get("claimReward").getAsBoolean();
-		boolean eligible = packet.getData().get("eligible").getAsBoolean();
+		UUID uuid = UUID.fromString(data.get("playerUUID").getAsString());
+		boolean claimReward = data.get("claimReward").getAsBoolean();
+		boolean eligible = data.get("eligible").getAsBoolean();
 
 		/* Handle on the main thread */
 		Bukkit.getScheduler().callSyncMethod(plugin, () -> {

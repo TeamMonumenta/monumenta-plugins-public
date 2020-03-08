@@ -30,19 +30,11 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.Lootable;
 
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.AuditLogPacket;
 
 public class AuditListener implements Listener {
-	private final Plugin mPlugin;
-	private final String mShardName;
-
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<HumanEntity, ItemStack>();
-
-	public AuditListener(@Nonnull Plugin plugin, @Nonnull String shardName) {
-		mPlugin = plugin;
-		mShardName = shardName;
-	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void gamemode(PlayerGameModeChangeEvent event) {
@@ -265,6 +257,6 @@ public class AuditListener implements Listener {
 	}
 
 	private void log(@Nonnull String message) {
-		mPlugin.mSocketManager.sendPacket(new AuditLogPacket(mShardName + ": " + message));
+		SocketManager.sendPacket(new AuditLogPacket(message));
 	}
 }

@@ -3,8 +3,7 @@ package com.playmonumenta.bungeecord.packets;
 import java.util.UUID;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.bungeecord.network.ClientSocket;
-import com.playmonumenta.bungeecord.network.SocketManager;
+import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.voting.VoteManager;
 
 /*
@@ -24,39 +23,36 @@ import com.playmonumenta.bungeecord.voting.VoteManager;
 public class BungeeCheckRaffleEligibilityPacket extends BasePacket {
 	public static final String PacketOperation = "Monumenta.Bungee.CheckRaffleEligibility";
 
-	public BungeeCheckRaffleEligibilityPacket(UUID playerUUID, boolean claimReward, boolean add_back) {
-		super(null, PacketOperation, new JsonObject());
-		mData.addProperty("playerUUID", playerUUID.toString());
-		mData.addProperty("claimReward", claimReward);
-		mData.addProperty("eligible", add_back);
+	public BungeeCheckRaffleEligibilityPacket(String destination, UUID playerUUID, boolean claimReward, boolean addBack) {
+		super(destination, PacketOperation);
+		getData().addProperty("playerUUID", playerUUID.toString());
+		getData().addProperty("claimReward", claimReward);
+		getData().addProperty("eligible", addBack);
 	}
 
-	public static void handlePacket(SocketManager manager, ClientSocket client, BasePacket packet) throws Exception {
-		if (!packet.hasData() ||
-		    !packet.getData().has("playerUUID") ||
-		    !packet.getData().get("playerUUID").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("playerUUID").isString()) {
+	public static void handlePacket(Main main, String source, JsonObject data) throws Exception {
+		if (!data.has("playerUUID") ||
+		    !data.get("playerUUID").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("playerUUID").isString()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required string field 'playerUUID'");
 		}
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("claimReward") ||
-		    !packet.getData().get("claimReward").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("claimReward").isBoolean()) {
+		if (!data.has("claimReward") ||
+		    !data.get("claimReward").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("claimReward").isBoolean()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required int field 'claimReward'");
 		}
 
-		if (!packet.hasData() ||
-		    !packet.getData().has("eligible") ||
-		    !packet.getData().get("eligible").isJsonPrimitive() ||
-		    !packet.getData().getAsJsonPrimitive("eligible").isBoolean()) {
+		if (!data.has("eligible") ||
+		    !data.get("eligible").isJsonPrimitive() ||
+		    !data.getAsJsonPrimitive("eligible").isBoolean()) {
 			throw new Exception("CheckRaffleEligibilityPacket failed to parse required int field 'eligible'");
 		}
 
-		UUID uuid = UUID.fromString(packet.getData().get("playerUUID").getAsString());
-		boolean claimReward = packet.getData().get("claimReward").getAsBoolean();
-		boolean eligible = packet.getData().get("eligible").getAsBoolean();
+		UUID uuid = UUID.fromString(data.get("playerUUID").getAsString());
+		boolean claimReward = data.get("claimReward").getAsBoolean();
+		boolean eligible = data.get("eligible").getAsBoolean();
 
-		VoteManager.gotShardRaffleEligibilityRequest(client, uuid, claimReward, eligible);
+		VoteManager.gotShardRaffleEligibilityRequest(source, uuid, claimReward, eligible);
 	}
 }

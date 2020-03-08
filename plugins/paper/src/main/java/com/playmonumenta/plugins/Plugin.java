@@ -161,10 +161,12 @@ public class Plugin extends JavaPlugin {
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
-		mSocketManager = new SocketManager(this, ServerProperties.getSocketHost(),
-		                                   ServerProperties.getSocketPort(),
-										   ServerProperties.getShardName());
-		// mSocketManager.open();
+		try {
+			mSocketManager = new SocketManager(this);
+		} catch (Exception ex) {
+			/* TODO: This is probably a fatal exception! */
+			ex.printStackTrace();
+		}
 
 		mItemOverrides = new ItemOverrides();
 
@@ -193,7 +195,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new SpectateBot(this), this);
 
 		if (ServerProperties.getAuditMessagesEnabled()) {
-			manager.registerEvents(new AuditListener(this, ServerProperties.getShardName()), this);
+			manager.registerEvents(new AuditListener(), this);
 		}
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
@@ -298,7 +300,7 @@ public class Plugin extends JavaPlugin {
 
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
-		mSocketManager.close();
+		mSocketManager.stop();
 		mBossManager.unloadAll(true);
 		MetadataUtils.removeAllMetadata(this);
 	}

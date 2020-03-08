@@ -1,21 +1,31 @@
 package com.playmonumenta.plugins.packets;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.rabbitmq.client.AMQP;
 
-public class BasePacket {
-	public static final String PacketOperation = "Do.Not.Use.This.Packet";
-	protected String mDestination;
-	protected String mOperation;
-	protected JsonObject mData;
+public abstract class BasePacket {
+	private final String mSource;
+	private final String mDestination;
+	private final String mOperation;
+	private final JsonObject mData;
 
-	public BasePacket(String destination, String operation, JsonObject data) {
+	public BasePacket(String destination, String operation) {
+		mSource = ServerProperties.getShardName();
 		mDestination = destination;
 		mOperation = operation;
-		mData = data;
+		mData = new JsonObject();
 	}
 
-	public Boolean hasDestination() {
+	public BasePacket() throws Exception {
+		throw new Exception("This shard can't generate this packet");
+	}
+
+	public boolean hasSource() {
+		return mSource != null && !mSource.isEmpty();
+	}
+
+	public boolean hasDestination() {
 		return mDestination != null && !mDestination.isEmpty();
 	}
 
@@ -25,6 +35,10 @@ public class BasePacket {
 
 	public boolean hasData() {
 		return mData != null && mData.size() != 0;
+	}
+
+	public String getSource() {
+		return mSource;
 	}
 
 	public String getDestination() {
@@ -39,21 +53,24 @@ public class BasePacket {
 		return mData;
 	}
 
-	public JsonObject toJson() {
-		JsonObject json = new JsonObject();
-		if (hasDestination()) {
-			json.addProperty("dest", getDestination());
-		}
-		if (hasOperation()) {
-			json.addProperty("op", getOperation());
-		}
-		if (hasData()) {
-			json.add("data", getData());
-		}
-		return json;
+	public AMQP.BasicProperties getProperties() {
+		return null;
 	}
 
-	public static void handlePacket(Plugin plugin, BasePacket packet) throws Exception {
-		throw new Exception("BasePacket cannot be handled by shards");
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+		if (hasSource()) {
+			json.addProperty("source", mSource);
+		}
+		if (hasDestination()) {
+			json.addProperty("dest", mDestination);
+		}
+		if (hasOperation()) {
+			json.addProperty("op", mOperation);
+		}
+		if (hasData()) {
+			json.add("data", mData);
+		}
+		return json;
 	}
 }

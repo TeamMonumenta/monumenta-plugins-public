@@ -134,6 +134,8 @@ public class TransferServer extends GenericCommand {
 						player.sendMessage(ChatColor.RED + "Transfer failed! Please try again.");
 						player.sendMessage(ChatColor.RED + "If this issue persists, please ask a moderator for assistance.");
 					}
+
+					/* TODO: Some kind of timeout to unlock player when transfer doesn't go through */
 				} else {
 					player.sendMessage(ChatColor.GOLD + "Transferring you " + ChatColor.RED + "without playerdata" +
 					                   ChatColor.GOLD + " to " + server);

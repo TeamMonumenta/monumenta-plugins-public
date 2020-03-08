@@ -1,199 +1,173 @@
 package com.playmonumenta.bungeecord.network;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
+import java.nio.charset.StandardCharsets;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.packets.BasePacket;
-import com.playmonumenta.bungeecord.packets.BroadcastCommandPacket;
 import com.playmonumenta.bungeecord.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.bungeecord.packets.BungeeCommandPacket;
-import com.playmonumenta.bungeecord.packets.BungeeErrorPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetServerListPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetVotesUnclaimedPacket;
-import com.playmonumenta.bungeecord.packets.BungeeHandshakePacket;
-import com.playmonumenta.bungeecord.packets.BungeeHeartbeatPacket;
 import com.playmonumenta.bungeecord.packets.BungeeSendPlayerPacket;
-import com.playmonumenta.bungeecord.packets.ShardCommandPacket;
-import com.playmonumenta.bungeecord.packets.ShardTransferPlayerDataPacket;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DeliverCallback;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class SocketManager {
+	private static final String QUEUE_NAME = "bungee";
+	private static final String CONSUMER_TAG = "consumerTag";
+
+	private static SocketManager INSTANCE = null;
+
 	public final Main mMain;
 	public final ProxyServer mProxy;
-	private int mPort = 0;
-	private ServerSocket mServer = null;
-	private Map<String, ClientSocket> mClients = new HashMap<>();
-	private Map<String, Queue<BasePacket>> mPacketQueue = new HashMap<>();
-	private Runnable mRunnable = null;
-	private ScheduledTask mTask = null;
-	private Boolean mEnabled = false;
+	private final Gson mGson = new Gson();
+	private final Runnable mRunnable;
+	private final ScheduledTask mTask;
+	private final Channel mChannel;
 
-	public SocketManager(Main main, int port) {
+	public SocketManager(Main main, String rabbitHost) throws Exception {
 		mProxy = ProxyServer.getInstance();
 		mMain = main;
-		mPort = port;
+
+		ConnectionFactory factory = new ConnectionFactory();
+		factory.setHost(rabbitHost);
+		Connection connection = factory.newConnection();
+		mChannel = connection.createChannel();
+
+		/* Consumer to receive messages */
+		mChannel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+			String message = new String(delivery.getBody(), "UTF-8");
+
+			try {
+				doWork(message);
+			} catch (Exception ex) {
+				mMain.getLogger().warning("Failed to handle rabbit message '" + message + "'");
+				ex.printStackTrace();
+			} finally {
+				mChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+			}
+		};
+
 		mRunnable = new Runnable() {
 			@Override
 			public void run() {
-				_listen();
+				try {
+					mChannel.basicConsume(QUEUE_NAME, false, CONSUMER_TAG, deliverCallback, shutdownCallback -> { /* TODO */ });
+				} catch (Exception ex) {
+					/* TODO: Better error? This will kill the shard... */
+					ex.printStackTrace();
+				}
 			}
 		};
+		mTask = mProxy.getScheduler().runAsync(mMain, mRunnable);
+
+		INSTANCE = this;
 	}
 
-	public void start() {
-		if (!mEnabled) {
-			mEnabled = true;
-			mTask = mProxy.getScheduler().runAsync(mMain, mRunnable);
+	private void doWork(String task) throws Exception {
+		JsonObject obj = null;
+		try {
+			obj = mGson.fromJson(task, JsonObject.class);
+		} catch (JsonParseException e) {
+			obj = null;
+		}
+		if (obj == null) {
+			mMain.getLogger().warning("Failed to parse rabbit message as json: " + task);
+			return;
+		}
+
+		if (!obj.has("op") || !obj.get("op").isJsonPrimitive() || !obj.get("op").getAsJsonPrimitive().isString()) {
+			mMain.getLogger().warning("Rabbit message missing 'op': " + task);
+			return;
+		}
+		if (!obj.has("source") || !obj.get("source").isJsonPrimitive() || !obj.get("source").getAsJsonPrimitive().isString()) {
+			mMain.getLogger().warning("Rabbit message missing 'source': " + task);
+			return;
+		}
+		if (!obj.has("data") || !obj.get("data").isJsonObject()) {
+			mMain.getLogger().warning("Rabbit message missing 'data': " + task);
+			return;
+		}
+		String op = obj.get("op").getAsString();
+		String source = obj.get("source").getAsString();
+		JsonObject data = obj.get("data").getAsJsonObject();
+
+		/* TODO: Make this debug later */
+		mMain.getLogger().info("Processing message from=" + source + " op=" + op);
+
+		switch (op) {
+			case BungeeCommandPacket.PacketOperation:
+				BungeeCommandPacket.handlePacket(mMain, source, data);
+				break;
+			case BungeeGetServerListPacket.PacketOperation:
+				BungeeGetServerListPacket.handlePacket(mMain, source, data);
+				break;
+			case BungeeSendPlayerPacket.PacketOperation:
+				BungeeSendPlayerPacket.handlePacket(mMain, source, data);
+				break;
+			case BungeeGetVotesUnclaimedPacket.PacketOperation:
+				BungeeGetVotesUnclaimedPacket.handlePacket(mMain, source, data);
+				break;
+			case BungeeCheckRaffleEligibilityPacket.PacketOperation:
+				BungeeCheckRaffleEligibilityPacket.handlePacket(mMain, source, data);
+				break;
+			default:
+				mMain.getLogger().warning("Received unknown rabbit op: " + op);
+				break;
 		}
 	}
 
 	public void stop() {
-		if (mEnabled) {
-			mEnabled = false;
-			mProxy.getScheduler().cancel(mTask);
+		try {
+			mChannel.basicCancel(CONSUMER_TAG);
+		} catch (Exception ex) {
+			mMain.getLogger().info("Failed to cancel rabbit consumer");
 		}
-		for (Entry<String, ClientSocket> entry : mClients.entrySet()) {
-			entry.getValue().close();
+		try {
+			mTask.cancel();
+		} catch (Exception ex) {
+			mMain.getLogger().info("Failed to cancel async rabbit consumer task");
 		}
 	}
 
-	public void clientHello(ClientSocket client, String name) {
-		client.setName(name);
-		if (mClients.containsKey(name)) {
-			// Assume the shard is reconnecting and close the current connection
-			mClients.get(name).close();
-			mClients.remove(name);
+	public static boolean sendPacket(BasePacket packet) {
+		if (INSTANCE != null) {
+			return INSTANCE.sendPacketInternal(packet);
 		}
-		mClients.put(name, client);
-		// // TODO: Make the queue work when dynamic start/stop is implemented.
-		// if (!mPacketQueue.containsKey(name)) {
-		//  mPacketQueue.put(name, new LinkedList<>());
-		// }
-		// while (mPacketQueue.get(name).peek() != null) {
-		//  client.sendPacket(mPacketQueue.get(name).element());
-		// }
+		return false;
 	}
 
-	public void sortPacket(ClientSocket client, BasePacket packet) {
-		mMain.getLogger().fine("Received packet from " + client.getName() + ": " + packet.getOperation());
-
+	private boolean sendPacketInternal(BasePacket packet) {
 		if (!packet.hasDestination()) {
-			// Packet has no destination field. The destination is bungee itself.
-			String op = packet.getOperation();
-			try {
-				if (op.equals(BasePacket.PacketOperation)) {
-					BasePacket.handlePacket(this, client, packet);
-				} else if (op.equals(BroadcastCommandPacket.PacketOperation)) {
-					BroadcastCommandPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeCommandPacket.PacketOperation)) {
-					BungeeCommandPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeErrorPacket.PacketOperation)) {
-					BungeeErrorPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeGetServerListPacket.PacketOperation)) {
-					BungeeGetServerListPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeHeartbeatPacket.PacketOperation)) {
-					BungeeHeartbeatPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeHandshakePacket.PacketOperation)) {
-					BungeeHandshakePacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeSendPlayerPacket.PacketOperation)) {
-					BungeeSendPlayerPacket.handlePacket(this, client, packet);
-				} else if (op.equals(ShardCommandPacket.PacketOperation)) {
-					ShardCommandPacket.handlePacket(this, client, packet);
-				} else if (op.equals(ShardTransferPlayerDataPacket.PacketOperation)) {
-					ShardTransferPlayerDataPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeGetVotesUnclaimedPacket.PacketOperation)) {
-					BungeeGetVotesUnclaimedPacket.handlePacket(this, client, packet);
-				} else if (op.equals(BungeeCheckRaffleEligibilityPacket.PacketOperation)) {
-					BungeeCheckRaffleEligibilityPacket.handlePacket(this, client, packet);
-				} else {
-					mMain.getLogger().warning("Bungee received unknown packet: " + op);
-				}
-			} catch (Exception e) {
-				mMain.getLogger().warning("Error processing packet");
-				e.printStackTrace();
-				client.sendPacket(new BungeeErrorPacket(e.getMessage(),
-				                                        client.getName(),
-				                                        packet.getDestination(),
-				                                        packet.getOperation(),
-				                                        packet.getData()));
-			}
-		} else if (packet.getDestination().equals("*")) {
-			// Packet should be sent to all connected clients, including the sender.
-			mMain.getLogger().fine("Received broadcast packet: " + packet.getOperation());
-			for (Entry<String, ClientSocket> entry : mClients.entrySet()) {
-				if (!entry.getValue().sendPacket(packet)) {
-					// // TODO: Make the queue work when dynamic start/stop is implemented.
-					// // Sending failed, queue packet and close socket
-					// mPacketQueue.get(entry.getKey()).add(packet);
-					// entry.getValue().close();
-				}
-			}
-		} else {
-			// Packet is addressed to a particular client
-			//TODO: Poke offline servers to turn on to receive packets
-			String dest = packet.getDestination();
-			mMain.getLogger().fine("Received packet to " + dest + ": " + packet.getOperation());
-			if (!mClients.containsKey(dest) ||
-			    !mClients.get(dest).sendPacket(packet)) {
-				// // TODO: Make the queue work when dynamic start/stop is implemented.
-				// // Shard was never connected, or was disconnected. Queue the packet.
-				// if (!mPacketQueue.containsKey(dest)) {
-				//  mPacketQueue.put(dest, new LinkedList<>());
-				// }
-				// mPacketQueue.get(dest).add(packet);
-				client.sendPacket(new BungeeErrorPacket("Shard not connected",
-				                                        client.getName(),
-				                                        packet.getDestination(),
-				                                        packet.getOperation(),
-				                                        packet.getData()));
-			}
+			mMain.getLogger().warning("Can't send packet with no destination!");
+			return false;
+		} else if (!packet.hasOperation()) {
+			mMain.getLogger().warning("Can't send packet with no operation!");
+			return false;
 		}
-	}
 
-	public Collection<ClientSocket> getClients() {
-		return mClients.values();
-	}
+		JsonObject raw = packet.toJson();
+		try {
+			mChannel.basicPublish("", packet.getDestination(), null, raw.toString().getBytes(StandardCharsets.UTF_8));
 
-	private void _listen() {
-		int attempts = 0;
-		while (mEnabled) {
-			mMain.getLogger().info("Now listening for sockets on port " + mPort);
-			try {
-				mServer = new ServerSocket(mPort);
-				while (mEnabled) {
-					try {
-						Socket socket = mServer.accept();
-						ClientSocket client = new ClientSocket(mMain, this, socket);
-						client.open();
-					} catch (Exception e) {
-						mMain.getLogger().warning("Error accepting socket: ");
-						e.printStackTrace();
-						break;
-					}
-				}
-			} catch (Exception e) {
-				mMain.getLogger().warning("Error creating socket server: ");
-				e.printStackTrace();
-			}
-			// Socket server must close or restart.
-			if (mEnabled) {
-				// Server will restart, add a delay between attempts
-				try {
-					Thread.sleep(Math.min(attempts, 10) * 1000);
-				} catch (Exception e) {
-					mMain.getLogger().warning("Error, can't sleep: ");
-					e.printStackTrace();
-				}
-				attempts++;
-			}
+			/* TODO: Make this debug later */
+			mMain.getLogger().info("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
+
+			return true;
+		} catch (Exception e) {
+			mMain.getLogger().warning(String.format("Error sending packet to %s: %s", packet.getDestination(), packet.getOperation()));
+			e.printStackTrace();
+			return false;
 		}
 	}
 }

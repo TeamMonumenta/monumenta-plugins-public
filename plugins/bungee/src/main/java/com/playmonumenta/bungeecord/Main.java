@@ -19,7 +19,6 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class Main extends Plugin {
 	private Configuration mConfig = null;
-	private int mSocketPort = 0;
 	private Level mLogLevel = Level.INFO;
 	private VoteManager mVoteManager = null;
 
@@ -31,8 +30,12 @@ public class Main extends Plugin {
 		_saveConfig();
 
 		PluginManager manager = getProxy().getPluginManager();
-		SocketManager socketManager = new SocketManager(this, mSocketPort);
-		socketManager.start();
+		try {
+			new SocketManager(this, mConfig.get("rabbitHost", "rabbitmq"));
+		} catch (Exception ex) {
+			/* TODO: This is probably a fatal exception! */
+			ex.printStackTrace();
+		}
 
 		if (!mConfig.contains("voting")) {
 			getLogger().warning("No 'voting' section in config file - disabling voting features");
@@ -84,9 +87,6 @@ public class Main extends Plugin {
 				mDefaultServer = null;
 			}
 
-			// load socket port
-			mSocketPort = mConfig.getInt("socket_port", 0);
-
 			// Load default server
 			String level = mConfig.getString("log_level", "INFO").toLowerCase();
 			switch (level) {
@@ -119,8 +119,6 @@ public class Main extends Plugin {
 			} else {
 				mConfig.set("default_server", mDefaultServer);
 			}
-
-			mConfig.set("socket_port", mSocketPort);
 
 			if (mLogLevel.equals(Level.FINEST)) {
 				mConfig.set("log_level", "FINEST");
