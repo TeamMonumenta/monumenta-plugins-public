@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.network;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.packets.BasePacket;
 import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
@@ -33,9 +33,19 @@ public class SocketManager {
 
 	private final Gson mGson = new Gson();
 	private final Plugin mPlugin;
-	private final BukkitRunnable mRunnable;
-	private final BukkitTask mTask;
 	private final Channel mChannel;
+
+	/*
+	 * If mShutdown = false, this is expected to run normally
+	 * If mShutdown = true, the server is already shutting down
+	 */
+	private boolean mShutdown = false;
+
+	/*
+	 * If mConsumerAlive = true, the consumer is running
+	 * If mConsumerAlive = false, the consumer has terminated
+	 */
+	private boolean mConsumerAlive = false;
 
 	public SocketManager(Plugin plugin) throws Exception {
 		mPlugin = plugin;
@@ -56,62 +66,83 @@ public class SocketManager {
 
 		/* Consumer to receive messages */
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-			String message = new String(delivery.getBody(), "UTF-8");
+			final String message;
+			final JsonObject obj;
 
 			try {
-				doWork(message);
+				message = new String(delivery.getBody(), "UTF-8");
+
+				obj = mGson.fromJson(message, JsonObject.class);
+				if (obj == null) {
+					throw new Exception("Failed to parse rabbit message as json: " + message);
+				}
+				if (!obj.has("op") || !obj.get("op").isJsonPrimitive() || !obj.get("op").getAsJsonPrimitive().isString()) {
+					throw new Exception("Rabbit message missing 'op': " + message);
+				}
+				if (!obj.has("source") || !obj.get("source").isJsonPrimitive() || !obj.get("source").getAsJsonPrimitive().isString()) {
+					throw new Exception("Rabbit message missing 'source': " + message);
+				}
+				if (!obj.has("data") || !obj.get("data").isJsonObject()) {
+					throw new Exception("Rabbit message missing 'data': " + message);
+				}
 			} catch (Exception ex) {
-				mPlugin.getLogger().warning("Failed to handle rabbit message '" + message + "'");
-				ex.printStackTrace();
-			} finally {
+				mPlugin.getLogger().warning(ex.getMessage());
+				/* Parsing this message failed - but ack it anyway, because it's not going to parse next time either */
 				mChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+				return;
 			}
+
+			String op = obj.get("op").getAsString();
+			String source = obj.get("source").getAsString();
+			JsonObject data = obj.get("data").getAsJsonObject();
+
+			/* Process the packet on the main thread */
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					try {
+						doWork(op, source, data);
+					} catch (Exception ex) {
+						mPlugin.getLogger().warning("Failed to handle rabbit message '" + message + "'");
+						ex.printStackTrace();
+					}
+
+					/*
+					 * Always acknowledge messages after attempting to handle them, even if there's an error
+					 * Don't want a failing message to get stuck in an infinite loop
+					 */
+
+					try {
+						mChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+					} catch (IOException ex) {
+						/*
+						 * If the channel disconnects, we just won't ack this message
+						 * It will be redelivered later
+						 */
+						mPlugin.getLogger().warning("Failed to acknowledge rabbit message '" + message + "'");
+					}
+				}
+			}.runTask(plugin);
 		};
 
-		mRunnable = new BukkitRunnable() {
-			@Override
-			public void run() {
-				try {
-					mChannel.basicConsume(shardName, false, CONSUMER_TAG, deliverCallback, shutdownCallback -> { /* TODO */ });
-				} catch (Exception ex) {
-					/* TODO: Better error? This will kill the shard... */
-					ex.printStackTrace();
-				}
+		mConsumerAlive = true;
+		mChannel.basicConsume(shardName, false, CONSUMER_TAG, deliverCallback,
+		                      consumerTag -> {
+			mConsumerAlive = false;
+			if (mShutdown) {
+				plugin.getLogger().info("RabbitMQ consumer has terminated");
+			} else {
+				plugin.getLogger().severe("RabbitMQ consumer has terminated unexpectedly - stopping the shard...");
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
 			}
-		};
-		mTask = mRunnable.runTaskAsynchronously(mPlugin);
+		});
+
+		plugin.getLogger().info("Started RabbitMQ consumer");
 
 		INSTANCE = this;
 	}
 
-	private void doWork(String task) throws Exception {
-		JsonObject obj = null;
-		try {
-			obj = mGson.fromJson(task, JsonObject.class);
-		} catch (JsonParseException e) {
-			obj = null;
-		}
-		if (obj == null) {
-			mPlugin.getLogger().warning("Failed to parse rabbit message as json: " + task);
-			return;
-		}
-
-		if (!obj.has("op") || !obj.get("op").isJsonPrimitive() || !obj.get("op").getAsJsonPrimitive().isString()) {
-			mPlugin.getLogger().warning("Rabbit message missing 'op': " + task);
-			return;
-		}
-		if (!obj.has("source") || !obj.get("source").isJsonPrimitive() || !obj.get("source").getAsJsonPrimitive().isString()) {
-			mPlugin.getLogger().warning("Rabbit message missing 'source': " + task);
-			return;
-		}
-		if (!obj.has("data") || !obj.get("data").isJsonObject()) {
-			mPlugin.getLogger().warning("Rabbit message missing 'data': " + task);
-			return;
-		}
-		String op = obj.get("op").getAsString();
-		String source = obj.get("source").getAsString();
-		JsonObject data = obj.get("data").getAsJsonObject();
-
+	private void doWork(String op, String source, JsonObject data) throws Exception {
 		/* TODO: Make this debug later */
 		mPlugin.getLogger().info("Processing message from=" + source + " op=" + op);
 
@@ -147,15 +178,13 @@ public class SocketManager {
 	}
 
 	public void stop() {
-		try {
-			mChannel.basicCancel(CONSUMER_TAG);
-		} catch (Exception ex) {
-			mPlugin.getLogger().info("Failed to cancel rabbit consumer");
-		}
-		try {
-			mTask.cancel();
-		} catch (Exception ex) {
-			mPlugin.getLogger().info("Failed to cancel async rabbit consumer task");
+		mShutdown = true;
+		if (mConsumerAlive) {
+			try {
+				mChannel.basicCancel(CONSUMER_TAG);
+			} catch (Exception ex) {
+				mPlugin.getLogger().info("Failed to cancel rabbit consumer");
+			}
 		}
 	}
 

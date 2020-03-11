@@ -81,7 +81,7 @@ public class Plugin extends JavaPlugin {
 
 	public EnchantmentManager mEnchantmentManager;
 	public JunkItemListener mJunkItemsListener;
-	public HttpManager mHttpManager;
+	private HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
 	public SpawnZoneManager mZoneManager;
@@ -134,9 +134,8 @@ public class Plugin extends JavaPlugin {
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 
-		mHttpManager = new HttpManager(this);
 		try {
-			mHttpManager.start();
+			mHttpManager = new HttpManager(this);
 		} catch (IOException err) {
 			getLogger().warning("HTTP manager failed to start");
 			err.printStackTrace();
@@ -160,6 +159,8 @@ public class Plugin extends JavaPlugin {
 	public void onEnable() {
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
+
+		mHttpManager.start();
 
 		try {
 			mSocketManager = new SocketManager(this);
@@ -225,10 +226,6 @@ public class Plugin extends JavaPlugin {
 				final boolean twoHertz = (mTicks % 10) == 0;
 				final boolean fourHertz = (mTicks % 5) == 0;
 				final boolean twentyHertz = true;
-
-				if (oneHertz) {
-					mHttpManager.tick();
-				}
 
 				// NOW IT'S TWICE A SECOND MOTHAFUCKAAAASSSSSSSSS!!!!!!!!!!
 				// FREQUENCY ANARCHY HAPPENING UP IN HERE

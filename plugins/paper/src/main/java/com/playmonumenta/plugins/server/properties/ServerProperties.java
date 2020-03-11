@@ -36,6 +36,7 @@ public class ServerProperties {
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
+	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
 	private String mRabbitHost = "rabbitmq";
@@ -109,6 +110,11 @@ public class ServerProperties {
 	public static boolean getAuditMessagesEnabled() {
 		ensureInstance();
 		return INSTANCE.mAuditMessagesEnabled;
+	}
+
+	public static int getHTTPStatusPort() {
+		ensureInstance();
+		return INSTANCE.mHTTPStatusPort;
 	}
 
 	public static String getShardName() {
@@ -191,6 +197,7 @@ public class ServerProperties {
 					mKeepLowTierInventory        = getPropertyValueBool(plugin, object, "keepLowTierInventory", mKeepLowTierInventory);
 					mClassSpecializationsEnabled = getPropertyValueBool(plugin, object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 					mAuditMessagesEnabled        = getPropertyValueBool(plugin, object, "auditMessagesEnabled", mAuditMessagesEnabled);
+					mHTTPStatusPort              = getPropertyValueInt(plugin, object, "httpStatusPort", mHTTPStatusPort);
 
 					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
 					mRabbitHost                  = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
