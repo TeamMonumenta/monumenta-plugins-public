@@ -49,6 +49,7 @@ public class Inferno implements BaseEnchantment {
 
 	private static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static BukkitRunnable sRunnable = null;
+	private static final Map<LivingEntity, InfernoMob> sPendingTagMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
 
 	private static final int FIRE_RESISTANT_INFERNO_TICKS = 80;
@@ -98,14 +99,23 @@ public class Inferno implements BaseEnchantment {
 	}
 
 	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player) {
-		/* Record this mob as being inferno tagged */
-		sTaggedMobs.put(target, new InfernoMob(player, level));
+		/*
+		 * Record this mob as being inferno tagged
+		 * Add to a secondary map of pending additions to prevent ConcurrentModificationException's
+		 */
+		sPendingTagMobs.put(target, new InfernoMob(player, level));
 
 		/* Make sure the ticking task is running that periodically validates that a mob is still alive and burning */
 		if (sRunnable == null) {
 			sRunnable = new BukkitRunnable() {
 				@Override
 				public void run() {
+					/* Move all the pending mobs to the actual tagged mobs list */
+					if (sPendingTagMobs.size() > 0) {
+						sTaggedMobs.putAll(sPendingTagMobs);
+						sPendingTagMobs.clear();
+					}
+
 					Iterator<Entry<LivingEntity, InfernoMob>> infernoMobsIter = sTaggedMobs.entrySet().iterator();
 					while (infernoMobsIter.hasNext()) {
 						Entry<LivingEntity, InfernoMob> entry = infernoMobsIter.next();

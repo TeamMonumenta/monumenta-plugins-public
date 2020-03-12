@@ -115,10 +115,12 @@ public class DeathsTouch extends Ability {
 								mPlayer.spawnParticle(Particle.SPELL_MOB, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
 								mPlayer.spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
 							}
-							if (t >= runnableDuration || target.isDead()) {
+							if (t >= runnableDuration || (target != null && (target.isDead() || !target.isValid()))) {
 								this.cancel();
+								if (target != null) {
+									target.removeMetadata("DeathsTouchBuffDuration", mPlugin);
+								}
 								target = null;
-								target.removeMetadata("DeathsTouchBuffDuration", mPlugin);
 							}
 						}
 

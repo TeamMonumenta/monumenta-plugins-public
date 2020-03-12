@@ -226,11 +226,14 @@ public class BodkinBlitz extends Ability {
 										mark = null;
 										this.cancel();
 									} else {
-										mWorld.spawnParticle(Particle.SMOKE_LARGE,
-												mark.getLocation().clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.07f);
 										i++;
 										if (mark == null) {
 											i = 100;
+										} else {
+											mWorld.spawnParticle(Particle.SMOKE_LARGE,
+											                     mark.getLocation().clone().add(0, 1, 0),
+																 1, 0.25, 0.5, 0.25, 0.07f);
+
 										}
 									}
 								}
