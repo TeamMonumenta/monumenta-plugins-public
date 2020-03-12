@@ -32,6 +32,8 @@ public class BroadcastCommand {
 	            "tell",
 	            "tellraw",
 	            "title",
+	            "mute",
+	            "unmute",
 
 	            "re",
 	            "function",
