@@ -1,0 +1,33 @@
+package com.playmonumenta.plugins.enchantments.infusions;
+
+import java.util.EnumSet;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
+
+public class Perspicacity implements BaseEnchantment {
+
+	public static final String PROPERTY_NAME = ChatColor.GRAY + "Perspicacity";
+
+	@Override
+	public String getProperty() {
+		return PROPERTY_NAME;
+	}
+
+	@Override
+	public EnumSet<ItemSlot> validSlots() {
+		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
+	}
+
+	@Override
+	public void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) {
+		double abilityDmgBuffPct = level * 0.01;
+		event.setDamage(event.getDamage() * (1.0 + abilityDmgBuffPct));
+	}
+}

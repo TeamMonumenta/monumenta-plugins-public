@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.commands.FestiveHeldItem;
 import com.playmonumenta.plugins.commands.GildifyHeldItem;
 import com.playmonumenta.plugins.commands.GiveSoulbound;
 import com.playmonumenta.plugins.commands.HopeifyHeldItem;
+import com.playmonumenta.plugins.commands.InfuseHeldItem;
 import com.playmonumenta.plugins.commands.MonumentaDebug;
 import com.playmonumenta.plugins.commands.MonumentaReload;
 import com.playmonumenta.plugins.commands.RedeemVoteRewards;
@@ -114,6 +115,7 @@ public class Plugin extends JavaPlugin {
 		HopeifyHeldItem.register();
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
+		InfuseHeldItem.register();
 		ClaimRaffle.register(this);
 		DeCluckifyHeldItem.register();
 		CalculateReforge.register();

@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
@@ -107,6 +108,13 @@ public class PlayerTracking implements EntityTracking {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
 			manager.onDamage(plugin, player, target, event);
+		}
+	}
+
+	public void onAbility(Plugin plugin, Player player, LivingEntity target, CustomDamageEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onAbility(plugin, player, target, event);
 		}
 	}
 

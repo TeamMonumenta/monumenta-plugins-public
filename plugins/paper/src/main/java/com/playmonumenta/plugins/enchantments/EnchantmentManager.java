@@ -23,6 +23,12 @@ import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.Evasion;
 import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
+import com.playmonumenta.plugins.enchantments.infusions.Acumen;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
+import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
+import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
+import com.playmonumenta.plugins.enchantments.infusions.Vigor;
+import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class EnchantmentManager implements Listener {
@@ -116,6 +122,14 @@ public class EnchantmentManager implements Listener {
 
 		// Tesseracts (not actually items a player can get enchants from)
 		init.add(new PestilenceTesseract());
+
+		// Infusion Enchantments
+		init.add(new Acumen());
+		init.add(new Focus());
+		init.add(new Perspicacity());
+		init.add(new Tenacity());
+		init.add(new Vigor());
+		init.add(new Vitality());
 
 		// Forbidden items (dynamically set based on server config)
 		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {

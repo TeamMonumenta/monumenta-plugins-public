@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
@@ -203,6 +204,15 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.onDamage(plugin, player, level, target, event);
+		}
+	}
+
+	public void onAbility(Plugin plugin, Player player, LivingEntity target, CustomDamageEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onAbility(plugin, player, level, target, event);
 		}
 	}
 

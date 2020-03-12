@@ -89,6 +89,7 @@ import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
+import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -185,6 +186,10 @@ public class EntityListener implements Listener {
 	public void customDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
 			mAbilities.playerDealtCustomDamageEvent((Player)event.getDamager(), event);
+			// If the event has a valid spell, call onAbility
+			if (event.getSpell() != null) {
+				mPlugin.mTrackingManager.mPlayers.onAbility(mPlugin, (Player)event.getDamager(), (LivingEntity)event.getDamaged(), event);
+			}
 		}
 	}
 
@@ -383,12 +388,14 @@ public class EntityListener implements Listener {
 			PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Focus.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 		}
 
 		if (damager instanceof Trident && damagee instanceof LivingEntity) {
 			Impact.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Slayer.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Duelist.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Focus.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 		}
 
 		if (damagee instanceof LivingEntity) {

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,6 +148,25 @@ public class InventoryUtils {
 		}
 
 		return 0;
+	}
+
+	public static void removeCustomEnchant(ItemStack item, String nameText) {
+		if (!nameText.isEmpty() && item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null && !lore.isEmpty()) {
+					List<String> newLore = new ArrayList<>();
+					for (String line : lore) {
+						if (!line.startsWith(nameText)) {
+							newLore.add(line);
+						}
+					}
+					meta.setLore(newLore);
+					item.setItemMeta(meta);
+				}
+			}
+		}
 	}
 
 	private static final Map<String, ItemSlot> LORE_SLOT_MAPPINGS = new HashMap<String, ItemSlot>();
