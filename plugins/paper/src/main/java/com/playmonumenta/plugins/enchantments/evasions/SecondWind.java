@@ -27,7 +27,7 @@ public class SecondWind implements BaseEnchantment {
 
 	@Override
 	public void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) {
-		PlayerUtils.healPlayer(player, level);
+		PlayerUtils.healPlayer(player, Math.sqrt(level));
 	}
 
 }

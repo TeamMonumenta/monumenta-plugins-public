@@ -16,6 +16,12 @@ import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class EvasionEnchant extends Ability {
+
+	private static final int EVASION_THRESHOLD_1 = 10;
+	private static final int EVASION_THRESHOLD_2 = 20;
+	private static final double EVASION_THRESHOLD_1_REDUCTION = 0.4;
+	private static final double EVASION_THRESHOLD_2_REDUCTION = 0.8;
+
 	public double mChance = 0;
 	private int mLastActivationTick = 0;
 
@@ -44,9 +50,9 @@ public class EvasionEnchant extends Ability {
 	private double evade(Player player, double damage, double finalDamage) {
 		double changedDamage = damage;
 		Location loc = player.getLocation().add(0, 1, 0);
-		if (mChance >= 200 || mChance >= 100 && mPlayer.getHealth() <= finalDamage / 2) {
-			mChance -= 200;
-			changedDamage *= 0.25;
+		if (mChance >= EVASION_THRESHOLD_2 || mChance >= EVASION_THRESHOLD_2 / 2 && mPlayer.getHealth() <= finalDamage / 2) {
+			mChance -= EVASION_THRESHOLD_2;
+			changedDamage *= (1 - EVASION_THRESHOLD_2_REDUCTION);
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);
 				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.2f, 1.5f);
@@ -58,9 +64,9 @@ public class EvasionEnchant extends Ability {
 			}
 			EvasionEvent event = new EvasionEvent(player);
 			Bukkit.getPluginManager().callEvent(event);
-		} else if (mChance >= 100 || mChance >= 50 && mPlayer.getHealth() <= finalDamage) {
-			mChance -= 100;
-			changedDamage *= 0.5;
+		} else if (mChance >= EVASION_THRESHOLD_1 || mChance >= EVASION_THRESHOLD_1 / 2 && mPlayer.getHealth() <= finalDamage) {
+			mChance -= EVASION_THRESHOLD_1;
+			changedDamage *= (1 - EVASION_THRESHOLD_1_REDUCTION);
 			if (Math.abs(player.getTicksLived() - mLastActivationTick) < 160) {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 16, 0.15, 0.25, 0.15, 0.05);
 				mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.2f, 1.5f);

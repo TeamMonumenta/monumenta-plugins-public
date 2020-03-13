@@ -36,7 +36,7 @@ public class MeleeEvasion implements BaseEnchantment {
 			&& event.getDamager().getBoundingBox().expand(EVASION_MELEE_THRESHOLD).contains(event.getEntity().getLocation().toVector())) {
 			EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 			if (evasion != null) {
-				evasion.mChance += (16 * level);
+				evasion.mChance += (2 * level);
 			}
 		}
 	}
