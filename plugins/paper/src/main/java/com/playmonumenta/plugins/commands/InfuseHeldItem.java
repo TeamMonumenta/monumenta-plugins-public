@@ -56,8 +56,6 @@ public class InfuseHeldItem extends GenericCommand {
 		for (Entity entity : frames) {
 			if (!(entity instanceof ItemFrame)) {
 				CommandAPI.fail("Got entity '" + entity.getType().toString() + "' that was not an item frame");
-			} else {
-				player.sendMessage("Got 1 item frame");
 			}
 		}
 
