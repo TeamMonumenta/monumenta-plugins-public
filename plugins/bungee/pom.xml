@@ -66,6 +66,7 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.MyzelYam</groupId>
@@ -85,12 +86,11 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.8.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.29</version>
         </dependency>
     </dependencies>
 
@@ -198,6 +198,18 @@
                             <mainClass>com.playmonumenta.bungeecord.Main</mainClass>
                         </transformer>
                     </transformers>
+
+                    <!-- Need to relocate these packages to prevent conflicts with other plugins -->
+                    <relocations>
+                        <relocation>
+                            <pattern>com.rabbitmq</pattern>
+                            <shadedPattern>shaded.monumenta.com.rabbitmq</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.slf4j</pattern>
+                            <shadedPattern>shaded.monumenta.org.slf4j</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
                 <executions>
                     <execution>
