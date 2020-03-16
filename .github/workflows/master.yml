@@ -22,7 +22,10 @@ jobs:
     - name: git config user.email
       run: git config --global user.email "Monumenta.CI@NotARealEmail.com"
     - name: Get Paper
-      run: git clone https://github.com/TeamMonumenta/Paper.git
+      run: |
+          git clone https://github.com/TeamMonumenta/Paper.git
+          cd Paper
+          git checkout 1.13
     - name: Build Paper
       working-directory: ./Paper
       run: ./paper jar
