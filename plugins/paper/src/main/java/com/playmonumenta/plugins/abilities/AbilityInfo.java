@@ -52,7 +52,7 @@ public class AbilityInfo {
 		}
 
 		String skillHeader;
-		skillHeader = "[" + mDisplayName.toUpperCase() + " " + Integer.toString(skillLevel) + "] : ";
+		skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + Integer.toString(skillLevel) + "] : ";
 
 		return new ComponentBuilder(skillHeader).color(ChatColor.GREEN).bold(true)
 		           .append(strDescription).color(ChatColor.GREEN).bold(false);
