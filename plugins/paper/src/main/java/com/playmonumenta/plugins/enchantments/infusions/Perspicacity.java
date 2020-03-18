@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 public class Perspicacity implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Perspicacity";
+	private static final double DAMAGE_PCT_PER_LEVEL = 0.01;
 
 	@Override
 	public String getProperty() {
@@ -27,7 +28,7 @@ public class Perspicacity implements BaseEnchantment {
 
 	@Override
 	public void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) {
-		double abilityDmgBuffPct = level * 0.01;
+		double abilityDmgBuffPct = level * DAMAGE_PCT_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 + abilityDmgBuffPct));
 	}
 }

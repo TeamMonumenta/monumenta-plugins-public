@@ -17,6 +17,7 @@ public class Vitality implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Vitality";
 	public static final String MODIFIER = "VitalityMod";
+	private static final double HP_PCT_PER_LEVEL = 0.01;
 
 	@Override
 	public String getProperty() {
@@ -32,7 +33,7 @@ public class Vitality implements BaseEnchantment {
 	public void applyProperty(Plugin plugin, Player player, int level) {
 		if (player != null) {
 			removeProperty(plugin, player);
-			double healthBoostPct = 0.01 * level;
+			double healthBoostPct = HP_PCT_PER_LEVEL * level;
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoostPct,
 					AttributeModifier.Operation.MULTIPLY_SCALAR_1);

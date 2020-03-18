@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 public class Vigor implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Vigor";
+	private static final double DAMAGE_PCT_PER_LEVEL = 0.01;
 
 	@Override
 	public String getProperty() {
@@ -27,7 +28,7 @@ public class Vigor implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		double damageBuffPct = level * 0.01;
+		double damageBuffPct = level * DAMAGE_PCT_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 + damageBuffPct));
 	}
 }

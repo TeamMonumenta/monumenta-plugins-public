@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 public class Tenacity implements BaseEnchantment {
 
 	public static final String PROPERTY_NAME = ChatColor.GRAY + "Tenacity";
+	private static final double REDUCT_PCT_PER_LEVEL = 0.005;
 
 	@Override
 	public String getProperty() {
@@ -27,13 +28,13 @@ public class Tenacity implements BaseEnchantment {
 
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
-		double reductionPct = level * 0.0075;
+		double reductionPct = level * REDUCT_PCT_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 - reductionPct));
 	}
 
 	@Override
 	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
-		double reductionPct = level * 0.0075;
+		double reductionPct = level * REDUCT_PCT_PER_LEVEL;
 		event.setDamage(event.getDamage() * (1.0 - reductionPct));
 	}
 }
