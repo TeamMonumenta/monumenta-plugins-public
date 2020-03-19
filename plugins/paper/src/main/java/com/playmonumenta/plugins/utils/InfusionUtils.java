@@ -68,7 +68,7 @@ public class InfusionUtils {
 		}
 
 		if (item.getAmount() > 1) {
-			CommandAPI.fail("Only one item can be infused!");
+			CommandAPI.fail("Only one item can be infused at a time!");
 			return;
 		}
 
@@ -166,7 +166,7 @@ public class InfusionUtils {
 		if (infuseLvl <= 3) {
 			cost *= Math.pow(2, infuseLvl);
 		} else {
-			CommandAPI.fail("Items may only be infused 4 times");
+			CommandAPI.fail("Items may only be infused 4 times!");
 		}
 		return cost;
 	}
@@ -179,6 +179,10 @@ public class InfusionUtils {
 
 	private static int getCostMultiplier(ItemStack item) throws CommandSyntaxException {
 		switch (ItemUtils.getItemTier(item)) {
+			case UNCOMMON:
+			case ENHANCED_UNCOMMON:
+			case UNIQUE:
+			case UNIQUE_EVENT:
 			case RARE:
 			case PATRON_MADE:
 				return 1;
@@ -189,7 +193,7 @@ public class InfusionUtils {
 			case EPIC:
 				return 4;
 			default:
-				CommandAPI.fail("Invalid item tier! Must be rare or higher to infuse");
+				CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
 				return 99999999;
 		}
 	}
@@ -228,7 +232,7 @@ public class InfusionUtils {
 			case 4:
 				return 30970;
 			default:
-				CommandAPI.fail("Invalid score multiplier");
+				CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				return 99999999;
 		}
 	}

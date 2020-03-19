@@ -63,7 +63,7 @@ public class InfuseHeldItem extends GenericCommand {
 			InfusionUtils.doInfusion(sender, player, player.getInventory().getItemInMainHand(), (List<ItemFrame>)frames, selection);
 		} catch (CommandSyntaxException ex) {
 			/* Let the player also know why it failed */
-			player.sendMessage(ChatColor.RED + ex.getMessage());
+			player.sendMessage(ChatColor.GOLD + "[Infusion Altar] " + ChatColor.RED + ex.getMessage());
 			/* Continue to propagate the failure */
 			throw ex;
 		}
