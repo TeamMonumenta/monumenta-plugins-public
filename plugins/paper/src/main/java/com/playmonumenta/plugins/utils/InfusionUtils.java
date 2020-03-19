@@ -3,12 +3,20 @@ package com.playmonumenta.plugins.utils;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.infusions.Acumen;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
@@ -117,6 +125,8 @@ public class InfusionUtils {
 						CommandAPI.fail("ERROR while assigning infusion level. Please contact a moderator if you see this message!");
 				}
 				CommandUtils.enchantify(sender, player, ChatColor.stripColor(selection.getEnchantName()) + numeral);
+
+				animate(player);
 			} else {
 				CommandAPI.fail("You don't have enough exp to infuse that item!");
 			}
@@ -129,6 +139,25 @@ public class InfusionUtils {
 				CommandAPI.fail("You must have a valid item to infuse in your main hand!");
 			}
 		}
+	}
+
+	private static void animate(Player player) {
+		Location loc = player.getLocation();
+		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+		FireworkMeta fwm = fw.getFireworkMeta();
+		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
+		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
+		fwBuilder.with(FireworkEffect.Type.BURST);
+		FireworkEffect fwEffect = fwBuilder.build();
+		fwm.addEffect(fwEffect);
+		fw.setFireworkMeta(fwm);
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				fw.detonate();
+			}
+		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
 	private static int calcInfuseCost(ItemStack item) throws CommandSyntaxException {
