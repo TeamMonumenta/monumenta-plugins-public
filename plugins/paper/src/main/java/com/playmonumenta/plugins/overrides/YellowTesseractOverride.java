@@ -179,7 +179,16 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
+		// Check Reference abilities for enabled skills
 		for (Ability reference : AbilityManager.getManager().getReferenceAbilities()) {
+			Integer level = targetSkills.get(reference.getDisplayName());
+			if (level != null) {
+				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+			}
+		}
+
+		// Check Disabled abilities for disabled skills (makes sure we get the spec skills even in R1)
+		for (Ability reference : AbilityManager.getManager().getDisabledAbilities()) {
 			Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);

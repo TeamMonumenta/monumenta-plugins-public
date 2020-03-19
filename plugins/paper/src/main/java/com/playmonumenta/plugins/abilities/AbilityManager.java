@@ -172,6 +172,7 @@ public class AbilityManager {
 	private World mWorld;
 	private Random mRandom;
 	private List<Ability> mReferenceAbilities;
+	private List<Ability> mDisabledAbilities;
 	private Map<UUID, AbilityCollection> mAbilities = new HashMap<UUID, AbilityCollection>();
 
 	//Public manager methods
@@ -186,13 +187,17 @@ public class AbilityManager {
 		mReferenceAbilities = new ArrayList<Ability>();
 		// Damage multiplying skills must come before damage bonus skills
 
-		if (ServerProperties.getClassSpecializationsEnabled()) {
-			mReferenceAbilities.addAll(Arrays.asList(
+		List<Ability> specAbilitiesPriority = Arrays.asList(
 			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
 			                               new DarkPact(mPlugin, mWorld, mRandom, null),
 										   // Starfall needs to come before Mana Lance
 			                               new Starfall(mPlugin, mWorld, mRandom, null)
-			                           ));
+			                           );
+
+		if (ServerProperties.getClassSpecializationsEnabled()) {
+			mReferenceAbilities.addAll(specAbilitiesPriority);
+		} else {
+			mDisabledAbilities.addAll(specAbilitiesPriority);
 		}
 
 		mReferenceAbilities.addAll(Arrays.asList(
@@ -286,86 +291,89 @@ public class AbilityManager {
 		                               new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
 		                               new AlchemistPotions(mPlugin, mWorld, mRandom, null)
 		                           ));
+		List<Ability> specAbilities = Arrays.asList(
+                /********** MAGE **********/
+                // ELEMENTALIST
+				   // Starfall up above
+                new ElementalSpirit(mPlugin, mWorld, mRandom, null),
+                new Blizzard(mPlugin, mWorld, mRandom, null),
+
+                // MAGE SWORDSMAN
+                new FlashSword(mPlugin, mWorld, mRandom, null),
+                new Overload(mPlugin, mWorld, mRandom, null),
+                new SagesInsight(mPlugin, mWorld, mRandom, null),
+
+                /********** ROGUE **********/
+                // SWORDSAGE
+                new WindWalk(mPlugin, mWorld, mRandom, null),
+                new BladeDance(mPlugin, mWorld, mRandom, null),
+                new DeadlyRonde(mPlugin, mWorld, mRandom, null),
+
+                // ASSASSIN
+                new BodkinBlitz(mPlugin, mWorld, mRandom, null),
+                new CloakAndDagger(mPlugin, mWorld, mRandom, null),
+                new CoupDeGrace(mPlugin, mWorld, mRandom, null),
+
+                /********** SCOUT **********/
+                // RANGER
+                new Quickdraw(mPlugin, mWorld, mRandom, null),
+                new Disengage(mPlugin, mWorld, mRandom, null),
+                new PrecisionStrike(mPlugin, mWorld, mRandom, null),
+
+                // HUNTER
+                new EnchantedShot(mPlugin, mWorld, mRandom, null),
+                new PinningShot(mPlugin, mWorld, mRandom, null),
+                new SplitArrow(mPlugin, mWorld, mRandom, null),
+
+                /********** WARRIOR **********/
+                // BERSERKER
+                new MeteorSlam(mPlugin, mWorld, mRandom, null),
+                new Rampage(mPlugin, mWorld, mRandom, null),
+
+                // GUARDIAN
+                new ShieldWall(mPlugin, mWorld, mRandom, null),
+                new Challenge(mPlugin, mWorld, mRandom, null),
+                new Bodyguard(mPlugin, mWorld, mRandom, null),
+
+                /********** CLERIC **********/
+                // PALADIN
+                new HolyJavelin(mPlugin, mWorld, mRandom, null),
+                new ChoirBells(mPlugin, mWorld, mRandom, null),
+                new LuminousInfusion(mPlugin, mWorld, mRandom, null),
+
+                // HIEROPHANT
+                new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
+                new HallowedBeam(mPlugin, mWorld, mRandom, null),
+                new ThuribleProcession(mPlugin, mWorld, mRandom, null),
+
+                /********** WARLOCK **********/
+                // REAPER
+                new DeathsTouch(mPlugin, mWorld, mRandom, null),
+                new HungeringVortex(mPlugin, mWorld, mRandom, null),
+                new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
+
+                // TENEBRIST
+                new EerieEminence(mPlugin, mWorld, mRandom, null),
+                new FractalEnervation(mPlugin, mWorld, mRandom, null),
+                new WitheringGaze(mPlugin, mWorld, mRandom, null),
+
+                /********** ALCHEMIST **********/
+                // HARBINGER
+                new AdrenalSerum(mPlugin, mWorld, mRandom, null),
+                new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
+                new PurpleHaze(mPlugin, mWorld, mRandom, null),
+
+                // APOTHECARY
+                new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
+                new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
+                new WardingRemedy(mPlugin, mWorld, mRandom, null),
+                new WardingRemedyNonApothecary(mPlugin, mWorld, mRandom, null)
+            );
 
 		if (ServerProperties.getClassSpecializationsEnabled()) {
-			mReferenceAbilities.addAll(Arrays.asList(
-			                               /********** MAGE **********/
-			                               // ELEMENTALIST
-										   // Starfall up above
-			                               new ElementalSpirit(mPlugin, mWorld, mRandom, null),
-			                               new Blizzard(mPlugin, mWorld, mRandom, null),
-
-			                               // MAGE SWORDSMAN
-			                               new FlashSword(mPlugin, mWorld, mRandom, null),
-			                               new Overload(mPlugin, mWorld, mRandom, null),
-			                               new SagesInsight(mPlugin, mWorld, mRandom, null),
-
-			                               /********** ROGUE **********/
-			                               // SWORDSAGE
-			                               new WindWalk(mPlugin, mWorld, mRandom, null),
-			                               new BladeDance(mPlugin, mWorld, mRandom, null),
-			                               new DeadlyRonde(mPlugin, mWorld, mRandom, null),
-
-			                               // ASSASSIN
-			                               new BodkinBlitz(mPlugin, mWorld, mRandom, null),
-			                               new CloakAndDagger(mPlugin, mWorld, mRandom, null),
-			                               new CoupDeGrace(mPlugin, mWorld, mRandom, null),
-
-			                               /********** SCOUT **********/
-			                               // RANGER
-			                               new Quickdraw(mPlugin, mWorld, mRandom, null),
-			                               new Disengage(mPlugin, mWorld, mRandom, null),
-			                               new PrecisionStrike(mPlugin, mWorld, mRandom, null),
-
-			                               // HUNTER
-			                               new EnchantedShot(mPlugin, mWorld, mRandom, null),
-			                               new PinningShot(mPlugin, mWorld, mRandom, null),
-			                               new SplitArrow(mPlugin, mWorld, mRandom, null),
-
-			                               /********** WARRIOR **********/
-			                               // BERSERKER
-			                               new MeteorSlam(mPlugin, mWorld, mRandom, null),
-			                               new Rampage(mPlugin, mWorld, mRandom, null),
-
-			                               // GUARDIAN
-			                               new ShieldWall(mPlugin, mWorld, mRandom, null),
-			                               new Challenge(mPlugin, mWorld, mRandom, null),
-			                               new Bodyguard(mPlugin, mWorld, mRandom, null),
-
-			                               /********** CLERIC **********/
-			                               // PALADIN
-			                               new HolyJavelin(mPlugin, mWorld, mRandom, null),
-			                               new ChoirBells(mPlugin, mWorld, mRandom, null),
-			                               new LuminousInfusion(mPlugin, mWorld, mRandom, null),
-
-			                               // HIEROPHANT
-			                               new EnchantedPrayer(mPlugin, mWorld, mRandom, null),
-			                               new HallowedBeam(mPlugin, mWorld, mRandom, null),
-			                               new ThuribleProcession(mPlugin, mWorld, mRandom, null),
-
-			                               /********** WARLOCK **********/
-			                               // REAPER
-			                               new DeathsTouch(mPlugin, mWorld, mRandom, null),
-			                               new HungeringVortex(mPlugin, mWorld, mRandom, null),
-			                               new DeathsTouchNonReaper(mPlugin, mWorld, mRandom, null),
-
-			                               // TENEBRIST
-			                               new EerieEminence(mPlugin, mWorld, mRandom, null),
-			                               new FractalEnervation(mPlugin, mWorld, mRandom, null),
-			                               new WitheringGaze(mPlugin, mWorld, mRandom, null),
-
-			                               /********** ALCHEMIST **********/
-			                               // HARBINGER
-			                               new AdrenalSerum(mPlugin, mWorld, mRandom, null),
-			                               new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
-			                               new PurpleHaze(mPlugin, mWorld, mRandom, null),
-
-			                               // APOTHECARY
-			                               new AlchemicalAmalgam(mPlugin, mWorld, mRandom, null),
-			                               new InvigoratingOdor(mPlugin, mWorld, mRandom, null),
-			                               new WardingRemedy(mPlugin, mWorld, mRandom, null),
-			                               new WardingRemedyNonApothecary(mPlugin, mWorld, mRandom, null)
-			                           ));
+			mReferenceAbilities.addAll(specAbilities);
+		} else {
+			mDisabledAbilities.addAll(specAbilities);
 		}
 
 		// These abilities should trigger after all event damage is calculated
@@ -447,6 +455,12 @@ public class AbilityManager {
 	/* Do not modify the returned data! */
 	public List<Ability> getReferenceAbilities() {
 		return mReferenceAbilities;
+	}
+
+	// This is for things that care about currently disabled abilities. (ex. Specs in R1)
+	/* Do not modify the returned data! */
+	public List<Ability> getDisabledAbilities() {
+		return mDisabledAbilities;
 	}
 
 	/* Convenience method */
