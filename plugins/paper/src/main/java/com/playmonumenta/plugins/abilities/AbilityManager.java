@@ -185,6 +185,7 @@ public class AbilityManager {
 		mManager = this;
 
 		mReferenceAbilities = new ArrayList<Ability>();
+		mDisabledAbilities = new ArrayList<Ability>();
 		// Damage multiplying skills must come before damage bonus skills
 
 		List<Ability> specAbilitiesPriority = Arrays.asList(
