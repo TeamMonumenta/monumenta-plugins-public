@@ -436,9 +436,7 @@ public class PlayerListener implements Listener {
 					if (event.getClick() != null &&
 					    event.getClick().equals(ClickType.RIGHT) &&
 					    inventory.getItem(event.getSlot()) == null &&
-					    event.getAction().equals(InventoryAction.NOTHING) &&
-					    // If the player has a shulker box open through shortcut, don't sort
-					    !mPlugin.mShulkerInventoryManager.playerHasShulkerOpen(player)) {
+					    event.getAction().equals(InventoryAction.NOTHING)) {
 
 						// Player right clicked an empty space and nothing happened
 						// Check if the last thing the player did was also the same thing.

@@ -111,6 +111,11 @@ public class TransferServer extends GenericCommand {
 				continue;
 			}
 
+			if (server.equalsIgnoreCase(ServerProperties.getShardName())) {
+				error(player, "Can not transfer to the same server you are already on");
+				continue;
+			}
+
 			try {
 				if (sendPlayerStuff) {
 					player.sendMessage(ChatColor.GOLD + "Transferring you to " + server);
