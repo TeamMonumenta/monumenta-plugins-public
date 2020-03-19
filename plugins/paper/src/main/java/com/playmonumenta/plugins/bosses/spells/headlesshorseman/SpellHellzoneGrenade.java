@@ -105,8 +105,8 @@ public class SpellHellzoneGrenade extends Spell {
 						world.spawnParticle(Particle.FLAME, fallingBlock.getLocation(), 150, 0, 0, 0, 0.165);
 						world.spawnParticle(Particle.SMOKE_LARGE, fallingBlock.getLocation(), 65, 0, 0, 0, 0.1);
 						world.spawnParticle(Particle.EXPLOSION_LARGE, fallingBlock.getLocation(), 1, 0, 0, 0, 0);
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
-
+						world.playSound(fallingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+						
 						for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								BossUtils.bossDamage(mBoss, player, 35);

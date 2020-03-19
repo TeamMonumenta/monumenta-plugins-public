@@ -44,6 +44,7 @@ public class SpellBatBombs extends Spell {
 			@Override
 			public void run() {
 				t++;
+				
 				if (t >= 30) {
 					this.cancel();
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125);
@@ -55,8 +56,10 @@ public class SpellBatBombs extends Spell {
 						@Override
 						public void run() {
 							t++;
-							world.spawnParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025);
-							world.spawnParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025);
+							if (t % 2 == 0) {
+								world.spawnParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025);
+								world.spawnParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025);
+							}
 							if (t >= 20 * 6) {
 								bat.remove();
 								this.cancel();
@@ -67,7 +70,7 @@ public class SpellBatBombs extends Spell {
 								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
-								for (Player player : PlayerUtils.playersInRange(loc, 6)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 4.5)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 										BossUtils.bossDamage(mHorseman.getEntity(), player, 32, loc, (event) -> {
 											if (!event.isPlayerBlocking()) {
@@ -89,7 +92,7 @@ public class SpellBatBombs extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		for (int i = 0; i < 14; i++) {
+		for (int i = 0; i < 20; i++) {
 			Location loc = new Location(
 			    world,
 			    mBoss.getLocation().getX() + mRand.nextDouble(-15, 15),

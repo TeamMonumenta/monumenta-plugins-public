@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -37,6 +39,7 @@ import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVeng
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHellzoneGrenade;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellPhantomOfTheOpera;
+import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellReaperOfLife;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellSinisterReach;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -103,6 +106,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	public boolean mShieldsUp;
+	private boolean mCooldown = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -134,28 +138,28 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				new SpellBatBombs(plugin, boss, this),
 				new SpellSinisterReach(plugin, boss, this),
 				new SpellBurningVengence(plugin, boss, this),
-				new SpellPhantomOfTheOpera(plugin, boss, this),
-				new SpellHallowsEnd(plugin, boss, this)
+				new SpellHallowsEnd(plugin, boss, this),
+				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange)
 				));
 
 		List<Spell> phase1Passives = Arrays.asList(
-				new SpellPurgeNegatives(mBoss, 20 * 6),
 				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 				// Teleport the boss to spawnLoc if he is stuck in bedrock
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().getBlock().getType() == Material.LAVA)
+				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
+				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60)
 			);
 
 		List<Spell> phase2Passives = Arrays.asList(
-				new SpellPurgeNegatives(mBoss, 20 * 4),
 				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 				// Teleport the boss to spawnLoc if he is stuck in bedrock
 				new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
 				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().getBlock().getType() == Material.LAVA)
+				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
+				new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60)
 			);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
@@ -202,8 +206,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		});
 
 		events.put(10, mBoss -> {
-			forceCastSpell(SpellHallowsEnd.class);
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
+			forceCastSpell(SpellReaperOfLife.class);
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -247,6 +251,28 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity().getLocation().distance(mBoss.getLocation()) <= 2) {
+			if (!mCooldown) {
+				mCooldown = true;
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						mCooldown = false;
+					}
+				}.runTaskLater(mPlugin, 20);
+				UUID uuid = event.getEntity().getUniqueId();
+				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
+					if (!player.getUniqueId().equals(uuid)) {
+						BossUtils.bossDamage(mBoss, player, event.getDamage());
+					}
+				}
+				World world = mBoss.getWorld();
+				world.spawnParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1);
+				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
+			}
+		}
+		
 		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
 			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
 			if (players.contains(event.getEntity())) {
@@ -313,11 +339,11 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public void init() {
 		int bossTargetHp = 0;
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		int hpDelta = 2448;
+		int hpDelta = 2500;
 		int armor = (int)(Math.sqrt(playerCount * 2) - 1);
 		while (playerCount > 0) {
 			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2 + 32;
+			hpDelta = (int)Math.floor(hpDelta / 1.5 + 32);
 			playerCount--;
 		}
 		mBoss.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(armor);

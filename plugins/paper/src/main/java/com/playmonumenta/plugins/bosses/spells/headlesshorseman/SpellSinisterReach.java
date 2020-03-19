@@ -8,7 +8,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -21,7 +20,6 @@ import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
@@ -45,14 +43,13 @@ public class SpellSinisterReach extends Spell {
 
 	@Override
 	public void run() {
-		if (mBoss.getVehicle() != null) {
-			if (mBoss.getVehicle() instanceof Horse) {
-				Horse horse = (Horse) mBoss.getVehicle();
-				horse.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 16, 100));
-			}
-		}
-
 		LivingEntity target = null;
+		mBoss.setAI(false);
+		LivingEntity horse = null;
+		if (mBoss.getVehicle() != null) {
+			horse = (LivingEntity) mBoss.getVehicle();
+			horse.setAI(false);
+		}
 		if (mBoss instanceof Creature) {
 			Creature c = (Creature) mBoss;
 			target = c.getTarget();
@@ -69,80 +66,78 @@ public class SpellSinisterReach extends Spell {
 		if (target != null) {
 			World world = mBoss.getWorld();
 			LivingEntity tar = target;
+			double degree = 20 / 2;
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_CAT_HISS, 3, 0.5f);
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 3, 0.85f);
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 1.25f);
 			new BukkitRunnable() {
 				int t = 0;
 				Vector dir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
 				Location tloc = mBoss.getLocation().setDirection(dir);
+
 				@Override
 				public void run() {
+					LivingEntity horse = null;
+					if (mBoss.getVehicle() != null) {
+						horse = (LivingEntity) mBoss.getVehicle();
+						horse.setVelocity(new Vector(0, 0, 0));
+					}
+
+					if (mBoss.isDead() || !mBoss.isValid()) {
+						this.cancel();
+						return;
+					}
+
 					t++;
 
 					Vector vec;
-					for (double r = 1; r < 10; r += 0.5) {
-						for (double degree = 60; degree < 121; degree += 8) {
-							double radian1 = Math.toRadians(degree);
+					for (double r = 1; r < 5; r += 0.5) {
+						for (double m = degree * -1; m <= degree; m += 5) {
+							double radian1 = Math.toRadians(m);
+							float yaw = tloc.getYaw();
+							float yaw1 = yaw + 90;
 							vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+							vec = VectorUtils.rotateYAxis(vec, yaw1);
 							vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
-							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw());
 
 							Location l = tloc.clone().add(vec);
-							world.spawnParticle(Particle.SMOKE_NORMAL, l, 1, 0.1, 0.1, 0.1, 0.05);
+							world.spawnParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05);
 						}
 					}
 
-					if (t >= 20) {
+					if (t >= 30) {
 						this.cancel();
+						mBoss.setAI(true);
+						horse.setAI(true);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 0.9f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 3, 0.75f);
-						world.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 3, 0.75f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 3, 0.75f);
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 1.65f);
 
-						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 8)) {
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
-								if (dir.dot(toVector) > .33) {
-									BossUtils.bossDamage(mBoss, player, 32, (event) -> {
-										if (!event.isPlayerBlocking()) {
-											player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3));
-											player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
-										} else {
-											MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
-										}
-									});
+								if (dir.dot(toVector) > 0.06) {
+									multiHit(player);
 								}
 							}
 						}
-						new BukkitRunnable() {
-							double degree = 60;
-							@Override
-							public void run() {
-
-								Vector vec;
-								for (double r = 1; r < 8; r += 0.5) {
-
-									for (double d = degree; d < degree + 30; d += 8) {
-										double radian1 = Math.toRadians(d);
-										vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-										vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
-										vec = VectorUtils.rotateYAxis(vec, tloc.getYaw());
-
-										Location l = tloc.clone().add(vec);
-										world.spawnParticle(Particle.FLAME, l, 2, 0.1, 0.1, 0.1, 0.065);
-										if (r >= 7.5) {
-											world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0);
-										}
-									}
-								}
-
-								degree += 30;
-								if (degree >= 150) {
-									this.cancel();
+						for (double r = 1; r < 5; r += 0.5) {
+							for (double n = degree * -1; n <= degree; n += 5) {
+								double radian1 = Math.toRadians(n);
+								float yaw = tloc.getYaw();
+								float yaw2 = yaw + 90;
+								vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+								vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
+								vec = VectorUtils.rotateYAxis(vec, yaw2);
+								Location l = tloc.clone().add(vec);
+								world.spawnParticle(Particle.FLAME, l, 2, 0.1, 0.1, 0.1, 0.065);
+								if (r >= 4.5) {
+									world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0);
 								}
 							}
-
-						}.runTaskTimer(mPlugin, 0, 1);
+						}
+						this.cancel();
 					}
 				}
 
@@ -150,6 +145,39 @@ public class SpellSinisterReach extends Spell {
 		}
 	}
 
+	public void multiHit(Player p) {
+		new BukkitRunnable() {
+			int mNDT = p.getNoDamageTicks();
+			int mInc = 0;
+			@Override
+			public void run() {
+				World world = mBoss.getWorld();
+				mBoss.setAI(false);
+				LivingEntity horse = null;
+				if (mBoss.getVehicle() != null) {
+					horse = (LivingEntity) mBoss.getVehicle();
+					horse.setAI(false);
+				}
+				mInc++;
+
+				if (mInc < 30 && mInc % 2 == 0) {
+					p.setNoDamageTicks(0);
+					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
+					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), (event) -> {
+						if (!event.isPlayerBlocking()) {
+							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
+						}
+					}, true);
+				}
+				if (mInc >= 30) {
+					p.setNoDamageTicks(mNDT);
+					mBoss.setAI(true);
+					horse.setAI(true);
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+	}
 	@Override
 	public int duration() {
 		// TODO Auto-generated method stub

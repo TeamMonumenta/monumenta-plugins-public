@@ -24,7 +24,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 nearby explodes, dealing 20/35 damage to players in a 4 block radius, igniting them for 8 seconds and
 launching them upwards greatly. Afterwards pillars appear underneath ⅓ of the players within 32 blocks of
 the horseman, after 1 second they also explode dealing the same thing. This continues to repeat as long as a
-player is dealt damage by the pillars explosion to a max of 8 casts of the skill. (In hard mode players
+player is dealt damage by the pillars explosion to a max of 5 casts of the skill. (In hard mode players
 it are also blinded for 5 seconds.)
  */
 
@@ -55,24 +55,31 @@ public class SpellHallowsEnd extends Spell {
 				for (int i = 0; i < 15; i++) {
 					world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
 				}
-
-				if (t >= 20) {
+				for (double deg = 0; deg < 360; deg += 6) {
+					double x = Math.cos(deg) * 2.5;
+					double z = Math.sin(deg) * 2.5;
+					world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(x, 0, z), 1, 0.15, 0.15, 0.15, 0);
+				}
+				
+				if (t >= 25) {
 					this.cancel();
 					for (int i = 0; i < 15; i++) {
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, i, 0), 10, 0.2, 0.2, 0.2, 0.1);
-						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 15, 0.2, 0.2, 0.2, 0.125);
+						world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, i, 0), 5, 0.2, 0.2, 0.2, 0.1);
+						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 8, 0.2, 0.2, 0.2, 0.125);
 					}
 
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.75f);
-					world.spawnParticle(Particle.FLAME, loc, 90, 0, 0, 0, 0.15);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 35, 0, 0, 0, 0.1);
-					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 65, 0, 0, 0, 0.15);
+					world.spawnParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.15);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
+					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15);
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
-						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange
-								&& player.getGameMode() == GameMode.SURVIVAL) {
+					for (Player player : PlayerUtils.playersInRange(loc, 2.5)) {
+						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
+							int mNDT = player.getNoDamageTicks();
+							player.setNoDamageTicks(0);
 							BossUtils.bossDamage(mBoss, player, 35);
 							player.setFireTicks(20 * 8);
+							player.setNoDamageTicks(mNDT);
 							MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 							if (bounce) {
 								mHit = true;
@@ -129,7 +136,7 @@ public class SpellHallowsEnd extends Spell {
 					List<Player> players = PlayerUtils.playersInRange(mHorseman.getSpawnLocation(), HeadlessHorsemanBoss.detectionRange);
 					Collections.shuffle(players);
 
-					int amt = players.size() / 3;
+					int amt = players.size() / 3 + 2;
 					if (players.size() < 3) {
 						amt = players.size();
 					}
@@ -139,14 +146,11 @@ public class SpellHallowsEnd extends Spell {
 					}
 				}
 
-				if (t >= 25 || hits >= 5) {
+				if (t > 30 || hits >= 5) {
 					this.cancel();
 				}
-
-
 			}
-
-		}.runTaskTimer(mPlugin, 20, 1);
+		}.runTaskTimer(mPlugin, 25, 1);
 	}
 
 	@Override

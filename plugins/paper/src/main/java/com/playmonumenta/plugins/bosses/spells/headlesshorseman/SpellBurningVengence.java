@@ -22,7 +22,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 /*
  * Burning Vengeance - The horseman after 0.5 seconds summons a ring of flames at the edge of a 16 block
 radius circle that travels inwards towards the boss, this ring travels over 1 block tall blocks.
-Players hit by the ring take 10/20 damage, ignited for 5 seconds, and knocked towards the boss. Players
+Players hit by the ring take 8/15 damage, ignited for 5 seconds, and knocked towards the boss. Players
 can be hit multiple times. After the ring reaches the horseman the fire erupts, dealing 20/30 damage
 in a 5 block radius and knocking them away from the boss.
  */
@@ -41,13 +41,15 @@ public class SpellBurningVengence extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-
+		Horse horse = null;
 		if (mBoss.getVehicle() != null) {
-			Horse horse = null;
 			if (mBoss.getVehicle() instanceof Horse) {
 				horse = (Horse) mBoss.getVehicle();
-				horse.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 16, 100));
+				horse.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 65, 2));
 			}
+		}
+		if (mBoss.getVehicle() != null) {
+			
 			if (mBoss.getVehicle() instanceof LivingEntity) {
 				mHorseman.disableShield();
 				LivingEntity h = (LivingEntity) mBoss.getVehicle();
@@ -56,6 +58,7 @@ public class SpellBurningVengence extends Spell {
 					int t = 0;
 					@Override
 					public void run() {
+						
 						if (t % 2 == 0) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + t / 32f);
 						}
@@ -64,12 +67,12 @@ public class SpellBurningVengence extends Spell {
 						for (int i = 0; i < 3; i++) {
 							double radian1 = Math.toRadians(i * 120 + (t * 3));
 							loc.add(Math.cos(radian1) * 4, 0, Math.sin(radian1) * 4);
-							world.spawnParticle(Particle.FLAME, loc, 3, 0.1, 0.1, 0.1, 0.065);
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.1, 0.1, 0.1, 0.065);
+							world.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.065);
+							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.1, 0.1, 0.1, 0.065);
 							loc.subtract(Math.cos(radian1) * 4, 0, Math.sin(radian1) * 4);
 						}
 
-						for (double i = 0; i < 360; i += 15) {
+						for (double i = 0; i < 360; i += 7.5) {
 							double radian1 = Math.toRadians(i);
 							boolean reduce = false;
 							loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
@@ -77,15 +80,15 @@ public class SpellBurningVengence extends Spell {
 								loc.add(0, 1, 0);
 								reduce = true;
 							}
-							world.spawnParticle(Particle.FLAME, loc, 3, 0.1, 0.1, 0.1, 0.065);
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.1, 0.1, 0.1, 0.065);
+							world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.065);
+							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.1, 0.1, 0.1, 0.065);
 
 							for (Player player : PlayerUtils.playersInRange(loc, 0.75)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamage(mBoss, player, 20);
+									BossUtils.bossDamage(mBoss, player, 10);
 									player.setFireTicks(20 * 5);
 									Vector direction = player.getLocation().toVector().subtract(loc.toVector()).normalize();
-									player.setVelocity(direction.multiply(-0.5));
+									player.setVelocity(direction.multiply(-0.7));
 								}
 							}
 							if (reduce) {
@@ -106,7 +109,7 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamage(mBoss, player, 37);
+									BossUtils.bossDamage(mBoss, player, 40);
 									MovementUtils.knockAway(loc, player, 0.7f);
 								}
 							}

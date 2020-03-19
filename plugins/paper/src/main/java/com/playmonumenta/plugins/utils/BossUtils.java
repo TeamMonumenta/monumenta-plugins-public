@@ -151,21 +151,25 @@ public class BossUtils {
 	}
 
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth) {
-		return bossDamagePercent(boss, target, percentHealth, (BossAbilityDamageEventModifier)null);
+		return bossDamagePercent(boss, target, percentHealth, null, null, false);
 	}
 
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable BossAbilityDamageEventModifier modifier) {
-		return bossDamagePercent(boss, target, percentHealth, boss.getLocation(), modifier);
+		return bossDamagePercent(boss, target, percentHealth, boss.getLocation(), modifier, false);
 	}
 
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source) {
-		return bossDamagePercent(boss, target, percentHealth, source, null);
+		return bossDamagePercent(boss, target, percentHealth, source, null, false);
 	}
 
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, @Nullable BossAbilityDamageEventModifier modifier) {
+		return bossDamagePercent(boss, target, percentHealth, source, modifier, false);
+	}
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, @Nullable BossAbilityDamageEventModifier modifier) {
+	
+	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, @Nullable BossAbilityDamageEventModifier modifier, boolean raw) {
 		if (target instanceof Player) {
 			Player player = (Player) target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
@@ -195,8 +199,11 @@ public class BossUtils {
 
 		// Resistance reduces percent HP damage
 		percentHealth *= (1 - 0.2*resistance);
-
+		
 		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * percentHealth);
+		if (raw) {
+			toTake = percentHealth;
+		}
 		BossAbilityDamageEvent event = new BossAbilityDamageEvent(boss, target, toTake, blocked);
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled() && modifier != null) {
@@ -208,9 +215,17 @@ public class BossUtils {
 				 * One second of cooldown for every 2 points of damage
 				 * Since this is % based, compute cooldown based on "Normal" health
 				 */
-				target.setCooldown(Material.SHIELD, (int)(20 * percentHealth * 20));
-				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield(target, (int)(percentHealth * 20 / 2.5));
+				if (raw) {
+					if (toTake > 1) {
+						target.setCooldown(Material.SHIELD, (int) Math.ceil(toTake * 0.5));
+					}
+					target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					ItemUtils.damageShield(target, (int) Math.ceil(toTake / 2.5));
+				} else {
+					target.setCooldown(Material.SHIELD, (int)(20 * percentHealth * 20));
+					target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					ItemUtils.damageShield(target, (int)(percentHealth * 20 / 2.5));
+				}
 			} else {
 				toTake = event.getDamage();
 				float absorp = AbsorptionUtils.getAbsorption(target);
@@ -239,7 +254,7 @@ public class BossUtils {
 		}
 		return true;
 	}
-
+	
 	public static int getPlayersInRangeForHealthScaling(Entity entity, double radius) {
 		return getPlayersInRangeForHealthScaling(entity.getLocation(), radius);
 	}

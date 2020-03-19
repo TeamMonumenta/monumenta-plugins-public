@@ -1,10 +1,18 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
@@ -18,107 +26,126 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
- *Phantom of the Opera (Idfk) - Fires out black projectiles at anyone within 12 blocks of himself after
-a 0.8 seconds delay. Players hit by these projectiles are blinded for 5 seconds, dealt 16/28 damage
-and 2 phantoms are summoned above the player with their aggro set to them.
+ *Phantom of the Opera (Idfk) - PASSIVE: chooses random players and spawns phantoms 5 blocks above 
+ *with delayed spawning for 1 second.
  */
 public class SpellPhantomOfTheOpera extends Spell {
 
+	private int mCooldown = 0;
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private HeadlessHorsemanBoss mHorseman;
+	private Location mCenter;
+	private double mRange;
+	private int mTimer;
+	private Set<UUID> mSummoned = new HashSet<UUID>();
+	private static final String mPhantom = "{CustomName:\"\\\"Night Terror\\\"\",Health:45.0f,Size:6,Attributes:[{Base:45.0d,Name:\"generic.maxHealth\"},{Base:100.0d,Name:\"generic.followRange\"}],Tags:[\"boss_charger\"],HandItems:[{id:\"minecraft:arrow\",Count:1b,tag:{display:{Name:\"\\\"Phantom Fang\\\"\"},AttributeModifiers:[{UUIDMost:-6498451240576266699L,UUIDLeast:-6858106810304442920L,Amount:12.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]}},{}]}";
 
-	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
+	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, Location center, int range, int timer) {
 		mPlugin = plugin;
 		mBoss = entity;
-		mHorseman = horseman;
+		mCenter = center;
+		mRange = range;
+		mTimer = timer;
+
 	}
-
-	private void launch(Player player) {
-		new BukkitRunnable() {
-			World world = mBoss.getWorld();
-			Vector dir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getEyeLocation());
-			Location loc = mBoss.getEyeLocation();
-			@Override
-			public void run() {
-				loc.add(dir.clone().multiply(1));
-				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.15, 0.15, 0.15, 0.125);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.15, 0.15, 0.15, 0.05);
-
-				for (Player p : PlayerUtils.playersInRange(loc, 1.45)) {
-					if (mHorseman.getSpawnLocation().distance(p.getLocation()) < HeadlessHorsemanBoss.detectionRange
-							&& p.getGameMode() == GameMode.SURVIVAL) {
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 30, 0.15, 0.15, 0.15, 0.15);
-						world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0.15, 0.15, 0.15, 0.1);
-						world.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 1.25f);
-
-						BossUtils.bossDamage(mBoss, p, 28, (event) -> {
-							if (!event.isPlayerBlocking()) {
-								p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 0));
-							}
-						});
-						world.spawnParticle(Particle.SMOKE_LARGE, p.getLocation().add(0, 3.5, 0), 20, 0.4, 0.4, 0.4, 0.1);
-						world.spawnParticle(Particle.SMOKE_NORMAL, p.getLocation().add(0, 3.5, 0), 45, 0.4, 0.4, 0.4, 0.145);
-						world.spawnParticle(Particle.SPELL_WITCH, p.getLocation().add(0, 3.5, 0), 60, 0.4, 0.4, 0.4, 0.1);
-						world.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 0.75f);
-						world.playSound(p.getLocation(), Sound.ENTITY_PHANTOM_HURT, 1, 0.8f);
-						for (int i = 0; i < 2; i++) {
-							Phantom phantom = (Phantom) world.spawnEntity(p.getLocation().add(0, 5, 0), EntityType.PHANTOM);
-							phantom.setCustomName("A Winged Flying Thing");
-							phantom.setSize(6);
-							phantom.setTarget(p);
-						}
-						this.cancel();
-						break;
-					}
-				}
-				if (loc.getBlock().getType().isSolid()) {
-					this.cancel();
-					return;
-				}
-
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
+	
 	@Override
 	public void run() {
-		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3, 0.65f);
-		new BukkitRunnable() {
-			int t = 0;
-			@Override
-			public void run() {
-				t++;
-				world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0.05);
-				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 4, 0.4, 0.4, 0.4, 0.05);
-				if (t >= 20) {
-					this.cancel();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 1.1f);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 25, 0.4, 0.4, 0.4, 0.125);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.09);
-					world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 50, 0.4, 0.4, 0.4, 0.05);
-					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 14)) {
-						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-							launch(player);
+		mCooldown -= 5;
+		if (mCooldown <= 0) {
+			mCooldown = mTimer;
+			World world = mBoss.getWorld();
+			int num = 0;
+			
+			//set amount of phantoms spawn
+			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+			if (players.size() == 0) {
+				return; 
+			}
+			if (players.size() <= 2) {
+				num = 2;
+			} else {
+				num = (int)Math.ceil(players.size() / 3 + 1);
+			}
+			
+			if (num >= 4) {
+				num = 4;
+			}
+			int amt = num;
+			
+			if (mBoss.isDead() || !mBoss.isValid()) {
+				this.cancel();
+				return;
+			}
+			
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3, 0.75f);
+			//choose random players until amt
+			for (int i = 0; i < amt; i++) {
+				Collections.shuffle(players);
+				Player player = players.get(0); 
+				
+				//spawn SMOKE_LARGE particles moving up at chosen player for 5 blocks in 1 second
+				Location pLoc = player.getLocation();
+				
+				new BukkitRunnable() {
+					int mInc = 0;
+					double mN = 0;
+					double mPlayerScalingHP = 0;
+					@Override
+					public void run() {
+						mInc++;
+						int y = mInc / 4;
+						Location particle = pLoc.clone().add(0, y, 0);
+						world.spawnParticle(Particle.SMOKE_LARGE, particle, 4, 0.3, 0, 0.3, 0.1);
+						
+						//stop particle spawns + spawn phantoms after 1.5 second
+						if (mInc >= 30) {
+							this.cancel();
+							Location sLoc = pLoc.clone().add(0, 7.5, 0);
+							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, 3, 0.75f);
+							world.spawnParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1);
+							EntityUtils.summonEntityAt(sLoc, EntityType.PHANTOM, mPhantom);
+							
+							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
+							if (players.size() == 0) {
+							      return; 
+							}
+							
+							int playerCount = players.size();
+							for (int j = 1; j <= playerCount; j++) {
+								mN = mN + (45 / j);
+							}
+							mPlayerScalingHP = mN;
+							
+							LivingEntity mEntity = null;
+							for (Entity e : mCenter.getWorld().getNearbyEntities(sLoc, 0.4, 0.4, 0.4)) {
+								if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Phantom && !mSummoned.contains(e.getUniqueId())) {
+									mEntity = (LivingEntity) e;
+									break;
+								}
+							}
+							if (!mSummoned.contains(mEntity.getUniqueId())) {
+								mSummoned.add(mEntity.getUniqueId());
+							}
+							mEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPlayerScalingHP);
+							mEntity.setHealth(mPlayerScalingHP);
 						}
 					}
-				}
+					
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-
+		}
 	}
-
+	
 	@Override
 	public int duration() {
 		// TODO Auto-generated method stub
-		return 20 * 10;
+		return 0;
 	}
 
 }
