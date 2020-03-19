@@ -79,6 +79,7 @@ import com.playmonumenta.plugins.bosses.bosses.HalloweenCreeperBoss;
 import com.playmonumenta.plugins.bosses.bosses.HandSwapBoss;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.bosses.HiddenBoss;
+import com.playmonumenta.plugins.bosses.bosses.HungerCloudBoss;
 import com.playmonumenta.plugins.bosses.bosses.IceAspectBoss;
 import com.playmonumenta.plugins.bosses.bosses.IceBreakBoss;
 import com.playmonumenta.plugins.bosses.bosses.ImmortalElementalKaulBoss;
@@ -162,6 +163,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> new HiddenBoss(p, e));
 		mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
 		mStatelessBosses.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> new FireResistantBoss(p, e));
+		mStatelessBosses.put(HungerCloudBoss.identityTag, (Plugin p, LivingEntity e) -> new HungerCloudBoss(p, e));
 		mStatelessBosses.put(BlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockBreakBoss(p, e));
 		mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
 		mStatelessBosses.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new WeaponSwitchBoss(p, e));
@@ -242,6 +244,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> InvisibleBoss.deserialize(p, e));
 		mBossDeserializers.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> HiddenBoss.deserialize(p, e));
 		mBossDeserializers.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> FireResistantBoss.deserialize(p, e));
+		mBossDeserializers.put(HungerCloudBoss.identityTag, (Plugin p, LivingEntity e) -> HungerCloudBoss.deserialize(p, e));
 		mBossDeserializers.put(BlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> BlockBreakBoss.deserialize(p, e));
 		mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> WeaponSwitchBoss.deserialize(p, e));
