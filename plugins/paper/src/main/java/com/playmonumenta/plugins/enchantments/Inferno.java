@@ -44,10 +44,11 @@ public class Inferno implements BaseEnchantment {
 	public static final String SET_FIRE_TICK_METAKEY = "FireSetOnMobTick";
 	public static final String FIRE_TICK_METAKEY = "FireDamagedMobTick";
 	public static final String INFERNO_TAG_METAKEY = "InfernoTagMob";
+	public static final String OLD_FIRE_TICKS_METAKEY = "MobFireTicksPreAttack";
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Inferno";
 	private static final String LEVEL_METAKEY = "InfernoLevelMetakey";
 
-	private static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
+	public static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static BukkitRunnable sRunnable = null;
 	private static final Map<LivingEntity, InfernoMob> sPendingTagMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
@@ -65,32 +66,84 @@ public class Inferno implements BaseEnchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		// If the player melee attacks with a fire aspect weapon OR if the mob has the metadata
-		// applied by ability fire, add the mob to inferno tracking
-		if (!target.hasMetadata(INFERNO_TAG_METAKEY)) {
-			target.setMetadata(INFERNO_TAG_METAKEY, new FixedMetadataValue(plugin, true));
-			if (event.getCause() == DamageCause.ENTITY_ATTACK
-				&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-				infernoTagMob(plugin, target, level, player);
-				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-			} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
-				infernoTagMob(plugin, target, level, player);
-			}
-			target.removeMetadata(INFERNO_TAG_METAKEY, plugin);
+	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
+		if (ALLOWED_PROJECTILES.contains(proj.getType()) && proj.getFireTicks() > 0) {
+			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
 		}
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
-		if (ALLOWED_PROJECTILES.contains(proj.getType()) && proj.getFireTicks() > 0) {
-			/*
-			 * You can delete this comment after viewing, but there is no longer a check for "cheating" by dual
-			 * wielding inferno because there now exist proper offhands with as high a level of inferno as mainhand
-			 * inferno items, so there is little (if any) benefit to dual wielding mainhand inferno items.
-			 */
-			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
+	public void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		// If the player melee attacks with a fire aspect weapon OR if the mob has the metadata
+		// applied by ability fire, add the mob to inferno tracking
+
+		if (event.getCause() == DamageCause.ENTITY_ATTACK
+			&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+			if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel <= level) {
+				infernoTagMob(plugin, target, level, player, "melee");
+				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			}
+		} else if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			// If player has inferno levels but no fire aspect, dont do anything special
+		} else if (event.getCause() == DamageCause.PROJECTILE) {
+			// Happens in onShootAttack()
+		} else if (target.hasMetadata(SET_FIRE_TICK_METAKEY)) {
+			// TODO fire ticks when using abilities may be mismanaged atm
+			if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel < level) {
+				infernoTagMob(plugin, target, level, player, "magichigh");
+			} else if (!sTaggedMobs.containsKey(target) || sTaggedMobs.get(target).mLevel == level) {
+				infernoTagMob(plugin, target, level, player, "magic");
+			}
+		}
+	}
+
+	/*
+	 * TODO: This needs some kind of better registration than expecting it to be called directly
+	 *
+	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageByEntityEvent !
+	 *
+	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
+	 * This applies after the arrow's OnDamage()
+	 * This applies for all onShootAttacks, not just Inferno shots
+	 * This has to manually manage the fire ticks because the fire ticks get overwritten before this function triggers
+	 */
+	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
+		if (!sTaggedMobs.containsKey(target)) {
+			// New inferno case
+			if (proj.hasMetadata(LEVEL_METAKEY)) {
+				int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+				infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+				target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+				target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			} else if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY) && target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt() > target.getFireTicks()) {
+				// Normal flame behaviour
+				target.setFireTicks(target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt());
+			}
+		} else if (proj.hasMetadata(LEVEL_METAKEY) && sTaggedMobs.get(target).mLevel < proj.getMetadata(LEVEL_METAKEY).get(0).asInt()) {
+			// Higher inferno case
+			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+		} else if (proj.hasMetadata(LEVEL_METAKEY) && sTaggedMobs.get(target).mLevel == proj.getMetadata(LEVEL_METAKEY).get(0).asInt()) {
+			// Same level inferno case
+			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+			infernoTagMob(plugin, target, level, (Player) proj.getShooter(), "projectile");
+			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
+			if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY) && target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt() > target.getFireTicks()) {
+				target.setFireTicks(target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt());
+			}
+		} else {
+			// Lower/no inferno flame
+			// Analog to potion effects, dont override higher level inferno with lower level even when longer duration fire, so just cancel the fire in that case
+			if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY)) {
+				target.setFireTicks(target.getMetadata(OLD_FIRE_TICKS_METAKEY).get(0).asInt());
+			}
+		}
+		if (target.hasMetadata(OLD_FIRE_TICKS_METAKEY)) {
+			target.removeMetadata(OLD_FIRE_TICKS_METAKEY, plugin);
 		}
 	}
 
@@ -98,12 +151,21 @@ public class Inferno implements BaseEnchantment {
 		return sTaggedMobs.containsKey(mob);
 	}
 
-	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player) {
+	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player, String type) {
 		/*
 		 * Record this mob as being inferno tagged
 		 * Add to a secondary map of pending additions to prevent ConcurrentModificationException's
 		 */
+
 		sPendingTagMobs.put(target, new InfernoMob(player, level));
+		// Analog to potion effects, only track duration of highest level inferno
+		if (target.getFireTicks() > 0) {
+			// Fire aspect applies fire ticks after onDamage and will set the fireticks to the right amount with this change.
+			// Due to ordering this differs for projectiles, which have to be managed manually in onShootAttack()
+			if (type == "melee" && type == "magichigh") {
+				target.setFireTicks(1);
+			}
+		}
 
 		/* Make sure the ticking task is running that periodically validates that a mob is still alive and burning */
 		if (sRunnable == null) {
@@ -141,13 +203,13 @@ public class Inferno implements BaseEnchantment {
 						}
 
 						// If the mob hasn't taken a fire tick in the past second, then give it a manual damage tick
-						// This is either caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
+						// This is usually caused by another DoT (wither 3, usually) eating iFrames, or the mob being fire resistant
 						if (ticksLived - mob.getMetadata(FIRE_TICK_METAKEY).get(0).asInt() > 20) {
 							double damage = EntityUtils.isFireResistant(mob) == true ? value.mFireResistantDamage : value.mLevel;
 							mob.setNoDamageTicks(0);
 							mob.getWorld().spawnParticle(Particle.FLAME, mob.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05);
 							Vector velocity = mob.getVelocity();
-							EntityUtils.damageEntity(plugin, mob, damage, value.mTriggeredBy, MagicType.ALCHEMY /* Use a better type here */);
+							EntityUtils.damageEntity(plugin, mob, 1 + damage, value.mTriggeredBy, MagicType.ALCHEMY /* Use a better type here */);
 							mob.setVelocity(velocity);
 							mob.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 						}
@@ -164,24 +226,6 @@ public class Inferno implements BaseEnchantment {
 			sRunnable.runTaskTimer(plugin, 1, 1);
 		}
 	}
-
-
-	/*
-	 * TODO: This needs some kind of better registration than expecting it to be called directly
-	 *
-	 * IF YOU COPY THIS YOU MUST PUT A CORRESPONDING CALL IN EntityDamageByEntityEvent !
-	 *
-	 * This works this way because you might have the enchantment when you fire the arrow, but switch to a different item before it hits
-	 */
-	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
-		if (proj.hasMetadata(LEVEL_METAKEY)) {
-			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-			infernoTagMob(plugin, target, level, (Player) proj.getShooter());
-			target.setMetadata(SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-			target.setMetadata(FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, target.getTicksLived()));
-		}
-	}
-
 
 	/*
 	 * TODO: This needs some kind of better registration than expecting it to be called directly

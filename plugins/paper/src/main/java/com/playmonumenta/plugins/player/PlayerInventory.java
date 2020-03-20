@@ -315,4 +315,15 @@ public class PlayerInventory {
 
 		mCurrentProperties.clear();
 	}
+
+	public int getEnchantmentLevel(Plugin plugin, Class<? extends BaseEnchantment> cls) {
+        BaseEnchantment enchant = plugin.mEnchantmentManager.getEnchantmentHandle(cls);
+        if (enchant != null && mCurrentProperties != null) {
+            Integer level = mCurrentProperties.get(enchant);
+            if (level != null) {
+                return level;
+            }
+        }
+        return 0;
+    }
 }

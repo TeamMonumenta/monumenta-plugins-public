@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.player.PlayerData;
@@ -42,11 +43,18 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class PlayerTracking implements EntityTracking {
+	private static PlayerTracking INSTANCE = null;
+
 	Plugin mPlugin = null;
 	private HashMap<Player, PlayerInventory> mPlayers = new HashMap<Player, PlayerInventory>();
 
 	PlayerTracking(Plugin plugin) {
 		mPlugin = plugin;
+		INSTANCE = this;
+	}
+
+	public static PlayerTracking getInstance() {
+		return INSTANCE;
 	}
 
 	@Override
@@ -81,6 +89,14 @@ public class PlayerTracking implements EntityTracking {
 
 	public Set<Player> getPlayers() {
 		return mPlayers.keySet();
+	}
+
+	public int getPlayerCustomEnchantLevel(Player player, Class<? extends BaseEnchantment> cls) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			return manager.getEnchantmentLevel(mPlugin, cls);
+		}
+		return 0;
 	}
 
 	public void updateEquipmentProperties(Player player, Event event) {

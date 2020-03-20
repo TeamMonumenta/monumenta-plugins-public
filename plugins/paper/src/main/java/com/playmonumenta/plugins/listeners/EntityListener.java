@@ -65,6 +65,7 @@ import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -94,6 +95,7 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -167,6 +169,16 @@ public class EntityListener implements Listener {
 			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
 		}
 
+		if ((combuster instanceof Player) && (combustee.getFireTicks() > 0)) {
+			Player player = (Player) combuster;
+			if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)
+				&& combustee instanceof LivingEntity && Inferno.mobHasInferno(mPlugin, (LivingEntity) combustee)
+				&& PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, Inferno.class) < Inferno.sTaggedMobs.get(combustee).mLevel) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+
 		if ((combustee instanceof Player)) {
 			Player player = (Player)combustee;
 
@@ -188,7 +200,7 @@ public class EntityListener implements Listener {
 			mAbilities.playerDealtCustomDamageEvent((Player)event.getDamager(), event);
 			// If the event has a valid spell, call onAbility
 			if (event.getSpell() != null) {
-				mPlugin.mTrackingManager.mPlayers.onAbility(mPlugin, (Player)event.getDamager(), (LivingEntity)event.getDamaged(), event);
+				mPlugin.mTrackingManager.mPlayers.onAbility(mPlugin, (Player)event.getDamager(), event.getDamaged(), event);
 			}
 		}
 	}
@@ -734,7 +746,7 @@ public class EntityListener implements Listener {
 
 		// Cancel the event if from a confused creeper, damage still applies it seems
 		Entity entity = event.getEntity();
-		if (entity instanceof Creeper && EntityUtils.isConfused((LivingEntity) event.getEntity())) {
+		if (entity instanceof Creeper && EntityUtils.isConfused(event.getEntity())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -831,6 +843,12 @@ public class EntityListener implements Listener {
 			}
 		}
 
+		if (((LivingEntity) event.getHitEntity()).getFireTicks() > 0) {
+			// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.
+			((LivingEntity) event.getHitEntity()).setMetadata(Inferno.OLD_FIRE_TICKS_METAKEY, new FixedMetadataValue(mPlugin, ((LivingEntity) event.getHitEntity()).getFireTicks()));
+			((LivingEntity) event.getHitEntity()).setFireTicks(1);
+		}
+
 		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SPECTRAL_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			ProjectileSource source = arrow.getShooter();
@@ -867,8 +885,8 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
-		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned((LivingEntity) event.getEntity())
-		                                              || EntityUtils.isConfused((LivingEntity) event.getEntity()))) {
+		if (event.getEntity() instanceof Creature && (EntityUtils.isStunned(event.getEntity())
+		                                              || EntityUtils.isConfused(event.getEntity()))) {
 			event.setCancelled(true);
 			return;
 		}

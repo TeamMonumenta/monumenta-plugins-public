@@ -52,6 +52,7 @@ public class EnchantmentManager implements Listener {
 	 * Most items only apply to armor or mainhand, and we don't need to check every single item in the
 	 * player's inventory * against these properties every time the player's inventory changes
 	 */
+	private final Map<Class<? extends BaseEnchantment>, BaseEnchantment> mEnchantLocator = new HashMap<Class<? extends BaseEnchantment>, BaseEnchantment>();
 	private final Map<ItemSlot, List<BaseEnchantment>> mProperties = new EnumMap<ItemSlot, List<BaseEnchantment>>(ItemSlot.class);
 	private final List<BaseEnchantment> mSpawnedProperties = new ArrayList<BaseEnchantment>();
 	private final Plugin mPlugin;
@@ -138,8 +139,11 @@ public class EnchantmentManager implements Listener {
 			}
 		}
 
+		mEnchantLocator.clear();
+
 		/* Build the map of which slots have which properties */
 		for (BaseEnchantment property : init) {
+			mEnchantLocator.put(property.getClass(), property);
 			for (ItemSlot slot : property.validSlots()) {
 				List<BaseEnchantment> slotList = mProperties.get(slot);
 				if (slotList == null) {
@@ -173,6 +177,10 @@ public class EnchantmentManager implements Listener {
 		default:
 			return null;
 		}
+	}
+
+	public BaseEnchantment getEnchantmentHandle(Class<? extends BaseEnchantment> cls) {
+		return mEnchantLocator.get(cls);
 	}
 
 	/*
