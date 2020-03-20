@@ -843,10 +843,13 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (((LivingEntity) event.getHitEntity()).getFireTicks() > 0) {
-			// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.
-			((LivingEntity) event.getHitEntity()).setMetadata(Inferno.OLD_FIRE_TICKS_METAKEY, new FixedMetadataValue(mPlugin, ((LivingEntity) event.getHitEntity()).getFireTicks()));
-			((LivingEntity) event.getHitEntity()).setFireTicks(1);
+		if (entity != null && entity instanceof LivingEntity) {
+			LivingEntity hitEntity = (LivingEntity) entity;
+			if (hitEntity.getFireTicks() > 0) {
+				// Save old fireticks, the fire ticks will be managed in Inferno.onShootAttack(), which triggers for every projectile attack.
+				hitEntity.setMetadata(Inferno.OLD_FIRE_TICKS_METAKEY, new FixedMetadataValue(mPlugin, hitEntity.getFireTicks()));
+				hitEntity.setFireTicks(1);
+			}
 		}
 
 		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SPECTRAL_ARROW) {
