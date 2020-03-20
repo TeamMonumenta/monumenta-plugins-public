@@ -37,6 +37,7 @@ public class WardingRemedy extends Ability {
 		super(plugin, world, random, player, "Warding Remedy");
 		mInfo.scoreboardId = "WardingRemedy";
 		mInfo.linkedSpell = Spells.WARDING_REMEDY;
+		mInfo.cooldown = getAbilityScore() == 1 ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;
 		mInfo.mShorthandName = "WR";
 		mInfo.mDescriptions.add("You and allies in a 12 block radius passively gain an additional 15% damage on melee and ranged attacks when at 3 or more absorption health. Shift and right click with an Alchemist Potion to give players (including yourself) within a 6 block radius 1 absorption health per 0.5 seconds for 6 seconds, up to 6 absorption health. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The damage bonus is increased to 25%, and cooldown decreased to 25s.");
@@ -59,10 +60,10 @@ public class WardingRemedy extends Ability {
 
 			@Override
 			public void run() {
-				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, (float) Math.pow(1.25, mPulses - 1));
+				mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.6f, (float) Math.pow(1.25, mPulses - 1));
 				for (Player p : PlayerUtils.playersInRange(mPlayer, WARDING_REMEDY_ACTIVE_RADIUS, true)) {
 					AbsorptionUtils.addAbsorption(p, 1, WARDING_REMEDY_MAX_ABSORPTION);
-					mWorld.spawnParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 20, 0.5, 1, 0.5, 0.1);
+					mWorld.spawnParticle(Particle.END_ROD, p.getLocation(), 20, 0.5, 0.5, 0.5, 0.1);
 				}
 
 				mPulses++;

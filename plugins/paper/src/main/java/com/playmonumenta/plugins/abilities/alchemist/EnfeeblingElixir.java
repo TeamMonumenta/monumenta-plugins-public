@@ -25,7 +25,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EnfeeblingElixir extends Ability {
-	private static final int ENFEEBLING_COOLDOWN = 20 * 20;
+	private static final int ENFEEBLING_1_COOLDOWN = 20 * 15;
+	private static final int ENFEEBLING_2_COOLDOWN = 20 * 10;
 	private static final int ENFEEBLING_1_DURATION = 6 * 20;
 	private static final int ENFEEBLING_2_DURATION = 9 * 20;
 	private static final float ENFEEBLING_1_KNOCKBACK_SPEED = 0.35f;
@@ -49,7 +50,7 @@ public class EnfeeblingElixir extends Ability {
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 5s. You gain Jump Boost II and Speed 1 for 6s. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The knockback increases by 50%, all effects are applied for 9 s, Weakness I and Speed I are both increased to II. Cooldown: 10s.");
-		mInfo.cooldown = ENFEEBLING_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? ENFEEBLING_1_COOLDOWN : ENFEEBLING_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mWeaknessAmp = getAbilityScore() == 1 ? ENFEEBLING_1_WEAKNESS_AMP : ENFEEBLING_2_WEAKNESS_AMP;
 		mSpeedAmp = getAbilityScore() == 1 ? ENFEEBLING_1_SPEED_AMP : ENFEEBLING_2_SPEED_AMP;
