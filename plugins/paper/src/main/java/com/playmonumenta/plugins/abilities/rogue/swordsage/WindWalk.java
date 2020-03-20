@@ -30,7 +30,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class WindWalk extends Ability {
 
 	/*
-	 * Wind Walk: Level 1 - Sprint + LClick without hitting a mob 3 times
+	 * Wind Walk: Level 1 - Sprint + LClick without hitting a mob 2 times
 	 * in quick succession to rush forward on a gale of air.
 	 * Regular mobs within 4 blocks of you during the rush are knocked into
 	 * the air and levitated for 3 seconds. Elites remain on the ground and
@@ -56,7 +56,7 @@ public class WindWalk extends Ability {
 		mInfo.linkedSpell = Spells.WIND_WALK;
 		mInfo.scoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
-		mInfo.mDescriptions.add("Left-click twice while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. This ability cannot be cast in safe zones. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 20 seconds.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
 		mInfo.cooldown = WIND_WALK_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
@@ -73,10 +73,12 @@ public class WindWalk extends Ability {
 				}
 				this.cancel();
 			}
-		}.runTaskLater(mPlugin, 20);
+		}.runTaskLater(mPlugin, 5);
 		if (mLeftClicks < 2) {
 			return;
 		}
+		mLeftClicks = 0;
+
 		int duration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1f);

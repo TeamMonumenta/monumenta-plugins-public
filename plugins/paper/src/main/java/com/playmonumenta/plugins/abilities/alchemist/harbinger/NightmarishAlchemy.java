@@ -18,7 +18,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 /*
  * Your Alchemist Potions deal +3/7 damage and have a 20%
- * chance of causing mobs to attack nearby mobs for 8 seconds.
+ * chance of causing mobs to attack nearby mobs for 4 seconds.
  * If you splash 5 or more mobs, at least 1 is guaranteed to be
  * confused.
  */
@@ -26,7 +26,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_1_DAMAGE = 3;
 	private static final int NIGHTMARISH_ALCHEMY_2_DAMAGE = 7;
-	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 8;
+	private static final int NIGHTMARISH_ALCHEMY_CONFUSION_DURATION = 20 * 4;
 	private static final float NIGHTMARISH_ALCHEMY_CONFUSION_CHANCE = 0.2f;
 
 	private int mDamage;

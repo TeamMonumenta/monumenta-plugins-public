@@ -32,7 +32,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
  * enemy within a 5 block cone takes 4 damage 3 times in rapid
  * succession, being knocked back with the last swipe. At level
  * 2 this abilities damage increases to 7 damage 3 times.
- * (CD: 10 seconds)
+ * (CD: 12 / 10 seconds)
  */
 public class FlashSword extends Ability {
 
@@ -40,7 +40,8 @@ public class FlashSword extends Ability {
 	private static final int FSWORD_2_DAMAGE = 7;
 	private static final int FSWORD_SWINGS = 3;
 	private static final int FSWORD_RADIUS = 5;
-	private static final int FSWORD_COOLDOWN = 20 * 10;
+	private static final int FSWORD_1_COOLDOWN = 20 * 12;
+	private static final int FSWORD_2_COOLDOWN = 20 * 10;
 	private static final float FSWORD_KNOCKBACK_SPEED = 0.3f;
 	private static final double FSWORD_DOT_ANGLE = 0.33;
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
@@ -50,10 +51,10 @@ public class FlashSword extends Ability {
 		super(plugin, world, random, player, "Flash Sword");
 		mInfo.scoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
-		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 10s.");
-		mInfo.mDescriptions.add("You instead do 7 damage 3 times.");
+		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 12s.");
+		mInfo.mDescriptions.add("You instead do 7 damage 3 times. Cooldown: 10s.");
 		mInfo.linkedSpell = Spells.FSWORD;
-		mInfo.cooldown = FSWORD_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? FSWORD_1_COOLDOWN : FSWORD_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 

@@ -22,20 +22,19 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Eerie Eminence: Provides a debuff aura around the player with a radius of 6 / 8 depending
- * on the spells you cast within the last 10 seconds(the effect lingers for 4 seconds after leaving the aura):
+ * on the spells you cast within the last 10 seconds:
  * Grasping Claws -> Slowness I
- * Consuming Flames -> Weakness I
+ * Consuming Flames -> Light nearby mobs on fire
  * Fractal Enervation -> Mining Fatigue I
  * Withering Gaze -> Wither I
- * At level 2, the aura also gives the opposite buff to nearby players (including self).
+ * At level 2, the aura also gives the opposite buff to nearby players, including self (Consuming Flames extinguishes players).
  */
 
 public class EerieEminence extends Ability {
 
 	private static final double EERIE_1_RADIUS = 6;
 	private static final double EERIE_2_RADIUS = 8;
-	private static final int EERIE_EFFECT_LINGER_DURATION = 20 * 4;
-	private static final int EERIE_EFFECT_TIMER = 20 * 10;
+	private static final int EERIE_EFFECT_TIMER = 20 * 9;	// The linger still inherently exists for 1 second or so, bringing this up to essentially 10 seconds
 
 	private static class DebuffElement {
 		protected final PotionEffectType mDebuff;
@@ -65,14 +64,17 @@ public class EerieEminence extends Ability {
 		}
 	}
 
+	private final double mRadius;
+
 	private List<DebuffElement> debuffs = new ArrayList<DebuffElement>();
 
 	public EerieEminence(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Eerie Eminence");
 		mInfo.scoreboardId = "EerieEminence";
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Weakness. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block range, and continues for 4s after they leave the AoE.");
-		mInfo.mDescriptions.add("The range is increased to 8. In addition it provides the opposite effect to players in range. Slowness > Speed. Weakness > Strength. Mining Fatigue > Haste. Wither > Regeneration.");
+		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block radius.");
+		mInfo.mDescriptions.add("The range is increased to 8. In addition it provides the opposite effect to players in range. Slowness > Speed. Set Fire > Extinguish Fire. Mining Fatigue > Haste. Wither > Regeneration.");
+		mRadius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class EerieEminence extends Ability {
 		if (event.getAbility() == Spells.GRASPING_CLAWS) {
 			debuffs.add(new DebuffElement(PotionEffectType.SLOW, PotionEffectType.SPEED, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.CONSUMING_FLAMES) {
-			debuffs.add(new DebuffElement(PotionEffectType.WEAKNESS, PotionEffectType.INCREASE_DAMAGE, EERIE_EFFECT_TIMER));
+			debuffs.add(new DebuffElement(null, null, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.FRACTAL_ENERVATION) {
 			debuffs.add(new DebuffElement(PotionEffectType.SLOW_DIGGING, PotionEffectType.FAST_DIGGING, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.WITHERING_GAZE) {
@@ -93,20 +95,36 @@ public class EerieEminence extends Ability {
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
-			double radius = getAbilityScore() == 1 ? EERIE_1_RADIUS : EERIE_2_RADIUS;
-
 			Iterator<DebuffElement> iter = debuffs.iterator();
 			while (iter.hasNext()) {
 				DebuffElement entry = iter.next();
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius)) {
-					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), EERIE_EFFECT_LINGER_DURATION, 0));
-				}
-				if (getAbilityScore() > 1) {
-					for (Player player : PlayerUtils.playersInRange(mPlayer, radius, true)) {
-						mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
-						                                 new PotionEffect(entry.getBuff(), EERIE_EFFECT_LINGER_DURATION, 0, true, true));
+
+				// Consuming Flames case
+				if (entry.getDebuff() == null) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
+						if (mob.getFireTicks() <= 0) {
+							EntityUtils.applyFire(mPlugin, 100, mob);
+						}
+					}
+
+					if (getAbilityScore() > 1) {
+						for (Player player : PlayerUtils.playersInRange(mPlayer, mRadius, true)) {
+							player.setFireTicks(0);
+						}
+					}
+				} else {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
+						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(entry.getDebuff(), 30, 0));
+					}
+
+					if (getAbilityScore() > 1) {
+						for (Player player : PlayerUtils.playersInRange(mPlayer, mRadius, true)) {
+							mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
+							                                 new PotionEffect(entry.getBuff(), 30, 0, true, true));
+						}
 					}
 				}
+
 				// 5 ticks because it triggers on four hertz.
 				int timer = entry.getDuration() - 5;
 				if (timer <= 0) {

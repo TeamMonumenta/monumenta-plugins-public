@@ -5,7 +5,6 @@ import java.util.Random;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,15 +22,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
  * Level 1: When you hit an enemy with another skill they gain 15% vulnerability
- * for 5 seconds. Level 2: The vulnerability given is increased to 25% and the
- * warlock gains +1 armor and +.5 armor toughness for every ability they have on
+ * for 5 seconds. Level 2: gain +1 armor and +.5 armor toughness for every ability they have on
  * cooldown lasting until skills come off cooldown.
  */
 
 public class BlasphemousAura extends Ability {
 
-	private static final int BLASPHEMY_1_VULN_LEVEL = 2;
-	private static final int BLASPHEMY_2_VULN_LEVEL = 4;
+	private static final int BLASPHEMY_VULN_LEVEL = 2;
 	private static final int BLASPHEMY_VULN_DURATION = 5 * 20;
 	private static final double BLASPHEMY_ARMOR_INCREMENT = 1;
 	private static final double BLASPHEMY_TOUGHNESS_INCREMENT = 0.5;
@@ -43,14 +40,12 @@ public class BlasphemousAura extends Ability {
 		mInfo.scoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("When you hit an enemy with a skill other than Blasphemous Aura they gain 15% vulnerability for 5 seconds.");
-		mInfo.mDescriptions.add("The vulnerability given is increased to 25% and the warlock gains +1 armor and +.5 armor toughness for every ability they have on cooldown lasting until skills come off cooldown.");
+		mInfo.mDescriptions.add("The warlock gains +1 armor and +.5 armor toughness for every ability they have on cooldown lasting until skills come off cooldown.");
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		LivingEntity damagee = event.getDamaged();
-		int amp = getAbilityScore() == 1 ? BLASPHEMY_1_VULN_LEVEL : BLASPHEMY_2_VULN_LEVEL;
-		PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, amp, false, true));
+		PotionUtils.applyPotion(mPlayer, event.getDamaged(), new PotionEffect(PotionEffectType.UNLUCK, BLASPHEMY_VULN_DURATION, BLASPHEMY_VULN_LEVEL, false, true));
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -13,7 +12,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,9 +31,9 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 /*
- * Bodyguard: Blocking while looking directly at another player
- * makes you charge to them (max range: 15 blocks, immune to
- * knockback and damage). Upon arriving, you knock back all
+ * Bodyguard: Left-twice while looking at another player for
+ * makes you charge to them (max range: 25 blocks,
+ * immune to knockback and damage). Upon arriving, you knock back all
  * nearby mobs (radius: 4 blocks). Both you and the other player
  * gain + 2 / + 4 armor and absorption I/II for 8 s. At lvl 2, mobs
  * are also stunned for 3 s. Cooldown: 30s
@@ -52,15 +50,17 @@ public class Bodyguard extends Ability {
 	private static final int BODYGUARD_BUFF_DURATION = 8 * 20;
 	private static final int BODYGUARD_STUN_DURATION = 3 * 20;
 
+	private int mLeftClicks = 0;
+
 	public Bodyguard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Bodyguard");
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
-		mInfo.mDescriptions.add("Blocking while looking directly at another player makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Left-click twice without hitting a mob while looking directly at another player without hitting any mobs makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Both you and the other player gain +4 armor and Absorption 2 for 8s instead. Additionally affected mobs are stunned for 3s.");
 		mInfo.linkedSpell = Spells.BODYGUARD;
 		mInfo.cooldown = BODYGUARD_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
@@ -78,6 +78,22 @@ public class Bodyguard extends Ability {
 			}
 			for (Player player : players) {
 				if (player.getBoundingBox().overlaps(box)) {
+					// Double LClick detection
+					mLeftClicks++;
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							if (mLeftClicks > 0) {
+								mLeftClicks--;
+							}
+							this.cancel();
+						}
+					}.runTaskLater(mPlugin, 5);
+					if (mLeftClicks < 2) {
+						return;
+					}
+					mLeftClicks = 0;
+
 					Location loc = mPlayer.getEyeLocation();
 					for (int j = 0; j < 45; j++) {
 						loc.add(dir.clone().multiply(0.33));
@@ -148,12 +164,7 @@ public class Bodyguard extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return mHand.getType() == Material.SHIELD || oHand.getType() == Material.SHIELD;
-		}
-		return false;
+		return !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
 	}
 
 }

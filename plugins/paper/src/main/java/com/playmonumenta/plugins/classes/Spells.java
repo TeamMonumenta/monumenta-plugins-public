@@ -15,7 +15,8 @@ public enum Spells {
 	//--Elementalist Spec.
 	BLIZZARD("Blizzard"),
 	STARFALL("Starfall"),
-	ELEMENTAL_SPIRIT("Elemental Spirit"),
+	ELEMENTAL_SPIRIT_FIRE("Elemental Spirit (Fire)"),
+	ELEMENTAL_SPIRIT_ICE("Elemental Spirit (Ice)"),
 
 	//--Arcanist Spec.
 	FSWORD("Flash Sword"),
@@ -101,6 +102,7 @@ public enum Spells {
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),
+	RAMPAGE("Rampage"),
 
 	//--Guardian
 	SHIELD_WALL("Shield Wall"),
@@ -116,9 +118,11 @@ public enum Spells {
 
 	//Harbinger
 	ADRENAL_SERUM("Adrenal Serum"),
+	SCORCHED_EARTH("Scorched Earth"),
 	PURPLE_HAZE("Purple Haze"),
 
 	//Apothecary
+	WARDING_REMEDY("Warding Remedy"),
 	ALCHEMICAL_AMALGAM("Alchemical Amalgam");
 
 	private final String mName;

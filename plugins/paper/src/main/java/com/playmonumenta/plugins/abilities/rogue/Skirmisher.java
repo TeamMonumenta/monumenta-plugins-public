@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -18,8 +18,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /*
- * Melee attacks deal +3 / +5 damage when there are 3 / 4 or fewer
- * enemies within 8 blocks of you.
+ * Melee attacks deal +3 / +5 damage to mobs
+ * with no other mobs within 4 blocks.
  */
 
 public class Skirmisher extends Ability {
@@ -28,26 +28,23 @@ public class Skirmisher extends Ability {
 	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 	private static final int SKIRMISHER_1_DAMAGE = 3;
 	private static final int SKIRMISHER_2_DAMAGE = 5;
-	private static final int SKIRMISHER_1_THRESHOLD = 3;
-	private static final int SKIRMISHER_2_THRESHOLD = 4;
+	private static final int SKIRMISHER_ISOLATION_RADIUS = 4;
 
 	public Skirmisher(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Skirmisher");
 		mInfo.scoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When there are 3 or fewer enemies within 8 blocks of you, deal an additional 3 melee damage.");
-		mInfo.mDescriptions.add("When there are 4 or fewer enemies within 8 blocks of you, deal an additional 5 melee damage.");
+		mInfo.mDescriptions.add("Deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");
+		mInfo.mDescriptions.add("Deal an additional 5 melee damage instead.");
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
-			int surrounding = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8).size();
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) event.getEntity();
+			Location loc = mob.getLocation();
 
-			Entity ent = event.getEntity();
-			int threshold = getAbilityScore() == 1 ? SKIRMISHER_1_THRESHOLD : SKIRMISHER_2_THRESHOLD;
-			if (surrounding <= threshold) {
-				Location loc = ent.getLocation();
+			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() == 0) {
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				mWorld.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
@@ -57,9 +54,9 @@ public class Skirmisher extends Ability {
 
 				// Not a CustomDamageEvent (similar to By My Blade)
 				int damage = getAbilityScore() == 1 ? SKIRMISHER_1_DAMAGE : SKIRMISHER_2_DAMAGE;
-				if (EntityUtils.isElite(ent)) {
+				if (EntityUtils.isElite(mob)) {
 					damage *= PASSIVE_DAMAGE_ELITE_MODIFIER;
-				} else if (EntityUtils.isBoss(ent)) {
+				} else if (EntityUtils.isBoss(mob)) {
 					damage *= PASSIVE_DAMAGE_BOSS_MODIFIER;
 				}
 				event.setDamage(event.getDamage() + damage);
@@ -69,6 +66,7 @@ public class Skirmisher extends Ability {
 		return true;
 	}
 
+	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();

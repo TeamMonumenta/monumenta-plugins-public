@@ -36,7 +36,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
  * damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on
  * enemies with static. An enemy can only be hit by a spellshock once per tick.
  *
- * LEVEL 2: Damage is increased to 5 and enemies are stunned for 0.5 seconds.
+ * LEVEL 2: Damage is increased to 5.
  * Additionally, gain speed 1 for 6 seconds whenever a spellshock is triggered.
  */
 public class Spellshock extends Ability {
@@ -56,7 +56,6 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_RADIUS = 3;
 	private static final int SPELL_SHOCK_1_DAMAGE = 3;
 	private static final int SPELL_SHOCK_2_DAMAGE = 5;
-	private static final int SPELL_SHOCK_STUN_DURATION = 10;
 	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
 	private static Map<UUID, SpellShockedMob> mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
@@ -68,7 +67,7 @@ public class Spellshock extends Ability {
 		mInfo.scoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
-		mInfo.mDescriptions.add("Damage is increased to 5 and enemies are stunned for 0.5 seconds. Additionally, gain speed 1 for 6 seconds whenever a spellshock is triggered.");
+		mInfo.mDescriptions.add("Damage is increased to 5. Additionally, gain Speed 1 for 6 seconds whenever a spellshock is triggered.");
 		/*
 		 * Only one runnable ever exists for spellshock - it is a global list, not tied to any individual players
 		 * At least one player must be a mage for this to start running. Once started, it runs forever.
@@ -124,9 +123,6 @@ public class Spellshock extends Ability {
 						Vector velocity = damagee.getVelocity();
 						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */);
 						damagee.setVelocity(velocity);
-						if (abilityScore > 1) {
-							EntityUtils.applyStun(plugin, SPELL_SHOCK_STUN_DURATION, damagee);
-						}
 					}
 
 					// Only put pending static mobs into the actual map if they weren't damaged by spellshock - this

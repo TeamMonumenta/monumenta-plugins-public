@@ -38,7 +38,7 @@ public class HandOfLight extends Ability {
 		mInfo.linkedSpell = Spells.HEALING;
 		mInfo.scoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("When you block while sneaking, you heal all OTHER players in a 12 block range in front of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Cooldown: 14 seconds.");
+		mInfo.mDescriptions.add("When you block while sneaking, you heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Cooldown: 14 seconds.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health, and the cooldown is reduced to 10 seconds.");
 		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
@@ -58,7 +58,7 @@ public class HandOfLight extends Ability {
 			// Only heal players that have their class disabled (so it doesn't work on arena contenders)
 			// Don't heal players with PvP enabled
 			// If the source player was included (because PvP is on), heal them
-			if ((playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
+			if (((playerDir.dot(toMobVector) > HEALING_DOT_ANGLE || p.getLocation().distance(mPlayer.getLocation()) < 2)
 			     && !p.getScoreboardTags().contains("disable_class")
 			     && !AbilityManager.getManager().isPvPEnabled(mPlayer))
 			    || p.equals(mPlayer)) {

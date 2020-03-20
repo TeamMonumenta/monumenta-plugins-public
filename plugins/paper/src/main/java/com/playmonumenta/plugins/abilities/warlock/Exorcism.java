@@ -39,7 +39,7 @@ public class Exorcism  extends Ability {
 		mInfo.linkedSpell = Spells.EXORCISM;
 		mInfo.scoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Right clicking while looking down removes all your debuffs and applies them to enemies within 12 blocks of you. (Cooldown: 25s)");
+		mInfo.mDescriptions.add("Right clicking while looking down without shifting removes all your debuffs and applies them to enemies within 12 blocks of you. (Cooldown: 25s)");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
@@ -111,7 +111,7 @@ public class Exorcism  extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.getLocation().getPitch() > EXORCISM_ANGLE &&
+		return mPlayer.getLocation().getPitch() > EXORCISM_ANGLE && !mPlayer.isSneaking() &&
 				InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) &&
 				(offHand == null || offHand.getType() != Material.BOW) &&
 				(!mPlayer.getActivePotionEffects().isEmpty() || (mPlayer.getFireTicks() > 1));

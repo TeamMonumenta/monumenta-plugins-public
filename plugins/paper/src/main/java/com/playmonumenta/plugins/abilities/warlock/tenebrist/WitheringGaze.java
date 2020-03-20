@@ -30,15 +30,15 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
- * magic in the direction the player faces that gives Slowness 7 to all enemies
- * in its path (bosses are given slowness 3) and gives wither III
- * for 6/10 seconds. 30/20 second cooldown.
+ * magic in the direction the player faces that stuns all enemies
+ * in its path for 3 / 4 seconds (elites and bosses are given slowness 3) and gives wither III
+ * for 6/8 seconds. 30/20 second cooldown.
  */
 
 public class WitheringGaze extends Ability {
 
-	private static final int WITHERING_GAZE_1_DURATION = 5;
-	private static final int WITHERING_GAZE_2_DURATION = 7;
+	private static final int WITHERING_GAZE_1_DURATION = 3;
+	private static final int WITHERING_GAZE_2_DURATION = 4;
 	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
 
@@ -46,8 +46,8 @@ public class WitheringGaze extends Ability {
 		super(plugin, world, random, player, "Withering Gaze");
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
-		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned (bosses are given Slowness 3 instead) and given Wither 3 for 5 seconds. Cooldown: 30 seconds.");
-		mInfo.mDescriptions.add("Stun and Wither last for 7 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30 seconds.");
+		mInfo.mDescriptions.add("Stun lasts for 4 seconds and Wither lasts for 8 seconds. Cooldown: 20 seconds.");
 		mInfo.linkedSpell = Spells.WITHERING_GAZE;
 		mInfo.cooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
@@ -88,12 +88,12 @@ public class WitheringGaze extends Ability {
 						Vector eVec = e.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
 						if (direction.dot(eVec) > 0.4) {
 							LivingEntity le = (LivingEntity) e;
-							if (EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
+							if (EntityUtils.isElite(le) || EntityUtils.isBoss(le) || ((e instanceof Player) && AbilityManager.getManager().isPvPEnabled((Player)e))) {
 								PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.SLOW, duration, 2));
 							} else {
 								EntityUtils.applyStun(mPlugin, duration, le);
 							}
-							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration, 2));
+							PotionUtils.applyPotion(player, le, new PotionEffect(PotionEffectType.WITHER, duration * 2, 2));
 							CustomDamageEvent event = new CustomDamageEvent(player, le, 0, null);
 							Bukkit.getPluginManager().callEvent(event);
 						}

@@ -52,9 +52,9 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalga
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedyNonApothecary;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.AdrenalSerum;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.NightmarishAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.ClericPassive;
@@ -84,7 +84,8 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
 import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
-import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpirit;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
+import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
 import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
@@ -296,7 +297,8 @@ public class AbilityManager {
                 /********** MAGE **********/
                 // ELEMENTALIST
 				   // Starfall up above
-                new ElementalSpirit(mPlugin, mWorld, mRandom, null),
+                new ElementalSpiritFire(mPlugin, mWorld, mRandom, null),
+                new ElementalSpiritIce(mPlugin, mWorld, mRandom, null),
                 new Blizzard(mPlugin, mWorld, mRandom, null),
 
                 // MAGE SWORDSMAN
@@ -360,7 +362,7 @@ public class AbilityManager {
 
                 /********** ALCHEMIST **********/
                 // HARBINGER
-                new AdrenalSerum(mPlugin, mWorld, mRandom, null),
+                new ScorchedEarth(mPlugin, mWorld, mRandom, null),
                 new NightmarishAlchemy(mPlugin, mWorld, mRandom, null),
                 new PurpleHaze(mPlugin, mWorld, mRandom, null),
 

@@ -25,19 +25,18 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 /*
  * Right click while looking up to prime the next right click within 10s
  * to summon a meteor where the player is looking (up to 25 blocks),
- * dealing 18 / 24 damage in a 5 - block radius and setting mobs on fire
- * for 3s. Does not activate mana lance. Cooldown 16 / 12 s
+ * dealing 20 / 36 damage in a 5 - block radius and setting mobs on fire
+ * for 3s. Does not activate mana lance. Cooldown 18 s
  */
 
 public class Starfall extends Ability {
-	private static final int STARFALL_PRIMED_TICKS = 10 * 20;
+	private static final int STARFALL_PRIMED_TICKS = 20 * 10;
 	private static final double STARFALL_ANGLE = 70.0;
 
-	private static final int STARFALL_1_COOLDOWN = 16 * 20;
-	private static final int STARFALL_2_COOLDOWN = 12 * 20;
-	private static final int STARFALL_1_DAMAGE = 18;
-	private static final int STARFALL_2_DAMAGE = 26;
-	private static final int STARFALL_FIRE_DURATION = 3 * 20;
+	private static final int STARFALL_COOLDOWN = 20 * 18;
+	private static final int STARFALL_1_DAMAGE = 20;
+	private static final int STARFALL_2_DAMAGE = 36;
+	private static final int STARFALL_FIRE_DURATION = 20 * 3;
 	private static final double STARFALL_RADIUS = 5;
 
 	/* The player's getTicksLived() when the skill was last primed or cast */
@@ -48,9 +47,9 @@ public class Starfall extends Ability {
 		mInfo.linkedSpell = Spells.STARFALL;
 		mInfo.scoreboardId = "Starfall";
 		mInfo.mShorthandName = "SF";
-		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 18 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 16s.");
-		mInfo.mDescriptions.add("Damage is increased to 26. Cooldown is reduced to 12s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? STARFALL_1_COOLDOWN : STARFALL_2_COOLDOWN;
+		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 20 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Damage is increased to 36.");
+		mInfo.cooldown = STARFALL_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
 

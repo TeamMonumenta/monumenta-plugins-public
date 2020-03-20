@@ -28,8 +28,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 * Sneak right click (without a bow) to leap backwards 6 ish blocks from your
 * position, with a bit of vertical velocity as well. Blocks fallen during
 * this period are halved for the purposes of fall damage calculations. Enemies within melee range
-* of you previous position are stunned for 4 seconds (does not work on elites
-* and bosses) (Cooldown: 12 seconds) At Level 2, you deal 12 damage.
+* of your previous position take 12 damage (Cooldown: 12 seconds).
+* At Level 2, stun non-elites for 4 seconds (Cooldown: 10 seconds).
 */
 
 public class Disengage extends Ability {
@@ -38,8 +38,7 @@ public class Disengage extends Ability {
 	private static final double DISENGAGE_Y_VELOCITY = 0.65;
 	private static final double DISENGAGE_STUN_RADIUS = 3;
 	private static final int DISENGAGE_STUN_DURATION = 4 * 20;
-	private static final int DISENGAGE_1_DAMAGE = 0;
-	private static final int DISENGAGE_2_DAMAGE = 12;
+	private static final int DISENGAGE_DAMAGE = 12;
 	private static final int DISENGAGE_1_COOLDOWN = 12 * 20;
 	private static final int DISENGAGE_2_COOLDOWN = 10 * 20;
 
@@ -51,8 +50,8 @@ public class Disengage extends Ability {
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
 		mInfo.mShorthandName = "Dis";
-		mInfo.mDescriptions.add("Right-clicking while shifted while not holding a bow, food, trident, potion, compass, or block causes you to leap backwards 6 blocks. Non-boss/elite enemies within melee range of your previous position are stunned for 4 seconds. If you land after being propelled by this skill's effect fall damage is calculated as if you fell for half as many blocks as you actually fell for. This can not be used in towns. Cooldown: 12s.");
-		mInfo.mDescriptions.add("Enemies in melee range when you activate this skill take 10 damage.");
+		mInfo.mDescriptions.add("Right-clicking while shifted while not holding a bow, food, trident, potion, compass, or block causes you to leap backwards 6 blocks. Enemies within melee range of your previous position take 12 damage. If you land after being propelled by this skill's effect fall damage is calculated as if you fell for half as many blocks as you actually fell for. This cannot be used in towns. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Non-elite/boss enemies in melee range when you activate this skill are stunned for 4 seconds. Cooldown: 10s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 	}
@@ -73,12 +72,11 @@ public class Disengage extends Ability {
 	@Override
 	public void cast(Action action) {
 		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS, mPlayer)) {
-			if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
+			if (getAbilityScore() > 1 && !EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
 			}
 
-			int damage = getAbilityScore() == 1 ? DISENGAGE_1_DAMAGE : DISENGAGE_2_DAMAGE;
-			EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
+			EntityUtils.damageEntity(mPlugin, le, DISENGAGE_DAMAGE, mPlayer);
 		}
 
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);

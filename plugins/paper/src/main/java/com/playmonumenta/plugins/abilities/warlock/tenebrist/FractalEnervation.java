@@ -35,7 +35,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * spreads to all enemies in a 3 / 4-block radius, and then from them,
  * and so on. All debuffs on the enemies increase by 1 effect level.
  * At level 2, each enemy hit is dealt 5 damage.
- * Cooldown: 16s / 13s
+ * Cooldown: 12s / 10s
  */
 public class FractalEnervation extends Ability {
 
@@ -47,6 +47,8 @@ public class FractalEnervation extends Ability {
 	private static final int FRACTAL_FATIGUE_DURATION = 20 * 12;
 	private static final int FRACTAL_1_CHAIN_RANGE = 3 + 1; // The +1 accounts for the mob's nonzero hitbox so that the distance between 2 mobs is approx 3 still
 	private static final int FRACTAL_2_CHAIN_RANGE = 4 + 1;
+	private static final int FRACTAL_1_COOLDOWN = 20 * 12;
+	private static final int FRACTAL_2_COOLDOWN = 20 * 10;
 
 	private int mRightClicks = 0;
 	private int damageBonus;
@@ -55,11 +57,11 @@ public class FractalEnervation extends Ability {
 		super(plugin, world, random, player, "Fractal Enervation");
 		mInfo.scoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
-		mInfo.mDescriptions.add("Double right-clicking fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s. In addition for that 12s all debuffs on the enemy increase by 1 effect level. The beam then instantly spreads to all enemies in a 3 block radius. Affected enemies take 5 damage. It will continue spreading until it doesn't find any new targets. Cooldown: 16s.");
-		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks and affected enemies take 12 damage. Additionally cooldown is reduced to 13s.");
+		mInfo.mDescriptions.add("Double right-clicking fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s. In addition for that 12s all debuffs on the enemy increase by 1 effect level. The beam then instantly spreads to all enemies in a 3 block radius. Affected enemies take 5 damage. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
+		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks and affected enemies take 12 damage. Additionally cooldown is reduced to 10s.");
 		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * 16 : 20 * 13;
+		mInfo.cooldown = getAbilityScore() == 1 ? FRACTAL_1_COOLDOWN : FRACTAL_2_COOLDOWN;
 		damageBonus = getAbilityScore() == 1 ? FRACTAL_1_DAMAGE : FRACTAL_2_DAMAGE;
 	}
 

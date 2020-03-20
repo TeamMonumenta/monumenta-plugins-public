@@ -17,19 +17,28 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 
 /*
  * Sage's Insight: Whenever you cast a spell, reduce the
- * cooldown of all other spells by 5% / 10%.
+ * cooldown of all other spells by 5% / 10%, capped at
+ * 0.5 / 1 second.
  */
 public class SagesInsight extends Ability {
 
 	private static final double ARCANIST_1_COOLDOWN_REDUCTION_PERCENT = 0.05;
 	private static final double ARCANIST_2_COOLDOWN_REDUCTION_PERCENT = 0.10;
+	private static final int ARCANIST_1_COOLDOWN_REDUCTION_CAP = 10;
+	private static final int ARCANIST_2_COOLDOWN_REDUCTION_CAP = 20;
+
+	private final double mCooldownReductionPercent;
+	private final int mCooldownReductionCap;
 
 	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Sage's Insight");
 		mInfo.scoreboardId = "SagesInsight";
 		mInfo.mShorthandName = "SI";
-		mInfo.mDescriptions.add("Whenever the user casts a spell the cooldowns of other equipped spells are reduced by 5%.");
-		mInfo.mDescriptions.add("Cooldown reduction upon casting a spell is increased to 10%");
+		mInfo.mDescriptions.add("Whenever the user casts a spell the cooldowns of other equipped spells are reduced by 5%, capped at 0.5 seconds.");
+		mInfo.mDescriptions.add("Cooldown reduction upon casting a spell is increased to 10%, and the cap is increased to 1 second.");
+
+		mCooldownReductionPercent = getAbilityScore() == 1 ? ARCANIST_1_COOLDOWN_REDUCTION_PERCENT : ARCANIST_2_COOLDOWN_REDUCTION_PERCENT;
+		mCooldownReductionCap = getAbilityScore() == 1 ? ARCANIST_1_COOLDOWN_REDUCTION_CAP : ARCANIST_2_COOLDOWN_REDUCTION_CAP;
 	}
 
 	@Override
@@ -43,13 +52,13 @@ public class SagesInsight extends Ability {
 			AbilityManager.getManager().getPlayerAbility(mPlayer, FlashSword.class)
 		};
 
-		double cooldownReductionPercent = getAbilityScore() == 1 ? ARCANIST_1_COOLDOWN_REDUCTION_PERCENT : ARCANIST_2_COOLDOWN_REDUCTION_PERCENT;
 		for (int i = 0; i < abilities.length; i++) {
 			if (abilities[i] != null) {
-				int cooldownReduction = (int)(abilities[i].getInfo().cooldown * cooldownReductionPercent);
-				mPlugin.mTimers.updateCooldown(mPlayer, abilities[i].getInfo().linkedSpell, cooldownReduction);
+				mPlugin.mTimers.updateCooldown(mPlayer, abilities[i].getInfo().linkedSpell,
+						(int)(Math.min(mCooldownReductionCap, abilities[i].getInfo().cooldown * mCooldownReductionPercent)));
 			}
 		}
+
 		return true;
 	}
 

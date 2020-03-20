@@ -29,7 +29,7 @@ public class DarkPact extends Ability {
 	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 0.8;
 
 	/*
-	 * Dark Pact: Sprint + left-click with a scythe to greatly amplify your
+	 * Dark Pact: Sprint + left-click twice with a scythe without hitting a mob to greatly amplify your
 	 * power for 10 s, making your skills and melee attacks deal 50% / 80% more
 	 * damage. At lvl 2, your scythe attacks also cleave, dealing 50% AoE
 	 * damage in front of you. While this ability is active, you cannot heal
@@ -41,12 +41,13 @@ public class DarkPact extends Ability {
 	private float mSaturation = 0;
 	private double mHealth = 0;
 	private boolean active = false;
+	private int mLeftClicks = 0;
 
 	public DarkPact(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Dark Pact");
 		mInfo.scoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Sprint left-clicking greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage at half its normal amount. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Sprint left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage at half its normal amount. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
 		mInfo.mDescriptions.add("You deal 80% more melee damage instead. Scythe attacks also cleave for 50% of the damage dealt in a 1.5 block radius from the mob hit.");
 		mInfo.cooldown = DARK_PACT_COOLDOWN;
 		mInfo.linkedSpell = Spells.DARK_PACT;
@@ -64,6 +65,21 @@ public class DarkPact extends Ability {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
+
+		mLeftClicks++;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mLeftClicks > 0) {
+					mLeftClicks--;
+				}
+				this.cancel();
+			}
+		}.runTaskLater(mPlugin, 5);
+		if (mLeftClicks < 2) {
+			return;
+		}
+		mLeftClicks = 0;
 
 		active = true;
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);

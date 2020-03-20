@@ -38,8 +38,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 /*
  * Shift+LClick with a bow to afflict the mob you're looking at (within 32 blocks)
  * with a plague that slows the target with slowness 3 and deals 3 DPS for 8 / 10 seconds.
- * If a mob with the plague is killed you gain an extra alch potion,
- * and the plague transfers to 1/2 nearby mobs within 5 blocks. Cooldown: 40 / 30 seconds.
+ * If a mob with the plague is killed you gain an extra alch potion, and the plague
+ * transfers to 2 nearby mobs within 5 blocks, up to a chain of 2 mobs. Cooldown: 35 / 20 seconds.
  */
 
 public class PurpleHaze extends Ability {
@@ -60,12 +60,12 @@ public class PurpleHaze extends Ability {
 		}
 	}
 
-	private static final int PURPLE_HAZE_1_DURATION = 8 * 20;
-	private static final int PURPLE_HAZE_2_DURATION = 10 * 20;
-	private static final int PURPLE_HAZE_1_COOLDOWN = 40 * 20;
-	private static final int PURPLE_HAZE_2_COOLDOWN = 30 * 20;
-	private static final int PURPLE_HAZE_1_TRANSFERS = 1;
-	private static final int PURPLE_HAZE_2_TRANSFERS = 2;
+	private static final int PURPLE_HAZE_1_DURATION = 20 * 8;
+	private static final int PURPLE_HAZE_2_DURATION = 20 * 10;
+	private static final int PURPLE_HAZE_1_COOLDOWN = 20 * 35;
+	private static final int PURPLE_HAZE_2_COOLDOWN = 20 * 20;
+	private static final int PURPLE_HAZE_TRANSFER_DEPTH = 2;
+	private static final int PURPLE_HAZE_TRANSFER_BREADTH = 2;
 	private static final double PURPLE_HAZE_DAMAGE = 3;
 	private static final int PURPLE_HAZE_RADIUS = 5;
 	private static final int PURPLE_HAZE_RANGE = 32;
@@ -75,6 +75,8 @@ public class PurpleHaze extends Ability {
 
 	private static BukkitRunnable mRunnable = null;
 
+	private final int mDuration;
+
 	private LivingEntity mTarget = null;
 
 	public PurpleHaze(Plugin plugin, World world, Random random, Player player) {
@@ -82,10 +84,12 @@ public class PurpleHaze extends Ability {
 		mInfo.linkedSpell = Spells.PURPLE_HAZE;
 		mInfo.scoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
-		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an Alchemist's Potion and the effects transfer to a mob up to 5 blocks from the target that died. Cooldown: 40s.");
-		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Purple Haze now spreads to two nearby mobs. Cooldown reduced to 30 seconds.");
+		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
+		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Cooldown reduced to 20 seconds.");
 		mInfo.cooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;
+
 		/*
 		 * Only one runnable ever exists for purple haze - it is a global list, not tied to any individual players
 		 * At least one player must be a warlock for this to start running. Once started, it runs forever.
@@ -109,10 +113,10 @@ public class PurpleHaze extends Ability {
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
-							Location loc = damagee.getLocation();
-							mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 10, 0, 0.2, 0, 0.0001);
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
-							mWorld.spawnParticle(Particle.FALLING_DUST, loc.clone().add(0, 1, 0), 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
+							Location loc = damagee.getLocation().add(0, 1, 0);
+							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
+							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
+							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
 							counter = 0;
 						}
 					}
@@ -123,7 +127,7 @@ public class PurpleHaze extends Ability {
 						HazedMob hazer = e.getValue();
 						hazer.mTicksLeft--;
 						if (hazer.mTicksLeft <= 0 || hazer.mMob.isDead()) {
-							if (hazer.mMob.isDead()) {
+							if (hazer.mMob.isDead() && hazer.mTransfers > 0) {
 								Location loc = hazer.mMob.getLocation();
 								// Perhaps a ball of purple haze going from the dead mob to the next instead?
 
@@ -133,7 +137,7 @@ public class PurpleHaze extends Ability {
 								mWorld.playSound(loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.0f, 2.0f);
 								mWorld.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.55f, 1.5f);
 
-								for (int i = 0; i < hazer.mTransfers; i++) {
+								for (int i = 0; i < PURPLE_HAZE_TRANSFER_BREADTH; i++) {
 									double closest = PURPLE_HAZE_RADIUS + 1;
 									LivingEntity closestMob = null;
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PURPLE_HAZE_RADIUS)) {
@@ -146,7 +150,7 @@ public class PurpleHaze extends Ability {
 									}
 
 									if (closestMob != null) {
-										HazedMob hazed = new HazedMob(closestMob, hazer.mTriggeredBy, hazer.mDuration, hazer.mTransfers);
+										HazedMob hazed = new HazedMob(closestMob, hazer.mTriggeredBy, hazer.mDuration, hazer.mTransfers - 1);
 										newHazedMobs.put(hazed.mMob.getUniqueId(), hazed);
 										Location loc2 = hazed.mMob.getLocation();
 										mWorld.spawnParticle(Particle.SPELL_WITCH, loc2.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
@@ -219,10 +223,8 @@ public class PurpleHaze extends Ability {
 	@Override
 	public void cast(Action action) {
 		LivingEntity entity = mTarget;
-		int purpleHaze = getAbilityScore();
 		if (entity != null && !mHazedMobs.containsKey(entity.getUniqueId())) {
-			HazedMob hazed = new HazedMob(entity, mPlayer, purpleHaze == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION,
-			                              purpleHaze == 1 ? PURPLE_HAZE_1_TRANSFERS : PURPLE_HAZE_2_TRANSFERS);
+			HazedMob hazed = new HazedMob(entity, mPlayer, mDuration, PURPLE_HAZE_TRANSFER_DEPTH);
 			mHazedMobs.put(entity.getUniqueId(), hazed);
 			Location loc = hazed.mMob.getLocation();
 			mWorld.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.001);
