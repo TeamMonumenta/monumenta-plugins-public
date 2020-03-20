@@ -56,7 +56,7 @@ public class WindWalk extends Ability {
 		mInfo.linkedSpell = Spells.WIND_WALK;
 		mInfo.scoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
-		mInfo.mDescriptions.add("Left-click twice while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Left-click twice while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. This ability cannot be cast in safe zones. Cooldown: 20 seconds.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
 		mInfo.cooldown = WIND_WALK_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;

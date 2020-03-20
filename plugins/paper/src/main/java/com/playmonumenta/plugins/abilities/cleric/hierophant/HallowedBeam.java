@@ -25,13 +25,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  * Hallowed Beam: Level 1 – Firing a fully-drawn bow while sneaking,
  * if pointed directly at a non-boss undead, will instantly deal 42 damage
  * to the undead instead of consuming the arrow. Cooldown: 20s. Level 2 -
- * The targeted undead explodes, dealing 20 damage to undead within a
+ * The targeted undead explodes, dealing 22 damage to undead within a
  * 5-block radius, and giving slowness 4 to all enemies.
  */
 public class HallowedBeam extends Ability {
 
 	private static final double HALLOWED_DAMAGE_DIRECT = 42;
-	private static final double HALLOWED_DAMAGE_EXPLOSION = 20;
+	private static final double HALLOWED_DAMAGE_EXPLOSION = 22;
 
 	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Hallowed Beam");

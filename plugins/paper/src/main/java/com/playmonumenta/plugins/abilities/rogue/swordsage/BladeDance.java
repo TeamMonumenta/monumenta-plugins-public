@@ -38,8 +38,8 @@ public class BladeDance extends Ability {
 	 * damage is increased. Cooldown: 30 seconds
 	 */
 
-	private static final int DANCE_1_DAMAGE = 10;
-	private static final int DANCE_2_DAMAGE = 15;
+	private static final int DANCE_1_DAMAGE = 12;
+	private static final int DANCE_2_DAMAGE = 18;
 	private static final int DANCE_RADIUS = 4;
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
@@ -48,10 +48,10 @@ public class BladeDance extends Ability {
 		super(plugin, world, random, player, "Blade Dance");
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
-		mInfo.mDescriptions.add("Right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack, with a radius of four blocks, that deals 10 damage to and afflicts Weakness III to all enemies hit for 5 seconds. Cooldown: 20 seconds.");
-		mInfo.mDescriptions.add("The area attack now deals 16 damage and afflicts Weakness IV");
+		mInfo.mDescriptions.add("Right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 12 damage to and afflicts Weakness III to all enemies in a 4 block radius for 5 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("The area attack now deals 18 damage and afflicts Weakness IV.");
 		mInfo.linkedSpell = Spells.BLADE_DANCE;
-		mInfo.cooldown = 20 * 20;
+		mInfo.cooldown = 20 * 15;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*

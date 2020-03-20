@@ -37,8 +37,8 @@ public class ViciousCombos extends Ability {
 		super(plugin, world, random, player, "Vicious Combos");
 		mInfo.scoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
-		mInfo.mDescriptions.add("While holding two swords, Right Click: Teleport in front of target hostile enemy within 10 blocks and gaining 5 seconds of Strength 2 (Cooldown 20s)");
-		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
+		mInfo.mDescriptions.add("Passively, killing an enemy refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
+		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with Weakness I and 15% Vulnerability for 5 seconds.");
 	}
 
 	@Override

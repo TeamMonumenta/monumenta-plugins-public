@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -37,6 +36,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class EnchantedPrayer extends Ability {
 
 	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 18;
+	private static final int ENCHANTED_PRAYER_1_DAMAGE = 7;
+	private static final int ENCHANTED_PRAYER_2_DAMAGE = 12;
+	private static final int ENCHANTED_PRAYER_1_HEAL = 2;
+	private static final int ENCHANTED_PRAYER_2_HEAL = 4;
 
 	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Enchanted Prayer");
@@ -124,12 +127,12 @@ public class EnchantedPrayer extends Ability {
 			world.playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 1.75f);
 			world.spawnParticle(Particle.SPELL_INSTANT, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 100, 0.25f, 0.3f, 0.25f, 1);
 			world.spawnParticle(Particle.FIREWORKS_SPARK, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 75, 0, 0, 0, 0.3);
-			double damage = enchantedPrayer == 1 ? 5 : 10;
-			double heal = enchantedPrayer == 1 ? 0.1 : 0.2;
+			double damage = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
+			double heal = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
 				EntityUtils.damageEntity(plugin, le, damage, player, MagicType.HOLY);
 			}
-			PlayerUtils.healPlayer(player, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * heal);
+			PlayerUtils.healPlayer(player, heal);
 		}
 	}
 }

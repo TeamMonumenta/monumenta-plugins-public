@@ -46,6 +46,8 @@ public class FinishingBlow extends Ability {
 	public FinishingBlow(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Finishing Blow");
 		mInfo.scoreboardId = "FinishingBlow";
+		mInfo.mDescriptions.add("Enemies hit by your fully-charged arrows are marked for 5 seconds. Striking a marked enemy with a melee attack detonates the mark to deal them 3 bonus damage, doubled against enemies below 50% health.");
+		mInfo.mDescriptions.add("Base damage increased to 6.");
 		mDamageBonus = getAbilityScore() == 1 ? FINISHING_BLOW_1_DAMAGE : FINISHING_BLOW_2_DAMAGE;
 	}
 

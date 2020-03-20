@@ -47,6 +47,8 @@ public class AdvancingShadows extends Ability {
 		mInfo.scoreboardId = "AdvancingShadows";
 		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mDescriptions.add("While holding two swords, right click to teleport to the target hostile enemy within 10 blocks and gain Strength II for 5 seconds. (Cooldown 20s)");
+		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
 	}
 
 	@Override
