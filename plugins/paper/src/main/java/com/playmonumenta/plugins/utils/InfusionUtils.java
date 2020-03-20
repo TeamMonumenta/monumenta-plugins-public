@@ -1,18 +1,25 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -40,7 +47,8 @@ public class InfusionUtils {
 		PERSPICACITY("perspicacity", Perspicacity.PROPERTY_NAME),
 		TENACITY("tenacity", Tenacity.PROPERTY_NAME),
 		VIGOR("vigor", Vigor.PROPERTY_NAME),
-		VITALITY("vitality", Vitality.PROPERTY_NAME);
+		VITALITY("vitality", Vitality.PROPERTY_NAME),
+		REFUND("refund", "refund");
 
 		private final String mLabel;
 		private final String mEnchantName;
@@ -59,6 +67,10 @@ public class InfusionUtils {
 	}
 
 	public static void doInfusion(CommandSender sender, Player player, ItemStack item, List<ItemFrame> paymentFrames, InfusionSelection selection) throws CommandSyntaxException {
+		if (selection.equals(InfusionSelection.REFUND)) {
+			refundInfusion(item, player);
+			return;
+		}
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int payment = calcPaymentValue(paymentFrames, region);
 		int cost = calcInfuseCost(item);
@@ -139,6 +151,45 @@ public class InfusionUtils {
 				CommandAPI.fail("You must have a valid item to infuse in your main hand!");
 			}
 		}
+	}
+
+	private static void refundInfusion(ItemStack item, Player player) throws CommandSyntaxException {
+		ItemRegion region = ItemUtils.getItemRegion(item);
+		int refundMaterials = 0;
+
+		//Calculate refund amount
+		int infuseLevel = getInfuseLevel(item) - 1;
+		while (infuseLevel >= 0) {
+			refundMaterials += (getCostMultiplier(item) * Math.pow(2, infuseLevel));
+			infuseLevel--;
+		}
+
+		//Remove the infusion enchants from the item
+		for (InfusionSelection sel : InfusionSelection.values()) {
+			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());
+		}
+		NamespacedKey key;
+		if (region.equals(ItemRegion.KINGS_VALLEY)) {
+			key = new NamespacedKey("epic", "r1/items/currency/pulsating_gold");
+		} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
+			key = new NamespacedKey("epic", "r2/items/currency/pulsating_emerald");
+		} else {
+			CommandAPI.fail("Item must have a Region tag!");
+			return;
+		}
+		LootTable lt = Bukkit.getLootTable(key);
+		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
+		LootContext context = builder.build();
+		Collection<ItemStack> items = lt.populateLoot(new Random(), context);
+		ItemStack materials;
+		if (items.size() > 0) {
+			materials = items.iterator().next();
+		} else {
+			CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
+			return;
+		}
+		Item eItem = player.getWorld().dropItemNaturally(player.getLocation(), materials.add(refundMaterials - 1));
+		eItem.setPickupDelay(0);
 	}
 
 	private static void animate(Player player) {

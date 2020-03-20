@@ -49,6 +49,7 @@ public class InfuseHeldItem extends GenericCommand {
 		registerType(InfusionSelection.TENACITY);
 		registerType(InfusionSelection.VIGOR);
 		registerType(InfusionSelection.VITALITY);
+		registerType(InfusionSelection.REFUND);
 	}
 
 	@SuppressWarnings("unchecked")
