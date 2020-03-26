@@ -52,7 +52,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
-	private boolean phase2;
+	private boolean mPhase2;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -70,7 +70,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		phase2 = false;
+		mPhase2 = false;
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mBoss.getWorld();
 
@@ -185,21 +185,21 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			world.spawnParticle(Particle.SMOKE_LARGE, to, 35, 0.1, 0.45, 0.1, 0.15);
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, to, 25, 0.2, 0, 0.2, 0.1);
 			new BukkitRunnable() {
-				int t = 0;
-				double y = 10;
-				ThreadLocalRandom rand = ThreadLocalRandom.current();
+				int mTime = 0;
+				double mY = 10;
+				ThreadLocalRandom mRand = ThreadLocalRandom.current();
 				@Override
 				public void run() {
-					t++;
-					y -= 0.1;
-					if (t % 6 == 0) {
-						Location loc = spawnLoc.clone().add(rand.nextDouble(-15, 15), 5 + rand.nextDouble(-5, 2), rand.nextDouble(-15, 15));
+					mTime++;
+					mY -= 0.1;
+					if (mTime % 6 == 0) {
+						Location loc = spawnLoc.clone().add(mRand.nextDouble(-15, 15), 5 + mRand.nextDouble(-5, 2), mRand.nextDouble(-15, 15));
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
 						world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					}
 
-					if (y <= 0) {
+					if (mY <= 0) {
 						this.cancel();
 						mBoss.setAI(true);
 						mBoss.teleport(spawnLoc);
@@ -211,7 +211,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK OINK OINK! OINK OINK OINK, OINK OINK OINK OINK!!! OOIIINNNKKK!!!\",\"color\":\"dark_red\"}]");
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
 					}
-					mBoss.teleport(mSpawnLoc.clone().add(0, y, 0));
+					mBoss.teleport(mSpawnLoc.clone().add(0, mY, 0));
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
@@ -244,37 +244,37 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			}
 
 			new BukkitRunnable() {
-				int t = 0;
+				int mTime = 0;
 
 				@Override
 				public void run() {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
-					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[t].toUpperCase() + "\",\"color\":\"dark_red\"}]");
-					t++;
-					if (t == dio.length) {
+					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mTime].toUpperCase() + "\",\"color\":\"dark_red\"}]");
+					mTime++;
+					if (mTime == dio.length) {
 						this.cancel();
 						new BukkitRunnable() {
-							double rotation = 0;
-							Location loc = mSpawnLoc.clone().add(5, -1.25, 0);
-							double radius = 5;
+							double mRotation = 0;
+							Location mLoc = mSpawnLoc.clone().add(5, -1.25, 0);
+							double mRadius = 5;
 
 							@Override
 							public void run() {
 
-								radius -= 0.25;
+								mRadius -= 0.25;
 								for (int i = 0; i < 15; i += 1) {
-									rotation += 24;
-									double radian1 = Math.toRadians(rotation);
-									loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-									world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0.1);
-									loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+									mRotation += 24;
+									double radian1 = Math.toRadians(mRotation);
+									mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+									world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+									mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 
 								}
-								if (radius <= 0) {
+								if (mRadius <= 0) {
 									this.cancel();
-									world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.125);
-									world.playSound(loc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
-									Chicken chicken = (Chicken) world.spawnEntity(loc, EntityType.CHICKEN);
+									world.spawnParticle(Particle.CLOUD, mLoc, 25, 0, 0, 0, 0.125);
+									world.playSound(mLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+									Chicken chicken = (Chicken) world.spawnEntity(mLoc, EntityType.CHICKEN);
 									chicken.setAI(false);
 									chicken.setAdult();
 									chicken.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 999, 10));
@@ -295,40 +295,40 @@ public class RabbitGodBoss extends BossAbilityGroup {
 									}.runTaskTimer(plugin, 0, 1);
 
 									new BukkitRunnable() {
-										int t = 0;
+										int mTime = 0;
 										@Override
 										public void run() {
-											if (t == 0) {
+											if (mTime == 0) {
 												world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 1f);
 												PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!? OINK OINK OINK!?!\",\"color\":\"dark_red\"}]");
 											}
-											t++;
+											mTime++;
 
-											if (t >= 20 * 4) {
+											if (mTime >= 20 * 4) {
 												this.cancel();
 												PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck. Cluck Cluck Cluck Cluck. Cluck CLUCK!!!\",\"color\":\"white\"}]");
 												world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, 1, 1);
 												world.playSound(chicken.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1, 1.35f);
 												new BukkitRunnable() {
-													double rotation = 0;
-													Location loc = spawnLoc.clone().add(5, -1.25, 0);
-													double radius = 10;
+													double mRotation = 0;
+													Location mLoc = spawnLoc.clone().add(5, -1.25, 0);
+													double mRadius = 10;
 
 													@Override
 													public void run() {
 														for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 															world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 0.25, 0), 1, 0.3, 0.3, 0.3, 0);
 														}
-														radius -= 0.2;
+														mRadius -= 0.2;
 														for (int i = 0; i < 24; i += 1) {
-															rotation += 15;
-															double radian1 = Math.toRadians(rotation);
-															loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-															world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0.1);
-															loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+															mRotation += 15;
+															double radian1 = Math.toRadians(mRotation);
+															mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+															world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+															mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 														}
 
-														if (radius <= 0) {
+														if (mRadius <= 0) {
 															this.cancel();
 															world.spawnParticle(Particle.CLOUD, chicken.getLocation(), 25, 0, 0, 0, 0.125);
 															world.playSound(chicken.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2);
@@ -350,19 +350,19 @@ public class RabbitGodBoss extends BossAbilityGroup {
 																player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 999, 2));
 															}
 															mBoss.setAI(true);
-															phase2 = true;
+															mPhase2 = true;
 															mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"Your curse of Clucking is suddenly brought out in power, making you feel extremely powerful!\",\"color\":\"aqua\"}]");
 															PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"You have gained OP AS CLUCK powers!! Cluck em' up!\",\"color\":\"aqua\"}]");
 															new BukkitRunnable() {
-																int t = 0;
+																int mTime = 0;
 																@Override
 																public void run() {
-																	t++;
-																	if (t == 1) {
+																	mTime++;
+																	if (mTime == 1) {
 																		world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_AMBIENT, 1.5f, 1f);
 																		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK!! OINK OINK OINK!!! OINK OINK!!!!!!!\",\"color\":\"dark_red\"}]");
-																	} else if (t == 2) {
+																	} else if (mTime == 2) {
 																		changePhase(phase2Spells, passive2Spells, null);
 																		this.cancel();
 																	}
@@ -393,30 +393,30 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0f);
 		new BukkitRunnable() {
-			double rotation = 0;
-			Location loc = mBoss.getLocation();
-			double radius = 0;
-			double y = 2.5;
-			double yminus = 0.35;
+			double mRotation = 0;
+			Location mLoc = mBoss.getLocation();
+			double mRadius = 0;
+			double mY = 2.5;
+			double mYminus = 0.35;
 
 			@Override
 			public void run() {
 
-				radius += 1;
+				mRadius += 1;
 				for (int i = 0; i < 15; i += 1) {
-					rotation += 24;
-					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
-					loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					mRotation += 24;
+					double radian1 = Math.toRadians(mRotation);
+					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 				}
-				y -= y * yminus;
-				yminus += 0.02;
-				if (yminus >= 1) {
-					yminus = 1;
+				mY -= mY * mYminus;
+				mYminus += 0.02;
+				if (mYminus >= 1) {
+					mYminus = 1;
 				}
-				if (radius >= r) {
+				if (mRadius >= r) {
 					this.cancel();
 				}
 
@@ -427,7 +427,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
-		if (phase2) {
+		if (mPhase2) {
 			event.setDamage(event.getDamage() * 15);
 		}
 	}
@@ -441,17 +441,17 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");
 		new BukkitRunnable() {
-			int t = 0;
-			ThreadLocalRandom rand = ThreadLocalRandom.current();
+			int mTime = 0;
+			ThreadLocalRandom mRand = ThreadLocalRandom.current();
 			@Override
 			public void run() {
-				t++;
-				Location loc = mBoss.getLocation().add(rand.nextDouble(-10, 10), rand.nextDouble(0, 3), rand.nextDouble(-10, 10));
+				mTime++;
+				Location loc = mBoss.getLocation().add(mRand.nextDouble(-10, 10), mRand.nextDouble(0, 3), mRand.nextDouble(-10, 10));
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
 				world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 
-				if (t >= 12) {
+				if (mTime >= 12) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OOOOOOIIIIIIINNNNNNNNNNKKKKKKKKK!!!!!!!\",\"color\":\"dark_red\"}]");
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_PIG_DEATH, 1.5f, 1f);
