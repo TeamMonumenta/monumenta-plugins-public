@@ -28,10 +28,11 @@ public class Sustenance implements BaseEnchantment {
 
 	@Override
 	public void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) {
-		if (target.getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK) {
+		if (target.getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK ||
+			target.getLastDamageCause().getCause() == DamageCause.CUSTOM) {
 			player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, 0);
 			player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EAT, 10f, 0.8f);
-			player.setSaturation(player.getSaturation() + level);
+			player.setSaturation(player.getSaturation() + level / 2);
 		}
 	}
 }
