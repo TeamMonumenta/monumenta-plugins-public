@@ -103,7 +103,7 @@ public class PrismaticShield extends Ability {
 
 		// Conditions match - prismatic shield
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 

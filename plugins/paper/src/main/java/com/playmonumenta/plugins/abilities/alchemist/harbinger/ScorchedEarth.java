@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -137,7 +138,7 @@ public class ScorchedEarth extends Ability {
 						mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 30, 0.2, 0.2, 0.2, 0);
 						mob.setNoDamageTicks(0);
 						Vector velocity = mob.getVelocity();
-						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue());
+						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.linkedSpell);
 						mob.setVelocity(velocity);
 						newMobHealths.put(mob, mob.getHealth());
 					}

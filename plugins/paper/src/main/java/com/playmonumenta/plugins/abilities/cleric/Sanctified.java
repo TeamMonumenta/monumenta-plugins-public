@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -32,6 +33,7 @@ public class Sanctified extends Ability {
 
 	public Sanctified(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Santified Armor");
+		mInfo.linkedSpell = Spells.SANCTIFIED;
 		mInfo.scoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
 		mInfo.mDescriptions.add("Whenever an undead enemy hits you with a melee attack, it takes 5 damage and it is knocked away from you.");
@@ -43,7 +45,7 @@ public class Sanctified extends Ability {
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
 		LivingEntity damager = (LivingEntity) event.getDamager();
 		if (EntityUtils.isUndead(damager) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer, MagicType.HOLY);
+			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 
 			MovementUtils.knockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
 

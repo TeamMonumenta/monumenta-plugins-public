@@ -49,7 +49,7 @@ public class ElementalSpiritIce extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getMagicType() == MagicType.ICE) {
+		if (event.getMagicType() == MagicType.ICE && event.getSpell() != null && !event.getSpell().equals(mInfo.linkedSpell)) {
 			mMobsDamaged.add(event.getDamaged());
 
 			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
@@ -85,7 +85,7 @@ public class ElementalSpiritIce extends Ability {
 									mWorld.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, ES_ICE_RADIUS)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
 										mob.setVelocity(new Vector(0, 0, 0));
 									}
 

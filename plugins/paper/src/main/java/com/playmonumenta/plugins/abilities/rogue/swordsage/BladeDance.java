@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -110,7 +111,7 @@ public class BladeDance extends Ability {
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 								mob.setNoDamageTicks(0);
-								EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+								EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 								MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
 
 								int amplifier = getAbilityScore() == 1 ? 2 : 3;

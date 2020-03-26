@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -29,6 +30,7 @@ public class BrutalAlchemy extends Ability {
 
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Brutal Alchemy");
+		mInfo.linkedSpell = Spells.BRUTAL_ALCHEMY;
 		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Killing a mob gives you an Alchemist's Potion. Your Alchemist's Potions deal 3 magic damage and 4s of Wither II. The first skill point spent on either Gruesome Alchemy or Brutal Alchemy will give you a potion per kill and a 30% chance of getting a second potion.");
@@ -52,7 +54,7 @@ public class BrutalAlchemy extends Ability {
 	}
 
 	public void apply(LivingEntity mob) {
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
 		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, mWitherDuration, 1, false, true));
 	}
 

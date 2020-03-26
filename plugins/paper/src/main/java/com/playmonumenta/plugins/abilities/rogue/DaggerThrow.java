@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -88,7 +89,7 @@ public class DaggerThrow extends Ability {
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						mWorld.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
 					} else if (bLoc.getBlock().getType().isSolid()) {

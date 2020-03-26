@@ -64,7 +64,7 @@ public class HallowedBeam extends Ability {
 						break;
 					}
 				}
-				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY);
+				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY, true, mInfo.linkedSpell);
 				Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
 				mWorld.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
@@ -74,7 +74,7 @@ public class HallowedBeam extends Ability {
 					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
 					for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, 5)) {
 						if (EntityUtils.isUndead(le)) {
-							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY);
+							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY, true, mInfo.linkedSpell);
 						}
 						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 					}

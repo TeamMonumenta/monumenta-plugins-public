@@ -123,9 +123,9 @@ public class Starfall extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									EntityUtils.damageEntity(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE);
+									EntityUtils.damageEntity(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE, true, mInfo.linkedSpell);
 								} else {
-									EntityUtils.damageEntity(mPlugin, e, (float) damage, player, MagicType.FIRE);
+									EntityUtils.damageEntity(mPlugin, e, (float) damage, player, MagicType.FIRE, true, mInfo.linkedSpell);
 								}
 								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e);
 

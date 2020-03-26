@@ -12,6 +12,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -27,6 +29,7 @@ public class BruteForce extends Ability {
 
 	public BruteForce(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Brute Force");
+		mInfo.linkedSpell = Spells.BRUTE_FORCE;
 		mInfo.scoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("When you critically strike, you deal 2 damage to all enemies near your target and knock them back.");
@@ -45,7 +48,7 @@ public class BruteForce extends Ability {
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, mPlayer)) {
 				if (mob != event.getEntity()) {
-					EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer);
+					EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 				}
 				if (!EntityUtils.isBoss(mob)) {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2);

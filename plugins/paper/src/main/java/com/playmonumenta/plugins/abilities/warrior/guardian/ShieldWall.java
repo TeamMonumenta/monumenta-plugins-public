@@ -152,7 +152,7 @@ public class ShieldWall extends Ability {
 								if (!mobsAlreadyHit.contains(le)) {
 									mobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
-									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY);
+									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 									if (knockback) {
 										MovementUtils.knockAway(loc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);

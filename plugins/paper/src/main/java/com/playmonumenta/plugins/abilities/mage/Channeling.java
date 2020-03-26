@@ -15,10 +15,12 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -43,6 +45,7 @@ public class Channeling extends Ability {
 
 	public Channeling(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Channeling");
+		mInfo.linkedSpell = Spells.CHANNELING;
 		mInfo.scoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add("After casting a spell, your next melee attack deals 3 extra damage. In addition it will have a bonus effect based on the type of spell used. Fire spells set the enemy on fire for 4s, ice spells slow the enemy for 4s, and arcane spells weaken the enemy for 4s.");
@@ -62,8 +65,20 @@ public class Channeling extends Ability {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mLastSpellCast != null && event.getEntity() instanceof LivingEntity && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			event.setDamage(event.getDamage() + mDamage);
 			LivingEntity mob = (LivingEntity) event.getEntity();
+
+			// Do Channeling damage in a runnable so we can set the damage ticks afterwards.
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					int ticks = mob.getNoDamageTicks();
+					mob.setNoDamageTicks(0);
+					// Call CustomDamageEvent, but not spellshock.
+					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell, false, false);
+					mob.setNoDamageTicks(ticks);
+				}
+			}.runTaskLater(mPlugin, 1);
+
 			Location loc = mob.getLocation();
 			mWorld.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 1.5f);
 			mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);

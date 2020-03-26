@@ -142,7 +142,9 @@ public class DarkPact extends Ability {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 1.5)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(loc.toVector()).normalize();
 					if (mob != event.getEntity() && dir.dot(toMobVector) > 0.6) {
-						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false);
+						// This won't proc Perspicacity unless we rework how that enchantment works
+						// This is because it doesn't call the CustomDamageEvent
+						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false, mInfo.linkedSpell);
 					}
 				}
 			}

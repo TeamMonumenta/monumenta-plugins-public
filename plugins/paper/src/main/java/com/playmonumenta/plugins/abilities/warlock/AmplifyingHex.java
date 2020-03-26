@@ -117,7 +117,7 @@ public class AmplifyingHex extends Ability {
 					debuffCount++;
 				}
 				if (debuffCount > 0) {
-					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player, MagicType.DARK_MAGIC);
+					EntityUtils.damageEntity(mPlugin, mob, debuffCount * damageMult, player, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
 					MovementUtils.knockAway(player, mob, AMPLIFYING_KNOCKBACK_SPEED);
 				}
 			}

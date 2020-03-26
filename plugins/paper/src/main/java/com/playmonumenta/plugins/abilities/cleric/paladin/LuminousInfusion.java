@@ -144,9 +144,9 @@ public class LuminousInfusion extends Ability {
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
 			mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
 			if (EntityUtils.isUndead(e)) {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer, MagicType.HOLY);
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 			} else {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer, MagicType.HOLY);
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 			}
 			MovementUtils.knockAway(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
 		}

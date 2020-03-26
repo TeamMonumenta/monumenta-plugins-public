@@ -109,7 +109,9 @@ public class PurpleHaze extends Ability {
 							int ticks = damagee.getNoDamageTicks();
 							damagee.setNoDamageTicks(0);
 							Vector v = damagee.getVelocity();
-							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */);
+							// This won't proc Perspicacity unless we rework how that enchantment works
+							// This is because it doesn't call the CustomDamageEvent
+							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));

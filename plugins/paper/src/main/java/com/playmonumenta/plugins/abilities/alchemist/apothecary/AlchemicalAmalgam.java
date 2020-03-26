@@ -100,7 +100,7 @@ public class AlchemicalAmalgam extends Ability {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox.overlaps(mob.getBoundingBox())) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
 						mobIter.remove();
 					}
 				}

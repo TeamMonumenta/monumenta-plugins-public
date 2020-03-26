@@ -55,7 +55,7 @@ public class FrostNova extends Ability {
 	public void cast(Action action) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			Vector velocity = mob.getVelocity();
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
 			mob.setVelocity(velocity);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier - 1, true, false));

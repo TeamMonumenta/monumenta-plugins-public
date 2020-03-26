@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -64,6 +65,7 @@ public class Spellshock extends Ability {
 
 	public Spellshock(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Spellshock");
+		mInfo.linkedSpell = Spells.SPELLSHOCK;
 		mInfo.scoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
@@ -121,7 +123,9 @@ public class Spellshock extends Ability {
 						// will not see it as intentional damage stacking, so iFrames need to be set manually
 						damagee.setNoDamageTicks(0);
 						Vector velocity = damagee.getVelocity();
-						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */);
+						// This won't proc Perspicacity unless we rework how that enchantment works
+						// This is because it doesn't call the CustomDamageEvent
+						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
 						damagee.setVelocity(velocity);
 					}
 

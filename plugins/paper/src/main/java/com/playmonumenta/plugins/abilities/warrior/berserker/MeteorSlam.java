@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -179,7 +180,7 @@ public class MeteorSlam extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
 			if (mob != damagee) {
-				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer);
+				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 			}
 		}
 

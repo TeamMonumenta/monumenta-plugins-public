@@ -65,7 +65,7 @@ public class CounterStrike extends Ability {
 				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */);
+					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */, true, mInfo.linkedSpell);
 				}
 			}
 
@@ -124,7 +124,7 @@ public class CounterStrike extends Ability {
 				if (mob != damagee) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 					if (playerDir.dot(toMobVector) > COUNTER_STRIKE_DOT_ANGLE) {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 					}
 				}
 			}

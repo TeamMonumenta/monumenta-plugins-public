@@ -11,6 +11,8 @@ public enum Spells {
 	MAGMA_SHIELD("Magma Shield"),
 	ARCANE_STRIKE("Arcane Strike"),
 	ELEMENTAL_ARROWS("Elemental Arrows"),
+	SPELLSHOCK("Spellshock"),
+	CHANNELING("Channeling"),
 
 	//--Elementalist Spec.
 	BLIZZARD("Blizzard"),
@@ -32,7 +34,7 @@ public enum Spells {
 	DAGGER_THROW("Dagger Throw"),
 
 	//--Swordsage Spec.
-	SNAKE_HEAD("Snake Head"),
+	RONDE("Deadly Ronde"),
 	BLADE_SURGE("Blade Surge"),
 	BLADE_DANCE("Blade Dance"),
 	WIND_WALK("Wind Walk"),
@@ -47,6 +49,7 @@ public enum Spells {
 	CELESTIAL_BLESSING("Celestial Blessing"),
 	CLEANSING("Cleansing Rain"),
 	HEALING("Hand of Light"),
+	SANCTIFIED("Sanctified Armor"),
 
 	//--Pally
 	HOLY_JAVELIN("Holy Javelin"),
@@ -99,6 +102,7 @@ public enum Spells {
 	DEFENSIVE_LINE("Defensive Line"),
 	COUNTER_STRIKE("Counter Strike"),
 	SHIELD_BASH("Shield Bash"),
+	BRUTE_FORCE("Brute Force"),
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),
@@ -110,6 +114,7 @@ public enum Spells {
 	BODYGUARD("Bodyguard"),
 
 	//Alchemist
+	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	POWER_INJECTION("Power Injection"),
 	IRON_TINCTURE("Iron Tincture"),
 	ENFEEBLING_ELIXIR("Enfeebling Elixir"),
@@ -117,12 +122,13 @@ public enum Spells {
 	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
 
 	//Harbinger
-	ADRENAL_SERUM("Adrenal Serum"),
+	NIGHTMARISH_ALCHEMY("Nightmarish Alchemy"),
 	SCORCHED_EARTH("Scorched Earth"),
 	PURPLE_HAZE("Purple Haze"),
 
 	//Apothecary
 	WARDING_REMEDY("Warding Remedy"),
+	INVIGORATING_ODOR("Invigorating_Odor"),
 	ALCHEMICAL_AMALGAM("Alchemical Amalgam");
 
 	private final String mName;

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -65,7 +66,7 @@ public class Rampage extends Ability {
 
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
-				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer);
+				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 				mWorld.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
 

@@ -14,6 +14,8 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -32,6 +34,7 @@ public class SplitArrow extends Ability {
 
 	public SplitArrow(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Split Arrow");
+		mInfo.linkedSpell = Spells.SPLIT_ARROW;
 		mInfo.scoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
 		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 6 damage. Any effects the arrows might have are also applied.");
@@ -71,7 +74,7 @@ public class SplitArrow extends Ability {
 				mWorld.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
 				mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
-				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer);
+				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
 			}
 		}

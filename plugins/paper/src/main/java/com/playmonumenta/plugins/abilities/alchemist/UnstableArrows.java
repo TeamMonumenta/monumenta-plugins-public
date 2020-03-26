@@ -86,7 +86,7 @@ public class UnstableArrows extends Ability {
 						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(explodeLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
-							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY);
+							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
 							MovementUtils.knockAwayRealistic(explodeLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
 							if (bp != null) {
 								bp.apply(mob);

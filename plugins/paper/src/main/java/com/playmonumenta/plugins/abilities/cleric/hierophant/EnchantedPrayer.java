@@ -130,7 +130,7 @@ public class EnchantedPrayer extends Ability {
 			double damage = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE;
 			double heal = enchantedPrayer == 1 ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(damagee.getLocation(), 3.5)) {
-				EntityUtils.damageEntity(plugin, le, damage, player, MagicType.HOLY);
+				EntityUtils.damageEntity(plugin, le, damage, player, MagicType.HOLY, true, Spells.ENCHANTED_PRAYER);
 			}
 			PlayerUtils.healPlayer(player, heal);
 		}

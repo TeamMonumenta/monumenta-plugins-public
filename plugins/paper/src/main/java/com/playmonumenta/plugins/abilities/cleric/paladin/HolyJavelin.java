@@ -90,9 +90,9 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY);
+						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 					} else {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 					}
 					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob);
 					iter.remove();

@@ -58,7 +58,7 @@ public class MagmaShield extends Ability {
 				if (mob instanceof Player && extraDamage > 10) {
 					extraDamage = 10;
 				}
-				EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE);
+				EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell);
 			}
 		}
 

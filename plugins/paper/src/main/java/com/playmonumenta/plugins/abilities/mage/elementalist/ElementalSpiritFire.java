@@ -51,7 +51,7 @@ public class ElementalSpiritFire extends Ability {
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getMagicType() == MagicType.FIRE) {
+		if (event.getMagicType() == MagicType.FIRE && event.getSpell() != null && !event.getSpell().equals(mInfo.linkedSpell)) {
 			mMobsDamaged.add(event.getDamaged());
 
 			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
@@ -87,7 +87,7 @@ public class ElementalSpiritFire extends Ability {
 									LivingEntity mob = iter.next();
 									if (mob.getBoundingBox().overlaps(fireSpirit)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer);
+										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell);
 										iter.remove();
 									}
 								}

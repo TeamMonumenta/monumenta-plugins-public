@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -240,7 +241,7 @@ public class BodkinBlitz extends Ability {
 							}.runTaskTimer(mPlugin, 0, 1);
 						}
 						int damage = getAbilityScore() == 1 ? BODKINBLITZ_1_DAMAGE : BODKINBLITZ_2_DAMAGE;
-						EntityUtils.damageEntity(mPlugin, target, damage, mPlayer);
+						EntityUtils.damageEntity(mPlugin, target, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 					}
 					this.cancel();
 				}

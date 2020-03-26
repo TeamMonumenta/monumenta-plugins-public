@@ -94,7 +94,9 @@ public class Exorcism  extends Ability {
 					int ticks = mob.getNoDamageTicks();
 					mob.setNoDamageTicks(0);
 					Vector v = mob.getVelocity();
-					EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, MagicType.DARK_MAGIC, false /* do not register CustomDamageEvent */);
+					// This won't proc Perspicacity unless we rework how that enchantment works
+					// This is because it doesn't call the CustomDamageEvent
+					EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, MagicType.DARK_MAGIC, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
 					mob.setVelocity(v);
 					mob.setNoDamageTicks(ticks);
 					EntityUtils.applyFire(mPlugin, EXORCISM_DURATION, mob);

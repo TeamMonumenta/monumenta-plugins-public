@@ -29,7 +29,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 /*
- * Fractal Enervation: Sprint right-click fires a dark magic beam
+ * Fractal Enervation: Double right-clicking fires a dark magic beam
  * (max range: 9), afflicting all enemies it hits with blindness that
  * lasts 12s. The beam then instantly
  * spreads to all enemies in a 3 / 4-block radius, and then from them,
@@ -147,7 +147,7 @@ public class FractalEnervation extends Ability {
 				mob.addPotionEffect(new PotionEffect(types, effect.getDuration(), effect.getAmplifier() + 1));
 			}
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
-			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer, MagicType.DARK_MAGIC);
+			EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
 		}
