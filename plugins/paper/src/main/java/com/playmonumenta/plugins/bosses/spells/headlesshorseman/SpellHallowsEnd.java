@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -56,11 +55,11 @@ public class SpellHallowsEnd extends Spell {
 					world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
 				}
 				for (double deg = 0; deg < 360; deg += 6) {
-					double x = Math.cos(deg) * 2.5;
-					double z = Math.sin(deg) * 2.5;
+					double x = Math.cos(deg) * 3.5;
+					double z = Math.sin(deg) * 3.5;
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(x, 0, z), 1, 0.15, 0.15, 0.15, 0);
 				}
-				
+
 				if (t >= 25) {
 					this.cancel();
 					for (int i = 0; i < 15; i++) {
@@ -73,7 +72,7 @@ public class SpellHallowsEnd extends Spell {
 					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15);
 					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-					for (Player player : PlayerUtils.playersInRange(loc, 2.5)) {
+					for (Player player : PlayerUtils.playersInRange(loc, 3.5)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();
 							player.setNoDamageTicks(0);

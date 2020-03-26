@@ -68,7 +68,7 @@ public class SpellReaperOfLife extends Spell {
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 			if (players.size() == 0) {
-				return; 
+				return;
 			}
 			for (Player player : PlayerUtils.playersInRange(mCenter, mRange)) {
 				if (!mWarnedPlayers.contains(player)) {
@@ -76,7 +76,7 @@ public class SpellReaperOfLife extends Spell {
 					player.sendMessage(ChatColor.AQUA + "Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?");
 				}
 			}
-			
+
 			new BukkitRunnable() {
 				double mN = 0;
 				double mPlayerScalingHP = 0;
@@ -85,19 +85,19 @@ public class SpellReaperOfLife extends Spell {
 					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 						fallingBlock.remove();
 						fallingBlock.getLocation().getBlock().setType(Material.AIR);
-						
+
 						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 						if (players.size() == 0) {
-						      return; 
+						      return;
 						}
-						
+
 						int playerCount = players.size();
 						for (int i = 1; i <= playerCount; i++) {
-							mN = mN + (150 / (Math.log(i) / Math.log(2)));
+							mN = mN + (150 / (Math.log(i + 1) / Math.log(2)));
 						}
 						mPlayerScalingHP = mN;
-						if (mPlayerScalingHP > 600) {
-							mPlayerScalingHP = 600;
+						if (mPlayerScalingHP > 1000) {
+							mPlayerScalingHP = 1000;
 						}
 						String summonNbt = "{CustomName:\"{\\\"text\\\":\\\"World Ender\\\"}\",Health:" + Double.toString(mPlayerScalingHP) + "f,Attributes:[{Base:" + Double.toString(mPlayerScalingHP) + "d,Name:\"generic.maxHealth\"}],Size:1}";
 						EntityUtils.summonEntityAt(mCenter, EntityType.MAGMA_CUBE, summonNbt);
@@ -121,14 +121,14 @@ public class SpellReaperOfLife extends Spell {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void bomb(LivingEntity z, double mPSHP) {
 		z.setAI(false);
 		z.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPSHP);
 		z.setHealth(mPSHP);
 		new BukkitRunnable() {
 			int mInc = 0;
-			
+
 			@Override
 			public void run() {
 				World world = mBoss.getWorld();
@@ -138,7 +138,7 @@ public class SpellReaperOfLife extends Spell {
 					mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 					this.cancel();
 					return;
-					
+
 				}
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					if (!z.isDead()) {
@@ -176,7 +176,7 @@ public class SpellReaperOfLife extends Spell {
 					}
 				}
 			}
-			
+
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 

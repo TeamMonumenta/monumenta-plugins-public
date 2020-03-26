@@ -160,7 +160,7 @@ public class SpellSinisterReach extends Spell {
 				}
 				mInc++;
 
-				if (mInc < 30 && mInc % 2 == 0) {
+				if (mInc < 36 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
 					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
 					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), (event) -> {
@@ -169,7 +169,7 @@ public class SpellSinisterReach extends Spell {
 						}
 					}, true);
 				}
-				if (mInc >= 30) {
+				if (mInc >= 36) {
 					p.setNoDamageTicks(mNDT);
 					mBoss.setAI(true);
 					horse.setAI(true);

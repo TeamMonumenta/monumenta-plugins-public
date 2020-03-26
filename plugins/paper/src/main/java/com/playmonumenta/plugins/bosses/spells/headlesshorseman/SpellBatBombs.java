@@ -44,7 +44,7 @@ public class SpellBatBombs extends Spell {
 			@Override
 			public void run() {
 				t++;
-				
+
 				if (t >= 30) {
 					this.cancel();
 					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125);
@@ -70,7 +70,7 @@ public class SpellBatBombs extends Spell {
 								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
-								for (Player player : PlayerUtils.playersInRange(loc, 4.5)) {
+								for (Player player : PlayerUtils.playersInRange(loc, 5.5)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 										BossUtils.bossDamage(mHorseman.getEntity(), player, 32, loc, (event) -> {
 											if (!event.isPlayerBlocking()) {
