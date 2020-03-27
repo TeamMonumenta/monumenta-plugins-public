@@ -59,7 +59,7 @@ public class SpellVolcanicDemise extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
-			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
+			player.sendMessage(ChatColor.GREEN + "SCRAM! DO NOT ANNOY MY PIZZA TIME!");
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {

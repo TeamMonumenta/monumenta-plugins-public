@@ -21,8 +21,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -33,7 +33,6 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
-import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBatBombs;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBurningVengence;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellHallowsEnd;
@@ -164,7 +163,9 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\": \"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
+			World world = mBoss.getWorld();
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Horse] \",\"color\": \"dark_red\"},{\"text\":\"Neigh\",\"color\":\"gold\"}]");
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_ANGRY, 3, 1);
 		});
 
 		events.put(50, mBoss -> {
@@ -202,11 +203,15 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 			}.runTaskTimer(mPlugin, 0, 1);
 			changePhase(phase2Spells, phase2Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to go all out.\",\"color\":\"gold\"}]");
+			World world = mBoss.getWorld();
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Horse] \",\"color\":\"gold\"},{\"text\":\"NEIGH\",\"color\":\"dark_red\"}]");
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_HURT, 3, 1);
 		});
 
 		events.put(10, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Meet your hallow end mortal!\",\"color\":\"gold\"}]");
+			World world = mBoss.getWorld();
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] NEIGH!!\",\"color\":\"dark_red\"}]");
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_SKELETON_HORSE_DEATH, 3, 1);
 			forceCastSpell(SpellReaperOfLife.class);
 		});
 
@@ -272,7 +277,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
 			}
 		}
-		
+
 		if (event.getEntity().getLocation().distance(mBoss.getLocation()) < 2.5) {
 			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange);
 			if (players.contains(event.getEntity())) {
@@ -360,7 +365,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
+			player.sendMessage(ChatColor.DARK_RED + "[Horse] neigh.");
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));

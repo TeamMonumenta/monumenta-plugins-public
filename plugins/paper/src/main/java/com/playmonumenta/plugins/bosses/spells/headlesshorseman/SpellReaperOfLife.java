@@ -65,7 +65,7 @@ public class SpellReaperOfLife extends Spell {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, 3, 1.5f);
 			world.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
 			world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
-			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[Horse] NEIGH!\",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"}]");
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange);
 			if (players.size() == 0) {
 				return;
