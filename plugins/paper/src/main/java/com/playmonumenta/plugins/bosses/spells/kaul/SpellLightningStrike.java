@@ -11,7 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -29,8 +28,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * ( 22s cd )
  */
 public class SpellLightningStrike extends Spell {
-	private static final String LIGHTNING_STRIKE_METAKEY = "MonumentaPlayerStruckByKaulLightning";
-	private static final int NO_STRIKE_PERIOD = 60;
 
 	private int mCooldown = 0;
 	private LivingEntity mBoss;
@@ -54,6 +51,10 @@ public class SpellLightningStrike extends Spell {
 
 	@Override
 	public void run() {
+		if (SpellPutridPlague.getPlagueActive()) {
+		    return;
+		}
+
 		mCooldown--;
 		if (mCooldown <= 0) {
 			mCooldown = (mTimer / 5);
@@ -78,7 +79,6 @@ public class SpellLightningStrike extends Spell {
 					lightning(player);
 				}
 			}
-
 		}
 	}
 
@@ -113,18 +113,10 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
-						/* Get the last time the player was struck by this attack */
-						int lastStrikeTime = 0;
-						if (p.hasMetadata(LIGHTNING_STRIKE_METAKEY)) {
-							lastStrikeTime = p.getMetadata(LIGHTNING_STRIKE_METAKEY).get(0).asInt();
-						}
-
-						if ((p.getTicksLived() - lastStrikeTime) > NO_STRIKE_PERIOD) {
-							BossUtils.bossDamagePercent(mBoss, p, 0.4, loc);
-
-							/* Store the current time the player was struck */
-							p.setMetadata(LIGHTNING_STRIKE_METAKEY, new FixedMetadataValue(mPlugin, p.getTicksLived()));
-						}
+						int ndt = p.getNoDamageTicks();
+						p.setNoDamageTicks(0);
+						BossUtils.bossDamagePercent(mBoss, p, 0.4, loc);
+						p.setNoDamageTicks(ndt);
 					}
 				}
 			}

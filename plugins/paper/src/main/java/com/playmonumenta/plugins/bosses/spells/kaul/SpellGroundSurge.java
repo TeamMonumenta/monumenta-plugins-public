@@ -62,6 +62,9 @@ public class SpellGroundSurge extends Spell {
 				if (t >= 20 * 2.5) {
 					this.cancel();
 					final int targets;
+					if (players.size() == 0) {
+						return;
+					}
 					if (players.size() <= 1) {
 						targets = 1;
 					} else if (players.size() == 2) {

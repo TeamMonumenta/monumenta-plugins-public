@@ -41,8 +41,13 @@ public class SpellPutridPlague extends Spell {
 	private double mRange;
 	private Random rand = new Random();
 	private boolean mPhase3;
+	private static boolean mPlagueActive;
 	private int mTime;
 	private Location mCenter;
+
+	public static boolean getPlagueActive() {
+	    return mPlagueActive;
+	}
 
 	public SpellPutridPlague(Plugin plugin, LivingEntity boss, double range, boolean phase3, Location center) {
 		mPlugin = plugin;
@@ -55,6 +60,15 @@ public class SpellPutridPlague extends Spell {
 
 	@Override
 	public void run() {
+		mPlagueActive = true;
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mPlagueActive = false;
+			}
+		}.runTaskLater(mPlugin, mTime);
+
 		double damage = mPhase3 ? 20 : 14;
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
