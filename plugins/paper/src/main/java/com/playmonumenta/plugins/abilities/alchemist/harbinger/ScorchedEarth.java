@@ -51,8 +51,8 @@ public class ScorchedEarth extends Ability {
 	private static final int SCORCHED_EARTH_WEAKNESS_AMP = 0;
 	private static final int SCORCHED_EARTH_BONUS_DAMAGE = 3;
 	private static final double SCORCHED_EARTH_RADIUS = 5;
-	private static final Particle.DustOptions SCORCHED_EARTH_COLOR_1 = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
-	private static final Particle.DustOptions SCORCHED_EARTH_COLOR_2 = new Particle.DustOptions(Color.fromRGB(64, 0, 0), 1.0f);
+	private static final Color SCORCHED_EARTH_COLOR_LIGHT = Color.fromRGB(230, 134, 0);
+	private static final Color SCORCHED_EARTH_COLOR_DARK = Color.fromRGB(140, 63, 0);
 
 	/*
 	 * I now hate myself for coming up with this skill, since jank is
@@ -105,11 +105,24 @@ public class ScorchedEarth extends Ability {
 							iter.remove();
 						} else {
 							timer.setValue(timer.getValue() - 1);
-
+							
 							Location loc = entry.getKey();
-							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 4, 1, 4, 0, SCORCHED_EARTH_COLOR_1);
-							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 4, 1, 4, 0, SCORCHED_EARTH_COLOR_2);
-							mWorld.spawnParticle(Particle.LAVA, loc, 1, 4, 1, 4, 0.2);
+							
+							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 2.1, 0.3, 2.1, 0);
+							mWorld.spawnParticle(Particle.FLAME, loc, 1, 2, 0.1, 2, 0.1f);
+							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
+							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
+							
+							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin(timer.getValue() % 40 / 20.0 * Math.PI), 0, 5 * Math.cos(timer.getValue() % 40 / 20.0 * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
+							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * Math.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
+							
+							if (timer.getValue() % 4 == 0) {
+								mWorld.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);
+							}
+							
+							if (timer.getValue() % 120 == 0 && timer.getValue() > 1) {
+								mWorld.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
+							}
 						}
 					}
 
@@ -135,7 +148,9 @@ public class ScorchedEarth extends Ability {
 					// Damage the mobs
 					for (Map.Entry<LivingEntity, Player> entry : mobsToBeDamaged.entrySet()) {
 						LivingEntity mob = entry.getKey();
-						mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 30, 0.2, 0.2, 0.2, 0);
+						mWorld.spawnParticle(Particle.FLAME, mob.getLocation().clone().add(0, 1, 0), 5, 0.25, 0.5, 0.25, 0.05);
+						mWorld.spawnParticle(Particle.REDSTONE, mob.getLocation().clone().add(0, 1, 0), 15, 0.35, 0.5, 0.35, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f));
+						mWorld.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
 						mob.setNoDamageTicks(0);
 						Vector velocity = mob.getVelocity();
 						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.linkedSpell);
@@ -181,8 +196,17 @@ public class ScorchedEarth extends Ability {
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
-			mWorld.playSound(loc, Sound.ENTITY_TNT_PRIMED, 3, 0.2f);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 300, 4, 1, 4, 0);
+			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 100, 2.1, 0.5, 2.1, 0.1);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 2.1, 0.5, 2.1, 0);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.5, 1, 0.4, 60);
+			mWorld.spawnParticle(Particle.FLAME, loc, 40, 2.1, 0.5, 2.1, 0.1);
+			mWorld.spawnParticle(Particle.LAVA, loc, 35, 1.5, 0.5, 1.5, 0);
+			
+			mWorld.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
+			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+			mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
+			
 			mZoneCenters.put(loc, new AbstractMap.SimpleEntry<Player, Integer>(mPlayer, SCORCHED_EARTH_DURATION));
 		}
 

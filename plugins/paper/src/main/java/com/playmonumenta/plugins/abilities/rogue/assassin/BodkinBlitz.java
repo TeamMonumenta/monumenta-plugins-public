@@ -39,6 +39,8 @@ public class BodkinBlitz extends Ability {
 	private static final int BODKINBLITZ_COOLDOWN = 25 * 20;
 	private static final int BODKINBLITZ_1_DAMAGE = 25;
 	private static final int BODKINBLITZ_2_DAMAGE = 30;
+	private static final int BODKINBLITZ_1_STEP = 20;
+	private static final int BODKINBLITZ_2_STEP = 25;
 
 	private int mLeftClicks = 0;
 	private LivingEntity mark;
@@ -83,63 +85,54 @@ public class BodkinBlitz extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
 
 		new BukkitRunnable() {
-			Location boxLoc;
-			Vector shiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
-			BoundingBox loc = mPlayer.getBoundingBox();
-			int j = 0;
+			Location mTpLoc = mPlayer.getLocation();
+			Vector mShiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
+			BoundingBox mPlayerBox = mPlayer.getBoundingBox();
+			int mTick = 0;
+			int mStep = getAbilityScore() == 1 ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
 
 			@Override
 			public void run() {
-				// Since the player's bounding box is a bit too close to the ground. This should give players more distance more consistently
-				// (due to how the teleport location is currently determined)
-				loc.shift(0, 0.15, 0);
-
 				// Fire projectile.
-				for (int i = 0; i < 15; i++) {
-					boxLoc = loc.getCenter().toLocation(mWorld);
-					boxLoc.setDirection(mPlayer.getLocation().getDirection());
-
-					/**
-					 * Going to continue to work on this for next week. What I want is for it to
-					 * teleport smarter: if the bounding box overlaps with a ceiling or floor,
-					 * it will try to reposition to find a suitable location within y +- 0.5.
-					 */
-//					boolean isBlocked = true;
-//					for (int x = -1; x <= 1; x++) {
-//						for (int z = -1; z <= 1; z++) {
-//							for (int y = -1; y <= 1; y++) {
-//								for (int dy = 0; dy < 8; dy++) {
-//									// This condition here just saves us a few checks.
-//									if (isBlocked) {
-//										Block block = boxLoc.clone().add(x, y + dy / 10.0, z).getBlock();
-//										if (!block.getBoundingBox().overlaps(loc) || !block.getType().isSolid()) {
-//											isBlocked = false;
-//											break;
-//										}
-//									}
-//								}
-//							}
-//						}
-//					}
-
-					boolean isBlocked = false;
-					for (int x = -1; x <= 1; x++) {
-						for (int z = -1; z <= 1; z++) {
-							for (int y = -1; y <= 1; y++) {
-								// This condition here just saves us a few checks.
-								if (!isBlocked) {
-									Block block = boxLoc.clone().add(x, y, z).getBlock();
-									if (block.getType().isSolid() && block.getBoundingBox().overlaps(loc)) {
-										isBlocked = true;
-										break;
+				for (int i = 0; i < mStep; i++) {
+					Location boxLoc = mPlayerBox.getCenter().toLocation(mWorld);
+					
+					boolean isBlocked = true;
+					BoundingBox testBox = mPlayerBox;
+					testBox.shift(0, -0.5, 0);
+					for (int dy = 0; dy < 10; dy++) {
+						// Start by scanning along the y-axis, from -0.5 to +0.5, to find the lowest available space.
+						boolean isValid = true;
+						for (int x = -1; x <= 1; x++) {
+							for (int z = -1; z <= 1; z++) {
+								for (int y = 0; y <= 2; y++) {
+									// Checking the blocks around the hitbox.
+									if (isValid) {
+										// If a bad spot has already been found, then there's no need to check the rest-- this spot is invalid.
+										Block block = testBox.getCenter().toLocation(mWorld).add(x * 0.4, dy / 10.0 + y * 0.975 - testBox.getHeight() / 2, z * 0.4).clone().add(x * 0.4, 0, z * 0.4).getBlock();
+										// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
+										
+										if (block.getType().isSolid() && block.getBoundingBox().overlaps(testBox)) {
+											isValid = false;
+										}
 									}
 								}
 							}
 						}
+						
+						// If the spot above is valid, then a spot has been found! No need to continue checking.
+						if (isValid) {
+							mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, dy / 10.0 - testBox.getHeight() / 2, 0);
+							isBlocked = false;
+							break;
+						}
+						
+						testBox.shift(0, 0.1, 0);
 					}
 
 					if (isBlocked) {
-						j = 4;
+						// If no spot was found, then you've literally hit a wall. Stop iterating.
+						mTick = 4;
 						break;
 					}
 
@@ -148,40 +141,31 @@ public class BodkinBlitz extends Ability {
 					mWorld.spawnParticle(Particle.CRIT, boxLoc, 4, 0.25, 0.5, 0.25, 0);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 5, 0.15, 0.45, 0.15, 0.01);
 
-					loc.shift(shiftVec);
+					mPlayerBox.shift(mShiftVec);
 
 				}
-				j++;
+				mTick++;
 				// Each incrementation of j checks for 1.5 blocks, for a max of 4 (6 blocks).
 				// This is so that we can have a small projectile animation.
 
 				// Teleport player
-				if (j >= 4) {
-					Location tpLoc = boxLoc.clone().add(0, -0.85, 0);
+				if (mTick >= 4) {
+					mTpLoc.setDirection(mPlayer.getLocation().getDirection());
+					mTpLoc.add(0, 0.1, 0);
+					mPlayer.teleport(mTpLoc);
 
-					for (int i = 0; i < 10; i++) {
-						if (!tpLoc.getBlock().getType().isSolid()) {
-							tpLoc.subtract(0, 0.1, 0);
-						} else {
-							tpLoc.add(0, 0.3, 0);
-							break;
-						}
-					}
+					mWorld.playSound(mTpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
+					mWorld.playSound(mTpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
+					mWorld.playSound(mTpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
+					mWorld.playSound(mTpLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
+					mWorld.playSound(mTpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
+					mWorld.playSound(mTpLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
 
-					mPlayer.teleport(tpLoc);
-
-					mWorld.playSound(boxLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
-					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
-					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
-					mWorld.playSound(boxLoc, Sound.ITEM_TRIDENT_HIT, 1f, 1f);
-					mWorld.playSound(boxLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
-					mWorld.playSound(boxLoc, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f);
-
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, boxLoc, 30, 0.25, 0.5, 0.25, 0.18);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, boxLoc, 15, 0.25, 0.5, 0.25, 0.04);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, boxLoc, 15, 0.5, 0.5, 0.5, 0);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, boxLoc, 50, 0.75, 0.5, 0.75, 0.05);
-					mWorld.spawnParticle(Particle.CRIT, boxLoc, 25, 1, 1, 1, 0.3);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, mTpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, mTpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, mTpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mTpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05);
+					mWorld.spawnParticle(Particle.CRIT, mTpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3);
 
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
