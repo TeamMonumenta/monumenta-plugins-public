@@ -143,8 +143,7 @@ public class SocketManager {
 	}
 
 	private void doWork(String op, String source, JsonObject data) throws Exception {
-		/* TODO: Make this debug later */
-		mPlugin.getLogger().info("Processing message from=" + source + " op=" + op);
+		mPlugin.getLogger().fine("Processing message from=" + source + " op=" + op);
 
 		switch (op) {
 			case BroadcastCommandPacket.PacketOperation:
@@ -219,8 +218,7 @@ public class SocketManager {
 				mChannel.basicPublish("", packet.getDestination(), properties, msg);
 			}
 
-			/* TODO: Make this debug later */
-			mPlugin.getLogger().info("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
+			mPlugin.getLogger().fine("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
 
 			return true;
 		} catch (Exception e) {

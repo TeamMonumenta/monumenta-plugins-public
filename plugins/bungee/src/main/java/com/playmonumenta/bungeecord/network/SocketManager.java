@@ -128,8 +128,7 @@ public class SocketManager {
 	}
 
 	private void doWork(String op, String source, JsonObject data) throws Exception {
-		/* TODO: Make this debug later */
-		mMain.getLogger().info("Processing message from=" + source + " op=" + op);
+		mMain.getLogger().fine("Processing message from=" + source + " op=" + op);
 
 		switch (op) {
 			case BungeeCommandPacket.PacketOperation:
@@ -185,8 +184,7 @@ public class SocketManager {
 		try {
 			mChannel.basicPublish("", packet.getDestination(), null, raw.toString().getBytes(StandardCharsets.UTF_8));
 
-			/* TODO: Make this debug later */
-			mMain.getLogger().info("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
+			mMain.getLogger().fine("Sent message to=" + packet.getDestination() + " op=" + packet.getOperation());
 
 			return true;
 		} catch (Exception e) {
