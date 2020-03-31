@@ -93,6 +93,14 @@
             <artifactId>amqp-client</artifactId>
             <version>5.8.0</version>
         </dependency>
+        <!-- This one needs to be shaded in also! -->
+        <dependency>
+        	<groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.2.0</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -199,6 +207,12 @@
                             <mainClass>com.playmonumenta.plugins.Plugin</mainClass>
                         </transformer>
                     </transformers>
+                    <relocations>
+                    	<relocation>
+                    		<pattern>redis.clients.jedis</pattern>
+                    		<shadedPattern>com.monumenta.plugins.internal.jedis</shadedPattern>
+                    	</relocation>
+                    </relocations>
                 </configuration>
                 <executions>
                     <execution>

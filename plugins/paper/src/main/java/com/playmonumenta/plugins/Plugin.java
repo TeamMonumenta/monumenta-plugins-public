@@ -64,6 +64,7 @@ import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.redis.RedisManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
@@ -89,6 +90,8 @@ public class Plugin extends JavaPlugin {
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
 	private BossManager mBossManager;
+
+	public RedisManager mRedis;
 
 	public SocketManager mSocketManager;
 
@@ -159,6 +162,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
+		mRedis = new RedisManager();
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
@@ -294,6 +298,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
+		mRedis.mPool.close();
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
