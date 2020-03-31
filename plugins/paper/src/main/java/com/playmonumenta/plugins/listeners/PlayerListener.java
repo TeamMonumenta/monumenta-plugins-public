@@ -621,11 +621,9 @@ public class PlayerListener implements Listener {
 				ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 				if (result == ItemDeathResult.SHATTER_NOW) {
 					// Item has Curse of Vanishing. It should be shattered
-					Location location = player.getLocation();
 					ItemUtils.shatterItem(item);
-					player.getWorld().dropItemNaturally(location, item);
-					// This still needs to happen so the player doesn't respawn with the item.
-					inv.clear(slot);
+					// Then treat it like a normal item
+					dropAndMarkItem(player, droppedItems, inv, slot, item, result);
 				} else if (result == ItemDeathResult.KEEP) {
 					// Item is kept with no durability loss
 					// This empty if statement is intentional so it's not included in "else".
@@ -633,54 +631,8 @@ public class PlayerListener implements Listener {
 				           (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
 					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
 				} else {
-					// Item is dropped, decide what to do with it.
-					Location location = player.getLocation();
-					Item droppedItem = player.getWorld().dropItemNaturally(location, item);
-					// Make sure items don't float away unless they're in water
-					new BukkitRunnable() {
-						int numTicks = 0;
-
-						@Override
-						public void run() {
-							if (droppedItem != null && droppedItem.isValid()) {
-								Location dLoc = droppedItem.getLocation();
-								if (!dLoc.getBlock().isLiquid() && dLoc.getY() > location.getY() + 2) {
-									droppedItem.teleport(location);
-								}
-							} else {
-								this.cancel();
-							}
-
-							// Very infrequently check if the item is still actually there
-							numTicks++;
-							if (numTicks > 30) {
-								numTicks = 0;
-								if (!EntityUtils.isStillLoaded(droppedItem)) {
-									this.cancel();
-								}
-							}
-						}
-					}.runTaskTimer(Plugin.getInstance(), 1 * 20, 1 * 20);
-					if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
-						droppedItem.setInvulnerable(true);
-					} else {
-						// Make item invulnerable to explosions for 5 seconds
-						droppedItem.addScoreboardTag("ExplosionImmune");
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								if (droppedItem != null && droppedItem.isValid()) {
-									droppedItem.removeScoreboardTag("ExplosionImmune");
-								}
-							}
-						}.runTaskLater(Plugin.getInstance(), 5 * 20);
-					}
-					if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER) &&
-					    !player.getScoreboardTags().contains("DisableGraves")) {
-						GraveUtils.setGraveScoreboard(droppedItem, player, location);
-					}
-					droppedItems.add(droppedItem);
-					inv.clear(slot);
+					// Migrated normal item treatment to a method so Curse of Vanishing items can be treated the same way
+					dropAndMarkItem(player, droppedItems, inv, slot, item, result);
 				}
 			}
 
@@ -701,6 +653,61 @@ public class PlayerListener implements Listener {
 		// Clear effects
 		mPlugin.mPotionManager.clearAllPotions(player);
 		mPlugin.mAbilityManager.updatePlayerAbilities(player);
+	}
+
+	private void dropAndMarkItem(Player player, List<Item> droppedItems, PlayerInventory inv, int slot, ItemStack item,
+			ItemDeathResult result) {
+		// Item is dropped, decide what to do with it.
+		Location location = player.getLocation();
+		Item droppedItem = player.getWorld().dropItemNaturally(location, item);
+		// Make sure items don't float away unless they're in water
+		new BukkitRunnable() {
+			int mNumTicks = 0;
+
+			@Override
+			public void run() {
+				if (droppedItem != null && droppedItem.isValid()) {
+					Location dLoc = droppedItem.getLocation();
+					// Check the item's location and the next block down for water, just in case it bobs out of the water.
+					// Should fix the weird bug with hoped items no longer floating?
+					if (!(dLoc.getBlock().isLiquid() || dLoc.clone().subtract(0, 1, 0).getBlock().isLiquid())
+							&& dLoc.getY() > location.getY() + 2) {
+						droppedItem.teleport(location);
+					}
+				} else {
+					this.cancel();
+				}
+
+				// Very infrequently check if the item is still actually there
+				mNumTicks++;
+				if (mNumTicks > 30) {
+					mNumTicks = 0;
+					if (!EntityUtils.isStillLoaded(droppedItem)) {
+						this.cancel();
+					}
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 1 * 20, 1 * 20);
+		if (InventoryUtils.testForItemWithLore(item, ChatColor.GRAY + "Hope")) {
+			droppedItem.setInvulnerable(true);
+		} else {
+			// Make item invulnerable to explosions for 5 seconds
+			droppedItem.addScoreboardTag("ExplosionImmune");
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (droppedItem != null && droppedItem.isValid()) {
+						droppedItem.removeScoreboardTag("ExplosionImmune");
+					}
+				}
+			}.runTaskLater(Plugin.getInstance(), 5 * 20);
+		}
+		if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW) &&
+		    !player.getScoreboardTags().contains("DisableGraves")) {
+			GraveUtils.setGraveScoreboard(droppedItem, player, location);
+		}
+		droppedItems.add(droppedItem);
+		inv.clear(slot);
 	}
 
 	// The player has respawned.

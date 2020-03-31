@@ -23,7 +23,8 @@ public class GraveUtils {
 		boolean destroyItem = true;
 		ItemStack item = entity.getItemStack();
 		ItemDeathResult result = ItemUtils.getItemDeathResult(item);
-		if (result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER && entity.getScoreboardTags().contains("PlayerDeath")) {
+		if (result == ItemDeathResult.SAFE || (result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW)
+				&& entity.getScoreboardTags().contains("PlayerDeath")) {
 			Location location = null;
 			String username = null;
 			// Item contains Player Death data, extract that data into variables
