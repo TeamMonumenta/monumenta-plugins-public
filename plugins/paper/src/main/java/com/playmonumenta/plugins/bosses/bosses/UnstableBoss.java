@@ -25,6 +25,6 @@ public class UnstableBoss extends BossAbilityGroup {
 	@Override
 	public void death(EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		loc.getWorld().createExplosion(loc, 4F);
+		loc.getWorld().createExplosion(mBoss, 4F, false);
 	}
 }
