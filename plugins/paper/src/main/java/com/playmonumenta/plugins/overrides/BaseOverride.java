@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +36,7 @@ public class BaseOverride {
 		return true;
 	}
 
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		return true;
 	}
 

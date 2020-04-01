@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.overrides;
 
+import java.util.Collection;
+
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,8 +28,15 @@ public class EnderChestOverride extends BaseOverride {
 
 	/* Chests placed on barriers can not be broken */
 	@Override
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		if ((player.getGameMode() == GameMode.CREATIVE) || ChestOverride.breakable(block)) {
+			ItemStack inHand = player.getInventory().getItemInMainHand();
+			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)
+					&& inHand != null && inHand.getEnchantmentLevel(Enchantment.SILK_TOUCH) != 0) {
+				event.setDropItems(false);
+				Collection<ItemStack> drops = block.getDrops(new ItemStack(inHand.getType()));
+				drops.forEach(drop -> player.getWorld().dropItemNaturally(block.getLocation(), drop));
+			}
 			return true;
 		}
 		return false;

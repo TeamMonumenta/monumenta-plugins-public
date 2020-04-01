@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
@@ -11,7 +12,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 
 public class UnbreakableOnBedrockOverride extends BaseOverride {
 	@Override
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		if ((player.getGameMode() == GameMode.CREATIVE) || breakable(block)) {
 			// Breaking was allowed - remove the metadata associated with the spawner
 			if (block.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {

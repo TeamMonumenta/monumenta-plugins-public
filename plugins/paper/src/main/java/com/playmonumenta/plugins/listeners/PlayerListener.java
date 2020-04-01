@@ -1109,7 +1109,7 @@ public class PlayerListener implements Listener {
 
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock())) {
+		if (!mPlugin.mItemOverrides.blockBreakInteraction(mPlugin, event.getPlayer(), event.getBlock(), event)) {
 			event.setCancelled(true);
 			return;
 		}

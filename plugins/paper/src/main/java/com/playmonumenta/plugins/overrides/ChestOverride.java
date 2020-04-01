@@ -15,6 +15,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
@@ -115,7 +116,7 @@ public class ChestOverride extends BaseOverride {
 
 	/* Chests placed on barriers can not be broken */
 	@Override
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		if (!command_chest(block)) {
 			return false;
 		} else if (player.getGameMode() == GameMode.CREATIVE) {

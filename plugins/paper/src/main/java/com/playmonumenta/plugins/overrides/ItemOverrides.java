@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -329,12 +330,12 @@ public class ItemOverrides {
 		return !eventCancelled;
 	}
 
-	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
+	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		boolean eventCancelled = false;
 
 		BaseOverride override = mItems.get(block.getType());
 		if (override != null) {
-			eventCancelled |= !override.blockBreakInteraction(plugin, player, block);
+			eventCancelled |= !override.blockBreakInteraction(plugin, player, block, event);
 		}
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
