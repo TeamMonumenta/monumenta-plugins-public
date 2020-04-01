@@ -254,6 +254,7 @@ public class ItemUtils {
 		THREE,
 		FOUR,
 		FIVE,
+		MEME,
 		UNCOMMON,
 		ENHANCED_UNCOMMON,
 		PATRON_MADE,
@@ -350,6 +351,8 @@ public class ItemUtils {
 						return ItemTier.FOUR;
 					} else if (stripped.endsWith(": Tier V")) {
 						return ItemTier.FIVE;
+					} else if (stripped.endsWith(": Meme")) {
+						return ItemTier.MEME;
 					} else if (stripped.endsWith(": Uncommon")) {
 						return ItemTier.UNCOMMON;
 					} else if (stripped.endsWith(": Enhanced Uncommon")) {
@@ -402,6 +405,7 @@ public class ItemUtils {
 				}
 			case FOUR:
 			case FIVE:
+			case MEME:
 			case UNCOMMON:
 			case ENHANCED_UNCOMMON:
 			case PATRON_MADE:
@@ -446,6 +450,7 @@ public class ItemUtils {
 			return item.getAmount() * 1;
 		case FIVE:
 			return item.getAmount() * 4;
+		case MEME:
 		case UNCOMMON:
 			return item.getAmount() * 16;
 		case UNIQUE:

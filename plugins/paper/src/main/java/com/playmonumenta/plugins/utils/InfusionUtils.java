@@ -230,6 +230,7 @@ public class InfusionUtils {
 
 	private static int getCostMultiplier(ItemStack item) throws CommandSyntaxException {
 		switch (ItemUtils.getItemTier(item)) {
+			case MEME:
 			case UNCOMMON:
 			case ENHANCED_UNCOMMON:
 			case UNIQUE:
