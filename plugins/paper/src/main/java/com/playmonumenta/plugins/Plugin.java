@@ -40,6 +40,8 @@ import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
+import com.playmonumenta.plugins.commands.SpringCleanItems;
+import com.playmonumenta.plugins.commands.SpringScores;
 import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.commands.TransferScores;
 import com.playmonumenta.plugins.commands.TransferServer;
@@ -91,7 +93,7 @@ public class Plugin extends JavaPlugin {
 	public ShulkerInventoryManager mShulkerInventoryManager;
 	private BossManager mBossManager;
 
-	public RedisManager mRedis;
+	private RedisManager mRedis;
 
 	public SocketManager mSocketManager;
 
@@ -119,6 +121,8 @@ public class Plugin extends JavaPlugin {
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
 		InfuseHeldItem.register();
+		SpringCleanItems.register();
+		SpringScores.register();
 		ClaimRaffle.register(this);
 		DeCluckifyHeldItem.register();
 		CalculateReforge.register();
@@ -162,16 +166,24 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
-		mRedis = new RedisManager();
 		INSTANCE = this;
 		PluginManager manager = getServer().getPluginManager();
 
 		mHttpManager.start();
 
 		try {
+			mRedis = new RedisManager(getLogger());
+		} catch (Exception ex) {
+			/* TODO: This is probably a fatal exception! */
+			getLogger().severe("Failed to instantiate redis manager: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+
+		try {
 			mSocketManager = new SocketManager(this);
 		} catch (Exception ex) {
 			/* TODO: This is probably a fatal exception! */
+			getLogger().severe("Failed to instantiate socket manager: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 
@@ -298,7 +310,7 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
-		mRedis.mPool.close();
+		mRedis.closePool();
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
