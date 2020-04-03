@@ -8,8 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -166,6 +168,22 @@ public class SpringEventUtils {
 		return value;
 	}
 
+	@SuppressWarnings("deprecation")
+	private static void triggerAdvancements(Player player, int value) {
+		NamespacedKey clean50 = new NamespacedKey("monumenta", "trophies/events/2020/cleaning1");
+		NamespacedKey clean500 = new NamespacedKey("monumenta", "trophies/events/2020/cleaning2");
+		NamespacedKey clean5000 = new NamespacedKey("monumenta", "trophies/events/2020/cleaning3");
+		if (value >= 50 && !player.getAdvancementProgress(Bukkit.getAdvancement(clean50)).isDone()) {
+			player.getAdvancementProgress(Bukkit.getAdvancement(clean50)).awardCriteria("event_done");
+		}
+		if (value >= 500 && !player.getAdvancementProgress(Bukkit.getAdvancement(clean500)).isDone()) {
+			player.getAdvancementProgress(Bukkit.getAdvancement(clean500)).awardCriteria("event_done");
+		}
+		if (value >= 5000 && !player.getAdvancementProgress(Bukkit.getAdvancement(clean5000)).isDone()) {
+			player.getAdvancementProgress(Bukkit.getAdvancement(clean5000)).awardCriteria("event_done");
+		}
+	}
+
 	/* Set database values
 	 * Storage Format:
 	 * Key: 'spring:[cityname]'
@@ -180,6 +198,7 @@ public class SpringEventUtils {
 		}
 		value += prevVal;
 		RedisManager.hset("spring:" + city.getLabel(), player.getName(), Integer.toString(value));
+		triggerAdvancements(player, value);
 	}
 
 	/*
