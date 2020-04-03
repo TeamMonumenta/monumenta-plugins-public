@@ -40,7 +40,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
 					double distance = player.getLocation().distance(launcher.getLocation());
 					BossUtils.bossDamage(launcher, player, ((maxDamage - minDamage) * ((radius - distance) / radius)) + minDamage);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 3));
 				}
 			}
 		);

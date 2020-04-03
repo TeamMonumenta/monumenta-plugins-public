@@ -43,6 +43,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.playmonumenta.plugins.bosses.bosses.ArcaneLaserBoss;
 import com.playmonumenta.plugins.bosses.bosses.AuraLargeFatigueBoss;
 import com.playmonumenta.plugins.bosses.bosses.AuraLargeHungerBoss;
 import com.playmonumenta.plugins.bosses.bosses.AuraLargeSlownessBoss;
@@ -166,6 +167,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(HungerCloudBoss.identityTag, (Plugin p, LivingEntity e) -> new HungerCloudBoss(p, e));
 		mStatelessBosses.put(BlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockBreakBoss(p, e));
 		mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
+		mStatelessBosses.put(ArcaneLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new ArcaneLaserBoss(p, e));
 		mStatelessBosses.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new WeaponSwitchBoss(p, e));
 		mStatelessBosses.put(ShieldSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new ShieldSwitchBoss(p, e));
 		mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
@@ -247,6 +249,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(HungerCloudBoss.identityTag, (Plugin p, LivingEntity e) -> HungerCloudBoss.deserialize(p, e));
 		mBossDeserializers.put(BlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> BlockBreakBoss.deserialize(p, e));
 		mBossDeserializers.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> PulseLaserBoss.deserialize(p, e));
+		mBossDeserializers.put(ArcaneLaserBoss.identityTag, (Plugin p, LivingEntity e) -> ArcaneLaserBoss.deserialize(p, e));
 		mBossDeserializers.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> WeaponSwitchBoss.deserialize(p, e));
 		mBossDeserializers.put(ShieldSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> ShieldSwitchBoss.deserialize(p, e));
 		mBossDeserializers.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> ChargerBoss.deserialize(p, e));

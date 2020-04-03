@@ -30,11 +30,11 @@ public class SpellFlameNova extends SpellBaseAoE {
 			(Location loc) -> {
 				World world = loc.getWorld();
 				world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.3);
-				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.1);
+				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1);
 			},
 			(Location loc) -> {
 				for (Player player : PlayerUtils.playersInRange(launcher.getLocation(), radius)) {
-					BossUtils.bossDamage(launcher, player, 11);
+					BossUtils.bossDamage(launcher, player, 17);
 					player.setFireTicks(80);
 				}
 			}

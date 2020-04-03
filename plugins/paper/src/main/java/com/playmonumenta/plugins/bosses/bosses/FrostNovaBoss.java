@@ -22,7 +22,7 @@ public class FrostNovaBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellFrostNova(plugin, mBoss, 8, 12, 4)
+			new SpellFrostNova(plugin, mBoss, 8, 18, 18)
 		));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
