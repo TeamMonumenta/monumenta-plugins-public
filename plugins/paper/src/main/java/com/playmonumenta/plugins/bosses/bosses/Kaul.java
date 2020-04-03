@@ -246,7 +246,7 @@ public class Kaul extends BossAbilityGroup {
 		});
 
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss),
+			new SpellKaulBlockBreak(mBoss, Material.WATER),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -262,7 +262,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss),
+			new SpellKaulBlockBreak(mBoss, Material.WATER),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -278,7 +278,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss),
+			new SpellKaulBlockBreak(mBoss, Material.WATER),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
@@ -300,7 +300,7 @@ public class Kaul extends BossAbilityGroup {
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
-			new SpellKaulBlockBreak(mBoss),
+			new SpellKaulBlockBreak(mBoss, Material.WATER),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
