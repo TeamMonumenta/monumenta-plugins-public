@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -48,7 +49,8 @@ public class InfusionUtils {
 		TENACITY("tenacity", Tenacity.PROPERTY_NAME),
 		VIGOR("vigor", Vigor.PROPERTY_NAME),
 		VITALITY("vitality", Vitality.PROPERTY_NAME),
-		REFUND("refund", "refund");
+		REFUND("refund", "refund"),
+		SPEC_REFUND("special", "special");
 
 		private final String mLabel;
 		private final String mEnchantName;
@@ -70,6 +72,9 @@ public class InfusionUtils {
 		if (selection.equals(InfusionSelection.REFUND)) {
 			refundInfusion(item, player);
 			return;
+		} else if (selection.equals(InfusionSelection.SPEC_REFUND)) {
+			specialRefund(item, player);
+			return;
 		}
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int payment = calcPaymentValue(paymentFrames, region);
@@ -85,7 +90,7 @@ public class InfusionUtils {
 		}
 
 		if (payment == cost) {
-			if (ExperienceUtils.getTotalExperience(player) >= getExpInfuseCost(getCostMultiplier(item))) {
+			if (ExperienceUtils.getTotalExperience(player) >= getExpInfuseCost(item)) {
 				//Infusion accepted
 				for (ItemFrame frame : paymentFrames) {
 					ItemStack frameItem = frame.getItem();
@@ -112,7 +117,7 @@ public class InfusionUtils {
 					}
 				}
 
-				int newXP = ExperienceUtils.getTotalExperience(player) - getExpInfuseCost(getCostMultiplier(item));
+				int newXP = ExperienceUtils.getTotalExperience(player) - getExpInfuseCost(item);
 				ExperienceUtils.setTotalExperience(player, newXP);
 
 				int prevLvl = InventoryUtils.getCustomEnchantLevel(item, selection.getEnchantName(), true);
@@ -144,12 +149,82 @@ public class InfusionUtils {
 			}
 		} else {
 			if (region.equals(ItemRegion.KINGS_VALLEY)) {
-				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Gold into the 4 item frames!");
+				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Gold into the 8 item frames!");
 			} else if (region.equals(ItemRegion.CELSIAN_ISLES) || region.equals(ItemRegion.MONUMENTA)) {
-				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Emeralds into the 4 item frames!");
+				CommandAPI.fail("You must insert exactly " + cost + " Pulsating Emeralds into the 8 item frames!");
 			} else {
 				CommandAPI.fail("You must have a valid item to infuse in your main hand!");
 			}
+		}
+	}
+
+	/*
+	 * Special Refunds for items that were infused prior to 4/2/2020 cost changes
+	 * Items must be marked with 'PRE-UPDATE' lore text to be eligible.
+	 * Running this command will grant the difference in pulsating materials to the player vs old costs
+	 */
+	private static void specialRefund(ItemStack item, Player player) throws CommandSyntaxException {
+		//Remove the lore text marker from the item
+		boolean isPreUpdate = false;
+		List<String> newLore = new ArrayList<>();
+		for (String line : item.getLore()) {
+			if (!line.contains("PRE COST ADJUST")) {
+				newLore.add(line);
+			} else {
+				isPreUpdate = true;
+			}
+		}
+		item.setLore(newLore);
+
+		if (isPreUpdate) {
+			ItemRegion region = ItemUtils.getItemRegion(item);
+			int refundMaterials = 0;
+
+			//Determine old cost multiplier
+			int oldMult = 0;
+			switch (ItemUtils.getItemTier(item)) {
+				case MEME:
+				case UNCOMMON:
+				case ENHANCED_UNCOMMON:
+				case UNIQUE:
+				case UNIQUE_EVENT:
+				case RARE:
+				case PATRON_MADE:
+					oldMult = 1;
+					break;
+				case RELIC:
+				case ARTIFACT:
+				case ENHANCED_RARE:
+					oldMult = 2;
+					break;
+				case EPIC:
+					oldMult = 4;
+					break;
+				default:
+					CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
+			}
+
+			//Calc old value
+			int infuseLevel = getInfuseLevel(item) - 1;
+			int oldValue = 0;
+			while (infuseLevel >= 0) {
+				oldValue += (oldMult * Math.pow(2, infuseLevel));
+				infuseLevel--;
+			}
+
+			//Calc new value [first level free]
+			infuseLevel = getInfuseLevel(item) - 2;
+			int newValue = 0;
+			while (infuseLevel >= 0) {
+				newValue += (getCostMultiplier(item) * Math.pow(2, infuseLevel));
+				infuseLevel--;
+			}
+
+			//Calc and give difference
+			refundMaterials = oldValue - newValue;
+			giveMaterials(player, region, refundMaterials);
+		} else {
+			CommandAPI.fail("This item does not have the 'PRE COST ADJUST' lore text so it is not eligible for a refund.");
 		}
 	}
 
@@ -158,9 +233,11 @@ public class InfusionUtils {
 		int refundMaterials = 0;
 
 		//Calculate refund amount
-		int infuseLevel = getInfuseLevel(item) - 1;
+		// First level is free and we calculate based on the level below current.
+		int infuseLevel = getInfuseLevel(item) - 2;
+		int costMult = getCostMultiplier(item);
 		while (infuseLevel >= 0) {
-			refundMaterials += (getCostMultiplier(item) * Math.pow(2, infuseLevel));
+			refundMaterials += (costMult * Math.pow(2, infuseLevel));
 			infuseLevel--;
 		}
 
@@ -168,6 +245,11 @@ public class InfusionUtils {
 		for (InfusionSelection sel : InfusionSelection.values()) {
 			InventoryUtils.removeCustomEnchant(item, sel.getEnchantName());
 		}
+		giveMaterials(player, region, refundMaterials);
+	}
+
+	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials)
+			throws CommandSyntaxException {
 		NamespacedKey key;
 		if (region.equals(ItemRegion.KINGS_VALLEY)) {
 			key = new NamespacedKey("epic", "r1/items/currency/pulsating_gold");
@@ -212,11 +294,16 @@ public class InfusionUtils {
 	}
 
 	private static int calcInfuseCost(ItemStack item) throws CommandSyntaxException {
-		int infuseLvl = getInfuseLevel(item);
+		// First level is free
+		int infuseLvl = getInfuseLevel(item) - 1;
 		int cost = getCostMultiplier(item);
-		if (infuseLvl <= 3) {
+		// Special case for first level
+		if (infuseLvl == -1) {
+			cost = 0;
+		} else if (infuseLvl <= 2) {
 			cost *= Math.pow(2, infuseLvl);
 		} else {
+			cost = 99999999;
 			CommandAPI.fail("Items may only be infused 4 times!");
 		}
 		return cost;
@@ -237,13 +324,13 @@ public class InfusionUtils {
 			case UNIQUE_EVENT:
 			case RARE:
 			case PATRON_MADE:
-				return 1;
+				return 2;
 			case RELIC:
 			case ARTIFACT:
 			case ENHANCED_RARE:
-				return 2;
+				return 3;
 			case EPIC:
-				return 4;
+				return 6;
 			default:
 				CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
 				return 99999999;
@@ -275,17 +362,55 @@ public class InfusionUtils {
 		return payment;
 	}
 
-	private static int getExpInfuseCost(int scoreMult) throws CommandSyntaxException {
-		switch (scoreMult) {
-			case 1:
-				return 8670;
+	private static int getExpInfuseCost(ItemStack item) throws CommandSyntaxException {
+		int costMult = getCostMultiplier(item);
+		int level = getInfuseLevel(item);
+		switch (costMult) {
 			case 2:
-				return 18020;
-			case 4:
-				return 30970;
-			default:
+				switch (level) {
+					case 0:				// Infuse Level 0 Rare
+						return 2920;	// Exp Level 40
+					case 1:				// Infuse Level 1 Rare
+						return 5345;	// Exp Level 50
+					case 2:				// Infuse Level 2 Rare
+						return 8670;	// Exp Level 60
+					case 3:				// Infuse Level 3 Rare
+						return 12895;	// Exp Level 70
+					default:			// Infuse Level 4 Rare
+						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
+						return 99999999;// Exp Level 9000 (but not really)
+				}
+			case 3:
+				switch (level) {
+					case 0:				// Infuse Level 0 Artifact
+						return 5345;	// Exp Level 50
+					case 1:				// Infuse Level 1 Artifact
+						return 8670;	// Exp Level 60
+					case 2:				// Infuse Level 2 Artifact
+						return 12895;	// Exp Level 70
+					case 3:				// Infuse Level 3 Artifact
+						return 18020;	// Exp Level 80
+					default:			// Infuse Level 4 Artifact
+						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
+						return 99999999;// Exp Level 9000 (but not really)
+				}
+			case 6:
+				switch (level) {
+					case 0:				// Infuse Level 0 Epic
+						return 8670;	// Exp Level 60
+					case 1:				// Infuse Level 1 Epic
+						return 12895;	// Exp Level 70
+					case 2:				// Infuse Level 2 Epic
+						return 18020;	// Exp Level 80
+					case 3:				// Infuse Level 3 Epic
+						return 24045;	// Exp Level 90
+					default:			// Infuse Level 4 Epic
+						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
+						return 99999999;// Exp Level 9000 (but not really)
+				}
+			default:					// Infuse level What even happened?
 				CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-				return 99999999;
+				return 99999999;		// Exp Level How did you hit this code?
 		}
 	}
 }
