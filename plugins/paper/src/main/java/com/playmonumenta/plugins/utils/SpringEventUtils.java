@@ -89,7 +89,7 @@ public class SpringEventUtils {
 			for (Map.Entry<String, Integer> e : leaders.entrySet()) {
 				player.sendMessage(i + ". " + e.getKey() + ":     " + e.getValue());
 				i++;
-				if (i >= MAX_PLAYERS) {
+				if (i > MAX_PLAYERS) {
 					break;
 				}
 			}
@@ -153,13 +153,23 @@ public class SpringEventUtils {
 					default:
 						CommandAPI.fail(ItemUtils.getItemTier(stack) + " tier items are not accepted by the Spring Cleaner.");
 				}
-			} else if (stack.getItemMeta().getDisplayName().contains("Fragment") && stack.getLore().contains("Material")) {
-				value += 80*stack.getAmount();
+			} else if (stack.getItemMeta().getDisplayName().contains("Fragment")) {
+				String dName = stack.getItemMeta().getDisplayName();
+				if (dName.contains("White") || dName.contains("Orange") || dName.contains("Magenta") || dName.contains("Light Blue") || dName.contains("Yellow") ||
+					dName.contains("Ephemeral") || dName.contains("Willows") || dName.contains("Forsworn") || dName.contains("Rock's") || dName.contains("King's")) {
+					//Rare R1 Fragment
+					value += 80*stack.getAmount();
+				} else if (dName.contains("Reverie") || dName.contains("Jungle") || dName.contains("Demonic")) {
+					//Artifact R1 Fragment
+					value += 160*stack.getAmount();
+				} else {
+					CommandAPI.fail("(Fragment)" + stack.getItemMeta().getDisplayName() + " is not accepted by the Spring Cleaner.");
+				}
 			} else if (stack.getItemMeta().getDisplayName().contains("Pulsating Gold") && stack.getType().equals(Material.GOLD_NUGGET)) {
 				value += 160*stack.getAmount();
 			} else if (stack.getItemMeta().getDisplayName().contains("Concentrated Experience")) {
 				value += 2*stack.getAmount();
-			} else if (stack.getItemMeta().getDisplayName().contains("Hyper Experience")) {
+			} else if (stack.getItemMeta().getDisplayName().contains("Hyperexperience")) {
 				value += 128*stack.getAmount();
 			} else {
 				CommandAPI.fail(stack.getItemMeta().getDisplayName() + " is not accepted by the Spring Cleaner.");
