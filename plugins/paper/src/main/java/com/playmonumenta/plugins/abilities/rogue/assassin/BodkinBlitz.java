@@ -72,7 +72,7 @@ public class BodkinBlitz extends Ability {
 				}
 				this.cancel();
 			}
-		}.runTaskLater(mPlugin, 20);
+		}.runTaskLater(mPlugin, 10);
 		if (mLeftClicks < 3) {
 			return;
 		}
@@ -98,36 +98,26 @@ public class BodkinBlitz extends Ability {
 					Location boxLoc = mPlayerBox.getCenter().toLocation(mWorld);
 					
 					boolean isBlocked = true;
-					BoundingBox testBox = mPlayerBox;
-					testBox.shift(0, -0.5, 0);
-					for (int dy = 0; dy < 10; dy++) {
-						// Start by scanning along the y-axis, from -0.5 to +0.5, to find the lowest available space.
-						boolean isValid = true;
-						for (int x = -1; x <= 1; x++) {
-							for (int z = -1; z <= 1; z++) {
-								for (int y = 0; y <= 2; y++) {
-									// Checking the blocks around the hitbox.
-									if (isValid) {
-										// If a bad spot has already been found, then there's no need to check the rest-- this spot is invalid.
-										Block block = testBox.getCenter().toLocation(mWorld).add(x * 0.4, dy / 10.0 + y * 0.975 - testBox.getHeight() / 2, z * 0.4).clone().add(x * 0.4, 0, z * 0.4).getBlock();
-										// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
-										
-										if (block.getType().isSolid() && block.getBoundingBox().overlaps(testBox)) {
-											isValid = false;
-										}
-									}
-								}
+					BoundingBox testBox = mPlayerBox.clone();
+					
+					// Preliminary check on the spot the player is standing on, before shifting locations.
+					if (testLocation(testBox)) {
+						mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, -testBox.getHeight() / 2, 0);
+						isBlocked = false;
+					}
+					
+					if (isBlocked) {
+						testBox.shift(0, -0.5, 0);
+						for (int dy = 0; dy < 10; dy++) {
+							// Start by scanning along the y-axis, from -0.5 to +0.5, to find the lowest available space.
+							if (testLocation(testBox)) {
+								mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, -testBox.getHeight() / 2, 0);
+								isBlocked = false;
+								break;
 							}
+							
+							testBox.shift(0, 0.1, 0);
 						}
-						
-						// If the spot above is valid, then a spot has been found! No need to continue checking.
-						if (isValid) {
-							mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, dy / 10.0 - testBox.getHeight() / 2, 0);
-							isBlocked = false;
-							break;
-						}
-						
-						testBox.shift(0, 0.1, 0);
 					}
 
 					if (isBlocked) {
@@ -231,6 +221,25 @@ public class BodkinBlitz extends Ability {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+	
+	private boolean testLocation(BoundingBox box) {
+		for (int x = -1; x <= 1; x++) {
+			for (int z = -1; z <= 1; z++) {
+				for (int y = 0; y <= 2; y++) {
+					// Checking the blocks around the hitbox.
+					Block block = box.getCenter().toLocation(mWorld).clone().add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4).getBlock();
+					// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
+					
+					if (block.getType().isSolid() && block.getBoundingBox().overlaps(box)) {
+						// If a bad spot has already been found, then there's no need to check the rest-- this spot is invalid.
+						return false;
+					}
+				}
+			}
+		}
+		
+		return true;
 	}
 
 	@Override

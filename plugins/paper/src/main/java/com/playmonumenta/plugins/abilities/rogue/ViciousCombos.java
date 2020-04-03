@@ -44,7 +44,7 @@ public class ViciousCombos extends Ability {
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		EntityDamageEvent e = event.getEntity().getLastDamageCause();
-		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK || e.getCause() == DamageCause.CUSTOM) {
 			LivingEntity killedEntity = event.getEntity();
 			int viciousCombos = getAbilityScore();
 
