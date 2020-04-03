@@ -76,6 +76,16 @@ public class InfusionUtils {
 			specialRefund(item, player);
 			return;
 		}
+
+		//If item is not being refunded, check if cost adjust lore text exists, if so remove it to prevent abuse
+		List<String> newLore = new ArrayList<>();
+		for (String line : item.getLore()) {
+			if (!line.contains("PRE COST ADJUST")) {
+				newLore.add(line);
+			}
+		}
+		item.setLore(newLore);
+
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int payment = calcPaymentValue(paymentFrames, region);
 		int cost = calcInfuseCost(item);
