@@ -49,7 +49,7 @@ public class SpellBurningVengence extends Spell {
 			}
 		}
 		if (mBoss.getVehicle() != null) {
-			
+
 			if (mBoss.getVehicle() instanceof LivingEntity) {
 				mHorseman.disableShield();
 				LivingEntity h = (LivingEntity) mBoss.getVehicle();
@@ -58,7 +58,7 @@ public class SpellBurningVengence extends Spell {
 					int t = 0;
 					@Override
 					public void run() {
-						
+
 						if (t % 2 == 0) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + t / 32f);
 						}
@@ -109,7 +109,7 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamage(mBoss, player, 40);
+									BossUtils.bossDamagePercent(mBoss, player, 0.8);
 									MovementUtils.knockAway(loc, player, 0.7f);
 								}
 							}

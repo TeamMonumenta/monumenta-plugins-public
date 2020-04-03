@@ -51,13 +51,10 @@ public class SpellHallowsEnd extends Spell {
 			@Override
 			public void run() {
 				t++;
-				for (int i = 0; i < 15; i++) {
-					world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
-				}
-				for (double deg = 0; deg < 360; deg += 30) {
-					double x = Math.cos(deg) * 3.5;
-					double z = Math.sin(deg) * 3.5;
-					world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(x, 0, z), 1, 0.15, 0.15, 0.15, 0);
+				if (t % 2 == 0) {
+					for (int i = 0; i < 15; i++) {
+						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
+					}
 				}
 
 				if (t >= 25) {
