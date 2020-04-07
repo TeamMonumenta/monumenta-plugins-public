@@ -163,6 +163,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AbilityManager {
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
@@ -687,6 +688,31 @@ public class AbilityManager {
 			updatePlayerAbilities(player);
 		}
 		return mAbilities.get(player.getUniqueId());
+	}
+
+	public void resetPlayerAbilities(Player player) {
+		// Clear all Reference Abilities from player
+		for (Ability ref : mReferenceAbilities) {
+			String scoreboard = ref.getScoreboard();
+			if (scoreboard != null) {
+				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+			}
+		}
+		// Clear all Disabled Abilities from player
+		for (Ability dRef : mDisabledAbilities) {
+			String scoreboard = dRef.getScoreboard();
+			if (scoreboard != null) {
+				ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+			}
+		}
+		// Reset Skill and SkillSpec
+		Integer skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel");
+		Integer spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec");
+		ScoreboardUtils.setScoreboardValue(player, "Skill", skill);
+		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
+
+		// Run updatePlayerAbilities to clear existing ability effects.
+		updatePlayerAbilities(player);
 	}
 
 	//---------------------------------------------------------------------------------------------------------------

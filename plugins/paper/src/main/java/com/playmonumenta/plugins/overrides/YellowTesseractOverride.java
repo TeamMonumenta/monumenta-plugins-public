@@ -173,26 +173,51 @@ public class YellowTesseractOverride extends BaseOverride {
 		if (coll != null) {
 			for (Ability ability : coll.getAbilities()) {
 				String scoreboard = ability.getScoreboard();
-				if (ability.getDisplayName() != null && scoreboard != null) {
+				if (scoreboard != null) {
 					ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 				}
 			}
 		}
 
+		/* Remove any disabled skills */
+		List<Ability> dColl = AbilityManager.getManager().getDisabledAbilities();
+		if (dColl != null) {
+			for (Ability ability : dColl) {
+				String scoreboard = ability.getScoreboard();
+				if (scoreboard != null) {
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+				}
+			}
+		}
+
+		int totalSkillsAdded = 0;
 		// Check Reference abilities for enabled skills
 		for (Ability reference : AbilityManager.getManager().getReferenceAbilities()) {
 			Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+				totalSkillsAdded += level;
 			}
 		}
 
-		// Check Disabled abilities for disabled skills (makes sure we get the spec skills even in R1)
+		// Check DisabledAbilities for disabled skills to be added (makes sure we get the spec skills even in R1)
 		for (Ability reference : AbilityManager.getManager().getDisabledAbilities()) {
 			Integer level = targetSkills.get(reference.getDisplayName());
 			if (level != null) {
 				ScoreboardUtils.setScoreboardValue(player, reference.getScoreboard(), level);
+				totalSkillsAdded += level;
 			}
+		}
+
+		// If the Tesseract had too many skills, reset the player and the item.
+		if (totalSkillsAdded > (totalLevel + totalSpec)) {
+			player.sendMessage(ChatColor.RED + "The Tesseract of the Elements has too many skills!");
+			resetTesseract(player, item);
+			AbilityManager.getManager().resetPlayerAbilities(player);
+			player.sendMessage(ChatColor.RED + "Your class has been reset!");
+			return;
+		} else if (totalSkillsAdded < (totalLevel + totalSpec)) {
+			player.sendMessage(ChatColor.YELLOW + "You have additional skill points to spend!");
 		}
 
 		AbilityManager.getManager().updatePlayerAbilities(player);
