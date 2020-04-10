@@ -39,10 +39,10 @@ public class Smokescreen extends Ability {
 		mInfo.linkedSpell = Spells.SMOKESCREEN;
 		mInfo.scoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
-		mInfo.mDescriptions.add("When you attack with a melee weapon while sneaking, you release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. (Cooldown: 20 s)");
+		mInfo.mDescriptions.add("Right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. (Cooldown: 20 s)");
 		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
 		mInfo.cooldown = SMOKESCREEN_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_SLOWNESS_AMPLIFIER : SMOKESCREEN_2_SLOWNESS_AMPLIFIER;
 		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
 	}
@@ -62,7 +62,7 @@ public class Smokescreen extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSneaking()) {
+		if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > 50) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);

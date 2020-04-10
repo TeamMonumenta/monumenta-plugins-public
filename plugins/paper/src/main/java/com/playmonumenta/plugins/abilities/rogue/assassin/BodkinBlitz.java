@@ -39,10 +39,9 @@ public class BodkinBlitz extends Ability {
 	private static final int BODKINBLITZ_COOLDOWN = 25 * 20;
 	private static final int BODKINBLITZ_1_DAMAGE = 25;
 	private static final int BODKINBLITZ_2_DAMAGE = 30;
-	private static final int BODKINBLITZ_1_STEP = 20;
-	private static final int BODKINBLITZ_2_STEP = 25;
+	private static final int BODKINBLITZ_1_STEP = 25;
+	private static final int BODKINBLITZ_2_STEP = 35;
 
-	private int mLeftClicks = 0;
 	private LivingEntity mark;
 
 	public BodkinBlitz(Plugin plugin, World world, Random random, Player player) {
@@ -50,8 +49,8 @@ public class BodkinBlitz extends Ability {
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Left-click quickly three times while holding two swords to teleport 6 blocks forwards. Upon teleporting, strike the nearest enemy within 3 blocks, dealing them 25 damage. This ability cannot be used in safe zones. Cooldown: 25 seconds.");
-		mInfo.mDescriptions.add("Bodkin Blitz now deals 30 damage and marks the target for up to 5 seconds. Killing a marked enemy refreshes the cooldown of Bodkin Blitz by 10 seconds.");
+		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Upon teleporting, strike the nearest enemy within 3 blocks, dealing them 25 damage. This ability cannot be used in safe zones. Cooldown: 25 seconds.");
+		mInfo.mDescriptions.add("Range increased to 14 blocks. Bodkin Blitz now deals 30 damage and marks the target for up to 5 seconds. Killing a marked enemy refreshes the cooldown of Bodkin Blitz by 10 seconds.");
 		mInfo.cooldown = BODKINBLITZ_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;
@@ -62,22 +61,6 @@ public class BodkinBlitz extends Ability {
 		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
 			return;
 		}
-
-		mLeftClicks++;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mLeftClicks > 0) {
-					mLeftClicks--;
-				}
-				this.cancel();
-			}
-		}.runTaskLater(mPlugin, 10);
-		if (mLeftClicks < 3) {
-			return;
-		}
-
-		mLeftClicks = 0;
 
 		putOnCooldown();
 
@@ -107,9 +90,9 @@ public class BodkinBlitz extends Ability {
 					}
 					
 					if (isBlocked) {
-						testBox.shift(0, -0.5, 0);
-						for (int dy = 0; dy < 10; dy++) {
-							// Start by scanning along the y-axis, from -0.5 to +0.5, to find the lowest available space.
+						testBox.shift(0, -1, 0);
+						for (int dy = 0; dy < 20; dy++) {
+							// Start by scanning along the y-axis, from -1 to +1, to find the lowest available space.
 							if (testLocation(testBox)) {
 								mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, -testBox.getHeight() / 2, 0);
 								isBlocked = false;
@@ -247,7 +230,7 @@ public class BodkinBlitz extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-			return !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
+			return mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
 		}
 		return false;
 	}

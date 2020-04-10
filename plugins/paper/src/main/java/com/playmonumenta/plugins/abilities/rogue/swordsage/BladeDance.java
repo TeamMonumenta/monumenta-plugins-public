@@ -69,7 +69,7 @@ public class BladeDance extends Ability {
 			return;
 		}
 
-		if (mPlayer.getLocation().getPitch() > 50) {
+		if (mPlayer.getLocation().getPitch() > 50 && !mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (mainHand != null && InventoryUtils.isSwordItem(mainHand)) {
 				mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1f, 0.75f);
