@@ -118,8 +118,8 @@ The elemental will lose his “Raise Jungle” ability, but will still possess t
 public class Kaul extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
-	private static final String primordial = "{CustomName:\"{\\\"text\\\":\\\"§6Pizza Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulprimoridal\"],Team:\"kaulele\"}";
-	private static final String immortal = "{CustomName:\"{\\\"text\\\":\\\"§6Immortal Pizza Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulimmortal\"],Team:\"kaulele\"}";
+	private static final String primordial = "{CustomName:\"{\\\"text\\\":\\\"§6Primordial Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulprimoridal\"],Team:\"kaulele\"}";
+	private static final String immortal = "{CustomName:\"{\\\"text\\\":\\\"§6Immortal Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulimmortal\"],Team:\"kaulele\"}";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
@@ -324,9 +324,9 @@ public class Kaul extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
 			if (players.size() == 1) {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"ONLY ONE OF YOU? I SWORE I ORDERED WAY MORE PIZZAS THAN THAT. AH WELL, I'LL TAKE WHAT I CAN GET. LIKE PINEAPPLE ON PIZZA, YOU MUST BE DESTROYED!\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USUPRER!\",\"color\":\"dark_green\"}]");
 			} else {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"I WILL TAKE THOSE PIZZAS AND EAT THEM... ALONG WITH YOU! I'M HUNGRY, DON'T JUDGE.\",\"color\":\"dark_green\"}]");
+				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USUPRERS.\",\"color\":\"dark_green\"}]");
 			}
 		});
 
@@ -442,7 +442,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"OKAY I'M REALLY HUNGRY NOW. I'LL EVEN TAKE ANCHOVIES AT THIS POINT.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
 		});
 
 		// Forcecast Raise Jungle
@@ -522,7 +522,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE SAUCE AND THE BODY MUST BE ENTWINED. I SUMMON FORTH MY PIZZA ELEMENTAL TO HELP. HE WILL GRIND YOU INTO MUSH...ROOMS.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -673,7 +673,7 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU'RE REALLY MAKING ME FIGHT FOR MY FOOD. I WILL REIGN SUPREME THOUGH!\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -730,13 +730,13 @@ public class Kaul extends BossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PIZZA ELEMENTAL, RETURN. TAKE DOWN THESE MEAT LOVERS FOR ME.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
 		});
 
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			forceCastSpell(SpellVolcanicDemise.class);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE PEPPERONI SHALL RAIN DOWN UPON YOU, LIKE METEORS FROM THE HEAVENS. FACE MY HUNGER, ZA-LORDS.\",\"color\":\"dark_green\"}]");
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -911,9 +911,9 @@ public class Kaul extends BossAbilityGroup {
 			return;
 		}
 		String[] dio = new String[] {
-			"AS PIZZA WOULD ENTER MY STOMACH, SO TOO MUST I REENTER THE GROUND.",
-			"I AM VANQUISHED; AN EMPTY TRAY. I SHALL REST AND BE MADE ANEW, LIKE DOUGH IN THE OVEN.",
-			"NOW... I MUST... BAKE...",
+			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
+			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
+			"NOW... THE JUNGLE... MUST SLEEP...",
 		};
 		defeated = true;
 		knockback(mPlugin, 10);
@@ -1058,8 +1058,8 @@ public class Kaul extends BossAbilityGroup {
 				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 				String[] dio = new String[] {
-					"ARE YOU MY PIZZA DELIVERY PEOPLE? I ORDERED IT AGES AGO.",
-					"THE APP SAID 35 MINUTES, AND IT'S BEEN LIKE 40 YEARS.",
+					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
+					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?",
 				};
 
 				new BukkitRunnable() {
