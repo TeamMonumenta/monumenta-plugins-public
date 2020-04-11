@@ -155,7 +155,7 @@ public class ShulkerEquipmentListener implements Listener {
 		Inventory sInv = sbox.getInventory();
 
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
-			if (slot.getKey() > 36 && slot.getKey() < 39 && pInv.getItem(slot.getKey()) != null && pInv.getItem(slot.getKey()).getEnchantmentLevel(Enchantment.BINDING_CURSE) != 0) {
+			if (slot.getKey() >= 36 && slot.getKey() <= 39 && pInv.getItem(slot.getKey()) != null && pInv.getItem(slot.getKey()).getEnchantmentLevel(Enchantment.BINDING_CURSE) != 0) {
 				//Does not swap if armor equipped has curse of binding on it
 			} else if (pInv.getItem(slot.getKey()) != null && InventoryUtils.getCustomEnchantLevel(pInv.getItem(slot.getKey()), CurseOfEphemerality.PROPERTY_NAME, false) != 0) {
 				//Doesn't swap with curse of ephemerality either
