@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.NetworkUtils;
+import com.playmonumenta.plugins.network.SocketManager;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -97,7 +97,7 @@ public class BroadcastCommand {
 		}
 
 		try {
-			NetworkUtils.broadcastCommand(plugin, commandStr);
+			SocketManager.broadcastCommand(plugin, commandStr);
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
 		}

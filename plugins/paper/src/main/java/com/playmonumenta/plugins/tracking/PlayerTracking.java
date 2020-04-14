@@ -31,7 +31,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -61,17 +60,8 @@ public class PlayerTracking implements EntityTracking {
 	public void addEntity(Entity entity) {
 		Player player = (Player)entity;
 
-		// Add the tag that prevents functions and advancement rewards from being applied to the player
-		player.addScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
-
 		// Initialize the player, either by loading data from disk or from the player
-		PlayerData.initializePlayer(mPlugin, player);
-
-		// Remove the metadata that prevents player from interacting with things (if present)
-		player.removeMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, mPlugin);
-
-		// Remove the tag that prevents the spawn box from applying functions to the player
-		player.removeScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
+		// TODO: Hook this up to PlayerData.applyTransferPlayerData
 
 		// Load the players inventory / custom enchantments and apply them
 		mPlayers.put(player, new PlayerInventory(mPlugin, player));
@@ -80,9 +70,6 @@ public class PlayerTracking implements EntityTracking {
 	@Override
 	public void removeEntity(Entity entity) {
 		Player player = (Player)entity;
-
-		// Add a scoreboard tag that prevents the spawn box from applying functions to the player
-		player.addScoreboardTag(Constants.PLAYER_MID_TRANSFER_TAG);
 
 		mPlayers.remove(player);
 	}

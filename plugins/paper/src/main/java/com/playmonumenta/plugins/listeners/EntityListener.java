@@ -147,8 +147,12 @@ public class EntityListener implements Listener {
 		mAbilities = abilities;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityCombustByEntityEvent(EntityCombustByEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		// Record the time of the player who sets a mob on fire
 		// Used to prevent arcane strike from counting mobs on fire that were
 		// set on fire by the same hit that triggered arcane strike
@@ -157,14 +161,6 @@ public class EntityListener implements Listener {
 		Entity combuster = event.getCombuster();
 
 		if ((combuster instanceof Player) && (combustee.getFireTicks() <= 0)) {
-			Player player = (Player)combuster;
-
-			/* Don't let the player interact with the world when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
-			}
-
 			MetadataUtils.checkOnceThisTick(mPlugin, combustee,
 			                                Constants.ENTITY_COMBUST_NONCE_METAKEY);
 		}
@@ -181,12 +177,6 @@ public class EntityListener implements Listener {
 
 		if ((combustee instanceof Player)) {
 			Player player = (Player)combustee;
-
-			/* Don't let the player interact with the world when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
-			}
 
 			if (!mAbilities.playerCombustByEntityEvent(player, event)) {
 				event.setCancelled(true);
@@ -217,12 +207,6 @@ public class EntityListener implements Listener {
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
 			Player player = (Player)damagee;
-
-			/* Don't let the player interact with the world when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
-			}
 
 			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
 
@@ -288,12 +272,6 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-			}
-
-			// Don't let the player interact with the world when transferring
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
 			}
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
@@ -417,11 +395,14 @@ public class EntityListener implements Listener {
 	}
 
 	// Entity Hurt Event.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		Entity damagee = event.getEntity();
 		DamageCause source = event.getCause();
 
+		if (event.isCancelled()) {
+			return;
+		}
 		if ((source == DamageCause.BLOCK_EXPLOSION || source == DamageCause.ENTITY_EXPLOSION) &&
 		    (damagee.getScoreboardTags().contains("ExplosionImmune") || damagee instanceof ItemFrame)) {
 			event.setCancelled(true);
@@ -431,11 +412,6 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 			World world = player.getWorld();
 			mPlugin.mTrackingManager.mPlayers.onHurt(mPlugin, player, event);
-			/* Don't let the player interact with the world when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
-			}
 
 			if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.RESIST_5)) {
 				if (DAMAGE_CAUSES_IGNORED_IN_TOWNS.contains(source)) {
@@ -512,19 +488,17 @@ public class EntityListener implements Listener {
 	}
 
 	// Hanging Entity hurt by another entity.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Entity damager = event.getRemover();
 
 		if (damager instanceof Player) {
 			// If hurt by a player in adventure mode we want to prevent the break;
 			Player player = (Player)damager;
-
-			/* Don't let the player interact with the world when transferring */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-				event.setCancelled(true);
-				return;
-			}
 
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
@@ -573,12 +547,12 @@ public class EntityListener implements Listener {
 	// Player shoots an arrow.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
-		Projectile proj = event.getEntity();
-		ProjectileSource shooter = proj.getShooter();
-		if (shooter != null && shooter instanceof Player && ((Player)shooter).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
+		if (event.isCancelled()) {
 			return;
 		}
+
+		Projectile proj = event.getEntity();
+		ProjectileSource shooter = proj.getShooter();
 
 		if (shooter instanceof Player) {
 			Player player = (Player)shooter;
@@ -648,6 +622,10 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void potionSplashEvent(PotionSplashEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		ThrownPotion potion = event.getPotion();
 		ProjectileSource source = potion.getShooter();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
@@ -657,9 +635,6 @@ public class EntityListener implements Listener {
 
 		// Don't apply effects to invulnerable entities
 		affectedEntities.removeIf(entity -> (entity.isInvulnerable()));
-
-		/* Don't let the player interact with the world when transferring */
-		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
 		/* If a potion has negative effects, don't apply them to any players except the thrower (if applicable) */
 		if (source instanceof Player && PotionUtils.hasNegativeEffects(potion.getItem())) {
@@ -702,6 +677,10 @@ public class EntityListener implements Listener {
 	// Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		AreaEffectCloud cloud = event.getEntity();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
 
@@ -713,9 +692,6 @@ public class EntityListener implements Listener {
 
 		// Don't apply effects to dead entities
 		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));
-
-		/* Don't let the player interact with the world when transferring */
-		affectedEntities.removeIf(entity -> (entity instanceof Player && ((Player)entity).hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)));
 
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
@@ -813,12 +789,6 @@ public class EntityListener implements Listener {
 			mAbilities.playerHitByProjectileEvent(player, event);
 			if (type == EntityType.TIPPED_ARROW) {
 				TippedArrow arrow = (TippedArrow)event.getEntity();
-
-				/* Don't let the player interact with the world when transferring */
-				if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-					removePotionDataFromArrow(arrow);
-					return;
-				}
 
 				if (player.isBlocking()) {
 					Vector to = player.getLocation().toVector();

@@ -121,26 +121,19 @@ public class PlayerListener implements Listener {
 		mRandom = random;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerJoinEvent(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+
 		if (ServerProperties.getJoinMessagesEnabled() == false) {
 			event.setJoinMessage("");
 		}
 
-		/* Mark this player as inventory locked until their inventory data is applied */
-		event.getPlayer().setMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY, new FixedMetadataValue(mPlugin, true));
+		/* This needs to stick around basically forever to remove this no-longer-needed tag */
+		player.removeScoreboardTag("MidTransfer");
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Player player = event.getPlayer();
-
-				if (player.isOnline()) {
-					mPlugin.mTrackingManager.addEntity(player);
-					DailyReset.handle(mPlugin, player);
-				}
-			}
-		}.runTaskLater(mPlugin, 20);
+		mPlugin.mTrackingManager.addEntity(player);
+		DailyReset.handle(mPlugin, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -164,16 +157,14 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerInteractEvent(PlayerInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
-
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
-			return;
-		}
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		AbilityManager.getManager().playerInteractEvent(player, action, item, mat);
@@ -255,26 +246,22 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItemInHand();
 		Player player = event.getPlayer();
 
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
-			return;
-		}
-
 		if (!mPlugin.mItemOverrides.blockPlaceInteraction(mPlugin, player, item, event)) {
 			event.setCancelled(true);
 		}
 	}
 
 	// Player interacts with an entity (not triggered on armor stands for some reason
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
 
-		/* Don't let the player do this when transferring or if in a restricted zone */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-		        && player.getGameMode() != GameMode.CREATIVE)) {
+		/* Don't let the player do this when in a restricted zone */
+		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -339,15 +326,17 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player interacts with an armor stand
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
 		ArmorStand armorStand = event.getRightClicked();
 
-		/* Don't let the player do this when transferring or if in a restricted zone */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-		        && player.getGameMode() != GameMode.CREATIVE)) {
+		/* Don't let the player do this in a restricted zone */
+		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -369,12 +358,14 @@ public class PlayerListener implements Listener {
 	// The player dropped an item.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void playerDropItemEvent(PlayerDropItemEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
 
-		/* Don't let the player do this when transferring or if in a restricted zone */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-		    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-		        && player.getGameMode() != GameMode.CREATIVE)) {
+		/* Don't let the player do this when in a restricted zone */
+		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 			event.setCancelled(true);
 			return;
 		}
@@ -384,13 +375,15 @@ public class PlayerListener implements Listener {
 	// An entity picked up an item
 	@EventHandler(priority = EventPriority.HIGH)
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
-		if (!event.isCancelled() && (event.getEntity() instanceof Player)) {
+		if (event.isCancelled()) {
+			return;
+		}
+
+		if (event.getEntity() instanceof Player) {
 			Player player = (Player)event.getEntity();
 
-			/* Don't let the player do this when transferring or if in a restricted zone */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-			        && player.getGameMode() != GameMode.CREATIVE)) {
+			/* Don't let the player do this when in a restricted zone */
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
 				return;
 			}
@@ -495,6 +488,10 @@ public class PlayerListener implements Listener {
 	// The player opened an inventory
 	@EventHandler(priority = EventPriority.HIGH)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		if (event.getPlayer() instanceof Player) {
 			Player player = (Player)event.getPlayer();
 
@@ -503,11 +500,10 @@ public class PlayerListener implements Listener {
 				player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
 			}
 
-			/* Don't let the player do this when transferring or if in a restricted zone */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-			        && player.getGameMode() != GameMode.CREATIVE
-			        && player.getGameMode() != GameMode.SPECTATOR)) {
+			/* Don't let the player do this when in a restricted zone */
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+			    && player.getGameMode() != GameMode.CREATIVE
+			    && player.getGameMode() != GameMode.SPECTATOR) {
 				event.setCancelled(true);
 				return;
 			}
@@ -549,14 +545,17 @@ public class PlayerListener implements Listener {
 	// Something interacts with an inventory
 	@EventHandler(priority = EventPriority.HIGH)
 	public void inventoryInteractEvent(InventoryInteractEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player)event.getWhoClicked();
 
-			/* Don't let the player do this when transferring or if in a restricted zone */
-			if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)
-			    || (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
-			        && player.getGameMode() != GameMode.CREATIVE
-			        && player.getGameMode() != GameMode.SPECTATOR)) {
+			/* Don't let the player do this when in a restricted zone */
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+			    && player.getGameMode() != GameMode.CREATIVE
+			    && player.getGameMode() != GameMode.SPECTATOR) {
 				event.setCancelled(true);
 				return;
 			}
@@ -733,13 +732,9 @@ public class PlayerListener implements Listener {
 		}, 0);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerFishEvent(PlayerFishEvent event) {
-		Player player = event.getPlayer();
-
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
+		if (event.isCancelled()) {
 			return;
 		}
 
@@ -754,16 +749,14 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		Player player = event.getPlayer();
-		AbilityManager.getManager().playerItemConsumeEvent(player, event);
-
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
+		if (event.isCancelled()) {
 			return;
 		}
+
+		Player player = event.getPlayer();
+		AbilityManager.getManager().playerItemConsumeEvent(player, event);
 
 		/* Don't let players consume shattered items */
 		if (ItemUtils.isItemShattered(event.getItem())) {
@@ -810,8 +803,12 @@ public class PlayerListener implements Listener {
 	}
 
 	// An item has taken damage.
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		ItemStack item = event.getItem();
 		AbilityManager.getManager().playerItemDamageEvent(event.getPlayer(), event);
 
@@ -830,12 +827,6 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerExpChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
-
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setAmount(0);
-			return;
-		}
 
 		mPlugin.mTrackingManager.mPlayers.onExpChange(mPlugin, player, event);
 	}
@@ -864,18 +855,16 @@ public class PlayerListener implements Listener {
 	 * If a command block is found, it's command string is used for coordinates to teleport
 	 * the player to after a short delay
 	 */
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerBedEnterEvent(PlayerBedEnterEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+
 		Player player = event.getPlayer();
 		Block bed = event.getBed();
 		Location loc = bed.getLocation();
 		World world = loc.getWorld();
-
-		/* Don't let the player interact with the world when transferring */
-		if (player.hasMetadata(Constants.PLAYER_ITEMS_LOCKED_METAKEY)) {
-			event.setCancelled(true);
-			return;
-		}
 
 		/* Prevent entering beds designed to glitch through blocks */
 		Material aboveMat = loc.add(0, 1, 0).getBlock().getType();
@@ -983,7 +972,7 @@ public class PlayerListener implements Listener {
 	public static Set<Material> POTION_TYPES = EnumSet.of(Material.POTION, Material.SPLASH_POTION,
 	                                                      Material.LINGERING_POTION);
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void brewEvent(BrewEvent event) {
 		BrewerInventory inv = event.getContents();
 		ItemStack ingred = inv.getIngredient();
@@ -1031,7 +1020,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOW)
 	public void playerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
 

@@ -86,6 +86,12 @@
             <version>1.16</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.playmonumenta</groupId>
+            <artifactId>redissync</artifactId>
+            <version>0.3</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- This one needs to be shaded in! -->
         <dependency>

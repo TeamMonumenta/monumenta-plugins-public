@@ -26,7 +26,6 @@ public class ServerProperties {
 
 	private boolean mDailyResetEnabled = false;
 	private boolean mJoinMessagesEnabled = false;
-	private boolean mTransferDataEnabled = true;
 	private boolean mIsTownWorld = false;
 	private boolean mBroadcastCommandEnabled = true;
 	// Height of plots in Sierhaven so that players under plots stay in adventure
@@ -41,7 +40,6 @@ public class ServerProperties {
 	private String mShardName = "default_settings";
 	private String mRabbitHost = "rabbitmq";
 
-	private Set<String> mAllowedTransferTargets = new HashSet<>();
 	private Set<String> mForbiddenItemLore = new HashSet<>();
 
 	private EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
@@ -70,11 +68,6 @@ public class ServerProperties {
 	public static boolean getJoinMessagesEnabled() {
 		ensureInstance();
 		return INSTANCE.mJoinMessagesEnabled;
-	}
-
-	public static boolean getTransferDataEnabled() {
-		ensureInstance();
-		return INSTANCE.mTransferDataEnabled;
 	}
 
 	public static boolean getIsTownWorld() {
@@ -125,11 +118,6 @@ public class ServerProperties {
 	public static String getRabbitHost() {
 		ensureInstance();
 		return INSTANCE.mRabbitHost;
-	}
-
-	public static Set<String> getAllowedTransferTargets() {
-		ensureInstance();
-		return INSTANCE.mAllowedTransferTargets;
 	}
 
 	public static Set<String> getForbiddenItemLore() {
@@ -188,7 +176,6 @@ public class ServerProperties {
 				if (object != null) {
 					mDailyResetEnabled           = getPropertyValueBool(plugin, object, "dailyResetEnabled", mDailyResetEnabled);
 					mJoinMessagesEnabled         = getPropertyValueBool(plugin, object, "joinMessagesEnabled", mJoinMessagesEnabled);
-					mTransferDataEnabled         = getPropertyValueBool(plugin, object, "transferDataEnabled", mTransferDataEnabled);
 					mIsTownWorld                 = getPropertyValueBool(plugin, object, "isTownWorld", mIsTownWorld);
 					mBroadcastCommandEnabled     = getPropertyValueBool(plugin, object, "broadcastCommandEnabled", mBroadcastCommandEnabled);
 					mPlotSurvivalMinHeight       = getPropertyValueInt(plugin, object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
@@ -202,7 +189,6 @@ public class ServerProperties {
 					mShardName                   = getPropertyValueString(plugin, object, "shardName", mShardName);
 					mRabbitHost                  = getPropertyValueString(plugin, object, "rabbitHost", mRabbitHost);
 
-					mAllowedTransferTargets      = getPropertyValueStringSet(plugin, object, "allowedTransferTargets");
 					mForbiddenItemLore           = getPropertyValueStringSet(plugin, object, "forbiddenItemLore");
 
 					mUnbreakableBlocks           = getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender);

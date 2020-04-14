@@ -13,11 +13,8 @@ import com.playmonumenta.plugins.packets.BasePacket;
 import com.playmonumenta.plugins.packets.BroadcastCommandPacket;
 import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.plugins.packets.BungeeCommandPacket;
-import com.playmonumenta.plugins.packets.BungeeGetServerListPacket;
 import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
-import com.playmonumenta.plugins.packets.BungeeSendPlayerPacket;
 import com.playmonumenta.plugins.packets.ShardCommandPacket;
-import com.playmonumenta.plugins.packets.ShardTransferPlayerDataPacket;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -152,17 +149,8 @@ public class SocketManager {
 			case BungeeCommandPacket.PacketOperation:
 				BungeeCommandPacket.handlePacket(mPlugin, data);
 				break;
-			case BungeeGetServerListPacket.PacketOperation:
-				BungeeGetServerListPacket.handlePacket(mPlugin, data);
-				break;
-			case BungeeSendPlayerPacket.PacketOperation:
-				BungeeSendPlayerPacket.handlePacket(mPlugin, data);
-				break;
 			case ShardCommandPacket.PacketOperation:
 				ShardCommandPacket.handlePacket(mPlugin, data);
-				break;
-			case ShardTransferPlayerDataPacket.PacketOperation:
-				ShardTransferPlayerDataPacket.handlePacket(mPlugin, data);
 				break;
 			case BungeeGetVotesUnclaimedPacket.PacketOperation:
 				BungeeGetVotesUnclaimedPacket.handlePacket(mPlugin, data);
@@ -226,5 +214,11 @@ public class SocketManager {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public static void broadcastCommand(Plugin plugin, String command) throws Exception {
+		sendPacket(new BroadcastCommandPacket(command));
+
+		plugin.getLogger().fine("Requested broadcast of command '" + command + "'");
 	}
 }

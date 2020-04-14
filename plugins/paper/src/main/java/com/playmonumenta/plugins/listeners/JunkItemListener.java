@@ -15,10 +15,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
@@ -28,11 +26,9 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
 	private static final int JUNK_ITEM_SIZE_THRESHOLD = 17;
-	private final Plugin mPlugin;
 	private final Set<Player> mPlayers = new HashSet<Player>();
 
-	public JunkItemListener(Plugin plugin) {
-		mPlugin = plugin;
+	public JunkItemListener() {
 		final String command = "pickup";
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.pickup");
 
@@ -73,16 +69,10 @@ public class JunkItemListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void join(PlayerJoinEvent event) {
-		/* TODO: This is a gross hack to work around player data transferring... */
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Player player = event.getPlayer();
-				if (player.getScoreboardTags() != null && player.getScoreboardTags().contains(NO_JUNK_ITEMS_TAG)) {
-					mPlayers.add(player);
-				}
-			}
-		}.runTaskLater(mPlugin, 30);
+		Player player = event.getPlayer();
+		if (player.getScoreboardTags() != null && player.getScoreboardTags().contains(NO_JUNK_ITEMS_TAG)) {
+			mPlayers.add(player);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)

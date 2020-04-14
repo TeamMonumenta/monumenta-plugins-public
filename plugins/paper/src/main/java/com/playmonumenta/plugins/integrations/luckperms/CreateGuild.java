@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.NetworkUtils;
+import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
@@ -100,7 +100,7 @@ public class CreateGuild {
 		}
 
 		try {
-			NetworkUtils.broadcastCommand(plugin, "tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
+			SocketManager.broadcastCommand(plugin, "tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
 		} catch (Exception e) {
 			sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
 		}

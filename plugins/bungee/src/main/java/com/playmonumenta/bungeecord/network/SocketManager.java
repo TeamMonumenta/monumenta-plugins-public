@@ -9,9 +9,7 @@ import com.playmonumenta.bungeecord.Main;
 import com.playmonumenta.bungeecord.packets.BasePacket;
 import com.playmonumenta.bungeecord.packets.BungeeCheckRaffleEligibilityPacket;
 import com.playmonumenta.bungeecord.packets.BungeeCommandPacket;
-import com.playmonumenta.bungeecord.packets.BungeeGetServerListPacket;
 import com.playmonumenta.bungeecord.packets.BungeeGetVotesUnclaimedPacket;
-import com.playmonumenta.bungeecord.packets.BungeeSendPlayerPacket;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -133,12 +131,6 @@ public class SocketManager {
 		switch (op) {
 			case BungeeCommandPacket.PacketOperation:
 				BungeeCommandPacket.handlePacket(mMain, source, data);
-				break;
-			case BungeeGetServerListPacket.PacketOperation:
-				BungeeGetServerListPacket.handlePacket(mMain, source, data);
-				break;
-			case BungeeSendPlayerPacket.PacketOperation:
-				BungeeSendPlayerPacket.handlePacket(mMain, source, data);
 				break;
 			case BungeeGetVotesUnclaimedPacket.PacketOperation:
 				BungeeGetVotesUnclaimedPacket.handlePacket(mMain, source, data);

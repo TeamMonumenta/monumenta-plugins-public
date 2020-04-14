@@ -31,12 +31,8 @@ public class Constants {
 	public static final boolean POTION_MANAGER_ENABLED = true;
 	public static final boolean COMMANDS_SERVER_ENABLED = true;
 
-	// Tag players always have when they are logged out and before they have data applied to them
-	public static final String PLAYER_MID_TRANSFER_TAG = "MidTransfer";
-
 	// Metadata keys
 	public static final String SPAWNER_COUNT_METAKEY = "MonumentaSpawnCount";
-	public static final String PLAYER_ITEMS_LOCKED_METAKEY = "MonumentaPlayerItemsLocked";
 	public static final String PLAYER_DAMAGE_NONCE_METAKEY = "MonumentaPlayerDamageNonce";
 	public static final String PLAYER_BOW_SHOT_METAKEY = "MonumentaPlayerBowShot";
 	public static final String TREE_METAKEY = "MonumentaStructureGrowEvent";

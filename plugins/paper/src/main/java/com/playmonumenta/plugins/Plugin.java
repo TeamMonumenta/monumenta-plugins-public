@@ -43,8 +43,6 @@ import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.SpringCleanItems;
 import com.playmonumenta.plugins.commands.SpringScores;
 import com.playmonumenta.plugins.commands.TestNoScore;
-import com.playmonumenta.plugins.commands.TransferScores;
-import com.playmonumenta.plugins.commands.TransferServer;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -56,6 +54,7 @@ import com.playmonumenta.plugins.listeners.JunkItemListener;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.PotionConsumeListener;
+import com.playmonumenta.plugins.listeners.ServerTransferListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
@@ -115,7 +114,6 @@ public class Plugin extends JavaPlugin {
 		 * These need to register immediately on load to prevent function loading errors
 		 */
 
-		TransferServer.register(this);
 		GiveSoulbound.register();
 		HopeifyHeldItem.register();
 		FestiveHeldItem.register();
@@ -133,7 +131,6 @@ public class Plugin extends JavaPlugin {
 		Effect.register(this);
 		RemoveTags.register();
 		DeathMsg.register();
-		TransferScores.register(this);
 		MonumentaReload.register(this);
 		MonumentaDebug.register(this);
 		RestartEmptyCommand.register(this);
@@ -155,7 +152,7 @@ public class Plugin extends JavaPlugin {
 		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
 
-		mJunkItemsListener = new JunkItemListener(this);
+		mJunkItemsListener = new JunkItemListener();
 
 		Bot.register(this);
 		if (ServerProperties.getBroadcastCommandEnabled()) {
@@ -216,6 +213,7 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getAuditMessagesEnabled()) {
 			manager.registerEvents(new AuditListener(), this);
 		}
+		manager.registerEvents(new ServerTransferListener(this.getLogger()), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
 		manager.registerEvents(new MobListener(this), this);
