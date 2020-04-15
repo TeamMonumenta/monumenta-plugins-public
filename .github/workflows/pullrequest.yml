@@ -15,7 +15,8 @@ jobs:
 
     - name: Setup reviewdog
       run: |
-        mkdir -p $HOME/bin && curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s -- -b $HOME/bin
+        set -o pipefail
+        mkdir -p $HOME/bin && curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b $HOME/bin
         echo ::add-path::$HOME/bin
 
     # Checkstyle
@@ -56,7 +57,8 @@ jobs:
 
     - name: Setup reviewdog
       run: |
-        mkdir -p $HOME/bin && curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s -- -b $HOME/bin
+        set -o pipefail
+        mkdir -p $HOME/bin && curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b $HOME/bin
         echo ::add-path::$HOME/bin
 
     - name: git config user.name
@@ -73,7 +75,9 @@ jobs:
       run: ./paper jar
     - name: Build with Maven
       working-directory: ./plugins
-      run: ./compile-all.sh | tee ../compile.log
+      run: |
+        set -o pipefail
+        ./compile-all.sh | tee ../compile.log
 
     - name: Run reviewdog to report deprecation warnings
       env:
