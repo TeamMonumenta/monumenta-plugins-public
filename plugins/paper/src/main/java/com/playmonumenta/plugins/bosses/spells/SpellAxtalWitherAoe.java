@@ -27,9 +27,9 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 			},
 			(Location loc) -> {
 				World world = loc.getWorld();
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 3, 0.5f);
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 3, 1f);
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 3, 1.5f);
+				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1f);
+				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.5f);
 				world.spawnParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5, null, true);
 			},
 			(Location loc) -> {
