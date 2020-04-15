@@ -155,7 +155,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.isCancelled()) {
 			return;
@@ -165,6 +165,10 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
+
+		if (event.isCancelled()) {
+			return;
+		}
 
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		AbilityManager.getManager().playerInteractEvent(player, action, item, mat);
@@ -252,7 +256,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// Player interacts with an entity (not triggered on armor stands for some reason
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		if (event.isCancelled()) {
 			return;

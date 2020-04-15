@@ -40,6 +40,7 @@ public class ShatteredEquipmentListener implements Listener {
 			if (ItemUtils.isItemShattered(item)) {
 				MessagingUtils.sendActionBarMessage(mPlugin, player, "Shattered items must be reforged before use");
 				event.setUseItemInHand(Event.Result.DENY);
+				event.setCancelled(true);
 			}
 		}
 	}
