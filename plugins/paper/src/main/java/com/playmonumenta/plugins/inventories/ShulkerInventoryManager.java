@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -10,8 +12,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -21,11 +25,14 @@ import java.util.UUID;
  * @see com.playmonumenta.plugins.inventories.ShulkerInventory
  */
 public class ShulkerInventoryManager {
-	private static final String ERROR_SHULKER_LOCKED = String.format("%s%sThis shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD);
-	private static final String ERROR_SHULKER_ALREADY_OPEN = String.format("%s%sThis shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD);
+	private static final String ERROR_SHULKER_LOCKED = ChatColor.RED + "This shulker is locked";
+	private static final String ERROR_SHULKER_ALREADY_OPEN = ChatColor.RED + "This shulker is already open";
+	private static final String ERROR_SHULKER_ZONE_BLOCKED = ChatColor.RED + "Shulkers can not be opened here";
+	private static final String ERROR_SHULKER_RATE_LIMITED = ChatColor.RED + "Too fast! Please try again";
 	private final Plugin mPlugin;
 	private final HashMap<UUID, ShulkerInventory> mInventories = new HashMap<>();
 	private final HashMap<UUID, ShulkerInventory> mDepositInventories = new HashMap<>();
+	private final HashSet<UUID> mRateLimited = new HashSet<>();
 
 	public ShulkerInventoryManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -40,6 +47,18 @@ public class ShulkerInventoryManager {
 	 * @return True if the Shulker Box was successfully opened.
 	 */
 	public boolean openShulker(Player player, Inventory parentInventory, ItemStack shulkerItem) {
+		if (mRateLimited.contains(player.getUniqueId())) {
+			player.sendMessage(ERROR_SHULKER_RATE_LIMITED);
+			return false;
+		}
+		mRateLimited.add(player.getUniqueId());
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mRateLimited.remove(player.getUniqueId());
+			}
+		}.runTaskLater(mPlugin, 10);
+
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
 			// Get metadata from shulker box. If it doesn't have metadata, this will generate blank data.
 			BlockStateMeta shulkerMeta = (BlockStateMeta)shulkerItem.getItemMeta();
@@ -82,6 +101,12 @@ public class ShulkerInventoryManager {
 					return false;
 				}
 			}
+
+			if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
+				player.sendMessage(ERROR_SHULKER_ZONE_BLOCKED);
+				return false;
+			}
+
 			player.closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);
 			shulkerBox.setLock("ShulkerShortcut:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
@@ -105,6 +130,17 @@ public class ShulkerInventoryManager {
 	 * @return The amount of items from the stack that were not able to fit in the Shulker Box.
 	 */
 	public int addItemToShulker(Player player, Inventory parentInventory, ItemStack shulkerItem, ItemStack item) {
+		if (mRateLimited.contains(player.getUniqueId())) {
+			return -5;
+		}
+		mRateLimited.add(player.getUniqueId());
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mRateLimited.remove(player.getUniqueId());
+			}
+		}.runTaskLater(mPlugin, 10);
+
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
 			// Get metadata from shulker box. If it doesn't have metadata, this will generate blank data.
 			BlockStateMeta shulkerMeta = (BlockStateMeta) shulkerItem.getItemMeta();
@@ -121,7 +157,6 @@ public class ShulkerInventoryManager {
 					if (mInventories.containsKey(lockUUID)) {
 						if (mInventories.get(lockUUID).getViewers().size() != 0) {
 							// Someone has this shulker open already.
-							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return -1;
 						}
 						// This shulker is stuck in an open state but no players have access.
@@ -133,7 +168,6 @@ public class ShulkerInventoryManager {
 					if (mDepositInventories.containsKey(lockUUID)) {
 						if (mDepositInventories.get(lockUUID).isDepositComplete()) {
 							// Someone is using this shulker for deposit.
-							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return -1;
 						}
 						// This shulker is stuck in an open state but the deposit was already completed.
@@ -141,10 +175,11 @@ public class ShulkerInventoryManager {
 						shulkerBox.setLock(null);
 					}
 				} else {
-					player.sendMessage(ERROR_SHULKER_LOCKED);
-					player.sendMessage("[DEBUG] Shulker Lock: " + lock);
 					return -2;
 				}
+			}
+			if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
+				return -4;
 			}
 			shulkerBox.setLock("ShulkerDeposit:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);

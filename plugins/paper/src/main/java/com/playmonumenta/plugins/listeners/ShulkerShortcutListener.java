@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
@@ -23,8 +24,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ItemUtils;
-
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -67,7 +66,7 @@ public class ShulkerShortcutListener implements Listener {
 			    !mPlugin.mShulkerInventoryManager.updateShulker(player)) {       // Try to update Shulker if it still exists.
 				// The currently open shulker no longer exists, cancel the click and close the inventory.
 				event.setCancelled(true);
-				player.sendMessage(ChatColor.DARK_RED + "Shulker no longer available");
+				player.sendMessage(ChatColor.RED + "Shulker no longer available");
 				new BukkitRunnable() {
 					@Override
 					public void run() {
@@ -76,12 +75,13 @@ public class ShulkerShortcutListener implements Listener {
 				}.runTask(mPlugin);
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
+			           !PortableEnderListener.isPortableEnder(itemClicked) &&
 			           !ItemUtils.isItemShattered(itemClicked)) {
 				// Player clicked a non-shattered non-equipment shulker box in an inventory.
 				if (mPlugin.mShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 					// A currently open shulker box was clicked, cancel.
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					player.sendMessage(ChatColor.DARK_RED + "That shulker is open");
+					player.sendMessage(ChatColor.RED + "That shulker is open");
 					event.setCancelled(true);
 				} else {
 					// A shulker box that isn't currently open was clicked.
@@ -95,19 +95,29 @@ public class ShulkerShortcutListener implements Listener {
 							int starting = itemHeld.getAmount();
 							int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, itemClicked, itemHeld);
 							switch (remaining) {
+								case -5:
+									// Rate limited
+									player.sendMessage(ChatColor.RED + "Too fast! Please try again");
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									break;
+								case -4:
+									// Shulker blocked by zone property
+									player.sendMessage(ChatColor.RED + "Shulkers can not be opened here");
+									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									break;
 								case -3:
 									// Somehow that wasn't a shulker
-									player.sendMessage(String.format("%s%sHow did you...? That isn't a shulker. Please report this", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.sendMessage(ChatColor.RED + "How did you...? That isn't a shulker. Please report this");
 									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 									break;
 								case -2:
 									// Shulker is locked
-									player.sendMessage(String.format("%s%sThat shulker is locked", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.sendMessage(ChatColor.RED + "That shulker is locked");
 									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 									break;
 								case -1:
 									// Shulker is already open
-									player.sendMessage(String.format("%s%sThat shulker is already open", ChatColor.DARK_RED, ChatColor.BOLD));
+									player.sendMessage(ChatColor.RED + "That shulker is already open");
 									player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 									break;
 								case 0:
@@ -120,20 +130,23 @@ public class ShulkerShortcutListener implements Listener {
 									if (remaining == starting) {
 										// No items were placed, shulker is full.
 										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-										player.sendMessage(ChatColor.DARK_RED + "That shulker is full.");
+										player.sendMessage(ChatColor.RED + "That shulker is full.");
 									} else {
 										// Items were inserted, but not all
-										player.sendMessage(ChatColor.DARK_RED + "That shulker was too full to accept the full stack.");
+										player.sendMessage(ChatColor.RED + "That shulker was too full to accept the full stack.");
 										player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 									}
 							}
 						} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
 							// Player right-clicked shulker with an empty cursor.
 							if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, itemClicked)) {
-								// Shulker was successfully opened, cancel.
+								// Shulker was successfully opened
 								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								event.setCancelled(true);
+							} else {
+								// Shulker couldn't be opened
+								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 							}
+							event.setCancelled(true);
 						}
 					}
 				}
@@ -156,7 +169,7 @@ public class ShulkerShortcutListener implements Listener {
 				!mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
 				// The currently open shulker no longer exists, cancel the click and close the inventory.
 				event.setCancelled(true);
-				player.sendMessage(ChatColor.DARK_RED + "Shulker no longer available");
+				player.sendMessage(ChatColor.RED + "Shulker no longer available");
 				new BukkitRunnable() {
 					@Override
 					public void run() {
@@ -210,7 +223,7 @@ public class ShulkerShortcutListener implements Listener {
 		    ItemUtils.isShulkerBox(block.getType()) &&
 		    mPlugin.mShulkerInventoryManager.isShulkerInUse(block)) {
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.sendMessage(ChatColor.DARK_RED + "That shulker is open");
+			player.sendMessage(ChatColor.RED + "That shulker is open");
 			event.setCancelled(true);
 			event.setBuild(false);
 		}

@@ -10,6 +10,7 @@ public class ZoneUtils {
 	public enum ZoneProperty {
 		PLOTS_POSSIBLE("Plots Possible"),
 		NO_MOBILITY_ABILITIES("No Mobility Abilities"),
+		NO_PORTABLE_STORAGE("No Portable Storage"),
 		SPECTATE_AVAILABLE("Spectate Available"),
 		RESIST_5("Resistance V"),
 		SPEED_2("Speed II"),
