@@ -21,24 +21,22 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellKaulBlockBreak extends Spell {
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private int mINC = 0;
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-	            Material.AIR,
-	            Material.COMMAND_BLOCK,
-	            Material.CHAIN_COMMAND_BLOCK,
-	            Material.REPEATING_COMMAND_BLOCK,
-	            Material.BEDROCK,
-				Material.BARRIER,
-	            Material.SPAWNER
-	        );
+			Material.AIR,
+			Material.COMMAND_BLOCK,
+			Material.CHAIN_COMMAND_BLOCK,
+			Material.REPEATING_COMMAND_BLOCK,
+			Material.BEDROCK,
+			Material.BARRIER,
+			Material.SPAWNER,
+			Material.WATER
+		);
 
-	public SpellKaulBlockBreak(LivingEntity launcher, Material... noBreak) {
+	public SpellKaulBlockBreak(LivingEntity launcher) {
 		mBoss = launcher;
-		for (Material mat : noBreak) {
-			mIgnoredMats.add(mat);
-		}
 	}
 
 	@Override
@@ -73,7 +71,7 @@ public class SpellKaulBlockBreak extends Spell {
 			if (target.getLocation().getY() > 8.7) {
 				mINC++;
 				if (target.getLocation().getY() > 8.7 && mBoss.getLocation().distance(target.getLocation()) < 5 &&
-					mINC > 4) {
+				    mINC > 4) {
 					l = target.getLocation();
 					l.setY(target.getLocation().getY() - 3);
 					mINC = 0;

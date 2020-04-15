@@ -104,12 +104,12 @@ public class SpellLightningStrike extends Spell {
 					Location strike = loc.clone().add(0, 10, 0);
 					for (int i = 0; i < 10; i++) {
 						strike.subtract(0, 1, 0);
-						world.spawnParticle(Particle.REDSTONE, strike, 20, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
-						world.spawnParticle(Particle.REDSTONE, strike, 20, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
+						world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
+						world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
 					}
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.25);
-					world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
+					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
+					world.spawnParticle(Particle.FLAME, loc, 30, 0, 0, 0, 0.175);
+					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
