@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -19,27 +18,18 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-
-/*
- * Gain a stack of rage for each 25 / 15 melee damage you deal,
- * capped at 15 / 20. Each stack grants passive 1% damage reduction.
- * Whenever at 10 or more stacks, RClick while looking down to
- * consume all stacks, dealing stacks consumed damage to enemies in
- * a 4 block radius and healing by ⅓ of stacks consumed. Stacks fall
- * off one at a time after 5 seconds of not dealing melee damage.
- */
 
 public class Rampage extends Ability {
 
 	private static final int RAMPAGE_STACK_DECAY_TIME = 20 * 5;
-	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 25;
-	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 15;
+	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 40;
+	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 25;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
-	private static final double RAMPAGE_HEAL_STACK_RATIO = 1.0 / 3;
+	private static final double RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO = 1.0 / 2;
+	private static final double RAMPAGE_HEAL_STACK_RATIO = 1.0 / 4;
 	private static final double RAMPAGE_RADIUS = 4;
 
 	private final int mDamagePerStack;
@@ -56,8 +46,8 @@ public class Rampage extends Ability {
 		mInfo.scoreboardId = "Rampage";
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage reduction (before armor calculations) for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/3 stacks consumed.");
-		mInfo.mDescriptions.add("Gain a stack of rage for each 15 melee damage dealt, with stacks capping at 20.");
+		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 0.5% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/4 stacks consumed.");
+		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
 		mDamagePerStack = getAbilityScore() == 1 ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK;
 		mStackLimit = getAbilityScore() == 1 ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT;
 	}
@@ -117,20 +107,15 @@ public class Rampage extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * (1 - mStacks / 100.0));
+		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
 		return true;
 	}
 
 	@Override
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * (1 - mStacks / 100.0));
+		event.setDamage(EntityUtils.getDamageApproximation(event, 1 - mStacks * RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO / 100.0));
 		return true;
 	}
 
-	@Override
-	public boolean runCheck() {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return InventoryUtils.isSwordItem(mainHand) || InventoryUtils.isAxeItem(mainHand);
-	}
 }
 

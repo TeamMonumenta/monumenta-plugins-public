@@ -30,24 +30,30 @@ public class GraspingClaws extends Ability {
 
 	private static final int GRASPING_CLAWS_RADIUS = 8;
 	private static final float GRASPING_CLAWS_SPEED = 0.175f;
-	private static final int GRASPING_CLAWS_EFFECT_LEVEL = 3;
+	private static final int GRASPING_CLAWS_1_AMPLIFIER = 1;
+	private static final int GRASPING_CLAWS_2_AMPLIFIER = 2;
 	private static final int GRASPING_CLAWS_1_DAMAGE = 3;
 	private static final int GRASPING_CLAWS_2_DAMAGE = 8;
 	private static final int GRASPING_CLAWS_DURATION = 8 * 20;
-	private static final int GRASPING_CLAWS_COOLDOWN = 16 * 20;
+	private static final int GRASPING_CLAWS_1_COOLDOWN = 16 * 20;
+	private static final int GRASPING_CLAWS_2_COOLDOWN = 12 * 20;
 
+	private final int mAmplifier;
+	private final int mDamage;
 	private Arrow arrow = null;
 
 	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Grasping Claws");
 		mInfo.scoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
-		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 6 block radius are given Slowness 3 for 8 seconds and take 3 damage. (Cooldown: 16s)");
-		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, the arrow's radius is increased to 8.");
+		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given Slowness 2 for 8 seconds and take 3 damage. (Cooldown: 16s)");
+		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and Slowness is increased to 3.");
 		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
-		mInfo.cooldown = GRASPING_CLAWS_COOLDOWN;
+		mInfo.cooldown = getAbilityScore() == 1 ? GRASPING_CLAWS_1_COOLDOWN : GRASPING_CLAWS_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;
+		mAmplifier = getAbilityScore() == 1 ? GRASPING_CLAWS_1_AMPLIFIER : GRASPING_CLAWS_2_AMPLIFIER;
+		mDamage = getAbilityScore() == 1 ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 	}
 
 	@Override
@@ -77,13 +83,10 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125);
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
-
-			int damage = (getAbilityScore() == 1) ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
-
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS, mPlayer)) {
-				EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
 				MovementUtils.pullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, GRASPING_CLAWS_EFFECT_LEVEL, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, mAmplifier, false, true));
 			}
 
 			arrow.remove();

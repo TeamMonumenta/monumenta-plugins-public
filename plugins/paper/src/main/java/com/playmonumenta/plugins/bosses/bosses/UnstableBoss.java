@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -24,7 +23,6 @@ public class UnstableBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		Location loc = mBoss.getLocation();
-		loc.getWorld().createExplosion(mBoss, 4F, false);
+		mBoss.getLocation().getWorld().createExplosion(mBoss, 4, false, true);
 	}
 }

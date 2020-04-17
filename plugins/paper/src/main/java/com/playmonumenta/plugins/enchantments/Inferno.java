@@ -151,6 +151,10 @@ public class Inferno implements BaseEnchantment {
 		return sTaggedMobs.containsKey(mob);
 	}
 
+	public static int getMobInfernoLevel(Plugin plugin, LivingEntity mob) {
+		return sTaggedMobs.containsKey(mob) ? sTaggedMobs.get(mob).mLevel : 0;
+	}
+
 	private static void infernoTagMob(Plugin plugin, LivingEntity target, int level, Player player, String type) {
 		/*
 		 * Record this mob as being inferno tagged

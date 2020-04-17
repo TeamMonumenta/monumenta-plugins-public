@@ -39,7 +39,7 @@ public class Exorcism  extends Ability {
 		mInfo.linkedSpell = Spells.EXORCISM;
 		mInfo.scoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Right clicking while looking down without shifting removes all your debuffs and applies them to enemies within 12 blocks of you. (Cooldown: 25s)");
+		mInfo.mDescriptions.add("Right clicking while looking down without shifting removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. (Cooldown: 25s)");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
@@ -59,7 +59,7 @@ public class Exorcism  extends Ability {
 			if (PotionUtils.hasNegativeEffects(effect.getType())) {
 				// createEffect() multiplies the given duration, so it needs to be divided by the same factor, effect.getType().getDurationModifier().
 				debuffs.add(effect.getType().createEffect((int) (EXORCISM_DURATION / effect.getType().getDurationModifier()), effect.getAmplifier()));
-			} else  if (getAbilityScore() > 1) {
+			} else if (getAbilityScore() > 1) {
 				if (effect.getType().equals(PotionEffectType.SPEED)) {
 					debuffs.add(new PotionEffect(PotionEffectType.SLOW, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {

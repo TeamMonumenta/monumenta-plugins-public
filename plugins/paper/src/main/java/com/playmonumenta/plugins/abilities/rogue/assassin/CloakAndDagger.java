@@ -5,6 +5,8 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -22,29 +24,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-/*
- * Cloak & Dagger: Every time you kill a normal mob by any means,
- * you gain a stack of "Cloak". Elite kills give you 5 stacks.
- * Your current stack of Cloaks is X.
- * Level 1 - Cloak stacks are capped at 8. When you shift right
- * click while looking down with dual wielded swords, stacks set
- * to 0 and you gain X seconds of invisibility and 1.5X extra
- * damage on your next attack while invisible. This requires a
- * minimum of 5 stacks. Attacking or switching the main hand
- * weapon to anything but a sword cancels invisibility. If you
- * let invisibility expire without attacking, you get Mining
- * Fatigue 2 for 5 seconds.
- * Level 2 - Cloak stacks are capped at 12 and bonus damage is 2.5X.
-
- */
-
-public class CloakAndDagger extends Ability {
+public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 
 	private static final String CLOAK_METADATA = "CloakAndDaggerPlayerIsInvisible";
 	private static final double CLOAK_1_DAMAGE_MULTIPLIER = 1.5;
@@ -55,6 +43,8 @@ public class CloakAndDagger extends Ability {
 	private static final int CLOAK_PENALTY_DURATION = 20 * 5;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
 
+	private final KillTriggeredAbilityTracker mTracker;
+
 	private double mDamageMultiplier;
 	private int mMaxStacks;
 	private boolean active = false;
@@ -63,16 +53,17 @@ public class CloakAndDagger extends Ability {
 	private int cloakOnActivation = 0;
 
 	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Cload and Dagger");
+		super(plugin, world, random, player, "Cloak and Dagger");
 		mInfo.scoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills give you five stacks. Stacks are capped at 8. When you shift right click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of invisibility (Mobs won't target you) and (1.5)(X) extra damage on your next attack while invisible where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this. Attacking with a sword or switching to any weapon that is not a sword cancels invisibility. If invisibility expires without attacking, you suffer from Mining Fatigue 2 for 5 seconds.");
+		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you shift right click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of invisibility (Mobs won't target you) and (1.5)(X) extra damage on your next attack while invisible where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this. Attacking with a sword or switching to any weapon that is not a sword cancels invisibility. If invisibility expires without attacking, you suffer from Mining Fatigue 2 for 5 seconds.");
 		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2.5)(X) where X is the number of stacks you have upon activating this skill.");
 		mInfo.linkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.cooldown = 0;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
 		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
+		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 
 	@Override
@@ -142,18 +133,32 @@ public class CloakAndDagger extends Ability {
 			}
 			event.setDamage(event.getDamage() + cloakOnActivation * mDamageMultiplier);
 		}
+
+		mTracker.updateDamageDealtToBosses(event);
+		return true;
+	}
+
+	@Override
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		mTracker.updateDamageDealtToBosses(event);
 		return true;
 	}
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		triggerOnKill(event.getEntity());
+	}
+
+	@Override
+	public void triggerOnKill(Entity mob) {
 		if (cloak < mMaxStacks) {
-			if (EntityUtils.isElite(event.getEntity())) {
+			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				cloak = Math.min(mMaxStacks, cloak + CLOAK_STACKS_ON_ELITE_KILL);
 			} else {
 				cloak++;
 			}
 		}
+
 		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cloak stacks: " + cloak);
 	}
 

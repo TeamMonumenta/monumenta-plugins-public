@@ -18,37 +18,35 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ConsumingFlames extends Ability {
 
-	private static final int CONSUMING_FLAMES_1_RADIUS = 5;
-	private static final int CONSUMING_FLAMES_2_RADIUS = 7;
-	private static final int CONSUMING_FLAMES_DAMAGE = 1;
+	private static final int CONSUMING_FLAMES_RADIUS = 8;
+	private static final int CONSUMING_FLAMES_1_DAMAGE = 1;
+	private static final int CONSUMING_FLAMES_2_DAMAGE = 8;
 	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
 	private static final int CONSUMING_FLAMES_COOLDOWN = 10 * 20;
+
+	private final int mDamage;
 
 	public ConsumingFlames(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Consuming Flames");
 		mInfo.scoreboardId = "ConsumingFlames";
 		mInfo.mShorthandName = "CF";
-		mInfo.mDescriptions.add("Crouching and right-clicking while not looking down while holding a scythe knocks back, weakens, and ignites mobs within 3 blocks of you for 7s doing 1 damage. (Cooldown: 10s)");
-		mInfo.mDescriptions.add("The radius is increased to 7 blocks. If you weaken any mob, you also gain fire resistance for 7s. Amplifying Hex now counts fire and inferno as a debuff.");
+		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. (Cooldown: 10s)");
+		mInfo.mDescriptions.add("The damage is increased to 8, and also afflict mobs with Weakness I.");
 		mInfo.linkedSpell = Spells.CONSUMING_FLAMES;
 		mInfo.cooldown = CONSUMING_FLAMES_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mDamage = getAbilityScore() == 1 ? CONSUMING_FLAMES_1_DAMAGE : CONSUMING_FLAMES_2_DAMAGE;
 	}
 
 	@Override
 	public void cast(Action action) {
-		Player player = mPlayer;
-		Location loc = player.getLocation();
-		World world = player.getWorld();
-		int consumingFlames = getAbilityScore();
-		int radius = (consumingFlames == 1) ? CONSUMING_FLAMES_1_RADIUS : CONSUMING_FLAMES_2_RADIUS;
+		Location loc = mPlayer.getLocation();
 
 		new BukkitRunnable() {
 			double r = 0;
@@ -64,27 +62,24 @@ public class ConsumingFlames extends Ability {
 					loc.subtract(Math.cos(radian1) * r, 0.15, Math.sin(radian1) * r);
 				}
 
-				if (r >= radius + 1) {
+				if (r >= CONSUMING_FLAMES_RADIUS + 1) {
 					this.cancel();
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
-		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
-		boolean effect = false;
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), radius, mPlayer)) {
-			PotionUtils.applyPotion(player, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
+		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 30, 0, 0, 0, 0.15);
+		mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
+		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
+
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CONSUMING_FLAMES_RADIUS, mPlayer)) {
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
 			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob);
 
-			EntityUtils.damageEntity(mPlugin, mob, CONSUMING_FLAMES_DAMAGE, player, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
-			effect = true;
-		}
-
-		if (consumingFlames > 1 && effect) {
-			mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, CONSUMING_FLAMES_DURATION, 0, false, true));
+			if (getAbilityScore() > 1) {
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
+			}
 		}
 
 		putOnCooldown();

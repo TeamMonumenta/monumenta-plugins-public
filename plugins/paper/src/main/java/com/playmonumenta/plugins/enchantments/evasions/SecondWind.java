@@ -13,7 +13,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SecondWind implements BaseEnchantment {
 
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Second Wind";
+	private static final double PERCENT_HEAL_CAP = 0.5;
 
 	@Override
 	public String getProperty() {
@@ -27,7 +28,7 @@ public class SecondWind implements BaseEnchantment {
 
 	@Override
 	public void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) {
-		PlayerUtils.healPlayer(player, Math.sqrt(level));
+		PlayerUtils.healPlayer(player, Math.max(event.getFinalDamage() * PERCENT_HEAL_CAP, Math.sqrt(level)));
 	}
 
 }

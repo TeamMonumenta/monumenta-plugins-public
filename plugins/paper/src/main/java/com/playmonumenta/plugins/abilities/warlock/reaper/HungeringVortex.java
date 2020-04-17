@@ -15,7 +15,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,65 +32,61 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class HungeringVortex extends Ability {
 
-	private static final String HUNGERING_VORTEX_METAKEY = "HungeringVortexDamageBonusActiveMetakey";
-
 	private static final int HUNGERING_VORTEX_DURATION = 8 * 20;
-	private static final int HUNGERING_VORTEX_COOLDOWN = 18 * 20;
-	private static final int HUNGERING_VORTEX_RADIUS = 7;
+	private static final int HUNGERING_VORTEX_COOLDOWN = 20 * 18;
+	private static final int HUNGERING_VORTEX_RADIUS = 8;
 	private static final int HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER = 0;
 	private static final int HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER = 1;
-	private static final int HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER = 0;
-	private static final int HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER = 1;
-	private static final int HUNGERING_VORTEX_RESISTANCE_DURATION = 20 * 4;
-	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE = 1;
-	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE = 2;
-	private static final double HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX = 1;
-	private static final double HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX = 2;
+	private static final int HUNGERING_VORTEX_1_ABSORPTION_AMPLIFIER = 0;
+	private static final int HUNGERING_VORTEX_2_ABSORPTION_AMPLIFIER = 1;
+	private static final int HUNGERING_VORTEX_1_EXTRA_DAMAGE = 1;
+	private static final int HUNGERING_VORTEX_2_EXTRA_DAMAGE = 2;
+	private static final int HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX = 6;
+	private static final int HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX = 12;
 
-	/*
-	 * Hungering Vortex: Shift + right click looking down pulls
-	 * all mobs in a 7-block radius towards you, afflicting them
-	 * with Slowness I / II for 8 s and increasing your melee
-	 * damage by 1 / 2 for each initially affected enemy, up
-	 * to a maximum of 6 / 12 for 8s. All affected enemies change
-	 * target to you. Gives Resistance I / II on activation for 4 seconds.
-	 * Cooldown: 18 s
-	 */
+	private final int mSlownessAmplifier;
+	private final int mAbsorptionAmplifier;
+	private final int mExtraDamage;
+	private final int mExtraDamageMax;
+
+	private int mActiveBonus = 0;
 
 	public HungeringVortex(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Hungering Vortex");
 		mInfo.scoreboardId = "HungeringVortex";
 		mInfo.mShorthandName = "HV";
-		mInfo.mDescriptions.add("Right-clicking while shifted while looking down pulls all mobs in a 7 block radius towards you, afflicting them with Slowness 1 for 8s. This draws the aggro of all mobs pulled and increases your melee damage by 1 for every affected enemy up to a maximum of 6 bonus damage for 8s. In addition you gain Resistance 1 for 4 seconds on activation. This skill only goes on cooldown if at least one mob is affected. Cooldown: 18s.");
-		mInfo.mDescriptions.add("You afflict enemies with Slowness 2 for 8s instead. In addition your melee damage increases by 2 for each affected enemy up to a maximum of 12 bonus damage for 8s. You also gain Resistance 2 for 4 seconds on activation.");
+		mInfo.mDescriptions.add("Right-clicking while shifted while looking down pulls all mobs in a 8 block radius towards you, afflicting them with Slowness I for 8s. This draws the aggro of all mobs pulled and increases your melee damage by 1 for every affected enemy up to a maximum of 6 bonus damage for 8s. In addition, you gain Absorption I for 8 seconds on activation. This skill only goes on cooldown if at least one mob is affected. Cooldown: 18s.");
+		mInfo.mDescriptions.add("Slowness is increased to II, Absorption is increased to II, and melee damage increased by 2 for each affected enemy, up to a maximum of 12.");
 		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
 		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.ignoreCooldown = true;
+		mSlownessAmplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
+		mAbsorptionAmplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_ABSORPTION_AMPLIFIER : HUNGERING_VORTEX_2_ABSORPTION_AMPLIFIER;
+		mExtraDamage = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
+		mExtraDamageMax = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX : HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {
-			event.setDamage(event.getDamage() + mPlayer.getMetadata(HUNGERING_VORTEX_METAKEY).get(0).asDouble());
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			event.setDamage(event.getDamage() + mActiveBonus);
 		}
 		return true;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.HUNGERING_VORTEX)
-		    || !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)
+				|| !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
 			return;
 		}
 
-		int vortex = getAbilityScore();
-		int slowness = vortex == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
 		float velocity = mPlayer.getLocation().getBlock().isLiquid() ? 0.04f : 0.055f;
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), HUNGERING_VORTEX_RADIUS, mPlayer);
 		for (LivingEntity mob : mobs) {
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, slowness));
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, HUNGERING_VORTEX_DURATION, mSlownessAmplifier));
 			if (mob instanceof Mob) {
 				((Mob)mob).setTarget(mPlayer);
 			}
@@ -105,8 +100,7 @@ public class HungeringVortex extends Ability {
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 0.8f, 1.25f);
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.8f, 0.75f);
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 200, 3.5, 3.5, 3.5, 1);
-		int amplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_RESISTANCE_AMPLIFIER : HUNGERING_VORTEX_2_RESISTANCE_AMPLIFIER;
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, HUNGERING_VORTEX_RESISTANCE_DURATION, amplifier, true, true));
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.ABSORPTION, HUNGERING_VORTEX_DURATION, mAbsorptionAmplifier, true, true));
 
 		// Gradual pull on mobs
 		new BukkitRunnable() {
@@ -124,7 +118,7 @@ public class HungeringVortex extends Ability {
 						}
 					}
 				}
-				if (t > HUNGERING_VORTEX_RESISTANCE_DURATION) {
+				if (t > HUNGERING_VORTEX_DURATION) {
 					this.cancel();
 				}
 			}
@@ -156,18 +150,13 @@ public class HungeringVortex extends Ability {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 
-		double damageInc = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
-		double damageMax = vortex == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE_MAX : HUNGERING_VORTEX_2_EXTRA_DAMAGE_MAX;
-		double extraDamage = Math.min(damageMax, mobs.size()) * damageInc;
+		mActiveBonus = Math.min(mExtraDamageMax, mobs.size() * mExtraDamage);
 
-		mPlayer.setMetadata(HUNGERING_VORTEX_METAKEY, new FixedMetadataValue(mPlugin, extraDamage));
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mPlayer.hasMetadata(HUNGERING_VORTEX_METAKEY)) {
-					mPlayer.removeMetadata(HUNGERING_VORTEX_METAKEY, mPlugin);
-					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "The power of your Vortex fades away...");
-				}
+				mActiveBonus = 0;
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "The power of your Vortex fades away...");
 				this.cancel();
 			}
 

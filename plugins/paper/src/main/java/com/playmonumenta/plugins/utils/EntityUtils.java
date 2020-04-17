@@ -431,10 +431,11 @@ public class EntityUtils {
 	}
 
 	// Manually calculates the real final damage dealt to a player, in case of manual event calls or absorption hearts.
-	// Evasion is not accounted for, as evasion modifies the actual event damage.
+	// Evasion is not accounted for, as evasion modifies the actual event damage. Works only for players.
 	public static double getRealFinalDamage(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player)) {
-			return event.getDamage();
+			// Give garbage value if being used incorrectly
+			return -1;
 		}
 
 		Player player = (Player) event.getEntity();
@@ -469,7 +470,10 @@ public class EntityUtils {
 			}
 		}
 
-		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25) * (1 - Math.min(20.0, protection) / 25);
+		int resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) == null
+				? 0 : (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1);
+
+		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
@@ -654,6 +658,70 @@ public class EntityUtils {
 
 		entities.sort((left, right) -> left.getLocation().distance(loc) >= right.getLocation().distance(loc) ? 1 : -1);
 		return entities.get(0);
+	}
+
+	private static final double MARGIN_OF_ERROR = 0.001;
+	private static final int MAXIMUM_ITERATIONS = (int)(Math.log(MARGIN_OF_ERROR) / Math.log(0.5) * 2);
+
+	/**
+	 * Returns the raw damage needed to achieve a final damage multiplied by some constant, undershoots to the margin of error.
+	 * <p>
+	 * If raw damage is directly multiplied, then armor piercing effects make the damage exponentially more punishing.
+	 *
+	 * @param event      the event that will be used to calculate the raw damage needed
+	 * @param multiplier the desired multiplier for the final damage
+	 * @return           the raw damage needed to achieve the desired multiplier for final damage
+	 */
+	public static double getDamageApproximation(EntityDamageEvent event, double multiplier) {
+		if (!(event.getEntity() instanceof LivingEntity)) {
+			return event.getDamage();
+		}
+
+		LivingEntity mob = (LivingEntity) event.getEntity();
+		double armor = mob.getAttribute(Attribute.GENERIC_ARMOR).getValue();
+		double toughness = mob.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+
+		double rawDamageLowerBound;
+		double rawDamageUpperBound;
+
+		if (multiplier > 1) {
+			rawDamageLowerBound = event.getDamage();
+			rawDamageUpperBound = rawDamageLowerBound * multiplier;
+		} else if (multiplier < 1) {
+			rawDamageUpperBound = event.getDamage();
+			rawDamageLowerBound = 0;	// Since armor gets better at lower damage, there's no good lower bound
+		} else {
+			return event.getDamage();
+		}
+
+		double finalDamageBaseline = calculateDamageAfterArmor(event.getDamage(), armor, toughness);
+
+		// Infinite loop safe this in case of bugs
+		for (int i = 0; i < MAXIMUM_ITERATIONS; i++) {
+			// No need to worry about double overflow
+			double rawDamageMiddle = (rawDamageLowerBound + rawDamageUpperBound) / 2;
+			// Since protection is constant and evasion is too complicated, ignore both
+			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness) / finalDamageBaseline;
+
+			if (damageRatio <= multiplier) {
+				if (damageRatio > multiplier * (1 - MARGIN_OF_ERROR)) {
+					return rawDamageMiddle;
+				}
+				rawDamageLowerBound = rawDamageMiddle;
+			} else {
+				rawDamageUpperBound = rawDamageMiddle;
+			}
+		}
+
+		// Can only reach because of bug, so return a very noticeable fail case
+		return 0;
+	}
+
+	// getFinalDamage() does not work for dummy event calls; this is fewer calculations than getRealFinalDamage()
+	private static double calculateDamageAfterArmor(double damage, double armor, double toughness) {
+		armor = Math.min(30, armor);
+		toughness = Math.min(20, toughness);
+		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25);
 	}
 
 }

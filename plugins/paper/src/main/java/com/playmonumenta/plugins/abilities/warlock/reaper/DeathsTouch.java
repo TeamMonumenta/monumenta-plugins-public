@@ -26,24 +26,21 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DeathsTouch extends Ability {
 
+	public static final String DEATHS_TOUCH_BUFF_DURATION = "DeathsTouchBuffDuration";
+	public static final String DEATHS_TOUCH_AMPLIFIER_CAP = "DeathsTouchAmplifierCap";
+
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "DeathsTouchTickRightClicked";
 
 	private static final int DEATHS_TOUCH_1_COOLDOWN = 25 * 20;
 	private static final int DEATHS_TOUCH_2_COOLDOWN = 15 * 20;
 	private static final int DEATHS_TOUCH_1_BUFF_DURATION = 15 * 20;
 	private static final int DEATHS_TOUCH_2_BUFF_DURATION = 20 * 20;
+	private static final int DEATHS_TOUCH_1_AMPLIFER_CAP = 0;
+	private static final int DEATHS_TOUCH_2_AMPLIFER_CAP = 1;
 	private static final int DEATHS_TOUCH_RANGE = 20;
 
-	/*
-	 * Death’s Touch: Sprint + right-click marks the enemy
-	 * you are looking at as the reaper’s next victim.
-	 * The player that kills the mob reaps its soul,
-	 * granting them 15 / 20 s of lvl 1 buffs contrary to the
-	 * debuffs affecting it (Weakness -> Strength, Slowness ->
-	 * Speed, On Fire -> Fire Resistance, Wither / Poison ->
-	 * Regeneration, Mining Fatigue -> Haste, Blindness ->
-	 * Night Vision). Cooldown: 25 / 15 s
-	 */
+	private final int mBuffDuration;
+	private final int mAmplifierCap;
 
 	// Although we now track the mob buffs on kill with metadata,
 	// We still need this variable to easily apply particle effects
@@ -56,9 +53,11 @@ public class DeathsTouch extends Ability {
 		mInfo.scoreboardId = "DeathsTouch";
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Double right-clicking marks the enemy you are looking at as the reaper's next victim. If you do not correctly aim at a mob this skill goes on cooldown for 5s and it does nothing. If you or another player kills that enemy, the player that killed it is granted 15s of level 1 buffs contrary to the debuffs affecting it. Weakness > Strength. Slowness > Speed. Fire > Fire Resistance. Wither/Poison > Regeneration. Mining Fatigue > Haste. Blindness > Night Vision. Cooldown: 25s.");
-		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead. The cooldown is reduced to 15s.");
+		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead, and the level of the buff is preserved, up to level 2. Cooldown: 15s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mBuffDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
+		mAmplifierCap = getAbilityScore() == 1 ? DEATHS_TOUCH_1_AMPLIFER_CAP : DEATHS_TOUCH_2_AMPLIFER_CAP;
 	}
 
 	@Override
@@ -99,8 +98,8 @@ public class DeathsTouch extends Ability {
 			for (LivingEntity mob : mobsInRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					target = mob;
-					int duration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
-					mob.setMetadata("DeathsTouchBuffDuration", new FixedMetadataValue(mPlugin, duration));
+					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
+					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.5f, 1f);
 
 					new BukkitRunnable() {
@@ -118,7 +117,8 @@ public class DeathsTouch extends Ability {
 							if (t >= runnableDuration || (target != null && (target.isDead() || !target.isValid()))) {
 								this.cancel();
 								if (target != null) {
-									target.removeMetadata("DeathsTouchBuffDuration", mPlugin);
+									target.removeMetadata(DEATHS_TOUCH_BUFF_DURATION, mPlugin);
+									target.removeMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, mPlugin);
 								}
 								target = null;
 							}

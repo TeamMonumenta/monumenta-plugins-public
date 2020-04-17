@@ -18,9 +18,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Adrenaline implements BaseEnchantment {
+
 	private static String ADRENALINE_METAKEY = "ActiveAdrenalineLevel";
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Adrenaline";
+
+	private static final int DURATION = 20 * 3;
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
+
 	private Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
 
 	@Override
@@ -33,8 +37,8 @@ public class Adrenaline implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
-	//Adds +0.1 movement speed per level for 50 ticks, currently walkspeed, movement speed increase broken
-	//0.2 is default for walk speed
+	// Adds +0.1 movement speed per level for 60 ticks, currently walkspeed, movement speed increase broken
+	// 0.2 is default for walk speed
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 
@@ -57,7 +61,7 @@ public class Adrenaline implements BaseEnchantment {
 				this.cancel();
 			}
 		};
-		runnable.runTaskLater(plugin, 50);
+		runnable.runTaskLater(plugin, DURATION);
 		mRunnables.put(player.getUniqueId(), runnable);
 	}
 

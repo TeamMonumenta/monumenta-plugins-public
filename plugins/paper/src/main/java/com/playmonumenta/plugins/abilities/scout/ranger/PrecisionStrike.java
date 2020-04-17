@@ -25,22 +25,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
-/*
-* Sprint right click (without a bow) to execute a fast dash that launches the
-* player a short distance, stopping at the first enemy hit, dealing 6 damage and
-* applying 20% vulnerability for 3 seconds. The hit enemy is also stunned for 1
-* second. If the player hits the ground before reaching an enemy, nothing
-* happens. At level 2 the damage increases to 10, the vulnerability increases to
-* 30%, and all mobs in a 3 block radius are stunned. (CD: 6 seconds)
-*/
-
 public class PrecisionStrike extends Ability {
 
 	private static final double PRECISION_STRIKE_Y_VELOCITY_MULTIPLIER = 0.5;
 	private static final double PRECISION_STRIKE_Y_VELOCITY_BONUS = 0.4;
 	private static final double PRECISION_STRIKE_ACTIVATION_RADIUS = 2;
-	private static final int PRECISION_STRIKE_1_DAMAGE = 6;
-	private static final int PRECISION_STRIKE_2_DAMAGE = 10;
+	private static final int PRECISION_STRIKE_1_DAMAGE = 8;
+	private static final int PRECISION_STRIKE_2_DAMAGE = 16;
 	private static final double PRECISION_STRIKE_STUN_RADIUS = 3;
 	private static final int PRECISION_STRIKE_STUN_DURATION = 1 * 20;
 	private static final int PRECISION_STRIKE_VULNERABILITY_DURATION = 3 * 20;

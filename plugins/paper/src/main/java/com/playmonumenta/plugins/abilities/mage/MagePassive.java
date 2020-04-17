@@ -5,17 +5,20 @@ import java.util.Random;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class MagePassive extends Ability {
 
-	private static final double PASSIVE_DAMAGE = 1.5;
+	private static final int TIME_TO_FIRE_RESISTANCE = 20 * 2;
+	private static final int FIRE_RESISTANCE_DURATION = 20 * 4;
+
+	private int mTicksOnFire = 0;
 
 	public MagePassive(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, null);
@@ -27,12 +30,16 @@ public class MagePassive extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && InventoryUtils.isWandItem(mainHand)) {
-			event.setDamage(event.getDamage() + PASSIVE_DAMAGE);
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mTicksOnFire > TIME_TO_FIRE_RESISTANCE) {
+			mTicksOnFire = 0;
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+					new PotionEffect(PotionEffectType.FIRE_RESISTANCE, FIRE_RESISTANCE_DURATION, 0, false, true));
 		}
-		return true;
+
+		if (mPlayer.getFireTicks() > 0 && mPlayer.getPotionEffect(PotionEffectType.FIRE_RESISTANCE) == null) {
+			mTicksOnFire += 5;
+		}
 	}
 
 	@Override
@@ -42,4 +49,5 @@ public class MagePassive extends Ability {
 		}
 		return true;
 	}
+
 }

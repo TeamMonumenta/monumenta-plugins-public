@@ -3,10 +3,8 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -32,14 +30,10 @@ public class WarlockPassive extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		LivingEntity killedEntity = event.getEntity();
-		if (EntityUtils.isHostileMob(killedEntity)) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-
-			if (InventoryUtils.isScytheItem(mainHand) || InventoryUtils.isScytheItem(offHand)) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, false, true));
-			}
+		if (EntityUtils.isHostileMob(event.getEntity())
+				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+					new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PASSIVE_DURATION, 0, false, true));
 		}
 	}
 

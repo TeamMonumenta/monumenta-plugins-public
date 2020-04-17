@@ -166,10 +166,6 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
 
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 		AbilityManager.getManager().playerInteractEvent(player, action, item, mat);
 		mPlugin.mTrackingManager.mPlayers.onPlayerInteract(mPlugin, player, event);

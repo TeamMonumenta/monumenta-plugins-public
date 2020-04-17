@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
+import com.playmonumenta.plugins.abilities.alchemist.PowerInjectionNonAlchemist;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
@@ -288,6 +289,7 @@ public class AbilityManager {
 		                               new BasiliskPoison(mPlugin, mWorld, mRandom, null),
 		                               new UnstableArrows(mPlugin, mWorld, mRandom, null),
 		                               new PowerInjection(mPlugin, mWorld, mRandom, null),
+		                               new PowerInjectionNonAlchemist(mPlugin, mWorld, mRandom, null),
 		                               new IronTincture(mPlugin, mWorld, mRandom, null),
 		                               new GruesomeAlchemy(mPlugin, mWorld, mRandom, null),
 		                               new BrutalAlchemy(mPlugin, mWorld, mRandom, null),

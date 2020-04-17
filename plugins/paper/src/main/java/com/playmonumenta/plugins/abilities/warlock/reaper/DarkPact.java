@@ -28,15 +28,6 @@ public class DarkPact extends Ability {
 	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.5;
 	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 0.8;
 
-	/*
-	 * Dark Pact: Sprint + left-click twice with a scythe without hitting a mob to greatly amplify your
-	 * power for 10 s, making your skills and melee attacks deal 50% / 80% more
-	 * damage. At lvl 2, your scythe attacks also cleave, dealing 50% AoE
-	 * damage in front of you. While this ability is active, you cannot heal
-	 * health. If Soul Rend is triggered, deal half AoE damage instead of AoE heal.
-	 * Cooldown: 10 s (Blasphemous Aura treats this skill as if it is always on cooldown)
-	 */
-
 	private BukkitRunnable mPactTimer;
 	private float mSaturation = 0;
 	private double mHealth = 0;
@@ -47,7 +38,7 @@ public class DarkPact extends Ability {
 		super(plugin, world, random, player, "Dark Pact");
 		mInfo.scoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Sprint left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage at half its normal amount. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage instead of healing. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
 		mInfo.mDescriptions.add("You deal 80% more melee damage instead. Scythe attacks also cleave for 50% of the damage dealt in a 1.5 block radius from the mob hit.");
 		mInfo.cooldown = DARK_PACT_COOLDOWN;
 		mInfo.linkedSpell = Spells.DARK_PACT;
@@ -62,7 +53,7 @@ public class DarkPact extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSprinting() || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 

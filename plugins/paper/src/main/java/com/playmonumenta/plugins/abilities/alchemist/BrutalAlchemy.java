@@ -19,24 +19,24 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BrutalAlchemy extends Ability {
-	private static final int BRUTAL_ALCHEMY_DAMAGE_1 = 3;
-	private static final int BRUTAL_ALCHEMY_DAMAGE_2 = 5;
-	private static final int BRUTAL_ALCHEMY_WITHER_1_DURATION = 4 * 20 + 10;
-	private static final int BRUTAL_ALCHEMY_WITHER_2_DURATION = 6 * 20 + 10;
-	public static final String BRUTAL_ALCHEMY_SCOREBOARD = "BrutalAlchemy";
+	private static final int BRUTAL_ALCHEMY_1_DAMAGE = 1;
+	private static final int BRUTAL_ALCHEMY_2_DAMAGE = 2;
+	private static final int BRUTAL_ALCHEMY_DURATION = 20 * 8;
+	private static final int BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 2;
+	private static final int BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 4;
 
-	private int mDamage;
-	private int mWitherDuration;
+	private final int mDamage;
+	private final int mVulnerabilityAmplifier;
 
 	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Brutal Alchemy");
 		mInfo.linkedSpell = Spells.BRUTAL_ALCHEMY;
-		mInfo.scoreboardId = BRUTAL_ALCHEMY_SCOREBOARD;
+		mInfo.scoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";
-		mInfo.mDescriptions.add("Killing a mob gives you an Alchemist's Potion. Your Alchemist's Potions deal 3 magic damage and 4s of Wither II. The first skill point spent on either Gruesome Alchemy or Brutal Alchemy will give you a potion per kill and a 30% chance of getting a second potion.");
-		mInfo.mDescriptions.add("Your Alchemist's Potions now deal 5 magic damage and 6s of Wither II");
-		mDamage = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_DAMAGE_1 : BRUTAL_ALCHEMY_DAMAGE_2;
-		mWitherDuration = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_WITHER_1_DURATION : BRUTAL_ALCHEMY_WITHER_2_DURATION;
+		mInfo.mDescriptions.add("Your Alchemist's Potions deal 1 damage and 15% Vulnerability for 8 seconds.");
+		mInfo.mDescriptions.add("Your Alchemist's Potions now deal 2 damage and 25% Vulnerability.");
+		mDamage = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_DAMAGE : BRUTAL_ALCHEMY_2_DAMAGE;
+		mVulnerabilityAmplifier = getAbilityScore() == 1 ? BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER : BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class BrutalAlchemy extends Ability {
 	}
 
 	public void apply(LivingEntity mob) {
+		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, BRUTAL_ALCHEMY_DURATION, mVulnerabilityAmplifier, false, true));
 		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
-		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WITHER, mWitherDuration, 1, false, true));
 	}
 
 }

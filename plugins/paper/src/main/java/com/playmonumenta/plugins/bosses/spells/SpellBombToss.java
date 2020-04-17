@@ -96,14 +96,24 @@ public class SpellBombToss extends Spell {
 		sLoc.setY(sLoc.getY() + 1.7f);
 		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 		try {
-			TNTPrimed tnt = (TNTPrimed) EntityUtils.getSummonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + Integer.toString(mFuse) + "}");
+			TNTPrimed tnt = (TNTPrimed) EntityUtils.getSummonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + mFuse + "}");
 			mTNTList.add(tnt);
-			tnt.setYield(mYield);
+			// Dummy TNT
+			tnt.setYield(0);
 			Location pLoc = target.getLocation();
 			Location tLoc = tnt.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
 			vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
 			tnt.setVelocity(vect);
+
+			// Detonate the creeper for proper damage calculations
+			new BukkitRunnable() {
+				TNTPrimed mTnt = tnt;
+				@Override
+				public void run() {
+					mBoss.getLocation().getWorld().createExplosion(mBoss, mTnt.getLocation(), mYield, false, true);
+				}
+			}.runTaskLater(mPlugin, mFuse);
 		} catch (Exception e) {
 			mPlugin.getLogger().warning("Failed to summon TNT for bomb toss: " + e.getMessage());
 			e.printStackTrace();

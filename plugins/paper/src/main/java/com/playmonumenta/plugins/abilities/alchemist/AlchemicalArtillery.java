@@ -26,13 +26,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
-/*
- * Alchemical Artillery: Left click with a bow to prime it with an alchemist potion.
- * Shooting the bow in the next 5 seconds consumes 4 / 3 potions.
- * When the arrow hits an enemy, the potion is appled in a 3 / 5 block radius.
- * Basilisk Poison is also applied if applicable.
- */
-
 public class AlchemicalArtillery extends Ability {
 	private static final String ALCHEMICAL_ARTILLERY_METAKEY = "AlchemicalArtilleryArrowGotTheDankPot";
 	private static final int ALCHEMICAL_ARTILLERY_1_RADIUS = 3;
@@ -95,6 +88,7 @@ public class AlchemicalArtillery extends Ability {
 			mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
 			mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
 
+			AlchemistPotions ap = (AlchemistPotions) AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
 			BrutalAlchemy ba = (BrutalAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
 			GruesomeAlchemy ga = (GruesomeAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
 			NightmarishAlchemy na = (NightmarishAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
@@ -106,12 +100,15 @@ public class AlchemicalArtillery extends Ability {
 			boolean guaranteedApplicationApplied = false;
 
 			for (LivingEntity mob : mobs) {
-				// Gruesome must go first to apply the Vulnerability
+				// Brutal must go first to apply the Vulnerability
+				if (ba != null) {
+					ba.apply(mob);
+				}
 				if (ga != null) {
 					ga.apply(mob);
 				}
-				if (ba != null) {
-					ba.apply(mob);
+				if (ap != null) {
+					ap.apply(mob);
 				}
 				if (na != null) {
 					guaranteedApplicationApplied = na.apply(mob, size, guaranteedApplicationApplied);

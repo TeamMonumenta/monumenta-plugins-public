@@ -23,16 +23,11 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-/*
- * INVIGORATING ODOR:
- * Alchemist Potions do +2 / +4 damage, and leave behind a
- * 3 second aura that gives players Speed I and Haste I for
- * 10 seconds. At level 2, Resistance I is added to the aura.
- */
 public class InvigoratingOdor extends Ability {
 
-	private static final int INVIGORATING_1_DAMAGE = 2;
-	private static final int INVIGORATING_2_DAMAGE = 4;
+	private static final double INVIGORATING_POTION_CHANCE = 0.25;
+	private static final int INVIGORATING_1_DAMAGE = 1;
+	private static final int INVIGORATING_2_DAMAGE = 2;
 	private static final int INVIGORATING_DURATION = 20 * 10;
 	private static final int INVIGORATING_AURA_DURATION = 20 * 3;
 	private static final int INVIGORATING_RADIUS = 3;
@@ -46,8 +41,8 @@ public class InvigoratingOdor extends Ability {
 		mInfo.linkedSpell = Spells.INVIGORATING_ODOR;
 		mInfo.scoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
-		mInfo.mDescriptions.add("Alchemist Potions deal 2 additional damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players for 10 seconds.");
-		mInfo.mDescriptions.add("Alchemist Potions deal 4 additional damage instead and Resistance I is added to the aura.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players for 10 seconds. The 50% chance for a potion on ally kills is increased to 75%.");
+		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and Resistance I is added to the aura. The chance for a potion on ally kills is increased to 100%.");
 		mDamage = getAbilityScore() == 1 ? INVIGORATING_1_DAMAGE : INVIGORATING_2_DAMAGE;
 	}
 
@@ -101,6 +96,11 @@ public class InvigoratingOdor extends Ability {
 				mTicks += 5;
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
+	}
+
+	// Used by NonAlchemistPotionPassive
+	public double getPotionChanceBonus() {
+		return INVIGORATING_POTION_CHANCE * getAbilityScore();
 	}
 
 }
