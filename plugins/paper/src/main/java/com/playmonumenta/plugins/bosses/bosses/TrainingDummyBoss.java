@@ -7,6 +7,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -33,13 +34,18 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
+		if (damager instanceof Player) {
+			Player player = (Player) damager;
+			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + event.getFinalDamage());
+		}
 
-		if (damager != null && damager instanceof Player) {
-			Player player = (Player)damager;
+		if (damager instanceof Projectile) {
+			Projectile projectile = (Projectile) damager;
 
-			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + Double.toString(event.getFinalDamage()));
-
-			return;
+			if (projectile.getShooter() instanceof Player) {
+				Player player = (Player) projectile.getShooter();
+				player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + event.getFinalDamage());
+			}
 		}
 	}
 }

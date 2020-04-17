@@ -41,7 +41,6 @@ public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 	static final int ALCH_PASSIVE_RADIUS = 12;
 	Random mRandom = new Random();
-
 	Plugin mPlugin = null;
 
 	public MobListener(Plugin plugin) {

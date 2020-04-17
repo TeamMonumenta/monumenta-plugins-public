@@ -20,8 +20,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
  * damage by 1, up to a max of 5. After 4 seconds without a successful hit, the
  * bonus is reduced by 1. At level 2, each hit increases damage by 2 up to 8.
  *
- * TODO: This damage buff
- * stacks with Enchanted Arrow and other bow skills.
+ * TODO: This damage buff stacks with Enchanted Arrow and other bow skills.
  */
 
 public class Sharpshooter extends Ability {
@@ -41,6 +40,7 @@ public class Sharpshooter extends Ability {
 
 	private int mSharpshot = 0;
 	private int mTicks = 0;
+	private boolean mCanVolley = true;
 
 	@Override
 	public boolean playerShotArrowEvent(Arrow arrow) {
@@ -52,15 +52,19 @@ public class Sharpshooter extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		// Only increment sharpshot if the arrow is critical and not from volley
-		if (arrow.isCritical() && !arrow.hasMetadata("Volley")) {
+		// Only increment sharpshot if the arrow is critical. Sharpshot can be triggered once per volley
+		if (arrow.isCritical() && (!arrow.hasMetadata("Volley") || mCanVolley)) {
 			mTicks = 0;
+			mCanVolley = false;
 
 			if (mSharpshot <= 0) {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
 						mTicks++;
+						if (mTicks % 10 == 0) {
+							mCanVolley = true; // Reset volley proc every half second
+						}
 
 						if (mTicks >= SHARPSHOOTER_DECAY_TIMER) {
 							mTicks = 0;

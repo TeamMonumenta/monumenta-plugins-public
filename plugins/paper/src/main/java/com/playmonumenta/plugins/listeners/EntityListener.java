@@ -326,8 +326,8 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					// If arrow is a throwing knife, skip added damage calculations.
-					if (ThrowingKnife.isThrowingKnife(arrow)) {
+					// If arrow is a throwing knife or trident, skip added damage calculations.
+					if (ThrowingKnife.isThrowingKnife(arrow) || arrow.getType() == EntityType.TRIDENT) {
 						return;
 					}
 
