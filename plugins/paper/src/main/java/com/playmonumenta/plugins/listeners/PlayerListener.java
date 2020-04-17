@@ -157,10 +157,6 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEvent(PlayerInteractEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
@@ -254,10 +250,6 @@ public class PlayerListener implements Listener {
 	// Player interacts with an entity (not triggered on armor stands for some reason
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
-
 		Player player = event.getPlayer();
 
 		/* Don't let the player do this when in a restricted zone */
