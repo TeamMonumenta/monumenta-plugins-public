@@ -580,7 +580,6 @@ public class PlayerListener implements Listener {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 
-
 		mPlugin.mTrackingManager.mPlayers.onDeath(mPlugin, player, event);
 		AbilityManager.getManager().playerDeathEvent(player, event);
 
@@ -611,10 +610,13 @@ public class PlayerListener implements Listener {
 				}
 				ItemDeathResult result = ItemUtils.getItemDeathResult(item);
 				if (result == ItemDeathResult.SHATTER_NOW) {
-					// Item has Curse of Vanishing. It should be shattered
+					// Item has Curse of Vanishing 1. It should be shattered
 					ItemUtils.shatterItem(item);
 					// Then treat it like a normal item
 					dropAndMarkItem(player, droppedItems, inv, slot, item, result);
+				} else if (result == ItemDeathResult.DESTROY) {
+					// Item has Curse of Vanishing 2, destroy item
+					inv.setItem(slot, null);
 				} else if (result == ItemDeathResult.KEEP) {
 					// Item is kept with no durability loss
 					// This empty if statement is intentional so it's not included in "else".

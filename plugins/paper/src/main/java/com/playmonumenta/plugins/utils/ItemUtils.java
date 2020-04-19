@@ -276,7 +276,8 @@ public class ItemUtils {
 		LOSE, // Item is dropped on death, lost when destroyed
 		SAFE, // Item is dropped on death, placed in grave when destroyed, does not shatter
 		SHATTER, // Item is dropped on death, placed in grave when destroyed, does shatter
-		SHATTER_NOW, // Item is shattered on death, like Curse of Vanishing
+		SHATTER_NOW, // Item is shattered on death, like Curse of Vanishing 1
+		DESTROY, // Item is destroyed on death, like Curse of Vanishing 2
 	}
 
 	public static ItemRegion getItemRegion(ItemStack item) {
@@ -388,7 +389,11 @@ public class ItemUtils {
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
 		if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-			return ItemDeathResult.SHATTER_NOW;
+			if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 1) {
+				return ItemDeathResult.SHATTER_NOW;
+			} else if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 2) {
+				return ItemDeathResult.DESTROY;
+			}
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:

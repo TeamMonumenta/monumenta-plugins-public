@@ -326,47 +326,45 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					// If arrow is a throwing knife or trident, skip added damage calculations.
-					if (ThrowingKnife.isThrowingKnife(arrow) || arrow.getType() == EntityType.TRIDENT) {
-						return;
-					}
+					// If arrow is not a throwing knife or a trident
+					if (!ThrowingKnife.isThrowingKnife(arrow) && arrow.getType() != EntityType.TRIDENT) {
+						// Set the arrow damage from attributes
+						AttributeBowDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
 
-					// Set the arrow damage from attributes
-					AttributeBowDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
-
-					mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity)damagee, event);
-					if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity)damagee, event)) {
-						damager.remove();
-						event.setCancelled(true);
-					}
-
-					/*
-					 * This handles bow damage for abilities
-					 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
-					 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
-					 */
-
-					if (damagee instanceof LivingEntity) {
-						LivingEntity mob = (LivingEntity) damagee;
-
-						if (arrow.hasMetadata("ArrowQuickdraw")) {
-							event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+						mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
+						if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity) damagee, event)) {
+							damager.remove();
+							event.setCancelled(true);
 						}
 
-						double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
-						double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
-						if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
-							&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
-							&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
-							multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
-							mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
-							mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-							mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
-							mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
-							mob.removePotionEffect(PotionEffectType.SLOW);
-						}
+						/*
+						 * This handles bow damage for abilities
+						 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
+						 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
+						 */
 
-						event.setDamage(event.getDamage() * multiplier + bonusDamage);
+						if (damagee instanceof LivingEntity) {
+							LivingEntity mob = (LivingEntity) damagee;
+
+							if (arrow.hasMetadata("ArrowQuickdraw")) {
+								event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+							}
+
+							double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
+							double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
+							if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
+								&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
+								&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
+								multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
+								mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
+								mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
+								mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
+								mob.removePotionEffect(PotionEffectType.SLOW);
+							}
+
+							event.setDamage(event.getDamage() * multiplier + bonusDamage);
+						}
 					}
 				}
 
