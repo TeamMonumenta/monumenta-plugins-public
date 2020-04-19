@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class Evasion implements BaseEnchantment {
 
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Evasion";
+	private static final int EVASION_CAP = 20;
 
 	@Override
 	public String getProperty() {
@@ -32,7 +33,7 @@ public class Evasion implements BaseEnchantment {
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 		if (evasion != null && EntityUtils.getRealFinalDamage(event) > 0) {
-			evasion.mCounter += level;
+			evasion.mCounter += Math.min(EVASION_CAP, level);
 		}
 	}
 
@@ -40,7 +41,7 @@ public class Evasion implements BaseEnchantment {
 	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
 		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 		if (evasion != null) {
-			evasion.mCounter += level;
+			evasion.mCounter += Math.min(EVASION_CAP, level);
 		}
 	}
 

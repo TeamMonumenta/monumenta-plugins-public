@@ -60,6 +60,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class EntityUtils {
 
@@ -475,6 +476,31 @@ public class EntityUtils {
 
 		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
 	}
+
+	// Same thing as above, for boss ability damage, which is always physical.
+	public static double getRealFinalDamage(BossAbilityDamageEvent event) {
+		Player player = event.getDamaged();
+		double damage = event.getDamage();
+		double armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
+		double toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+
+		int protection = 0;
+		ItemStack[] armorContents = player.getInventory().getArmorContents();
+
+		for (int i = 0; i < armorContents.length; i++) {
+			if (armorContents[i] != null) {
+				if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				}
+			}
+		}
+
+		int resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) == null
+				? 0 : (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1);
+
+		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
+	}
+
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
 		damageEntity(plugin, target, damage, damager, null);
