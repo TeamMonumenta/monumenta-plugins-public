@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class DailyReset {
+	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
 	private static BukkitRunnable mRunnable = null;
 
 	public static void startTimer(Plugin plugin) {
@@ -86,39 +87,8 @@ public class DailyReset {
 				//  If so reset some scoreboards and message the player.
 				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());
 
-				ScoreboardUtils.setScoreboardValue(player, "DailyQuest", 0);
-				ScoreboardUtils.setScoreboardValue(player, "Daily2Quest", 0);
-
-				if (ScoreboardUtils.getScoreboardValue(player, "TP_Farr") >= 1) {
-					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The king's bounty has changed! Perhaps you should seek out the Herald...");
-				}
-				if (ScoreboardUtils.getScoreboardValue(player, "Quest101") >= 13) {
-					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "The chains of fate have realigned. Perhaps you should ask the Seer for new wisdom...");
-				}
-
-				// Remove the tag that prevents players from getting more than one Azacor artifact per day
-				player.removeScoreboardTag("am_antiartifact");
-
-				// Remove the tag that prevents players from getting more than one Kaul artifact per day
-				player.removeScoreboardTag("kaul_daily_artifact");
-
-				// Remove the tag that prevents players from getting more than one Headless Horseman artifact per day
-				player.removeScoreboardTag("horseman_daily_artifact");
-
-				/* Reset the player's access to the Patreon shrine (if applicable) */
-				int patreon = ScoreboardUtils.getScoreboardValue(player, "Patreon");
-				int shrinePower = (patreon >= 20) ? 2 : ((patreon >= 10) ? 1 : 0);
-				ScoreboardUtils.setScoreboardValue(player, "ShrinePower", shrinePower);
-
-				if (shrinePower >= 1) {
-					player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "Your ability to activate the Sierhaven shrine has been restored");
-					if (shrinePower == 1) {
-						player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine once each day");
-					} else {
-						player.sendMessage(ChatColor.DARK_AQUA + "You can activate the shrine twice (or two effects) each day");
-					}
-					player.sendMessage(ChatColor.DARK_AQUA + "Thank you for supporting the server!");
-				}
+				String commandStr = DAILY_PLAYER_CHANGES_COMMAND.replaceAll("@S", player.getName());
+				plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), commandStr);
 			}
 		}
 	}
