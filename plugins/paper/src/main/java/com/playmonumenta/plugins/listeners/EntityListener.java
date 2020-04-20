@@ -187,10 +187,15 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void customDamageEvent(CustomDamageEvent event) {
 		if (event.getDamager() instanceof Player) {
-			mAbilities.playerDealtCustomDamageEvent((Player)event.getDamager(), event);
 			// If the event has a valid spell, call onAbility
 			if (event.getSpell() != null) {
 				mPlugin.mTrackingManager.mPlayers.onAbility(mPlugin, (Player)event.getDamager(), event.getDamaged(), event);
+			}
+
+			if (event.getRegistered()) {
+				mAbilities.playerDealtCustomDamageEvent((Player)event.getDamager(), event);
+			} else {
+				mAbilities.playerDealtUnregisteredCustomDamageEvent((Player)event.getDamager(), event);
 			}
 		}
 	}
@@ -477,7 +482,7 @@ public class EntityListener implements Listener {
 			// Only items and players can activate tripwires
 			// Also pigs, for the pig quest
 			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig ||
-				(entity.getScoreboardTags() != null && entity.getScoreboardTags().contains("block_interact"))) {
+			    (entity.getScoreboardTags() != null && entity.getScoreboardTags().contains("block_interact"))) {
 				return;
 			}
 

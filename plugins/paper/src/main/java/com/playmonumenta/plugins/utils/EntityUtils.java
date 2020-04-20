@@ -44,6 +44,7 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.ZombieHorse;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -56,6 +57,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
@@ -520,14 +522,13 @@ public class EntityUtils {
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager, MagicType magicType, boolean callEvent, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
 		if (!target.isDead() && !target.isInvulnerable()) {
-			if (callEvent) {
-				CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType, spell, applySpellshock, triggerSpellshock);
-				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
-					return;
-				}
-				damage = event.getDamage();
+			CustomDamageEvent event = new CustomDamageEvent(damager, target, damage, magicType, callEvent, spell, applySpellshock, triggerSpellshock);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				return;
 			}
+			damage = event.getDamage();
+
 			if (target.getNoDamageTicks() == target.getMaximumNoDamageTicks()) {
 				target.setNoDamageTicks(0);
 			}
@@ -598,7 +599,7 @@ public class EntityUtils {
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob)) {
+		if (isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
 			return;
 		}
 
@@ -635,7 +636,7 @@ public class EntityUtils {
 	}
 
 	public static void applyConfusion(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob) || !(mob instanceof Mob)) {
+		if (isBoss(mob) || !(mob instanceof Mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
 			return;
 		}
 
@@ -693,40 +694,36 @@ public class EntityUtils {
 	 * Returns the raw damage needed to achieve a final damage multiplied by some constant, undershoots to the margin of error.
 	 * <p>
 	 * If raw damage is directly multiplied, then armor piercing effects make the damage exponentially more punishing.
+	 * <p>
+	 * IMPORTANT: do not use this method if the damage taken is not reduced by armor.
 	 *
-	 * @param event      the event that will be used to calculate the raw damage needed
+	 * @param armor	     the armor of the damagee
+	 * @param toughness  the armor toughness of the damagee
+	 * @param damage     the initial raw damage
 	 * @param multiplier the desired multiplier for the final damage
 	 * @return           the raw damage needed to achieve the desired multiplier for final damage
 	 */
-	public static double getDamageApproximation(EntityDamageEvent event, double multiplier) {
-		if (!(event.getEntity() instanceof LivingEntity)) {
-			return event.getDamage();
-		}
-
-		LivingEntity mob = (LivingEntity) event.getEntity();
-		double armor = mob.getAttribute(Attribute.GENERIC_ARMOR).getValue();
-		double toughness = mob.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
-
+	public static double getDamageApproximation(double armor, double toughness, double damage, double multiplier) {
 		double rawDamageLowerBound;
 		double rawDamageUpperBound;
 
 		if (multiplier > 1) {
-			rawDamageLowerBound = event.getDamage();
+			rawDamageLowerBound = damage;
 			rawDamageUpperBound = rawDamageLowerBound * multiplier;
 		} else if (multiplier < 1) {
-			rawDamageUpperBound = event.getDamage();
+			rawDamageUpperBound = damage;
 			rawDamageLowerBound = 0;	// Since armor gets better at lower damage, there's no good lower bound
 		} else {
-			return event.getDamage();
+			return damage;
 		}
 
-		double finalDamageBaseline = calculateDamageAfterArmor(event.getDamage(), armor, toughness);
+		double finalDamageBaseline = calculateDamageAfterArmor(damage, armor, toughness);
 
 		// Infinite loop safe this in case of bugs
 		for (int i = 0; i < MAXIMUM_ITERATIONS; i++) {
 			// No need to worry about double overflow
 			double rawDamageMiddle = (rawDamageLowerBound + rawDamageUpperBound) / 2;
-			// Since protection is constant and evasion is too complicated, ignore both
+			// Protection is constant, evasion is already factored in
 			double damageRatio = calculateDamageAfterArmor(rawDamageMiddle, armor, toughness) / finalDamageBaseline;
 
 			if (damageRatio <= multiplier) {
@@ -743,7 +740,23 @@ public class EntityUtils {
 		return 0;
 	}
 
-	// getFinalDamage() does not work for dummy event calls; this is fewer calculations than getRealFinalDamage()
+	public static double getDamageApproximation(EntityDamageByEntityEvent event, double multiplier) {
+		// Not affected by armor
+		if (!PHYSICAL_DAMAGE.contains(event.getCause())) {
+			return event.getDamage() * multiplier;
+		}
+
+		// Has no attributes
+		if (!(event.getEntity() instanceof LivingEntity)) {
+			return event.getDamage() * multiplier;
+		}
+
+		LivingEntity mob = (LivingEntity) event.getEntity();
+
+		return getDamageApproximation(mob.getAttribute(Attribute.GENERIC_ARMOR).getValue(), mob.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier);
+	}
+
+	// getFinalDamage() does not work for dummy event calls, and this is fewer calculations than getRealFinalDamage()
 	private static double calculateDamageAfterArmor(double damage, double armor, double toughness) {
 		armor = Math.min(30, armor);
 		toughness = Math.min(20, toughness);

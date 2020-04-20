@@ -192,6 +192,9 @@ public abstract class Ability {
 
 	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
 
+	// Do not use this for regular abilities
+	public void playerDealtUnregisteredCustomDamageEvent(CustomDamageEvent event) { }
+
 	public void potionApplyEvent(PotionEffectApplyEvent event) { }
 
 	public void playerDeathEvent(PlayerDeathEvent event) { }

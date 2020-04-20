@@ -72,6 +72,14 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.delves.cursed.Mystic;
+import com.playmonumenta.plugins.abilities.delves.cursed.Ruthless;
+import com.playmonumenta.plugins.abilities.delves.cursed.Spectral;
+import com.playmonumenta.plugins.abilities.delves.cursed.Unyielding;
+import com.playmonumenta.plugins.abilities.delves.twisted.Arcanic;
+import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
+import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
+import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -194,7 +202,7 @@ public class AbilityManager {
 		List<Ability> specAbilitiesPriority = Arrays.asList(
 			                               new GrowingRage(mPlugin, mWorld, mRandom, null),
 			                               new DarkPact(mPlugin, mWorld, mRandom, null),
-										   // Starfall needs to come before Mana Lance
+			                               // Starfall needs to come before Mana Lance
 			                               new Starfall(mPlugin, mWorld, mRandom, null)
 			                           );
 
@@ -296,6 +304,7 @@ public class AbilityManager {
 		                               new EnfeeblingElixir(mPlugin, mWorld, mRandom, null),
 		                               new AlchemistPotions(mPlugin, mWorld, mRandom, null)
 		                           ));
+
 		List<Ability> specAbilities = Arrays.asList(
                 /********** MAGE **********/
                 // ELEMENTALIST
@@ -385,6 +394,19 @@ public class AbilityManager {
 		// These abilities should trigger after all event damage is calculated
 		mReferenceAbilities.addAll(Arrays.asList(
 									   new EvasionEnchant(mPlugin, mWorld, mRandom, null),
+
+		                               /********** DELVES **********/
+		                               // CURSED
+		                               new Ruthless(mPlugin, mWorld, mRandom, null),
+		                               new Unyielding(mPlugin, mWorld, mRandom, null),
+		                               new Mystic(mPlugin, mWorld, mRandom, null),
+		                               new Spectral(mPlugin, mWorld, mRandom, null),
+		                               // TWISTED
+		                               new Merciless(mPlugin, mWorld, mRandom, null),
+		                               new Relentless(mPlugin, mWorld, mRandom, null),
+		                               new Arcanic(mPlugin, mWorld, mRandom, null),
+		                               new Dreadful(mPlugin, mWorld, mRandom, null),
+
 									   new PrismaticShield(mPlugin, mWorld, mRandom, null),
 		                               new EscapeDeath(mPlugin, mWorld, mRandom, null)
 		                           ));
@@ -502,7 +524,8 @@ public class AbilityManager {
 			if (abil.canCast()) {
 				// Do not allow any skills with no cooldown to apply damage more than once
 				// Always allow sweep attacks to go through for things like Deadly Ronde
-				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && (abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
+				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && !abil.getInfo().mIgnoreTriggerCap
+				    && (abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
 				    && !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
 					return true;
 				}
@@ -633,6 +656,16 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerDealtCustomDamageEvent(event));
 	}
 
+	/*
+	 * EntityUtils.damageEntity() does not trigger the EntityDamageByEntityEvent, and it may not
+	 * trigger the CustomDamageEvent either if the flag is set to such. Since we need to attach an
+	 * event to ALL damage dealt (currently, for delves to work), we need to trigger a dummy event
+	 * for this express purpose that isn't used in things like regular abilities.
+	 */
+	public void playerDealtUnregisteredCustomDamageEvent(Player player, CustomDamageEvent event) {
+		conditionalCast(player, (ability) -> ability.playerDealtUnregisteredCustomDamageEvent(event));
+	}
+
 	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
 		conditionalCast(player, (ability) -> ability.entityTargetLivingEntityEvent(event));
 	}
@@ -685,6 +718,9 @@ public class AbilityManager {
 		}
 	}
 
+	//---------------------------------------------------------------------------------------------------------------
+
+	//Private methods
 	public AbilityCollection getPlayerAbilities(Player player) {
 		if (!mAbilities.containsKey(player.getUniqueId())) {
 			updatePlayerAbilities(player);

@@ -3,16 +3,15 @@ package com.playmonumenta.plugins.abilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.command.CommandSender;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.classes.Spells;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-
-import org.bukkit.command.CommandSender;
 
 /**
  * The AbilityInfo class contains the small information bits
@@ -45,6 +44,13 @@ public class AbilityInfo {
 	 */
 	public boolean ignoreCooldown = false;
 
+	/*
+	 * If this is set to true, the LivingEntityDamagedByPlayerEvent will be allowed
+	 * to trigger multiple times per tick. Be very careful with this, as it can lead
+	 * to infinite damage loops if you aren't careful.
+	 */
+	public boolean mIgnoreTriggerCap = false;
+
 	public ComponentBuilder getFormattedDescription(int skillLevel) throws IndexOutOfBoundsException {
 		String strDescription = mDescriptions.get(skillLevel - 1);
 		if (strDescription == null) {
@@ -60,7 +66,6 @@ public class AbilityInfo {
 
 	public ComponentBuilder getFormattedDescriptions() {
 		if (mDescriptions.size() == 0) {
-			BaseComponent[] uhOh;
 			return new ComponentBuilder("No descriptions found for " + mDisplayName + "!").color(ChatColor.RED);
 		}
 

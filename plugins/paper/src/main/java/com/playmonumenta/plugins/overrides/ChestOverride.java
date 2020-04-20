@@ -97,6 +97,7 @@ public class ChestOverride extends BaseOverride {
 			return true;
 		} else if (player.getGameMode() != GameMode.SPECTATOR) {
 			check_nerf_chest(block, player);
+			ChestUtils.replaceWithDelveLootTable(player, block);
 			return true;
 		}
 

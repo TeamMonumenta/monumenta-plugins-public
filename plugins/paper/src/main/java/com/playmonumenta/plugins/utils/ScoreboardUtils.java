@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
@@ -7,7 +9,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 public class ScoreboardUtils {
+
+	private static final Map<String, String> DELVE_SHARD_SCOREBOARD_MAPPINGS = new HashMap<String, String>();
+
+	static {
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("white", "Delve1Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("orange", "Delve2Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("magenta", "Delve3Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lightblue", "Delve4Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("yellow", "Delve5Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lime", "Delve6Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("pink", "Delve7Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("gray", "Delve8Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("lightgray", "Delve9Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("cyan", "Delve10Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("purple", "Delve11Challenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev1", "DelveChallenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("dev2", "DelveChallenge");
+		DELVE_SHARD_SCOREBOARD_MAPPINGS.put("mobs", "DelveChallenge");
+	}
+
 	/**
 	 * Get scoreboard value for player.
 	 *
@@ -61,4 +85,19 @@ public class ScoreboardUtils {
 			score.setScore(value);
 		}
 	}
+
+	public static boolean isDelveChallengeActive(Player player, int challengeScore) {
+		if (player == null) {
+			return false;
+		}
+
+		String scoreboard = DELVE_SHARD_SCOREBOARD_MAPPINGS.get(ServerProperties.getShardName());
+
+		if (scoreboard != null) {
+			return ScoreboardUtils.getScoreboardValue(player, scoreboard) == challengeScore;
+		}
+
+		return false;
+	}
+
 }

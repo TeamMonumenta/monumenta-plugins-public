@@ -117,7 +117,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 	/* This is called either when the boss chunk loads OR when he is first created */
 	private void resumeBossFight(Plugin plugin, LivingEntity boss) {
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellBombToss(plugin, mBoss, 20, 2, 1, 100),
+				new SpellBombToss(plugin, mBoss, 20, 2, 1, 100, false, true),
 				new SpellBash(plugin, mBoss)
 			));
 

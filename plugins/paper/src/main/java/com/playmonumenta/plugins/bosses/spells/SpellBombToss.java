@@ -28,20 +28,24 @@ public class SpellBombToss extends Spell {
 	private final int mYield;
 	private final int mLobs;
 	private final int mFuse;
+	private final boolean mSetFire;
+	private final boolean mBreakBlocks;
 
 	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
 
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range) {
-		this(plugin, boss, range, 4, 1, 50);
+		this(plugin, boss, range, 4, 1, 50, false, true);
 	}
 
-	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int yield, int lobs, int fuse) {
+	public SpellBombToss(Plugin plugin, LivingEntity boss, int range, int yield, int lobs, int fuse, boolean setFire, boolean breakBlocks) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
 		mYield = yield;
 		mLobs = lobs;
 		mFuse = fuse;
+		mSetFire = setFire;
+		mBreakBlocks = breakBlocks;
 	}
 
 	@Override
@@ -106,12 +110,12 @@ public class SpellBombToss extends Spell {
 			vect.normalize().multiply((pLoc.distance(tLoc)) / 20).setY(0.7f);
 			tnt.setVelocity(vect);
 
-			// Detonate the creeper for proper damage calculations
+			// Create explosion manually for proper damage calculations; source it at a mob entity and use the TNT location
 			new BukkitRunnable() {
 				TNTPrimed mTnt = tnt;
 				@Override
 				public void run() {
-					mBoss.getLocation().getWorld().createExplosion(mBoss, mTnt.getLocation(), mYield, false, true);
+					mBoss.getLocation().getWorld().createExplosion(mBoss, mTnt.getLocation(), mYield, mSetFire, mBreakBlocks);
 				}
 			}.runTaskLater(mPlugin, mFuse);
 		} catch (Exception e) {

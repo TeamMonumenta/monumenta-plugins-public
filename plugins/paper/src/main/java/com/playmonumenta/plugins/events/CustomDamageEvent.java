@@ -19,15 +19,22 @@ public class CustomDamageEvent extends Event implements Cancellable {
 	private double mDamage;
 	private final MagicType mMagicType;
 
+	/*
+	 * We want this event to trigger on all custom damage,
+	 * but this flag determines if abilities should be
+	 * able to trigger off this event.
+	 */
+	private final boolean mRegistered;
+
 	private final Spells mSpell;
 	private final boolean mApplySpellshock;
 	private final boolean mTriggerSpellshock;
 
 	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType) {
-		this(damager, damaged, damage, magicType, null, true, true);
+		this(damager, damaged, damage, magicType, true, null, true, true);
 	}
 
-	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
+	public CustomDamageEvent(Entity damager, LivingEntity damaged, double damage, MagicType magicType, boolean registered, Spells spell, boolean applySpellshock, boolean triggerSpellshock) {
 		mIsCancelled = false;
 		mDamager = damager;
 		mDamaged = damaged;
@@ -37,6 +44,7 @@ public class CustomDamageEvent extends Event implements Cancellable {
 		} else {
 			mMagicType = magicType;
 		}
+		mRegistered = registered;
 		mSpell = spell;
 		mApplySpellshock = applySpellshock;
 		mTriggerSpellshock = triggerSpellshock;
@@ -58,6 +66,10 @@ public class CustomDamageEvent extends Event implements Cancellable {
 
 	public MagicType getMagicType() {
 		return mMagicType;
+	}
+
+	public boolean getRegistered() {
+		return mRegistered;
 	}
 
 	public Entity getDamager() {
