@@ -120,6 +120,7 @@ public class EnchantmentManager implements Listener {
 		init.add(new TwoHanded());
 		init.add(new CurseOfCrippling());
 		init.add(new CurseOfEphemerality());
+		init.add(new CurseOfShrapnel());
 
 		// Tesseracts (not actually items a player can get enchants from)
 		init.add(new PestilenceTesseract());
