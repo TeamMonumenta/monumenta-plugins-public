@@ -6,12 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -28,7 +28,7 @@ public class ReforgeHeldItem extends GenericCommand {
 		});
 	}
 
-	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());

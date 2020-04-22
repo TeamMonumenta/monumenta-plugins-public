@@ -7,14 +7,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -42,7 +41,7 @@ public class TeleportGuild {
 		});
 	}
 
-	private static void run(LuckPermsApi lp, Player player, String guildName) throws CommandSyntaxException {
+	private static void run(LuckPermsApi lp, Player player, String guildName) throws WrapperCommandSyntaxException {
 
 		Group group = null;
 

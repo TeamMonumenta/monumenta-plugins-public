@@ -17,11 +17,11 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.redis.RedisManager;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class SpringEventUtils {
 	public enum City {
@@ -62,7 +62,7 @@ public class SpringEventUtils {
 	}
 */
 
-	public static void doClean(CommandSender sender, Player player, List<Item> items, City city) throws CommandSyntaxException {
+	public static void doClean(CommandSender sender, Player player, List<Item> items, City city) throws WrapperCommandSyntaxException {
 		if (!items.isEmpty()) {
 			int valueOfItems = calcItemValue(items);
 			for (Item i : items) { //kill all item entities before adding scores
@@ -78,7 +78,7 @@ public class SpringEventUtils {
 	/*
 	 * Show top n players for a given city and display its total
 	 */
-	public static void displayCityStats(CommandSender sender, Player player, City city) throws CommandSyntaxException {
+	public static void displayCityStats(CommandSender sender, Player player, City city) throws WrapperCommandSyntaxException {
 		player.sendMessage(ChatColor.BOLD + "Stats for " + city.getLabel().toUpperCase() + ":");
 		player.sendMessage(ChatColor.AQUA + "City Total: " + getCityTotal(city));
 		player.sendMessage(ChatColor.BOLD + "Top 5 contributors:");
@@ -98,7 +98,7 @@ public class SpringEventUtils {
 		}
 	}
 
-	public static void displayPlayerStats(CommandSender sender, Player player) throws CommandSyntaxException {
+	public static void displayPlayerStats(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		Map<String, Integer> contributions = getPlayerContributions(player);
 		if (!contributions.isEmpty()) {
 			player.sendMessage(ChatColor.BOLD + "Your contributions to the Spring Cleaning Event:");
@@ -110,7 +110,7 @@ public class SpringEventUtils {
 		}
 	}
 
-	private static int calcItemValue(List<Item> items) throws CommandSyntaxException {
+	private static int calcItemValue(List<Item> items) throws WrapperCommandSyntaxException {
 		int value = 0;
 		ItemStack stack;
 		for (Item i : items) {

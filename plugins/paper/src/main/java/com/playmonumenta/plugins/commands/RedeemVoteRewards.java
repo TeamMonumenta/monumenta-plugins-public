@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeGetVotesUnclaimedPacket;
@@ -21,6 +20,7 @@ import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.FunctionArgument;
 import io.github.jorelali.commandapi.api.arguments.StringArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 /*
  * This is obnoxiously complicated.
@@ -71,7 +71,7 @@ public class RedeemVoteRewards extends GenericCommand {
 		);
 	}
 
-	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) throws CommandSyntaxException {
+	private static void run(Plugin plugin, Player player, String scoreboardName, FunctionWrapper[] functions) throws WrapperCommandSyntaxException {
 		PendingRewardContext context = new PendingRewardContext(player, scoreboardName, functions);
 
 		mPendingRewards.put(player.getUniqueId(), context);

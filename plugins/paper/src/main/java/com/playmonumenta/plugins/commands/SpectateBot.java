@@ -22,7 +22,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -30,6 +29,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class SpectateBot extends GenericCommand implements Listener {
 	public static final int MAX_RADIUS = 17;
@@ -100,7 +100,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 		return cameraLoc;
 	}
 
-	private void run(Plugin plugin, Player player) throws CommandSyntaxException {
+	private void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		if (mSpectators.containsKey(player)) {
 			player.sendMessage(ChatColor.RED + "You are no longer spectate botting");
 			mSpectators.remove(player);

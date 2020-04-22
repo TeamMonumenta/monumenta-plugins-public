@@ -10,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -21,6 +20,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.MessagingService;
@@ -45,7 +45,7 @@ public class CreateGuild {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
-	                        String guildName, String guildTag, Collection<Player> founders) throws CommandSyntaxException {
+	                        String guildName, String guildTag, Collection<Player> founders) throws WrapperCommandSyntaxException {
 
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);

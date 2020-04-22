@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.LinkedHashMap;
 
 import org.bukkit.ChatColor;
@@ -7,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 
@@ -15,10 +16,10 @@ import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
-import io.github.jorelali.commandapi.api.arguments.SuggestedStringArgument;
+import io.github.jorelali.commandapi.api.arguments.StringArgument;
 
 public class BroadcastCommand {
-	private static final ImmutableList<String> ALLOWED_COMMANDS = ImmutableList.of(
+	private static final String[] ALLOWED_COMMANDS = {
 	            "whitelist",
 	            "ban",
 	            "ban-ip",
@@ -43,13 +44,16 @@ public class BroadcastCommand {
 	            "team",
 	            "setblock",
 	            "restart-empty"
-	        );
+	        };
+
+	private static final List<String> ALLOWED_COMMANDS_LIST = Arrays.asList(ALLOWED_COMMANDS);
 
 	public static void register(Plugin plugin) {
+		CommandPermission perm = CommandPermission.fromString("monumenta.command.broadcastcommand");
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("command", new SuggestedStringArgument(ALLOWED_COMMANDS));
+		arguments.put("command", new StringArgument().overrideSuggestions(ALLOWED_COMMANDS));
 		CommandAPI.getInstance().register("broadcastcommand",
-		                                  CommandPermission.fromString("monumenta.command.broadcastcommand"),
+		                                  perm,
 		                                  arguments,
 		                                  (sender, args) -> {
 											  run(plugin, sender, (String)args[0], null);
@@ -58,7 +62,7 @@ public class BroadcastCommand {
 
 		arguments.put("args", new GreedyStringArgument());
 		CommandAPI.getInstance().register("broadcastcommand",
-		                                  CommandPermission.fromString("monumenta.command.broadcastcommand"),
+		                                  perm,
 		                                  arguments,
 		                                  (sender, args) -> {
 											  run(plugin, sender, (String)args[0], (String)args[1]);
@@ -68,7 +72,7 @@ public class BroadcastCommand {
 
 	private static void run(Plugin plugin, CommandSender sender, String command, String args) {
 		/* Make sure the command is on the whitelist */
-		if (!ALLOWED_COMMANDS.contains(command)) {
+		if (!ALLOWED_COMMANDS_LIST.contains(command)) {
 			sender.sendMessage(ChatColor.RED + "This command is not supported!");
 			return;
 		}

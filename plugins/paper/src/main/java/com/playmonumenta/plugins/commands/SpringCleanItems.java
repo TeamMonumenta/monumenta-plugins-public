@@ -9,7 +9,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.utils.SpringEventUtils;
 import com.playmonumenta.plugins.utils.SpringEventUtils.City;
 
@@ -19,6 +18,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class SpringCleanItems extends GenericCommand {
 	@SuppressWarnings("unchecked")
@@ -52,7 +52,7 @@ public class SpringCleanItems extends GenericCommand {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void run(CommandSender sender, Player player, List<? extends Entity> items, City city) throws CommandSyntaxException {
+	private static void run(CommandSender sender, Player player, List<? extends Entity> items, City city) throws WrapperCommandSyntaxException {
 		for (Entity entity : items) {
 			if (!(entity instanceof Item)) {
 				CommandAPI.fail("Got entity '" + entity.getType().toString() + "' that was not an item.");
@@ -61,7 +61,7 @@ public class SpringCleanItems extends GenericCommand {
 
 		try {
 			SpringEventUtils.doClean(sender, player, (List<Item>)items, city);
-		} catch (CommandSyntaxException ex) {
+		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
 			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
 			/* Continue to propagate the failure */

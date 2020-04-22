@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 
 /*
@@ -31,7 +31,7 @@ public class ReforgeInventory extends GenericCommand {
 		});
 	}
 
-	private static void run(Player player) throws CommandSyntaxException {
+	private static void run(Player player) throws WrapperCommandSyntaxException {
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			// Get the cost to reforge the entire inventory

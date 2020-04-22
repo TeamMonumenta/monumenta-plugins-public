@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
@@ -13,6 +12,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -32,7 +32,7 @@ public class TestGuild {
 		});
 	}
 
-	private static void run(LuckPermsApi lp, String guildName, Player player) throws CommandSyntaxException {
+	private static void run(LuckPermsApi lp, String guildName, Player player) throws WrapperCommandSyntaxException {
 		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 

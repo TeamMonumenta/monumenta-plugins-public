@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.packets.BungeeCheckRaffleEligibilityPacket;
@@ -16,6 +15,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class ClaimRaffle {
 	private static final String CONFIRMED_METAKEY = "MonumentaRaffleClaimMetadata";
@@ -36,7 +36,7 @@ public class ClaimRaffle {
 		                                  });
 	}
 
-	private static void run(Plugin plugin, Player player) throws CommandSyntaxException {
+	private static void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		if (player.hasMetadata(CONFIRMED_METAKEY)) {
 			// This player is running this command twice, to gild an item. And they had a credit to gild with earlier
 			SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), true, false));
@@ -61,7 +61,7 @@ public class ClaimRaffle {
 		if (claimReward && eligible) {
 			try {
 				CommandUtils.enchantify(player, player, "Gilded", "Gilded by");
-			} catch (CommandSyntaxException ex) {
+			} catch (WrapperCommandSyntaxException ex) {
 				/* Failed to claim reward - send back the reward to bungee */
 				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
 				player.sendMessage(ChatColor.RED + ex.getMessage());

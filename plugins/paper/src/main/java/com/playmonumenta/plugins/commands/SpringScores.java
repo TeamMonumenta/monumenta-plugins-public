@@ -6,7 +6,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.utils.SpringEventUtils;
 import com.playmonumenta.plugins.utils.SpringEventUtils.City;
 
@@ -16,9 +15,9 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class SpringScores {
-	@SuppressWarnings("unchecked")
 	public static void registerType(City city) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put(city.getLabel(), new LiteralArgument(city.getLabel()));
@@ -56,10 +55,10 @@ public class SpringScores {
 		registerType();
 	}
 
-	private static void run(CommandSender sender, Player player, City city) throws CommandSyntaxException {
+	private static void run(CommandSender sender, Player player, City city) throws WrapperCommandSyntaxException {
 		try {
 			SpringEventUtils.displayCityStats(sender, player, city);
-		} catch (CommandSyntaxException ex) {
+		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
 			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
 			/* Continue to propagate the failure */
@@ -67,10 +66,10 @@ public class SpringScores {
 		}
 	}
 
-	private static void run(CommandSender sender, Player player) throws CommandSyntaxException {
+	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		try {
 			SpringEventUtils.displayPlayerStats(sender, player);
-		} catch (CommandSyntaxException ex) {
+		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
 			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
 			/* Continue to propagate the failure */

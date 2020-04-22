@@ -9,7 +9,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
 
@@ -19,6 +18,7 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 /*
  * NOTICE!
@@ -54,7 +54,7 @@ public class InfuseHeldItem extends GenericCommand {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void run(CommandSender sender, Player player, List<? extends Entity> frames, InfusionSelection selection) throws CommandSyntaxException {
+	private static void run(CommandSender sender, Player player, List<? extends Entity> frames, InfusionSelection selection) throws WrapperCommandSyntaxException {
 		for (Entity entity : frames) {
 			if (!(entity instanceof ItemFrame)) {
 				CommandAPI.fail("Got entity '" + entity.getType().toString() + "' that was not an item frame");
@@ -63,7 +63,7 @@ public class InfuseHeldItem extends GenericCommand {
 
 		try {
 			InfusionUtils.doInfusion(sender, player, player.getInventory().getItemInMainHand(), (List<ItemFrame>)frames, selection);
-		} catch (CommandSyntaxException ex) {
+		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
 			player.sendMessage(ChatColor.GOLD + "[Infusion Altar] " + ChatColor.RED + ex.getMessage());
 			/* Continue to propagate the failure */

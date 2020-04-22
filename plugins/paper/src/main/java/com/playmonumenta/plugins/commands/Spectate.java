@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -21,6 +20,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class Spectate implements Listener {
 	public static final String SPECTATE_METAKEY = "MonumentaSpectateMetakey";
@@ -70,7 +70,7 @@ public class Spectate implements Listener {
 		                                  });
 	}
 
-	public static boolean run(Plugin plugin, Player player) throws CommandSyntaxException {
+	public static boolean run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			if (player.hasMetadata(SPECTATE_METAKEY)) {
 				// Put player back where they were before when they log out

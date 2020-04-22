@@ -23,7 +23,6 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.infusions.Acumen;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
@@ -34,6 +33,7 @@ import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class InfusionUtils {
 
@@ -68,7 +68,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static void doInfusion(CommandSender sender, Player player, ItemStack item, List<ItemFrame> paymentFrames, InfusionSelection selection) throws CommandSyntaxException {
+	public static void doInfusion(CommandSender sender, Player player, ItemStack item, List<ItemFrame> paymentFrames, InfusionSelection selection) throws WrapperCommandSyntaxException {
 		if (selection.equals(InfusionSelection.REFUND)) {
 			refundInfusion(item, player);
 			return;
@@ -173,7 +173,7 @@ public class InfusionUtils {
 	 * Items must be marked with 'PRE-UPDATE' lore text to be eligible.
 	 * Running this command will grant the difference in pulsating materials to the player vs old costs
 	 */
-	private static void specialRefund(ItemStack item, Player player) throws CommandSyntaxException {
+	private static void specialRefund(ItemStack item, Player player) throws WrapperCommandSyntaxException {
 		//Remove the lore text marker from the item
 		boolean isPreUpdate = false;
 		List<String> newLore = new ArrayList<>();
@@ -238,7 +238,7 @@ public class InfusionUtils {
 		}
 	}
 
-	private static void refundInfusion(ItemStack item, Player player) throws CommandSyntaxException {
+	private static void refundInfusion(ItemStack item, Player player) throws WrapperCommandSyntaxException {
 		ItemRegion region = ItemUtils.getItemRegion(item);
 		int refundMaterials = 0;
 
@@ -258,8 +258,7 @@ public class InfusionUtils {
 		giveMaterials(player, region, refundMaterials);
 	}
 
-	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials)
-			throws CommandSyntaxException {
+	private static void giveMaterials(Player player, ItemRegion region, int refundMaterials) throws WrapperCommandSyntaxException {
 		NamespacedKey key;
 		if (region.equals(ItemRegion.KINGS_VALLEY)) {
 			key = new NamespacedKey("epic", "r1/items/currency/pulsating_gold");
@@ -303,7 +302,7 @@ public class InfusionUtils {
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
-	private static int calcInfuseCost(ItemStack item) throws CommandSyntaxException {
+	private static int calcInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
 		// First level is free
 		int infuseLvl = getInfuseLevel(item) - 1;
 		int cost = getCostMultiplier(item);
@@ -325,7 +324,7 @@ public class InfusionUtils {
 				+ InventoryUtils.getCustomEnchantLevel(item, Vigor.PROPERTY_NAME, true) + InventoryUtils.getCustomEnchantLevel(item, Vitality.PROPERTY_NAME, true);
 	}
 
-	private static int getCostMultiplier(ItemStack item) throws CommandSyntaxException {
+	private static int getCostMultiplier(ItemStack item) throws WrapperCommandSyntaxException {
 		switch (ItemUtils.getItemTier(item)) {
 			case MEME:
 			case UNCOMMON:
@@ -372,7 +371,7 @@ public class InfusionUtils {
 		return payment;
 	}
 
-	private static int getExpInfuseCost(ItemStack item) throws CommandSyntaxException {
+	private static int getExpInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
 		int costMult = getCostMultiplier(item);
 		int level = getInfuseLevel(item);
 		switch (costMult) {

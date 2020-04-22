@@ -7,13 +7,13 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.TextArgument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -32,7 +32,7 @@ public class SetGuildTeleport {
 	}
 
 	private static void run(Plugin plugin, LuckPermsApi lp, CommandSender sender,
-	                        String guildName) throws CommandSyntaxException {
+	                        String guildName) throws WrapperCommandSyntaxException {
 
 		if (!(sender instanceof Player)) {
 			CommandAPI.fail("This command can only be run by players");

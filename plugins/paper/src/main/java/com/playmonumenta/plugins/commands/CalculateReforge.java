@@ -15,12 +15,12 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -48,7 +48,7 @@ public class CalculateReforge extends GenericCommand {
 	}
 
 	@SuppressWarnings("deprecation")
-	private static void run(Player player) throws CommandSyntaxException {
+	private static void run(Player player) throws WrapperCommandSyntaxException {
 		// #region Loot Table extraction
 		// Grab currency items from the loot tables so we can scan for and remove them from players' inventories.
 		if (mCXP == null || mHXP == null || mCCS == null || mHCS == null) {

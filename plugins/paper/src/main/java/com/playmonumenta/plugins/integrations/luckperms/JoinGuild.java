@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -17,6 +16,7 @@ import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -36,7 +36,7 @@ public class JoinGuild {
 		});
 	}
 
-	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws CommandSyntaxException {
+	private static void run(Plugin plugin, LuckPermsApi lp, Player player) throws WrapperCommandSyntaxException {
 		Group currentGuild = LuckPermsIntegration.getGuild(lp, player);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuildName != null) {

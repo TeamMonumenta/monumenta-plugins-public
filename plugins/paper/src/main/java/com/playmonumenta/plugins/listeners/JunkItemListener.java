@@ -16,12 +16,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class JunkItemListener implements Listener {
 	private static final String NO_JUNK_ITEMS_TAG = "NoJunkItemsPickup";
@@ -42,7 +42,7 @@ public class JunkItemListener implements Listener {
 		);
 	}
 
-	private void playerToggle(CommandSender sender) throws CommandSyntaxException {
+	private void playerToggle(CommandSender sender) throws WrapperCommandSyntaxException {
 		Player player = null;
 
 		if (sender instanceof ProxiedCommandSender) {

@@ -22,6 +22,7 @@ import io.github.jorelali.commandapi.api.arguments.LocationArgument;
 
 public class BossFight {
 	public static void register() {
+		CommandPermission perm = CommandPermission.fromString("monumenta.bossfight");
 		/* First one has just the boss name (stateless) */
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 
@@ -32,7 +33,7 @@ public class BossFight {
 			}
 		));
 		CommandAPI.getInstance().register("bossfight",
-		                                  CommandPermission.fromString("monumenta.bossfight"),
+		                                  perm,
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateless(sender, (Entity)args[0],
@@ -43,7 +44,7 @@ public class BossFight {
 		/* Second one of these includes coordinate arguments */
 		arguments.put("redstone_pos", new LocationArgument());
 		CommandAPI.getInstance().register("bossfight",
-		                                  CommandPermission.fromString("monumenta.bossfight"),
+		                                  perm,
 		                                  arguments,
 		                                  (sender, args) -> {
 		                                      createBossStateful(sender, (Entity)args[0],

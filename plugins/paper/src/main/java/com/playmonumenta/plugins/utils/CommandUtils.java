@@ -14,11 +14,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
+import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
 public class CommandUtils {
 
@@ -137,7 +137,7 @@ public class CommandUtils {
 		}
 	}
 
-	public static void enchantify(CommandSender sender, Player player, String enchantment) throws CommandSyntaxException {
+	public static void enchantify(CommandSender sender, Player player, String enchantment) throws WrapperCommandSyntaxException {
 		enchantify(sender, player, enchantment, null);
 	}
 
@@ -148,7 +148,7 @@ public class CommandUtils {
 	 * This most likely means @NickNackGus or @Combustible
 	 * If this does not happen, your changes will NOT persist across weekly updates!
 	 */
-	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws CommandSyntaxException {
+	public static void enchantify(CommandSender sender, Player player, String enchantment, String ownerPrefix) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null) {
 			CommandAPI.fail("Player must have a valid item in their main hand!");
