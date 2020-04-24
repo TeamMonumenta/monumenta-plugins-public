@@ -55,23 +55,32 @@ public class Disengage extends Ability {
 		mInfo.mDescriptions.add("Non-elite/boss enemies in melee range when you activate this skill are stunned for 4 seconds. Cooldown: 10s.");
 		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.ignoreCooldown = true;
 	}
 
 	@Override
 	public boolean runCheck() {
+		return true;
+	}
+
+	public boolean runCheckActiveCast() {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
 		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			// Checks for bows in offhand, and bows, pickaxes, potions, blocks, food, and tridents in mainhand
 			return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
 			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() && !inMainHand.getType().isEdible()
-			       && inMainHand.getType() != Material.TRIDENT && inMainHand.getType() != Material.COMPASS;
+			       && inMainHand.getType() != Material.TRIDENT && inMainHand.getType() != Material.COMPASS
+			       && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
 		}
 		return false;
 	}
 
 	@Override
 	public void cast(Action action) {
+		if (!runCheckActiveCast()) {
+			return;
+		}
 		for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DISENGAGE_STUN_RADIUS, mPlayer)) {
 			if (getAbilityScore() > 1 && !EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {
 				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);

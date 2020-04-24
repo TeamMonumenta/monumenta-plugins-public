@@ -55,7 +55,7 @@ public class EscapeDeath extends Ability {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ESCAPE_DEATH_RANGE, mPlayer)) {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
 			                                                       ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
-			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, ESCAPE_DEATH_DURATION_SLOWNESS,
 			                                                       ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
 		}
 
