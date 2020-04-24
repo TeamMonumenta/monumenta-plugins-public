@@ -111,13 +111,15 @@ public class SpellBombToss extends Spell {
 			tnt.setVelocity(vect);
 
 			// Create explosion manually for proper damage calculations; source it at a mob entity and use the TNT location
-			new BukkitRunnable() {
+			BukkitRunnable explosion = new BukkitRunnable() {
 				TNTPrimed mTnt = tnt;
 				@Override
 				public void run() {
 					mBoss.getLocation().getWorld().createExplosion(mBoss, mTnt.getLocation(), mYield, mSetFire, mBreakBlocks);
 				}
-			}.runTaskLater(mPlugin, mFuse);
+			};
+			explosion.runTaskLater(mPlugin, mFuse);
+			mActiveRunnables.add(explosion);
 		} catch (Exception e) {
 			mPlugin.getLogger().warning("Failed to summon TNT for bomb toss: " + e.getMessage());
 			e.printStackTrace();

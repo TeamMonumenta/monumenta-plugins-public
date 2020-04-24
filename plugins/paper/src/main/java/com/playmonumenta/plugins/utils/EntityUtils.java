@@ -653,6 +653,8 @@ public class EntityUtils {
 		List<LivingEntity> nearby = getNearbyMobs(mob.getLocation(), 8, mob);
 		if (nearby.size() > 0) {
 			creature.setTarget(nearby.get(0));
+		} else {
+			creature.setTarget(null);
 		}
 		PotionUtils.applyPotion(null, mob, new PotionEffect(PotionEffectType.SPEED, ticks, 2, false, true));
 

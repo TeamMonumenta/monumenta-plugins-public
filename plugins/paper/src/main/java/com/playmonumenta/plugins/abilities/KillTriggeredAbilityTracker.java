@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.abilities;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 public class KillTriggeredAbilityTracker {
 
 	public interface KillTriggeredAbility {
-		void triggerOnKill(Entity mob);
+		void triggerOnKill(LivingEntity mob);
 	}
 
 	private static final int DAMAGE_DEALT_TO_R1_BOSSES_PER_KILL = 100;
@@ -26,11 +26,15 @@ public class KillTriggeredAbilityTracker {
 	}
 
 	public void updateDamageDealtToBosses(EntityDamageByEntityEvent event) {
-		if (EntityUtils.isBoss(event.getEntity())) {
-			mDamageDealtToBosses += event.getFinalDamage();
-			if (mDamageDealtToBosses >= mDamageDealtToBossesPerKill) {
-				mDamageDealtToBosses -= mDamageDealtToBossesPerKill;
-				mLinkedAbility.triggerOnKill(event.getEntity());
+		if (event.getEntity() instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) event.getEntity();
+
+			if (EntityUtils.isBoss(mob)) {
+				mDamageDealtToBosses += event.getFinalDamage();
+				if (mDamageDealtToBosses >= mDamageDealtToBossesPerKill) {
+					mDamageDealtToBosses -= mDamageDealtToBossesPerKill;
+					mLinkedAbility.triggerOnKill(mob);
+				}
 			}
 		}
 	}

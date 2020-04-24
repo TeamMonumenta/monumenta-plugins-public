@@ -17,11 +17,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
-/*
- * Melee attacks deal +3 / +5 damage to mobs
- * with no other mobs within 4 blocks.
- */
-
 public class Skirmisher extends Ability {
 
 	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
@@ -34,7 +29,7 @@ public class Skirmisher extends Ability {
 		super(plugin, world, random, player, "Skirmisher");
 		mInfo.scoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("Deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");
+		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");
 		mInfo.mDescriptions.add("Deal an additional 5 melee damage instead.");
 	}
 

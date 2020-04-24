@@ -29,30 +29,21 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
-/*
- * Blizzard: Shift right click with a wand while looking up to
- * create an aura of ice and snow in a range of 6 / 8 that lasts 10s
- * (similar to Rains) each enemy that enters the aura gets slowness 1,
- * slowness 2 after 3 seconds, and slowness 4 after 6 seconds,
- * and take 2 / 3 damage per second. Puts out players on fire within range.
- * Cooldown: 20 s / 15 s after Blizzard finishes.
- */
-
 public class Blizzard extends Ability {
 
 	private static final int BLIZZARD_1_RADIUS = 6;
 	private static final int BLIZZARD_2_RADIUS = 8;
 	private static final int BLIZZARD_1_DAMAGE = 2;
 	private static final int BLIZZARD_2_DAMAGE = 3;
-	private static final int BLIZZARD_1_COOLDOWN = 20;
-	private static final int BLIZZARD_2_COOLDOWN = 15;
+	private static final int BLIZZARD_1_COOLDOWN = 30;
+	private static final int BLIZZARD_2_COOLDOWN = 25;
 
 	public Blizzard(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Blizzard");
 		mInfo.scoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
-		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 20s.");
-		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs take 3 damage a second. Cooldown is reduced to 15s");
+		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
+		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs take 3 damage a second. Cooldown is reduced to 25s.");
 		mInfo.linkedSpell = Spells.BLIZZARD;
 		mInfo.cooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
@@ -66,7 +57,10 @@ public class Blizzard extends Ability {
 		if (mActive) {
 			return;
 		}
+
 		mActive = true;
+		putOnCooldown();
+
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
@@ -113,7 +107,6 @@ public class Blizzard extends Ability {
 				if (t >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
 					this.cancel();
 					affected.clear();
-					putOnCooldown();
 					mActive = false;
 				}
 			}

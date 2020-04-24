@@ -44,7 +44,7 @@ public class FractalEnervation extends Ability {
 		super(plugin, world, random, player, "Fractal Enervation");
 		mInfo.scoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
-		mInfo.mDescriptions.add("Right-clicking while not looking down fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
+		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks. Additionally, Amplifying Hex's extra level cap is increased from 2 to 4 on affected enemies. Cooldown: 10s.");
 		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
@@ -127,7 +127,7 @@ public class FractalEnervation extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.getLocation().getPitch() < 50
+		return !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < 50
 				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
 

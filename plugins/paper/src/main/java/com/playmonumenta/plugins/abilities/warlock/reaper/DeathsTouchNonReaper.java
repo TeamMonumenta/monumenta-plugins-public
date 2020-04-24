@@ -5,25 +5,32 @@ import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
+import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
-public class DeathsTouchNonReaper extends Ability {
+public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbility {
 
 	/*
 	 * Allow other players to reap the benefits of a marked enemy.
 	 */
 
+	private final KillTriggeredAbilityTracker mTracker;
+
 	public DeathsTouchNonReaper(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, null);
+		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 
 	@Override
@@ -49,11 +56,28 @@ public class DeathsTouchNonReaper extends Ability {
 	}
 
 	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		mTracker.updateDamageDealtToBosses(event);
+		return true;
+	}
+
+	@Override
+	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		mTracker.updateDamageDealtToBosses(event);
+		return true;
+	}
+
+	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (event.getEntity().hasMetadata("DeathsTouchBuffDuration")) {
-			Map<PotionEffectType, Integer> effects = getOppositeEffects(event.getEntity());
-			int duration = event.getEntity().getMetadata(DeathsTouch.DEATHS_TOUCH_BUFF_DURATION).get(0).asInt();
-			int amplifierCap = event.getEntity().getMetadata(DeathsTouch.DEATHS_TOUCH_AMPLIFIER_CAP).get(0).asInt();
+		triggerOnKill(event.getEntity());
+	}
+
+	@Override
+	public void triggerOnKill(LivingEntity mob) {
+		if (mob.hasMetadata("DeathsTouchBuffDuration")) {
+			Map<PotionEffectType, Integer> effects = getOppositeEffects(mob);
+			int duration = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_BUFF_DURATION).get(0).asInt();
+			int amplifierCap = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_AMPLIFIER_CAP).get(0).asInt();
 			for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
 				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, Math.min(amplifierCap, effect.getValue()), true, true));
 			}

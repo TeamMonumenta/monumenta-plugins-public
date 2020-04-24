@@ -6,7 +6,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -150,7 +149,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	}
 
 	@Override
-	public void triggerOnKill(Entity mob) {
+	public void triggerOnKill(LivingEntity mob) {
 		if (cloak < mMaxStacks) {
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				cloak = Math.min(mMaxStacks, cloak + CLOAK_STACKS_ON_ELITE_KILL);

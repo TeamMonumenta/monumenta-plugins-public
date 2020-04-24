@@ -44,8 +44,8 @@ public class PowerInjection extends Ability {
 		mInfo.linkedSpell = Spells.POWER_INJECTION;
 		mInfo.scoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
-		mInfo.mDescriptions.add("Left-clicking, while looking at another player within 16 blocks, while holding an Alchemist Potion gives you Speed I and +3 melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown 30s");
-		mInfo.mDescriptions.add("Give +6 melee damage instead.");
+		mInfo.mDescriptions.add("Left-clicking, while looking at another player within 16 blocks, while holding an Alchemist Potion gives you Speed I and +2 melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown 30s");
+		mInfo.mDescriptions.add("Give +5 melee damage instead.");
 		mInfo.cooldown = POWER_INJECTION_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? POWER_INJECTION_1_DAMAGE : POWER_INJECTION_2_DAMAGE;

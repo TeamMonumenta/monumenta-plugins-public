@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -56,7 +55,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 	}
 
 	@Override
-	public void triggerOnKill(Entity mob) {
+	public void triggerOnKill(LivingEntity mob) {
 		Ability ap;
 		for (Player player : PlayerUtils.playersInRange(mPlayer, 12, false)) {
 			if ((ap = AbilityManager.getManager().getPlayerAbility(player, AlchemistPotions.class)) != null

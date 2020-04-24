@@ -6,7 +6,6 @@ import java.util.Random;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
@@ -108,7 +107,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 	}
 
 	@Override
-	public void triggerOnKill(Entity mob) {
+	public void triggerOnKill(LivingEntity mob) {
 		int newPot = 1;
 		if (mRandom.nextDouble() < 0.50) {
 			newPot++;

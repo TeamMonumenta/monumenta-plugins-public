@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -18,6 +20,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -54,6 +57,12 @@ public class Rampage extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		if (InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock()
+				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT) {
+			return;
+		}
+
 		Location loc = mPlayer.getLocation();
 
 		if (mStacks >= 10 && loc.getPitch() > 70) {
