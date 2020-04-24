@@ -63,7 +63,7 @@ public class SpringCleanItems extends GenericCommand {
 			SpringEventUtils.doClean(sender, player, (List<Item>)items, city);
 		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
-			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
+			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getException().getMessage());
 			/* Continue to propagate the failure */
 			throw ex;
 		}

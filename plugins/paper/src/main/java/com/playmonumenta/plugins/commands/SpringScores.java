@@ -60,7 +60,7 @@ public class SpringScores {
 			SpringEventUtils.displayCityStats(sender, player, city);
 		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
-			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
+			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getException().getMessage());
 			/* Continue to propagate the failure */
 			throw ex;
 		}
@@ -71,7 +71,7 @@ public class SpringScores {
 			SpringEventUtils.displayPlayerStats(sender, player);
 		} catch (WrapperCommandSyntaxException ex) {
 			/* Let the player also know why it failed */
-			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getMessage());
+			player.sendMessage(ChatColor.GOLD + "[Spring Cleaner] " + ChatColor.RED + ex.getException().getMessage());
 			/* Continue to propagate the failure */
 			throw ex;
 		}

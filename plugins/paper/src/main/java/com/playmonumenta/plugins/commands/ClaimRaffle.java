@@ -64,7 +64,7 @@ public class ClaimRaffle {
 			} catch (WrapperCommandSyntaxException ex) {
 				/* Failed to claim reward - send back the reward to bungee */
 				SocketManager.sendPacket(new BungeeCheckRaffleEligibilityPacket(player.getUniqueId(), false, true));
-				player.sendMessage(ChatColor.RED + ex.getMessage());
+				player.sendMessage(ChatColor.RED + ex.getException().getMessage());
 			}
 		} else if (!claimReward && eligible) {
 			player.setMetadata(CONFIRMED_METAKEY, new FixedMetadataValue(plugin, 0));
