@@ -54,25 +54,30 @@ public class Dreadful extends Ability {
 		if (event.getEntity() instanceof LivingEntity) {
 			LivingEntity mob = event.getEntity();
 
-			if (EntityUtils.isElite(mob) && !mob.getScoreboardTags().contains(DREADFUL_DREADNAUGHT_TAG)) {
-				Location loc = mob.getLocation();
-				String command = DREADFUL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mDreadfulSummonCommandData;
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
-
-				loc.add(0, 1, 0);
-				mWorld.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
-				mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
-			} else if (!mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG) && !mob.getScoreboardTags().contains("boss_dreadling")) {
-				mSpawnCounter += (2 + mRandom.nextInt(3));
-
-				if (mSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
+			if (!mob.getScoreboardTags().contains(DREADFUL_DREADNAUGHT_TAG)
+					&& !mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG)
+					&& !mob.getScoreboardTags().contains("boss_dreadling")) {
+				if (EntityUtils.isElite(mob)) {
 					Location loc = mob.getLocation();
-					String command = Spectral.SPECTRAL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mSpectralSummonCommandData;
+					String command = DREADFUL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mDreadfulSummonCommandData;
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
 					loc.add(0, 1, 0);
-					mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
+					mWorld.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
 					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+				} else {
+					mSpawnCounter += (2 + mRandom.nextInt(3));
+
+					if (mSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
+						mSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
+						Location loc = mob.getLocation();
+						String command = Spectral.SPECTRAL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mSpectralSummonCommandData;
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+
+						loc.add(0, 1, 0);
+						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+					}
 				}
 			}
 		}
