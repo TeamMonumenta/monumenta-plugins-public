@@ -36,7 +36,7 @@ public class MeleeEvasion implements BaseEnchantment {
 		//Add the extra location distance check because mob ability count as ENTITY_ATTACK for some reason.
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.getRealFinalDamage(event) > 0
 			&& event.getDamager().getBoundingBox().expand(EVASION_MELEE_THRESHOLD).contains(event.getEntity().getLocation().toVector())) {
-			EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
+			EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 			if (evasion != null) {
 				// Evasion and Melee Evasion add up, so calculate the effective cap accordingly
 				evasion.mCounter += Math.min(level * 2,

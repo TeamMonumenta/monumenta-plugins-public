@@ -31,7 +31,7 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
-		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
+		EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 		if (evasion != null && EntityUtils.getRealFinalDamage(event) > 0) {
 			evasion.mCounter += Math.min(EVASION_CAP, level);
 		}
@@ -39,7 +39,7 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
-		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
+		EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 		if (evasion != null) {
 			evasion.mCounter += Math.min(EVASION_CAP, level);
 		}

@@ -116,7 +116,7 @@ public class AmplifyingHex extends Ability {
 								mob.getPotionEffect(effect).getAmplifier()))
 						.sum();
 
-				ConsumingFlames cf = (ConsumingFlames) AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
+				ConsumingFlames cf = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);
 
 				if (cf != null)	{
 					if (cf.getAbilityScore() > 0 && mob.getFireTicks() > 0) {

@@ -81,7 +81,7 @@ public class UnstableArrows extends Ability {
 						mWorld.spawnParticle(Particle.FLAME, explodeLoc, 115, 0.02, 0.02, 0.02, 0.2);
 						mWorld.spawnParticle(Particle.SMOKE_LARGE, explodeLoc, 40, 0.02, 0.02, 0.02, 0.35);
 						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, explodeLoc, 40, 0.02, 0.02, 0.02, 0.35);
-						BasiliskPoison bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+						BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
 						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
 

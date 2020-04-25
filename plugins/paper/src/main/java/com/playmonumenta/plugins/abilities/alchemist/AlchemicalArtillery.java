@@ -88,12 +88,12 @@ public class AlchemicalArtillery extends Ability {
 			mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
 			mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
 
-			AlchemistPotions ap = (AlchemistPotions) AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
-			BrutalAlchemy ba = (BrutalAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-			GruesomeAlchemy ga = (GruesomeAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
-			NightmarishAlchemy na = (NightmarishAlchemy) AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
-			InvigoratingOdor io = (InvigoratingOdor) AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-			BasiliskPoison bp = (BasiliskPoison) AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+			AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
+			BrutalAlchemy ba = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
+			GruesomeAlchemy ga = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
+			NightmarishAlchemy na = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
+			InvigoratingOdor io = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
+			BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			int size = mobs.size();

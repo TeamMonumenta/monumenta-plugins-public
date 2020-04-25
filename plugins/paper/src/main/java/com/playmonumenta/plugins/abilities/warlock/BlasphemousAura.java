@@ -51,8 +51,8 @@ public class BlasphemousAura extends Ability {
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (getAbilityScore() > 1) {
-			GraspingClaws gc = (GraspingClaws) AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
-			DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
+			GraspingClaws gc = AbilityManager.getManager().getPlayerAbility(mPlayer, GraspingClaws.class);
+			DarkPact dp = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
 			Ability[] abilities = new Ability[8];
 			abilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, AmplifyingHex.class);
 			abilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, ConsumingFlames.class);

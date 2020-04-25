@@ -67,7 +67,7 @@ public class SoulRend extends Ability {
 				world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.4f, 1.15f);
 
 				// If Dark Pact is active, damage nearby mobs - otherwise, skill proceeds as normal
-				DarkPact dp = (DarkPact) AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
+				DarkPact dp = AbilityManager.getManager().getPlayerAbility(mPlayer, DarkPact.class);
 				if (dp != null && dp.isActive()) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SOUL_REND_RADIUS)) {
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);

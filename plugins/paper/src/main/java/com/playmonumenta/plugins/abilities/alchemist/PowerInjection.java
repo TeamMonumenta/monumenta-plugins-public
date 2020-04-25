@@ -64,7 +64,7 @@ public class PowerInjection extends Ability {
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_AMP, false, true));
-		PowerInjectionNonAlchemist pi = (PowerInjectionNonAlchemist) AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjectionNonAlchemist.class);
+		PowerInjectionNonAlchemist pi = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjectionNonAlchemist.class);
 		pi.applyBonusDamage(mDamage);
 
 		// Other player
@@ -94,7 +94,7 @@ public class PowerInjection extends Ability {
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 					new PotionEffect(PotionEffectType.SPEED, POWER_INJECTION_DURATION, POWER_INJECTION_SPEED_AMP, false, true));
-			PowerInjectionNonAlchemist pina = (PowerInjectionNonAlchemist) AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjectionNonAlchemist.class);
+			PowerInjectionNonAlchemist pina = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjectionNonAlchemist.class);
 			pina.applyBonusDamage(mDamage);
 
 			mTargetPlayer = null;

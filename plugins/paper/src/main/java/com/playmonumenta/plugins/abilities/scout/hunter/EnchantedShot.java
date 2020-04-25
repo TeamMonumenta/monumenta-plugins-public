@@ -106,11 +106,11 @@ public class EnchantedShot extends Ability {
 			mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(dir), 10, 0.2, 0.2, 0.2, 0.15);
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30, mPlayer);
-			BowMastery bm = (BowMastery) AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
+			BowMastery bm = AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
 			if (bm != null) {
 				damage += bm.getBonusDamage();
 			}
-			Sharpshooter ss = (Sharpshooter) AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
+			Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
 			if (ss != null) {
 				damage += ss.getSharpshot();
 			}

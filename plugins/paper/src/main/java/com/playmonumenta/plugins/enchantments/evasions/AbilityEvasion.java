@@ -30,7 +30,7 @@ public class AbilityEvasion implements BaseEnchantment {
 
 	@Override
 	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
-		EvasionEnchant evasion = (EvasionEnchant) AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
+		EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
 		if (evasion != null) {
 			// Evasion and Ability Evasion add up, so calculate the effective cap accordingly
 			evasion.mCounter += Math.min(level * 2,

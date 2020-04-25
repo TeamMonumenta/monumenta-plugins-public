@@ -62,7 +62,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 					&& ap.canUse(player)) {
 				// Nearby player has one of the alchemist skills - chance to give them a potion
 				double chance = POTION_CHANCE;
-				InvigoratingOdor io = (InvigoratingOdor) AbilityManager.getManager().getPlayerAbility(player, InvigoratingOdor.class);
+				InvigoratingOdor io = AbilityManager.getManager().getPlayerAbility(player, InvigoratingOdor.class);
 				if (io != null) {
 					chance += io.getPotionChanceBonus();
 				}

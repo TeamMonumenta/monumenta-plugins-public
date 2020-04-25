@@ -90,7 +90,7 @@ public class ManaLance extends Ability {
 	@Override
 	public boolean runCheck() {
 		// Must not have triggered Starfall
-		Starfall starfall = (Starfall)AbilityManager.getManager().getPlayerAbility(mPlayer, Starfall.class);
+		Starfall starfall = AbilityManager.getManager().getPlayerAbility(mPlayer, Starfall.class);
 		if (starfall != null && starfall.shouldCancelManaLance()) {
 			return false;
 		}

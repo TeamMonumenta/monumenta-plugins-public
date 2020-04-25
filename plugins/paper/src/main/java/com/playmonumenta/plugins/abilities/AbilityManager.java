@@ -476,7 +476,7 @@ public class AbilityManager {
 		}
 	}
 
-	public Ability getPlayerAbility(Player player, Class<?> cls) {
+	public <T extends Ability> T getPlayerAbility(Player player, Class<T> cls) {
 		return getPlayerAbilities(player).getAbility(cls);
 	}
 
