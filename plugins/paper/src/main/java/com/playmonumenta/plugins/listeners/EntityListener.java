@@ -868,7 +868,12 @@ public class EntityListener implements Listener {
 		}
 		if (event.getTarget() instanceof Player) {
 			Player player = (Player) event.getTarget();
-			mAbilities.entityTargetLivingEntityEvent(player, event);
+			if (AbilityUtils.isStealthed(player)) {
+				event.setTarget(null);
+				event.setCancelled(true);
+			} else {
+				mAbilities.entityTargetLivingEntityEvent(player, event);
+			}
 		}
 	}
 

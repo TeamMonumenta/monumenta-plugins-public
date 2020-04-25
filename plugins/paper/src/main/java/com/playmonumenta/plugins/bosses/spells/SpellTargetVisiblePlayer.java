@@ -9,7 +9,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
 
-import com.playmonumenta.plugins.abilities.rogue.assassin.CloakAndDagger;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -57,7 +57,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 		// Forget about this target if they leave the game or switch to spectator or are invisible
 		if (mLastTarget != null) {
 			if (EntityUtils.isStunned(mBoss) || EntityUtils.isConfused(mBoss) || !mLastTarget.isOnline() ||
-					mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || CloakAndDagger.isInvisible(mLastTarget)) {
+					mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || AbilityUtils.isStealthed(mLastTarget)) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
 				mCooldownRemaining = 0;
@@ -88,7 +88,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
 
 				for (Player player : potentialTargets) {
-					if (LocationUtils.hasLineOfSight(mBoss, player) && !CloakAndDagger.isInvisible(player)) {
+					if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
 						mLastTarget = player;
 						mBoss.setTarget(player);
 						mCooldownRemaining = mCooldown;

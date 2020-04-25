@@ -17,6 +17,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.rogue.assassin.BodkinBlitz;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -55,8 +57,16 @@ public class ViciousCombos extends Ability {
 				public void run() {
 					Location loc = killedEntity.getLocation();
 					loc = loc.add(0, 0.5, 0);
+
+					BodkinBlitz blitz = AbilityManager.getManager().getPlayerAbility(mPlayer, BodkinBlitz.class);
+
 					if (EntityUtils.isElite(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
+
+						if (blitz != null) {
+							blitz.fullReset();
+						}
+
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
 						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, true, true));
 
@@ -77,6 +87,10 @@ public class ViciousCombos extends Ability {
 						int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 						if (killedEntity instanceof Player) {
 							timeReduction *= 2;
+						}
+
+						if (blitz != null) {
+							blitz.lowerCooldown(timeReduction);
 						}
 
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);

@@ -169,6 +169,7 @@ import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -530,6 +531,9 @@ public class AbilityManager {
 					return true;
 				}
 				if (!abil.livingEntityDamagedByPlayerEvent(event)) {
+					return false;
+				}
+				if (AbilityUtils.isStealthed(player) && !abil.onStealthAttack(event)) {
 					return false;
 				}
 			}

@@ -2,13 +2,24 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.Inventory;
@@ -16,9 +27,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 public class AbilityUtils {
 
@@ -30,6 +45,89 @@ public class AbilityUtils {
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 	// This value obtained from testing; in reality, a fully charged shot outputs an arrow with a velocity between 2.95 and 3.05
 	private static final float ARROW_MAX_VELOCITY = 2.9f;
+
+	private static final Map<UUID, Integer> INVISIBLE_PLAYERS = new HashMap<UUID, Integer>();
+	private static BukkitRunnable invisTracker = null;
+
+	private static void startInvisTracker(Plugin plugin) {
+		invisTracker = new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (INVISIBLE_PLAYERS.isEmpty()) {
+					this.cancel();
+				} else {
+					for (Entry<UUID, Integer> entry : INVISIBLE_PLAYERS.entrySet()) {
+						Player player = Bukkit.getPlayer(entry.getKey());
+						ItemStack item = player.getInventory().getItemInMainHand();
+						if (entry.getValue() <= 0) {
+							removeStealth(plugin, player, false);
+						} else if (!InventoryUtils.isAxeItem(item) && !InventoryUtils.isSwordItem(item) && !InventoryUtils.isScytheItem(item)) {
+							removeStealth(plugin, player, true);
+						} else {
+							player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f);
+							INVISIBLE_PLAYERS.put(player.getUniqueId(), entry.getValue() - 1);
+						}
+					}
+				}
+			}
+		};
+		invisTracker.runTaskTimer(plugin, 0, 1);
+	}
+
+	public static boolean isStealthed(Player player) {
+		return INVISIBLE_PLAYERS.containsKey(player.getUniqueId());
+	}
+
+	public static void removeStealth(Plugin plugin, Player player, boolean inflictPenalty) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+
+		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, 1f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, 0.6f, 0.5f);
+
+		plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
+
+		INVISIBLE_PLAYERS.remove(player.getUniqueId());
+
+		if (inflictPenalty) {
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 3, 1));
+		}
+	}
+
+	public static void applyStealth(Plugin plugin, Player player, int duration) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+
+		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
+		world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, 1f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, 0.5f, 2f);
+
+		if (!isStealthed(player)) {
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0));
+			INVISIBLE_PLAYERS.put(player.getUniqueId(), duration);
+		} else {
+			int currentDuration = INVISIBLE_PLAYERS.get(player.getUniqueId());
+			plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration + currentDuration, 0));
+			INVISIBLE_PLAYERS.put(player.getUniqueId(), duration + currentDuration);
+		}
+
+		if (invisTracker == null || invisTracker.isCancelled()) {
+			startInvisTracker(plugin);
+		}
+
+		for (LivingEntity entity : EntityUtils.getNearbyMobs(player.getLocation(), 64)) {
+			if (entity instanceof Mob) {
+				Mob mob = (Mob) entity;
+				if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
+					mob.setTarget(null);
+				}
+			}
+		}
+	}
 
 	public static double getArrowFinalDamageMultiplier(Arrow arrow) {
 		if (arrow.hasMetadata(ARROW_FINAL_DAMAGE_MULTIPLIER_METAKEY)) {

@@ -8,12 +8,11 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -25,44 +24,56 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class BodkinBlitz extends Ability {
 
-	private static final int BODKINBLITZ_COOLDOWN = 25 * 20;
-	private static final int BODKINBLITZ_1_DAMAGE = 25;
-	private static final int BODKINBLITZ_2_DAMAGE = 30;
+	private static final int BODKINBLITZ_1_COOLDOWN = 16 * 20;
+	private static final int BODKINBLITZ_2_COOLDOWN = 12 * 20;
+	private static final int BODKINBLITZ_2_BONUS_DMG = 20;
 	private static final int BODKINBLITZ_1_STEP = 25;
 	private static final int BODKINBLITZ_2_STEP = 35;
+	private static final int BODKINBLITZ_MAX_CHARGES = 2;
 
-	private LivingEntity mark;
+	private BukkitRunnable mCDRunnable = null;
+	private BukkitRunnable mRunnable = null;
+	private int mTicks = 0;
+	private boolean mTeleporting = false;
+	private int mCharges;
+	private int mChargeCooldown;
 
 	public BodkinBlitz(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Bodkin Blitz");
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Upon teleporting, strike the nearest enemy within 3 blocks, dealing them 25 damage. This ability cannot be used in safe zones. Cooldown: 25 seconds.");
-		mInfo.mDescriptions.add("Range increased to 14 blocks. Bodkin Blitz now deals 30 damage and marks the target for up to 5 seconds. Killing a marked enemy refreshes the cooldown of Bodkin Blitz by 10 seconds.");
-		mInfo.cooldown = BODKINBLITZ_COOLDOWN;
+		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Bodkin Blitz utilises a charge system. Gain a charge once every 16 seconds.");
+		mInfo.mDescriptions.add("Range increased to 14 blocks. Cooldown per charge reduced to 12 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you.");
+		mInfo.cooldown = 0;
 		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.ignoreCooldown = true;
+		mCharges = BODKINBLITZ_MAX_CHARGES;
+		mChargeCooldown = 0;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+		if (mCharges <= 0 || mTeleporting || !mPlayer.isSneaking() || !(InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) ||
+				ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
-		putOnCooldown();
+		consumeCharge();
+		mTeleporting = true;
+
+		MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
 
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
@@ -79,16 +90,16 @@ public class BodkinBlitz extends Ability {
 				// Fire projectile.
 				for (int i = 0; i < mStep; i++) {
 					Location boxLoc = mPlayerBox.getCenter().toLocation(mWorld);
-					
+
 					boolean isBlocked = true;
 					BoundingBox testBox = mPlayerBox.clone();
-					
+
 					// Preliminary check on the spot the player is standing on, before shifting locations.
 					if (testLocation(testBox)) {
 						mTpLoc = testBox.getCenter().toLocation(mWorld).add(0, -testBox.getHeight() / 2, 0);
 						isBlocked = false;
 					}
-					
+
 					if (isBlocked) {
 						testBox.shift(0, -1, 0);
 						for (int dy = 0; dy < 20; dy++) {
@@ -98,7 +109,7 @@ public class BodkinBlitz extends Ability {
 								isBlocked = false;
 								break;
 							}
-							
+
 							testBox.shift(0, 0.1, 0);
 						}
 					}
@@ -127,6 +138,8 @@ public class BodkinBlitz extends Ability {
 					mTpLoc.add(0, 0.1, 0);
 					mPlayer.teleport(mTpLoc);
 
+					mTeleporting = false;
+
 					mWorld.playSound(mTpLoc, Sound.BLOCK_ENDER_CHEST_OPEN, 1f, 2f);
 					mWorld.playSound(mTpLoc, Sound.ITEM_TRIDENT_RETURN, 1f, 0.8f);
 					mWorld.playSound(mTpLoc, Sound.ITEM_TRIDENT_THROW, 1f, 0.5f);
@@ -143,69 +156,31 @@ public class BodkinBlitz extends Ability {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
 
-					LivingEntity target = EntityUtils.getNearestHostile(mPlayer, 3);
+					AbilityUtils.applyStealth(mPlugin, mPlayer, 20);
 
-					// Damage enemy, if applicable
-					if (target != null) {
-						Location beamLoc = mPlayer.getLocation().add(0, 1.5, 0);
-						Location enemyLoc = target.getLocation().add(0, 1.5, 0);
-						Vector beam = LocationUtils.getDirectionTo(enemyLoc, beamLoc).multiply(0.2);
-
-						for (int i = 0; i < 15; i++) {
-							beamLoc.add(beam);
-
-							mWorld.spawnParticle(Particle.SMOKE_LARGE, beamLoc, 3, 0.2, 0.2, 0.2, 0.01);
-							mWorld.spawnParticle(Particle.CRIT, beamLoc, 1, 0.2, 0.2, 0.2, 0.2);
-							mWorld.spawnParticle(Particle.SPELL_MOB, beamLoc, 2, 0.2, 0.2, 0.2, 0);
-
-							if (beamLoc.distance(enemyLoc) < 0.4) {
-								break;
-							}
-						}
-
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, enemyLoc, 15, 0.25, 0.5, 0.25, 0.1);
-						mWorld.spawnParticle(Particle.SMOKE_NORMAL, enemyLoc, 20, 0.25, 0.5, 0.25, 0.07);
-						mWorld.spawnParticle(Particle.SPELL_WITCH, enemyLoc, 8, 0.45, 0.5, 0.45, 0);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, enemyLoc, 5, 0.5, 0.6, 0.5, 0);
-						mWorld.spawnParticle(Particle.CRIT, enemyLoc, 40, 0.25, 0.5, 0.25, 0.4);
-
-						mWorld.playSound(enemyLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.7f, 2f);
-						mWorld.playSound(enemyLoc, Sound.BLOCK_ANVIL_LAND, 0.6f, 2f);
-
-						if (getAbilityScore() > 1) {
-							mark = target;
-
-							new BukkitRunnable() {
-								int i = 0;
-
-								@Override
-								public void run() {
-									if (i >= 100) {
-										mark = null;
-										this.cancel();
-									} else {
-										i++;
-										if (mark == null) {
-											i = 100;
-										} else {
-											mWorld.spawnParticle(Particle.SMOKE_LARGE,
-											                     mark.getLocation().clone().add(0, 1, 0),
-																 1, 0.25, 0.5, 0.25, 0.07f);
-
-										}
-									}
+					mTicks = 100;
+					if (mRunnable == null || mRunnable.isCancelled()) {
+						mRunnable = new BukkitRunnable() {
+							@Override
+							public void run() {
+								mWorld.spawnParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete"));
+								if (mTicks <= 0) {
+									mTicks = 0;
+									this.cancel();
+									mRunnable = null;
 								}
-							}.runTaskTimer(mPlugin, 0, 1);
-						}
-						int damage = getAbilityScore() == 1 ? BODKINBLITZ_1_DAMAGE : BODKINBLITZ_2_DAMAGE;
-						EntityUtils.damageEntity(mPlugin, target, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+								mTicks--;
+							}
+						};
+						mRunnable.runTaskTimer(mPlugin, 0, 1);
 					}
+
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
-	
+
 	private boolean testLocation(BoundingBox box) {
 		for (int x = -1; x <= 1; x++) {
 			for (int z = -1; z <= 1; z++) {
@@ -213,7 +188,7 @@ public class BodkinBlitz extends Ability {
 					// Checking the blocks around the hitbox.
 					Block block = box.getCenter().toLocation(mWorld).clone().add(x * 0.4, y * 0.975 - box.getHeight() / 2, z * 0.4).getBlock();
 					// A player's hitbox is 0.625 * 0.625 * 1.8125 blocks. Rounding up to 0.8 * 0.8 * 1.95 to be safe.
-					
+
 					if (block.getType().isSolid() && block.getBoundingBox().overlaps(box)) {
 						// If a bad spot has already been found, then there's no need to check the rest-- this spot is invalid.
 						return false;
@@ -221,38 +196,76 @@ public class BodkinBlitz extends Ability {
 				}
 			}
 		}
-		
+
 		return true;
 	}
 
 	@Override
 	public boolean runCheck() {
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
-			return mPlayer.isSneaking() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
-		}
-		return false;
+		return true;
 	}
 
 	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		EntityDamageEvent e = event.getEntity().getLastDamageCause();
-		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK
-				|| e.getCause() == DamageCause.CUSTOM) {
-			if (event.getEntity() == mark) {
-				LivingEntity mob = event.getEntity();
-				mWorld.playSound(mob.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 2f);
-				mWorld.playSound(mob.getLocation(), Sound.ENTITY_HORSE_ARMOR, 0.5f, 0.75f);
-				mWorld.playSound(mob.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, 0.5f, 2f);
-				mWorld.spawnParticle(Particle.SMOKE_LARGE, mob.getLocation(), 30, 0.25, 0.5, 0.25, 0.2f);
-				mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.35, 0.5, 0.35, 0f);
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (mRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+			mTicks = 0;
+			mRunnable.cancel();
+			mRunnable = null;
+			if (event.getEntity() instanceof Mob) {
+				Mob m = (Mob) event.getEntity();
+				if (m.getTarget() == null || !m.getTarget().getUniqueId().equals(mPlayer.getUniqueId())) {
+					Location entityLoc = m.getLocation().clone().add(0, 1, 0);
 
-				mPlugin.mTimers.updateCooldown(mPlayer, mInfo.linkedSpell, 200);
-				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Cooldown refreshed!");
+					mWorld.playSound(entityLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 2f);
+					mWorld.playSound(entityLoc, Sound.BLOCK_ANVIL_LAND, 0.8f, 2f);
+					mWorld.spawnParticle(Particle.FALLING_DUST, entityLoc, 35, 0.35, 0.5, 0.35, Bukkit.createBlockData("gray_concrete"));
+					mWorld.spawnParticle(Particle.BLOCK_CRACK, entityLoc, 20, 0.25, 0.25, 0.25, 1, Bukkit.createBlockData("redstone_block"));
 
-				mark = null;
+					event.setDamage(event.getDamage() + BODKINBLITZ_2_BONUS_DMG);
+				}
 			}
 		}
+		return true;
+	}
+
+	private void consumeCharge() {
+		if (mChargeCooldown <= 0) {
+			mChargeCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+		}
+		mCharges--;
+
+		if (mCDRunnable == null || mCDRunnable.isCancelled()) {
+			mCDRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mChargeCooldown <= 0) {
+						if (mCharges < BODKINBLITZ_MAX_CHARGES) {
+							// If charge count isn't maxed, add one.
+							mCharges++;
+							MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
+							if (mCharges < BODKINBLITZ_MAX_CHARGES) {
+								// If it still isn't, put it back on cooldown.
+								mChargeCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+							} else {
+								this.cancel();
+								mCDRunnable = null;
+							}
+						}
+					} else {
+						mChargeCooldown -= 1;
+					}
+				}
+			};
+			mCDRunnable.runTaskTimer(mPlugin, 0, 1);
+		}
+	}
+
+	public void lowerCooldown(int reduction) {
+		mChargeCooldown -= reduction;
+	}
+
+	public void fullReset() {
+		mCharges = 2;
+		mChargeCooldown = 0;
 	}
 }

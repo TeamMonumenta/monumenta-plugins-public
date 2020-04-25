@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.abilities;
 import java.util.Collection;
 import java.util.Random;
 
-import net.md_5.bungee.api.chat.ComponentBuilder;
-
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LingeringPotion;
@@ -34,6 +32,8 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;
@@ -118,6 +118,10 @@ public abstract class Ability {
 
 	//Events
 	//---------------------------------------------------------------------------------------------------------------
+
+	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
+		return true;
+	}
 
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		return true;
