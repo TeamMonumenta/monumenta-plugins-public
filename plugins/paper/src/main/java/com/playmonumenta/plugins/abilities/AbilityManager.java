@@ -434,6 +434,7 @@ public class AbilityManager {
 		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
 		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+		Toughness.removeModifier(player);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
 
