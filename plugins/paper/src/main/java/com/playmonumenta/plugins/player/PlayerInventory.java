@@ -20,6 +20,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -51,7 +52,7 @@ public class PlayerInventory {
 	private Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
-	private boolean mHasShiftClicked = false;
+	private boolean mNeedsUpdate = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
 		updateEquipmentProperties(plugin, player, null);
@@ -75,8 +76,11 @@ public class PlayerInventory {
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
 		//Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent) {
+			if (((InventoryClickEvent) event).getSlotType() == InventoryType.SlotType.CRAFTING) {
+				mNeedsUpdate = true;
+			}
 			if (((InventoryClickEvent) event).isShiftClick()) {
-				mHasShiftClicked = true;
+				mNeedsUpdate = true;
 				return;
 			} else if (((InventoryClickEvent) event).isRightClick() && ShulkerEquipmentListener.isEquipmentBox(((InventoryClickEvent) event).getCurrentItem()))  {
 				for (int i = 0; i <= 8; i++) {
@@ -119,13 +123,13 @@ public class PlayerInventory {
 			plugin.mEnchantmentManager.updateItemProperties(40, mCurrentProperties, mInventoryProperties, player, plugin);
 		} else if (event instanceof PlayerDropItemEvent) {
 			plugin.mEnchantmentManager.updateItemProperties(player.getInventory().getHeldItemSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-		} else if (!mHasShiftClicked && event instanceof InventoryCloseEvent) {
+		} else if (!mNeedsUpdate && event instanceof InventoryCloseEvent) {
 			return; //Only ever updates on InventoryCloseEvent if shift clicks have been made
 		} else {
 
 			// Sets mHasShiftClicked to false after updating entire inventory
-			if (mHasShiftClicked && event instanceof InventoryCloseEvent) {
-				mHasShiftClicked = false;
+			if (mNeedsUpdate && event instanceof InventoryCloseEvent) {
+				mNeedsUpdate = false;
 			}
 
 			// Swap current and previous lists

@@ -374,7 +374,7 @@ public class PlayerListener implements Listener {
 		}
 
 		if (event.getEntity() instanceof Player) {
-			Player player = (Player)event.getEntity();
+			Player player = (Player) event.getEntity();
 
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
@@ -409,21 +409,21 @@ public class PlayerListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-		if (JeffChestSortIntegration.isPresent()) {
-			if (event.getWhoClicked() instanceof Player) {
-				Player player = (Player)event.getWhoClicked();
+		if (event.getWhoClicked() instanceof Player) {
+			Player player = (Player) event.getWhoClicked();
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			if (JeffChestSortIntegration.isPresent()) {
 				Inventory inventory = event.getClickedInventory();
 				if (inventory == null) {
 					return;
 				} else if (inventory instanceof PlayerInventory) {
-					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 					// Don't sort player inventories until support is added
 					// to prevent sorting hotbar / armor slots
 				} else {
-					if (event.getClick() != null &&
-					    event.getClick().equals(ClickType.RIGHT) &&
-					    inventory.getItem(event.getSlot()) == null &&
-					    event.getAction().equals(InventoryAction.NOTHING)) {
+					if (event.getClick() != null
+					    && event.getClick().equals(ClickType.RIGHT)
+					    && inventory.getItem(event.getSlot()) == null
+					    && event.getAction().equals(InventoryAction.NOTHING)) {
 
 						// Player right clicked an empty space and nothing happened
 						// Check if the last thing the player did was also the same thing.
@@ -448,10 +448,13 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
-		//If item contains curse of ephemerality, prevent from putting in other inventories
-		//Checks for player inevntory unless it's a shift click
-		if (event.getWhoClicked() instanceof Player && (event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor()) && !(event.getClickedInventory() instanceof PlayerInventory)
-				|| event.getCurrentItem() != null && CurseOfEphemerality.isEphemeral(event.getCurrentItem()) && (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT))) {
+		// If item contains curse of ephemerality, prevent from putting in other inventories
+		// Checks for player inevntory unless it's a shift click
+		if (event.getWhoClicked() instanceof Player && (event.getCursor() != null
+			&& CurseOfEphemerality.isEphemeral(event.getCursor())
+			&& !(event.getClickedInventory() instanceof PlayerInventory)
+			|| event.getCurrentItem() != null && CurseOfEphemerality.isEphemeral(event.getCurrentItem())
+			&& (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT))) {
 			event.setCancelled(true);
 		}
 	}
@@ -487,7 +490,7 @@ public class PlayerListener implements Listener {
 		}
 
 		if (event.getPlayer() instanceof Player) {
-			Player player = (Player)event.getPlayer();
+			Player player = (Player) event.getPlayer();
 
 			// Clear the player's sorting flag if present
 			if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
@@ -511,7 +514,7 @@ public class PlayerListener implements Listener {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
 		if (holder != null && holder instanceof Player) {
-			Player player = (Player)holder;
+			Player player = (Player) holder;
 
 			// Clear the player's sorting flag if present
 			if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
@@ -522,7 +525,6 @@ public class PlayerListener implements Listener {
 			ItemStack offHand = player.getInventory().getItemInOffHand();
 
 			AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
-			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 		} else if (holder instanceof Chest) {
 			Chest chest = (Chest) holder;
 			// Break empty graves or halloween creeper chests in safe zones automatically when closed
@@ -534,6 +536,9 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+		if (event.getPlayer() != null && event.getPlayer() instanceof Player) {
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) event.getPlayer(), event);
+		}
 	}
 
 	// Something interacts with an inventory
@@ -544,7 +549,7 @@ public class PlayerListener implements Listener {
 		}
 
 		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player)event.getWhoClicked();
+			Player player = (Player) event.getWhoClicked();
 
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
@@ -630,8 +635,8 @@ public class PlayerListener implements Listener {
 				} else if (result == ItemDeathResult.KEEP) {
 					// Item is kept with no durability loss
 					// This empty if statement is intentional so it's not included in "else".
-				} else if (result == ItemDeathResult.KEEP_DAMAGED ||
-				           (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
+				} else if (result == ItemDeathResult.KEEP_DAMAGED
+				           || (result == ItemDeathResult.KEEP_EQUIPPED && KEEP_EQUIPPED_SLOTS.contains(slot))) {
 					ItemUtils.damageItemPercent(item, KEPT_ITEM_DURABILITY_DAMAGE_PERCENT, false);
 				} else {
 					// Migrated normal item treatment to a method so Curse of Vanishing items can be treated the same way
@@ -705,8 +710,8 @@ public class PlayerListener implements Listener {
 				}
 			}.runTaskLater(Plugin.getInstance(), 5 * 20);
 		}
-		if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW) &&
-		    !player.getScoreboardTags().contains("DisableGraves")) {
+		if ((result == ItemDeathResult.SAFE || result == ItemDeathResult.SHATTER || result == ItemDeathResult.SHATTER_NOW)
+		    && !player.getScoreboardTags().contains("DisableGraves")) {
 			GraveUtils.setGraveScoreboard(droppedItem, player, location);
 		}
 		droppedItems.add(droppedItem);
@@ -769,7 +774,7 @@ public class PlayerListener implements Listener {
 		}
 
 		if (event.getItem().getItemMeta() instanceof PotionMeta) {
-			if (PotionUtils.isLuckPotion((PotionMeta)event.getItem().getItemMeta())) {
+			if (PotionUtils.isLuckPotion((PotionMeta) event.getItem().getItemMeta())) {
 				Location loc = player.getLocation();
 				loc.getWorld().playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Luck potions can no longer be consumed");
@@ -790,9 +795,9 @@ public class PlayerListener implements Listener {
 
 		for (PotionEffect effect : PotionUtils.getEffects(event.getItem())) {
 			// Kill the player if they drink a potion with instant damage 10+
-			if (effect.getType() != null &&
-			    effect.getType().equals(PotionEffectType.HARM) &&
-			    effect.getAmplifier() >= 9) {
+			if (effect.getType() != null
+			    && effect.getType().equals(PotionEffectType.HARM)
+				&& effect.getAmplifier() >= 9) {
 
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
 					@Override
@@ -898,7 +903,7 @@ public class PlayerListener implements Listener {
 			if (testblock.getType().equals(Material.COMMAND_BLOCK)
 			    && state instanceof CommandBlock) {
 
-				String str = ((CommandBlock)state).getCommand();
+				String str = ((CommandBlock) state).getCommand();
 
 				String[] split = str.split(" ");
 				if (split.length != 5) {
@@ -911,8 +916,8 @@ public class PlayerListener implements Listener {
 					// Coordinates are relative to the head of the bed
 					Point pt = Point.fromString(player, split[0], split[1], split[2], false, bed.getLocation());
 
-					float yaw = (float)CommandUtils.parseDoubleFromString(player, split[3]);
-					float pitch = (float)CommandUtils.parseDoubleFromString(player, split[4]);
+					float yaw = (float) CommandUtils.parseDoubleFromString(player, split[3]);
+					float pitch = (float) CommandUtils.parseDoubleFromString(player, split[4]);
 
 					// Adjust for player teleports being off-center
 					Location teleLoc = new Location(world, pt.mX - 0.5, pt.mY, pt.mZ - 0.5, yaw, pitch);
@@ -972,7 +977,6 @@ public class PlayerListener implements Listener {
 		player.teleport(loc.add(0.5, 1, 0.5));
 	}
 
-
 	public static Set<Material> POTION_TYPES = EnumSet.of(Material.POTION, Material.SPLASH_POTION,
 	                                                      Material.LINGERING_POTION);
 
@@ -1015,8 +1019,8 @@ public class PlayerListener implements Listener {
 			for (Entity e : loc.getWorld().getNearbyEntities(loc, 3, 3, 3)) {
 				if (e instanceof Player) {
 					Player player = (Player) e;
-					Vector v = player.getLocation().toVector().subtract(
-					               loc.toVector()).normalize(); // Create the vector.
+					Vector v = player.getLocation().toVector().subtract(loc.toVector()).normalize();
+					// Create the vector.
 					v.add(new Vector(0, 0.5, 0));
 					player.setVelocity(v.multiply(1)); // Set the velocity.
 				}
