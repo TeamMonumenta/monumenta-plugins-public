@@ -109,6 +109,8 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class EntityListener implements Listener {
 	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
 	            Material.TRIPWIRE,
@@ -633,6 +635,7 @@ public class EntityListener implements Listener {
 		ThrownPotion potion = event.getPotion();
 		ProjectileSource source = potion.getShooter();
 		Collection<LivingEntity> affectedEntities = event.getAffectedEntities();
+		List<Player> affectedPlayers = new ArrayList<>();
 
 		// Never apply effects to villagers
 		affectedEntities.removeIf(entity -> (entity instanceof Villager));
@@ -660,6 +663,7 @@ public class EntityListener implements Listener {
 		 */
 		for (LivingEntity entity : new ArrayList<LivingEntity>(affectedEntities)) {
 			if (entity instanceof Player) {
+				affectedPlayers.add((Player)entity);
 				if (!mAbilities.playerSplashedByPotionEvent((Player)entity, affectedEntities, potion, event)) {
 					event.setCancelled(true);
 					return;
@@ -673,6 +677,23 @@ public class EntityListener implements Listener {
 				if (entity instanceof Player) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, PotionUtils.getEffects(potion.getItem()),
 					                                 event.getIntensity(entity));
+				}
+			}
+		}
+
+		for (Player p : affectedPlayers) {
+			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
+			for (PotionEffect pe : appliedEffects) {
+				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
+						p.getGameMode().equals(GameMode.ADVENTURE)) {
+					//Remove Slow Falling effects in Adventure mode areas (#947)
+					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
+					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+						@Override
+						public void run() {
+							p.removePotionEffect(PotionEffectType.SLOW_FALLING);
+						}
+					}, 1);
 				}
 			}
 		}
@@ -700,16 +721,35 @@ public class EntityListener implements Listener {
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
+		List<Player> affectedPlayers = new ArrayList<>();
 
 		// All affected players need to have the effect added to their potion manager.
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player) {
+				affectedPlayers.add((Player)entity);
 				if (info != null) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, info);
 				}
 
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion((Player)entity, PotionID.APPLIED_POTION, effects);
+				}
+			}
+		}
+
+		for (Player p : affectedPlayers) {
+			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
+			for (PotionEffect pe : appliedEffects) {
+				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
+						p.getGameMode().equals(GameMode.ADVENTURE)) {
+					//Remove Slow Falling effects in Adventure mode areas (#947)
+					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
+					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+						@Override
+						public void run() {
+							p.removePotionEffect(PotionEffectType.SLOW_FALLING);
+						}
+					}, 1);
 				}
 			}
 		}
@@ -955,5 +995,4 @@ public class EntityListener implements Listener {
 			}
 		}
 	}
-
 }

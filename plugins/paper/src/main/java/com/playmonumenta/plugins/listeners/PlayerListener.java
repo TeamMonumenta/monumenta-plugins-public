@@ -805,6 +805,17 @@ public class PlayerListener implements Listener {
 						player.setHealth(0);
 					}
 				}, 0);
+			} else if (effect.getType() != null &&
+					effect.getType().equals(PotionEffectType.SLOW_FALLING) &&
+					player.getGameMode().equals(GameMode.ADVENTURE)) {
+				//Remove Slow Falling effects in Adventure mode areas (#947)
+				player.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
+				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
+					@Override
+					public void run() {
+						player.removePotionEffect(PotionEffectType.SLOW_FALLING);
+					}
+				}, 1);
 			}
 
 			mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effect);
