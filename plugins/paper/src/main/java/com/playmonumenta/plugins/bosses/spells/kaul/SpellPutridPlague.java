@@ -83,7 +83,7 @@ public class SpellPutridPlague extends Spell {
 			}
 		}
 		if (!points.isEmpty()) {
-			Location loc = mBoss.getLocation();
+			Location loc = mCenter;
 			ArmorStand point = points.get(rand.nextInt(points.size()));
 			if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color blue");
