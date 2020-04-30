@@ -114,6 +114,7 @@ public enum Spells {
 	BODYGUARD("Bodyguard"),
 
 	//Alchemist
+	ALCHEMIST_POTION("Alchemist Potion"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	POWER_INJECTION("Power Injection"),
 	IRON_TINCTURE("Iron Tincture"),
