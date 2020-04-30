@@ -30,7 +30,7 @@ public class CurseOfShrapnel implements BaseEnchantment {
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) {
 		if (InventoryUtils.isPickaxeItem(item) && event.getBlock().getType() == Material.SPAWNER) {
-			EntityUtils.damageEntity(plugin, player, level, player);
+			EntityUtils.damageEntity(plugin, player, level, null);
 			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().add(0, 1, 0), 8, 0.4, 0.4, 0.4, 0.1);
 		}
 	}
