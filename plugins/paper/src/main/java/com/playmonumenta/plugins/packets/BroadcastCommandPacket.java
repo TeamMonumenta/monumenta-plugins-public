@@ -27,6 +27,8 @@ public class BroadcastCommandPacket extends BasePacket {
 		    || command.startsWith("say")
 		    || command.startsWith("msg")
 		    || command.startsWith("tell")
+		    || command.startsWith("restart-empty")
+		    || command.startsWith("save-all")
 		    || command.startsWith("tellraw")) {
 
 			plugin.getLogger().fine("Executing broadcast received command '" + command + "'");
