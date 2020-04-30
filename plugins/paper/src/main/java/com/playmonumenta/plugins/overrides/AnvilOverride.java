@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -67,8 +68,11 @@ public class AnvilOverride extends BaseOverride {
 			}.runTaskTimer(plugin, 0, 7);
 			block.setType(Material.AIR);
 			block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
-			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE);
-			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount + 1);
+			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE) + 1;
+			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
+
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+			                       "execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
 		} else {
 			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");
 			if (!block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
