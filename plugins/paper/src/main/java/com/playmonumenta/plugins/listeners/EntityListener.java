@@ -35,6 +35,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
@@ -911,6 +912,11 @@ public class EntityListener implements Listener {
 	public void entityChangeBlockEvent(EntityChangeBlockEvent event) {
 		event.setCancelled(!mPlugin.mItemOverrides.blockChangeInteraction(mPlugin, event.getBlock()));
 		if (event.getEntity() instanceof Wither) {
+			event.setCancelled(true);
+		}
+
+		// When sheep eat grass outside of plots, do not change to dirt
+		if (event.getEntity() instanceof Sheep && !ZoneUtils.inPlot(event.getBlock().getLocation(), ServerProperties.getIsTownWorld())) {
 			event.setCancelled(true);
 		}
 	}

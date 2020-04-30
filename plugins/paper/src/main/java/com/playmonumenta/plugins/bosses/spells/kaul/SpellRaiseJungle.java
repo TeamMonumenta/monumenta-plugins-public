@@ -191,6 +191,10 @@ public class SpellRaiseJungle extends Spell {
 						if (mSummoned.isEmpty()) {
 							this.cancel();
 						}
+
+						if (mBoss.isDead() || !mBoss.isValid()) {
+							this.cancel();
+						}
 					}
 
 				}.runTaskTimer(mPlugin, 0, 1);

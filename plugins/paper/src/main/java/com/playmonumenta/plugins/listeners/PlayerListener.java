@@ -17,6 +17,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -585,6 +587,14 @@ public class PlayerListener implements Listener {
 
 		if (player.getHealth() > 0) {
 			return;
+		}
+
+		// Prevent an inescapable death loop by overriding KeepInventory if your Max Health is 0
+		if (event.getKeepInventory()) {
+			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null && maxHealth.getValue() <= 0) {
+				event.setKeepInventory(false);
+			}
 		}
 
 		if (!event.getKeepInventory()) {
