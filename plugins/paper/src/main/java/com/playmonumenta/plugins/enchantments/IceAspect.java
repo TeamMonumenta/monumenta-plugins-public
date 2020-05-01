@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class IceAspect implements BaseEnchantment {
 	private static final int ICE_ASPECT_DURATION = 20 * 5;
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Ice Aspect";
 
 	@Override
 	public String getProperty() {
@@ -31,7 +31,7 @@ public class IceAspect implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
-		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.SLOW, ICE_ASPECT_DURATION, level - 1, false, true));
+		PotionUtils.applyPotion(player, target, new PotionEffect(PotionEffectType.SLOW, (int)(ICE_ASPECT_DURATION * player.getCooledAttackStrength(0)), level - 1, false, true));
 		player.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 
 		if (target instanceof Blaze) {

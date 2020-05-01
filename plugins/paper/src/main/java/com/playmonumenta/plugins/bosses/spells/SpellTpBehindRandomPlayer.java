@@ -8,14 +8,16 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -23,6 +25,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class SpellTpBehindRandomPlayer extends Spell {
 	private static final int MAX_RANGE = 80;
 	private static final int TP_DELAY = 50;
+	private static final int TP_STUN = 10;			// Time after teleporting that the mob cannot perform actions
+	private static final int TP_STUN_CREEPER = 30;	// Increased time for creepers
 
 	private final Plugin mPlugin;
 	private final Entity mLauncher;
@@ -119,8 +123,12 @@ public class SpellTpBehindRandomPlayer extends Spell {
 				world.spawnParticle(Particle.SPELL_WITCH, newloc.clone().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
 				world.spawnParticle(Particle.SMOKE_LARGE, newloc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
-				if (mLauncher instanceof Mob) {
-					((Mob)mLauncher).setTarget(target);
+
+				// The mPlugin here is of the incorrect type for some reason
+				if (mLauncher instanceof Creeper) {
+					EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), TP_STUN_CREEPER, (LivingEntity) mLauncher);
+				} else if (mLauncher instanceof LivingEntity) {
+					EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), TP_STUN, (LivingEntity) mLauncher);
 				}
 			}
 		};

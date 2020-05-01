@@ -170,6 +170,7 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -437,6 +438,8 @@ public class AbilityManager {
 		Toughness.removeModifier(player);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
+		// The absorption tracker may lose track of the player when doing things like shard transfers, so reset absorption
+		AbsorptionUtils.setAbsorption(player, 0, -1);
 
 		/* Get the old ability list and run invalidate() on all of them to clean up lingering runnables */
 		if (mAbilities.containsKey(player.getUniqueId())) {

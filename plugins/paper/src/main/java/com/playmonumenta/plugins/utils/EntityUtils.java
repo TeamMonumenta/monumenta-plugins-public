@@ -94,9 +94,31 @@ public class EntityUtils {
 		    EntityType.DROWNED
 	);
 
+	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
+			EntityType.CREEPER,
+			EntityType.BLAZE,
+			EntityType.ENDERMAN,
+			EntityType.ENDERMITE,
+			EntityType.WOLF,
+			EntityType.OCELOT
+	);
+
+	private static final EnumSet<EntityType> HUMANOID_MOBS = EnumSet.of(
+			EntityType.VINDICATOR,
+			EntityType.ILLUSIONER,
+			EntityType.EVOKER,
+			EntityType.VEX,
+			EntityType.WITCH,
+			EntityType.IRON_GOLEM
+	);
+
+	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static final Map<LivingEntity, Integer> CONFUSED_MOBS = new HashMap<LivingEntity, Integer>();
 	private static BukkitRunnable mobsTracker = null;
+
+	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 
 	private static void startTracker(Plugin plugin) {
 		mobsTracker = new BukkitRunnable() {
@@ -106,8 +128,30 @@ public class EntityUtils {
 			public void run() {
 				mRotation += 20;
 
+				Iterator<Map.Entry<LivingEntity, Integer>> coolingIter = COOLING_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> confusedIter = CONFUSED_MOBS.entrySet().iterator();
+
+				while (coolingIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> cooling = coolingIter.next();
+					LivingEntity mob = cooling.getKey();
+					COOLING_MOBS.put(mob, cooling.getValue() - 1);
+
+					if (cooling.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 10);
+
+						if (mob instanceof Mob) {
+							Location mobLoc = mob.getLocation();
+							List<Player> nearbyPlayers = PlayerUtils.playersInRange(mobLoc, 8);
+							if (nearbyPlayers.size() > 0) {
+								nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(mobLoc) <= e2.getLocation().distance(mobLoc) ? 1 : -1);
+								((Mob) mob).setTarget(nearbyPlayers.get(0));
+							}
+						}
+
+						coolingIter.remove();
+					}
+				}
 
 				while (stunnedIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> stunned = stunnedIter.next();
@@ -157,6 +201,16 @@ public class EntityUtils {
 
 	public static boolean isUndead(LivingEntity mob) {
 		return UNDEAD_MOBS.contains(mob.getType());
+	}
+
+	// Affected by Slayer
+	public static boolean isBeast(LivingEntity mob) {
+		return BEAST_MOBS.contains(mob.getType());
+	}
+
+	// Affected by Duelist
+	public static boolean isHumanoid(LivingEntity mob) {
+		return HUMANOID_MOBS.contains(mob.getType());
 	}
 
 	public static boolean isElite(Entity entity) {
@@ -582,13 +636,52 @@ public class EntityUtils {
 		return target;
 	}
 
-	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob) {
+	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob, Player player) {
 		mob.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 		mob.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 		mob.setFireTicks(ticks);
+
+		// Inferno detects a damage event (since it can light fire resistant mobs "on fire"), so do some damage
+		// We need to do this even for abilities that deal damage, since the damage events might not occur due to iFrames
+		int iFrames = mob.getNoDamageTicks();
+		Vector velocity = mob.getVelocity();
+		mob.setNoDamageTicks(0);
+		EntityUtils.damageEntity(plugin, mob, 0.001, player, null, false, null, false, false);
+		mob.setNoDamageTicks(iFrames);
+		mob.setVelocity(velocity);
 	}
 
-	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	public static boolean isCooling(Entity mob) {
+		return COOLING_MOBS.containsKey(mob);
+	}
+
+	public static void removeCooling(LivingEntity mob) {
+		COOLING_MOBS.put(mob, 0);
+	}
+
+	// Used when a mob is rendered immobile as a result of its own actions, e.g. TP-Behind; behaves similarly to stun
+	public static void applyCooling(Plugin plugin, int ticks, LivingEntity mob) {
+		if (mobsTracker == null || mobsTracker.isCancelled()) {
+			startTracker(plugin);
+		}
+
+		if (mob instanceof Mob) {
+			((Mob) mob).setTarget(null);
+		}
+
+		if (mob instanceof Vex) {
+			mob.setVelocity(new Vector(0, 0, 0));
+		}
+
+		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
+		Integer t = COOLING_MOBS.get(mob);
+		if (t == null) {
+			mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 10);
+		}
+		if (t == null || t < ticks) {
+			COOLING_MOBS.put(mob, ticks);
+		}
+	}
 
 	public static boolean isStunned(Entity mob) {
 		return STUNNED_MOBS.containsKey(mob);
@@ -624,8 +717,6 @@ public class EntityUtils {
 			STUNNED_MOBS.put(mob, ticks);
 		}
 	}
-
-	private static final Particle.DustOptions CONFUSION_COLOR = new Particle.DustOptions(Color.fromRGB(62, 0, 102), 1.0f);
 
 	public static boolean isConfused(Entity mob) {
 		return CONFUSED_MOBS.containsKey(mob);

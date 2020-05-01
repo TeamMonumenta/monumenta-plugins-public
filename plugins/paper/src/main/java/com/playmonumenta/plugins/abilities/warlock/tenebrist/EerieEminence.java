@@ -10,27 +10,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-
-/*
- * Eerie Eminence: Provides a debuff aura around the player with a radius of 6 / 8 depending
- * on the spells you cast within the last 10 seconds:
- * Grasping Claws -> Slowness I
- * Consuming Flames -> Light nearby mobs on fire
- * Fractal Enervation -> Mining Fatigue I
- * Withering Gaze -> Wither I
- * At level 2, the aura also gives the opposite buff to nearby players, including self (Consuming Flames extinguishes players).
- */
 
 public class EerieEminence extends Ability {
 
@@ -105,11 +93,7 @@ public class EerieEminence extends Ability {
 				if (entry.getDebuff() == null) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
 						if (mob.getFireTicks() <= 0) {
-							// Inferno registers based off of damage events, so we need to cause damage
-							Vector velocity = mob.getVelocity();
-							EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, MagicType.DARK_MAGIC, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
-							mob.setVelocity(velocity);
-							EntityUtils.applyFire(mPlugin, 100, mob);
+							EntityUtils.applyFire(mPlugin, 100, mob, mPlayer);
 						}
 					}
 

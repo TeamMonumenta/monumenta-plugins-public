@@ -75,7 +75,7 @@ public class ConsumingFlames extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CONSUMING_FLAMES_RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
-			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob);
+			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));

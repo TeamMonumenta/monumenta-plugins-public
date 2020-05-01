@@ -8,11 +8,11 @@ import org.bukkit.plugin.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 
-public class BombTossStrongNoBlockBreakBoss extends BossAbilityGroup {
-	public static final String identityTag = "boss_bombtossstrongnoblockbreak";
+public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
+	public static final String identityTag = "boss_bombtossnoblockbreak";
 	public static final int detectionRange = 20;
 
-	private static final int EXPLOSION_RADIUS = 6;
+	private static final int EXPLOSION_RADIUS = 4;
 
 	LivingEntity mBoss;
 
@@ -20,7 +20,7 @@ public class BombTossStrongNoBlockBreakBoss extends BossAbilityGroup {
 		return new BombTossBoss(plugin, boss);
 	}
 
-	public BombTossStrongNoBlockBreakBoss(Plugin plugin, LivingEntity boss) {
+	public BombTossNoBlockBreakBoss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(

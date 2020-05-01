@@ -8,20 +8,17 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -81,28 +78,14 @@ public class Exorcism  extends Ability {
 			mPlayer.setFireTicks(1);
 		}
 
-		for (Entity e : mPlayer.getNearbyEntities(EXORCISM_RANGE, EXORCISM_RANGE * 2, EXORCISM_RANGE)) {
-			if (EntityUtils.isHostileMob(e)) {
-				LivingEntity mob = (LivingEntity) e;
-
-				for (PotionEffect debuff : debuffs) {
-					PotionUtils.applyPotion(mPlayer, mob, debuff);
-				}
-				if (onFire == true) {
-					// Tags the mobs with the damager so that they drop xp if they die due to the fire.
-					// Sets iFrames to not influence any damage stacking.
-					int ticks = mob.getNoDamageTicks();
-					mob.setNoDamageTicks(0);
-					Vector v = mob.getVelocity();
-					// This won't proc Perspicacity unless we rework how that enchantment works
-					// This is because it doesn't call the CustomDamageEvent
-					EntityUtils.damageEntity(mPlugin, mob, 0.01, mPlayer, MagicType.DARK_MAGIC, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
-					mob.setVelocity(v);
-					mob.setNoDamageTicks(ticks);
-					EntityUtils.applyFire(mPlugin, EXORCISM_DURATION, mob);
-				}
-				mWorld.spawnParticle(Particle.SQUID_INK, e.getLocation(), 40, 0.1, 0.2, 0.1, 0.15);
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), EXORCISM_RANGE)) {
+			for (PotionEffect debuff : debuffs) {
+				PotionUtils.applyPotion(mPlayer, mob, debuff);
 			}
+			if (onFire) {
+				EntityUtils.applyFire(mPlugin, EXORCISM_DURATION, mob, mPlayer);
+			}
+			mWorld.spawnParticle(Particle.SQUID_INK, mob.getLocation(), 40, 0.1, 0.2, 0.1, 0.15);
 		}
 
 		// a cool particle effect on the player would be nice too

@@ -58,7 +58,7 @@ import com.playmonumenta.plugins.bosses.bosses.BerserkerBoss;
 import com.playmonumenta.plugins.bosses.bosses.BlastResistBoss;
 import com.playmonumenta.plugins.bosses.bosses.BlockBreakBoss;
 import com.playmonumenta.plugins.bosses.bosses.BombTossBoss;
-import com.playmonumenta.plugins.bosses.bosses.BombTossStrongNoBlockBreakBoss;
+import com.playmonumenta.plugins.bosses.bosses.BombTossNoBlockBreakBoss;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.CAxtal;
 import com.playmonumenta.plugins.bosses.bosses.CShuraPhaseOne;
@@ -205,7 +205,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> new IceAspectBoss(p, e));
 		mStatelessBosses.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new TsunamiChargerBoss(p, e));
 		mStatelessBosses.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossBoss(p, e));
-		mStatelessBosses.put(BombTossStrongNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossStrongNoBlockBreakBoss(p, e));
+		mStatelessBosses.put(BombTossNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossNoBlockBreakBoss(p, e));
 		mStatelessBosses.put(RejuvenationBoss.identityTag, (Plugin p, LivingEntity e) -> new RejuvenationBoss(p, e));
 		mStatelessBosses.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new HandSwapBoss(p, e));
 		mStatelessBosses.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> new UnstableBoss(p, e));
@@ -303,7 +303,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(CShuraPhaseTwo.identityTag, (Plugin p, LivingEntity e) -> CShuraPhaseTwo.deserialize(p, e));
 		mBossDeserializers.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> TsunamiChargerBoss.deserialize(p, e));
 		mBossDeserializers.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossBoss.deserialize(p, e));
-		mBossDeserializers.put(BombTossStrongNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossStrongNoBlockBreakBoss.deserialize(p, e));
+		mBossDeserializers.put(BombTossNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> BombTossNoBlockBreakBoss.deserialize(p, e));
 		mBossDeserializers.put(RejuvenationBoss.identityTag, (Plugin p, LivingEntity e) -> RejuvenationBoss.deserialize(p, e));
 		mBossDeserializers.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> HandSwapBoss.deserialize(p, e));
 		mBossDeserializers.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> UnstableBoss.deserialize(p, e));

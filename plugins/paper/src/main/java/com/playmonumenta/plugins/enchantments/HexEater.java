@@ -43,7 +43,7 @@ public class HexEater implements BaseEnchantment {
 		}
 
 		if (effects > 0) {
-			event.setDamage(event.getDamage() + (level * effects));
+			event.setDamage(event.getDamage() + level * effects * player.getCooledAttackStrength(0));
 			player.getWorld().spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}
 	}

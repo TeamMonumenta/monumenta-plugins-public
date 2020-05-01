@@ -43,6 +43,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		super.constructBoss(plugin, identityTag, mBoss, null, null, detectionRange, null);
 	}
 
+	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 
@@ -64,18 +65,17 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		event.setCancelled(true);
 	}
 
+	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
 			Player player = (Player)event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				float absorp = AbsorptionUtils.getAbsorption(player);
-				absorp -= 2;
-				AbsorptionUtils.setAbsorption(player, absorp);
+				AbsorptionUtils.subtractAbsorption(player, 2);
 
 				Location loc = player.getLocation().add(0, 1.4, 0);
 				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);
 				loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
-				if (absorp <= 0) {
+				if (AbsorptionUtils.getAbsorption(player) <= 0) {
 					if (mBoss.getCustomName() != null) {
 						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getCustomName()));
 					}
@@ -85,10 +85,12 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		}
 	}
 
+	@Override
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		event.getAffectedEntities().remove(mBoss);
 	}
 
+	@Override
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
 		event.getAffectedEntities().remove(mBoss);
 	}

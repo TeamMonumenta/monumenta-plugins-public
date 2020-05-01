@@ -94,7 +94,7 @@ public class HolyJavelin extends Ability {
 					} else {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
 					}
-					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob);
+					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob, mPlayer);
 					iter.remove();
 				}
 			}

@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -65,6 +66,11 @@ public class Adrenaline implements BaseEnchantment {
 		mRunnables.put(player.getUniqueId(), runnable);
 	}
 
+	@Override
+	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) {
+		mRunnables.get(player.getUniqueId()).cancel();
+	}
+
 	private void applyEffects(Plugin plugin, Player player, int level) {
 		if (player.hasMetadata(ADRENALINE_METAKEY)) {
 			plugin.getLogger().warning("Tried to apply Adrenaline to player '" + player.getName() + "' that already has it!");
@@ -78,4 +84,5 @@ public class Adrenaline implements BaseEnchantment {
 		player.setWalkSpeed(player.getWalkSpeed() - (player.getMetadata(ADRENALINE_METAKEY).get(0).asInt() * 0.02f));
 		player.removeMetadata(ADRENALINE_METAKEY, plugin);
 	}
+
 }

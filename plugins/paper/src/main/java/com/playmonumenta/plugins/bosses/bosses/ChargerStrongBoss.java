@@ -12,7 +12,7 @@ public class ChargerStrongBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_chargerstrong";
 	public static final int detectionRange = 20;
 
-	private static final int DAMAGE = 30;
+	private static final int DAMAGE = 25;
 
 	LivingEntity mBoss;
 

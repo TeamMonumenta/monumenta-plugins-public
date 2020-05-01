@@ -168,10 +168,10 @@ public class BossUtils {
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	
+
 	public static boolean bossDamagePercent(@Nonnull LivingEntity boss, @Nonnull Player target, double percentHealth, @Nullable Location source, @Nullable BossAbilityDamageEventModifier modifier, boolean raw) {
 		if (target instanceof Player) {
-			Player player = (Player) target;
+			Player player = target;
 			if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
 				return true;
 			}
@@ -199,7 +199,7 @@ public class BossUtils {
 
 		// Resistance reduces percent HP damage
 		percentHealth *= (1 - 0.2*resistance);
-		
+
 		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * percentHealth);
 		if (raw) {
 			toTake = percentHealth;
@@ -238,10 +238,10 @@ public class BossUtils {
 				} else {
 					if (absorp > 0) {
 						if (absorp - toTake > 0) {
-							AbsorptionUtils.setAbsorption(target, (float) (absorp - toTake));
+							AbsorptionUtils.setAbsorption(target, (float) (absorp - toTake), -1);
 							toTake = 0;
 						} else {
-							AbsorptionUtils.setAbsorption(target, 0f);
+							AbsorptionUtils.setAbsorption(target, 0f, -1);
 							toTake -= absorp;
 						}
 					}
@@ -254,7 +254,7 @@ public class BossUtils {
 		}
 		return true;
 	}
-	
+
 	public static int getPlayersInRangeForHealthScaling(Entity entity, double radius) {
 		return getPlayersInRangeForHealthScaling(entity.getLocation(), radius);
 	}

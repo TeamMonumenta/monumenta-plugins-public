@@ -8,12 +8,15 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * About damn time someone fixed this crappy ability.
@@ -110,6 +113,17 @@ public class SpellBaseAoE extends Spell {
 
 	@Override
 	public void run() {
+		// Don't cast if no player in sight, e.g. should not initiate cast through a wall
+		boolean hasLineOfSight = false;
+		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius * 4)) {
+			if (LocationUtils.hasLineOfSight(mLauncher, player)) {
+				hasLineOfSight = true;
+				break;
+			}
+		}
+		if (!hasLineOfSight) {
+			return;
+		}
 
 		if (!mCanMoveWhileCasting) {
 			((LivingEntity) mLauncher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));

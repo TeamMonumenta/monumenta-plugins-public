@@ -11,8 +11,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -27,18 +25,24 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
+	private static final int IRON_TINCTURE_1_ABSORPTION = 8;
+	private static final int IRON_TINCTURE_2_ABSORPTION = 12;
+	private static final int IRON_TINCTURE_ABSORPTION_DURATION = 20 * 50;
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
+
+	private final int mAbsorption;
 
 	public IronTincture(Plugin plugin, World world, Random random, Player player) {
 		super(plugin, world, random, player, "Iron Tincture");
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
-		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain Absorption II for 50s. If an ally walks over it, or is hit by it, you both gain the Absorption II (4 Hearts). If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown 50s.");
-		mInfo.mDescriptions.add("Increase the effect to Absorption III (6 Hearts)");
+		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50 seconds.");
+		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
 		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mAbsorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
 	}
 
 	@Override
@@ -116,14 +120,7 @@ public class IronTincture extends Ability {
 	}
 
 	private void execute(Player player) {
-		// Do not allow Absorption stacking with WardingRemedy and Amalgam:
-		// If current Absorption is less than Tincture Absorption, remove all Absorption and apply Tincture.
-		// Otherwise, do not apply Tincture.
-		int absorptionAmplifier = getAbilityScore();
-		if ((absorptionAmplifier + 1) * 4 > AbsorptionUtils.getAbsorption(player)) {
-			AbsorptionUtils.setAbsorption(player, 0);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, IRON_TINCTURE_USE_COOLDOWN, absorptionAmplifier));
-		}
+		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, IRON_TINCTURE_ABSORPTION_DURATION);
 
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 		mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);

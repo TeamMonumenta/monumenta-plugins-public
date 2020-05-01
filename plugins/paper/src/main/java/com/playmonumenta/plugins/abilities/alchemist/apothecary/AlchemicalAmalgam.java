@@ -29,15 +29,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
-/*
- * Shift left click with an bow to shoot a mixture
- * that deals 8 / 16 damage to every enemy touched and adds 2 / 3
- * absorption health to players (including yourself), maximum 12.
- * After hitting a block or travelling 10 blocks, the mixture traces
- * and returns to you, able to damage enemies and shield allies a
- * second time. Cooldown: 30 seconds.
- */
-
 public class AlchemicalAmalgam extends Ability {
 
 	private static final int AMALGAM_1_DAMAGE = 8;
@@ -45,8 +36,9 @@ public class AlchemicalAmalgam extends Ability {
 	private static final int AMALGAM_1_SHIELD = 2;
 	private static final int AMALGAM_2_SHIELD = 3;
 	private static final int AMALGAM_MAX_SHIELD = 12;
+	private static final int AMALGAM_ABSORPTION_DURATION = 20 * 30;
 	// Calculate the range with MAX_DURATION * MOVE_SPEED
-	private static final int AMALGAM_MAX_DURATION = (int) (20 * 2);
+	private static final int AMALGAM_MAX_DURATION = 20 * 2;
 	private static final double AMALGAM_MOVE_SPEED = 0.25;
 	private static final double AMALGAM_RADIUS = 1.5;
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
@@ -59,7 +51,7 @@ public class AlchemicalAmalgam extends Ability {
 		super(plugin, world, random, player, "Alchemical Amalgam");
 		mInfo.scoreboardId = "Alchemical";
 		mInfo.mShorthandName = "AAm";
-		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30 seconds.");
+		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), lasting 30 seconds, maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30 seconds.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 3 and damage is increased to 16.");
 		mInfo.cooldown = 20 * 30;
 		mInfo.linkedSpell = Spells.ALCHEMICAL_AMALGAM;
@@ -76,7 +68,7 @@ public class AlchemicalAmalgam extends Ability {
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
 		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1);
 
-		AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
+		AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD, AMALGAM_ABSORPTION_DURATION);
 		putOnCooldown();
 
 		new BukkitRunnable() {
@@ -108,7 +100,7 @@ public class AlchemicalAmalgam extends Ability {
 				while (playerIter.hasNext()) {
 					Player player = playerIter.next();
 					if (mBox.overlaps(player.getBoundingBox())) {
-						AbsorptionUtils.addAbsorption(player, mShield, AMALGAM_MAX_SHIELD);
+						AbsorptionUtils.addAbsorption(player, mShield, AMALGAM_MAX_SHIELD, AMALGAM_ABSORPTION_DURATION);
 						playerIter.remove();
 					}
 				}
@@ -136,7 +128,7 @@ public class AlchemicalAmalgam extends Ability {
 
 				if (mReverse) {
 					if (mTicks <= 0) {
-						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD);
+						AbsorptionUtils.addAbsorption(mPlayer, mShield, AMALGAM_MAX_SHIELD, AMALGAM_ABSORPTION_DURATION);
 						mWorld.playSound(mLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.2f, 2.4f);
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.5);
 						mWorld.spawnParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), 8, 0.35, 0.5, 0.35);

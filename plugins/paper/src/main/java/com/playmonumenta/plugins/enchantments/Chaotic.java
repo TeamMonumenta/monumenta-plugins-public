@@ -39,6 +39,6 @@ public class Chaotic implements BaseEnchantment {
 			rand = rand / 2;
 		}
 
-		event.setDamage(Math.max(0, event.getDamage() + rand));
+		event.setDamage(Math.max(0, event.getDamage() + rand * player.getCooledAttackStrength(0)));
 	}
 }

@@ -22,13 +22,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 
-/*
- * Right click while looking up to prime the next right click within 10s
- * to summon a meteor where the player is looking (up to 25 blocks),
- * dealing 20 / 36 damage in a 5 - block radius and setting mobs on fire
- * for 3s. Does not activate mana lance. Cooldown 18 s
- */
-
 public class Starfall extends Ability {
 	private static final int STARFALL_PRIMED_TICKS = 20 * 10;
 	private static final double STARFALL_ANGLE = 70.0;
@@ -38,6 +31,8 @@ public class Starfall extends Ability {
 	private static final int STARFALL_2_DAMAGE = 36;
 	private static final int STARFALL_FIRE_DURATION = 20 * 3;
 	private static final double STARFALL_RADIUS = 5;
+
+	private final int mDamage;
 
 	/* The player's getTicksLived() when the skill was last primed or cast */
 	private int mPrimedTick = -1;
@@ -51,6 +46,7 @@ public class Starfall extends Ability {
 		mInfo.mDescriptions.add("Damage is increased to 36.");
 		mInfo.cooldown = STARFALL_COOLDOWN;
 		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mDamage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
 	}
 
 	@Override
@@ -103,7 +99,6 @@ public class Starfall extends Ability {
 	}
 
 	private void launchMeteor(final Player player, final Location loc) {
-		double damage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
 		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
 		new BukkitRunnable() {
@@ -123,11 +118,11 @@ public class Starfall extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									EntityUtils.damageEntity(mPlugin, e, (float)(damage * 0.75), player, MagicType.FIRE, true, mInfo.linkedSpell);
+									EntityUtils.damageEntity(mPlugin, e, mDamage * 0.75, player, MagicType.FIRE, true, mInfo.linkedSpell);
 								} else {
-									EntityUtils.damageEntity(mPlugin, e, (float) damage, player, MagicType.FIRE, true, mInfo.linkedSpell);
+									EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.linkedSpell);
 								}
-								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e);
+								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e, mPlayer);
 
 								Vector v = e.getLocation().toVector().subtract(loc.toVector()).normalize();
 								v.add(new Vector(0, 0.2, 0));
