@@ -76,6 +76,11 @@ public class SplitArrow extends Ability {
 				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
+				
+				if (arrow.getFireTicks() > 0) {
+					// Since Flame sets enemies on fire for 5 seconds.
+					nearestMob.setFireTicks(100);
+				}
 			}
 		}
 

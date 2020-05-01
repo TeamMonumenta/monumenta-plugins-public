@@ -73,7 +73,7 @@ public class DeadlyRonde extends Ability {
 				@Override
 				public void run() {
 					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR);
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 5, 0, true, false));
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 5, 0));
 					if (activeRunnable == null) {
 						this.cancel();
 					}
