@@ -68,7 +68,7 @@ public class Starfall extends Ability {
 			if (lookingUp) {
 				// Looking up - prime starfall
 				mPrimedTick = mPlayer.getTicksLived();
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.1f);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.1f);
 				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Starfall primed!");
 			}
 

@@ -158,7 +158,7 @@ public class Azacor extends BossAbilityGroup {
 		} else if (rand == 3) {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:wither_skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {Tags:[\"Boss\",\"boss_flamenova\",\"boss_generic\"],HurtByTimestamp:0,Attributes:[{Base:" + eliteHealth * 0.75 + "d,Name:\"generic.maxHealth\"},{Base:0.0d,Name:\"generic.knockbackResistance\"},{Base:0.29d,Name:\"generic.movementSpeed\"},{Base:0.0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:100.0d,Name:\"generic.followRange\"},{Base:5.0d,Name:\"generic.attackDamage\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:0b,Spigot.ticksLived:133,Motion:[0.009843517136819713d,-0.0784000015258789d,-0.0730011114372536d],Leashed:0b,Health:" + eliteHealth + "f,Bukkit.updateLevel:2,LeftHanded:0b,Air:300s,OnGround:1b,Dimension:0,HandItems:[{id:\"minecraft:blaze_rod\",Count:1b,tag:{display:{Name:\"{\\\"text\\\":\\\"§5§lHell\\\\u0027s Fury\\\"}\"},Enchantments:[{lvl:3s,id:\"minecraft:sharpness\"},{lvl:2s,id:\"minecraft:knockback\"},{lvl:5s,id:\"minecraft:fire_aspect\"}],AttributeModifiers:[{UUIDMost:69502167760309831L,UUIDLeast:25155512585813018L,Amount:0.12d,Slot:\"mainhand\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"generic.movementSpeed\"}]}},{id:\"minecraft:blaze_powder\",Count:1b,tag:{display:{Name:\"{\\\"text\\\":\\\"§4§lSoul of Conflagration\\\"}\"},Enchantments:[{lvl:3s,id:\"minecraft:fire_aspect\"}],AttributeModifiers:[{UUIDMost:-7769405553159353316L,UUIDLeast:-5980438255535144460L,Amount:0.16d,Slot:\"offhand\",AttributeName:\"generic.attackSpeed\",Operation:1,Name:\"Modifier\"},{UUIDMost:6881167597771049715L,UUIDLeast:-5128578317340387122L,Amount:1.5d,Slot:\"offhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]}}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],CustomName:\"{\\\"text\\\":\\\"§r§4§lVerkan\\\\u0027tal the Cunning\\\"}\",Pos:[-720.0716621107997d,67.0d,-1455.2620444425788d],Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:3284283,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Boots\\\"}\"},Enchantments:[{lvl:5s,id:\"minecraft:projectile_protection\"}]}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:5386337,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Pants\\\"}\"},Enchantments:[{lvl:5s,id:\"minecraft:feather_falling\"}]}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:6962813,Name:\"{\\\"text\\\":\\\"§c§lDemoncaller Tunic\\\"}\"},Enchantments:[{lvl:20s,id:\"minecraft:blast_protection\"}]}},{id:\"minecraft:player_head\",Count:1b,tag:{SkullOwner:{Id:\"69d62fc7-fcb3-4687-b076-8d1230d8344d\",Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDdlNjM3ZjFjYTczNWVmMzU0NjdhNjI3NTlkYWU0MWNmNGZmYjVjMmMxNGFhZDQyZWE4YWNlOWJjN2U2OGVjIn19fQ==\"}]}}}}],CanPickUpLoot:0b,HurtTime:0s,WorldUUIDLeast:-7560693509725274339L,Team:\"Azac\"}");
 		}
-		if (tellraw != null && tellraw.isEmpty()) {
+		if (tellraw != null && !tellraw.isEmpty()) {
 			PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange, tellraw);
 		}
 	}
@@ -179,19 +179,19 @@ public class Azacor extends BossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		//launch event related spawn commands
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "effect give @s minecraft:blindness 2 2");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"Azacor\",\"color\":\"dark_gray\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s subtitle [\"\",{\"text\":\"The Dark Summoner\",\"color\":\"gray\",\"bold\":true}]");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "effect give @s minecraft:blindness 2 2");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s title [\"\",{\"text\":\"Azacor\",\"color\":\"dark_gray\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "title @s subtitle [\"\",{\"text\":\"The Dark Summoner\",\"color\":\"gray\",\"bold\":true}]");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
 
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange)) {
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
+		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange)) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}

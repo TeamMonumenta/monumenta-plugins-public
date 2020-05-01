@@ -90,7 +90,7 @@ public class EscapeDeath extends Ability {
 		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
 		if (lastDamage != null && lastDamage.getCause() == DamageCause.ENTITY_ATTACK) {
 			double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
-			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER) {
+			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER && lastDamage.getFinalDamage() > 0) {
 				return true;
 			}
 		}
