@@ -189,6 +189,9 @@ public class EnchantmentManager implements Listener {
 	 */
 	public void updateItemProperties(int index, Map<BaseEnchantment, Integer> propertyMap, Map<Integer, Map<BaseEnchantment, Integer>> inventoryMap, Player player, Plugin plugin) {
 		try {
+			if (index == -999) {
+				return;
+			}
 
 			final PlayerInventory inv = player.getInventory();
 			ItemStack item = inv.getItem(index);
