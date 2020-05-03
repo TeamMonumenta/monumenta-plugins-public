@@ -4,9 +4,8 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
@@ -77,7 +76,7 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (testRandomChance()) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}
@@ -85,7 +84,7 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerThrewLingeringPotionEvent(LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
 		if (testRandomChance()) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}

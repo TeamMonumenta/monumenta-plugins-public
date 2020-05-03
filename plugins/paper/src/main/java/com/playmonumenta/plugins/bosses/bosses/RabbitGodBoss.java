@@ -77,7 +77,7 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 25, 10, false, 12, 6,
 			(Player player) -> {
 				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.5f, 0.5f);
 			},
 			// Warning particles

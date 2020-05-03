@@ -72,8 +72,8 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(50, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[\",\"color\":\"gold\"},{\"text\":\"C'Shura\",\"color\":\"dark_red\",\"bold\":true},{\"text\":\"] \",\"color\":\"gold\",\"bold\":false},{\"text\":\"Z'CUN, DIE ALREADY!\",\"color\":\"red\"}]");
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0), true);
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 0), true);
+			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 12000, 0));
+			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 12000, 0));
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 5)) {
 				Vector dir = player.getLocation().subtract(mBoss.getLocation().toVector()).toVector().multiply(1.0f);
 				dir.setY(0.5f);
@@ -108,6 +108,7 @@ public class CShuraPhaseTwo extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.7");
 	}
 
+	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		int rand = mRand.nextInt(4);
 		LivingEntity target = (LivingEntity) event.getEntity();

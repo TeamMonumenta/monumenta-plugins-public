@@ -8,7 +8,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -60,7 +59,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (InventoryUtils.testForItemWithName(potion.getItem(), "Alchemist's Potion")) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));

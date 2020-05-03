@@ -64,7 +64,7 @@ public class TCalin extends BossAbilityGroup {
 		SpellBaseCharge charge = new SpellBaseCharge(plugin, mBoss, 20, 25, true,
 			(Player player) -> {
 				boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
 			},
 			// Warning particles

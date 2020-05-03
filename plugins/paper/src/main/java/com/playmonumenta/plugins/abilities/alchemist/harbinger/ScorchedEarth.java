@@ -14,7 +14,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -105,21 +104,21 @@ public class ScorchedEarth extends Ability {
 							iter.remove();
 						} else {
 							timer.setValue(timer.getValue() - 1);
-							
+
 							Location loc = entry.getKey();
-							
+
 							mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 2.1, 0.3, 2.1, 0);
 							mWorld.spawnParticle(Particle.FLAME, loc, 1, 2, 0.1, 2, 0.1f);
 							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
 							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
-							
+
 							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin(timer.getValue() % 40 / 20.0 * Math.PI), 0, 5 * Math.cos(timer.getValue() % 40 / 20.0 * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
 							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * Math.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
-							
+
 							if (timer.getValue() % 4 == 0) {
 								mWorld.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);
 							}
-							
+
 							if (timer.getValue() % 120 == 0 && timer.getValue() > 1) {
 								mWorld.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
 							}
@@ -181,7 +180,7 @@ public class ScorchedEarth extends Ability {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mCharges > 0 && mPlayer.isSneaking()
 				&& InventoryUtils.testForItemWithName(mPlayer.getInventory().getItemInMainHand(), "Alchemist's Potion")) {
 			potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
@@ -202,11 +201,11 @@ public class ScorchedEarth extends Ability {
 			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.5, 1, 0.4, 60);
 			mWorld.spawnParticle(Particle.FLAME, loc, 40, 2.1, 0.5, 2.1, 0.1);
 			mWorld.spawnParticle(Particle.LAVA, loc, 35, 1.5, 0.5, 1.5, 0);
-			
+
 			mWorld.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
 			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
 			mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
-			
+
 			mZoneCenters.put(loc, new AbstractMap.SimpleEntry<Player, Integer>(mPlayer, SCORCHED_EARTH_DURATION));
 		}
 

@@ -20,7 +20,7 @@ public class SpellDashAttack extends SpellBaseCharge {
 		      // Warning sound/particles at boss location and slow boss
 		      (Player player) -> {
 		          boss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0);
-		          boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+		          boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.75f);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.15f);
 		          boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 1f, 0.85f);

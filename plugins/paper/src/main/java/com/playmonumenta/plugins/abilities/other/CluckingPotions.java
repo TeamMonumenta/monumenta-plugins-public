@@ -10,7 +10,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +37,7 @@ public class CluckingPotions extends Ability {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (InventoryUtils.testForItemWithName(potion.getItem(), "Jar of Clucks")) {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.CLOUD);
 			potion.setMetadata("CluckingPotion", new FixedMetadataValue(mPlugin, 0));

@@ -50,8 +50,8 @@ public class SpellSmokeBomb extends Spell {
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
 					BossUtils.bossDamage(mLauncher, player, 2);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1), true);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0), true);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0));
 				}
 			}
 		};
@@ -81,7 +81,7 @@ public class SpellSmokeBomb extends Spell {
 				double rad = (double)(mRadius * w) / 5;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
-					angle = (double)j * increment;
+					angle = j * increment;
 					particleLoc.setX(lloc.getX() + (rad * Math.cos(angle)));
 					particleLoc.setZ(lloc.getZ() + (rad * Math.sin(angle)));
 					particleLoc.setY(lloc.getY() + 1.5);

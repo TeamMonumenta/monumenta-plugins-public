@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

@@ -7,11 +7,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Arrow.PickupStatus;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -61,13 +60,13 @@ public class ThrowingKnife implements BaseEnchantment {
 						arrow.setCritical(true);
 						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 					} else if (item.getType() == Material.SPECTRAL_ARROW) {
-						Arrow arrow = player.launchProjectile(SpectralArrow.class);
+						SpectralArrow arrow = player.launchProjectile(SpectralArrow.class);
 						arrow.setVelocity(dir.clone().multiply(ARROW_VELOCITY));
 						arrow.setCritical(true);
 						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 					} else if (item.getType() == Material.TIPPED_ARROW) {
 						PotionMeta meta = (PotionMeta) item.getItemMeta();
-						TippedArrow arrow = player.launchProjectile(TippedArrow.class);
+						Arrow arrow = player.launchProjectile(Arrow.class);
 						arrow.setBasePotionData(meta.getBasePotionData());
 						if (meta.hasCustomEffects()) {
 							for (PotionEffect effect : meta.getCustomEffects()) {

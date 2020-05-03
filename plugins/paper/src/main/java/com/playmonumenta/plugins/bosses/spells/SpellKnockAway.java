@@ -53,8 +53,8 @@ public class SpellKnockAway extends Spell {
 			public void run() {
 				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius)) {
 					BossUtils.bossDamage(mLauncher, player, 9.0f);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4), true);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1), true);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
 
 					Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
 					dir.setY(0.5f);
@@ -76,7 +76,7 @@ public class SpellKnockAway extends Spell {
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
 				centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, (float)mRadius / 7, (float)(0.5 + mRand.nextInt(150) / 100));
 				centerLoc.getWorld().spawnParticle(Particle.CRIT, centerLoc, 10, 1, 1, 1, 0.01);
-				mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3), true);
+				mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3));
 			}
 		};
 
@@ -90,7 +90,7 @@ public class SpellKnockAway extends Spell {
 				double rad = (double)(mRadius * w) / 5;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
-					angle = (double)j * increment;
+					angle = j * increment;
 					particleLoc.setX(lloc.getX() + (rad * Math.cos(angle)));
 					particleLoc.setZ(lloc.getZ() + (rad * Math.sin(angle)));
 					particleLoc.setY(lloc.getY() + 1.5);

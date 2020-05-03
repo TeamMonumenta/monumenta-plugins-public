@@ -11,7 +11,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
@@ -72,21 +71,16 @@ public class Volley extends Ability {
 
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
-				if (arrow instanceof TippedArrow) {
-					TippedArrow tArrow = (TippedArrow)arrow;
-
-					tArrowData = tArrow.getBasePotionData();
+				if (arrow.hasCustomEffects()) {
+					tArrowData = arrow.getBasePotionData();
 					if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
 						// This arrow isn't weakness or slowness - don't store the potion data
 						tArrowData = null;
 					}
 				}
 
-				if (tArrowData == null) {
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, Arrow.class);
-				} else {
-					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, TippedArrow.class);
-				}
+
+				projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, Arrow.class);
 
 				for (Projectile proj : projectiles) {
 					Arrow projArrow = (Arrow)proj;
@@ -94,8 +88,8 @@ public class Volley extends Ability {
 					proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
-					if (tArrowData != null && projArrow instanceof TippedArrow) {
-						((TippedArrow)projArrow).setBasePotionData(tArrowData);
+					if (tArrowData != null) {
+						(projArrow).setBasePotionData(tArrowData);
 					}
 
 					projArrow.setCritical(arrow.isCritical());

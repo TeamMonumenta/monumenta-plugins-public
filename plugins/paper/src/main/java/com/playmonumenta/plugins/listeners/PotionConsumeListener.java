@@ -12,9 +12,8 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -209,14 +208,8 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		//Create item as type splash or lingering and set entity item to the inv potion
-		if (item.getType().equals(Material.SPLASH_POTION)) {
-			SplashPotion potion = (SplashPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
-			potion.setItem(item);
-		} else if (item.getType().equals(Material.LINGERING_POTION)) {
-			LingeringPotion potion = (LingeringPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.LINGERING_POTION);
-			potion.setItem(item);
-
-		}
+		ThrownPotion potion = (ThrownPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
+		potion.setItem(item);
 
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 

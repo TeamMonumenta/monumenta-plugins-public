@@ -30,16 +30,13 @@ import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wither;
@@ -509,7 +506,7 @@ public class EntityListener implements Listener {
 			if (player.getGameMode() == GameMode.ADVENTURE) {
 				event.setCancelled(true);
 			}
-		} else if (damager instanceof Arrow || damager instanceof TippedArrow) {
+		} else if (damager instanceof Arrow) {
 			// If hurt by an arrow from a player in adventure mode.
 			Arrow arrow = (Arrow)damager;
 
@@ -602,7 +599,7 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.TIPPED_ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
+			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
 				Arrow arrow = (Arrow)proj;
 				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
@@ -613,14 +610,18 @@ public class EntityListener implements Listener {
 				// Stores velocity for ability damage calculations
 				AbilityUtils.setArrowVelocityDamageMultiplier(mPlugin, arrow);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
-				SplashPotion potion = (SplashPotion)proj;
-				if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
-					event.setCancelled(true);
-				}
-			} else if (event.getEntityType() == EntityType.LINGERING_POTION) {
-				LingeringPotion potion = (LingeringPotion)proj;
-				if (!mAbilities.playerThrewLingeringPotionEvent(player, potion)) {
-					event.setCancelled(true);
+				ThrownPotion potion = (ThrownPotion)proj;
+				if (potion.getItem() != null) {
+					ItemStack potionItem = potion.getItem();
+					if (potionItem.getType() == Material.SPLASH_POTION) {
+						if (!mAbilities.playerThrewSplashPotionEvent(player, potion)) {
+							event.setCancelled(true);
+						}
+					} else if (potionItem.getType() == Material.LINGERING_POTION) {
+						if (!mAbilities.playerThrewLingeringPotionEvent(player, potion)) {
+							event.setCancelled(true);
+						}
+					}
 				}
 			}
 		}
@@ -831,8 +832,8 @@ public class EntityListener implements Listener {
 		if (entity != null && entity instanceof Player) {
 			Player player = (Player)entity;
 			mAbilities.playerHitByProjectileEvent(player, event);
-			if (type == EntityType.TIPPED_ARROW) {
-				TippedArrow arrow = (TippedArrow)event.getEntity();
+			if (type == EntityType.ARROW) {
+				Arrow arrow = (Arrow)event.getEntity();
 
 				if (player.isBlocking()) {
 					Vector to = player.getLocation().toVector();
@@ -866,7 +867,7 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (type == EntityType.ARROW || type == EntityType.TIPPED_ARROW || type == EntityType.SPECTRAL_ARROW) {
+		if (type == EntityType.ARROW || type == EntityType.SPECTRAL_ARROW) {
 			Arrow arrow = (Arrow)event.getEntity();
 			ProjectileSource source = arrow.getShooter();
 			if (source instanceof Player) {
@@ -887,7 +888,7 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private void removePotionDataFromArrow(TippedArrow arrow) {
+	private void removePotionDataFromArrow(Arrow arrow) {
 		PotionData data = new PotionData(PotionType.AWKWARD);
 		arrow.setBasePotionData(data);
 

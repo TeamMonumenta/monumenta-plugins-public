@@ -5,10 +5,8 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -159,11 +157,11 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		return true;
 	}
 
-	public boolean playerThrewLingeringPotionEvent(LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
 		return true;
 	}
 

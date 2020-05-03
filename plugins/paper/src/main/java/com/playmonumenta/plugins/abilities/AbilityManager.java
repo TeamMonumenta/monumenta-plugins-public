@@ -14,10 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -598,11 +596,11 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.playerShotArrowEvent(arrow));
 	}
 
-	public boolean playerThrewSplashPotionEvent(Player player, SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerThrewSplashPotionEvent(potion));
 	}
 
-	public boolean playerThrewLingeringPotionEvent(Player player, LingeringPotion potion) {
+	public boolean playerThrewLingeringPotionEvent(Player player, ThrownPotion potion) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerThrewLingeringPotionEvent(potion));
 	}
 

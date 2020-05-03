@@ -23,7 +23,7 @@ public class Frost implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Frost";
 	private static final int FROST_DURATION = 20 * 4;
 	private static final String LEVEL_METAKEY = "FrostLevelMetakey";
-	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
+	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
 
 	@Override
 	public String getProperty() {

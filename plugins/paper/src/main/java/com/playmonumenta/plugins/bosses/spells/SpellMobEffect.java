@@ -14,7 +14,7 @@ public class SpellMobEffect extends Spell {
 
 	@Override
 	public void run() {
-		mLauncher.addPotionEffect(mPotion, true);
+		mLauncher.addPotionEffect(mPotion);
 	}
 
 	@Override

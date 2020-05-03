@@ -1,30 +1,26 @@
 package com.playmonumenta.plugins.utils;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_13_R2.ChatMessage;
-import net.minecraft.server.v1_13_R2.DamageSource;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityCreature;
-import net.minecraft.server.v1_13_R2.EntityDamageSource;
-import net.minecraft.server.v1_13_R2.EntityInsentient;
-import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
-import net.minecraft.server.v1_13_R2.IChatBaseComponent;
-import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
-import net.minecraft.server.v1_13_R2.Vec3D;
+import com.playmonumenta.plugins.Plugin;
+
+import net.minecraft.server.v1_15_R1.ChatMessage;
+import net.minecraft.server.v1_15_R1.DamageSource;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.EntityDamageSource;
+import net.minecraft.server.v1_15_R1.EntityLiving;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.IChatBaseComponent;
+import net.minecraft.server.v1_15_R1.Vec3D;
 
 public class NmsUtils {
 	public static void resetPlayerIdleTimer(Player player) {
@@ -33,29 +29,9 @@ public class NmsUtils {
 		playerHandle.resetIdleTimer();
 	}
 
-	private static Class<?> itemClazz = null;
-
 	public static void removeVexSpawnAIFromEvoker(LivingEntity boss) {
-		try {
-			if (itemClazz == null) {
-				itemClazz = Class.forName("net.minecraft.server.v1_13_R2.PathfinderGoalSelector$PathfinderGoalSelectorItem");
-			}
-
-			if (((CraftEntity) boss).getHandle() instanceof EntityInsentient && ((CraftEntity) boss).getHandle() instanceof EntityCreature) {
-				EntityInsentient ei = (EntityInsentient)((CraftEntity) boss).getHandle();
-				Set<?> goalB = (Set<?>) getPrivateField("b", PathfinderGoalSelector.class, ei.goalSelector);
-				Iterator<?> it = goalB.iterator();
-				while (it.hasNext()) {
-					Object selector = it.next();
-					Object goal = getPrivateField("a", itemClazz, selector);
-					if (goal.getClass().getName().equals("net.minecraft.server.v1_13_R2.EntityEvoker$c")) {
-						it.remove();
-					}
-				}
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		/* TODO: This has not yet been ported from 1.13! */
+		Plugin.getInstance().getLogger().severe("Attempted to remove vex spawn from evoker but this code has not been ported from 1.13!");
 	}
 
 	private static class CustomDamageSource extends EntityDamageSource {
@@ -75,7 +51,7 @@ public class NmsUtils {
 		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
 			// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
 			String s = "death.attack.indirectMagic.item";
-			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName(), mKilledUsingMsg});
+			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.x.getScoreboardDisplayName(), mKilledUsingMsg});
 		}
 	}
 
@@ -102,7 +78,7 @@ public class NmsUtils {
 		@Override
 		public IChatBaseComponent getLocalizedDeathMessage(EntityLiving entityliving) {
 			String s = "death.attack.mob";
-			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.w.getScoreboardDisplayName()});
+			return new ChatMessage(s, new Object[] { entityliving.getScoreboardDisplayName(), this.x.getScoreboardDisplayName()});
 		}
 
 	}

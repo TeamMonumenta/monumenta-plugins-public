@@ -69,7 +69,7 @@ jobs:
       run: |
           git clone https://github.com/TeamMonumenta/Paper.git
           cd Paper
-          git checkout 1.13
+          git checkout 1.15
     - name: Build Paper
       working-directory: ./Paper
       run: ./paper jar

@@ -13,6 +13,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,7 +40,7 @@ public class PvP extends Ability {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = mPlayer;
 		if (player.getKiller() != null) {
-			event.setReviveHealth(player.getMaxHealth());
+			event.setReviveHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			Bukkit.broadcastMessage(event.getDeathMessage());
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
@@ -49,7 +51,9 @@ public class PvP extends Ability {
 			ItemStack[] inv = player.getInventory().getContents();
 			for (ItemStack item : inv) {
 				if (item != null && item.getType().getMaxDurability() > 0) {
-					item.setDurability((short) 0);
+					ItemMeta meta = item.getItemMeta();
+					((Damageable) meta).setDamage(item.getType().getMaxDurability());
+					item.setItemMeta(meta);
 				}
 				if (item != null) {
 					mWorld.dropItemNaturally(player.getLocation(), item);

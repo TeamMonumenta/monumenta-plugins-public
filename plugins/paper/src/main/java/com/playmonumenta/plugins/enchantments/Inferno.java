@@ -51,7 +51,7 @@ public class Inferno implements BaseEnchantment {
 	public static final Map<LivingEntity, InfernoMob> sTaggedMobs = new HashMap<LivingEntity, InfernoMob>();
 	private static BukkitRunnable sRunnable = null;
 	private static final Map<LivingEntity, InfernoMob> sPendingTagMobs = new HashMap<LivingEntity, InfernoMob>();
-	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
+	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
 
 	private static final int FIRE_RESISTANT_INFERNO_TICKS = 80;
 

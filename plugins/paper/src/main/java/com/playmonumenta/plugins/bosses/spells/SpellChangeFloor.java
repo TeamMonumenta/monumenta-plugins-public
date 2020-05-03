@@ -95,7 +95,7 @@ public class SpellChangeFloor extends Spell {
 					target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
 					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
 					mBoss.getLocation().getWorld().spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0);
-					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3), true);
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3));
 
 					// Get a list of blocks that should be changed
 					for (int dx = -mRadius; dx < mRadius; dx++) {

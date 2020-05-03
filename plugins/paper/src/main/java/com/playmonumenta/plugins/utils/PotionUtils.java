@@ -320,7 +320,7 @@ public class PotionUtils {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
 				if (!event.isCancelled()) {
-					applied.addPotionEffect(event.getEffect(), true);
+					applied.addPotionEffect(event.getEffect());
 				}
 			}
 		} else {

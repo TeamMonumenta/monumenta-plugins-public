@@ -24,7 +24,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 		(Player player) -> {
 			boss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15);
 			boss.getWorld().spawnParticle(Particle.SWEEP_ATTACK, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15);
-			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4), true);
+			boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
 			boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0f);
 		},
 		// Warning particles

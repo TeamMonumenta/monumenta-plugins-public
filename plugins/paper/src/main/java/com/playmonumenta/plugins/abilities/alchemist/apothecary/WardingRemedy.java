@@ -7,7 +7,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -45,7 +45,7 @@ public class WardingRemedy extends Ability {
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(SplashPotion potion) {
+	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		// This is sufficient because we are already checking conditions in runCheck()
 		// potion.remove() automatically returns the potion to the player
 		potion.remove();

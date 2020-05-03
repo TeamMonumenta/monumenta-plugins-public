@@ -278,10 +278,34 @@ public class LocationUtils {
 		switch (block.getType()) {
 
 		// cases for individual blocks
-		case SIGN:
+		case OAK_SIGN:
 			collides = false;
 			break;
-		case WALL_SIGN:
+		case OAK_WALL_SIGN:
+			collides = false;
+			break;
+		case BIRCH_SIGN:
+			collides = false;
+			break;
+		case BIRCH_WALL_SIGN:
+			collides = false;
+			break;
+		case SPRUCE_SIGN:
+			collides = false;
+			break;
+		case SPRUCE_WALL_SIGN:
+			collides = false;
+			break;
+		case DARK_OAK_SIGN:
+			collides = false;
+			break;
+		case DARK_OAK_WALL_SIGN:
+			collides = false;
+			break;
+		case ACACIA_SIGN:
+			collides = false;
+			break;
+		case ACACIA_WALL_SIGN:
 			collides = false;
 			break;
 		case TURTLE_EGG:

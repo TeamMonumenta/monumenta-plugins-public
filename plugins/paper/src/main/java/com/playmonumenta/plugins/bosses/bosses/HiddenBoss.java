@@ -33,7 +33,7 @@ public class HiddenBoss extends BossAbilityGroup {
 		// Immediately apply the effect, don't wait
 		Spell invis = new SpellRunAction(() -> {
 			if (BossUtils.getPlayersInRangeForHealthScaling(mBoss, visibleRange) < 1) {
-				mBoss.addPotionEffect(potion, true);
+				mBoss.addPotionEffect(potion);
 			}
 		});
 		invis.run();

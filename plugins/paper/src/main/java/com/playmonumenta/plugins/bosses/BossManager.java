@@ -11,16 +11,17 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -38,6 +39,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
@@ -395,16 +397,14 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
-		if (!event.isCancelled()) {
-			Entity[] entities = event.getChunk().getEntities();
+		Entity[] entities = event.getChunk().getEntities();
 
-			for (Entity entity : entities) {
-				if (!(entity instanceof LivingEntity)) {
-					continue;
-				}
-
-				unload((LivingEntity)entity, false);
+		for (Entity entity : entities) {
+			if (!(entity instanceof LivingEntity)) {
+				continue;
 			}
+
+			unload((LivingEntity)entity, false);
 		}
 	}
 
@@ -615,16 +615,19 @@ public class BossManager implements Listener {
 	/* Another weird one - used for exorcism potion */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
-		if (event.getEntityType() == EntityType.LINGERING_POTION) {
-			LingeringPotion potEntity = event.getEntity();
-			if (InventoryUtils.testForItemWithLore(potEntity.getItem(), "Exorcism")) {
-				AreaEffectCloud cloud = event.getAreaEffectCloud();
-				if (event.getAreaEffectCloud() != null) {
-					cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
-					cloud.setRadius(6.5f);
-					cloud.setDurationOnUse(0);
-					cloud.setRadiusOnUse(0);
-					cloud.setRadiusPerTick(-0.004f);
+		if (event.getEntityType() == EntityType.SPLASH_POTION) {
+			ThrownPotion potEntity = event.getEntity();
+			ItemStack potItem = potEntity.getItem();
+			if (potItem.getType() == Material.LINGERING_POTION) {
+				if (InventoryUtils.testForItemWithLore(potItem, "Exorcism")) {
+					AreaEffectCloud cloud = event.getAreaEffectCloud();
+					if (event.getAreaEffectCloud() != null) {
+						cloud.setMetadata("MonumentaBossesGrayExorcism", new FixedMetadataValue(mPlugin, 1));
+						cloud.setRadius(6.5f);
+						cloud.setDurationOnUse(0);
+						cloud.setRadiusOnUse(0);
+						cloud.setRadiusPerTick(-0.004f);
+					}
 				}
 			}
 		}

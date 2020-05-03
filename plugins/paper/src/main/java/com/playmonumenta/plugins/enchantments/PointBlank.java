@@ -25,7 +25,7 @@ public class PointBlank implements BaseEnchantment {
 	private static final int DAMAGE_PER_LEVEL = 2;
 	private static final String LEVEL_METAKEY = "PointBlankLevelMetakey";
 	private static final String LOCATION_METAKEY = "PointBlankLocationMetakey";
-	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.TIPPED_ARROW, EntityType.SPECTRAL_ARROW);
+	private static final EnumSet<EntityType> ALLOWED_PROJECTILES = EnumSet.of(EntityType.ARROW, EntityType.SPECTRAL_ARROW);
 
 	@Override
 	public String getProperty() {

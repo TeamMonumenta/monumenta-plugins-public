@@ -41,7 +41,7 @@ public class SpellMinionResist extends Spell {
 
 			for (Entity e : mLauncher.getNearbyEntities(mRange, mRange, mRange)) {
 				if (mTeam.equals(mScoreboard.getEntryTeam(e.getUniqueId().toString()))) {
-					mLauncher.addPotionEffect(mPotion, true);
+					mLauncher.addPotionEffect(mPotion);
 				}
 			}
 		}

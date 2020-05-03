@@ -38,7 +38,7 @@ import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
-import org.bukkit.entity.SplashPotion;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vex;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
@@ -408,8 +408,8 @@ public class EntityUtils {
 		return cloud;
 	}
 
-	public static SplashPotion spawnCustomSplashPotion(World world, Player player, ItemStack potionStack, Location loc) {
-		SplashPotion potion = (SplashPotion)world.spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
+	public static ThrownPotion spawnCustomSplashPotion(World world, Player player, ItemStack potionStack, Location loc) {
+		ThrownPotion potion = (ThrownPotion)world.spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
 		potion.setShooter(player);
 		potion.setItem(potionStack);
 

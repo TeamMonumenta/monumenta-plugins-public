@@ -7,11 +7,11 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -107,8 +107,8 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		if (event.getEntity() instanceof TippedArrow) {
-			TippedArrow arrow = (TippedArrow) event.getEntity();
+		if (event.getEntity() instanceof Arrow && ((Arrow) event.getEntity()).hasCustomEffects()) {
+			Arrow arrow = (Arrow) event.getEntity();
 			PotionData data = new PotionData(PotionType.MUNDANE);
 			arrow.setBasePotionData(data);
 			arrow.clearCustomEffects();
