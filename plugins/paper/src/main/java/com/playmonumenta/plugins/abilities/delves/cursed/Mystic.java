@@ -20,13 +20,12 @@ public class Mystic extends StatMultiplier {
 	private static final int MYSTIC_CHALLENGE_SCORE = 13;
 	private static final double MYSTIC_DAMAGE_DEALT_MULTIPLIER = 0.625;
 	private static final double MYSTIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1;
-	private static final double MYSTIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 3;
+	private static final double MYSTIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double MYSTIC_ABILITY_CHANCE = 0.5;
 
 	private static final String[] MYSTIC_ABILITY_POOL = {
 			" boss_pulselaser",
 			" boss_flamelaser",
-			" boss_chargerstrong",
 			" boss_chargerstrong",
 			" boss_flamenova",
 			" boss_frostnova"

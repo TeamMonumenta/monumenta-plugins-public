@@ -1,16 +1,21 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
+import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.bosses.spells.SpellDreadlingParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class DreadlingBoss extends BossAbilityGroup {
-	public static final String identityTag = "boss_dreadling";
+	public static final String identityTag = Dreadful.DREADFUL_DREADLING_TAG;
 	public static final int detectionRange = 50;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -18,7 +23,11 @@ public class DreadlingBoss extends BossAbilityGroup {
 	}
 
 	public DreadlingBoss(Plugin plugin, LivingEntity boss) throws Exception {
-		super.constructBoss(plugin, identityTag, boss, null, null, detectionRange, null);
+		List<Spell> passiveSpells = Arrays.asList(
+			new SpellDreadlingParticle(boss)
+		);
+
+		super.constructBoss(plugin, identityTag, boss, null, passiveSpells, detectionRange, null);
 	}
 
 	@Override

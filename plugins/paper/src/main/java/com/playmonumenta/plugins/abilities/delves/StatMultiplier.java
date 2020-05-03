@@ -8,6 +8,8 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,6 +29,7 @@ import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 public class StatMultiplier extends Ability {
 
 	private static final String MESSAGED_PLAYER_TICK_METAKEY = "StatMultiplierMessagedPlayerTickMetakey";
+	private static final String SPEED_MODIFIER_NAME = "DelvesSpeedModifier";
 	private static final int PROPERTIES_APPLICATION_RADIUS = 24;
 
 	// Overall tracker for mobs that have had properties applied
@@ -155,15 +158,29 @@ public class StatMultiplier extends Ability {
 				if (!PROPERTIED_MOBS.contains(mob)) {
 					PROPERTIED_MOBS.add(mob);
 
-					if (mMobSpeedMultiplier != 1) {
-						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mMobSpeedMultiplier * mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
+					// Additional check in case the plugin stopped and cleared the faster internal tracking
+					boolean hasProperties = false;
+					AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+					for (AttributeModifier mod : speed.getModifiers()) {
+						if (mod != null && mod.getName().equals(SPEED_MODIFIER_NAME)) {
+							hasProperties = true;
+							break;
+						}
 					}
 
-					if (mRandom.nextDouble() < mMobAbilityChance) {
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"bossfight " + mob.getUniqueId() + " boss_blastresist");
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"bossfight " + mob.getUniqueId() + mMobAbilityPool[mRandom.nextInt(mMobAbilityPool.length)]);
+					if (!hasProperties) {
+						// Speed
+						AttributeModifier mod = new AttributeModifier(SPEED_MODIFIER_NAME,
+								mMobSpeedMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+						speed.addModifier(mod);
+
+						// Abilities
+						if (mRandom.nextDouble() < mMobAbilityChance) {
+							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+									"bossfight " + mob.getUniqueId() + " boss_blastresist");
+							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+									"bossfight " + mob.getUniqueId() + mMobAbilityPool[mRandom.nextInt(mMobAbilityPool.length)]);
+						}
 					}
 				}
 			}
