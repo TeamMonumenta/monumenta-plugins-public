@@ -8,13 +8,13 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class SpellMobHealAoE extends SpellBaseAoE {
+
+	private static final int HEALTH_HEALED = 25;
 
 	public SpellMobHealAoE(Plugin plugin, Entity launcher) {
 		super(plugin, launcher, 14, 80, 20 * 7, false, Sound.ITEM_TRIDENT_RETURN, 0.8f, 2,
@@ -42,12 +42,12 @@ public class SpellMobHealAoE extends SpellBaseAoE {
 				for (Entity e : loc.getWorld().getNearbyEntities(loc, 14, 7, 14)) {
 					if (e instanceof LivingEntity && EntityUtils.isHostileMob(e) && !e.isDead()) {
 						LivingEntity le = (LivingEntity) e;
-						double hp = le.getHealth() + 25;
+						double hp = le.getHealth() + HEALTH_HEALED;
 						double max = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 						if (hp >= max) {
 							int missing = (int) (hp - max);
 							le.setHealth(max);
-							PotionUtils.applyPotion(le, le, new PotionEffect(PotionEffectType.ABSORPTION, 60 * 20, missing / 4, true, false));
+							AbsorptionUtils.addAbsorption(le, missing, HEALTH_HEALED, -1);
 						} else {
 							le.setHealth(hp);
 						}

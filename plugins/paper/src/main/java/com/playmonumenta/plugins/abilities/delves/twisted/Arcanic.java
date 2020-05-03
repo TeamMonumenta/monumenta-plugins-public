@@ -26,11 +26,9 @@ public class Arcanic extends StatMultiplier {
 	private static final String[] ARCANIC_ABILITY_POOL = {
 		" boss_rejuvenation",
 		" boss_bombtossnoblockbreak",
-		" boss_tpbehind",
-		" boss_tpbehind",
+		" boss_tpbehindtargeted",
 		" boss_pulselaser",
 		" boss_flamelaser",
-		" boss_chargerstrong",
 		" boss_chargerstrong",
 		" boss_flamenova",
 		" boss_frostnova"
