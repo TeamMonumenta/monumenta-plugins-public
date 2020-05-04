@@ -31,7 +31,7 @@ public class SpellTpBehindRandomPlayer extends SpellTpBehindTargetedPlayer {
 				/* This player is in a safe area - don't tp to them */
 				players.remove(target);
 			} else {
-				launch(target);
+				launch(target, MAX_RANGE);
 				animation(target);
 				break;
 			}
