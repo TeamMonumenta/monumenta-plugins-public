@@ -20,7 +20,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class SpellTpBehindTargetedPlayer extends Spell {
-	private static final int MAX_RANGE_SQUARED = 20 * 20;
+	private static final int MAX_RANGE = 20;
 	private static final int TP_DELAY = 50;
 	private static final int TP_STUN = 10;					// Time after teleporting that the mob cannot perform actions
 	private static final int TP_STUN_CREEPER = 30;			// Increased time for creepers
@@ -41,10 +41,10 @@ public class SpellTpBehindTargetedPlayer extends Spell {
 	public void run() {
 		if (mLauncher instanceof Mob) {
 			LivingEntity target = ((Mob) mLauncher).getTarget();
-			if (target instanceof Player && target.getLocation().distanceSquared(mLauncher.getLocation()) < MAX_RANGE_SQUARED
+			if (target instanceof Player && target.getLocation().distance(mLauncher.getLocation()) < MAX_RANGE
 					&& !ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
 				Player player = (Player) target;
-				launch(player);
+				launch(player, MAX_RANGE);
 				animation(player);
 			}
 		}
@@ -55,12 +55,17 @@ public class SpellTpBehindTargetedPlayer extends Spell {
 		return mDuration;
 	}
 
-	protected void launch(Player target) {
+	protected void launch(Player target, double maxRange) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				World world = target.getWorld();
 				Location loc = target.getLocation();
+				// We need a second check when the teleport is actually about to occur
+				if (loc.distance(mLauncher.getLocation()) > maxRange || ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+					return;
+				}
+
+				World world = target.getWorld();
 				loc.setY(loc.getY() + 0.1f);
 				Vector shift = loc.getDirection();
 				shift.setY(0).normalize().multiply(-0.5);
