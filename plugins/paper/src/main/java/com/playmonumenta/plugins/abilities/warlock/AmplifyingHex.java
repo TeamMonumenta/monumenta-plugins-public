@@ -49,6 +49,7 @@ public class AmplifyingHex extends Ability {
 	                                                          PotionEffectType.POISON,
 	                                                          PotionEffectType.UNLUCK,
 	                                                          PotionEffectType.BLINDNESS,
+	                                                          PotionEffectType.CONFUSION,
 	                                                          PotionEffectType.HUNGER
 	                                                      );
 
