@@ -61,6 +61,8 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
+import org.bukkit.event.entity.VillagerCareerChangeEvent;
+import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -846,6 +848,18 @@ public class EntityListener implements Listener {
 	// Never generate new trades
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void villagerAcquireTradeEvent(VillagerAcquireTradeEvent event) {
+		event.setCancelled(true);
+	}
+
+	// Never generate new trades
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void villagerCareerChangeEvent(VillagerCareerChangeEvent event) {
+		event.setCancelled(true);
+	}
+
+	// Never generate new trades
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void villagerReplenishTradeEvent(VillagerReplenishTradeEvent event) {
 		event.setCancelled(true);
 	}
 
