@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EagleEye extends Ability {
@@ -86,7 +87,7 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking();
+		return mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 }
