@@ -17,6 +17,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
@@ -82,12 +83,15 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.enchantments.AttributeBowDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
+import com.playmonumenta.plugins.enchantments.HexEater;
+import com.playmonumenta.plugins.enchantments.IceAspect;
 import com.playmonumenta.plugins.enchantments.Impact;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
+import com.playmonumenta.plugins.enchantments.Thunder;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -244,6 +248,25 @@ public class EntityListener implements Listener {
 							}
 						}
 					}
+				} else if (damager instanceof AbstractArrow) {
+					// Illagers shooting crossbows (or any non player entity using a crossbow)
+					ProjectileSource source = ((Projectile) damager).getShooter();
+					if (!(source instanceof Player)) {
+						ItemMeta meta = ((LivingEntity)source).getEquipment().getItemInMainHand().getItemMeta();
+						if (meta != null && meta.hasAttributeModifiers()) {
+							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+							if (modifiers != null) {
+								Iterator<AttributeModifier> iter = modifiers.iterator();
+								while (iter.hasNext()) {
+									AttributeModifier mod = iter.next();
+									if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
+										// Sets damage to exactly the attribute modifiers, has +1 for consistency with tridents
+										event.setDamage(mod.getAmount() + 1);
+									}
+								}
+							}
+						}
+					}
 				}
 
 				if (!mAbilities.playerDamagedByProjectileEvent(player, event)) {
@@ -386,6 +409,9 @@ public class EntityListener implements Listener {
 
 		if (damager instanceof Trident && damagee instanceof LivingEntity) {
 			Impact.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			IceAspect.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			Thunder.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
+			HexEater.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Slayer.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Duelist.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 			Focus.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);

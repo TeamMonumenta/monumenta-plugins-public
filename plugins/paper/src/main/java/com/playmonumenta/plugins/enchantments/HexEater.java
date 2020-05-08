@@ -6,7 +6,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
@@ -19,6 +23,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class HexEater implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Hex Eater";
+	private static final String LEVEL_METAKEY = "HexEaterLevelMetakey";
 
 	@Override
 	public String getProperty() {
@@ -32,6 +37,11 @@ public class HexEater implements BaseEnchantment {
 
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		applyHexDamage(plugin, false, player, level, target, event);
+	}
+
+	//Apply the damage from effects
+	public static void applyHexDamage(Plugin plugin, boolean tridentThrow, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 		int effects = PotionUtils.getNegativeEffects(target).size();
 
 		if (EntityUtils.isStunned(target)) {
@@ -43,9 +53,30 @@ public class HexEater implements BaseEnchantment {
 		}
 
 		if (effects > 0) {
-			event.setDamage(event.getDamage() + level * effects * player.getCooledAttackStrength(0));
+			//Trident throw does not rely on player attack strength
+			if (tridentThrow) {
+				event.setDamage(event.getDamage() + level * effects);
+			} else {
+				event.setDamage(event.getDamage() + level * effects * player.getCooledAttackStrength(0));
+			}
 			player.getWorld().spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001);
 		}
 	}
 
+	// Thrown trident damage handling
+	@Override
+	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
+		if (proj instanceof Trident) {
+			proj.setMetadata(LEVEL_METAKEY, new FixedMetadataValue(plugin, level));
+		}
+	}
+
+	//Trident hit effect
+	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
+		if (proj.hasMetadata(LEVEL_METAKEY) && proj instanceof Trident && proj.getShooter() instanceof Player) {
+			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
+			Player player = (Player)proj.getShooter();
+			applyHexDamage(plugin, true, player, level, target, event);
+		}
+	}
 }

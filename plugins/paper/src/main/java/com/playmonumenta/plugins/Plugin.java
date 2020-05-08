@@ -48,6 +48,7 @@ import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.listeners.CrossbowListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
@@ -227,6 +228,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(new ZonePropertyListener(), this);
+		manager.registerEvents(new CrossbowListener(), this);
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
