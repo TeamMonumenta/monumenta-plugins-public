@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,19 @@ public class ReforgeHeldItem extends GenericCommand {
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getInventory().getItemInMainHand();
+		// If the player is in creative, reforge for free.
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			if (item == null || item.getLore() == null) {
+				CommandAPI.fail("Player must have a Shattered item in their main hand!");
+			} else if (ItemUtils.isItemShattered(item)) {
+				ItemUtils.reforgeItem(item);
+				player.sendMessage("Your item has been reforged!");
+				if (sender != player) {
+					sender.sendMessage("Successfully reforged the player's held item");
+				}
+				return;
+			}
+		}
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			if (item == null || item.getLore() == null) {

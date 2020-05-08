@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -32,6 +33,15 @@ public class ReforgeInventory extends GenericCommand {
 	}
 
 	private static void run(Player player) throws WrapperCommandSyntaxException {
+		// If the player is in creative, reforge for free.
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			for (ItemStack item : player.getInventory()) {
+				if (ItemUtils.isItemShattered(item)) {
+					ItemUtils.reforgeItem(item);
+				}
+			}
+			player.sendMessage("All of your items have been reforged!");
+		}
 		if (player.hasMetadata("PlayerCanReforge")) {
 			player.removeMetadata("PlayerCanReforge", Plugin.getInstance());
 			// Get the cost to reforge the entire inventory
