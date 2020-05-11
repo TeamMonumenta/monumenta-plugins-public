@@ -88,10 +88,12 @@ public class ArcaneStrike extends Ability {
 				@Override
 				public void run() {
 					Vector vec;
-					for (double r = 1; r < 4; r += 0.5) {
-						for (double degree = d; degree < d + 60; degree += 8) {
-							double radian1 = Math.toRadians(degree);
-							vec = new Vector(Math.cos(radian1) * r, 1, Math.sin(radian1) * r);
+					for (double degree = d; degree < d + 30; degree += 8) {
+						double radian1 = Math.toRadians(degree);
+						double cos = Math.cos(radian1);
+						double sin = Math.sin(radian1);
+						for (double r = 1; r < 4; r += 0.5) {
+							vec = new Vector(cos * r, 1, sin * r);
 							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
@@ -100,7 +102,7 @@ public class ArcaneStrike extends Ability {
 							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, ARCANE_STRIKE_COLOR_2);
 						}
 					}
-					d += 60;
+					d += 30;
 					if (d >= 150) {
 						this.cancel();
 					}
