@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 
@@ -30,5 +32,12 @@ public class ServerTransferListener implements Listener {
 		} else if (dropped > 1) {
 			player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
 		}
+
+		/* Remove potion effects that will be reapplied on the destination shard */
+		Plugin plugin = Plugin.getInstance();
+		plugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
+		plugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_OTHER);
+		plugin.mPotionManager.clearPotionIDType(player, PotionID.SAFE_ZONE);
+		plugin.mPotionManager.clearPotionIDType(player, PotionID.ITEM);
 	}
 }
