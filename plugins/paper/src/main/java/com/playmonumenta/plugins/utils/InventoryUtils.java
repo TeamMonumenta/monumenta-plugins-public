@@ -211,10 +211,17 @@ public class InventoryUtils {
 								}
 
 								if (foundAttributeSlot && loreEntry.contains(nameText)) {
-									// If calculating Bow Damage or Arrow Speed and player has mainhand and offhand bow, then ignore the offhand bow stats
-									if ((nameText.equals(" Bow Damage") || nameText.equals(" Arrow Speed")) && slot == ItemSlot.OFFHAND
+									// If item is a bow and calculating Bow Damage or Arrow Speed and player has mainhand and offhand bow, then ignore the offhand bow stats
+									if (item.getType() == Material.BOW &&
+										(nameText.equals(" Bow Damage") || nameText.equals(" Arrow Speed")) && slot == ItemSlot.OFFHAND
 										&& player.getInventory().getItemInOffHand().getType() == Material.BOW
 										&& player.getInventory().getItemInMainHand().getType() == Material.BOW) {
+										return 0;
+									//If item is a trident and calculating Throw Rate and player has mainhand and offhand trident, ignore the offhand trident stats
+									} else if (item.getType() == Material.TRIDENT &&
+										nameText.equals(" Throw Rate") && slot == ItemSlot.OFFHAND
+										&& player.getInventory().getItemInOffHand().getType() == Material.TRIDENT
+										&& player.getInventory().getItemInMainHand().getType() == Material.TRIDENT) {
 										return 0;
 									}
 

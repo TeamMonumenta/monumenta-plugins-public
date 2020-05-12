@@ -8,8 +8,11 @@ import javax.annotation.Nullable;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftTrident;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
+import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 
@@ -27,6 +30,11 @@ public class NmsUtils {
 		CraftPlayer p = (CraftPlayer)player;
 		EntityPlayer playerHandle = p.getHandle();
 		playerHandle.resetIdleTimer();
+	}
+
+	//Returns the trident projectile as an ItemStack
+	public static ItemStack getTridentItem(Trident trident) {
+		return ((CraftTrident) trident).getHandle().trident.getBukkitStack();
 	}
 
 	public static void removeVexSpawnAIFromEvoker(LivingEntity boss) {

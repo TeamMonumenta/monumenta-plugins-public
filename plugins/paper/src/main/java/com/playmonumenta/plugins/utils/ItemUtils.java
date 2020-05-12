@@ -719,6 +719,16 @@ public class ItemUtils {
 		}
 	}
 
+	public static void damageItemWithUnbreaking(ItemStack item, int damage, boolean canBreak) {
+		//Damages item by chance based on unbreaking level (always damages for no unbreaking)
+		//Chance to do damage (Unbreaking 0 = 1 or 100%, Unbreaking 1 = 1/2 or 50%, etc.)
+		double chance = 1.0 / (item.getEnchantmentLevel(Enchantment.DURABILITY) + 1);
+		double rand = Math.random();
+		if (rand < chance) {
+			damageItem(item, damage, canBreak);
+		}
+	}
+
 	public static String[] getBukkitMaterialStringArray() {
 		ArrayList<String> strList = new ArrayList<>();
 		for (Material m : Material.values()) {
