@@ -212,4 +212,19 @@ public class CommandUtils {
 	public static void runCommandViaConsole(String cmd) {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
+
+	// returns the sender as Player, if that sender is a player instance, or a proxied player
+	// returns null otherwise
+	public static Player getPlayerFromSender(CommandSender sender) {
+		Player p = null;
+		if (sender instanceof Player) {
+			p = ((Player)sender);
+		} else if (sender instanceof ProxiedCommandSender) {
+			CommandSender callee = ((ProxiedCommandSender) sender).getCallee();
+			if (callee instanceof Player) {
+				p = ((Player)callee);
+			}
+		}
+		return p;
+	}
 }

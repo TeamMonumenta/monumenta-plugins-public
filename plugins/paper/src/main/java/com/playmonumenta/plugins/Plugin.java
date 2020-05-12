@@ -19,6 +19,9 @@ import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
+import com.playmonumenta.plugins.cooking.CookingCommand;
+import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
+import com.playmonumenta.plugins.cooking.CookingTableListeners;
 import com.playmonumenta.plugins.commands.DeCluckifyHeldItem;
 import com.playmonumenta.plugins.commands.DeathMsg;
 import com.playmonumenta.plugins.commands.DebugInfo;
@@ -46,6 +49,7 @@ import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
@@ -92,6 +96,7 @@ public class Plugin extends JavaPlugin {
 	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
+	public CookingTableInventoryManager mCookingTableInventoryManager;
 	private BossManager mBossManager;
 
 	private RedisManager mRedis;
@@ -141,6 +146,7 @@ public class Plugin extends JavaPlugin {
 		SpellDetectionCircle.registerCommand(this);
 		SkillDescription.register(this);
 		SkillSummary.register(this);
+		CookingCommand.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -201,6 +207,7 @@ public class Plugin extends JavaPlugin {
 		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
+		mCookingTableInventoryManager = new CookingTableInventoryManager(this);
 		mBossManager = new BossManager(this);
 
 		DailyReset.startTimer(this);
@@ -232,6 +239,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
+		manager.registerEvents(new CookingTableListeners(this), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());

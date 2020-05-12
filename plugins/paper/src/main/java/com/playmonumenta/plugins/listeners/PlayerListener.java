@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.playmonumenta.plugins.cooking.CookingItemObject;
+import com.playmonumenta.plugins.cooking.CookingUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -766,6 +768,13 @@ public class PlayerListener implements Listener {
 
 		Player player = event.getPlayer();
 		AbilityManager.getManager().playerItemConsumeEvent(player, event);
+
+		// cooking
+		String json = CookingUtils.extractItemDataFromFirstLoreLine(event.getItem());
+		CookingItemObject item = CookingUtils.cookingItemObjectFromJson(json);
+		if (item != null) {
+			item.consumeItem(player);
+		}
 
 		/* Don't let players consume shattered items */
 		if (ItemUtils.isItemShattered(event.getItem())) {

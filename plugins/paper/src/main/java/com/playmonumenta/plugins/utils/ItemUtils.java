@@ -241,32 +241,53 @@ public class ItemUtils {
 	);
 
 	public enum ItemRegion {
-		UNKNOWN,
-		KINGS_VALLEY,
-		CELSIAN_ISLES,
-		MONUMENTA
+		UNKNOWN("Unknown"),
+		KINGS_VALLEY("King's Valley"),
+		CELSIAN_ISLES("Celsian Isles"),
+		MONUMENTA("Monumenta");
+
+		String mReadableString;
+
+		ItemRegion(String s) {
+			this.mReadableString = s;
+		}
+
+		public String asLoreString() {
+			return ChatColor.DARK_GRAY + this.mReadableString + " : ";
+		}
 	}
 
 	public enum ItemTier {
-		UNKNOWN,
-		ONE,
-		TWO,
-		THREE,
-		FOUR,
-		FIVE,
-		MEME,
-		UNCOMMON,
-		ENHANCED_UNCOMMON,
-		PATRON_MADE,
-		RARE,
-		ENHANCED_RARE,
-		ARTIFACT,
-		RELIC,
-		EPIC,
-		UNIQUE,
-		UNIQUE_EVENT,
-		SHULKER_BOX,
-		QUEST_COMPASS
+		UNKNOWN(ChatColor.BLACK + "Unknown"),
+		ONE(ChatColor.DARK_GRAY + "Tier I"),
+		TWO(ChatColor.DARK_GRAY + "Tier II"),
+		THREE(ChatColor.DARK_GRAY + "Tier III"),
+		FOUR(ChatColor.DARK_GRAY + "Tier IV"),
+		FIVE(ChatColor.DARK_GRAY + "Tier V"),
+		MEME(ChatColor.DARK_GRAY + "Meme"),
+		UNCOMMON(ChatColor.DARK_GRAY + "Uncommon"),
+		ENHANCED_UNCOMMON(ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Enhanced Uncommon"),
+		PATRON_MADE(ChatColor.GOLD + "Patron Made"),
+		RARE(ChatColor.YELLOW + "Rare"),
+		ENHANCED_RARE(ChatColor.YELLOW + "" + ChatColor.BOLD + "Enhanced Rare"),
+		ARTIFACT(ChatColor.DARK_RED + "Artifact"),
+		RELIC(ChatColor.GREEN + "Relic"),
+		EPIC(ChatColor.GOLD + "" + ChatColor.BOLD + "Patron Made"),
+		UNIQUE(ChatColor.DARK_PURPLE + "Unique"),
+		UNIQUE_EVENT(ChatColor.DARK_PURPLE + "Unique Event"),
+		DISH(ChatColor.GREEN + "Dish"),
+		SHULKER_BOX("Shulker Box"),
+		QUEST_COMPASS("Quest Compass");
+
+		String mReadableString;
+
+		ItemTier(String s) {
+			this.mReadableString = s;
+		}
+
+		public String asLoreString() {
+			return this.mReadableString;
+		}
 	}
 
 	public enum ItemDeathResult {
@@ -374,6 +395,8 @@ public class ItemUtils {
 						return ItemTier.UNIQUE;
 					} else if (stripped.endsWith(": Unique Event")) {
 						return ItemTier.UNIQUE_EVENT;
+					} else if (stripped.endsWith(": Dish")) {
+						return ItemTier.DISH;
 					}
 				}
 			}
@@ -694,5 +717,15 @@ public class ItemUtils {
 				damageItem(offHand, damage / (offHand.getEnchantmentLevel(Enchantment.DURABILITY) + 1), true);
 			}
 		}
+	}
+
+	public static String[] getBukkitMaterialStringArray() {
+		ArrayList<String> strList = new ArrayList<>();
+		for (Material m : Material.values()) {
+			if (m.isItem()) {
+				strList.add(m.toString());
+			}
+		}
+		return strList.toArray(new String[0]);
 	}
 }
