@@ -100,7 +100,7 @@ public class EnchantmentManager implements Listener {
 		init.add(new Inferno());
 		init.add(new Impact());
 		init.add(new AttributeArrowSpeed());
-		init.add(new AttributeBowDamage());
+		init.add(new AttributeRangedDamage());
 		init.add(new Sniper());
 		init.add(new PointBlank());
 		init.add(new Decay());

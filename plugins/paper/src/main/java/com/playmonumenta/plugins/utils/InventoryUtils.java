@@ -211,17 +211,11 @@ public class InventoryUtils {
 								}
 
 								if (foundAttributeSlot && loreEntry.contains(nameText)) {
-									// If item is a bow and calculating Bow Damage or Arrow Speed and player has mainhand and offhand bow, then ignore the offhand bow stats
-									if (item.getType() == Material.BOW &&
-										(nameText.equals(" Bow Damage") || nameText.equals(" Arrow Speed")) && slot == ItemSlot.OFFHAND
-										&& player.getInventory().getItemInOffHand().getType() == Material.BOW
-										&& player.getInventory().getItemInMainHand().getType() == Material.BOW) {
-										return 0;
-									//If item is a trident and calculating Throw Rate and player has mainhand and offhand trident, ignore the offhand trident stats
-									} else if (item.getType() == Material.TRIDENT &&
-										nameText.equals(" Throw Rate") && slot == ItemSlot.OFFHAND
-										&& player.getInventory().getItemInOffHand().getType() == Material.TRIDENT
-										&& player.getInventory().getItemInMainHand().getType() == Material.TRIDENT) {
+									// If calculating any attribute and player has mainhand and offhand of same item (i.e. trident or bow), then ignore the offhand bow stats
+									// Both attributes have to be the set damage modifier (i.e. not - or +)
+									// Also ignore offhand if the main hand and off hand item is ranged (i.e. it shoots projectiles)
+									if ((nameText.equals(" Ranged Damage") || nameText.equals(" Arrow Speed") || nameText.equals(" Throw Rate")) && slot == ItemSlot.OFFHAND
+										&& ItemUtils.isRanged(player.getInventory().getItemInMainHand().getType()) && ItemUtils.isRanged(item.getType())) {
 										return 0;
 									}
 

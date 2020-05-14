@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Player;
@@ -50,7 +49,7 @@ public class AttributeThrowRate implements BaseEnchantment {
 			//Only run Throw Rate if the Infinity enchantment is not on the trident
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0) {
 				//Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
-				player.setCooldown(Material.TRIDENT, (int)(20 * (10 / InventoryUtils.getAttributeValue(level))));
+				player.setCooldown(item.getType(), (int)(20 * (10 / InventoryUtils.getAttributeValue(level))));
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
 				//Replace item in hand so that it stays in inventory

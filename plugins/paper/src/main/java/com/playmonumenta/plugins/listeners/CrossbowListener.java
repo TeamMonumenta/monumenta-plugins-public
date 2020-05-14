@@ -14,7 +14,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.playmonumenta.plugins.Plugin;
+
 public class CrossbowListener implements Listener {
+
+	private Plugin mPlugin;
+
+	public CrossbowListener(Plugin plugin) {
+		mPlugin = plugin;
+	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
@@ -74,6 +82,8 @@ public class CrossbowListener implements Listener {
 							itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK) : itemInOffHand.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
 					arrow.setKnockbackStrength(level);
 				}
+				//Has to manually call projectile launch event because of arrow changes
+				mPlugin.mTrackingManager.mPlayers.onLaunchProjectile(mPlugin, player, event.getEntity(), event);
 			}
 		}
 	}

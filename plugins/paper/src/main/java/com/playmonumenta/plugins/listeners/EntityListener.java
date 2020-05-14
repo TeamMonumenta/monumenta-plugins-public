@@ -82,7 +82,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.enchantments.AttributeBowDamage;
+import com.playmonumenta.plugins.enchantments.AttributeRangedDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.HexEater;
@@ -332,10 +332,10 @@ public class EntityListener implements Listener {
 					}
 				}
 			}
-		} else if (damager instanceof Arrow) {
-			Arrow arrow = (Arrow)damager;
-			if (arrow.getShooter() instanceof Player) {
-				Player player = (Player)arrow.getShooter();
+		} else if (damager instanceof Projectile) {
+			Projectile proj = (Projectile)damager;
+			if (proj.getShooter() instanceof Player) {
+				Player player = (Player)proj.getShooter();
 
 				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 				if (player.getGameMode() == GameMode.ADVENTURE
@@ -356,44 +356,49 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					// If arrow is not a throwing knife or a trident
-					if (!ThrowingKnife.isThrowingKnife(arrow) && arrow.getType() != EntityType.TRIDENT) {
-						// Set the arrow damage from attributes
-						AttributeBowDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
+					// Set the projectiledamage from attributes
+					AttributeRangedDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
 
-						mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
-						if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity) damagee, event)) {
-							damager.remove();
-							event.setCancelled(true);
-						}
+					//If normal arrow is the projectile
+					if (proj instanceof Arrow) {
+						Arrow arrow = (Arrow)proj;
+						// If arrow is not a throwing knife or a trident
+						if (!ThrowingKnife.isThrowingKnife(arrow) && arrow.getType() != EntityType.TRIDENT) {
 
-						/*
-						 * This handles bow damage for abilities
-						 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
-						 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
-						 */
-
-						if (damagee instanceof LivingEntity) {
-							LivingEntity mob = (LivingEntity) damagee;
-
-							if (arrow.hasMetadata("ArrowQuickdraw")) {
-								event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+							mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
+							if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity) damagee, event)) {
+								damager.remove();
+								event.setCancelled(true);
 							}
 
-							double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
-							double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
-							if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
-								&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
-								&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
-								multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
-								mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
-								mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-								mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
-								mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
-								mob.removePotionEffect(PotionEffectType.SLOW);
-							}
+							/*
+							 * This handles bow damage for abilities
+							 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
+							 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
+							 */
 
-							event.setDamage(event.getDamage() * multiplier + bonusDamage);
+							if (damagee instanceof LivingEntity) {
+								LivingEntity mob = (LivingEntity) damagee;
+
+								if (arrow.hasMetadata("ArrowQuickdraw")) {
+									event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
+								}
+
+								double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
+								double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
+								if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
+									&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
+									&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
+									multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
+									mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
+									mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+									mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
+									mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
+									mob.removePotionEffect(PotionEffectType.SLOW);
+								}
+
+								event.setDamage(event.getDamage() * multiplier + bonusDamage);
+							}
 						}
 					}
 				}
@@ -607,6 +612,10 @@ public class EntityListener implements Listener {
 					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
+					//Set Ranged Damage attribute
+					if (origBall.hasMetadata(AttributeRangedDamage.DAMAGE_METAKEY)) {
+						newBall.setMetadata(AttributeRangedDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origBall.getMetadata(AttributeRangedDamage.DAMAGE_METAKEY).get(0).asDouble()));
+					}
 					event.setCancelled(true);
 					return;
 				}
@@ -624,6 +633,10 @@ public class EntityListener implements Listener {
 					EnderPearl newPearl = (EnderPearl)mWorld.spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
+					//Set Ranged Damage attribute
+					if (origPearl.hasMetadata(AttributeRangedDamage.DAMAGE_METAKEY)) {
+						newPearl.setMetadata(AttributeRangedDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origPearl.getMetadata(AttributeRangedDamage.DAMAGE_METAKEY).get(0).asDouble()));
+					}
 					event.setCancelled(true);
 					return;
 				}

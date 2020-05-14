@@ -240,6 +240,15 @@ public class ItemUtils {
 		Material.BLACK_SHULKER_BOX
 	);
 
+	public static final Set<Material> ranged = EnumSet.of(
+		Material.BOW,
+		Material.CROSSBOW,
+		Material.TRIDENT,
+		Material.ENDER_PEARL,
+		Material.EGG,
+		Material.SNOWBALL
+	);
+
 	public enum ItemRegion {
 		UNKNOWN("Unknown"),
 		KINGS_VALLEY("King's Valley"),
@@ -668,6 +677,11 @@ public class ItemUtils {
 
 	public static boolean isShulkerBox(Material mat) {
 		return shulkerBoxes.contains(mat);
+	}
+
+	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from
+	public static boolean isRanged(Material mat) {
+		return ranged.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
