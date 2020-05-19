@@ -92,6 +92,11 @@
             <version>0.3</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.goncalomb.bukkit</groupId>
+            <artifactId>nbteditor</artifactId>
+            <version>3.2</version>
+        </dependency>
 
         <!-- This one needs to be shaded in! -->
         <dependency>
