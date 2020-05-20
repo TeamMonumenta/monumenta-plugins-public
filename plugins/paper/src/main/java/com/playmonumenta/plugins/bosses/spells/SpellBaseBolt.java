@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -13,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -79,7 +79,6 @@ public class SpellBaseBolt extends Spell {
 	private final CastAction mCastAction;
 	private final ParticleAction mParticleAction;
 	private final IntersectAction mIntersectAction;
-	private final Random mRandom = new Random();
 
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit,
@@ -150,11 +149,11 @@ public class SpellBaseBolt extends Spell {
 									if (mob.getTarget() != null && mob.getTarget() instanceof Player) {
 										launchBolt((Player)mob.getTarget());
 									} else {
-										Player player = players.get(mRandom.nextInt(players.size()));
+										Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 										launchBolt(player);
 									}
 								} else {
-									Player player = players.get(mRandom.nextInt(players.size()));
+									Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									launchBolt(player);
 								}
 							} else {

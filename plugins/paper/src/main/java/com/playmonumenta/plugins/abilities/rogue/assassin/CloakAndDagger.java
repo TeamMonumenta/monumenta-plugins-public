@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -43,8 +42,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	private int cloakOnActivation = 0;
 	private boolean active = false;
 
-	public CloakAndDagger(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Cloak and Dagger");
+	public CloakAndDagger(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Cloak and Dagger");
 		mInfo.scoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
 		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you shift right click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");

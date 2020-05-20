@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -41,8 +39,8 @@ public class EnchantedPrayer extends Ability {
 	private static final int ENCHANTED_PRAYER_1_HEAL = 2;
 	private static final int ENCHANTED_PRAYER_2_HEAL = 4;
 
-	public EnchantedPrayer(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Enchanted Prayer");
+	public EnchantedPrayer(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Enchanted Prayer");
 		mInfo.scoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
 		mInfo.mDescriptions.add("Right-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");

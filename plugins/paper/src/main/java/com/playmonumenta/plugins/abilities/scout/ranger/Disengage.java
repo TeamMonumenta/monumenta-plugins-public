@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,8 +45,8 @@ public class Disengage extends Ability {
 	private boolean mStillInAir = false;
 	private int mLandedTick = 0;
 
-	public Disengage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Disengage");
+	public Disengage(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Disengage");
 		mInfo.linkedSpell = Spells.DISENGAGE;
 		mInfo.scoreboardId = "Disengage";
 		mInfo.mShorthandName = "Dis";

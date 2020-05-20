@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,6 +21,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -37,8 +37,8 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
 
-	public HeavenlyBoon(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Heavenly Boon");
+	public HeavenlyBoon(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Heavenly Boon");
 		mInfo.scoreboardId = "HeavenlyBoon";
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob, you have a 6% chance to be splashed with an Instant Health I potion, as well as either a Speed I, Regen I, or Absorption I potion.");
@@ -110,11 +110,11 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (EntityUtils.isUndead(mob) && mRandom.nextDouble() < mChance) {
+		if (EntityUtils.isUndead(mob) && FastUtils.RANDOM.nextDouble() < mChance) {
 			ItemStack potions;
 
 			if (getAbilityScore() == 1) {
-				int rand = mRandom.nextInt(4);
+				int rand = FastUtils.RANDOM.nextInt(4);
 				if (rand == 0 || rand == 1) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 20 * 20, 0,
 					                                         "Splash Potion of Regeneration");
@@ -126,7 +126,7 @@ public class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 					                                         "Splash Potion of Speed");
 				}
 			} else {
-				int rand = mRandom.nextInt(5);
+				int rand = FastUtils.RANDOM.nextInt(5);
 				if (rand == 0) {
 					potions = ItemUtils.createStackedPotions(PotionEffectType.REGENERATION, 1, 50 * 20, 0,
 					                                         "Splash Potion of Regeneration");

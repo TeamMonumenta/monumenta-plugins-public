@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -40,8 +39,8 @@ public class FractalEnervation extends Ability {
 	private static final int FRACTAL_1_COOLDOWN = 20 * 12;
 	private static final int FRACTAL_2_COOLDOWN = 20 * 10;
 
-	public FractalEnervation(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Fractal Enervation");
+	public FractalEnervation(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Fractal Enervation");
 		mInfo.scoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
 		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");

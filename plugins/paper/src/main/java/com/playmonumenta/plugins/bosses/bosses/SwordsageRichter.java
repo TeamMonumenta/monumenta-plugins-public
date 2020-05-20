@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -36,6 +35,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileDeflection;
 import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -49,7 +49,6 @@ public class SwordsageRichter extends BossAbilityGroup {
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private final Random rand = new Random();
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -244,9 +243,9 @@ public class SwordsageRichter extends BossAbilityGroup {
 			}
 
 			new BukkitRunnable() {
-				Location loc = mBoss.getLocation().add(rand.nextInt(summonRadius), 1.5, rand.nextInt(summonRadius));
-				double rotation = 0;
-				double radius = 4;
+				Location mLoc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summonRadius), 1.5, FastUtils.RANDOM.nextInt(summonRadius));
+				double mRotation = 0;
+				double mRadius = 4;
 				@Override
 				public void run() {
 					if (mBoss.isDead()) {
@@ -255,20 +254,20 @@ public class SwordsageRichter extends BossAbilityGroup {
 					}
 
 					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(rotation + (72 * i));
-						loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-						world.spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.15);
-						loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						double radian1 = Math.toRadians(mRotation + (72 * i));
+						mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 3, 0.1, 0.1, 0.1, 0);
+						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 5, 0.1, 0.1, 0.1, 0.15);
+						mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 					}
-					rotation += 8;
-					radius -= 0.25;
-					if (radius <= 0) {
+					mRotation += 8;
+					mRadius -= 0.25;
+					if (mRadius <= 0) {
 						this.cancel();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
-						world.spawnParticle(Particle.SPELL_INSTANT, loc, 50, 0.1, 0.1, 0.1, 1);
-						world.spawnParticle(Particle.CRIT_MAGIC, loc, 150, 0.1, 0.1, 0.1, 1);
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + mobdata);
+						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 50, 0.1, 0.1, 0.1, 1);
+						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:zombie " + mLoc.getX() + " " + mLoc.getY() + " " + mLoc.getZ() + " " + mobdata);
 					}
 				}
 			}.runTaskTimer(plugin, t * 10, 1);
@@ -283,31 +282,31 @@ public class SwordsageRichter extends BossAbilityGroup {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f);
 		}
 		new BukkitRunnable() {
-			double rotation = 0;
-			Location loc = mBoss.getLocation();
-			double radius = 0;
-			double y = 2.5;
-			double yminus = 0.35;
+			double mRotation = 0;
+			Location mLoc = mBoss.getLocation();
+			double mRadius = 0;
+			double mY = 2.5;
+			double mDelta = 0.35;
 
 			@Override
 			public void run() {
 
-				radius += 1;
+				mRadius += 1;
 				for (int i = 0; i < 15; i += 1) {
-					rotation += 24;
-					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
-					loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					mRotation += 24;
+					double radian1 = Math.toRadians(mRotation);
+					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
+					world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 				}
-				y -= y * yminus;
-				yminus += 0.02;
-				if (yminus >= 1) {
-					yminus = 1;
+				mY -= mY * mDelta;
+				mDelta += 0.02;
+				if (mDelta >= 1) {
+					mDelta = 1;
 				}
-				if (radius >= r) {
+				if (mRadius >= r) {
 					this.cancel();
 				}
 

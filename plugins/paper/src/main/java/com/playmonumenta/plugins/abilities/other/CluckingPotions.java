@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.other;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -18,6 +17,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 /* TODO:
@@ -27,8 +27,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
  * into something like EntityListener
  */
 public class CluckingPotions extends Ability {
-	public CluckingPotions(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public CluckingPotions(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class CluckingPotions extends Ability {
 						}
 
 						while (!cluckingCandidates.isEmpty()) {
-							int idx = mRandom.nextInt(cluckingCandidates.size());
+							int idx = FastUtils.RANDOM.nextInt(cluckingCandidates.size());
 							ItemStack item = cluckingCandidates.get(idx);
 							cluckingCandidates.remove(idx);
 

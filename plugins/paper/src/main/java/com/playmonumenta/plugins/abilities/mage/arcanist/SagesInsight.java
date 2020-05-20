@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -30,8 +29,8 @@ public class SagesInsight extends Ability {
 	private final double mCooldownReductionPercent;
 	private final int mCooldownReductionCap;
 
-	public SagesInsight(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Sage's Insight");
+	public SagesInsight(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Sage's Insight");
 		mInfo.scoreboardId = "SagesInsight";
 		mInfo.mShorthandName = "SI";
 		mInfo.mDescriptions.add("Whenever the user casts a spell the cooldowns of other equipped spells are reduced by 5%, capped at 0.5 seconds.");

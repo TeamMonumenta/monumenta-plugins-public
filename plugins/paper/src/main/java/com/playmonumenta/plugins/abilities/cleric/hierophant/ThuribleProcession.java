@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -48,8 +47,8 @@ public class ThuribleProcession extends Ability {
 	private int seconds = 0;
 	private int buffs = 0;
 
-	public ThuribleProcession(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Thurible Procession");
+	public ThuribleProcession(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Thurible Procession");
 		mInfo.scoreboardId = "Thurible";
 		mInfo.mShorthandName = "TP";
 		mInfo.mDescriptions.add("The Hierophant passively builds up potion effect buffs, which are applied to all other players within 20 blocks. Buffs end and the buildup resets upon a melee attack on a hostile mob, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. Progression - Haste 1 (after 5s of no melee), Speed 1 (after 10s of no melee), Strength 1 (after 15s of no melee)");

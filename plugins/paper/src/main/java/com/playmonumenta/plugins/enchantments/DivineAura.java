@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,13 +19,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineAura implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Divine Aura";
 	private static final String TAG_TO_DISABLE = "NoDivineAura";
-	private static final Random RAND = new Random();
 	private static final Set<Player> NO_SELF_PARTICLES = new HashSet<Player>();
 	private static int STATIC_TICKS = 0;
 
@@ -165,19 +164,19 @@ public class DivineAura implements BaseEnchantment {
 
 				UUID uuid = player.getUniqueId();
 				if (uuid.equals(mNeodymeowm)) {
-					String m = mNeoLines[RAND.nextInt(6)];
+					String m = mNeoLines[FastUtils.RANDOM.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				} else if (uuid.equals(mCorpe)) {
-					String m = mCorpeLines[RAND.nextInt(6)];
+					String m = mCorpeLines[FastUtils.RANDOM.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				} else if (uuid.equals(mSpy21dd)) {
-					String m = mSpyLines[RAND.nextInt(6)];
+					String m = mSpyLines[FastUtils.RANDOM.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				} else if (uuid.equals(mRedvam)) {
-					String m = mRedLines[RAND.nextInt(6)];
+					String m = mRedLines[FastUtils.RANDOM.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				} else if (uuid.equals(mFire)) {
-					String m = mFireLines[RAND.nextInt(6)];
+					String m = mFireLines[FastUtils.RANDOM.nextInt(6)];
 					player.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + m);
 				}
 			}

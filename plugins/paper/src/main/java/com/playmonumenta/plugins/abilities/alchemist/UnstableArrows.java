@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -36,8 +35,8 @@ public class UnstableArrows extends Ability {
 
 	private Arrow mUnstableArrow = null;
 
-	public UnstableArrows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Unstable Arrows");
+	public UnstableArrows(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Unstable Arrows");
 		mInfo.linkedSpell = Spells.UNSTABLE_ARROWS;
 		mInfo.scoreboardId = "BombArrow";
 		mInfo.mShorthandName = "UA";

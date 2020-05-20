@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -16,6 +15,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 public class NightmarishAlchemy extends Ability {
 	private static final int NIGHTMARISH_ALCHEMY_1_DAMAGE = 2;
@@ -27,8 +27,8 @@ public class NightmarishAlchemy extends Ability {
 	private final float mConfusionChance;
 	private final int mDamage;
 
-	public NightmarishAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Nightmarish Alchemy");
+	public NightmarishAlchemy(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Nightmarish Alchemy");
 		mInfo.linkedSpell = Spells.NIGHTMARISH_ALCHEMY;
 		mInfo.scoreboardId = "Nightmarish";
 		mInfo.mShorthandName = "Nm";
@@ -59,7 +59,7 @@ public class NightmarishAlchemy extends Ability {
 	public boolean apply(LivingEntity mob, int size, boolean guaranteedApplicationApplied) {
 		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
 		if (mob instanceof Mob) {
-			if (mRandom.nextFloat() < mConfusionChance || !guaranteedApplicationApplied && size >= 1 / mConfusionChance) {
+			if (FastUtils.RANDOM.nextDouble() < mConfusionChance || !guaranteedApplicationApplied && size >= 1 / mConfusionChance) {
 				EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, mob);
 				guaranteedApplicationApplied = true;
 			}

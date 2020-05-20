@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.scout;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -54,8 +53,8 @@ public class SwiftCuts extends Ability {
 	private int mVulnerabilityAmplifier;
 	private int mDamageBonus;
 
-	public SwiftCuts(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Swift Cuts");
+	public SwiftCuts(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Swift Cuts");
 		mInfo.scoreboardId = "SwiftCuts";
 		mInfo.mShorthandName = "SC";
 		mInfo.mDescriptions.add("On a melee hit you mark your target. When that target is hit again the mark is removed, they take 3 extra damage, and they get 10% Vulnerability for 2 seconds. You can not remark a target within 3 seconds of it having your mark removed.");

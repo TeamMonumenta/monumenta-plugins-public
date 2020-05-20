@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -28,8 +27,8 @@ public class BrutalAlchemy extends Ability {
 	private final int mDamage;
 	private final int mVulnerabilityAmplifier;
 
-	public BrutalAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Brutal Alchemy");
+	public BrutalAlchemy(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Brutal Alchemy");
 		mInfo.linkedSpell = Spells.BRUTAL_ALCHEMY;
 		mInfo.scoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";

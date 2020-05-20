@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,8 +46,8 @@ public class DeathsTouch extends Ability {
 	private LivingEntity target = null;
 	private int mRightClicks = 0;
 
-	public DeathsTouch(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Death's Touch");
+	public DeathsTouch(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Death's Touch");
 		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
 		mInfo.scoreboardId = "DeathsTouch";
 		mInfo.mShorthandName = "DT";

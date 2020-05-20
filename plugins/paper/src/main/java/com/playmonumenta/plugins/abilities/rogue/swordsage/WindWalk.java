@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,8 +45,8 @@ public class WindWalk extends Ability {
 	private int mCharges = 2;
 	private boolean mWasOnCooldown = false;
 
-	public WindWalk(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Wind Walk");
+	public WindWalk(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Wind Walk");
 		mInfo.linkedSpell = Spells.WIND_WALK;
 		mInfo.scoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,8 +24,8 @@ public class Skirmisher extends Ability {
 	private static final int SKIRMISHER_2_DAMAGE = 5;
 	private static final int SKIRMISHER_ISOLATION_RADIUS = 4;
 
-	public Skirmisher(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Skirmisher");
+	public Skirmisher(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Skirmisher");
 		mInfo.scoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
 		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");

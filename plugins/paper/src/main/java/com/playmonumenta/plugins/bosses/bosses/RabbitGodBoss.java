@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -40,6 +39,7 @@ import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffPools;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellFluffingDeath;
 import com.playmonumenta.plugins.bosses.spells.cluckingop.SpellOmegaLeap;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -187,13 +187,12 @@ public class RabbitGodBoss extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mTime = 0;
 				double mY = 10;
-				ThreadLocalRandom mRand = ThreadLocalRandom.current();
 				@Override
 				public void run() {
 					mTime++;
 					mY -= 0.1;
 					if (mTime % 6 == 0) {
-						Location loc = spawnLoc.clone().add(mRand.nextDouble(-15, 15), 5 + mRand.nextDouble(-5, 2), mRand.nextDouble(-15, 15));
+						Location loc = spawnLoc.clone().add(FastUtils.randomDoubleInRange(-15, 15), 5 + FastUtils.randomDoubleInRange(-5, 2), FastUtils.randomDoubleInRange(-15, 15));
 						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
 						world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 						world.playSound(spawnLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
@@ -442,11 +441,10 @@ public class RabbitGodBoss extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"OINK! OINK OINK! OINK OINK OINK OINK!?!?!?\",\"color\":\"dark_red\"}]");
 		new BukkitRunnable() {
 			int mTime = 0;
-			ThreadLocalRandom mRand = ThreadLocalRandom.current();
 			@Override
 			public void run() {
 				mTime++;
-				Location loc = mBoss.getLocation().add(mRand.nextDouble(-10, 10), mRand.nextDouble(0, 3), mRand.nextDouble(-10, 10));
+				Location loc = mBoss.getLocation().add(FastUtils.randomDoubleInRange(-10, 10), FastUtils.randomDoubleInRange(0, 3), FastUtils.randomDoubleInRange(-10, 10));
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
 				world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);

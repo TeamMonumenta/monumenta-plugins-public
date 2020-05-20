@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.SplittableRandom;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -15,6 +14,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -62,7 +62,6 @@ public class SpellBaseLaser extends Spell {
 	private final TickAction mTickAction;
 	private final ParticleAction mParticleAction;
 	private final FinishAction mFinishAction;
-	private final SplittableRandom mRandom = new SplittableRandom();
 
 	/**
 	 * @param plugin          Plugin
@@ -149,7 +148,7 @@ public class SpellBaseLaser extends Spell {
 					box.shift(baseVect);
 					endLoc = box.getCenter().toLocation(mBoss.getWorld());
 
-					if (mParticleAction != null && mRandom.nextInt(3) == 0) {
+					if (mParticleAction != null && FastUtils.RANDOM.nextInt(3) == 0) {
 						mParticleAction.run(endLoc);
 					}
 					List<Block> blocks = new ArrayList<Block>();

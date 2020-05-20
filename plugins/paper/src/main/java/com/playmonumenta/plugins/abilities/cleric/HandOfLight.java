@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,8 +32,8 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 
-	public HandOfLight(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Hand of Light");
+	public HandOfLight(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Hand of Light");
 		mInfo.linkedSpell = Spells.HEALING;
 		mInfo.scoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";

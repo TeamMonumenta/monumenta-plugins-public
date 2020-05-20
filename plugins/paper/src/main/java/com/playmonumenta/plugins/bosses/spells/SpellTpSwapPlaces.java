@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -23,7 +23,6 @@ public class SpellTpSwapPlaces extends Spell {
 	private final Plugin mPlugin;
 	private final Entity mLauncher;
 	private final int mDuration;
-	private final Random mRand = new Random();
 
 	public SpellTpSwapPlaces(Plugin plugin, Entity launcher, int duration) {
 		mPlugin = plugin;
@@ -35,7 +34,7 @@ public class SpellTpSwapPlaces extends Spell {
 	public void run() {
 		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), MAX_RANGE);
 		while (!players.isEmpty()) {
-			Player target = players.get(mRand.nextInt(players.size()));
+			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 
 			/* Do not teleport to players in safezones */
 			if (ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {

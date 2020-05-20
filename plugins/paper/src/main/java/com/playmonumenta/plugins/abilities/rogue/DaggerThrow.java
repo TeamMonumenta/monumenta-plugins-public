@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -43,8 +42,8 @@ public class DaggerThrow extends Ability {
 	private int mDamage;
 	private int mVulnAmplifier;
 
-	public DaggerThrow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Dagger Throw");
+	public DaggerThrow(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Dagger Throw");
 		mInfo.linkedSpell = Spells.DAGGER_THROW;
 		mInfo.scoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";

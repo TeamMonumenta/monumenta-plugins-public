@@ -98,13 +98,12 @@
             <version>3.2</version>
         </dependency>
 
-        <!-- This one needs to be shaded in! -->
+        <!-- These need to be shaded in! -->
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.8.0</version>
         </dependency>
-        <!-- This one needs to be shaded in also! -->
         <dependency>
         	<groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>

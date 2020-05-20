@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -39,7 +39,6 @@ public class SpellPutridPlague extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mRange;
-	private Random rand = new Random();
 	private boolean mPhase3;
 	private static boolean mPlagueActive;
 	private int mTime;
@@ -84,7 +83,7 @@ public class SpellPutridPlague extends Spell {
 		}
 		if (!points.isEmpty()) {
 			Location loc = mCenter;
-			ArmorStand point = points.get(rand.nextInt(points.size()));
+			ArmorStand point = points.get(FastUtils.RANDOM.nextInt(points.size()));
 			if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify kaul color blue");
 				for (Player player : PlayerUtils.playersInRange(loc, mRange)) {

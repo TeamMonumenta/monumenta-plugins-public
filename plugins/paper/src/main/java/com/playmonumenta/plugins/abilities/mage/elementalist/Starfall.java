@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,8 +36,8 @@ public class Starfall extends Ability {
 	/* The player's getTicksLived() when the skill was last primed or cast */
 	private int mPrimedTick = -1;
 
-	public Starfall(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Starfall");
+	public Starfall(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Starfall");
 		mInfo.linkedSpell = Spells.STARFALL;
 		mInfo.scoreboardId = "Starfall";
 		mInfo.mShorthandName = "SF";

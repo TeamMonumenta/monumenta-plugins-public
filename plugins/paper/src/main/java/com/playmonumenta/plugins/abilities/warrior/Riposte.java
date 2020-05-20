@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,8 +31,8 @@ public class Riposte extends Ability {
 	private static final double RIPOSTE_MELEE_THRESHOLD = 2;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
-	public Riposte(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Riposte");
+	public Riposte(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Riposte");
 		mInfo.linkedSpell = Spells.RIPOSTE;
 		mInfo.scoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -20,8 +19,8 @@ public class Rejuvenation extends Ability {
 
 	private int timer = 0;
 
-	public Rejuvenation(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Rejuvenation");
+	public Rejuvenation(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Rejuvenation");
 		mInfo.scoreboardId = "Rejuvenation";
 		mInfo.mShorthandName = "Rjv";
 		mInfo.mDescriptions.add("You regenerate 5% of your max health every 3 seconds.");

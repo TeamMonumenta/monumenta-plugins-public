@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,8 +46,8 @@ public class BodkinBlitz extends Ability {
 	private int mCharges;
 	private int mChargeCooldown;
 
-	public BodkinBlitz(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Bodkin Blitz");
+	public BodkinBlitz(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Bodkin Blitz");
 		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.scoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";

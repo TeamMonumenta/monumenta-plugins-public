@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -38,8 +37,8 @@ public class Blizzard extends Ability {
 	private static final int BLIZZARD_1_COOLDOWN = 30;
 	private static final int BLIZZARD_2_COOLDOWN = 25;
 
-	public Blizzard(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Blizzard");
+	public Blizzard(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Blizzard");
 		mInfo.scoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");

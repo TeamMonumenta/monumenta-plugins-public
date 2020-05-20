@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,8 +21,8 @@ public class WeaponryMastery extends Ability {
 	private final double damageBonusAxe;
 	private final double damageBonusSword;
 
-	public WeaponryMastery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Weapon Mastery");
+	public WeaponryMastery(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Weapon Mastery");
 		mInfo.scoreboardId = "WeaponMastery";
 		mInfo.mShorthandName = "WM";
 		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Deal +3 damage while using an axe.");

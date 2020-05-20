@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -31,8 +30,8 @@ public class Exorcism  extends Ability {
 	private static final int EXORCISM_1_COOLDOWN = 25 * 20;
 	private static final int EXORCISM_2_COOLDOWN = 15 * 20;
 
-	public Exorcism(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Exorcism");
+	public Exorcism(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Exorcism");
 		mInfo.linkedSpell = Spells.EXORCISM;
 		mInfo.scoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";

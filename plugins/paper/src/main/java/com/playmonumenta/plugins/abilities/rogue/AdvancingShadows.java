@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -41,8 +40,8 @@ public class AdvancingShadows extends Ability {
 
 	private LivingEntity mTarget = null;
 
-	public AdvancingShadows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Advancing Shadows");
+	public AdvancingShadows(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Advancing Shadows");
 		mInfo.linkedSpell = Spells.ADVANCING_SHADOWS;
 		mInfo.scoreboardId = "AdvancingShadows";
 		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;

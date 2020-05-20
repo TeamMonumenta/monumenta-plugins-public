@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.other;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,8 +27,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
  */
 public class PvP extends Ability {
 
-	public PvP(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public PvP(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 
 		if (player != null) {
 			player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);

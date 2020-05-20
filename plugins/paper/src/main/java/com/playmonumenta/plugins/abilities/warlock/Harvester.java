@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -13,8 +12,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Harvester extends Ability {
 
-	public Harvester(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Harvester of the Damned");
+	public Harvester(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Harvester of the Damned");
 		mInfo.scoreboardId = "Harvester";
 		mInfo.mShorthandName = "HotD";
 		mInfo.mDescriptions.add("Whenever an enemy dies within 8 blocks of you, reduce the cooldown of your skills by .5s.");

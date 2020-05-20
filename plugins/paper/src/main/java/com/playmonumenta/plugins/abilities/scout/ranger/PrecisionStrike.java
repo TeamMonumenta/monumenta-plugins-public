@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -41,8 +40,8 @@ public class PrecisionStrike extends Ability {
 
 	private LivingEntity mHitMob;
 
-	public PrecisionStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Precision Strike");
+	public PrecisionStrike(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Precision Strike");
 		mInfo.linkedSpell = Spells.PRECISION_STRIKE;
 		mInfo.scoreboardId = "PrecisionStrike";
 		mInfo.mShorthandName = "PSt";

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,8 +46,8 @@ public class LuminousInfusion extends Ability {
 
 	private boolean mActive = false;
 
-	public LuminousInfusion(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Luminous Infusion");
+	public LuminousInfusion(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Luminous Infusion");
 		mInfo.linkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.scoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";

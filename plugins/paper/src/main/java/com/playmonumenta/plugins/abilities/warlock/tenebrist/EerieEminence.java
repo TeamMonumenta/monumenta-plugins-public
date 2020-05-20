@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -58,8 +57,8 @@ public class EerieEminence extends Ability {
 
 	private List<DebuffElement> debuffs = new ArrayList<DebuffElement>();
 
-	public EerieEminence(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Eerie Eminence");
+	public EerieEminence(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Eerie Eminence");
 		mInfo.scoreboardId = "EerieEminence";
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block radius.");

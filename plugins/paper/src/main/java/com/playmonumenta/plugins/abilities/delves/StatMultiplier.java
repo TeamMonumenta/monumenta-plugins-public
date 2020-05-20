@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.delves;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -23,6 +22,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
@@ -46,33 +46,33 @@ public class StatMultiplier extends Ability {
 	private final String[] mMobAbilityPool;
 	private final double mMobAbilityChance;
 
-	public StatMultiplier(Plugin plugin, World world, Random random, Player player, String message,
+	public StatMultiplier(Plugin plugin, World world, Player player, String message,
 			double damageDealtMultiplier, double damageTakenMultiplier, double abilityDamageTakenMultiplier) {
-		this(plugin, world, random, player, message,
+		this(plugin, world, player, message,
 				damageDealtMultiplier, damageTakenMultiplier, abilityDamageTakenMultiplier,
 				1, null, 0);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Random random, Player player, String message,
+	public StatMultiplier(Plugin plugin, World world, Player player, String message,
 			double damageDealtMultiplier, double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			double mobSpeedMultiplier) {
-		this(plugin, world, random, player, message,
+		this(plugin, world, player, message,
 				damageDealtMultiplier, damageTakenMultiplier, abilityDamageTakenMultiplier, mobSpeedMultiplier,
 				null, 0);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Random random, Player player, String message,
+	public StatMultiplier(Plugin plugin, World world, Player player, String message,
 			double damageDealtMultiplier, double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			String[] mobAbilitiesPool, double mobAbilitiesChance) {
-		this(plugin, world, random, player, message,
+		this(plugin, world, player, message,
 				damageDealtMultiplier, damageTakenMultiplier, abilityDamageTakenMultiplier,
 				1, mobAbilitiesPool, mobAbilitiesChance);
 	}
 
-	public StatMultiplier(Plugin plugin, World world, Random random, Player player, String message,
+	public StatMultiplier(Plugin plugin, World world, Player player, String message,
 			double damageDealtMultiplier, double damageTakenMultiplier, double abilityDamageTakenMultiplier,
 			double mobSpeedMultiplier, String[] mobAbilityPool, double mobAbilityChance) {
-		super(plugin, world, random, player, null);
+		super(plugin, world, player, null);
 		mInfo.mIgnoreTriggerCap = true;
 
 		mDamageDealtMultiplier = damageDealtMultiplier;
@@ -175,11 +175,11 @@ public class StatMultiplier extends Ability {
 						speed.addModifier(mod);
 
 						// Abilities
-						if (mRandom.nextDouble() < mMobAbilityChance) {
+						if (FastUtils.RANDOM.nextDouble() < mMobAbilityChance) {
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 									"bossfight " + mob.getUniqueId() + " boss_blastresist");
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-									"bossfight " + mob.getUniqueId() + mMobAbilityPool[mRandom.nextInt(mMobAbilityPool.length)]);
+									"bossfight " + mob.getUniqueId() + mMobAbilityPool[FastUtils.RANDOM.nextInt(mMobAbilityPool.length)]);
 						}
 					}
 				}

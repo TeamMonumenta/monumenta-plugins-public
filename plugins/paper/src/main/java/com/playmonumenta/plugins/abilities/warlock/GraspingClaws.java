@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,8 +41,8 @@ public class GraspingClaws extends Ability {
 	private final int mDamage;
 	private Arrow arrow = null;
 
-	public GraspingClaws(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Grasping Claws");
+	public GraspingClaws(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Grasping Claws");
 		mInfo.scoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
 		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given Slowness 2 for 8 seconds and take 3 damage. (Cooldown: 16s)");

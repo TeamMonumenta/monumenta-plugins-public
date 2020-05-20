@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -34,8 +32,8 @@ public class DarkPact extends Ability {
 	private boolean active = false;
 	private int mLeftClicks = 0;
 
-	public DarkPact(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Dark Pact");
+	public DarkPact(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Dark Pact");
 		mInfo.scoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
 		mInfo.mDescriptions.add("Left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage instead of healing. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");

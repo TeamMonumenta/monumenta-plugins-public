@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.cursed;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -14,6 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
@@ -37,8 +36,8 @@ public class Spectral extends StatMultiplier {
 
 	private int mSpawnCounter = 0;
 
-	public Spectral(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Spectral(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "The air reeks of death, heralding a " + ChatColor.RED + ChatColor.BOLD + "SPECTRAL" + ChatColor.GRAY + " fate for the fallen.",
 				1, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? SPECTRAL_2_SUMMON_COMMAND_DATA : SPECTRAL_1_SUMMON_COMMAND_DATA;
@@ -55,7 +54,7 @@ public class Spectral extends StatMultiplier {
 			LivingEntity mob = event.getEntity();
 
 			if (!mob.getScoreboardTags().contains(SPECTRAL_SPECTRE_TAG)) {
-				mSpawnCounter += (2 + mRandom.nextInt(3));
+				mSpawnCounter += (2 + FastUtils.RANDOM.nextInt(3));
 
 				if (mSpawnCounter >= SPECTRAL_SPAWN_COUNTER_SPAWN) {
 					mSpawnCounter -= SPECTRAL_SPAWN_COUNTER_SPAWN;

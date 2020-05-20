@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,8 +31,8 @@ public class ConsumingFlames extends Ability {
 
 	private final int mDamage;
 
-	public ConsumingFlames(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Consuming Flames");
+	public ConsumingFlames(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Consuming Flames");
 		mInfo.scoreboardId = "ConsumingFlames";
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. (Cooldown: 10s)");

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import com.playmonumenta.plugins.cooking.CookingItemObject;
@@ -117,12 +116,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class PlayerListener implements Listener {
 	Plugin mPlugin = null;
 	World mWorld = null;
-	Random mRandom = null;
 
-	public PlayerListener(Plugin plugin, World world, Random random) {
+	public PlayerListener(Plugin plugin, World world) {
 		mPlugin = plugin;
 		mWorld = world;
-		mRandom = random;
 	}
 
 	@EventHandler(priority = EventPriority.LOW)

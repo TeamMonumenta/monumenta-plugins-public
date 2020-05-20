@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -79,8 +78,8 @@ public class PurpleHaze extends Ability {
 
 	private LivingEntity mTarget = null;
 
-	public PurpleHaze(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Purple Haze");
+	public PurpleHaze(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Purple Haze");
 		mInfo.linkedSpell = Spells.PURPLE_HAZE;
 		mInfo.scoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";

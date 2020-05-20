@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,8 +31,8 @@ public class SplitArrow extends Ability {
 	private static final int SPLIT_ARROW_2_DAMAGE = 10;
 	private static final double SPLIT_ARROW_CHAIN_RANGE = 5;
 
-	public SplitArrow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Split Arrow");
+	public SplitArrow(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Split Arrow");
 		mInfo.linkedSpell = Spells.SPLIT_ARROW;
 		mInfo.scoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
@@ -76,7 +75,7 @@ public class SplitArrow extends Ability {
 				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
-				
+
 				if (arrow.getFireTicks() > 0) {
 					// Since Flame sets enemies on fire for 5 seconds.
 					nearestMob.setFireTicks(100);

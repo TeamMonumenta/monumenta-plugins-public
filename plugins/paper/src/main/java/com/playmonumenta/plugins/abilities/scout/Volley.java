@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,8 +30,8 @@ public class Volley extends Ability {
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 2.0;
 
-	public Volley(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Volley");
+	public Volley(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Volley");
 		mInfo.linkedSpell = Spells.VOLLEY;
 		mInfo.scoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";

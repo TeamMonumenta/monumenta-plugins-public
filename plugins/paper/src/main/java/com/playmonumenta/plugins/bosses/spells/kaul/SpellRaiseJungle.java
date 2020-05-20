@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -91,18 +91,17 @@ public class SpellRaiseJungle extends Spell {
 			num += 24 + (1 * (players.size() - 10));
 		}
 		int amt = num;
-		ThreadLocalRandom rand = ThreadLocalRandom.current();
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
 				for (int i = 0; i < amt; i++) {
-					double x = rand.nextDouble(-mSummonRange, mSummonRange);
-					double z = rand.nextDouble(-mSummonRange, mSummonRange);
+					double x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
+					double z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 					Location sLoc = loc.clone().add(x, 0.25, z);
 					while (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()) {
-						x = rand.nextDouble(-mSummonRange, mSummonRange);
-						z = rand.nextDouble(-mSummonRange, mSummonRange);
+						x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
+						z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 						sLoc = loc.clone().add(x, 0.25, z);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);

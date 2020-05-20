@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -53,8 +52,8 @@ public class DeadlyRonde extends Ability {
 	BukkitRunnable activeRunnable = null;
 	int rondeStacks = 0;
 
-	public DeadlyRonde(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Deadly Ronde");
+	public DeadlyRonde(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Deadly Ronde");
 		mInfo.linkedSpell = Spells.RONDE;
 		mInfo.scoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";

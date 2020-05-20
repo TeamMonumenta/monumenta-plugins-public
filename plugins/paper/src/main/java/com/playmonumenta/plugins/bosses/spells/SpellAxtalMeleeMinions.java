@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
-import java.util.Random;
+
+import com.playmonumenta.plugins.utils.FastUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,7 +22,6 @@ public class SpellAxtalMeleeMinions extends Spell {
 	private int mRepeats;
 	private int mNearbyRadius;
 	private int mMaxNearby;
-	private Random mRand = new Random();
 
 	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope,
 	                              int repeats, int nearbyRadius, int maxNearby) {
@@ -58,14 +58,14 @@ public class SpellAxtalMeleeMinions extends Spell {
 		Runnable singleSpawn = new Runnable() {
 			@Override
 			public void run() {
-				int numberToSpawn = mCount + (mRand.nextInt(2 * mScope) - mScope);
+				int numberToSpawn = mCount + (FastUtils.RANDOM.nextInt(2 * mScope) - mScope);
 				for (int j = 0; j < numberToSpawn; j++) {
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "summon skeleton " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " {CustomName:\"\\\"Soul\\\"\",CustomNameVisible:1,Tags:[\"Soul\"],ArmorItems:[{},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:12430010}}},{id:\"minecraft:skeleton_skull\",Count:1b}],Attributes:[{Name:generic.maxHealth,Base:11},{Name:generic.attackDamage,Base:6}],Health:11.0f,DeathLootTable:\"minecraft:empty\",Team:\"Tlax\",ActiveEffects:[{Id:14b,Amplifier:1b,Duration:999999},{Id:20b,Amplifier:0b,Duration:999999}],Silent:1b}");
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (skelly.getType() == EntityType.SKELETON) {
-						double x = 0.5f * Math.cos((double)mRand.nextInt(628) / 100);
-						double z = 0.5f * Math.sin((double)mRand.nextInt(628) / 100);
+						double x = 0.5f * Math.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * Math.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}

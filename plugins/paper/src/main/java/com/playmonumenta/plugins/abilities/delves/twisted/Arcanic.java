@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.twisted;
 
-import java.util.Random;
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -34,8 +32,8 @@ public class Arcanic extends StatMultiplier {
 		" boss_frostnova"
 	};
 
-	public Arcanic(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Arcanic(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.DARK_RED + ChatColor.BOLD + "ARCANIC" + ChatColor.GRAY + " powers channeled within.",
 				ARCANIC_DAMAGE_DEALT_MULTIPLIER, 1,
 				ServerProperties.getClassSpecializationsEnabled() ? ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER : ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER,

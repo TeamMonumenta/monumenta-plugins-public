@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -35,8 +34,8 @@ public class ManaLance extends Ability {
 	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
-	public ManaLance(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Mana Lance");
+	public ManaLance(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Mana Lance");
 		mInfo.linkedSpell = Spells.MANA_LANCE;
 		mInfo.scoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";

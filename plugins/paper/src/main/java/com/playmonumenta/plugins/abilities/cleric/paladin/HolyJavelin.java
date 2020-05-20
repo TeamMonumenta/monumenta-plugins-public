@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -48,8 +47,8 @@ public class HolyJavelin extends Ability {
 	private int mDamage;
 	private int mDamageUndead;
 
-	public HolyJavelin(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Holy Javelin");
+	public HolyJavelin(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Holy Javelin");
 		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.scoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";

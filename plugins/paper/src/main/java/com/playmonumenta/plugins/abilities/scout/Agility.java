@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,8 +21,8 @@ public class Agility extends Ability {
 
 	private final int mDamageBonus;
 
-	public Agility(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Agility");
+	public Agility(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Agility");
 		mInfo.scoreboardId = "Agility";
 		mInfo.mShorthandName = "Agl";
 		mInfo.mDescriptions.add("You gain permanent Haste I. Your melee attacks deal +1 extra damage.");

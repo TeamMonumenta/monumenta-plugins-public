@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.twisted;
 
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,8 +19,8 @@ public class Merciless extends StatMultiplier {
 	private static final double MERCILESS_DAMAGE_DEALT_MULTIPLIER = 0.333;
 	private static final double MERCILESS_DAMAGE_TAKEN_MULTIPLIER = 3;
 
-	public Merciless(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Merciless(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "Weathering injury that shouldn't be possible, they return with " + ChatColor.DARK_RED + ChatColor.BOLD + "MERCILESS" + ChatColor.GRAY + " strikes of their own.",
 				MERCILESS_DAMAGE_DEALT_MULTIPLIER, MERCILESS_DAMAGE_TAKEN_MULTIPLIER, MERCILESS_DAMAGE_TAKEN_MULTIPLIER);
 	}

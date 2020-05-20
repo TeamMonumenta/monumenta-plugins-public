@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,6 +37,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -122,13 +122,11 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
-	private Random rand = new Random();
-
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 		if (players.size() > 0) {
-			Player newTarget = players.get(rand.nextInt(players.size()));
+			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);
 		}
 	}

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -21,8 +20,8 @@ public class BasiliskPoison extends Ability {
 	private static final int BASILISK_POISON_1_DURATION = 7 * 20;
 	private static final int BASILISK_POISON_2_DURATION = 6 * 20;
 
-	public BasiliskPoison(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Basilisk Poison");
+	public BasiliskPoison(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Basilisk Poison");
 		mInfo.scoreboardId = "BasiliskPoison";
 		mInfo.mShorthandName = "BP";
 		mInfo.mDescriptions.add("Equips your arrows with a noxious mixture that afflicts targets with 7s of Wither II.");

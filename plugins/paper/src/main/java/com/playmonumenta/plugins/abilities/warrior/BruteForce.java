@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -27,8 +25,8 @@ public class BruteForce extends Ability {
 
 	private final double damageBonus;
 
-	public BruteForce(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Brute Force");
+	public BruteForce(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Brute Force");
 		mInfo.linkedSpell = Spells.BRUTE_FORCE;
 		mInfo.scoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";

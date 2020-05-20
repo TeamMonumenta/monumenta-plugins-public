@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,8 +28,8 @@ public class PinningShot extends Ability {
 
 	private static final double PINNING_SHOT_DAMAGE_MULTIPLIER = 1.3;
 
-	public PinningShot(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Pinning Shot");
+	public PinningShot(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Pinning Shot");
 		mInfo.scoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
 		mInfo.mDescriptions.add("When you shoot a non-boss enemy with a bow you automatically inflict Slowness 7 for 5s. Shooting a pinned enemy removes the slowness. This can only affect each enemy once.");

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
@@ -28,8 +27,8 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 
 	private final KillTriggeredAbilityTracker mTracker;
 
-	public DeathsTouchNonReaper(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public DeathsTouchNonReaper(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 

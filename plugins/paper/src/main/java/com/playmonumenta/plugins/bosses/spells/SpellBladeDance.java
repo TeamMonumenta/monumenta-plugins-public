@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,6 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -47,31 +46,31 @@ public class SpellBladeDance extends Spell {
 				world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0);
 				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
 				mPitch += 0.2;
+				Location loc1 = mCaster.getLocation().add(6, 6, 6);
+				Location loc2 = mCaster.getLocation().add(-6, -1, -6);
+
+				double x1 = FastUtils.randomDoubleInRange(loc2.getX(), loc1.getX());
+				double y1 = FastUtils.randomDoubleInRange(loc2.getY(), loc1.getY());
+				double z1 = FastUtils.randomDoubleInRange(loc2.getZ(), loc1.getZ());
+
+				double x2 = FastUtils.randomDoubleInRange(loc2.getX(), loc1.getX());
+				double y2 = FastUtils.randomDoubleInRange(loc2.getY(), loc1.getY());
+				double z2 = FastUtils.randomDoubleInRange(loc2.getZ(), loc1.getZ());
+
 				new BukkitRunnable() {
-					Location loc1 = mCaster.getLocation().add(6, 6, 6);
-					Location loc2 = mCaster.getLocation().add(-6, -1, -6);
+					Location mLoc1 = new Location(world, x1, y1, z1);
+					Location mLoc2 = new Location(world, x2, y2, z2);
+					Vector mDir = LocationUtils.getDirectionTo(mLoc2, mLoc1);
+					int mTicks = 0;
 
-					double x1 = ThreadLocalRandom.current().nextDouble(loc2.getX(), loc1.getX());
-					double y1 = ThreadLocalRandom.current().nextDouble(loc2.getY(), loc1.getY());
-					double z1 = ThreadLocalRandom.current().nextDouble(loc2.getZ(), loc1.getZ());
-					Location l1 = new Location(world, x1, y1, z1);
-
-					double x2 = ThreadLocalRandom.current().nextDouble(loc2.getX(), loc1.getX());
-					double y2 = ThreadLocalRandom.current().nextDouble(loc2.getY(), loc1.getY());
-					double z2 = ThreadLocalRandom.current().nextDouble(loc2.getZ(), loc1.getZ());
-					Location l2 = new Location(world, x2, y2, z2);
-
-					Vector dir = LocationUtils.getDirectionTo(l2, l1);
-
-					int t = 0;
 					@Override
 					public void run() {
-						t++;
-						l1.add(dir.clone().multiply(1.15));
-						world.spawnParticle(Particle.CRIT_MAGIC, l1, 4, 0, 0, 0, 0.35);
-						world.spawnParticle(Particle.CLOUD, l1, 1, 0, 0, 0, 0);
-						world.spawnParticle(Particle.SWEEP_ATTACK, l1, 1, 0, 0, 0, 0);
-						if (t >= 10) {
+						mTicks++;
+						mLoc1.add(mDir.clone().multiply(1.15));
+						world.spawnParticle(Particle.CRIT_MAGIC, mLoc1, 4, 0, 0, 0, 0.35);
+						world.spawnParticle(Particle.CLOUD, mLoc1, 1, 0, 0, 0, 0);
+						world.spawnParticle(Particle.SWEEP_ATTACK, mLoc1, 1, 0, 0, 0, 0);
+						if (mTicks >= 10) {
 							this.cancel();
 						}
 					}

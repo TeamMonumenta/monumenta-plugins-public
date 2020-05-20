@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -53,8 +52,8 @@ public class Dodging extends Ability {
 
 	private int mTriggerTick = 0;
 
-	public Dodging(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Dodging");
+	public Dodging(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Dodging");
 		mInfo.linkedSpell = Spells.DODGING;
 		mInfo.scoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";

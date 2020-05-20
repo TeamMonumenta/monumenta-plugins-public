@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -41,8 +40,8 @@ public class EnfeeblingElixir extends Ability {
 	private final int mSpeedAmp;
 	private final float mKnockbackSpeed;
 
-	public EnfeeblingElixir(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Enfeebling Elixir");
+	public EnfeeblingElixir(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Enfeebling Elixir");
 		mInfo.linkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.scoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";

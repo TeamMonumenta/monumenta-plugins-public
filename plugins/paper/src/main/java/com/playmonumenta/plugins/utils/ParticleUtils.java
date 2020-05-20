@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.utils;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,7 +12,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class ParticleUtils {
-	private static final Random PARTICLE_RAND = new Random();
 
 	@FunctionalInterface
 	public interface SpawnParticleAction {
@@ -32,12 +30,12 @@ public class ParticleUtils {
 
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / (7 * radius)) {
 					double x = mCurrentRadius * Math.cos(theta);
-					double y = (PARTICLE_RAND.nextDouble() - 0.5) * height;
+					double y = (FastUtils.RANDOM.nextDouble() - 0.5) * height;
 					double z = mCurrentRadius * Math.sin(theta);
 					loc.add(x, y, z);
 
 					for (Map.Entry<Double, SpawnParticleAction> particle : particles) {
-						if (PARTICLE_RAND.nextDouble() < particle.getKey()) {
+						if (FastUtils.RANDOM.nextDouble() < particle.getKey()) {
 							particle.getValue().run(loc);
 						}
 					}
@@ -69,7 +67,7 @@ public class ParticleUtils {
 
 					Vector toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (mDirection.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent1) {
+					if (mDirection.dot(toParticle) > dotAngle && FastUtils.RANDOM.nextDouble() < percent1) {
 						mWorld.spawnParticle(type1, mLoc, 1);
 					}
 
@@ -84,7 +82,7 @@ public class ParticleUtils {
 
 					toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (mDirection.dot(toParticle) > dotAngle && PARTICLE_RAND.nextDouble() < percent2) {
+					if (mDirection.dot(toParticle) > dotAngle && FastUtils.RANDOM.nextDouble() < percent2) {
 						mWorld.spawnParticle(type2, mLoc, 1);
 					}
 

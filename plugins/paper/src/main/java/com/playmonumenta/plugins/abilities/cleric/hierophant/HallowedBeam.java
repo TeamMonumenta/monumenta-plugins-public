@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,8 +32,8 @@ public class HallowedBeam extends Ability {
 	private static final double HALLOWED_DAMAGE_DIRECT = 42;
 	private static final double HALLOWED_DAMAGE_EXPLOSION = 22;
 
-	public HallowedBeam(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Hallowed Beam");
+	public HallowedBeam(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Hallowed Beam");
 		mInfo.scoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Firing a fully-drawn bow while shifted, while pointing directly at a non-boss undead, will instantly deal 42 damage to the undead instead of consuming an arrow. Cooldown: 20s.");

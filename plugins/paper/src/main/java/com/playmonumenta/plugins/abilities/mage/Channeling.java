@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -43,8 +42,8 @@ public class Channeling extends Ability {
 	private int mDamage;
 	private Spells mLastSpellCast;
 
-	public Channeling(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Channeling");
+	public Channeling(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Channeling");
 		mInfo.linkedSpell = Spells.CHANNELING;
 		mInfo.scoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";

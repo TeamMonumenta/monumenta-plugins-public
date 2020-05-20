@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,8 +50,8 @@ public class HungeringVortex extends Ability {
 
 	private int mActiveBonus = 0;
 
-	public HungeringVortex(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Hungering Vortex");
+	public HungeringVortex(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Hungering Vortex");
 		mInfo.scoreboardId = "HungeringVortex";
 		mInfo.mShorthandName = "HV";
 		mInfo.mDescriptions.add("Right-clicking while shifted while looking down pulls all mobs in a 8 block radius towards you, afflicting them with Slowness I for 8s. This draws the aggro of all mobs pulled and increases your melee damage by 1 for every affected enemy up to a maximum of 6 bonus damage for 8s. In addition, you gain Absorption I for 8 seconds on activation. This skill only goes on cooldown if at least one mob is affected. Cooldown: 18s.");

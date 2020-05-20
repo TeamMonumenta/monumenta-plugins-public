@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -20,8 +19,8 @@ public class RoguePassive extends Ability {
 	public static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 
-	public RoguePassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public RoguePassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

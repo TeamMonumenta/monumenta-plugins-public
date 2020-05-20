@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -44,8 +43,8 @@ public class Quickdraw extends Ability {
 	private static final int QUICKDRAW_SLOWNESS_DURATION = 20 * 2;
 	private static final int QUICKDRAW_SLOWNESS_LEVEL = 2;
 
-	public Quickdraw(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Quickdraw");
+	public Quickdraw(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Quickdraw");
 		mInfo.linkedSpell = Spells.QUICKDRAW;
 		mInfo.scoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";

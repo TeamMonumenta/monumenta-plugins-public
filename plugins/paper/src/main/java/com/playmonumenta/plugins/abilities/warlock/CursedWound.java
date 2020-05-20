@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,8 +31,8 @@ public class CursedWound extends Ability {
 
 	private final int damageBonus;
 
-	public CursedWound(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Cursed Wound");
+	public CursedWound(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Cursed Wound");
 		mInfo.scoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Hitting an enemy with a scythe gives 6s of Wither II. In addition, scythe attacks deal +1 damage.");

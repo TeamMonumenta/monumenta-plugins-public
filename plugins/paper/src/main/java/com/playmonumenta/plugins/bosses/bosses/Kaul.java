@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -57,6 +56,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -128,7 +128,6 @@ public class Kaul extends BossAbilityGroup {
 	private boolean cooldown = false;
 	private boolean primordialPhase = false;
 	private int hits = 0;
-	private final Random rand = new Random();
 
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
@@ -348,7 +347,6 @@ public class Kaul extends BossAbilityGroup {
 				public void run() {
 					teleport(mSpawnLoc.clone().add(0, 5, 0));
 					new BukkitRunnable() {
-						Random rand = new Random();
 						Location loc = mBoss.getLocation();
 						float j = 0;
 						double rotation = 0;
@@ -400,7 +398,7 @@ public class Kaul extends BossAbilityGroup {
 										}
 										for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t),
 										                                 loc.clone().add(t, 0, t))) {
-											if (rand.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
+											if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
 											    && block.getLocation().add(0, 1.5, 0).getBlock()
 											    .getType() == Material.AIR) {
 												block.setType(Material.SMOOTH_RED_SANDSTONE);
@@ -611,7 +609,6 @@ public class Kaul extends BossAbilityGroup {
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, 5, 0.9f);
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 
-										Random rand = new Random();
 										new BukkitRunnable() {
 											Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
 											double rotation = 0;
@@ -632,7 +629,7 @@ public class Kaul extends BossAbilityGroup {
 												for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
 													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 														block.setType(Material.NETHERRACK);
-														if (rand.nextInt(3) == 1) {
+														if (FastUtils.RANDOM.nextInt(3) == 1) {
 															block.setType(Material.MAGMA_BLOCK);
 														}
 													} else if (block.getType() == Material.SMOOTH_SANDSTONE) {
@@ -891,7 +888,7 @@ public class Kaul extends BossAbilityGroup {
 								teleport(mSpawnLoc);
 								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 								if (players.size() > 0) {
-									Player newTarget = players.get(rand.nextInt(players.size()));
+									Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									((Mob) mBoss).setTarget(newTarget);
 								}
 							}
@@ -930,7 +927,6 @@ public class Kaul extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.GLOWING);
-		Random rand = new Random();
 		for (Entity ent : mSpawnLoc.getNearbyLivingEntities(detectionRange)) {
 			if (!ent.getUniqueId().equals(mBoss.getUniqueId()) && ent instanceof WitherSkeleton && !ent.isDead()) {
 				ent.remove();
@@ -956,12 +952,12 @@ public class Kaul extends BossAbilityGroup {
 				for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
 					if (block.getType() == Material.MAGMA_BLOCK) {
 						block.setType(Material.OAK_LEAVES);
-						if (rand.nextInt(5) == 1) {
+						if (FastUtils.RANDOM.nextInt(5) == 1) {
 							block.setType(Material.GLOWSTONE);
 						}
 					} else if (block.getType() == Material.SMOOTH_RED_SANDSTONE || block.getType() == Material.NETHERRACK) {
 						block.setType(Material.GRASS_BLOCK);
-						if (rand.nextInt(3) == 1) {
+						if (FastUtils.RANDOM.nextInt(3) == 1) {
 							Block b = block.getLocation().add(0, 1.5, 0).getBlock();
 							if (!b.getType().isSolid()) {
 								b.setType(Material.GRASS);

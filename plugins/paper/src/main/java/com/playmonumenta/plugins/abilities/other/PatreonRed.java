@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.other;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -17,8 +16,8 @@ public class PatreonRed extends Ability {
 
 	private final boolean mNoSelfParticles;
 
-	public PatreonRed(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public PatreonRed(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 
 		if (player != null) {
 			mNoSelfParticles = player.getScoreboardTags().contains("noSelfParticles");

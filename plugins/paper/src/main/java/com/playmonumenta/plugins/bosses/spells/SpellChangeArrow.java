@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Random;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -10,8 +10,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class SpellChangeArrow extends Spell {
-	private static final Random RAND = new Random();
-
 	private LivingEntity mLauncher;
 
 	public SpellChangeArrow(LivingEntity launcher) {
@@ -19,7 +17,7 @@ public class SpellChangeArrow extends Spell {
 	}
 
 	private static ItemStack getTippedArrow() {
-		int rand = RAND.nextInt(4);
+		int rand = FastUtils.RANDOM.nextInt(4);
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, 1);
 
 		PotionMeta meta = (PotionMeta)stack.getItemMeta();

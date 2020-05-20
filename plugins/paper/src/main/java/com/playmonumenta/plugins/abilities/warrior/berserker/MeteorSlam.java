@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,6 +23,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -65,8 +63,8 @@ public class MeteorSlam extends Ability {
 	private final Plugin mPlugin;
 	private final BukkitRunnable mRunnable;
 
-	public MeteorSlam(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Meteor Slam");
+	public MeteorSlam(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Meteor Slam");
 		mPlugin = plugin;
 
 		mInfo.linkedSpell = Spells.METEOR_SLAM;
@@ -159,11 +157,11 @@ public class MeteorSlam extends Ability {
 			//Wanted to try something new: Particles that have no y velocity and only x and z.
 			//Flame
 			for (int i = 0; i < 60; i++) {
-				double x = ThreadLocalRandom.current().nextDouble(-3, 3);
-				double z = ThreadLocalRandom.current().nextDouble(-3, 3);
+				double x = FastUtils.randomDoubleInRange(-3, 3);
+				double z = FastUtils.randomDoubleInRange(-3, 3);
 				Location to = mPlayer.getLocation().add(x, 0.15, z);
 				Vector dir = LocationUtils.getDirectionTo(to, mPlayer.getLocation().add(0, 0.15, 0));
-				mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), ThreadLocalRandom.current().nextDouble(0.1, 0.3));
+				mWorld.spawnParticle(Particle.FLAME, mPlayer.getLocation().add(0, 0.15, 0), 0, (float) dir.getX(), 0f, (float) dir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.3));
 			}
 		}
 	}

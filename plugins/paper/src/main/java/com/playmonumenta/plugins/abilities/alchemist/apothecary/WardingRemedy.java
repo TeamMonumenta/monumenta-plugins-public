@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -29,8 +28,8 @@ public class WardingRemedy extends Ability {
 	private static final Color APOTHECARY_LIGHT_COLOR = Color.fromRGB(255, 255, 100);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
-	public WardingRemedy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Warding Remedy");
+	public WardingRemedy(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Warding Remedy");
 		mInfo.scoreboardId = "WardingRemedy";
 		mInfo.linkedSpell = Spells.WARDING_REMEDY;
 		mInfo.cooldown = getAbilityScore() == 1 ? WARDING_REMEDY_1_COOLDOWN : WARDING_REMEDY_2_COOLDOWN;

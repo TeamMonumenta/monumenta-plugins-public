@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 
@@ -36,7 +36,6 @@ public class SpellLightningStrike extends Spell {
 	private int mTimer;
 	private int mDivisor;
 	private Location mLoc;
-	private Random mRandom = new Random();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
@@ -63,7 +62,7 @@ public class SpellLightningStrike extends Spell {
 				List<Player> toHit = new ArrayList<Player>();
 				int cap = players.size() / mDivisor;
 				for (int i = 0; i < cap; i++) {
-					Player player = players.get(mRandom.nextInt(players.size()));
+					Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 					if (!toHit.contains(player)) {
 						toHit.add(player);
 					} else {

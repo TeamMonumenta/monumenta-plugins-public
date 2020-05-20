@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.scout;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -43,8 +42,8 @@ public class FinishingBlow extends Ability {
 	private Map<UUID, Counter> mMarkedMobs = new HashMap<UUID, Counter>();
 	private int mDamageBonus;
 
-	public FinishingBlow(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Finishing Blow");
+	public FinishingBlow(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Finishing Blow");
 		mInfo.scoreboardId = "FinishingBlow";
 		mInfo.mDescriptions.add("Enemies hit by your fully-charged arrows are marked for 5 seconds. Striking a marked enemy with a melee attack detonates the mark to deal them 3 bonus damage, doubled against enemies below 50% health.");
 		mInfo.mDescriptions.add("Base damage increased to 6.");

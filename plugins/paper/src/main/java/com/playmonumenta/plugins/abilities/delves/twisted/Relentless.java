@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.twisted;
 
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -21,8 +20,8 @@ public class Relentless extends StatMultiplier {
 	private static final double RELENTLESS_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double RELENTLESS_SPEED_MULTIPLIER = 1.5;
 
-	public Relentless(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Relentless(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "Footsteps hound you, " + ChatColor.DARK_RED + ChatColor.BOLD + "RELENTLESS" + ChatColor.GRAY + " in their deadly pursuit.",
 				RELENTLESS_DAMAGE_DEALT_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_SPEED_MULTIPLIER);
 	}

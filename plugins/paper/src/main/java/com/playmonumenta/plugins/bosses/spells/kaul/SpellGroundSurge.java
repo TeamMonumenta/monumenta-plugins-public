@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -22,6 +21,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -30,7 +30,6 @@ public class SpellGroundSurge extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private double mRange;
-	private final Random random = new Random();
 
 	public SpellGroundSurge(Plugin plugin, LivingEntity boss, double range) {
 		mPlugin = plugin;
@@ -79,7 +78,7 @@ public class SpellGroundSurge extends Spell {
 
 					List<Player> toHit = new ArrayList<Player>();
 					while (toHit.size() < targets) {
-						Player player = players.get(random.nextInt(players.size()));
+						Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 						if (!toHit.contains(player)) {
 							toHit.add(player);
 						}
@@ -140,7 +139,7 @@ public class SpellGroundSurge extends Spell {
 										// Find a random other player that is not equal to the current target
 										Player rPlayer = target;
 										while (rPlayer.getUniqueId().equals(target.getUniqueId())) {
-											rPlayer = players.get(random.nextInt(players.size()));
+											rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 										}
 										Player tPlayer = rPlayer;
 										new BukkitRunnable() {
@@ -194,13 +193,13 @@ public class SpellGroundSurge extends Spell {
 														mTicks = 0;
 														if (mHits < players.size() && mHits <= 2) {
 															int attempts = 0;
-															_tPlayer = players.get(random.nextInt(players.size()));
+															_tPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 															while (mHit.contains(_tPlayer.getUniqueId())) {
 																//A rare case can occur where the loop has gone through all of the possible
 																//players, but they have been hit. Add an attempt integer to make sure that
 																//it does not cause an infinite loop.
 																if (attempts < 5) {
-																	_tPlayer = players.get(random.nextInt(players.size()));
+																	_tPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 																	attempts++;
 																} else {
 																	this.cancel();

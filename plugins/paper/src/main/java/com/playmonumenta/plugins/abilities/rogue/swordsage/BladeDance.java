@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -34,8 +33,8 @@ public class BladeDance extends Ability {
 	private static final float DANCE_KNOCKBACK_SPEED = 0.2f;
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
-	public BladeDance(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Blade Dance");
+	public BladeDance(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Blade Dance");
 		mInfo.scoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
 		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 12 damage to and afflicts Weakness III to all enemies in a 4 block radius for 5 seconds. Cooldown: 20 seconds.");

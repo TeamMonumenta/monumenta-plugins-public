@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -35,8 +34,8 @@ public class ByMyBlade extends Ability {
 	private int mHasteAmplifier;
 	private int mDamageBonus;
 
-	public ByMyBlade(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "By My Blade");
+	public ByMyBlade(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "By My Blade");
 		mInfo.linkedSpell = Spells.BY_MY_BLADE;
 		mInfo.scoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";

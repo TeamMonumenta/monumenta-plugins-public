@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -26,8 +25,8 @@ public class WardingRemedyNonApothecary extends Ability {
 	private static final double WARDING_REMEDY_2_DAMAGE_MULTIPLIER = 1.25;
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
-	public WardingRemedyNonApothecary(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public WardingRemedyNonApothecary(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -13,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 public class SpellIceBreak extends Spell {
 	private Entity mLauncher;
@@ -21,7 +21,6 @@ public class SpellIceBreak extends Spell {
 		mLauncher = launcher;
 	}
 
-	private Random mRand = new Random();
 	private Set<Block> mIceBlocks = new HashSet<Block>();
 	private Set<Block> mFrostedBlocks = new HashSet<Block>();
 	private Set<Block> mBrokenBlocks = new HashSet<Block>();
@@ -77,7 +76,7 @@ public class SpellIceBreak extends Spell {
 			// Make the new frosted blocks
 			for (Block block : mIceBlocks) {
 				// Randomise a bit to make it look better.
-				if (mRand.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
+				if (FastUtils.RANDOM.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
 					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.1f, 0.9f);
 					block.getLocation().getWorld().spawnParticle(Particle.CLOUD, block.getLocation(), 10, 1, 1, 1, 0.03);
 					block.setType(Material.FROSTED_ICE);

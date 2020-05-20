@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -29,8 +28,8 @@ public class ElementalArrows extends Ability {
 	private static final int ELEMENTAL_ARROWS_DURATION = 20 * 6;
 	private static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 
-	public ElementalArrows(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Elemental Arrows");
+	public ElementalArrows(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Elemental Arrows");
 		mInfo.linkedSpell = Spells.ELEMENTAL_ARROWS;
 		mInfo.scoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";

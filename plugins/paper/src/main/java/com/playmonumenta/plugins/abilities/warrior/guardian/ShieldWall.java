@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,8 +51,8 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
 	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
 
-	public ShieldWall(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Shield Wall");
+	public ShieldWall(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Shield Wall");
 		mInfo.scoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");

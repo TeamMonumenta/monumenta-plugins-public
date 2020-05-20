@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -27,8 +25,8 @@ public class GrowingRage extends Ability {
 	private double damagePercent;
 	private int mHealthThreshold = 0;
 
-	public GrowingRage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Growing Rage");
+	public GrowingRage(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Growing Rage");
 		mInfo.scoreboardId = "GrowingRage";
 		mInfo.mShorthandName = "GR";
 		mInfo.mDescriptions.add("You do 10% more damage with non-skill based melee damage. Every 2 hearts you fall below your maximum health, gain another 5% more damage, to a maximum of 40% total.");

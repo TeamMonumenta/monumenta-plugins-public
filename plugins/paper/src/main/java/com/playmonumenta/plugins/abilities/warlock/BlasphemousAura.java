@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -35,8 +34,8 @@ public class BlasphemousAura extends Ability {
 
 	private int oldBonus = 0;
 
-	public BlasphemousAura(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Blasphemous Aura");
+	public BlasphemousAura(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Blasphemous Aura");
 		mInfo.scoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("When you hit an enemy with a skill other than Blasphemous Aura they gain 15% vulnerability for 5 seconds.");

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,6 +14,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellAxtalTntThrow extends Spell {
@@ -22,7 +22,6 @@ public class SpellAxtalTntThrow extends Spell {
 	private Entity mLauncher;
 	private int mCount;
 	private int mCooldown;
-	Random mRand = new Random();
 
 	public SpellAxtalTntThrow(Plugin plugin, Entity launcher, int count, int cooldown) {
 		mPlugin = plugin;
@@ -75,7 +74,7 @@ public class SpellAxtalTntThrow extends Spell {
 			public void run() {
 				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100);
 				if (plist.size() >= 1) {
-					Player target = plist.get(mRand.nextInt(plist.size()));
+					Player target = plist.get(FastUtils.RANDOM.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation();
 					try {
 						Entity tnt = EntityUtils.getSummonEntityAt(sLoc.add(0, 1.7, 0), EntityType.PRIMED_TNT, "{Fuse:50}");

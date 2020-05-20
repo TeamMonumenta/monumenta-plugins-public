@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -23,8 +22,8 @@ public class DivineJustice extends Ability {
 	private static final int DIVINE_JUSTICE_HEAL = 4;
 	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
 
-	public DivineJustice(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Divine Justice");
+	public DivineJustice(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Divine Justice");
 		mInfo.scoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add("Your critical strikes deal 5 additional damage to undead enemies. When you critically strike an undead enemy, you heal yourself for 0.5 hearts.");

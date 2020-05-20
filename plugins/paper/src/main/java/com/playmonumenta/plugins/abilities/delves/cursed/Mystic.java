@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.cursed;
 
-import java.util.Random;
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -31,8 +29,8 @@ public class Mystic extends StatMultiplier {
 			" boss_frostnova"
 	};
 
-	public Mystic(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Mystic(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.RED + ChatColor.BOLD + "MYSTIC" + ChatColor.GRAY + " powers channeled within.",
 				MYSTIC_DAMAGE_DEALT_MULTIPLIER, 1,
 				ServerProperties.getClassSpecializationsEnabled() ? MYSTIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER : MYSTIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER,

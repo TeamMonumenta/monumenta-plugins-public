@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellArachnopocolypse extends Spell {
@@ -23,7 +22,6 @@ public class SpellArachnopocolypse extends Spell {
 	private LivingEntity mBoss;
 	private Location mLoc;
 	private double mDetectRange;
-	private Random rand = new Random();
 	private boolean cooldown = false;
 
 	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, Location loc, double detectRange) {
@@ -82,7 +80,7 @@ public class SpellArachnopocolypse extends Spell {
 	}
 
 	public void riseSpider(Location loc) {
-		int num = rand.nextInt(5);
+		int num = FastUtils.RANDOM.nextInt(5);
 		String summon = null;
 		if (num == 0) {
 			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Corrupted Spider\\\"}\",Health:20.0f,Attributes:[{Base:20,Name:\"generic.maxHealth\"},{Base:0.36d,Name:\"generic.movementSpeed\"},{Base:25,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:199980,Id:8,Amplifier:3}],HandItems:[{id:\"minecraft:wooden_sword\",tag:{Enchantments:[{lvl:2,id:\"minecraft:knockback\"}]},Count:1b},{}]}";
@@ -116,10 +114,9 @@ public class SpellArachnopocolypse extends Spell {
 	}
 
 	private Location getRandomLocation(Location origin, double range) {
-		ThreadLocalRandom rand = ThreadLocalRandom.current();
-		Location loc = origin.clone().add(rand.nextDouble(-range, range), 0, rand.nextDouble(-range, range));
+		Location loc = origin.clone().add(FastUtils.randomDoubleInRange(-range, range), 0, FastUtils.randomDoubleInRange(-range, range));
 		while (loc.getBlock().getType().isSolid()) {
-			loc = origin.clone().add(rand.nextDouble(-range, range), 0, rand.nextDouble(-range, range));
+			loc = origin.clone().add(FastUtils.randomDoubleInRange(-range, range), 0, FastUtils.randomDoubleInRange(-range, range));
 		}
 		return loc;
 	}

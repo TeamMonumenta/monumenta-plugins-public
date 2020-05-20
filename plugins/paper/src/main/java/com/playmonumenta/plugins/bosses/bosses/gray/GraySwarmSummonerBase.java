@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses.gray;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,6 +20,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -33,7 +33,6 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int SPAWNS_PER_PLAYER = 8;
 	private static final int PLAYER_RANGE = 32;
 	private static final int MAX_NEARBY_SUMMONS = 25;
-	private static final Random mRand = new Random();
 
 	GraySwarmSummonerBase(Plugin plugin, LivingEntity boss, String identityTag, int detectionRange, EntityType mobType, String mobNBT) throws Exception {
 		if (!(boss instanceof Mob)) {
@@ -95,7 +94,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 							}.runTaskLater(plugin, SUMMON_PARTICLE_DELAY);
 						}
 					};
-					runnable.runTaskLater(plugin, mRand.nextInt(SUMMON_MAX_TIME));
+					runnable.runTaskLater(plugin, FastUtils.RANDOM.nextInt(SUMMON_MAX_TIME));
 					return runnable;
 				},
 				() -> {

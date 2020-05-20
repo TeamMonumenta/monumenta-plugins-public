@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.cursed;
 
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,8 +19,8 @@ public class Ruthless extends StatMultiplier {
 	private static final double RUTHLESS_DAMAGE_DEALT_MULTIPLIER = 0.5;
 	private static final double RUTHLESS_DAMAGE_TAKEN_MULTIPLIER = 2;
 
-	public Ruthless(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Ruthless(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "Weathering injury that shouldn't be possible, they return with " + ChatColor.RED + ChatColor.BOLD + "RUTHLESS" + ChatColor.GRAY + " strikes of their own.",
 				RUTHLESS_DAMAGE_DEALT_MULTIPLIER, RUTHLESS_DAMAGE_TAKEN_MULTIPLIER, RUTHLESS_DAMAGE_TAKEN_MULTIPLIER);
 	}

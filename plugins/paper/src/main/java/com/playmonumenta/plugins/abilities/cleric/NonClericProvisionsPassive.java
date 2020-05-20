@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
@@ -13,6 +12,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -24,8 +24,8 @@ public class NonClericProvisionsPassive extends Ability {
 	private static final float PROVISIONS_1_CHANCE = 0.2f;
 	private static final float PROVISIONS_2_CHANCE = 0.4f;
 
-	public NonClericProvisionsPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public NonClericProvisionsPassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override
@@ -40,14 +40,14 @@ public class NonClericProvisionsPassive extends Ability {
 			if (provisions != null) {
 				Integer score = provisions.getAbilityScore();
 				if (score == 2) {
-					return mRandom.nextFloat() < PROVISIONS_2_CHANCE;
+					return FastUtils.RANDOM.nextDouble() < PROVISIONS_2_CHANCE;
 				} else if (score > level) {
 					level = score;
 				}
 			}
 		}
 		if (level == 1) {
-			return mRandom.nextFloat() < PROVISIONS_1_CHANCE;
+			return FastUtils.RANDOM.nextDouble() < PROVISIONS_1_CHANCE;
 		} else {
 			return false;
 		}

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,12 +22,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindRandomPlayer;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class CShuraPhaseOne extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura_1";
 	public static final int detectionRange = 50;
-	private final Random mRand = new Random();
 
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
@@ -83,7 +82,7 @@ public class CShuraPhaseOne extends BossAbilityGroup {
 	}
 
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		int rand = mRand.nextInt(4);
+		int rand = FastUtils.RANDOM.nextInt(4);
 		LivingEntity target = (LivingEntity) event.getEntity();
 		if (rand == 0) {
 			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 0, false, true));

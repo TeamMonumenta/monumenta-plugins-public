@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -17,8 +16,8 @@ public class BowMastery extends Ability {
 	private static final int BOW_MASTER_1_DAMAGE = 3;
 	private static final int BOW_MASTER_2_DAMAGE = 6;
 
-	public BowMastery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Bow Mastery");
+	public BowMastery(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Bow Mastery");
 		mInfo.scoreboardId = "BowMastery";
 		mInfo.mShorthandName = "BM";
 		mInfo.mDescriptions.add("Your arrows deal up to 3 extra damage scaling with the charge level of your bow.");

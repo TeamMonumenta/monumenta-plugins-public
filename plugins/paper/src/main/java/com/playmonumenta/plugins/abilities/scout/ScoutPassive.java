@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -10,6 +9,7 @@ import org.bukkit.entity.Player;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
@@ -20,8 +20,8 @@ public class ScoutPassive extends Ability {
 
 	private static float PASSIVE_ARROW_SAVE = 0.20f;
 
-	public ScoutPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public ScoutPassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class ScoutPassive extends Ability {
 
 	@Override
 	public boolean playerShotArrowEvent(Arrow arrow) {
-		if (mRandom.nextFloat() < PASSIVE_ARROW_SAVE) {
+		if (FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}

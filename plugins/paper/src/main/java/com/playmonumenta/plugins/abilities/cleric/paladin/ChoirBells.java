@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,8 +42,8 @@ public class ChoirBells extends Ability {
 	private static final int CHOIR_BELLS_2_COOLDOWN = 20 * 20;
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
 
-	public ChoirBells(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Choir Bells");
+	public ChoirBells(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Choir Bells");
 		mInfo.linkedSpell = Spells.CHOIR_BELLS;
 		mInfo.scoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -40,8 +39,8 @@ public class PrismaticShield extends Ability {
 	private final int mDuration;
 	private final int mDamage;
 
-	public PrismaticShield(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Prismatic Shield");
+	public PrismaticShield(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Prismatic Shield");
 		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
 		mInfo.scoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";

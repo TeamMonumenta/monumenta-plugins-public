@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -55,8 +54,8 @@ public class AmplifyingHex extends Ability {
 	private final int mEffectDamage;
 	private final int mAmplifierDamage;
 
-	public AmplifyingHex(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Amplifying Hex");
+	public AmplifyingHex(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Amplifying Hex");
 		mInfo.scoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
 		mInfo.mDescriptions.add("If you left-click with a scythe while sneaking, you fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. Extra levels of Vulnerability not counted). Cooldown: 12s.");

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -34,8 +33,8 @@ public class Smokescreen extends Ability {
 	private int mSlownessAmplifier;
 	private int mWeaknessAmplifier;
 
-	public Smokescreen(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Smoke Screen");
+	public Smokescreen(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Smoke Screen");
 		mInfo.linkedSpell = Spells.SMOKESCREEN;
 		mInfo.scoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";

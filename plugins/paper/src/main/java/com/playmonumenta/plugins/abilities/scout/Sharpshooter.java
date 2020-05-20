@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
@@ -30,8 +29,8 @@ public class Sharpshooter extends Ability {
 	private static final int SHARPSHOOTER_1_INCREMENT = 1;
 	private static final int SHARPSHOOTER_2_INCREMENT = 2;
 
-	public Sharpshooter(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Sharpshooter");
+	public Sharpshooter(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Sharpshooter");
 		mInfo.scoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Each successful charged arrow hit increases your arrow damage by +1, up to a max of +5. This damage scales depending on the charge level of your bow. Every 4 seconds a stack expires, and hitting an enemy with a charged arrow restarts that timer. Volley can only give one stack.");

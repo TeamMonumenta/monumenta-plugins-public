@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.other;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,8 +39,8 @@ public class EvasionEnchant extends Ability {
 
 	public int mCounter = 0;
 
-	public EvasionEnchant(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public EvasionEnchant(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,6 +19,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -40,7 +40,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  *
  */
 public class SpellVolcanicDemise extends Spell {
-	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private double mRange;
@@ -92,14 +91,14 @@ public class SpellVolcanicDemise extends Spell {
 								}
 							}
 							for (int j = 0; j < 4; j++) {
-								rainMeteor(mCenter.clone().add(mRand.nextDouble(-mRange, mRange), 0, mRand.nextDouble(-mRange, mRange)), players, 40);
+								rainMeteor(mCenter.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), 0, FastUtils.randomDoubleInRange(-mRange, mRange)), players, 40);
 							}
 
 							// Target one random player. Have a meteor rain nearby them.
 							if (players.size() >= 1) {
-								Player rPlayer = players.get(mRand.nextInt(players.size()));
+								Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(mRand.nextDouble(-8, 8), 0, mRand.nextDouble(-8, 8)), players, 40);
+								rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), players, 40);
 							}
 
 							if (i >= 25) {
@@ -147,7 +146,7 @@ public class SpellVolcanicDemise extends Spell {
 				}
 				Location particle = loc.clone().add(0, y, 0);
 				world.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
-				if (mRand.nextBoolean()) {
+				if (FastUtils.RANDOM.nextBoolean()) {
 					world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
 				}
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
@@ -174,7 +173,7 @@ public class SpellVolcanicDemise extends Spell {
 						}
 					}
 					for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 4)) {
-						if (mRand.nextBoolean() && mRand.nextBoolean() && mRand.nextBoolean()) {
+						if (FastUtils.RANDOM.nextDouble() < 0.125) {
 							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 								block.setType(Material.NETHERRACK);
 							} else if (block.getType() == Material.NETHERRACK) {

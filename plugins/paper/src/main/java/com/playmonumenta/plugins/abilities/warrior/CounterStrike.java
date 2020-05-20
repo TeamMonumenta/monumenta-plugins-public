@@ -1,6 +1,14 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,15 +21,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.classes.Spells;
-import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.events.AbilityCastEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class CounterStrike extends Ability {
 
@@ -37,8 +36,8 @@ public class CounterStrike extends Ability {
 	private BukkitRunnable mActivityTimer;
 	private boolean mActive = false;
 
-	public CounterStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Counter Strike");
+	public CounterStrike(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Counter Strike");
 		mInfo.scoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
 		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
@@ -54,7 +53,7 @@ public class CounterStrike extends Ability {
 		if (event.getEntity().getBoundingBox().expand(COUNTER_STRIKE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
 
 			// Passive chance to damage nearby mobs
-			if (mRandom.nextFloat() < 0.15f) {
+			if (FastUtils.RANDOM.nextDouble() < 0.15f) {
 				int counterStrike = getAbilityScore();
 				Entity damager = event.getDamager();
 				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation().add(0, 1, 0), damager.getLocation().add(0, damager.getHeight() / 2, 0));

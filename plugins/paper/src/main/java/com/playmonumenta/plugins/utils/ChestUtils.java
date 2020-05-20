@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -233,8 +232,7 @@ public class ChestUtils {
 
 			int luckLevel;
 
-			Random mRandom = new Random();
-			double rand = mRandom.nextDouble();
+			double rand = FastUtils.RANDOM.nextDouble();
 
 			if (playerCount <= 1) {
 				if (rand < 0.5) {

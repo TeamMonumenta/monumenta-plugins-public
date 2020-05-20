@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -41,8 +40,8 @@ public class ArcaneStrike extends Ability {
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
 
-	public ArcaneStrike(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Arcane Strike");
+	public ArcaneStrike(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Arcane Strike");
 		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
 		mInfo.scoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";

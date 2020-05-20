@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -38,8 +37,8 @@ public class ElementalSpiritFire extends Ability {
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
-	public ElementalSpiritFire(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Elemental Spirit");
+	public ElementalSpiritFire(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Elemental Spirit");
 		mInfo.scoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 12. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");

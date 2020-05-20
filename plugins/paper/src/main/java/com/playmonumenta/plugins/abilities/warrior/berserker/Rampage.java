@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior.berserker;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -42,8 +40,8 @@ public class Rampage extends Ability {
 	private int mRemainderDamage = 0;
 	private int mTimeToStackDecay = 0;
 
-	public Rampage(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Rampage");
+	public Rampage(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Rampage");
 		mInfo.linkedSpell = Spells.RAMPAGE;
 		mInfo.cooldown = 0;
 		mInfo.scoreboardId = "Rampage";

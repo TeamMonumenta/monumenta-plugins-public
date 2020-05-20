@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -27,13 +26,11 @@ public class SpellBatBombs extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private ThreadLocalRandom mRand;
 	private HeadlessHorsemanBoss mHorseman;
 
 	public SpellBatBombs(Plugin plugin, LivingEntity entity, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;
 		mBoss = entity;
-		mRand = ThreadLocalRandom.current();
 		mHorseman = horseman;
 	}
 
@@ -95,16 +92,16 @@ public class SpellBatBombs extends Spell {
 		for (int i = 0; i < 20; i++) {
 			Location loc = new Location(
 			    world,
-			    mBoss.getLocation().getX() + mRand.nextDouble(-15, 15),
-			    mBoss.getLocation().getY() + mRand.nextDouble(1, 3),
-			    mBoss.getLocation().getZ() + mRand.nextDouble(-15, 15)
+			    mBoss.getLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
+			    mBoss.getLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
+			    mBoss.getLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
 			);
 			while (loc.getBlock().getType().isSolid()) {
 				loc = new Location(
 				    world,
-				    mBoss.getLocation().getX() + mRand.nextDouble(-15, 15),
-				    mBoss.getLocation().getY() + mRand.nextDouble(1, 3),
-				    mBoss.getLocation().getZ() + mRand.nextDouble(-15, 15)
+				    mBoss.getLocation().getX() + FastUtils.randomDoubleInRange(-15, 15),
+				    mBoss.getLocation().getY() + FastUtils.randomDoubleInRange(1, 3),
+				    mBoss.getLocation().getZ() + FastUtils.randomDoubleInRange(-15, 15)
 				);
 			}
 			if (mHorseman.getSpawnLocation().distance(loc) < HeadlessHorsemanBoss.detectionRange) {
@@ -147,7 +144,6 @@ public class SpellBatBombs extends Spell {
 
 	@Override
 	public int duration() {
-		// TODO Auto-generated method stub
 		return 20 * 10;
 	}
 

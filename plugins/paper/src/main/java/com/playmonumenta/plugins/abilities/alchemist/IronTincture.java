@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,8 +32,8 @@ public class IronTincture extends Ability {
 
 	private final int mAbsorption;
 
-	public IronTincture(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Iron Tincture");
+	public IronTincture(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Iron Tincture");
 		mInfo.linkedSpell = Spells.IRON_TINCTURE;
 		mInfo.scoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";

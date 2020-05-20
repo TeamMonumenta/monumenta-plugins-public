@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.InstantDrink;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -143,7 +144,7 @@ public class PotionConsumeListener implements Listener {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 						this.cancel();
 					}
-					float pitch = ((float)Math.random() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
+					float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f + pitch);
 					mTicks += DRINK_TICK_DELAY;
 				}

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.listeners;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -40,7 +39,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 public class MobListener implements Listener {
 	static final int SPAWNER_DROP_THRESHOLD = 20;
 	static final int ALCH_PASSIVE_RADIUS = 12;
-	Random mRandom = new Random();
 	Plugin mPlugin = null;
 
 	public MobListener(Plugin plugin) {

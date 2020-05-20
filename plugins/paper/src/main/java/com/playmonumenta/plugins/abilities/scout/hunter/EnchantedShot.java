@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -49,8 +48,8 @@ public class EnchantedShot extends Ability {
 
 	private boolean mActive = false;
 
-	public EnchantedShot(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Enchanted Arrow");
+	public EnchantedShot(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Enchanted Arrow");
 		mInfo.scoreboardId = "EnchantedArrow";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Left-clicking with a bow, while not shifted, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage. Cooldown: 25s.");

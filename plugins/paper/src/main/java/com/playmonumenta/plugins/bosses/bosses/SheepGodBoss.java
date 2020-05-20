@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 
@@ -70,11 +69,10 @@ public class SheepGodBoss extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"BAAA! BAA BAAAA! BAA BAAA BAAA BAAAAAA!?!?!?\",\"color\":\"dark_red\"}]");
 		new BukkitRunnable() {
 			int mT = 0;
-			ThreadLocalRandom mRand = ThreadLocalRandom.current();
 			@Override
 			public void run() {
 				mT++;
-				Location loc = mBoss.getLocation().add(mRand.nextDouble(-10, 10), mRand.nextDouble(0, 3), mRand.nextDouble(-10, 10));
+				Location loc = mBoss.getLocation().add(FastUtils.randomDoubleInRange(-10, 10), FastUtils.randomDoubleInRange(0, 3), FastUtils.randomDoubleInRange(-10, 10));
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
 				world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);

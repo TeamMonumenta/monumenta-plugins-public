@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -47,8 +46,8 @@ public class FlashSword extends Ability {
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
-	public FlashSword(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Flash Sword");
+	public FlashSword(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Flash Sword");
 		mInfo.scoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
 		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 12s.");

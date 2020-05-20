@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -16,6 +15,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ItemUtils.ItemRegion;
 
@@ -52,14 +52,13 @@ public class CalculateReforge extends GenericCommand {
 		// #region Loot Table extraction
 		// Grab currency items from the loot tables so we can scan for and remove them from players' inventories.
 		if (mCXP == null || mHXP == null || mCCS == null || mHCS == null) {
-			Random random = new Random();
 			LootContext context = new LootContext.Builder(player.getLocation()).build();
 			ItemStack[] dummy = new ItemStack[0];
 			if (mCXP == null) {
 				NamespacedKey key = new NamespacedKey("epic", "r1/items/currency/concentrated_experience");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
-					Collection<ItemStack> loot = table.populateLoot(random, context);
+					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						mCXP = loot.toArray(dummy)[0];
 					}
@@ -69,7 +68,7 @@ public class CalculateReforge extends GenericCommand {
 				NamespacedKey key = new NamespacedKey("epic", "r1/items/currency/hyper_experience");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
-					Collection<ItemStack> loot = table.populateLoot(random, context);
+					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						mHXP = loot.toArray(dummy)[0];
 					}
@@ -79,7 +78,7 @@ public class CalculateReforge extends GenericCommand {
 				NamespacedKey key = new NamespacedKey("epic", "r2/items/currency/compressed_crystalline_shard");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
-					Collection<ItemStack> loot = table.populateLoot(random, context);
+					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						mCCS = loot.toArray(dummy)[0];
 					}
@@ -89,7 +88,7 @@ public class CalculateReforge extends GenericCommand {
 				NamespacedKey key = new NamespacedKey("epic", "r2/items/currency/hyper_crystalline_shard");
 				LootTable table = Bukkit.getLootTable(key);
 				if (table != null) {
-					Collection<ItemStack> loot = table.populateLoot(random, context);
+					Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, context);
 					if (!loot.isEmpty()) {
 						mHCS = loot.toArray(dummy)[0];
 					}

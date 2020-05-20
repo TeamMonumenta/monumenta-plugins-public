@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,8 +28,8 @@ public class EagleEye extends Ability {
 	private static final int EAGLE_EYE_2_VULN_LEVEL = 6; // 35%
 	private static final int EAGLE_EYE_RADIUS = 20;
 
-	public EagleEye(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Eagle Eye");
+	public EagleEye(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Eagle Eye");
 		mInfo.linkedSpell = Spells.EAGLE_EYE;
 		mInfo.scoreboardId = "Tinkering"; // lmao
 		mInfo.mShorthandName = "EE";

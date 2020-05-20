@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,8 +18,8 @@ public class WarlockPassive extends Ability {
 
 	private static final int PASSIVE_DURATION = 6 * 20;
 
-	public WarlockPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public WarlockPassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

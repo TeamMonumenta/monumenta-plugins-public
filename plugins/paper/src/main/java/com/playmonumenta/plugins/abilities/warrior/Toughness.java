@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -17,8 +15,8 @@ public class Toughness extends Ability {
 	public static final int TOUGHNESS_2_HEALTH_BOOST = 8;
 	public static final String MODIFIER = "ToughnessMod";
 
-	public Toughness(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Toughness");
+	public Toughness(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Toughness");
 		mInfo.scoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";
 		mInfo.mDescriptions.add("You gain +4 max health (2 hearts).");

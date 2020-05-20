@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -33,7 +33,6 @@ public class CrownbearerBoss extends BossAbilityGroup {
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private final Random rand = new Random();
 	private final String sotf = "{HurtByTimestamp:274,Attributes:[{Base:24.0d,Name:\"generic.maxHealth\"},{Base:0.0d,Name:\"generic.knockbackResistance\"},{Base:0.28d,Name:\"generic.movementSpeed\"},{Base:2.0d,Name:\"generic.armor\"},{Base:0.0d,Name:\"generic.armorToughness\"},{Base:35.0d,Name:\"generic.followRange\"},{Base:3.0d,Name:\"generic.attackDamage\"},{Base:0.024851952672861142d,Name:\"zombie.spawnReinforcements\"}],Invulnerable:0b,FallFlying:0b,PortalCooldown:0,AbsorptionAmount:0.0f,InWaterTime:-1,FallDistance:0.0f,DeathTime:0s,WorldUUIDMost:-1041596277173696703L,HandDropChances:[-200.1f,-200.1f],PersistenceRequired:0b,Spigot.ticksLived:496,ConversionTime:-1,Motion:[0.0d,-0.0784000015258789d,0.0d],Leashed:0b,Health:22.1462f,Bukkit.updateLevel:2,LeftHanded:0b,Paper.AAAB:[-1132.582911225707d,182.0d,-1069.7724767288335d,-1131.9829112018651d,183.95000004768372d,-1069.1724767049916d],Air:300s,OnGround:1b,Dimension:0,Rotation:[93.105225f,0.0f],Paper.ShouldBurnInDay:1b,HandItems:[{id:\"minecraft:wooden_sword\",Count:1b,tag:{Enchantments:[{lvl:1,id:\"minecraft:unbreaking\"}],Damage:0}},{id:\"minecraft:jungle_sapling\",Count:1b}],ArmorDropChances:[-200.1f,-200.1f,-200.1f,-200.1f],Profession:5,CustomName:\"{\\\"text\\\":\\\"Son of the Forest\\\"}\",Passengers:[{shake:0b,xTile:0,Invulnerable:0b,PortalCooldown:0,FallDistance:0.0f,WorldUUIDMost:-1041596277173696703L,zTile:0,yTile:0,id:\"minecraft:potion\",Spigot.ticksLived:496,Motion:[0.0d,-0.05000000074505806d,0.0d],UUIDLeast:-6032565129635564387L,Potion:{id:\"minecraft:lingering_potion\",Count:1b,tag:{CustomPotionEffects:[{Duration:240,Id:5,Amplifier:0},{Duration:20,Id:7,Amplifier:1},{Duration:200,Id:9,Amplifier:0}],Potion:\"minecraft:awkward\"}},Bukkit.updateLevel:2,inGround:0b,Paper.AAAB:[-1132.407911213786d,183.4625000357628d,-1069.5974767169125d,-1132.157911213786d,183.7125000357628d,-1069.3474767169125d],Air:0s,OnGround:0b,Dimension:0,Rotation:[0.0f,0.0f],UUIDMost:-9057466973911038820L,Pos:[-1132.282911213786d,183.4625000357628d,-1069.4724767169125d],Fire:0s,WorldUUIDLeast:-7560693509725274339L,Paper.Origin:[-1128.2814645405856d,183.0d,-1067.2047218221555d]}],Pos:[-1132.282911213786d,182.0d,-1069.4724767169125d],CanBreakDoors:0b,Fire:-1s,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:3060485},Damage:0}},{},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:3060485},Damage:0}},{id:\"minecraft:grass\",Count:1b}],CanPickUpLoot:0b,HurtTime:0s,Paper.FromMobSpawner:1b,WorldUUIDLeast:-7560693509725274339L,DrownedConversionTime:-1,Paper.Origin:[-1128.2814645405856d,183.0d,-1067.2047218221555d]}";
 
 
@@ -70,7 +69,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				@Override
 				public void run() {
 					t++;
-					Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
+					Location loc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summon_radius), 1.5, FastUtils.RANDOM.nextInt(summon_radius));
 					summonSOTF(loc);
 					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
 					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);
@@ -95,7 +94,7 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				@Override
 				public void run() {
 					t++;
-					Location loc = mBoss.getLocation().add(rand.nextInt(summon_radius), 1.5, rand.nextInt(summon_radius));
+					Location loc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summon_radius), 1.5, FastUtils.RANDOM.nextInt(summon_radius));
 					summonSOTF(loc);
 					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
 					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);

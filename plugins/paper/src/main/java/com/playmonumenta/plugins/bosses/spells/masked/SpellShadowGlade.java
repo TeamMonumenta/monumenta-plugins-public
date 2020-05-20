@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.masked;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,6 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellShadowGlade extends Spell {
@@ -20,7 +20,6 @@ public class SpellShadowGlade extends Spell {
 	private final Plugin mPlugin;
 	private final int mCount;
 	private final Location mLoc;
-	private final Random mRand = new Random();
 
 	public SpellShadowGlade(Plugin plugin, Location loc, int count) {
 		mPlugin = plugin;
@@ -42,7 +41,7 @@ public class SpellShadowGlade extends Spell {
 		int chosen;
 		int count = mCount;
 		while (count > 0) {
-			chosen = mRand.nextInt(4);
+			chosen = FastUtils.RANDOM.nextInt(4);
 			if (!isQuadrantDone[chosen]) {
 				count--;
 				isQuadrantDone[chosen] = true;

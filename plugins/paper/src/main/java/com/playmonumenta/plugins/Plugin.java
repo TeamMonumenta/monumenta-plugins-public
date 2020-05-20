@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins;
 
 import java.io.IOException;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -85,7 +84,6 @@ public class Plugin extends JavaPlugin {
 	public CooldownTimers mTimers = null;
 	public ProjectileEffectTimers mProjectileEffectTimers = null;
 	public CombatLoggingTimers mCombatLoggingTimers = null;
-	public Random mRandom = null;
 	int mPeriodicTimer = -1;
 
 	public EnchantmentManager mEnchantmentManager;
@@ -195,7 +193,6 @@ public class Plugin extends JavaPlugin {
 		mItemOverrides = new ItemOverrides();
 
 		//  Initialize Variables.
-		mRandom = new Random();
 		mTimers = new CooldownTimers(this);
 		mCombatLoggingTimers = new CombatLoggingTimers();
 
@@ -205,7 +202,7 @@ public class Plugin extends JavaPlugin {
 		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
-		mAbilityManager = new AbilityManager(this, mWorld, mRandom);
+		mAbilityManager = new AbilityManager(this, mWorld);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mCookingTableInventoryManager = new CookingTableInventoryManager(this);
 		mBossManager = new BossManager(this);
@@ -224,7 +221,7 @@ public class Plugin extends JavaPlugin {
 		}
 		manager.registerEvents(new ServerTransferListener(this.getLogger()), this);
 		manager.registerEvents(new ExceptionListener(this), this);
-		manager.registerEvents(new PlayerListener(this, mWorld, mRandom), this);
+		manager.registerEvents(new PlayerListener(this, mWorld), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mWorld, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);

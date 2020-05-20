@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,8 +14,8 @@ public class PowerInjectionNonAlchemist extends Ability {
 
 	private int mBonusDamage = 0;
 
-	public PowerInjectionNonAlchemist(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public PowerInjectionNonAlchemist(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

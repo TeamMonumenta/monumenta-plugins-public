@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -39,8 +38,8 @@ public class PowerInjection extends Ability {
 
 	private Player mTargetPlayer;
 
-	public PowerInjection(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Power Injection");
+	public PowerInjection(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Power Injection");
 		mInfo.linkedSpell = Spells.POWER_INJECTION;
 		mInfo.scoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";

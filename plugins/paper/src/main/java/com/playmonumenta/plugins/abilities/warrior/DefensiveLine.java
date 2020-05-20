@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,8 +30,8 @@ public class DefensiveLine extends Ability {
 	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 50 * 20;
 	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
 
-	public DefensiveLine(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Defensive Line");
+	public DefensiveLine(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Defensive Line");
 		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.scoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";

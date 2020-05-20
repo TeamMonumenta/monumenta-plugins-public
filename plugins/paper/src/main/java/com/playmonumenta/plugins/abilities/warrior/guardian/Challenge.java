@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -50,8 +49,8 @@ public class Challenge extends Ability {
 
 	private boolean mDamageBonusActive = false;
 
-	public Challenge(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Challenge");
+	public Challenge(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Challenge");
 		mInfo.scoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add("Left-clicking while shifted makes all enemies within 12 blocks target you. You gain Absorption 1 and 0.5 armor per affected mob (max: 4) for 10s. If no mobs changed targets, gain 10% extra melee damage. Cooldown: 20s.");

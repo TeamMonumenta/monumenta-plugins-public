@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 
@@ -39,7 +39,6 @@ public class SpectateBot extends GenericCommand implements Listener {
 	public static final int DISTANCE_VELOCITY_ADJUST_PERIOD = 20;
 	public static final double MAX_PITCH = 80;
 	public static final double MIN_PITCH = 5;
-	public static final Random RAND = new Random();
 	public static final int AUTO_PLAYER_SWITCH_TICKS = 3600;
 
 	private static class SpectateContext {
@@ -138,7 +137,7 @@ public class SpectateBot extends GenericCommand implements Listener {
 							 * Periodically skip a tick to allow the player to download the world
 							 * Skip the first many ticks when switching targets
 							 */
-							if (ctx.mTimeSinceLastSwitch < 100 || RAND.nextInt(200) == 0) {
+							if (ctx.mTimeSinceLastSwitch < 100 || FastUtils.RANDOM.nextInt(200) == 0) {
 								/* Make sure the player won't get idle kicked */
 								NmsUtils.resetPlayerIdleTimer(ctx.mSpectator);
 								continue;

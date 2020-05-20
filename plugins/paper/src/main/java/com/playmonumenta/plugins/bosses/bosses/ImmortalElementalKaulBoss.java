@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +28,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellPurgeNegatives;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellKaulBlockBreak;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -126,13 +126,11 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 		}
 	}
 
-	private Random rand = new Random();
-
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
 		if (players.size() > 0) {
-			Player newTarget = players.get(rand.nextInt(players.size()));
+			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			((Mob) mBoss).setTarget(newTarget);
 		}
 	}

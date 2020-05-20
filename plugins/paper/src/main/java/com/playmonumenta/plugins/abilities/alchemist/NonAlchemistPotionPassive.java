@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -16,6 +14,7 @@ import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
@@ -27,8 +26,8 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 
 	private final KillTriggeredAbilityTracker mTracker;
 
-	public NonAlchemistPotionPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public NonAlchemistPotionPassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 
@@ -67,7 +66,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 					chance += io.getPotionChanceBonus();
 				}
 
-				if (mRandom.nextDouble() < chance) {
+				if (FastUtils.RANDOM.nextDouble() < chance) {
 					AbilityUtils.addAlchemistPotions(player, 1);
 				}
 			}

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -35,8 +34,8 @@ public class MagmaShield extends Ability {
 
 	private final int mDamage;
 
-	public MagmaShield(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Magma Shield");
+	public MagmaShield(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Magma Shield");
 		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
 		mInfo.scoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";

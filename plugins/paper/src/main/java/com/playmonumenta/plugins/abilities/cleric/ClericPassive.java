@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -21,8 +20,8 @@ public class ClericPassive extends Ability {
 
 	private int timer = 0;
 
-	public ClericPassive(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public ClericPassive(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 	}
 
 	@Override

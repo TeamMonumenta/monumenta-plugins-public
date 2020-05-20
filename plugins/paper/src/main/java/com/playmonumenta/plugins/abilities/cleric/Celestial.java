@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,8 +31,8 @@ public class Celestial extends Ability {
 	private static final double CELESTIAL_1_DAMAGE_MULTIPLIER = 1.20;
 	private static final double CELESTIAL_2_DAMAGE_MULTIPLIER = 1.35;
 
-	public Celestial(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Celestial Blessing");
+	public Celestial(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Celestial Blessing");
 		mInfo.linkedSpell = Spells.CELESTIAL_BLESSING;
 		mInfo.scoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";

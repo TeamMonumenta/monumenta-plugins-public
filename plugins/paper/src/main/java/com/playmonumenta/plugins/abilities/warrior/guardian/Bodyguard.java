@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior.guardian;
 
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,6 +23,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -51,8 +50,8 @@ public class Bodyguard extends Ability {
 
 	private int mLeftClicks = 0;
 
-	public Bodyguard(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Bodyguard");
+	public Bodyguard(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Bodyguard");
 		mInfo.scoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
 		mInfo.mDescriptions.add("Passively gain 5% damage resistance. Left-click twice without hitting a mob while looking directly at another player without hitting any mobs makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
@@ -128,20 +127,20 @@ public class Bodyguard extends Ability {
 
 					//Flame
 					for (int k = 0; k < 120; k++) {
-						double x = ThreadLocalRandom.current().nextDouble(-3, 3);
-						double z = ThreadLocalRandom.current().nextDouble(-3, 3);
+						double x = FastUtils.randomDoubleInRange(-3, 3);
+						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						mWorld.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), ThreadLocalRandom.current().nextDouble(0.1, 0.4));
+						mWorld.spawnParticle(Particle.FLAME, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4));
 					}
 
 					//Explosion_Normal
 					for (int k = 0; k < 60; k++) {
-						double x = ThreadLocalRandom.current().nextDouble(-3, 3);
-						double z = ThreadLocalRandom.current().nextDouble(-3, 3);
+						double x = FastUtils.randomDoubleInRange(-3, 3);
+						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), ThreadLocalRandom.current().nextDouble(0.15, 0.5));
+						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5));
 					}
 
 					if (mPlayer.getLocation().distance(player.getLocation()) > 1) {

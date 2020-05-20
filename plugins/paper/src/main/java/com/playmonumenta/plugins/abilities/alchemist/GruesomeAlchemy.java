@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -26,8 +25,8 @@ public class GruesomeAlchemy extends Ability {
 	private final int mSlownessAmplifier;
 	private final int mWitherAmplifier;
 
-	public GruesomeAlchemy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Gruesome Alchemy");
+	public GruesomeAlchemy(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Gruesome Alchemy");
 		mInfo.scoreboardId = "GruesomeAlchemy";
 		mInfo.mShorthandName = "GA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions give Slowness I and Wither I for 8 seconds.");

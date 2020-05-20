@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -204,7 +205,7 @@ public class SpellBaseAoE extends Spell {
 				healers++;
 			}
 		}
-		if (Math.random() > 1.0 / Math.pow(healers, 2)) {
+		if (FastUtils.RANDOM.nextDouble() > 1.0 / Math.pow(healers, 2)) {
 			return false;
 		}
 		return true;

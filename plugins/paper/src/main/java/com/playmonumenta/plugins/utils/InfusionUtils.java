@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -271,7 +270,7 @@ public class InfusionUtils {
 		LootTable lt = Bukkit.getLootTable(key);
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		LootContext context = builder.build();
-		Collection<ItemStack> items = lt.populateLoot(new Random(), context);
+		Collection<ItemStack> items = lt.populateLoot(FastUtils.RANDOM, context);
 		ItemStack materials;
 		if (items.size() > 0) {
 			materials = items.iterator().next();

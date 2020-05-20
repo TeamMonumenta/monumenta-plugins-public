@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -20,8 +18,8 @@ public class Frenzy extends Ability {
 
 	private static final int FRENZY_DURATION = 5 * 20;
 
-	public Frenzy(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Frenzy");
+	public Frenzy(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Frenzy");
 		mInfo.scoreboardId = "Frenzy";
 		mInfo.mShorthandName = "Fnz";
 		mInfo.mDescriptions.add("You gain 5 seconds of Haste III after killing a mob. You lose this buff when you hold a pickaxe.");

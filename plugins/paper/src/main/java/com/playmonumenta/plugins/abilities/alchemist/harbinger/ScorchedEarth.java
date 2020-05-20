@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -76,8 +75,8 @@ public class ScorchedEarth extends Ability {
 	private int mTimeToNextCharge;
 	private int mCharges;
 
-	public ScorchedEarth(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Scorched Earth");
+	public ScorchedEarth(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Scorched Earth");
 		mInfo.linkedSpell = Spells.SCORCHED_EARTH;
 		mInfo.scoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";

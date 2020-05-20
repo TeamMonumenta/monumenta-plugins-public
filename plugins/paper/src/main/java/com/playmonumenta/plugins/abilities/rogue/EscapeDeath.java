@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -36,8 +35,8 @@ public class EscapeDeath extends Ability {
 	private static final int ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL = 2;
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
 
-	public EscapeDeath(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Escape Death");
+	public EscapeDeath(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Escape Death");
 		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.scoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";

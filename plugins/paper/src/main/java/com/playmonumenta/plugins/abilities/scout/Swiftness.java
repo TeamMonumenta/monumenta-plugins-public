@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,8 +15,8 @@ public class Swiftness extends Ability {
 	private static final int SWIFTNESS_EFFECT_SPEED_LVL = 0;
 	private static final int SWIFTNESS_EFFECT_JUMP_LVL = 2;
 
-	public Swiftness(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Swiftness");
+	public Swiftness(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Swiftness");
 		mInfo.scoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
 		mInfo.mDescriptions.add("You gain permanent Speed I.");

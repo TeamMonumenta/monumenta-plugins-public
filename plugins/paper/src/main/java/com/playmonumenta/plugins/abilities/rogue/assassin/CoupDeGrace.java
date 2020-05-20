@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,8 +34,8 @@ public class CoupDeGrace extends Ability {
 	private final double mNormalThreshold;
 	private final double mEliteThreshold;
 
-	public CoupDeGrace(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Coup de Grace");
+	public CoupDeGrace(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Coup de Grace");
 		mInfo.scoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
 		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health");

@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.twisted;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,6 +14,7 @@ import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
 import com.playmonumenta.plugins.abilities.delves.cursed.Spectral;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
@@ -43,8 +42,8 @@ public class Dreadful extends StatMultiplier {
 	private int mSpawnCounter = 0;
 	private int mEliteSpawnCounter = 0;
 
-	public Dreadful(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player,
+	public Dreadful(Plugin plugin, World world, Player player) {
+		super(plugin, world, player,
 				ChatColor.GRAY + "The air reeks of death, heralding a " + ChatColor.DARK_RED + ChatColor.BOLD + "DREADFUL" + ChatColor.GRAY + " fate for the fallen.",
 				1, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, DREADFUL_DAMAGE_TAKEN_MULTIPLIER);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? Spectral.SPECTRAL_2_SUMMON_COMMAND_DATA : Spectral.SPECTRAL_1_SUMMON_COMMAND_DATA;
@@ -65,7 +64,7 @@ public class Dreadful extends StatMultiplier {
 					&& !mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG)
 					&& !mob.getScoreboardTags().contains(DREADFUL_DREADLING_TAG)) {
 				if (EntityUtils.isElite(mob)) {
-					mEliteSpawnCounter += (4 + mRandom.nextInt(3));
+					mEliteSpawnCounter += (4 + FastUtils.RANDOM.nextInt(3));
 
 					if (mEliteSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
 						mEliteSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
@@ -78,7 +77,7 @@ public class Dreadful extends StatMultiplier {
 						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
 					}
 				} else {
-					mSpawnCounter += (2 + mRandom.nextInt(2));
+					mSpawnCounter += (2 + FastUtils.RANDOM.nextInt(2));
 
 					if (mSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
 						mSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;

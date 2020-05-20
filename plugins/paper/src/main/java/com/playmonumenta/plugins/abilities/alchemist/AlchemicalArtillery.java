@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,8 +37,8 @@ public class AlchemicalArtillery extends Ability {
 	private int mCost;
 	private boolean mActive = false;
 
-	public AlchemicalArtillery(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Alchemical Artillery");
+	public AlchemicalArtillery(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Alchemical Artillery");
 		mInfo.linkedSpell = Spells.ALCHEMICAL_ARTILLERY;
 		mInfo.scoreboardId = "Artillery";
 		mInfo.mShorthandName = "AAr";

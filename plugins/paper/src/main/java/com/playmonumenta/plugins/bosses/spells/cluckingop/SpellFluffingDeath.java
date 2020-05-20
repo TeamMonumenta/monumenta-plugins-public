@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -26,8 +25,6 @@ public class SpellFluffingDeath extends Spell {
 	private LivingEntity mBoss;
 	private int mRange;
 	private Location mStartLoc;
-	private ThreadLocalRandom rand = ThreadLocalRandom.current();
-	private Random random = new Random();
 
 	public SpellFluffingDeath(Plugin plugin, LivingEntity boss, int range, Location startLoc) {
 		mPlugin = plugin;
@@ -44,39 +41,39 @@ public class SpellFluffingDeath extends Spell {
 		mBoss.setAI(false);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 12, 10));
 		new BukkitRunnable() {
-			int t = 0;
+			int mTicks = 0;
 			@Override
 			public void run() {
-				t += 2;
-				float fTick = t;
+				mTicks += 2;
+				float fTick = mTicks;
 				float ft = fTick / 25;
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 3, 0.35, 0, 0.35, 0.1);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
-				if (t >= 20 * 2) {
+				if (mTicks >= 20 * 2) {
 					this.cancel();
 					new BukkitRunnable() {
 
-						int i = 0;
+						int mInnerTicks = 0;
 						@Override
 						public void run() {
-							i++;
+							mInnerTicks++;
 
 							for (int j = 0; j < 3; j++) {
-								rainMeteor(mStartLoc.clone().add(rand.nextDouble(-mRange, mRange), -1.25, rand.nextDouble(-mRange, mRange)), 30);
+								rainMeteor(mStartLoc.clone().add(FastUtils.randomDoubleInRange(-mRange, mRange), -1.25, FastUtils.randomDoubleInRange(-mRange, mRange)), 30);
 							}
 
 							//Target one random player. Have a meteor rain nearby them.
 							if (players.size() > 1) {
-								Player rPlayer = players.get(random.nextInt(players.size()));
+								Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), 30);
+								rainMeteor(loc.add(FastUtils.randomDoubleInRange(-5, 5), 0, FastUtils.randomDoubleInRange(-5, 5)), 30);
 							} else if (players.size() == 1) {
 								Player rPlayer = players.get(0);
 								Location loc = rPlayer.getLocation();
-								rainMeteor(loc.add(rand.nextDouble(-5, 5), 0, rand.nextDouble(-5, 5)), 30);
+								rainMeteor(loc.add(FastUtils.randomDoubleInRange(-5, 5), 0, FastUtils.randomDoubleInRange(-5, 5)), 30);
 							}
 
-							if (i >= 20) {
+							if (mInnerTicks >= 20) {
 								this.cancel();
 								mBoss.setAI(true);
 							}
@@ -92,16 +89,15 @@ public class SpellFluffingDeath extends Spell {
 	private void rainMeteor(Location loc, double spawnY) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
-			double y = spawnY;
-			Location loc = mStartLoc.clone().add(rand.nextDouble(-mRange, mRange), 0, rand.nextDouble(-mRange, mRange));
+			double mY = spawnY;
 			@Override
 			public void run() {
-				y -= 1;
-				Location particle = loc.clone().add(0, y, 0);
+				mY -= 1;
+				Location particle = loc.clone().add(0, mY, 0);
 				world.spawnParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true);
 				world.spawnParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true);
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-				if (y <= 0) {
+				if (mY <= 0) {
 					this.cancel();
 					world.spawnParticle(Particle.FLAME, loc, 25, 0, 0, 0, 0.175, null, true);
 					world.spawnParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.25, null, true);

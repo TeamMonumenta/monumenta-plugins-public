@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -36,8 +35,8 @@ public class InvigoratingOdor extends Ability {
 
 	private int mDamage;
 
-	public InvigoratingOdor(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Invigorating Odor");
+	public InvigoratingOdor(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Invigorating Odor");
 		mInfo.linkedSpell = Spells.INVIGORATING_ODOR;
 		mInfo.scoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";

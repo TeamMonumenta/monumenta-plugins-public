@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +42,6 @@ public class AzacorNormal extends BossAbilityGroup {
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private final Random mRand = new Random();
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -128,7 +126,7 @@ public class AzacorNormal extends BossAbilityGroup {
 
 
 	private void randomMinion(String tellraw) {
-		Azacor.randomMinion(tellraw, mSpawnLoc, mRand, 100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 50.0);
+		Azacor.randomMinion(tellraw, mSpawnLoc, 100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 50.0);
 	}
 
 	@Override

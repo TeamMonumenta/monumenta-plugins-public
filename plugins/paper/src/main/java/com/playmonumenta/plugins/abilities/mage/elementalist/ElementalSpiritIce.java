@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -37,10 +36,10 @@ public class ElementalSpiritIce extends Ability {
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
-	public ElementalSpiritIce(Plugin plugin, World world, Random random, Player player) {
+	public ElementalSpiritIce(Plugin plugin, World world, Player player) {
 		/* NOTE: Display name is null so this variant will be ignored by the tesseract.
 		 * This variant also does not have a description */
-		super(plugin, world, random, player, null);
+		super(plugin, world, player, null);
 		mInfo.scoreboardId = "ElementalSpirit";
 		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
 		mInfo.cooldown = ES_ICE_COOLDOWN;

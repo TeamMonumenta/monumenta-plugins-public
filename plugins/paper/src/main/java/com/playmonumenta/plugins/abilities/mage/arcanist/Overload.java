@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Color;
@@ -29,8 +28,8 @@ public class Overload extends Ability {
 
 	private int mDamage;
 
-	public Overload(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Overload");
+	public Overload(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Overload");
 		mInfo.scoreboardId = "Overload";
 		mInfo.mShorthandName = "Ov";
 		mInfo.mDescriptions.add("Spells other than Spellshock and Channeling deal an additional 1 damage for each spell on cooldown.");

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -35,8 +34,8 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 3;
 	private static final int VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0;
 
-	public ViciousCombos(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Vicious Combos");
+	public ViciousCombos(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Vicious Combos");
 		mInfo.scoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
 		mInfo.mDescriptions.add("Passively, killing an enemy refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,8 +37,8 @@ public class FrostNova extends Ability {
 	private int mDamage;
 	private int mSlownessAmplifier;
 
-	public FrostNova(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Frost Nova");
+	public FrostNova(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Frost Nova");
 		mInfo.linkedSpell = Spells.FROST_NOVA;
 		mInfo.scoreboardId = "FrostNova";
 		mInfo.mShorthandName = "FN";

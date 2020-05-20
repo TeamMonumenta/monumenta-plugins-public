@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -21,6 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
@@ -66,7 +66,7 @@ public class InstantDrink implements BaseEnchantment {
 					double green = color.getGreen() / 255D;
 					double blue = color.getBlue() / 255D;
 					for (int i = 0; i < 30; i++) {
-						double y = ThreadLocalRandom.current().nextDouble(0.25, 1.75);
+						double y = FastUtils.randomDoubleInRange(0.25, 1.75);
 						world.spawnParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 0, red, green, blue, 1);
 					}
 				} else {

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -38,12 +37,12 @@ public class InventoryUtils {
 	private static int LEGGINGS_SLOT = 37;
 	private static int BOOTS_SLOT = 36;
 
-	public static void scheduleDelayedEquipmentCheck(Plugin plugin, Player player, Event event) {
+	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final Event event) {
 		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				ItemStack offHand = player.getInventory().getItemInOffHand();
+				final ItemStack mainHand = player.getInventory().getItemInMainHand();
+				final ItemStack offHand = player.getInventory().getItemInOffHand();
 
 				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, event);
@@ -51,17 +50,17 @@ public class InventoryUtils {
 		}, 0);
 	}
 
-	public static boolean testForItemWithLore(ItemStack item, String loreText) {
+	public static boolean testForItemWithLore(final ItemStack item, final String loreText) {
 		if (loreText == null || loreText.isEmpty()) {
 			return true;
 		}
 
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				List<String> lore = meta.getLore();
+				final List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
+					for (final String loreEntry : lore) {
 						if (loreEntry.contains(loreText)) {
 							return true;
 						}
@@ -74,15 +73,15 @@ public class InventoryUtils {
 	}
 
 	// TODO: This will *not* match items that don't have an NBT name (stick, stone sword, etc.)
-	public static boolean testForItemWithName(ItemStack item, String nameText) {
+	public static boolean testForItemWithName(final ItemStack item, final String nameText) {
 		if (nameText == null || nameText.isEmpty()) {
 			return true;
 		}
 
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				String displayName = meta.getDisplayName();
+				final String displayName = meta.getDisplayName();
 				if (displayName != null && !displayName.isEmpty()) {
 					if (displayName.contains(nameText)) {
 						return true;
@@ -94,27 +93,27 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static int getCustomEnchantLevel(ItemStack item, String nameText, boolean useLevel) {
+	public static int getCustomEnchantLevel(final ItemStack item, final String nameText, final boolean useLevel) {
 		if (nameText == null || nameText.isEmpty()) {
 			return 0;
 		}
 
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				List<String> lore = meta.getLore();
+				final List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					for (String loreEntry : lore) {
+					for (final String loreEntry : lore) {
 						if (loreEntry.startsWith(nameText)) {
 							if (useLevel) {
 								int offset = 1;
 								int level = 0;
 								while (true) {
-									char c = loreEntry.charAt(loreEntry.length() - offset);
+									final char c = loreEntry.charAt(loreEntry.length() - offset);
 									if (c == 'I') {
 										level += 1;
 									} else if (c == 'V') {
-										char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+										final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
 										if (cn == 'I') {
 											level += 4;
 											offset += 1;
@@ -122,7 +121,7 @@ public class InventoryUtils {
 											level += 5;
 										}
 									} else if (c == 'X') {
-										char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
+										final char cn = loreEntry.charAt(loreEntry.length() - offset - 1);
 										if (cn == 'I') {
 											level += 9;
 											offset += 1;
@@ -150,14 +149,14 @@ public class InventoryUtils {
 		return 0;
 	}
 
-	public static void removeCustomEnchant(ItemStack item, String nameText) {
+	public static void removeCustomEnchant(final ItemStack item, final String nameText) {
 		if (!nameText.isEmpty() && item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				List<String> lore = meta.getLore();
+				final List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					List<String> newLore = new ArrayList<>();
-					for (String line : lore) {
+					final List<String> newLore = new ArrayList<>();
+					for (final String line : lore) {
 						if (!line.startsWith(nameText)) {
 							newLore.add(line);
 						}
@@ -177,17 +176,17 @@ public class InventoryUtils {
 		LORE_SLOT_MAPPINGS.put(ChatColor.GRAY + "When on ", ItemSlot.ARMOR);
 	}
 
-	public static int getCustomAttribute(ItemStack item, String nameText, Player player, ItemSlot slot) {
+	public static int getCustomAttribute(final ItemStack item, final String nameText, final Player player, final ItemSlot slot) {
 		if (nameText == null || nameText.isEmpty()) {
 			return 0;
 		}
 
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				List<String> lore = meta.getLore();
+				final List<String> lore = meta.getLore();
 				if (lore != null && !lore.isEmpty()) {
-					for (Map.Entry<String, ItemSlot> loreSlotMapping : LORE_SLOT_MAPPINGS.entrySet()) {
+					for (final Map.Entry<String, ItemSlot> loreSlotMapping : LORE_SLOT_MAPPINGS.entrySet()) {
 						// Find the lore slot entry corresponding to the slot the item occupies
 						if (slot == loreSlotMapping.getValue()) {
 							boolean foundAttributeSlot = false;
@@ -197,13 +196,13 @@ public class InventoryUtils {
 							int percentPositive = 0;
 							int percentNegative = 0;
 
-							for (String loreEntry : lore) {
+							for (final String loreEntry : lore) {
 								// If we find the proper lore, then we found the attributes for the slot
 								if (loreEntry.contains(loreSlotMapping.getKey())) {
 									foundAttributeSlot = true;
 								} else {
 									// Check that the lore isn't any other attribute slot marker
-									for (String loreKey : LORE_SLOT_MAPPINGS.keySet()) {
+									for (final String loreKey : LORE_SLOT_MAPPINGS.keySet()) {
 										if (loreEntry.contains(loreKey)) {
 											foundAttributeSlot = false;
 										}
@@ -223,14 +222,14 @@ public class InventoryUtils {
 									if (loreEntry.charAt(2) == ' ' || loreEntry.charAt(2) == '-' || loreEntry.charAt(2) == '+') {
 										// Get the number value of the attribute
 										if (loreEntry.indexOf('%') == -1) {
-											int flat = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf(' ', 3)).trim());
+											final int flat = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf(' ', 3)).trim());
 											if (flat < 0) {
 												flatNegative += Math.abs(flat);
 											} else {
 												flatPositive += flat;
 											}
 										} else {
-											int percent = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf('%', 3)).trim());
+											final int percent = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf('%', 3)).trim());
 											if (percent < 0) {
 												percentNegative += Math.abs(percent);
 											} else {
@@ -253,13 +252,13 @@ public class InventoryUtils {
 	}
 
 	// Returns the attribute value stored in the "level" (due to bitshifts)
-	public static double getAttributeValue(int level) {
+	public static double getAttributeValue(final int level) {
 		return Math.max(0, ((level & 0xFF) - ((level >>> 8) & 0x3F)) * (1 + (((level >>> 14) & 0x3FF) - (level >>> 24)) / 100.0));
 	}
 
-	public static boolean isAxeItem(ItemStack item) {
+	public static boolean isAxeItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.WOODEN_AXE || mat == Material.STONE_AXE || mat == Material.GOLDEN_AXE
 			       || mat == Material.IRON_AXE || mat == Material.DIAMOND_AXE;
 		}
@@ -267,18 +266,18 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isBowItem(ItemStack item) {
+	public static boolean isBowItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.BOW;
 		}
 
 		return false;
 	}
 
-	public static boolean isSwordItem(ItemStack item) {
+	public static boolean isSwordItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.WOODEN_SWORD || mat == Material.STONE_SWORD || mat == Material.GOLDEN_SWORD
 			       || mat == Material.IRON_SWORD || mat == Material.DIAMOND_SWORD;
 		}
@@ -286,9 +285,9 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isPickaxeItem(ItemStack item) {
+	public static boolean isPickaxeItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.WOODEN_PICKAXE || mat == Material.STONE_PICKAXE || mat == Material.GOLDEN_PICKAXE
 			       || mat == Material.IRON_PICKAXE || mat == Material.DIAMOND_PICKAXE;
 		}
@@ -296,9 +295,9 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isScytheItem(ItemStack item) {
+	public static boolean isScytheItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.WOODEN_HOE || mat == Material.STONE_HOE || mat == Material.GOLDEN_HOE
 			       || mat == Material.IRON_HOE || mat == Material.DIAMOND_HOE;
 		}
@@ -306,9 +305,9 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isShovelItem(ItemStack item) {
+	public static boolean isShovelItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.WOODEN_SHOVEL || mat == Material.STONE_SHOVEL || mat == Material.GOLDEN_SHOVEL
 			       || mat == Material.IRON_SHOVEL || mat == Material.DIAMOND_SHOVEL;
 		}
@@ -316,11 +315,11 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isWandItem(ItemStack item) {
+	public static boolean isWandItem(final ItemStack item) {
 		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
+			final ItemMeta meta = item.getItemMeta();
 			if (meta != null && meta.hasLore()) {
-				List<String> lore = meta.getLore();
+				final List<String> lore = meta.getLore();
 
 				if (!lore.isEmpty()) {
 					for (int i = 0; i < lore.size(); i++) {
@@ -335,25 +334,25 @@ public class InventoryUtils {
 		return false;
 	}
 
-	public static boolean isSoulboundToPlayer(ItemStack item, Player player) {
+	public static boolean isSoulboundToPlayer(final ItemStack item, final Player player) {
 		// TODO: Needs to handle renames
 		return testForItemWithLore(item, "* Soulbound to " + player.getName() + " *");
 	}
 
-	public static boolean isPotionItem(ItemStack item) {
+	public static boolean isPotionItem(final ItemStack item) {
 		if (item != null) {
-			Material mat = item.getType();
+			final Material mat = item.getType();
 			return mat == Material.POTION || mat == Material.LINGERING_POTION || mat == Material.SPLASH_POTION;
 		}
 
 		return false;
 	}
 
-	public static void removeRandomEquipment(Random rand, LivingEntity mob, Integer piecesToRemove) {
-		int[] equipment = { 0, 1, 2, 3 };
-		shuffleArray(rand, equipment);
+	public static void removeRandomEquipment(final LivingEntity mob, final Integer piecesToRemove) {
+		final int[] equipment = { 0, 1, 2, 3 };
+		shuffleArray(equipment);
 
-		EntityEquipment gear = mob.getEquipment();
+		final EntityEquipment gear = mob.getEquipment();
 
 		int removedCount = 0;
 		for (int i = 0; i < equipment.length; i++) {
@@ -389,10 +388,10 @@ public class InventoryUtils {
 		}
 	}
 
-	public static int removeSpecialItems(Player player, boolean ephemeralOnly) {
+	public static int removeSpecialItems(final Player player, final boolean ephemeralOnly) {
 		int dropped = 0;
 
-		Location loc = player.getLocation();
+		final Location loc = player.getLocation();
 
 		// Inventory
 		dropped += removeSpecialItemsFromInventory(player.getInventory(), loc, ephemeralOnly);
@@ -413,7 +412,7 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(ItemStack[] items, Location loc, boolean ephemeralOnly) {
+	private static int removeSpecialItemsFromInventory(final ItemStack[] items, final Location loc, final boolean ephemeralOnly) {
 		int dropped = 0;
 
 		for (int i = 0; i < items.length; i++) {
@@ -426,9 +425,9 @@ public class InventoryUtils {
 					items[i] = null;
 				} else {
 					if (items[i].hasItemMeta() && items[i].getItemMeta() instanceof BlockStateMeta) {
-						BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
+						final BlockStateMeta meta = (BlockStateMeta)items[i].getItemMeta();
 						if (meta.getBlockState() instanceof ShulkerBox) {
-							ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
+							final ShulkerBox shulker = (ShulkerBox)meta.getBlockState();
 							dropped += removeSpecialItemsFromInventory(shulker.getInventory(), loc, ephemeralOnly);
 
 							meta.setBlockState(shulker);
@@ -442,14 +441,14 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(Inventory inventory, Location loc, boolean ephemeralOnly) {
-		ItemStack[] items = inventory.getContents();
-		int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
+	private static int removeSpecialItemsFromInventory(final Inventory inventory, final Location loc, final boolean ephemeralOnly) {
+		final ItemStack[] items = inventory.getContents();
+		final int dropped = removeSpecialItemsFromInventory(items, loc, ephemeralOnly);
 		inventory.setContents(items);
 		return dropped;
 	}
 
-	private static boolean containsSpecialLore(ItemStack item) {
+	private static boolean containsSpecialLore(final ItemStack item) {
 		return  testForItemWithLore(item, "D4 Key") ||
 		        testForItemWithLore(item, "D5 Key") ||
 		        testForItemWithLore(item, "D6 Key") ||
@@ -457,10 +456,10 @@ public class InventoryUtils {
 		        testForItemWithLore(item, "DN Key");
 	}
 
-	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
+	public static String itemStackArrayToBase64(final ItemStack[] items) throws IllegalStateException {
 		try {
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+			final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			final BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
 			//  Write the size of the inventory.
 			dataOutput.writeInt(items.length);
@@ -473,16 +472,16 @@ public class InventoryUtils {
 			//  Serialize the array.
 			dataOutput.close();
 			return Base64Coder.encodeLines(outputStream.toByteArray());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new IllegalStateException("Unable to save item stacks.", e);
 		}
 	}
 
-	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
+	public static ItemStack[] itemStackArrayFromBase64(final String data) throws IOException {
 		try {
-			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
-			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-			ItemStack[] items = new ItemStack[dataInput.readInt()];
+			final ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+			final BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+			final ItemStack[] items = new ItemStack[dataInput.readInt()];
 
 			// Read the serialized inventory
 			for (int i = 0; i < items.length; i++) {
@@ -491,30 +490,30 @@ public class InventoryUtils {
 
 			dataInput.close();
 			return items;
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 			throw new IOException("Unable to decode class type.", e);
 		}
 	}
 
-	public static boolean isArmorSlotFromId(int slotId) {
+	public static boolean isArmorSlotFromId(final int slotId) {
 		return slotId == OFFHAND_SLOT || slotId == HELMET_SLOT || slotId == CHESTPLATE_SLOT
 		       || slotId == LEGGINGS_SLOT || slotId == BOOTS_SLOT;
 	}
 
-	static void shuffleArray(Random rand, int[] ar) {
+	static void shuffleArray(final int[] ar) {
 		for (int i = ar.length - 1; i > 0; i--) {
-			int index = rand.nextInt(i + 1);
+			final int index = FastUtils.RANDOM.nextInt(i + 1);
 			// Simple swap
-			int a = ar[index];
+			final int a = ar[index];
 			ar[index] = ar[i];
 			ar[i] = a;
 		}
 	}
 
-	public static void giveItem(Player player, ItemStack item) {
-		PlayerInventory inv = player.getInventory();
+	public static void giveItem(final Player player, final ItemStack item) {
+		final PlayerInventory inv = player.getInventory();
 		if (inv.firstEmpty() == -1) {
-			Location ploc = player.getLocation();
+			final Location ploc = player.getLocation();
 			ploc.getWorld().dropItem(ploc, item);
 			player.sendMessage(ChatColor.RED + "Your inventory is full! Some items were dropped on the ground!");
 		} else {

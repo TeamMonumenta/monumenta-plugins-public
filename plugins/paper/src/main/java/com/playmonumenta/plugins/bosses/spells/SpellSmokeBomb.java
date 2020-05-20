@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,11 +12,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellSmokeBomb extends Spell {
 	private Plugin mPlugin;
-	private Random mRand = new Random();
 	private LivingEntity mLauncher;
 	private int mRadius;
 	private int mTime;
@@ -66,7 +64,7 @@ public class SpellSmokeBomb extends Spell {
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float)mRadius / 7, (float)(0.5 + mRand.nextInt(150) / 100));
+				centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float)mRadius / 7, (float)(0.5 + FastUtils.RANDOM.nextInt(150) / 100));
 				centerLoc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, centerLoc, 10, 1, 1, 1, 0.01);
 			}
 		};
@@ -75,7 +73,7 @@ public class SpellSmokeBomb extends Spell {
 			@Override
 			public void run() {
 				Location lloc = mLauncher.getLocation();
-				double precision = mRand.nextInt(50) + 100;
+				double precision = FastUtils.RANDOM.nextInt(50) + 100;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
 				double rad = (double)(mRadius * w) / 5;

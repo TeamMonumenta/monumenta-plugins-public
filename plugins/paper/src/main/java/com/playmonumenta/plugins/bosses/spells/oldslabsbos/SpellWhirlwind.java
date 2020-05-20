@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -25,13 +25,11 @@ public class SpellWhirlwind extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
-	private final Random mRand;
 
 	public SpellWhirlwind(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = mBoss.getWorld();
-		mRand = new Random();
 	}
 
 	@Override
@@ -80,7 +78,7 @@ public class SpellWhirlwind extends Spell {
 							Location loc = mBoss.getLocation();
 							mWorld.spawnParticle(Particle.CLOUD, loc, 4, 0.1, 0.1, 0.1, 0.15);
 							mWorld.spawnParticle(Particle.CRIT, loc, 12, 0.1, 0.1, 0.1, 0.85);
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + (mRand.nextFloat() * 0.5f));
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + ((float)FastUtils.RANDOM.nextDouble() * 0.5f));
 							for (int i = 0; i < 2; i++) {
 								rotation += 10;
 								sin += 0.1;

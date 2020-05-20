@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,8 +41,8 @@ public class WitheringGaze extends Ability {
 	private static final int WITHERING_GAZE_1_COOLDOWN = 20 * 30;
 	private static final int WITHERING_GAZE_2_COOLDOWN = 20 * 20;
 
-	public WitheringGaze(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Withering Gaze");
+	public WitheringGaze(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Withering Gaze");
 		mInfo.scoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30 seconds.");

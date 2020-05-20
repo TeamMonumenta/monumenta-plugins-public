@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.enchantments;
 
 import java.util.EnumSet;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -21,6 +20,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 
 public class Thunder implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Thunder Aspect";
@@ -46,7 +46,7 @@ public class Thunder implements BaseEnchantment {
 	//Run thunder check and application if true
 	//randChance is the chance for the attack to stun
 	private static void thunderAspectHit(Plugin plugin, Player player, double randChance, LivingEntity target, EntityDamageByEntityEvent event) {
-		double rand = new Random().nextDouble();
+		double rand = FastUtils.RANDOM.nextDouble();
 		World world = target.getWorld();
 
 		if (rand < randChance) {

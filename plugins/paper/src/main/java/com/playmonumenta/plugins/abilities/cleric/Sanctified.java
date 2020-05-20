@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -31,8 +30,8 @@ public class Sanctified extends Ability {
 
 	private int mDamage;
 
-	public Sanctified(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Santified Armor");
+	public Sanctified(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Santified Armor");
 		mInfo.linkedSpell = Spells.SANCTIFIED;
 		mInfo.scoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";

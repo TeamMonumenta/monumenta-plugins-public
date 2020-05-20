@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.mage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -63,8 +62,8 @@ public class Spellshock extends Ability {
 	private static Set<LivingEntity> mPendingStaticMobs = new HashSet<LivingEntity>();
 	private static BukkitRunnable mRunnable = null;
 
-	public Spellshock(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Spellshock");
+	public Spellshock(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Spellshock");
 		mInfo.linkedSpell = Spells.SPELLSHOCK;
 		mInfo.scoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";

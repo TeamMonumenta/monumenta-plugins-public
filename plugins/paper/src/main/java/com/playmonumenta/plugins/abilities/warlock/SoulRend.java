@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -30,8 +29,8 @@ public class SoulRend extends Ability {
 	private static final int SOUL_REND_2_HEAL = 4;
 	private static final double SOUL_REND_HEAL_MULTIPLIER = 0.2;
 
-	public SoulRend(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Soul Rend");
+	public SoulRend(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Soul Rend");
 		mInfo.scoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
 		mInfo.mDescriptions.add("Getting a critical hit with a scythe heals you for 2 hp + 20% of the damage dealt. (Cooldown: 6s)");

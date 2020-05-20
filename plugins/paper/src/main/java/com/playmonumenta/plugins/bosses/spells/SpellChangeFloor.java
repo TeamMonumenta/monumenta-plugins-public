@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellChangeFloor extends Spell {
@@ -27,8 +27,6 @@ public class SpellChangeFloor extends Spell {
 	private int mRadius;
 	private Material mMaterial;
 	private int mFloorDuration;
-
-	private Random mRandom = new Random();
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 	            Material.AIR,
@@ -58,7 +56,7 @@ public class SpellChangeFloor extends Spell {
 	public void run() {
 		List<Player> players = PlayerUtils.playersInRange(mCenterLoc, mRange);
 		if (!players.isEmpty()) {
-			launch(players.get(mRandom.nextInt(players.size())));
+			launch(players.get(FastUtils.RANDOM.nextInt(players.size())));
 		}
 	}
 
@@ -79,7 +77,6 @@ public class SpellChangeFloor extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 			List<BlockState> restoreBlocks = new LinkedList<BlockState>();
-			Random mRandom = new Random();
 
 			@Override
 			public void run() {
@@ -104,7 +101,7 @@ public class SpellChangeFloor extends Spell {
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
 								if (!mIgnoredMats.contains(state.getType()) &&
 								    !state.getType().isInteractable() &&
-									mRandom.nextInt(16) > 6) {
+									FastUtils.RANDOM.nextInt(16) > 6) {
 									restoreBlocks.add(state);
 								}
 							}

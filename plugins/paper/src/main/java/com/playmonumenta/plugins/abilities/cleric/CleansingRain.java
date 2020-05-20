@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,8 +31,8 @@ public class CleansingRain extends Ability {
 	private static final int CLEANSING_2_COOLDOWN = 30 * 20;
 	private static final double CLEANSING_ANGLE = 50.0;
 
-	public CleansingRain(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Cleansing Rain");
+	public CleansingRain(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Cleansing Rain");
 		mInfo.linkedSpell = Spells.CLEANSING;
 		mInfo.scoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";

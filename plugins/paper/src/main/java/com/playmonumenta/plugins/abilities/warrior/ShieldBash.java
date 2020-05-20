@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -73,8 +72,8 @@ public class ShieldBash extends Ability {
 
 	private int mStunDuration;
 
-	public ShieldBash(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, "Shield Bash");
+	public ShieldBash(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, "Shield Bash");
 		mInfo.linkedSpell = Spells.SHIELD_BASH;
 		mInfo.scoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";

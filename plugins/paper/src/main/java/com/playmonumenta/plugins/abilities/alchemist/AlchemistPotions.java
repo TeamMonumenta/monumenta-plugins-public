@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -29,6 +28,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -44,8 +44,8 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
 	private double mDamage = -1;
 
-	public AlchemistPotions(Plugin plugin, World world, Random random, Player player) {
-		super(plugin, world, random, player, null);
+	public AlchemistPotions(Plugin plugin, World world, Player player) {
+		super(plugin, world, player, null);
 		mInfo.linkedSpell = Spells.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
@@ -110,7 +110,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		int newPot = 1;
-		if (mRandom.nextDouble() < 0.50) {
+		if (FastUtils.RANDOM.nextDouble() < 0.50) {
 			newPot++;
 		}
 
