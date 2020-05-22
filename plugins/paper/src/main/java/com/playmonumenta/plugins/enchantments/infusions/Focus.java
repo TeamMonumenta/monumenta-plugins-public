@@ -46,7 +46,7 @@ public class Focus implements BaseEnchantment {
 	public static void onShootAttack(Plugin plugin, Projectile proj, LivingEntity target, EntityDamageByEntityEvent event) {
 		if (proj.hasMetadata(LEVEL_METAKEY)) {
 			int level = proj.getMetadata(LEVEL_METAKEY).get(0).asInt();
-			event.setDamage(event.getDamage() + level * (1.0 + DAMAGE_PCT_PER_LEVEL));
+			event.setDamage(event.getDamage() * (1.0 + level * DAMAGE_PCT_PER_LEVEL));
 		}
 	}
 }
