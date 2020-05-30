@@ -454,7 +454,7 @@ public class AbilityManager {
 		try {
 			for (Ability ab : mReferenceAbilities) {
 				if (ab.canUse(player)) {
-					Class[] constructorTypes = new Class[4];
+					Class[] constructorTypes = new Class[3];
 					constructorTypes[0] = Plugin.class;
 					constructorTypes[1] = World.class;
 					constructorTypes[2] = Player.class;
