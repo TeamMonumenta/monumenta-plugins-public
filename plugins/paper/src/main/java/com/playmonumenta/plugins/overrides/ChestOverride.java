@@ -67,20 +67,22 @@ public class ChestOverride extends BaseOverride {
 
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
-		// Iterate over adjacent blocks to trigger physics
-		for (Vector vec : ADJACENT_OFFSETS) {
-			Location tmpLoc = block.getLocation().add(vec);
-			Block blk = tmpLoc.getBlock();
-			Material type = blk.getType();
-			Location underLoc = tmpLoc.clone().subtract(0, 1, 0);
-			Material underType = underLoc.getBlock().getType();
-			if (GRAVITY_BLOCKS.contains(type) && (underType.equals(Material.AIR) || underType.equals(Material.CAVE_AIR))) {
-				if (underType.equals(Material.CAVE_AIR)) {
-					underLoc.getBlock().setType(Material.AIR);
-					underLoc.getBlock().setType(Material.CAVE_AIR);
-				} else {
-					underLoc.getBlock().setType(Material.CAVE_AIR);
-					underLoc.getBlock().setType(Material.AIR);
+		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			// Iterate over adjacent blocks to trigger physics
+			for (Vector vec : ADJACENT_OFFSETS) {
+				Location tmpLoc = block.getLocation().add(vec);
+				Block blk = tmpLoc.getBlock();
+				Material type = blk.getType();
+				Location underLoc = tmpLoc.clone().subtract(0, 1, 0);
+				Material underType = underLoc.getBlock().getType();
+				if (GRAVITY_BLOCKS.contains(type) && (underType.equals(Material.AIR) || underType.equals(Material.CAVE_AIR))) {
+					if (underType.equals(Material.CAVE_AIR)) {
+						underLoc.getBlock().setType(Material.AIR);
+						underLoc.getBlock().setType(Material.CAVE_AIR);
+					} else {
+						underLoc.getBlock().setType(Material.CAVE_AIR);
+						underLoc.getBlock().setType(Material.AIR);
+					}
 				}
 			}
 		}
