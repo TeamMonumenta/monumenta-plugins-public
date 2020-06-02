@@ -3,6 +3,10 @@ package com.playmonumenta.plugins;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.playmonumenta.plugins.commands.ItemIndex;
+import com.playmonumenta.plugins.inventories.IndexInventoryListeners;
+import com.playmonumenta.plugins.inventories.IndexInventoryManager;
+import com.playmonumenta.plugins.items.ItemManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -96,6 +100,8 @@ public class Plugin extends JavaPlugin {
 	public ShulkerInventoryManager mShulkerInventoryManager;
 	public CookingTableInventoryManager mCookingTableInventoryManager;
 	private BossManager mBossManager;
+	public ItemManager mItemManager;
+	public IndexInventoryManager mIndexInventoryManager;
 
 	private RedisManager mRedis;
 
@@ -145,6 +151,7 @@ public class Plugin extends JavaPlugin {
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		CookingCommand.register(this);
+		ItemIndex.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -199,6 +206,8 @@ public class Plugin extends JavaPlugin {
 		mWorld = Bukkit.getWorlds().get(0);
 		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
 
+		mItemManager = new ItemManager();
+		mIndexInventoryManager = new IndexInventoryManager();
 		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this, mWorld);
 		mZoneManager = new SpawnZoneManager(this);
@@ -238,6 +247,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(new CookingTableListeners(this), this);
+		manager.registerEvents(new IndexInventoryListeners(), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());
@@ -337,5 +347,6 @@ public class Plugin extends JavaPlugin {
 	public void reloadMonumentaConfig(CommandSender sender) {
 		ServerProperties.load(this, sender);
 		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
+		mItemManager.load();
 	}
 }

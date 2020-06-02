@@ -87,7 +87,9 @@ public interface BaseEnchantment {
 	 * applyProperty will be called every time the player changes their inventory
 	 * and the player matches this ItemProperty
 	 */
-	default void applyProperty(Plugin plugin, Player player, int level) { }
+	default void applyProperty(Plugin plugin, Player player, int level) {
+
+	}
 
 	/*
 	 * removeProperty will be called every time the player changes their inventory
@@ -97,60 +99,94 @@ public interface BaseEnchantment {
 	 * TODO: Modify this so it is only called when the item effect should actually
 	 * be removed
 	 */
-	default void removeProperty(Plugin plugin, Player player) { }
+	default void removeProperty(Plugin plugin, Player player) {
+
+	}
 
 	/*
 	 * Runs whenever the player changes their inventory and equipment is updated
 	 */
-	default void onEquipmentUpdate(Plugin plugin, Player player) { }
+	default void onEquipmentUpdate(Plugin plugin, Player player) {
+
+	}
 
 
 	/* This method will be called four times per second */
-	default void tick(Plugin plugin, World world, Player player, int level) { }
+	default void tick(Plugin plugin, World world, Player player, int level) {
+
+	}
 
 	/*
 	 * The onAttack() method will be called whenever the player damages something while
 	 * they have any levels of this property (This only applies for MELEE attacks)
 	 */
-	default void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	default void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+
+	}
 
 	/*
 	 * The onKill() method will be called whenever the player kills something
 	 * while they have any levels of this property
 	 */
-	default void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) { }
+	default void onKill(Plugin plugin, Player player, int level, Entity target, EntityDeathEvent event) {
+
+	}
 
 	/*
 	 * The onDamage() method will be called whenever the player damages something, no
 	 * matter the cause of damage.
 	 */
-	default void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) { }
+	default void onDamage(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
 
-	default void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) { }
+	}
 
-	default void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) { }
+	default void onAbility(Plugin plugin, Player player, Integer level, LivingEntity target, CustomDamageEvent event) {
 
-	default void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) { }
+	}
 
-	default void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) { }
+	default void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 
-	default void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) { }
+	}
 
-	default void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) { }
+	default void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
+
+	}
+
+	default void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
+
+	}
+
+	default void onEvade(Plugin plugin, Player player, int level, EvasionEvent event) {
+
+	}
+
+	default void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) {
+
+	}
 
 	/*
 	 * The onShootAttack() method will be called whenever the player damages something with a projectile while
 	 * they have any levels of this property
 	 */
-	default void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile target, ProjectileLaunchEvent event) { }
+	default void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile target, ProjectileLaunchEvent event) {
 
-	default void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) { }
+	}
 
-	default void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) { }
+	default void onExpChange(Plugin plugin, Player player, PlayerExpChangeEvent event, int level) {
 
-	default void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) { }
+	}
 
-	default void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) { }
+	default void onBlockBreak(Plugin plugin, Player player, BlockBreakEvent event, ItemStack item, int level) {
+
+	}
+
+	default void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
+
+	}
+
+	default void onConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event, int level) {
+
+	}
 
 	/*
 	 * Triggers when an item entity spawns in the world (possibly a player dropped item)
@@ -161,7 +197,9 @@ public interface BaseEnchantment {
 		return false;
 	}
 
-	default void onSpawn(Plugin plugin, Item item, int level) { }
+	default void onSpawn(Plugin plugin, Item item, int level) {
+
+	}
 
 	/*
 	 * TODO: Add an onRightClick() method so you can make items that cast spells

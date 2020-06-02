@@ -747,7 +747,7 @@ public class ItemUtils {
 		ArrayList<String> strList = new ArrayList<>();
 		for (Material m : Material.values()) {
 			if (m.isItem()) {
-				strList.add(m.toString());
+				strList.add(m.toString().toLowerCase());
 			}
 		}
 		return strList.toArray(new String[0]);
