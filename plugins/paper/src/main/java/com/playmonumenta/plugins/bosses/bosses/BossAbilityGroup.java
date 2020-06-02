@@ -198,57 +198,81 @@ public abstract class BossAbilityGroup {
 	/*
 	 * Boss damaged another entity
 	 */
-	public void bossDamagedEntity(EntityDamageByEntityEvent event) {}
+	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
+
+	}
 
 	/*
 	 * Boss was damaged
 	 */
-	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {}
+	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
+
+	}
 
 	/*
 	 * Boss shot a projectile
 	 */
-	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {}
+	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {
+
+	}
 
 	/*
 	 * Boss-shot projectile hit something
 	 */
-	public void bossProjectileHit(ProjectileHitEvent event) {}
+	public void bossProjectileHit(ProjectileHitEvent event) {
+
+	}
 
 	/*
 	 * Boss gets hit by a projectile
 	 */
-	public void bossHitByProjectile(ProjectileHitEvent event) {}
+	public void bossHitByProjectile(ProjectileHitEvent event) {
+
+	}
 
 	/*
 	 * Boss hit by area effect cloud
 	 */
-	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {}
+	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
+
+	}
 
 	/*
 	 * Boss-shot projectile hit something
 	 */
-	public void splashPotionAppliedToBoss(PotionSplashEvent event) {}
+	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
 
-	public void bossCastAbility(SpellCastEvent event) {}
+	}
 
-	public void bossPathfind(EntityPathfindEvent event) {}
+	public void bossCastAbility(SpellCastEvent event) {
 
-	public void bossChangedTarget(EntityTargetEvent event) {}
+	}
+
+	public void bossPathfind(EntityPathfindEvent event) {
+
+	}
+
+	public void bossChangedTarget(EntityTargetEvent event) {
+
+	}
 
 	/*
 	 * Called only the first time the boss is summoned into the world
 	 *
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
-	public void init() {}
+	public void init() {
+
+	}
 
 	/*
 	 * Called when the boss dies
 	 *
 	 * Useful to use setblock or a command to trigger post-fight logic
 	 */
-	public void death(EntityDeathEvent event) {}
+	public void death(EntityDeathEvent event) {
+
+	}
 
 	/*
 	 * Called when the mob is unloading and we need to save its metadata

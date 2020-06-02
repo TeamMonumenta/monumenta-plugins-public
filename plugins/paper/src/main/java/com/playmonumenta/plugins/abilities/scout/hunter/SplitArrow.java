@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.hunter;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.other;
 
-
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

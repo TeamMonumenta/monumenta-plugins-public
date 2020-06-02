@@ -149,8 +149,7 @@ public class NameListener implements Listener {
 		lock.readLock().lock();
 		try {
 			copy.putAll(uuid2name);
-		}
-		finally {
+		} finally {
 			lock.readLock().unlock();
 		}
 

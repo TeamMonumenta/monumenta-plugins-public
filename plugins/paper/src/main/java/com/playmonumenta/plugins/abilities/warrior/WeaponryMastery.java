@@ -18,8 +18,8 @@ public class WeaponryMastery extends Ability {
 	private static final double WEAPON_MASTERY_SWORD_2_DAMAGE = 2;
 	private static final double WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE = 0.1;
 
-	private final double damageBonusAxe;
-	private final double damageBonusSword;
+	private final double mDamageBonusAxe;
+	private final double mDamageBonusSword;
 
 	public WeaponryMastery(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Weapon Mastery");
@@ -27,8 +27,8 @@ public class WeaponryMastery extends Ability {
 		mInfo.mShorthandName = "WM";
 		mInfo.mDescriptions.add("You gain 10% damage resistance while holding a sword. Deal +3 damage while using an axe.");
 		mInfo.mDescriptions.add("Instead deal +6 damage with an axe and gain an additional +2 damage while using a sword.");
-		damageBonusAxe = getAbilityScore() == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
-		damageBonusSword = getAbilityScore() == 1 ? 0 : WEAPON_MASTERY_SWORD_2_DAMAGE;
+		mDamageBonusAxe = getAbilityScore() == 1 ? WEAPON_MASTERY_AXE_1_DAMAGE : WEAPON_MASTERY_AXE_2_DAMAGE;
+		mDamageBonusSword = getAbilityScore() == 1 ? 0 : WEAPON_MASTERY_SWORD_2_DAMAGE;
 	}
 
 	@Override
@@ -37,9 +37,9 @@ public class WeaponryMastery extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 
 			if (InventoryUtils.isAxeItem(mainHand)) {
-				event.setDamage(event.getDamage() + damageBonusAxe);
+				event.setDamage(event.getDamage() + mDamageBonusAxe);
 			} else if (InventoryUtils.isSwordItem(mainHand)) {
-				event.setDamage(event.getDamage() + damageBonusSword);
+				event.setDamage(event.getDamage() + mDamageBonusSword);
 			}
 		}
 

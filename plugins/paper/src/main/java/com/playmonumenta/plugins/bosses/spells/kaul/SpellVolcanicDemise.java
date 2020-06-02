@@ -77,10 +77,10 @@ public class SpellVolcanicDemise extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 
-						int i = 0;
+						int mI = 0;
 						@Override
 						public void run() {
-							i++;
+							mI++;
 							List<Player> players = PlayerUtils.playersInRange(mCenter, 50);
 							players.removeIf(p -> p.getLocation().getY() >= 61);
 							Collections.shuffle(players);
@@ -101,7 +101,7 @@ public class SpellVolcanicDemise extends Spell {
 								rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), players, 40);
 							}
 
-							if (i >= 25) {
+							if (mI >= 25) {
 								this.cancel();
 								mActiveRunnables.remove(this);
 							}
@@ -125,54 +125,54 @@ public class SpellVolcanicDemise extends Spell {
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			double y = spawnY;
-			Location loc = locInput.clone();
-			World world = locInput.getWorld();
+			double mY = spawnY;
+			Location mLoc = locInput.clone();
+			World mWorld = locInput.getWorld();
 
 			@Override
 			public void run() {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
-				y -= 1;
-				if (y % 2 == 0) {
+				mY -= 1;
+				if (mY % 2 == 0) {
 					for (Player player : players) {
 						// Player gets more particles the closer they are to the landing area
-						double dist = player.getLocation().distance(loc);
+						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 30)) {
-							player.spawnParticle(Particle.FLAME, loc.clone().add(Math.cos(deg), 0, Math.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
+							player.spawnParticle(Particle.FLAME, mLoc.clone().add(Math.cos(deg), 0, Math.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
 						}
 					}
 				}
-				Location particle = loc.clone().add(0, y, 0);
-				world.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				Location particle = mLoc.clone().add(0, mY, 0);
+				mWorld.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
 				if (FastUtils.RANDOM.nextBoolean()) {
-					world.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
 				}
-				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
-				if (y <= 0) {
+				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				if (mY <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175, null, true);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25, null, true);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-					BoundingBox death = BoundingBox.of(loc, 1.5, 1.5, 1.5);
-					BoundingBox box = BoundingBox.of(loc, 4, 4, 4);
-					for (Player player : PlayerUtils.playersInRange(loc, 4)) {
+					mWorld.spawnParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true);
+					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					BoundingBox death = BoundingBox.of(mLoc, 1.5, 1.5, 1.5);
+					BoundingBox box = BoundingBox.of(mLoc, 4, 4, 4);
+					for (Player player : PlayerUtils.playersInRange(mLoc, 4)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
-							BossUtils.bossDamage(mBoss, player, 1000, loc, (event) -> {
-								MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
+							BossUtils.bossDamage(mBoss, player, 1000, mLoc, (event) -> {
+								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 							});
 						} else if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 42, loc, (event) -> {
+							BossUtils.bossDamage(mBoss, player, 42, mLoc, (event) -> {
 								if (!event.isPlayerBlocking()) {
-									MovementUtils.knockAway(loc, player, 0.5f, 0.65f);
+									MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 								}
 							});
 						}
 					}
-					for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 4)) {
+					for (Block block : LocationUtils.getNearbyBlocks(mLoc.getBlock(), 4)) {
 						if (FastUtils.RANDOM.nextDouble() < 0.125) {
 							if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 								block.setType(Material.NETHERRACK);

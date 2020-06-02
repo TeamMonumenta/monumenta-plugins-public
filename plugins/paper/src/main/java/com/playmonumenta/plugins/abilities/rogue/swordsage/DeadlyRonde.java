@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;

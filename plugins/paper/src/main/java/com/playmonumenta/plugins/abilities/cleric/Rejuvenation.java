@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -17,7 +16,7 @@ public class Rejuvenation extends Ability {
 	private static final int REJUVENATION_RADIUS = 12;
 	private static final String REJUVENATION_METADATA_KEY = "RejuvenationMetadataKey";
 
-	private int timer = 0;
+	private int mTimer = 0;
 
 	public Rejuvenation(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Rejuvenation");
@@ -33,8 +32,8 @@ public class Rejuvenation extends Ability {
 			//  Don't trigger this if dead!
 			if (!mPlayer.isDead()) {
 				// 5 ticks because it triggers on four hertz.
-				timer += 5;
-				if (timer % 60 == 0) {
+				mTimer += 5;
+				if (mTimer % 60 == 0) {
 					int rejuvenation = getAbilityScore();
 					for (Player p : PlayerUtils.playersInRange(mPlayer, REJUVENATION_RADIUS, true)) {
 						// Don't buff players that have their class disabled or who have PvP enabled

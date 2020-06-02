@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;

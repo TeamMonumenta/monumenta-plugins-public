@@ -163,13 +163,13 @@ public class SwordsageRichter extends BossAbilityGroup {
 						public void run() {
 
 							new BukkitRunnable() {
-								int t = 0;
-								boolean attacked = false;
+								int mT = 0;
+								boolean mAttacked = false;
 								@Override
 								public void run() {
-									t++;
-									if (t >= 20 * 2 && !attacked) {
-										attacked = true;
+									mT++;
+									if (mT >= 20 * 2 && !mAttacked) {
+										mAttacked = true;
 										for (Player player : players) {
 											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
@@ -178,7 +178,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 											world.spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0);
 										}
 									} else {
-										float pitch = t / 20;
+										float pitch = mT / 20;
 										double offset = 2.5 - pitch;
 										for (Player player : players) {
 											Location loc = player.getLocation().add(0, 1, 0);
@@ -188,7 +188,7 @@ public class SwordsageRichter extends BossAbilityGroup {
 										}
 									}
 
-									if (t >= 20 * 2.1) {
+									if (mT >= 20 * 2.1) {
 										this.cancel();
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 									}

@@ -69,10 +69,9 @@ public class SpellWhirlwind extends Spell {
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.5f, 0.85f);
 					new BukkitRunnable() {
-						double rotation = 0;
-
-						double sin = 0;
-						double y = 0;
+						double mRotation = 0;
+						double mSin = 0;
+						double mY = 0;
 						@Override
 						public void run() {
 							Location loc = mBoss.getLocation();
@@ -80,15 +79,15 @@ public class SpellWhirlwind extends Spell {
 							mWorld.spawnParticle(Particle.CRIT, loc, 12, 0.1, 0.1, 0.1, 0.85);
 							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + ((float)FastUtils.RANDOM.nextDouble() * 0.5f));
 							for (int i = 0; i < 2; i++) {
-								rotation += 10;
-								sin += 0.1;
-								y = 1 + Math.sin(sin);
-								double radian1 = Math.toRadians(rotation);
-								loc.add(Math.cos(radian1) * mRadius, y, Math.sin(radian1) * mRadius);
+								mRotation += 10;
+								mSin += 0.1;
+								mY = 1 + Math.sin(mSin);
+								double radian1 = Math.toRadians(mRotation);
+								loc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025);
 								mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025);
 								mWorld.spawnParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2);
-								loc.subtract(Math.cos(radian1) * mRadius, y, Math.sin(radian1) * mRadius);
+								loc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 								/*
 								 * Check if this hits a player
@@ -106,7 +105,7 @@ public class SpellWhirlwind extends Spell {
 								}
 							}
 
-							if (rotation >= 360) {
+							if (mRotation >= 360) {
 								mBoss.removePotionEffect(PotionEffectType.SLOW);
 								this.cancel();
 							}

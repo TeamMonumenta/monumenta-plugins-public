@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

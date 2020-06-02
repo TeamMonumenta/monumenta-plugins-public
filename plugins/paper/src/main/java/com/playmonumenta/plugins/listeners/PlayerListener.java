@@ -139,7 +139,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerQuitEvent(PlayerQuitEvent event) {
-		if (ServerProperties.getJoinMessagesEnabled() == false) {
+		if (!ServerProperties.getJoinMessagesEnabled()) {
 			event.setQuitMessage("");
 		}
 

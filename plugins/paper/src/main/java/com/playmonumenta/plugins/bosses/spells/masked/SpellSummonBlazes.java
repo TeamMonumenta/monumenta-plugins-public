@@ -23,6 +23,9 @@ public class SpellSummonBlazes extends Spell {
 	private static final int MAX_BLAZES_PER_SPAWN = 4;
 	private static final int SPAWN_CYCLES = 2;
 	private static final int DURATION = 20 * 8;
+	private static final int PERIOD = 3;
+	private static final int DEFAULT_COUNTDOWN = 45 / PERIOD;
+
 	private Plugin mPlugin;
 	private Entity mLauncher;
 
@@ -40,11 +43,9 @@ public class SpellSummonBlazes extends Spell {
 
 	@Override
 	public void run() {
-		final int PERIOD = 3;
 
 
 		BukkitRunnable loop = new BukkitRunnable() {
-			final int DEFAULT_COUNTDOWN = 45 / PERIOD;
 			final Location mLoc = mLauncher.getLocation();
 
 			int mCountdown = DEFAULT_COUNTDOWN;

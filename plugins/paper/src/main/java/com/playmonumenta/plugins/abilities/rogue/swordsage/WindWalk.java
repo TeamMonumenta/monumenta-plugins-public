@@ -92,12 +92,12 @@ public class WindWalk extends Ability {
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 		new BukkitRunnable() {
-			List<LivingEntity> mobsAlreadyHit = new ArrayList<LivingEntity>();
+			List<LivingEntity> mMobsAlreadyHit = new ArrayList<LivingEntity>();
 			@Override
 			public void run() {
 				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(mPlayer.getVelocity().normalize()), WIND_WALK_RADIUS)) {
-					if (!mobsAlreadyHit.contains(mob)) {
+					if (!mMobsAlreadyHit.contains(mob)) {
 						if (!EntityUtils.isBoss(mob)) {
 							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
@@ -115,7 +115,7 @@ public class WindWalk extends Ability {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
 							}
 						}
-						mobsAlreadyHit.add(mob);
+						mMobsAlreadyHit.add(mob);
 					}
 				}
 				if (mPlayer.isOnGround() || mPlayer.getLocation().getBlock().getType() == Material.WATER || mPlayer.getLocation().getBlock().getType() == Material.LAVA) {

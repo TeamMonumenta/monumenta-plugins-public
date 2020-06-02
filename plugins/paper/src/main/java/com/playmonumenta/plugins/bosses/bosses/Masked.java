@@ -93,19 +93,19 @@ public class Masked extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 
 			@Override
 			public void run() {
-				if (t == TIME_SPAWN) {
+				if (mT == TIME_SPAWN) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, SPAWN_DIALOG_COMMAND);
 					mWorld.spawnParticle(Particle.DRAGON_BREATH, mSpawnLoc, 50, 0.5, 0.5, 0.5, 0.02);
 					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 1f);
-				} else if (t == TIME_TITLE) {
+				} else if (mT == TIME_TITLE) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TIME_COMMAND);
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_SUBTITLE_COMMAND);
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, TITLE_TITLE_COMMAND);
-				} else if (t == TIME_BEGIN) {
+				} else if (mT == TIME_BEGIN) {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 					// Swap weapon to bow for phase 1
@@ -117,7 +117,7 @@ public class Masked extends BossAbilityGroup {
 					this.cancel();
 				}
 
-				t += TIMER_INCREMENT;
+				mT += TIMER_INCREMENT;
 			}
 		}.runTaskTimer(mPlugin, 0, TIMER_INCREMENT);
 	}

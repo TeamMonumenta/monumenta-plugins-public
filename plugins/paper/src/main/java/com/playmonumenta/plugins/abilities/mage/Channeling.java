@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;

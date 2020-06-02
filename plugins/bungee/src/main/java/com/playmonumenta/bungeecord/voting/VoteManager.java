@@ -59,7 +59,7 @@ public class VoteManager implements Listener {
 		}
 
 		List<String> urls = config.getStringList("sites");
-		List<String> alternate_names = config.getStringList("alternate_names");
+		List<String> alternateNames = config.getStringList("alternate_names");
 		List<Integer> times = config.getIntList("cooldown_minutes");
 
 		if (urls.size() < 1 || times.size() < 1 || urls.size() != times.size()) {
@@ -68,17 +68,15 @@ public class VoteManager implements Listener {
 
 		for (int i = 0; i < urls.size(); i++) {
 			SITE_TIMERS.put(urls.get(i), Long.valueOf(times.get(i)));
-			if (!alternate_names.get(i).isEmpty()) {
-				mAlternateNames.put(alternate_names.get(i), urls.get(i));
+			if (!alternateNames.get(i).isEmpty()) {
+				mAlternateNames.put(alternateNames.get(i), urls.get(i));
 			}
 		}
 
 		// For testing!
 		//SITE_TIMERS.put("https://mctools.org/votifier-tester", Long.valueOf(2));
 
-		mTickTask = plugin.getProxy().getScheduler().schedule(plugin, () -> {
-			tick();
-		}, TICK_PERIOD_SECONDS, TICK_PERIOD_SECONDS, TimeUnit.SECONDS);
+		mTickTask = plugin.getProxy().getScheduler().schedule(plugin, this::tick, TICK_PERIOD_SECONDS, TICK_PERIOD_SECONDS, TimeUnit.SECONDS);
 	}
 
 	public void unload() {

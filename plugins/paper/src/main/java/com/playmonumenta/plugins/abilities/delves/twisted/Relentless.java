@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.delves.twisted;
 
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

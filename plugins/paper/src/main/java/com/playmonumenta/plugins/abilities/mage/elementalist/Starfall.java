@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.elementalist;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -101,10 +100,10 @@ public class Starfall extends Ability {
 		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
 		new BukkitRunnable() {
-			double t = 0;
+			double mT = 0;
 			@Override
 			public void run() {
-				t += 1;
+				mT += 1;
 				for (int i = 0; i < 8; i++) {
 					loc.subtract(0, 0.25, 0);
 					if (loc.getBlock().getType().isSolid()) {
@@ -135,7 +134,7 @@ public class Starfall extends Ability {
 				mWorld.spawnParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F);
 				mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F);
 
-				if (t >= 50) {
+				if (mT >= 50) {
 					this.cancel();
 				}
 			}

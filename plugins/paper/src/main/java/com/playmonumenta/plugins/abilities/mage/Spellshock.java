@@ -42,13 +42,13 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class Spellshock extends Ability {
 
 	public static class SpellShockedMob {
-		public boolean triggered = false;
-		public Player triggeredBy;
-		public LivingEntity mob;
-		public int ticksLeft = SPELL_SHOCK_DURATION;
+		public boolean mTriggered = false;
+		public Player mTriggeredBy;
+		public LivingEntity mMob;
+		public int mTicksLeft = SPELL_SHOCK_DURATION;
 
 		public SpellShockedMob(LivingEntity mob) {
-			this.mob = mob;
+			this.mMob = mob;
 		}
 	}
 
@@ -85,22 +85,22 @@ public class Spellshock extends Ability {
 						continueLooping = false;
 						for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
 							SpellShockedMob e = entry.getValue();
-							if (e.triggered) {
+							if (e.mTriggered) {
 								triggeredMobs.add(entry.getKey());
-								runTriggerParticles(e.mob.getLocation().add(0, 1, 0));
+								runTriggerParticles(e.mMob.getLocation().add(0, 1, 0));
 								// Apply speed I for 6 seconds if player has level 2 spellshock
-								if (ScoreboardUtils.getScoreboardValue(e.triggeredBy, "SpellShock") > 1) {
-									plugin.mPotionManager.addPotion(e.triggeredBy, PotionID.ABILITY_SELF,
+								if (ScoreboardUtils.getScoreboardValue(e.mTriggeredBy, "SpellShock") > 1) {
+									plugin.mPotionManager.addPotion(e.mTriggeredBy, PotionID.ABILITY_SELF,
 									                                new PotionEffect(PotionEffectType.SPEED, SPELL_SHOCK_DURATION, 0));
 								}
-								for (LivingEntity le : EntityUtils.getNearbyMobs(e.mob.getLocation(), SPELL_SHOCK_RADIUS)) {
+								for (LivingEntity le : EntityUtils.getNearbyMobs(e.mMob.getLocation(), SPELL_SHOCK_RADIUS)) {
 									// Add nearby mobs to the damage queue
-									pendingDamageMobs.put(le, e.triggeredBy);
+									pendingDamageMobs.put(le, e.mTriggeredBy);
 									// If the mob has static and hasn't been triggered, trigger it and do another loop later
 									UUID leUniqueId = le.getUniqueId();
 									if (mSpellShockedMobs.containsKey(leUniqueId) && !triggeredMobs.contains(leUniqueId)) {
-										mSpellShockedMobs.get(leUniqueId).triggered = true;
-										mSpellShockedMobs.get(leUniqueId).triggeredBy = e.triggeredBy;
+										mSpellShockedMobs.get(leUniqueId).mTriggered = true;
+										mSpellShockedMobs.get(leUniqueId).mTriggeredBy = e.mTriggeredBy;
 										continueLooping = true;
 									}
 								}
@@ -144,11 +144,11 @@ public class Spellshock extends Ability {
 					Set<UUID> expiredMobs = new HashSet<UUID>();
 					for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
 						SpellShockedMob e = entry.getValue();
-						Location loc = e.mob.getLocation();
+						Location loc = e.mMob.getLocation();
 						loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0.2, 0.6, 0.2, 1);
 						loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0.3, 0.6, 0.3, SPELL_SHOCK_COLOR);
-						e.ticksLeft--;
-						if (e.ticksLeft <= 0 || e.mob.isDead()) {
+						e.mTicksLeft--;
+						if (e.mTicksLeft <= 0 || e.mMob.isDead()) {
 							expiredMobs.add(entry.getKey());
 						}
 					}
@@ -166,8 +166,8 @@ public class Spellshock extends Ability {
 		// If the mob has static, trigger it, otherwise, apply it
 		if (event.triggersSpellshock() && mSpellShockedMobs.containsKey(mob.getUniqueId())) {
 			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
-			e.triggeredBy = mPlayer;
-			e.triggered = true;
+			e.mTriggeredBy = mPlayer;
+			e.mTriggered = true;
 		} else if (event.appliesSpellshock() && !mPendingStaticMobs.contains(mob)) {
 			mPendingStaticMobs.add(mob);
 		}

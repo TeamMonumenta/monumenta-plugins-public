@@ -109,8 +109,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 		return player.getUniqueId().toString();
 	}
 
-	private String oldKey(ProxiedPlayer player)
-	{
+	private String oldKey(ProxiedPlayer player) {
 		InetSocketAddress host = player.getPendingConnection().getVirtualHost();
 		return player.getName() + ";" + host.getHostString() + ":" + host.getPort();
 	}

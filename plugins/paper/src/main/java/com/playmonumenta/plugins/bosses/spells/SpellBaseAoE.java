@@ -166,7 +166,7 @@ public class SpellBaseAoE extends Spell {
 					mOutburstAction.run(loc);
 
 					new BukkitRunnable() {
-						Location loc = mLauncher.getLocation();
+						Location mLoc = mLauncher.getLocation();
 						double mBurstRadius = 0;
 						@Override
 						public void run() {
@@ -174,9 +174,9 @@ public class SpellBaseAoE extends Spell {
 								mBurstRadius += 1.5;
 								for (double i = 0; i < 360; i += 15) {
 									double radian1 = Math.toRadians(i);
-									loc.add(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
-									mCircleOutburstAction.run(loc);
-									loc.subtract(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
+									mLoc.add(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
+									mCircleOutburstAction.run(mLoc);
+									mLoc.subtract(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
 								}
 							}
 							if (mBurstRadius >= mRadius) {

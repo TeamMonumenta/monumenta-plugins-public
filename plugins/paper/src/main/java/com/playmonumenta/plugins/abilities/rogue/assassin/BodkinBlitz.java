@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;

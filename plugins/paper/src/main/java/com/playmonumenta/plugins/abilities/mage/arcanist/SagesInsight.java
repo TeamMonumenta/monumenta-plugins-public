@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
-
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 

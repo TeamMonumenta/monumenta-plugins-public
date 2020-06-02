@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

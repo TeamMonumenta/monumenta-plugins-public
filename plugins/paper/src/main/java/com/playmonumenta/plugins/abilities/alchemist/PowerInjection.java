@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

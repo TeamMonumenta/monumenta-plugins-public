@@ -77,17 +77,17 @@ public class LuminousInfusion extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1, 1.65f);
 		mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.75f, 0.25f, 0.75f, 1);
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 
 			@Override
 			public void run() {
-				t++;
+				mT++;
 				Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				if (t >= LUMINOUS_INFUSION_COOLDOWN || !mActive) {
-					if (t >= LUMINOUS_INFUSION_COOLDOWN) {
+				if (mT >= LUMINOUS_INFUSION_COOLDOWN || !mActive) {
+					if (mT >= LUMINOUS_INFUSION_COOLDOWN) {
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
 					}
 					mActive = false;

@@ -23,7 +23,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  * - If no players have line of sight, the mob continues to target the last seen player, even through walls
  */
 public class SpellTargetVisiblePlayer extends Spell {
-	private final int PERIOD = 5;
+	private static final int PERIOD = 5;
 
 	private final Mob mBoss;
 	private final int mDetectionRange;

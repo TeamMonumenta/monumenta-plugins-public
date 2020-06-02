@@ -55,22 +55,22 @@ public class SpellShadowGlade extends Spell {
 		List<Player> pList = PlayerUtils.playersInRange(zoneStart, 40);
 
 		BukkitRunnable loop = new BukkitRunnable() {
-			private int j = 0;
+			private int mJ = 0;
 
 			@Override
 			public void run() {
 				zoneStart.getWorld().playSound(zoneStart, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 2f, 0.5f);
-				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (j / mCount) * 10, 4, 0, 4, 0.01);
-				if (j / mCount >= 24) {
+				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01);
+				if (mJ / mCount >= 24) {
 					for (Player player : pList) {
 						Location pPos = player.getLocation();
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
 					}
-					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (j / mCount) * 10, 4, 0, 4, 0.01);
+					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01);
 				}
-				j++;
+				mJ++;
 
-				if (j * PERIOD > 140) {
+				if (mJ * PERIOD > 140) {
 					this.cancel();
 
 					for (Player player : pList) {

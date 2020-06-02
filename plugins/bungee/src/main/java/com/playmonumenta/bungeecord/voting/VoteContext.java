@@ -234,6 +234,7 @@ public class VoteContext {
 
 	/* Pattern to extract the domain name from the full URL */
 	private static final Pattern pattern = Pattern.compile("https*://([^/]*)/");
+
 	protected BaseComponent[] getSiteInfo(boolean withClickEvents) {
 		mLock.readLock().lock();
 

@@ -44,8 +44,8 @@ public class ThuribleProcession extends Ability {
 	private static final int THURIBLE_COOLDOWN = 8;
 	private static final PotionEffectType[] EFFECTS = new PotionEffectType[] {PotionEffectType.FAST_DIGGING, PotionEffectType.SPEED, PotionEffectType.INCREASE_DAMAGE, PotionEffectType.DAMAGE_RESISTANCE};
 
-	private int seconds = 0;
-	private int buffs = 0;
+	private int mSeconds = 0;
+	private int mBuffs = 0;
 
 	public ThuribleProcession(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Thurible Procession");
@@ -65,7 +65,7 @@ public class ThuribleProcession extends Ability {
 			return true;
 		}
 
-		if (buffs > 0 && event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isHostileMob(event.getEntity())) {
+		if (mBuffs > 0 && event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isHostileMob(event.getEntity())) {
 
 			updateBuffs();
 
@@ -78,7 +78,7 @@ public class ThuribleProcession extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1);
 
 			//Reset timer and have 8 second cooldown
-			seconds = 0;
+			mSeconds = 0;
 			putOnCooldown();
 		}
 		return true;
@@ -90,12 +90,12 @@ public class ThuribleProcession extends Ability {
 			return;
 		}
 		if (oneSecond) {
-			seconds++;
+			mSeconds++;
 			updateBuffs();
 			applyBuffs(PASSIVE_DURATION);
 		}
 		if (fourHertz) {
-			for (int i = 0; i < buffs; i++) {
+			for (int i = 0; i < mBuffs; i++) {
 				Particle.DustOptions color = new Particle.DustOptions(EFFECTS[i].getColor(), 1);
 				mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 1, 0.4, 0.4, 0.4, color);
 			}
@@ -106,14 +106,14 @@ public class ThuribleProcession extends Ability {
 	private void updateBuffs() {
 
 		//Convert time into number of buffs and cap to maximum effect index for that level
-		buffs = getAbilityScore() == 1 ? seconds / 5 : seconds / 3;
+		mBuffs = getAbilityScore() == 1 ? mSeconds / 5 : mSeconds / 3;
 
 		//If level 2, cap to 4 effects, if level 1, cap to 3 effects
-		if (buffs > 3) {
+		if (mBuffs > 3) {
 			if (getAbilityScore() != 1) {
-				buffs = 4;
+				mBuffs = 4;
 			} else {
-				buffs = 3;
+				mBuffs = 3;
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public class ThuribleProcession extends Ability {
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer, radius, true);
 		for (Player pl : players) {
-			for (int i = 0; i < buffs; i++) {
+			for (int i = 0; i < mBuffs; i++) {
 				mPlugin.mPotionManager.addPotion(pl, PotionID.ABILITY_OTHER, new PotionEffect(EFFECTS[i], duration, 0, true, true));
 			}
 		}

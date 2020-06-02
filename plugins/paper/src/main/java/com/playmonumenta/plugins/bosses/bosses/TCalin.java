@@ -44,9 +44,7 @@ public class TCalin extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new TCalin(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new TCalin(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -137,26 +135,26 @@ public class TCalin extends BossAbilityGroup {
 				mBoss.removePotionEffect(PotionEffectType.SLOW);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 3, 1));
 				new BukkitRunnable() {
-					float j = 0;
-					double rotation = 0;
-					double radius = 5;
+					float mJ = 0;
+					double mRotation = 0;
+					double mRadius = 5;
 
 					@Override
 					public void run() {
 						Location loc = mBoss.getLocation();
-						j++;
+						mJ++;
 						world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 2, 0.25, 0.45, 0.25);
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (j / 20));
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
 						for (int i = 0; i < 5; i++) {
-							double radian1 = Math.toRadians(rotation + (72 * i));
-							loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+							double radian1 = Math.toRadians(mRotation + (72 * i));
+							loc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 							world.spawnParticle(Particle.SPELL_WITCH, loc, 6, 0.25, 0.25, 0.25, 0);
 							world.spawnParticle(Particle.SPELL_MOB, loc, 4, 0.25, 0.25, 0.25, 0);
-							loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+							loc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 						}
-						rotation += 10;
-						radius -= 0.1;
-						if (radius <= 0 || mBoss.isDead()) {
+						mRotation += 10;
+						mRadius -= 0.1;
+						if (mRadius <= 0 || mBoss.isDead()) {
 							this.cancel();
 						}
 					}
@@ -210,26 +208,26 @@ public class TCalin extends BossAbilityGroup {
 			world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
 			super.changePhase(null, null, null);
 			new BukkitRunnable() {
-				float j = 0;
-				double rotation = 0;
-				double radius = 10;
-				Location loc = mBoss.getLocation();
+				float mJ = 0;
+				double mRotation = 0;
+				double mRadius = 10;
+				Location mLoc = mBoss.getLocation();
 
 				@Override
 				public void run() {
-					j++;
+					mJ++;
 					world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 2, 0.25, 0.45, 0.25, 0);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (j / 20));
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
 					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(rotation + (72 * i));
-						loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-						world.spawnParticle(Particle.SPELL_WITCH, loc, 6, 0.25, 0.25, 0.25, 0);
-						world.spawnParticle(Particle.SPELL_MOB, loc, 4, 0.25, 0.25, 0.25, 0);
-						loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						double radian1 = Math.toRadians(mRotation + (72 * i));
+						mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						world.spawnParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0);
+						world.spawnParticle(Particle.SPELL_MOB, mLoc, 4, 0.25, 0.25, 0.25, 0);
+						mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 					}
-					rotation += 10;
-					radius -= 0.25;
-					if (radius <= 0) {
+					mRotation += 10;
+					mRadius -= 0.25;
+					if (mRadius <= 0) {
 						this.cancel();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
 						world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45,
@@ -271,31 +269,31 @@ public class TCalin extends BossAbilityGroup {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f);
 		}
 		new BukkitRunnable() {
-			double rotation = 0;
-			Location loc = mBoss.getLocation();
-			double radius = 0;
-			double y = 2.5;
-			double yminus = 0.35;
+			double mRotation = 0;
+			Location mLoc = mBoss.getLocation();
+			double mRadius = 0;
+			double mY = 2.5;
+			double mYminus = 0.35;
 
 			@Override
 			public void run() {
 
-				radius += 1;
+				mRadius += 1;
 				for (int i = 0; i < 15; i += 1) {
-					rotation += 24;
-					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-					world.spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.25, 0.25, 0.25, 0);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.1, 0.1, 0.1, 0.1);
-					loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					mRotation += 24;
+					double radian1 = Math.toRadians(mRotation);
+					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 2, 0.25, 0.25, 0.25, 0);
+					world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 2, 0.1, 0.1, 0.1, 0.1);
+					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 				}
-				y -= y * yminus;
-				yminus += 0.02;
-				if (yminus >= 1) {
-					yminus = 1;
+				mY -= mY * mYminus;
+				mYminus += 0.02;
+				if (mYminus >= 1) {
+					mYminus = 1;
 				}
-				if (radius >= r) {
+				if (mRadius >= r) {
 					this.cancel();
 				}
 

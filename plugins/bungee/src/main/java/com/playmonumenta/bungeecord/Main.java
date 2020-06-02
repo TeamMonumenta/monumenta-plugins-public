@@ -26,8 +26,8 @@ public class Main extends Plugin {
 
 	@Override
 	public void onEnable() {
-		_loadConfig();
-		_saveConfig();
+		loadConfig();
+		saveConfig();
 
 		PluginManager manager = getProxy().getPluginManager();
 		try {
@@ -65,7 +65,7 @@ public class Main extends Plugin {
 		}
     }
 
-	private void _loadConfig() {
+	private void loadConfig() {
 		// Create data directory if it doesn't exist
 		if (!getDataFolder().exists()) {
 			getDataFolder().mkdir();
@@ -108,7 +108,7 @@ public class Main extends Plugin {
 		}
 	}
 
-	private void _saveConfig() {
+	private void saveConfig() {
 		if (!getDataFolder().exists()) {
 			getDataFolder().mkdir();
 		}

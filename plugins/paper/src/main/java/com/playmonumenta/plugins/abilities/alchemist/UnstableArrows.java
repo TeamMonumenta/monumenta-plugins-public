@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -22,7 +21,6 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-
 
 public class UnstableArrows extends Ability {
 	private static final int UNSTABLE_ARROWS_COOLDOWN = 16 * 20;

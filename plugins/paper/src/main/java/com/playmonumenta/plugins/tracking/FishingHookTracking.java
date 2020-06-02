@@ -14,14 +14,18 @@ public class FishingHookTracking implements EntityTracking {
 	private HashMap<UUID, FishHook> mEntities = new HashMap<UUID, FishHook>();
 
 	@Override
-	public void addEntity(Entity entity) { }
+	public void addEntity(Entity entity) {
+
+	}
 
 	public void addEntity(Player player, Entity entity) {
 		mEntities.put(player.getUniqueId(), (FishHook)entity);
 	}
 
 	@Override
-	public void removeEntity(Entity entity) { }
+	public void removeEntity(Entity entity) {
+
+	}
 
 	public void removeEntity(Player player) {
 		UUID uuid = player.getUniqueId();
@@ -41,7 +45,9 @@ public class FishingHookTracking implements EntityTracking {
 	}
 
 	@Override
-	public void update(World world, int ticks) { }
+	public void update(World world, int ticks) {
+
+	}
 
 	@Override
 	public void unloadTrackedEntities() {

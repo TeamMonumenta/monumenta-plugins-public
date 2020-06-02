@@ -60,7 +60,9 @@ public abstract class Ability {
 	 * AbilityTrigger (Right Click/Left Click), along with whatever
 	 * runCheck() may contain, is correct.
 	 */
-	public void cast(Action trigger) { }
+	public void cast(Action trigger) {
+
+	}
 
 	/**
 	 * Gets the AbilityInfo object, which contains the small data side of the ability itself, and is required to have for any ability.
@@ -82,9 +84,7 @@ public abstract class Ability {
 	public boolean isOnCooldown() {
 		AbilityInfo info = getInfo();
 		if (info.linkedSpell != null && !info.ignoreCooldown) {
-			if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
-				return true;
-			}
+			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell);
 		}
 		return false;
 	}
@@ -105,10 +105,7 @@ public abstract class Ability {
 	 * @return
 	 */
 	public final boolean canCast() {
-		if (runCheck() && !isOnCooldown()) {
-			return true;
-		}
-		return false;
+		return runCheck() && !isOnCooldown();
 	}
 
 	//Events
@@ -173,45 +170,75 @@ public abstract class Ability {
 		return true;
 	}
 
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 
-	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) { }
+	}
+
+	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+
+	}
 
 	public double entityDeathRadius() {
 		return 0;
 	}
 
-	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) { }
+	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
 
-	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) { }
+	}
 
-	public void playerExtendedSneakEvent() { }
+	public void playerItemHeldEvent(ItemStack mainHand, ItemStack offHand) {
 
-	public void playerDealtCustomDamageEvent(CustomDamageEvent event) { }
+	}
 
-	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) { }
+	public void playerExtendedSneakEvent() {
+
+	}
+
+	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+
+	}
+
+	public void entityTargetLivingEntityEvent(EntityTargetLivingEntityEvent event) {
+
+	}
 
 	// Do not use this for regular abilities
-	public void playerDealtUnregisteredCustomDamageEvent(CustomDamageEvent event) { }
+	public void playerDealtUnregisteredCustomDamageEvent(CustomDamageEvent event) {
 
-	public void potionApplyEvent(PotionEffectApplyEvent event) { }
+	}
 
-	public void playerDeathEvent(PlayerDeathEvent event) { }
+	public void potionApplyEvent(PotionEffectApplyEvent event) {
 
-	public void playerAnimationEvent(PlayerAnimationEvent event) { }
+	}
 
-	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) { }
+	public void playerDeathEvent(PlayerDeathEvent event) {
 
-	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) { }
+	}
 
-	public void playerItemDamageEvent(PlayerItemDamageEvent event) { }
+	public void playerAnimationEvent(PlayerAnimationEvent event) {
+
+	}
+
+	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) {
+
+	}
+
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
+
+	}
+
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
+
+	}
 
 	//---------------------------------------------------------------------------------------------------------------
 
 	//Other
 	//---------------------------------------------------------------------------------------------------------------
 
-	public void setupClassPotionEffects() { }
+	public void setupClassPotionEffects() {
+
+	}
 
 	public boolean has1SecondTrigger() {
 		return false;
@@ -229,7 +256,9 @@ public abstract class Ability {
 		return false;
 	}
 
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {}
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+
+	}
 
 	//---------------------------------------------------------------------------------------------------------------
 	/*
@@ -275,5 +304,7 @@ public abstract class Ability {
 	}
 
 	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */
-	public void invalidate() { }
+	public void invalidate() {
+
+	}
 }

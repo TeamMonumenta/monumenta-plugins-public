@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.scout;
 
-
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;

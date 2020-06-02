@@ -95,11 +95,11 @@ public class PurpleHaze extends Ability {
 		 */
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			mRunnable = new BukkitRunnable() {
-				int counter = 0;
+				int mCounter = 0;
 				@Override
 				public void run() {
-					counter++;
-					if (counter % 20 == 0) {
+					mCounter++;
+					if (mCounter % 20 == 0) {
 						for (Map.Entry<UUID, HazedMob> entry : mHazedMobs.entrySet()) {
 							HazedMob e = entry.getValue();
 							LivingEntity damagee = e.mMob;
@@ -118,7 +118,7 @@ public class PurpleHaze extends Ability {
 							mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 10, 0, 0.2, 0, 0.0001);
 							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("purple_concrete"));
 							mWorld.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.2, 0.65, 0.2, Bukkit.createBlockData("pink_terracotta"));
-							counter = 0;
+							mCounter = 0;
 						}
 					}
 

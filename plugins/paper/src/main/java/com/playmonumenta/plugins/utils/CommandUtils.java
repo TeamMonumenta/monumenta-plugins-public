@@ -20,6 +20,8 @@ import com.playmonumenta.plugins.point.Point;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
+import javax.annotation.Nullable;
+
 public class CommandUtils {
 
 	/**
@@ -215,16 +217,16 @@ public class CommandUtils {
 
 	// returns the sender as Player, if that sender is a player instance, or a proxied player
 	// returns null otherwise
+	@Nullable
 	public static Player getPlayerFromSender(CommandSender sender) {
-		Player p = null;
 		if (sender instanceof Player) {
-			p = ((Player)sender);
+			return ((Player)sender);
 		} else if (sender instanceof ProxiedCommandSender) {
 			CommandSender callee = ((ProxiedCommandSender) sender).getCallee();
 			if (callee instanceof Player) {
-				p = ((Player)callee);
+				return ((Player)callee);
 			}
 		}
-		return p;
+		return null;
 	}
 }

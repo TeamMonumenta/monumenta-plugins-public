@@ -57,7 +57,7 @@ public class SpellDetectionCircle extends Spell {
 	@Override
 	public void run() {
 		new BukkitRunnable() {
-			private int runs_left = mDuration;
+			private int mRunsLeft = mDuration;
 
 			@Override
 			public void run() {
@@ -82,10 +82,10 @@ public class SpellDetectionCircle extends Spell {
 						break;
 					}
 				}
-				if (runs_left <= 0) {
+				if (mRunsLeft <= 0) {
 					this.cancel();
 				}
-				runs_left -= 5;
+				mRunsLeft -= 5;
 			}
 		}.runTaskTimer(mPlugin, 1, 5);
 	}

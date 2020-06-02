@@ -32,17 +32,17 @@ public class SpellEruption extends Spell {
 		World world = mBoss.getWorld();
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30);
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 			@Override
 			public void run() {
-				t++;
+				mT++;
 				world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 20, 0.15, 0, 0.15, 0.175);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.5f, 1f);
 				for (Player player : players) {
 					world.spawnParticle(Particle.LAVA, player.getLocation(), 10, 0.15, 0, 0.15, 0.175);
 				}
 
-				if (t >= 3) {
+				if (mT >= 3) {
 					this.cancel();
 					for (Player player : players) {
 						player.setVelocity(new Vector(0, 2, 0));

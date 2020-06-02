@@ -71,9 +71,9 @@ public class SpellSinisterReach extends Spell {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 3, 0.85f);
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 1.25f);
 			new BukkitRunnable() {
-				int t = 0;
-				Vector dir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
-				Location tloc = mBoss.getLocation().setDirection(dir);
+				int mT = 0;
+				Vector mDir = LocationUtils.getDirectionTo(tar.getLocation().add(0, 1, 0), mBoss.getLocation());
+				Location mTloc = mBoss.getLocation().setDirection(mDir);
 
 				@Override
 				public void run() {
@@ -88,24 +88,24 @@ public class SpellSinisterReach extends Spell {
 						return;
 					}
 
-					t++;
+					mT++;
 
 					Vector vec;
 					for (double r = 1; r < 5; r += 0.5) {
 						for (double m = degree * -1; m <= degree; m += 5) {
 							double radian1 = Math.toRadians(m);
-							float yaw = tloc.getYaw();
+							float yaw = mTloc.getYaw();
 							float yaw1 = yaw + 90;
 							vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
 							vec = VectorUtils.rotateYAxis(vec, yaw1);
-							vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
+							vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
 
-							Location l = tloc.clone().add(vec);
+							Location l = mTloc.clone().add(vec);
 							world.spawnParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05);
 						}
 					}
 
-					if (t >= 30) {
+					if (mT >= 30) {
 						this.cancel();
 						mBoss.setAI(true);
 						horse.setAI(true);
@@ -117,7 +117,7 @@ public class SpellSinisterReach extends Spell {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4)) {
 							if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 								Vector toVector = player.getLocation().toVector().subtract(mBoss.getLocation().toVector()).normalize();
-								if (dir.dot(toVector) > 0.06) {
+								if (mDir.dot(toVector) > 0.06) {
 									multiHit(player);
 								}
 							}
@@ -125,12 +125,12 @@ public class SpellSinisterReach extends Spell {
 						for (double r = 1; r < 5; r += 0.5) {
 							for (double n = degree * -1; n <= degree; n += 5) {
 								double radian1 = Math.toRadians(n);
-								float yaw = tloc.getYaw();
+								float yaw = mTloc.getYaw();
 								float yaw2 = yaw + 90;
 								vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-								vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
+								vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
 								vec = VectorUtils.rotateYAxis(vec, yaw2);
-								Location l = tloc.clone().add(vec);
+								Location l = mTloc.clone().add(vec);
 								world.spawnParticle(Particle.FLAME, l, 2, 0.1, 0.1, 0.1, 0.065);
 								if (r >= 4.5) {
 									world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0);
@@ -178,6 +178,7 @@ public class SpellSinisterReach extends Spell {
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
+
 	@Override
 	public int duration() {
 		// TODO Auto-generated method stub

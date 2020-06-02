@@ -12,6 +12,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * server crashes. If you need to use a Jedis function that does not yet exist in this class,
  * add it here following the same format used in the other functions.
  */
+
 public class RedisManager {
 	private static JedisPool mPool = null;
 	private static Logger mLogger = null;

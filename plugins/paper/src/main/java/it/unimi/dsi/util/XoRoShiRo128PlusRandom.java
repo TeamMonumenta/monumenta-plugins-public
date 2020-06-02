@@ -62,12 +62,12 @@ import java.util.Random;
 public class XoRoShiRo128PlusRandom extends Random {
 	private static final long serialVersionUID = 1L;
 	/** The internal state of the algorithm. */
-	private long s0;
-	private long s1;
+	private long mS0;
+	private long mS1;
 
 	protected XoRoShiRo128PlusRandom(final long s0, final long s1) {
-		this.s0 = s0;
-		this.s1 = s1;
+		this.mS0 = s0;
+		this.mS1 = s1;
 	}
 
 	/** Creates a new generator seeded using {@link Util#randomSeed()}. */
@@ -93,7 +93,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 	 * @return a copy of this generator.
 	 */
 	public XoRoShiRo128PlusRandom copy() {
-		return new XoRoShiRo128PlusRandom(s0, s1);
+		return new XoRoShiRo128PlusRandom(mS0, mS1);
 	}
 
 	@Override
@@ -108,12 +108,12 @@ public class XoRoShiRo128PlusRandom extends Random {
 
 	@Override
 	public long nextLong() {
-		final long s0 = this.s0;
-		long s1 = this.s1;
+		final long s0 = this.mS0;
+		long s1 = this.mS1;
 		final long result = s0 + s1;
 		s1 ^= s0;
-		this.s0 = Long.rotateLeft(s0, 24) ^ s1 ^ s1 << 16;
-		this.s1 = Long.rotateLeft(s1, 37);
+		this.mS0 = Long.rotateLeft(s0, 24) ^ s1 ^ s1 << 16;
+		this.mS1 = Long.rotateLeft(s1, 37);
 		return result;
 	}
 
@@ -200,15 +200,15 @@ public class XoRoShiRo128PlusRandom extends Random {
 		for (final long element : jump) {
 			for (int b = 0; b < 64; b++) {
 				if ((element & 1L << b) != 0) {
-					s0 ^= this.s0;
-					s1 ^= this.s1;
+					s0 ^= this.mS0;
+					s1 ^= this.mS1;
 				}
 				nextLong();
 			}
 		}
 
-		this.s0 = s0;
-		this.s1 = s1;
+		this.mS0 = s0;
+		this.mS1 = s1;
 		return this;
 	}
 
@@ -262,10 +262,10 @@ public class XoRoShiRo128PlusRandom extends Random {
 		nextLong();
 		final XoRoShiRo128PlusRandom split = copy();
 
-		long h0 = s0;
-		long h1 = s1;
-		long h2 = s0 + 0x55a650a4c1dac3e9L; // Random constants
-		long h3 = s1 + 0xb39ae98dfa439b73L;
+		long h0 = mS0;
+		long h1 = mS1;
+		long h2 = mS0 + 0x55a650a4c1dac3e9L; // Random constants
+		long h3 = mS1 + 0xb39ae98dfa439b73L;
 
 		// A round of SpookyHash ShortMix
 		h2 = Long.rotateLeft(h2, 50);
@@ -305,8 +305,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 		h1 += h2;
 		//h3 ^= h1;
 
-		split.s0 = h0;
-		split.s1 = h1;
+		split.mS0 = h0;
+		split.mS1 = h1;
 
 		return split;
 	}
@@ -324,8 +324,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 	@Override
 	public void setSeed(final long seed) {
 		final Random r = new Random(seed);
-		s0 = r.nextLong();
-		s1 = r.nextLong();
+		mS0 = r.nextLong();
+		mS1 = r.nextLong();
 	}
 
 
@@ -339,7 +339,7 @@ public class XoRoShiRo128PlusRandom extends Random {
 		if (state.length != 2) {
 			throw new IllegalArgumentException("The argument array contains " + state.length + " longs instead of " + 2);
 		}
-		s0 = state[0];
-		s1 = state[1];
+		mS0 = state[0];
+		mS1 = state[1];
 	}
 }

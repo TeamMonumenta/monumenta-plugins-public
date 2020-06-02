@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

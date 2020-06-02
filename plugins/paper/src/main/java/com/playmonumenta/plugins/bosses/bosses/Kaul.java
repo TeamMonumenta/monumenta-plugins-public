@@ -124,10 +124,10 @@ public class Kaul extends BossAbilityGroup {
 	private final LivingEntity mBoss;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private boolean defeated = false;
-	private boolean cooldown = false;
-	private boolean primordialPhase = false;
-	private int hits = 0;
+	private boolean mDefeated = false;
+	private boolean mCooldown = false;
+	private boolean mPrimordialPhase = false;
+	private int mHits = 0;
 
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
@@ -174,7 +174,7 @@ public class Kaul extends BossAbilityGroup {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
 					}
 				}
-				if (defeated || mBoss.isDead() || !mBoss.isValid()) {
+				if (mDefeated || mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 			}
@@ -347,64 +347,64 @@ public class Kaul extends BossAbilityGroup {
 				public void run() {
 					teleport(mSpawnLoc.clone().add(0, 5, 0));
 					new BukkitRunnable() {
-						Location loc = mBoss.getLocation();
-						float j = 0;
-						double rotation = 0;
-						double radius = 10;
+						Location mLoc = mBoss.getLocation();
+						float mJ = 0;
+						double mRotation = 0;
+						double mRadius = 10;
 
 						@Override
 						public void run() {
-							j++;
-							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 3, 0.5f + (j / 25));
+							mJ++;
+							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 3, 0.5f + (mJ / 25));
 							for (int i = 0; i < 5; i++) {
-								double radian1 = Math.toRadians(rotation + (72 * i));
-								loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-								world.spawnParticle(Particle.SPELL_WITCH, loc, 6, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 4, 0.25, 0.25, 0.25, 0.25,
+								double radian1 = Math.toRadians(mRotation + (72 * i));
+								mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+								world.spawnParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0);
+								world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
 								Material.COARSE_DIRT.createBlockData());
-								loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+								mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 							}
 							world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8,
 							                    0);
-							rotation += 8;
-							radius -= 0.25;
+							mRotation += 8;
+							mRadius -= 0.25;
 
 							if (mBoss.isDead() || !mBoss.isValid()) {
 								this.cancel();
 							}
 
-							if (radius <= 0) {
+							if (mRadius <= 0) {
 								this.cancel();
 								Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
 								changePhase(null, phase2PassiveSpells, null);
 								new BukkitRunnable() {
-									int t = 0;
-									double rotation = 0;
-									double radius = 0;
+									int mT = 0;
+									double mRotation = 0;
+									double mRadius = 0;
 
 									@Override
 									public void run() {
-										t++;
-										radius = t;
+										mT++;
+										mRadius = mT;
 										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
 										world.spawnParticle(Particle.SMOKE_NORMAL, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
 										for (int i = 0; i < 36; i++) {
-											double radian1 = Math.toRadians(rotation + (10 * i));
-											loc.add(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
+											double radian1 = Math.toRadians(mRotation + (10 * i));
+											loc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
 											world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0);
 											world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.4, 0.4, 0.25,
 											                    Material.COARSE_DIRT.createBlockData());
-											loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
+											loc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
 										}
-										for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t),
-										                                 loc.clone().add(t, 0, t))) {
+										for (Block block : LocationUtils.getEdge(loc.clone().subtract(mT, 0, mT),
+										                                 loc.clone().add(mT, 0, mT))) {
 											if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
 											    && block.getLocation().add(0, 1.5, 0).getBlock()
 											    .getType() == Material.AIR) {
 												block.setType(Material.SMOOTH_RED_SANDSTONE);
 											}
 										}
-										if (t >= 40) {
+										if (mT >= 40) {
 											this.cancel();
 										}
 									}
@@ -456,32 +456,32 @@ public class Kaul extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 9999, 12));
 			teleport(mSpawnLoc.clone().add(0, 5, 0));
-			primordialPhase = true;
+			mPrimordialPhase = true;
 			new BukkitRunnable() {
-				Location loc = mSpawnLoc;
-				double rotation = 0;
-				double radius = 10;
+				Location mLoc = mSpawnLoc;
+				double mRotation = 0;
+				double mRadius = 10;
 
 				@Override
 				public void run() {
 					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(rotation + (72 * i));
-						loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
-						world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 3, 0.1, 0.1, 0.1, 0.25,
+						double radian1 = Math.toRadians(mRotation + (72 * i));
+						mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
+						world.spawnParticle(Particle.BLOCK_DUST, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
 						Material.DIRT.createBlockData());
-						loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 					}
-					rotation += 8;
-					radius -= 0.15;
-					if (radius <= 0) {
+					mRotation += 8;
+					mRadius -= 0.15;
+					if (mRadius <= 0) {
 						this.cancel();
-						world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
-						world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
-						world.spawnParticle(Particle.CRIT_MAGIC, loc, 50, 0.1, 0.1, 0.1, 1);
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 150, 0.1, 0.1, 0.1, 0.5,
+						world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
+						world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1);
+						world.spawnParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
 						                    Material.DIRT.createBlockData());
-						LivingEntity miniboss = spawnPrimordial(loc);
+						LivingEntity miniboss = spawnPrimordial(mLoc);
 						new BukkitRunnable() {
 
 							@Override
@@ -496,7 +496,7 @@ public class Kaul extends BossAbilityGroup {
 									mBoss.setAI(true);
 									teleport(mSpawnLoc);
 									mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-									primordialPhase = false;
+									mPrimordialPhase = false;
 									new BukkitRunnable() {
 
 										@Override
@@ -554,49 +554,49 @@ public class Kaul extends BossAbilityGroup {
 						for (ArmorStand point : points) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 5, 0.75f);
 							new BukkitRunnable() {
-								Location loc = point.getLocation().add(0, 15, 0);
-								Vector dir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), loc);
-								float t = 0;
+								Location mLoc = point.getLocation().add(0, 15, 0);
+								Vector mDir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), mLoc);
+								float mT = 0;
 
 								@Override
 								public void run() {
-									t++;
-									if (t % 2 == 0) {
+									mT++;
+									if (mT % 2 == 0) {
 										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									}
 									world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
 									world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0);
 									world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0);
-									if (t == 1) {
-										loc.getWorld().createExplosion(loc, 6, true);
-										loc.getWorld().createExplosion(loc.clone().subtract(0, 4, 0), 6, true);
+									if (mT == 1) {
+										mLoc.getWorld().createExplosion(mLoc, 6, true);
+										mLoc.getWorld().createExplosion(mLoc.clone().subtract(0, 4, 0), 6, true);
 									}
-									loc.add(dir.clone().multiply(0.35));
+									mLoc.add(mDir.clone().multiply(0.35));
 									if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
-										world.spawnParticle(Particle.FALLING_DUST, loc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, loc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.4, 0.4, 0.4, 0.1);
+										world.spawnParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
+										world.spawnParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
+										world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1);
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
-										world.spawnParticle(Particle.REDSTONE, loc, 15, 0.4, 0.4, 0.4, RED_COLOR);
-										world.spawnParticle(Particle.FALLING_DUST, loc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData());
+										world.spawnParticle(Particle.REDSTONE, mLoc, 15, 0.4, 0.4, 0.4, RED_COLOR);
+										world.spawnParticle(Particle.FALLING_DUST, mLoc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData());
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
-										world.spawnParticle(Particle.FLAME, loc, 10, 0.3, 0.3, 0.3, 0.1);
-										world.spawnParticle(Particle.SMOKE_LARGE, loc, 3, 0.4, 0.4, 0.4, 0);
+										world.spawnParticle(Particle.FLAME, mLoc, 10, 0.3, 0.3, 0.3, 0.1);
+										world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.4, 0.4, 0.4, 0);
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
-										world.spawnParticle(Particle.FALLING_DUST, loc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, loc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.4, 0.4, 0.4, 0.1);
+										world.spawnParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
+										world.spawnParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
+										world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1);
 									}
-									if (loc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || loc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
+									if (mLoc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || mLoc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
 										this.cancel();
-										hits++;
+										mHits++;
 									}
 
 									if (mBoss.isDead() || !mBoss.isValid()) {
 										this.cancel();
 									}
 
-									if (hits >= 4) {
+									if (mHits >= 4) {
 										this.cancel();
 										world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
 										world.spawnParticle(Particle.FLAME, mCenter.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
@@ -610,23 +610,23 @@ public class Kaul extends BossAbilityGroup {
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 
 										new BukkitRunnable() {
-											Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
-											double rotation = 0;
-											double radius = 0;
-											int t = 0;
+											Location mLoc = mCenter.getLocation().subtract(0, 0.5, 0);
+											double mRotation = 0;
+											double mRadius = 0;
+											int mT = 0;
 
 											@Override
 											public void run() {
-												t++;
-												radius = t;
+												mT++;
+												mRadius = mT;
 												for (int i = 0; i < 36; i++) {
-													double radian1 = Math.toRadians(rotation + (10 * i));
-													loc.add(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
-													world.spawnParticle(Particle.FLAME, loc, 2, 0.25, 0.25, 0.25, 0.1);
-													world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
-													loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
+													double radian1 = Math.toRadians(mRotation + (10 * i));
+													mLoc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+													world.spawnParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1);
+													world.spawnParticle(Particle.BLOCK_DUST, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
+													mLoc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
 												}
-												for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
+												for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
 													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
 														block.setType(Material.NETHERRACK);
 														if (FastUtils.RANDOM.nextInt(3) == 1) {
@@ -636,7 +636,7 @@ public class Kaul extends BossAbilityGroup {
 														block.setType(Material.SMOOTH_RED_SANDSTONE);
 													}
 												}
-												if (t >= 40) {
+												if (mT >= 40) {
 													this.cancel();
 												}
 											}
@@ -682,22 +682,22 @@ public class Kaul extends BossAbilityGroup {
 		events.put(20, mBoss -> {
 			new BukkitRunnable() {
 				Location loc = mSpawnLoc;
-				double rotation = 0;
-				double radius = 5;
+				double mRotation = 0;
+				double mRadius = 5;
 
 				@Override
 				public void run() {
 					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(rotation + (72 * i));
-						loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						double radian1 = Math.toRadians(mRotation + (72 * i));
+						loc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.1, 0.1, 0.1, 0);
 						world.spawnParticle(Particle.BLOCK_DUST, loc, 4, 0.2, 0.2, 0.2, 0.25,
 						Material.COARSE_DIRT.createBlockData());
-						loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+						loc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
 					}
-					rotation += 8;
-					radius -= 0.25;
-					if (radius <= 0) {
+					mRotation += 8;
+					mRadius -= 0.25;
+					if (mRadius <= 0) {
 						this.cancel();
 						world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
 						world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
@@ -711,7 +711,7 @@ public class Kaul extends BossAbilityGroup {
 							@Override
 							public void run() {
 
-								if (mBoss.isDead() || !mBoss.isValid() || defeated) {
+								if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
 									this.cancel();
 									if (!miniboss.isDead()) {
 										miniboss.setHealth(0);
@@ -758,32 +758,32 @@ public class Kaul extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
 		new BukkitRunnable() {
-			double rotation = 0;
-			Location loc = mBoss.getLocation();
-			double radius = 0;
-			double y = 2.5;
-			double yminus = 0.35;
+			double mRotation = 0;
+			Location mLoc = mBoss.getLocation();
+			double mRadius = 0;
+			double mY = 2.5;
+			double mYminus = 0.35;
 
 			@Override
 			public void run() {
 
-				radius += 1;
+				mRadius += 1;
 				for (int i = 0; i < 15; i += 1) {
-					rotation += 24;
-					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
-					mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 4, 0.2, 0.2, 0.2, 0.25,
+					mRotation += 24;
+					double radian1 = Math.toRadians(mRotation);
+					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
 					                               Material.COARSE_DIRT.createBlockData());
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 3, 0.1, 0.1, 0.1, 0.1);
-					loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 
 				}
-				y -= y * yminus;
-				yminus += 0.02;
-				if (yminus >= 1) {
-					yminus = 1;
+				mY -= mY * mYminus;
+				mYminus += 0.02;
+				if (mYminus >= 1) {
+					mYminus = 1;
 				}
-				if (radius >= r) {
+				if (mRadius >= r) {
 					this.cancel();
 				}
 
@@ -809,12 +809,12 @@ public class Kaul extends BossAbilityGroup {
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 		/* Boss deals AoE damage when melee'ing a player */
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity().getLocation().distance(mBoss.getLocation()) <= 2) {
-			if (!cooldown) {
-				cooldown = true;
+			if (!mCooldown) {
+				mCooldown = true;
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						cooldown = false;
+						mCooldown = false;
 					}
 				}.runTaskLater(mPlugin, 20);
 				UUID uuid = event.getEntity().getUniqueId();
@@ -881,7 +881,7 @@ public class Kaul extends BossAbilityGroup {
 						@Override
 						public void run() {
 							// If the Primordial Elemental is active, don't allow other abilities to turn Kaul's AI back on
-							if (!primordialPhase) {
+							if (!mPrimordialPhase) {
 								mBoss.setInvulnerable(false);
 								mBoss.setAI(true);
 								mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -912,7 +912,7 @@ public class Kaul extends BossAbilityGroup {
 			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
 			"NOW... THE JUNGLE... MUST SLEEP...",
 		};
-		defeated = true;
+		mDefeated = true;
 		knockback(mPlugin, 10);
 
 		for (Player player : players) {
@@ -933,23 +933,23 @@ public class Kaul extends BossAbilityGroup {
 			}
 		}
 		new BukkitRunnable() {
-			Location loc = mCenter.getLocation().subtract(0, 0.5, 0);
-			double rotation = 0;
-			double radius = 0;
-			int t = 0;
+			Location mLoc = mCenter.getLocation().subtract(0, 0.5, 0);
+			double mRotation = 0;
+			double mRadius = 0;
+			int mT = 0;
 
 			@Override
 			public void run() {
-				t++;
-				radius = t;
+				mT++;
+				mRadius = mT;
 				for (int i = 0; i < 36; i++) {
-					double radian1 = Math.toRadians(rotation + (10 * i));
-					loc.add(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
-					world.spawnParticle(Particle.CLOUD, loc, 3, 0.25, 0.25, 0.25, 0.025, null, true);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, loc, 5, 0.4, 0.25, 0.4, 0.25, null, true);
-					loc.subtract(Math.cos(radian1) * radius, 1, Math.sin(radian1) * radius);
+					double radian1 = Math.toRadians(mRotation + (10 * i));
+					mLoc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+					world.spawnParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null, true);
+					world.spawnParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null, true);
+					mLoc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
 				}
-				for (Block block : LocationUtils.getEdge(loc.clone().subtract(t, 0, t), loc.clone().add(t, 0, t))) {
+				for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
 					if (block.getType() == Material.MAGMA_BLOCK) {
 						block.setType(Material.OAK_LEAVES);
 						if (FastUtils.RANDOM.nextInt(5) == 1) {
@@ -965,33 +965,32 @@ public class Kaul extends BossAbilityGroup {
 						}
 					}
 				}
-				if (t >= 40) {
+				if (mT >= 40) {
 					this.cancel();
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-		String[] d = dio;
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 
 			@Override
 			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + d[t].toUpperCase() + "\",\"color\":\"dark_green\"}]");
-				t++;
-				if (t == d.length) {
+				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mT].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+				mT++;
+				if (mT == dio.length) {
 					this.cancel();
 					teleport(mSpawnLoc);
 					new BukkitRunnable() {
-						int t = 0;
+						int mT = 0;
 
 						@Override
 						public void run() {
-							if (t <= 0) {
+							if (mT <= 0) {
 								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
 							}
-							t++;
-							if (t <= 60) {
+							mT++;
+							if (mT <= 60) {
 								mBoss.teleport(mBoss.getLocation().subtract(0, 0.05, 0));
 								mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
 								                               Material.COARSE_DIRT.createBlockData());
@@ -1001,7 +1000,7 @@ public class Kaul extends BossAbilityGroup {
 								mBoss.setAI(false);
 								mBoss.setSilent(true);
 								mBoss.setInvulnerable(true);
-								if (t >= 100) {
+								if (mT >= 100) {
 									this.cancel();
 									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 100 0.8");
 									PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "title @s title [\"\",{\"text\":\"VICTORY\",\"color\":\"green\",\"bold\":true}]");
@@ -1059,24 +1058,24 @@ public class Kaul extends BossAbilityGroup {
 				};
 
 				new BukkitRunnable() {
-					int t = 0;
-					int index = 0;
+					int mT = 0;
+					int mIndex = 0;
 
 					@Override
 					public void run() {
-						if (t == 0) {
+						if (mT == 0) {
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3, 0f);
 						}
 
-						if (t % (20 * 4) == 0) {
-							if (index < dio.length) {
-								PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[index].toUpperCase() + "\",\"color\":\"dark_green\"}]");
-								index++;
+						if (mT % (20 * 4) == 0) {
+							if (mIndex < dio.length) {
+								PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mIndex].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+								mIndex++;
 							}
 						}
-						t++;
+						mT++;
 
-						if (t >= (20 * 8)) {
+						if (mT >= (20 * 8)) {
 							this.cancel();
 							mBoss.setAI(true);
 							mBoss.setSilent(false);

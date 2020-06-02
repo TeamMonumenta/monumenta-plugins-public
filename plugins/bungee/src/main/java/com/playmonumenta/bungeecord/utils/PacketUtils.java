@@ -6,7 +6,7 @@ public class PacketUtils {
 	/**
 	 * Encodes string array to a single string
 	 */
-	public static String encodeStrings(String in[]) throws Exception {
+	public static String encodeStrings(String[] in) throws Exception {
 		Gson gs = new Gson();
 		return gs.toJson(in);
 	}
