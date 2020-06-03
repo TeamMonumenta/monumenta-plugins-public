@@ -41,6 +41,14 @@
             <id>coreprotect</id>
             <url>http://maven.playpro.com/</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -97,6 +105,19 @@
             <groupId>com.goncalomb.bukkit</groupId>
             <artifactId>nbteditor</artifactId>
             <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>item-nbt-api-plugin</artifactId>
+            <version>2.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.5.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- These need to be shaded in! -->
@@ -106,7 +127,7 @@
             <version>5.8.0</version>
         </dependency>
         <dependency>
-        	<groupId>redis.clients</groupId>
+            <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.2.0</version>
             <type>jar</type>
@@ -219,10 +240,10 @@
                         </transformer>
                     </transformers>
                     <relocations>
-                    	<relocation>
-                    		<pattern>redis.clients.jedis</pattern>
-                    		<shadedPattern>com.monumenta.plugins.internal.jedis</shadedPattern>
-                    	</relocation>
+                        <relocation>
+                            <pattern>redis.clients.jedis</pattern>
+                            <shadedPattern>com.monumenta.plugins.internal.jedis</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
