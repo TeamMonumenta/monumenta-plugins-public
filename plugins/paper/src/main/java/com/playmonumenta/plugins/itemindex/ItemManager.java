@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.items;
+package com.playmonumenta.plugins.itemindex;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.StringUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -70,6 +69,7 @@ public class ItemManager {
 			return null;
 		}
 		try {
+			System.out.println(json);
 			JsonObject root = new JsonParser().parse(json).getAsJsonObject();
 			JsonElement elem = root.get("monumentaItem");
 			if (elem == null) {
@@ -77,6 +77,9 @@ public class ItemManager {
 			}
 			return new Gson().fromJson(root.get("monumentaItem"), MonumentaItem.class);
 		} catch (IllegalStateException e) {
+			return null;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -99,7 +102,6 @@ public class ItemManager {
 		try {
 			dir.mkdirs();
 			String json = item.toLootTablePrettyJson();
-			System.out.println(json);
 			com.google.common.io.Files.write(json, file, Charsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -112,13 +114,34 @@ public class ItemManager {
 	}
 
 	@Nullable
-	public MonumentaItem getMMItem(ItemStack itemStack) {
-		return getMMItem(itemStack.getType(), ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
+	public MonumentaItem getIndexMMItem(ItemStack itemStack) {
+		MonumentaItem i = getIndexMMItem(itemStack.getType(), ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
+		return i;
 	}
 
 	@Nullable
-	public MonumentaItem getMMItem(Material material, String name) {
+	public MonumentaItem getIndexMMItem(Material material, String name) {
 		return this.mItems.getOrDefault(material, new TreeMap<>()).getOrDefault(name, null);
+	}
+
+
+	@Nullable
+	public MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
+		String json = new NBTItem(itemStack).getString("MonumentaItemEdits");
+		MonumentaItem edits = null;
+		if (json != null) {
+			edits = new Gson().fromJson(json, MonumentaItem.class);
+		}
+		MonumentaItem item = new MonumentaItem();
+		MonumentaItem indexItem = getIndexMMItem(itemStack);
+		if (indexItem == null) {
+			indexItem = new MonumentaItem();
+			indexItem.setDefaultValues();
+		}
+		item.setEdits(indexItem.clone());
+		item.mergeEdits();
+		item.setEdits(edits);
+		return item;
 	}
 
 	public MonumentaItem[] getItemArray() {
@@ -129,26 +152,6 @@ public class ItemManager {
 			}
 		}
 		return out.toArray(new MonumentaItem[0]);
-	}
-
-	@Nullable
-	public String extractJsonFromEditable(ItemStack item) {
-		List<String> loreLines = item.getLore();
-		if (loreLines == null || loreLines.size() < 1) {
-			return null;
-		}
-		String lore = loreLines.get(0);
-		String[] split = lore.split("§¬§¬§¬", -1);
-		if (split[0].length() == lore.length()) {
-			return null;
-		}
-		return StringUtils.convertToVisibleLoreLine(split[0]);
-	}
-
-
-	public MonumentaItem getMMItemFromEditable(ItemStack itemInMainHand) {
-		String json = extractJsonFromEditable(itemInMainHand);
-		return jsonToItem(json);
 	}
 
 	public void remove(MonumentaItem item) {

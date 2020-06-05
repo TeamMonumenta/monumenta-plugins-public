@@ -1,7 +1,6 @@
-package com.playmonumenta.plugins.inventories;
+package com.playmonumenta.plugins.itemindex;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.items.MonumentaItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -88,7 +87,9 @@ public class IndexInventory {
 			this.mCurrentPage = (this.mItems.length - 1) / 45 + 1;
 		}
 		for (int i = 0; i < 45 && i + this.mCurrentPage * 45 < this.mItems.length; i++) {
-			this.mContents[i] = this.mItems[i + this.mCurrentPage * 45].toItemStack();
+			MonumentaItem item = this.mItems[i + this.mCurrentPage * 45];
+			item.setEdits(null);
+			this.mContents[i] = item.toItemStack();
 		}
 		this.addBottomHUD();
 		this.mInventory.setContents(this.mContents);

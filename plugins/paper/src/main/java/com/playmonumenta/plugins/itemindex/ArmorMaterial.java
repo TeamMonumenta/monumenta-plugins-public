@@ -1,11 +1,8 @@
-package com.playmonumenta.plugins.enums;
+package com.playmonumenta.plugins.itemindex;
 
-import com.playmonumenta.plugins.items.MonumentaItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.ArrayList;
 
@@ -74,8 +71,8 @@ public enum ArmorMaterial {
 			return true;
 		}
 		MatchCondition[] conds = calculateConditions(this);
-		Attribute armAtr = Attribute.GENERIC_ARMOR;
-		Attribute touAtr = Attribute.GENERIC_ARMOR_TOUGHNESS;
+		Attribute armAtr = Attribute.ARMOR;
+		Attribute touAtr = Attribute.TOUGHNESS;
 		AttributeModifier.Operation op = AttributeModifier.Operation.ADD_NUMBER;
 		EquipmentSlot[] slots = new EquipmentSlot[4];
 		slots[0] = EquipmentSlot.HEAD;

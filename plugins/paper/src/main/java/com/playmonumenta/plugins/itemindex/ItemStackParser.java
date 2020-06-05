@@ -1,10 +1,7 @@
-package com.playmonumenta.plugins.items;
+package com.playmonumenta.plugins.itemindex;
 
 import com.google.common.collect.Multimap;
-import com.playmonumenta.plugins.enums.Enchantment;
-import com.playmonumenta.plugins.enums.ItemLocation;
-import com.playmonumenta.plugins.enums.ItemTier;
-import com.playmonumenta.plugins.enums.Region;
+import com.playmonumenta.plugins.enchantments.Enchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
@@ -41,7 +38,6 @@ public class ItemStackParser {
 		this.parseLore();
 		this.parseLocation();
 
-		this.mMonumentaItem.setEditable(true);
 		return this.mMonumentaItem;
 	}
 
@@ -55,17 +51,15 @@ public class ItemStackParser {
 
 	private void parseRegionTier() {
 		ItemUtils.ItemRegion itemRegion = ItemUtils.getItemRegion(this.mItemStack);
-		if (itemRegion == ItemUtils.ItemRegion.UNKNOWN) {
-			this.mMonumentaItem.setRegion(Region.NONE);
+		if (itemRegion != ItemUtils.ItemRegion.UNKNOWN) {
+			Region r = Region.valueOf(itemRegion.name());
+			this.mMonumentaItem.setRegion(r);
 		}
 		ItemUtils.ItemTier itemTier = ItemUtils.getItemTier(this.mItemStack);
-		if (itemTier == ItemUtils.ItemTier.UNKNOWN) {
-			this.mMonumentaItem.setTier(ItemTier.NONE);
+		if (itemTier != ItemUtils.ItemTier.UNKNOWN) {
+			ItemTier t = ItemTier.valueOf(itemTier.name());
+			this.mMonumentaItem.setTier(t);
 		}
-		Region r = Region.valueOf(itemRegion.name());
-		ItemTier t = ItemTier.valueOf(itemTier.name());
-		this.mMonumentaItem.setRegion(r);
-		this.mMonumentaItem.setTier(t);
 	}
 
 	private void parseAttributes() {
@@ -74,7 +68,9 @@ public class ItemStackParser {
 			return;
 		}
 		for (Map.Entry<Attribute, AttributeModifier> entry : attribs.entries()) {
-			this.mMonumentaItem.setAttribute(entry.getValue().getSlot(), entry.getKey(), entry.getValue().getOperation(), entry.getValue().getAmount());
+			this.mMonumentaItem.setAttribute(EquipmentSlot.valueOf(entry.getValue().getSlot().toString()),
+				com.playmonumenta.plugins.itemindex.Attribute.valueOf(entry.getKey().toString()),
+				entry.getValue().getOperation(), entry.getValue().getAmount());
 		}
 	}
 

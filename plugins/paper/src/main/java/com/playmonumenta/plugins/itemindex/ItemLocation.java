@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.enums;
+package com.playmonumenta.plugins.itemindex;
 
 import org.bukkit.ChatColor;
 

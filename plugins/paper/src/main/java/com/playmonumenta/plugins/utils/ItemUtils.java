@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.playmonumenta.plugins.itemindex.Attribute;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -248,6 +251,52 @@ public class ItemUtils {
 		Material.EGG,
 		Material.SNOWBALL
 	);
+
+	public static final Set<Attribute> mainStat = EnumSet.of(
+		Attribute.ATTACK_DAMAGE,
+		Attribute.RANGED_DAMAGE,
+		Attribute.ATTACK_SPEED,
+		Attribute.THROW_RATE,
+		Attribute.ARROW_SPEED
+	);
+
+	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
+		ChatColor color = ChatColor.BLUE;
+		String isPercent = "%";
+		String isPositive = "+";
+		if (amount <= 0) {
+			color = ChatColor.RED;
+			isPositive = "-";
+		}
+		if (operation == AttributeModifier.Operation.ADD_NUMBER) {
+			isPercent = "";
+		}
+		if (slot == com.playmonumenta.plugins.itemindex.EquipmentSlot.MAIN_HAND) {
+			if (mainStat.contains(attribute)) {
+				color = ChatColor.DARK_GREEN;
+				isPositive = " ";
+			}
+			switch (attribute) {
+				case ATTACK_DAMAGE:
+				case ARROW_SPEED:
+					amount += 1;
+					break;
+				case ATTACK_SPEED:
+					amount += 4;
+					break;
+				case RANGED_DAMAGE:
+					amount += 8;
+					break;
+				default:
+					break;
+			}
+		}
+		String numberStr = StringUtils.left(amount.toString(), 4);
+		if (amount.equals((double)(amount.intValue() + 0))) {
+			numberStr = numberStr.split("\\.")[0];
+		}
+		return color + isPositive + numberStr + isPercent + attribute.getReadableStringFormat();
+	}
 
 	public enum ItemRegion {
 		UNKNOWN("Unknown"),

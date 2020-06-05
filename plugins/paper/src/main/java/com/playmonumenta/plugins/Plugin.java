@@ -3,10 +3,10 @@ package com.playmonumenta.plugins;
 import java.io.IOException;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.commands.ItemIndex;
-import com.playmonumenta.plugins.inventories.IndexInventoryListeners;
-import com.playmonumenta.plugins.inventories.IndexInventoryManager;
-import com.playmonumenta.plugins.items.ItemManager;
+import com.playmonumenta.plugins.itemindex.ItemIndexCommand;
+import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
+import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
+import com.playmonumenta.plugins.itemindex.ItemManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -151,7 +151,7 @@ public class Plugin extends JavaPlugin {
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		CookingCommand.register(this);
-		ItemIndex.register();
+		ItemIndexCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

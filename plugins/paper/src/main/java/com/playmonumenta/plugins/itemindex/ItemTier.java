@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.enums;
+package com.playmonumenta.plugins.itemindex;
 
 import net.md_5.bungee.api.ChatColor;
 

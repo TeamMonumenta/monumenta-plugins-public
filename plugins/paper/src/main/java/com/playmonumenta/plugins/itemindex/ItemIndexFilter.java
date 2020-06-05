@@ -1,6 +1,4 @@
-package com.playmonumenta.plugins.inventories;
-
-import com.playmonumenta.plugins.items.MonumentaItem;
+package com.playmonumenta.plugins.itemindex;
 
 public class ItemIndexFilter {
 	public enum Type {

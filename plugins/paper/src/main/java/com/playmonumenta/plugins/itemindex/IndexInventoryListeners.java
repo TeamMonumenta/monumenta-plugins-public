@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.inventories;
+package com.playmonumenta.plugins.itemindex;
 
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.entity.Player;

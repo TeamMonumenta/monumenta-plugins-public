@@ -1,9 +1,6 @@
-package com.playmonumenta.plugins.commands;
+package com.playmonumenta.plugins.itemindex;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enums.ArmorMaterial;
-import com.playmonumenta.plugins.items.ItemStackParser;
-import com.playmonumenta.plugins.items.MonumentaItem;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
@@ -13,20 +10,15 @@ import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
 import io.github.jorelali.commandapi.api.arguments.StringArgument;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import com.playmonumenta.plugins.enums.Enchantment;
-import com.playmonumenta.plugins.enums.ItemLocation;
-import com.playmonumenta.plugins.enums.ItemTier;
-import com.playmonumenta.plugins.enums.Region;
+import com.playmonumenta.plugins.enchantments.Enchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import io.github.jorelali.commandapi.api.arguments.DynamicSuggestedStringArgument;
 import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,16 +26,41 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class ItemIndex {
+public class ItemIndexCommand {
 	public static void register() {
+		registerFixIndexItems();
 		registerIndex();
 		registerParseItem();
 		registerChest();
 		registerNew();
 		registerCommit();
-		registerEnableEdit();
 		registerRemove();
 		registerEdit();
+	}
+
+	private static void registerFixIndexItems() {
+		//mi fixIndexItems
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("fixIndexItems", new LiteralArgument("fixIndexItems"));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = CommandUtils.getPlayerFromSender(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem[] items = Plugin.getInstance().mItemManager.getItemArray();
+				for (int i = 0; i < items.length; i++) {
+					p.sendActionBar("fixing index items...   " + (i + 1) + " / " + items.length);
+					MonumentaItem item = items[i];
+					ItemStack itemStack = item.toItemStack();
+					item = MonumentaItem.fromItemStack(itemStack);
+					Plugin.getInstance().mItemManager.addToManager(item);
+				}
+				p.sendMessage("Items fixed ;3");
+			}
+		);
 	}
 
 	private static void registerParseItem() {
@@ -62,7 +79,9 @@ public class ItemIndex {
 				if (mainhand.getAmount() == 0 || mainhand.getType() == Material.AIR) {
 					return;
 				}
-				MonumentaItem item = new ItemStackParser(mainhand).parse();
+				MonumentaItem item = new MonumentaItem();
+				item.setDefaultValues();
+				item.setEdits((new ItemStackParser(mainhand).parse()));
 				ItemStack out = item.toItemStack();
 				p.getInventory().addItem(out);
 				p.sendMessage("the converted item has been added to your inventory. make sure the parsed data is correct, and do /mi commit when everything is done as wanted");
@@ -105,11 +124,11 @@ public class ItemIndex {
 							if (inputStack == null || inputStack.getType() == Material.AIR) {
 								continue;
 							}
-							MonumentaItem item = Plugin.getInstance().mItemManager.getMMItemFromEditable(inputStack);
+							MonumentaItem item = Plugin.getInstance().mItemManager.getMMItemWithEdits(inputStack);
 							if (item == null) {
 								continue;
 							}
-							item.setEditable(false);
+							item.mergeEdits();
 							Plugin.getInstance().mItemManager.addToManager(item);
 							changes++;
 						}
@@ -136,7 +155,7 @@ public class ItemIndex {
 					return;
 				}
 				MonumentaItem i = new MonumentaItem();
-				i.setEditable(true);
+				i.setDefaultValues();
 				updateItemInHand(i, p);
 				p.sendMessage("you've been given a new item, ready for edits. when you want to add it to the Index, do /mi commit");
 			}
@@ -155,12 +174,13 @@ public class ItemIndex {
 				if (p == null) {
 					return;
 				}
-				MonumentaItem item = Plugin.getInstance().mItemManager.getMMItemFromEditable(p.getInventory().getItemInMainHand());
+				MonumentaItem item = Plugin.getInstance().mItemManager.getMMItemWithEdits(p.getInventory().getItemInMainHand());
 				if (item == null) {
 					return;
 				}
-				item.setEditable(false);
+				item.mergeEdits();
 				Plugin.getInstance().mItemManager.addToManager(item);
+				updateItemInHandNoTimestamps(item, p);
 				p.sendMessage("Index entry for " + item.getMaterial().toString().toLowerCase() + ":" + item.getNameColorless() +
 					" has been successfully edited");
 			}
@@ -178,37 +198,7 @@ public class ItemIndex {
 				if (!(sender instanceof Player)) {
 					return;
 				}
-				Plugin.getInstance().mIndexInventoryManager.openIndex((Player)sender);
-			}
-		);
-	}
-
-	private static void registerEnableEdit() {
-		//mi enableEdit
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("enableEdit", new LiteralArgument("enableEdit"));
-		CommandAPI.getInstance().register("mi",
-			CommandPermission.fromString("monumenta.mi"),
-			arguments,
-			(sender, args) -> {
-				Player p = commandSecurities(sender);
-				if (p == null) {
-					return;
-				}
-				String json = Plugin.getInstance().mItemManager.extractJsonFromEditable(p.getInventory().getItemInMainHand());
-				if (json != null && !json.equals("")) {
-					p.sendMessage("held item is already considered as editable");
-					return;
-				}
-				MonumentaItem item = Plugin.getInstance().mItemManager.getMMItem(p.getInventory().getItemInMainHand());
-				if (item == null) {
-					p.sendMessage("no item has been found in the index that matches the current mainHand item");
-					return;
-				}
-				item.setEditable(true);
-				updateItemInHand(item, p);
-				p.sendMessage("item " + item.getMaterial().toString().toLowerCase() + ":" + item.getNameColorless() +
-					"has been successfully fetched from index, and is now ready for edits. do '/mi commit' when finished.");
+				Plugin.getInstance().mIndexInventoryManager.openIndex((Player) sender);
 			}
 		);
 	}
@@ -225,12 +215,7 @@ public class ItemIndex {
 				if (p == null) {
 					return;
 				}
-				String json = Plugin.getInstance().mItemManager.extractJsonFromEditable(p.getInventory().getItemInMainHand());
-				if (json != null && !json.equals("")) {
-					p.sendMessage("held item is considered as editable, only freshly taken items from the item can be removed from it");
-					return;
-				}
-				MonumentaItem item = Plugin.getInstance().mItemManager.getMMItem(p.getInventory().getItemInMainHand());
+				MonumentaItem item = Plugin.getInstance().mItemManager.getIndexMMItem(p.getInventory().getItemInMainHand());
 				if (item == null) {
 					p.sendMessage("no item has been found in the index that matches the current mainHand item");
 					return;
@@ -258,6 +243,7 @@ public class ItemIndex {
 					return;
 				}
 				p.sendMessage(item.toColoredRawEditInfo());
+				updateItemInHandNoTimestamps(item, p);
 			}
 		);
 		registerEditName();
@@ -289,7 +275,7 @@ public class ItemIndex {
 				if (item == null) {
 					return;
 				}
-				item.setName("");
+				item.edit().setName("");
 				updateItemInHand(item, p);
 			}
 		);
@@ -306,7 +292,7 @@ public class ItemIndex {
 				if (item == null) {
 					return;
 				}
-				item.setName((String)args[0]);
+				item.edit().setName((String)args[0]);
 				updateItemInHand(item, p);
 			}
 		);
@@ -331,7 +317,7 @@ public class ItemIndex {
 					return;
 				}
 				Material mat = Material.valueOf(((String)args[0]).toUpperCase());
-				item.setMaterial(mat);
+				item.edit().setMaterial(mat);
 				updateItemInHand(item, p);
 			}
 		);
@@ -356,7 +342,7 @@ public class ItemIndex {
 					return;
 				}
 				Region r = Region.valueOf(((String)args[0]).toUpperCase());
-				item.setRegion(r);
+				item.edit().setRegion(r);
 				updateItemInHand(item, p);
 			}
 		);
@@ -381,7 +367,7 @@ public class ItemIndex {
 					return;
 				}
 				ItemTier tier = ItemTier.valueOf(((String)args[0]).toUpperCase());
-				item.setTier(tier);
+				item.edit().setTier(tier);
 				updateItemInHand(item, p);
 			}
 		);
@@ -406,7 +392,7 @@ public class ItemIndex {
 					return;
 				}
 				ItemLocation loc = ItemLocation.valueOf(((String)args[0]).toUpperCase());
-				item.setLocation(loc);
+				item.edit().setLocation(loc);
 				updateItemInHand(item, p);
 			}
 		);
@@ -430,7 +416,7 @@ public class ItemIndex {
 				if (item == null) {
 					return;
 				}
-				item.setLoreLine((Integer)args[0] - 1, null);
+				item.edit().setLoreLine((Integer)args[0] - 1, null);
 				updateItemInHand(item, p);
 			}
 		);
@@ -447,7 +433,7 @@ public class ItemIndex {
 				if (item == null) {
 					return;
 				}
-				item.setLoreLine((Integer)args[0] - 1, (String)args[1]);
+				item.edit().setLoreLine((Integer)args[0] - 1, (String)args[1]);
 				updateItemInHand(item, p);
 			}
 		);
@@ -473,7 +459,7 @@ public class ItemIndex {
 					return;
 				}
 				Enchantment ench = Enchantment.valueOf(((String)args[0]).toUpperCase());
-				item.setEnchantLevel(ench, (int)args[1]);
+				item.edit().setEnchantLevel(ench, (int)args[1]);
 				updateItemInHand(item, p);
 			}
 		);
@@ -499,31 +485,18 @@ public class ItemIndex {
 				}
 				int rgb = Integer.parseInt((String)args[0], 16);
 				int[] color = {rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255};
-				item.setColor(color);
+				item.edit().setColor(color);
 				updateItemInHand(item, p);
 			}
 		);
 	}
 
 	private static void registerEditAttribute() {
-		//mi edit attribute <slot> <attribute_name> <operation> <amount>
+		//mi edit attribute <attribute_name> <operation> <amount> <slot>
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put("edit", new LiteralArgument("edit"));
 		arguments.put("attribute", new LiteralArgument("attribute"));
-		arguments.put("slot", new DynamicSuggestedStringArgument(() -> {
-			ArrayList<String> out = new ArrayList<>();
-			for (EquipmentSlot e: EquipmentSlot.values()) {
-				out.add(e.toString().toLowerCase());
-			}
-			return out.toArray(new String[0]);
-		}));
-		arguments.put("attribute_name", new DynamicSuggestedStringArgument(() -> {
-			ArrayList<String> out = new ArrayList<>();
-			for (Attribute a : Attribute.values()) {
-				out.add(a.toString().toLowerCase());
-			}
-			return out.toArray(new String[0]);
-		}));
+		arguments.put("attribute_name", new DynamicSuggestedStringArgument(Attribute::valuesAsStringArray));
 		arguments.put("Operation", new DynamicSuggestedStringArgument(() -> {
 			ArrayList<String> out = new ArrayList<>();
 			for (AttributeModifier.Operation a : AttributeModifier.Operation.values()) {
@@ -533,6 +506,7 @@ public class ItemIndex {
 			return out.toArray(new String[0]);
 		}));
 		arguments.put("amount", new DoubleArgument());
+		arguments.put("slot", new DynamicSuggestedStringArgument(EquipmentSlot::valuesAsStringArray));
 		CommandAPI.getInstance().register("mi",
 			CommandPermission.fromString("monumenta.mi"),
 			arguments,
@@ -545,16 +519,16 @@ public class ItemIndex {
 				if (item == null) {
 					return;
 				}
-				Attribute attrib = Attribute.valueOf(((String)args[1]).toUpperCase());
+				Attribute attrib = Attribute.valueOf(((String)args[0]).toUpperCase());
 				AttributeModifier.Operation op = AttributeModifier.Operation.ADD_NUMBER;
-				if (args[2].equals("1") || args[2].equals(AttributeModifier.Operation.ADD_SCALAR.toString().toLowerCase())) {
+				if (args[1].equals("1") || args[1].equals(AttributeModifier.Operation.ADD_SCALAR.toString().toLowerCase())) {
 					op = AttributeModifier.Operation.ADD_SCALAR;
-				} else if (args[2].equals("2") || args[2].equals(AttributeModifier.Operation.MULTIPLY_SCALAR_1.toString().toLowerCase())) {
+				} else if (args[1].equals("2") || args[1].equals(AttributeModifier.Operation.MULTIPLY_SCALAR_1.toString().toLowerCase())) {
 					op = AttributeModifier.Operation.MULTIPLY_SCALAR_1;
 				}
-				Double amount = (Double)args[3];
-				EquipmentSlot slot = EquipmentSlot.valueOf(((String)args[0]).toUpperCase());
-				item.setAttribute(slot, attrib, op, amount);
+				Double amount = (Double)args[2];
+				EquipmentSlot slot = EquipmentSlot.valueOf(((String)args[3]).toUpperCase());
+				item.edit().setAttribute(slot, attrib, op, amount);
 				updateItemInHand(item, p);
 			}
 		);
@@ -579,7 +553,7 @@ public class ItemIndex {
 					return;
 				}
 				ArmorMaterial mat = ArmorMaterial.valueOf(((String)args[0]).toUpperCase());
-				item.setArmorMaterialOverride(mat);
+				item.edit().setArmorMaterialOverride(mat);
 				updateItemInHand(item, p);
 			}
 		);
@@ -601,17 +575,18 @@ public class ItemIndex {
 	}
 
 	private static MonumentaItem itemSecurities(Player p) {
-		MonumentaItem out = Plugin.getInstance().mItemManager.getMMItemFromEditable(p.getInventory().getItemInMainHand());
-		if (out == null) {
-			p.sendMessage("Item is not an editable Monumenta item. use /mi enableEdit or /mi new");
-		}
+		MonumentaItem out = Plugin.getInstance().mItemManager.getMMItemWithEdits(p.getInventory().getItemInMainHand());
 		return out;
 	}
 
 	private static void updateItemInHand(MonumentaItem item, Player p) {
+		item.edit().updateLastEditedTimestamp();
+		item.edit().setLastEditor(p.getDisplayName());
+		updateItemInHandNoTimestamps(item, p);
+	}
+
+	private static void updateItemInHandNoTimestamps(MonumentaItem item, Player p) {
 		// set mainhand item
-		item.updateLastEditedTimestamp();
-		item.setLastEditor(p.getDisplayName());
 		int amount = p.getInventory().getItemInMainHand().getAmount();
 		ItemStack out = item.toItemStack();
 		out.setAmount(amount == 0 ? 1 : amount);

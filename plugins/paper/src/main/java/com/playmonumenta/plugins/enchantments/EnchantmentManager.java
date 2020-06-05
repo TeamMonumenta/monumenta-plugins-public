@@ -67,72 +67,15 @@ public class EnchantmentManager implements Listener {
 
 		final List<BaseEnchantment> init = new ArrayList<BaseEnchantment>();
 
-		// Passive enchantments
-		init.add(new Regeneration());
-		init.add(new Darksight());
-		init.add(new Radiant());
-		init.add(new Gills());
-		init.add(new Gilded());
-		init.add(new Festive());
-		init.add(new Clucking());
-		init.add(new Oinking());
-		init.add(new Stylish());
-		init.add(new Colorful());
-		init.add(new Hope());
-		init.add(new Frost());
-		init.add(new Intuition());
-		init.add(new LifeDrain());
-		init.add(new Evasion());
-		init.add(new MeleeEvasion());
-		init.add(new AbilityEvasion());
-		init.add(new Resurrection());
-		init.add(new DivineAura());
-		init.add(new SecondWind());
-		init.add(new VoidTether());
-		init.add(new Ethereal());
-
-		// Active enchantments
-		init.add(new Chaotic());
-		init.add(new IceAspect());
-		init.add(new Slayer());
-		init.add(new Duelist());
-		init.add(new Thunder());
-		init.add(new Inferno());
-		init.add(new Impact());
-		init.add(new AttributeArrowSpeed());
-		init.add(new AttributeRangedDamage());
-		init.add(new Sniper());
-		init.add(new PointBlank());
-		init.add(new Decay());
-		init.add(new Sapper());
-		init.add(new Multitool());
-		init.add(new HexEater());
-		init.add(new ThrowingKnife());
-		init.add(new Current());
-		init.add(new InstantDrink());
-		init.add(new JunglesNourishment());
-		init.add(new Adrenaline());
-		init.add(new Sustenance());
-		init.add(new Eruption());
-		init.add(new AttributeThrowRate());
-
-		// Curses
-		init.add(new CurseOfCorruption());
-		init.add(new TwoHanded());
-		init.add(new CurseOfCrippling());
-		init.add(new CurseOfEphemerality());
-		init.add(new CurseOfShrapnel());
+		// in order to add a new enchant to the manager, add it as an enum value in the Enchantment enum
+		for (Enchantment e : Enchantment.values()) {
+			if (e.isCustomEnchant()) {
+				init.add(e.getEnchantClass());
+			}
+		}
 
 		// Tesseracts (not actually items a player can get enchants from)
 		init.add(new PestilenceTesseract());
-
-		// Infusion Enchantments
-		init.add(new Acumen());
-		init.add(new Focus());
-		init.add(new Perspicacity());
-		init.add(new Tenacity());
-		init.add(new Vigor());
-		init.add(new Vitality());
 
 		// Forbidden items (dynamically set based on server config)
 		if (forbiddenItemLore != null && !forbiddenItemLore.isEmpty()) {
