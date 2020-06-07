@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
@@ -36,7 +37,9 @@ public class Multitool implements BaseEnchantment {
 
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, PlayerInteractEvent event, int level) {
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+		//Does not swap when clicking an interactable
+		if (event.getAction() == Action.RIGHT_CLICK_AIR
+				|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.

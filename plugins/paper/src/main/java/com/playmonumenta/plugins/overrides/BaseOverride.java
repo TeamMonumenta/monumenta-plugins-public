@@ -7,6 +7,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -53,6 +54,10 @@ public class BaseOverride {
 	}
 
 	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
+		return true;
+	}
+
+	public boolean playerRiptide(Plugin plugin, Player player, PlayerRiptideEvent event) {
 		return true;
 	}
 }

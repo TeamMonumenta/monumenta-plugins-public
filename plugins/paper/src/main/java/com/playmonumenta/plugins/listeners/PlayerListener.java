@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.playmonumenta.plugins.cooking.CookingItemObject;
-import com.playmonumenta.plugins.cooking.CookingUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -69,6 +67,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -92,6 +91,8 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.cooking.CookingItemObject;
+import com.playmonumenta.plugins.cooking.CookingUtils;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
@@ -847,6 +848,25 @@ public class PlayerListener implements Listener {
 			}
 
 			event.setDamage(damage);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerRiptideEvent(PlayerRiptideEvent event) {
+		Player player = event.getPlayer();
+		Location loc = player.getLocation();
+		//Manually forces the player in place during the riptide if they use it out of water (in rain)
+		if (!mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!player.isRiptiding()) {
+						this.cancel();
+						return;
+					}
+					player.teleport(loc);
+				}
+			}.runTaskTimer(mPlugin, 0, 2);
 		}
 	}
 
