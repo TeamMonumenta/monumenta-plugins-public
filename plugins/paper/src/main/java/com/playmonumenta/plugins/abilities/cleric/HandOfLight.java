@@ -6,6 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
@@ -33,35 +34,37 @@ public class HandOfLight extends Ability {
 
 	public HandOfLight(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Hand of Light");
-		mInfo.linkedSpell = Spells.HEALING;
-		mInfo.scoreboardId = "Healing";
+		mInfo.mLinkedSpell = Spells.HEALING;
+		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
 		mInfo.mDescriptions.add("When you block while sneaking, you heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Cooldown: 14 seconds.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health, and the cooldown is reduced to 10 seconds.");
-		mInfo.cooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
 	public void cast(Action action) {
-		int healing = getAbilityScore();
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
 		boolean healCaster = AbilityManager.getManager().isPvPEnabled(mPlayer);
 		for (Player p : PlayerUtils.playersInRange(mPlayer, HEALING_RADIUS, healCaster)) {
-			double healAmount = healing == 1 ? 2 + (p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.1) : 4 + (p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.2);
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 
 			// Only heal players in the correct direction
 			// Only heal players that have their class disabled (so it doesn't work on arena contenders)
 			// Don't heal players with PvP enabled
 			// If the source player was included (because PvP is on), heal them
-			if (((playerDir.dot(toMobVector) > HEALING_DOT_ANGLE || p.getLocation().distance(mPlayer.getLocation()) < 2)
-			     && !p.getScoreboardTags().contains("disable_class")
-			     && !AbilityManager.getManager().isPvPEnabled(mPlayer))
-			    || p.equals(mPlayer)) {
+			if (p.equals(mPlayer)
+			    || (!p.getScoreboardTags().contains("disable_class")
+			        && !AbilityManager.getManager().isPvPEnabled(mPlayer)
+			        && (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
+			            || p.getLocation().distance(mPlayer.getLocation()) < 2))) {
 
-				PlayerUtils.healPlayer(p, healAmount);
+				AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+				if (maxHealth != null) {
+					PlayerUtils.healPlayer(p, getAbilityScore() == 1 ? 2 + (maxHealth.getValue() * 0.1) : 4 + (maxHealth.getValue() * 0.2));
+				}
 
 				Location loc = p.getLocation();
 				mPlugin.mPotionManager.addPotion(p, PotionID.ABILITY_OTHER,
@@ -85,8 +88,8 @@ public class HandOfLight extends Ability {
 		// Must be holding a shield
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (offHand == null || offHand.getType() != Material.SHIELD
-		    && (mainHand == null || mainHand.getType() != Material.SHIELD)) {
+		if (offHand.getType() != Material.SHIELD
+		    && mainHand.getType() != Material.SHIELD) {
 			return false;
 		}
 

@@ -38,13 +38,13 @@ public class Channeling extends Ability {
 
 	private static final Particle.DustOptions CHANNELING_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 0.75f);
 
-	private int mDamage;
+	private final int mDamage;
 	private Spells mLastSpellCast;
 
 	public Channeling(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Channeling");
-		mInfo.linkedSpell = Spells.CHANNELING;
-		mInfo.scoreboardId = "Channeling";
+		mInfo.mLinkedSpell = Spells.CHANNELING;
+		mInfo.mScoreboardId = "Channeling";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add("After casting a spell, your next melee attack deals 3 extra damage. In addition it will have a bonus effect based on the type of spell used. Fire spells set the enemy on fire for 4s, ice spells slow the enemy for 4s, and arcane spells weaken the enemy for 4s.");
 		mInfo.mDescriptions.add("Bonus damage is increased to 6.");
@@ -72,7 +72,7 @@ public class Channeling extends Ability {
 					int ticks = mob.getNoDamageTicks();
 					mob.setNoDamageTicks(0);
 					// Call CustomDamageEvent, but not spellshock.
-					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell, false, false);
+					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
 					mob.setNoDamageTicks(ticks);
 				}
 			}.runTaskLater(mPlugin, 1);
@@ -110,10 +110,7 @@ public class Channeling extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.isWandItem(mainHand)) {
-			return true;
-		}
-		return false;
+		return InventoryUtils.isWandItem(mainHand);
 	}
 
 }

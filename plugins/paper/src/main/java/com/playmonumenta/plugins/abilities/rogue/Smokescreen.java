@@ -29,20 +29,20 @@ public class Smokescreen extends Ability {
 	private static final int SMOKESCREEN_2_WEAKNESS_AMPLIFIER = 1;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 
-	private int mSlownessAmplifier;
-	private int mWeaknessAmplifier;
+	private final int mSlownessAmplifier;
+	private final int mWeaknessAmplifier;
 
 	public Smokescreen(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Smoke Screen");
-		mInfo.linkedSpell = Spells.SMOKESCREEN;
-		mInfo.scoreboardId = "SmokeScreen";
+		mInfo.mLinkedSpell = Spells.SMOKESCREEN;
+		mInfo.mScoreboardId = "SmokeScreen";
 		mInfo.mShorthandName = "Smk";
 		mInfo.mDescriptions.add("When holding two swords, right-click while sneaking and looking down to release a cloud of smoke, afflicting all enemies in a 6 block radius with 8 s of Weakness I and Slowness II. (Cooldown: 20 s)");
 		mInfo.mDescriptions.add("The Weakness debuff is increased to level II.");
-		mInfo.cooldown = SMOKESCREEN_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = SMOKESCREEN_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_SLOWNESS_AMPLIFIER : SMOKESCREEN_2_SLOWNESS_AMPLIFIER;
-		mSlownessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
+		mWeaknessAmplifier = getAbilityScore() == 1 ? SMOKESCREEN_1_WEAKNESS_AMPLIFIER : SMOKESCREEN_2_WEAKNESS_AMPLIFIER;
 	}
 
 	@Override

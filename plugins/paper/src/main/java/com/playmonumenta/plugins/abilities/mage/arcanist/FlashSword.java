@@ -47,13 +47,13 @@ public class FlashSword extends Ability {
 
 	public FlashSword(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Flash Sword");
-		mInfo.scoreboardId = "FlashSword";
+		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
 		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 12s.");
 		mInfo.mDescriptions.add("You instead do 7 damage 3 times. Cooldown: 10s.");
-		mInfo.linkedSpell = Spells.FSWORD;
-		mInfo.cooldown = getAbilityScore() == 1 ? FSWORD_1_COOLDOWN : FSWORD_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mLinkedSpell = Spells.FSWORD;
+		mInfo.mCooldown = getAbilityScore() == 1 ? FSWORD_1_COOLDOWN : FSWORD_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
@@ -62,14 +62,14 @@ public class FlashSword extends Ability {
 		Player player = mPlayer;
 		putOnCooldown();
 		new BukkitRunnable() {
-			int t = 0;
-			float pitch = 1.2f;
-			int sw = 0;
+			int mT = 0;
+			float mPitch = 1.2f;
+			int mSw = 0;
 
 			@Override
 			public void run() {
-				t++;
-				sw++;
+				mT++;
+				mSw++;
 				Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
 				Location origin = player.getLocation();
 				if (player.getVelocity().length() > 0.1) {
@@ -80,18 +80,18 @@ public class FlashSword extends Ability {
 					Vector toMobVector = mob.getLocation().toVector().subtract(origin.toVector()).setY(0)
 					                     .normalize();
 					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
-						int damageMult = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
+						int damageMultiplier = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
 						Vector velocity = mob.getVelocity();
 						mob.setNoDamageTicks(0);
 
 						// Only interact with spellshock on the first swing
-						if (t == 1) {
-							EntityUtils.damageEntity(mPlugin, mob, damageMult, player, MagicType.ARCANE, true, mInfo.linkedSpell, true, true);
+						if (mT == 1) {
+							EntityUtils.damageEntity(mPlugin, mob, damageMultiplier, player, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true);
 						} else {
-							EntityUtils.damageEntity(mPlugin, mob, damageMult, player, MagicType.ARCANE, true, mInfo.linkedSpell, false, false);
+							EntityUtils.damageEntity(mPlugin, mob, damageMultiplier, player, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
 						}
 
-						if (t >= FSWORD_SWINGS) {
+						if (mT >= FSWORD_SWINGS) {
 							MovementUtils.knockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
 						} else {
 							mob.setVelocity(velocity);
@@ -99,36 +99,36 @@ public class FlashSword extends Ability {
 					}
 				}
 
-				if (t >= FSWORD_SWINGS) {
-					pitch = 1.45f;
+				if (mT >= FSWORD_SWINGS) {
+					mPitch = 1.45f;
 				}
 				player.getWorld().playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
-				player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, pitch);
+				player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
 				new BukkitRunnable() {
-					final int i = sw;
-					double roll;
-					double d = 45;
-					boolean init = false;
+					final int mI = mSw;
+					double mRoll;
+					double mD = 45;
+					boolean mInit = false;
 
 					@Override
 					public void run() {
-						if (!init) {
-							if (i % 2 == 0) {
-								roll = -8;
-								d = 45;
+						if (!mInit) {
+							if (mI % 2 == 0) {
+								mRoll = -8;
+								mD = 45;
 							} else {
-								roll = 8;
-								d = 135;
+								mRoll = 8;
+								mD = 135;
 							}
-							init = true;
+							mInit = true;
 						}
-						if (i % 2 == 0) {
+						if (mI % 2 == 0) {
 							Vector vec;
 							for (double r = 1; r < 5; r += 0.5) {
-								for (double degree = d; degree < d + 30; degree += 5) {
+								for (double degree = mD; degree < mD + 30; degree += 5) {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-									vec = VectorUtils.rotateZAxis(vec, roll);
+									vec = VectorUtils.rotateZAxis(vec, mRoll);
 									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
@@ -138,14 +138,14 @@ public class FlashSword extends Ability {
 								}
 							}
 
-							d += 30;
+							mD += 30;
 						} else {
 							Vector vec;
 							for (double r = 1; r < 5; r += 0.5) {
-								for (double degree = d; degree > d - 30; degree -= 5) {
+								for (double degree = mD; degree > mD - 30; degree -= 5) {
 									double radian1 = Math.toRadians(degree);
 									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
-									vec = VectorUtils.rotateZAxis(vec, roll);
+									vec = VectorUtils.rotateZAxis(vec, mRoll);
 									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
 
@@ -154,16 +154,16 @@ public class FlashSword extends Ability {
 									mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, FSWORD_COLOR2);
 								}
 							}
-							d -= 30;
+							mD -= 30;
 						}
 
-						if ((d >= 135 && i % 2 == 0) || (d <= 45 && i % 2 > 0)) {
+						if ((mD >= 135 && mI % 2 == 0) || (mD <= 45 && mI % 2 > 0)) {
 							this.cancel();
 						}
 					}
 
 				}.runTaskTimer(mPlugin, 0, 1);
-				if (t >= FSWORD_SWINGS) {
+				if (mT >= FSWORD_SWINGS) {
 					this.cancel();
 				}
 			}
@@ -173,8 +173,8 @@ public class FlashSword extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSprinting() && (mHand != null && (InventoryUtils.isWandItem(mHand)));
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		return mPlayer.isSprinting() && InventoryUtils.isWandItem(mainHand);
 	}
 
 	@Override

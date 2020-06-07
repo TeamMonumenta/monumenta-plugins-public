@@ -44,18 +44,18 @@ public class HolyJavelin extends Ability {
 	private static final int HOLY_JAVELIN_1_COOLDOWN = 7 * 20;
 	private static final int HOLY_JAVELIN_2_COOLDOWN = 8 * 20;
 
-	private int mDamage;
-	private int mDamageUndead;
+	private final int mDamage;
+	private final int mDamageUndead;
 
 	public HolyJavelin(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Holy Javelin");
-		mInfo.linkedSpell = Spells.HOLY_JAVELIN;
-		mInfo.scoreboardId = "HolyJavelin";
+		mInfo.mLinkedSpell = Spells.HOLY_JAVELIN;
+		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
 		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks dealing 10 damage to undead and 5 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 7s.");
 		mInfo.mDescriptions.add("Damage is increased to 20 to undead and 10 to all others.");
-		mInfo.cooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
 		mDamageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
 	}
@@ -89,9 +89,9 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					} else {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					}
 					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob, mPlayer);
 					iter.remove();

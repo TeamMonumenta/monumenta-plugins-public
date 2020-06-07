@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities.delves;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -33,7 +32,7 @@ public class StatMultiplier extends Ability {
 	private static final int PROPERTIES_APPLICATION_RADIUS = 24;
 
 	// Overall tracker for mobs that have had properties applied
-	private static final Set<LivingEntity> PROPERTIED_MOBS = new HashSet<LivingEntity>();
+	private static final Set<LivingEntity> PROPERTIED_MOBS = new HashSet<>();
 	// Cleaner, essentially final but must be initialized after we know the plugin is started
 	private static BukkitRunnable PROPERTIED_MOBS_CLEANER;
 
@@ -147,8 +146,11 @@ public class StatMultiplier extends Ability {
 
 	@Override
 	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) {
-		event.setDamage(EntityUtils.getDamageApproximation(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getValue(),
-				mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), mAbilityDamageTakenMultiplier));
+		AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+		AttributeInstance toughness = mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
+		double armorValue = armor != null ? armor.getValue() : 0;
+		double toughnessValue = toughness != null ? toughness.getValue() : 0;
+		event.setDamage(EntityUtils.getDamageApproximation(armorValue, toughnessValue, event.getDamage(), mAbilityDamageTakenMultiplier));
 	}
 
 	@Override
@@ -161,25 +163,27 @@ public class StatMultiplier extends Ability {
 					// Additional check in case the plugin stopped and cleared the faster internal tracking
 					boolean hasProperties = false;
 					AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-					for (AttributeModifier mod : speed.getModifiers()) {
-						if (mod != null && mod.getName().equals(SPEED_MODIFIER_NAME)) {
-							hasProperties = true;
-							break;
+					if (speed != null) {
+						for (AttributeModifier mod : speed.getModifiers()) {
+							if (mod != null && mod.getName().equals(SPEED_MODIFIER_NAME)) {
+								hasProperties = true;
+								break;
+							}
 						}
-					}
 
-					if (!hasProperties) {
-						// Speed
-						AttributeModifier mod = new AttributeModifier(SPEED_MODIFIER_NAME,
+						if (!hasProperties) {
+							// Speed
+							AttributeModifier mod = new AttributeModifier(SPEED_MODIFIER_NAME,
 								mMobSpeedMultiplier - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-						speed.addModifier(mod);
+							speed.addModifier(mod);
 
-						// Abilities
-						if (FastUtils.RANDOM.nextDouble() < mMobAbilityChance) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							// Abilities
+							if (FastUtils.RANDOM.nextDouble() < mMobAbilityChance) {
+								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 									"bossfight " + mob.getUniqueId() + " boss_blastresist");
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 									"bossfight " + mob.getUniqueId() + mMobAbilityPool[FastUtils.RANDOM.nextInt(mMobAbilityPool.length)]);
+							}
 						}
 					}
 				}
@@ -192,13 +196,7 @@ public class StatMultiplier extends Ability {
 			PROPERTIED_MOBS_CLEANER = new BukkitRunnable() {
 				@Override
 				public void run() {
-					Iterator<LivingEntity> iter = PROPERTIED_MOBS.iterator();
-					while (iter.hasNext()) {
-						LivingEntity mob = iter.next();
-						if (mob.isDead() || !mob.isValid()) {
-							iter.remove();
-						}
-					}
+					PROPERTIED_MOBS.removeIf(mob -> mob.isDead() || !mob.isValid());
 				}
 			};
 			PROPERTIED_MOBS_CLEANER.runTaskTimer(mPlugin, 0, 20 * 10);

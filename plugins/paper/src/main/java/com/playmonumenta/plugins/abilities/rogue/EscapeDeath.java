@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,23 +25,23 @@ public class EscapeDeath extends Ability {
 	private static final double ESCAPE_DEATH_HEALTH_TRIGGER = 10;
 	private static final int ESCAPE_DEATH_DURATION = 5 * 20;
 	private static final int ESCAPE_DEATH_DURATION_OTHER = 8 * 20;
-	private static final int ESCAPE_DEATH_ABSORBTION_EFFECT_LVL = 1;
+	private static final int ESCAPE_DEATH_ABSORPTION_EFFECT_LVL = 1;
 	private static final int ESCAPE_DEATH_SPEED_EFFECT_LVL = 1;
 	private static final int ESCAPE_DEATH_JUMP_EFFECT_LVL = 2;
 	private static final int ESCAPE_DEATH_RANGE = 5;
 	private static final int ESCAPE_DEATH_DURATION_SLOWNESS = 5 * 20;
 	private static final int ESCAPE_DEATH_SLOWNESS_EFFECT_LVL = 4;
-	private static final int ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL = 2;
+	private static final int ESCAPE_DEATH_WEAKNESS_EFFECT_LEVEL = 2;
 	private static final int ESCAPE_DEATH_COOLDOWN = 90 * 20;
 
 	public EscapeDeath(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Escape Death");
-		mInfo.linkedSpell = Spells.ESCAPE_DEATH;
-		mInfo.scoreboardId = "EscapeDeath";
+		mInfo.mLinkedSpell = Spells.ESCAPE_DEATH;
+		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
 		mInfo.mDescriptions.add("When your health drops below 5 hearts, you throw a paralyzing grenade, afflicting all nearby enemies (5 blocks) with Slowness V and Weakness III for 5 s. (cooldown: 90 s).");
 		mInfo.mDescriptions.add("When this skill is triggered, you gain 5 s of Absorption II as well as 8 s of Speed II and Jump Boost III");
-		mInfo.cooldown = ESCAPE_DEATH_COOLDOWN;
+		mInfo.mCooldown = ESCAPE_DEATH_COOLDOWN;
 	}
 
 	/*
@@ -55,13 +54,13 @@ public class EscapeDeath extends Ability {
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ESCAPE_DEATH_DURATION_SLOWNESS,
 			                                                       ESCAPE_DEATH_SLOWNESS_EFFECT_LVL, true, false));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, ESCAPE_DEATH_DURATION_SLOWNESS,
-			                                                       ESCAPE_DEATH_WEAKNES_EFFECT_LEVEL, true, false));
+				ESCAPE_DEATH_WEAKNESS_EFFECT_LEVEL, true, false));
 		}
 
 		if (escapeDeath > 1) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.ABSORPTION, ESCAPE_DEATH_DURATION,
-			                                                  ESCAPE_DEATH_ABSORBTION_EFFECT_LVL, true, true));
+												 ESCAPE_DEATH_ABSORPTION_EFFECT_LVL, true, true));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.SPEED, ESCAPE_DEATH_DURATION_OTHER,
 			                                                  ESCAPE_DEATH_SPEED_EFFECT_LVL, true, true));
@@ -89,9 +88,10 @@ public class EscapeDeath extends Ability {
 		EntityDamageEvent lastDamage = mPlayer.getLastDamageCause();
 		if (lastDamage != null && lastDamage.getCause() == DamageCause.ENTITY_ATTACK) {
 			double correctHealth = mPlayer.getHealth() - lastDamage.getFinalDamage();
-			if (!mPlayer.isDead() && correctHealth > 0 && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER && lastDamage.getFinalDamage() > 0) {
-				return true;
-			}
+			return !mPlayer.isDead()
+			       && correctHealth > 0
+			       && correctHealth <= ESCAPE_DEATH_HEALTH_TRIGGER
+			       && lastDamage.getFinalDamage() > 0;
 		}
 		return false;
 	}

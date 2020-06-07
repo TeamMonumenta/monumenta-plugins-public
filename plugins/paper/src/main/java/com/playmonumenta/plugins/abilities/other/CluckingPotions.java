@@ -60,7 +60,7 @@ public class CluckingPotions extends Ability {
 							}
 						}
 
-						while (!cluckingCandidates.isEmpty()) {
+						loop: while (!cluckingCandidates.isEmpty()) {
 							int idx = FastUtils.RANDOM.nextInt(cluckingCandidates.size());
 							ItemStack item = cluckingCandidates.get(idx);
 							cluckingCandidates.remove(idx);
@@ -68,14 +68,16 @@ public class CluckingPotions extends Ability {
 							ItemMeta meta = item.getItemMeta();
 							List<String> lore = meta.getLore();
 
-							List<String> newLore = new ArrayList<String>();
-							for (String loreEntry : lore) {
-								if (loreEntry.contains("Clucking")) {
-									// Already has clucking, don't touch this item
-									continue;
-								}
+							List<String> newLore = new ArrayList<>();
+							if (lore != null) {
+								for (String loreEntry : lore) {
+									if (loreEntry.contains("Clucking")) {
+										// Already has clucking, don't touch this item
+										continue loop;
+									}
 
-								newLore.add(loreEntry);
+									newLore.add(loreEntry);
+								}
 							}
 
 							// This is an item without clucking - success!

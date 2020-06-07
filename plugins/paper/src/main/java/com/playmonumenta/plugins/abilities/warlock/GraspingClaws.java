@@ -38,18 +38,18 @@ public class GraspingClaws extends Ability {
 
 	private final int mAmplifier;
 	private final int mDamage;
-	private Arrow arrow = null;
+	private Arrow mArrow = null;
 
 	public GraspingClaws(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Grasping Claws");
-		mInfo.scoreboardId = "GraspingClaws";
+		mInfo.mScoreboardId = "GraspingClaws";
 		mInfo.mShorthandName = "GC";
 		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given Slowness 2 for 8 seconds and take 3 damage. (Cooldown: 16s)");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and Slowness is increased to 3.");
-		mInfo.linkedSpell = Spells.GRASPING_CLAWS;
-		mInfo.cooldown = getAbilityScore() == 1 ? GRASPING_CLAWS_1_COOLDOWN : GRASPING_CLAWS_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.GRASPING_CLAWS;
+		mInfo.mCooldown = getAbilityScore() == 1 ? GRASPING_CLAWS_1_COOLDOWN : GRASPING_CLAWS_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mAmplifier = getAbilityScore() == 1 ? GRASPING_CLAWS_1_AMPLIFIER : GRASPING_CLAWS_2_AMPLIFIER;
 		mDamage = getAbilityScore() == 1 ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
 	}
@@ -58,18 +58,18 @@ public class GraspingClaws extends Ability {
 	public void cast(Action action) {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.GRASPING_CLAWS) && mPlayer.isSneaking() && InventoryUtils.isBowItem(inMainHand)) {
-			arrow = mPlayer.launchProjectile(Arrow.class);
-			arrow.setDamage(0);
-			arrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
-			mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.SPELL_WITCH);
+			mArrow = mPlayer.launchProjectile(Arrow.class);
+			mArrow.setDamage(0);
+			mArrow.setVelocity(mPlayer.getLocation().getDirection().multiply(1.5));
+			mPlugin.mProjectileEffectTimers.addEntity(mArrow, Particle.SPELL_WITCH);
 			putOnCooldown();
 		}
 	}
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (this.arrow != null && this.arrow == arrow) {
-			this.arrow = null;
+		if (this.mArrow != null && this.mArrow == arrow) {
+			this.mArrow = null;
 			Location loc = arrow.getLocation();
 			World world = arrow.getWorld();
 
@@ -82,7 +82,7 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS, mPlayer)) {
-				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 				MovementUtils.pullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, mAmplifier, false, true));
 			}
@@ -92,6 +92,6 @@ public class GraspingClaws extends Ability {
 	}
 
 	public boolean onCooldown() {
-		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 	}
 }

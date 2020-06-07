@@ -30,27 +30,27 @@ public class ElementalSpiritFire extends Ability {
 	private static final int ES_FIRE_COOLDOWN = 20 * 12;
 	private static final int ES_FIRE_1_DAMAGE = 12;
 	private static final int ES_FIRE_2_DAMAGE = 21;
-	private static final double ES_FIRE_WIDTH = 1.5;
+	private static final double ES_FIRE_SIZE = 1.5;
 
 	private final int mDamage;
-	private final Set<LivingEntity> mMobsDamaged = new HashSet<LivingEntity>();
+	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
 	public ElementalSpiritFire(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Elemental Spirit");
-		mInfo.scoreboardId = "ElementalSpirit";
+		mInfo.mScoreboardId = "ElementalSpirit";
 		mInfo.mShorthandName = "ES";
 		mInfo.mDescriptions.add("You are accompanied a spirit of fire and a spirit of ice. Upon using a fire spell, the fire spirit will rush towards the farthest enemy hit with the spell, damaging all enemies along the way by 12. Upon using an ice spell, the ice spirit will rush towards the closest enemy hit with the spell, damaging mobs in a 3 block radius by 4 per second for 3 seconds. Each spirit operates on its own cooldown of 12s.");
 		mInfo.mDescriptions.add("Damage dealt by the fire spirit is increased to 21, and damage dealt by the ice spirit is increased to 7.");
-		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
-		mInfo.cooldown = ES_FIRE_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_FIRE;
+		mInfo.mCooldown = ES_FIRE_COOLDOWN;
 		mDamage = getAbilityScore() == 1 ? ES_FIRE_1_DAMAGE : ES_FIRE_2_DAMAGE;
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getMagicType() == MagicType.FIRE && event.getSpell() != null && !event.getSpell().equals(mInfo.linkedSpell)) {
+		if (event.getMagicType() == MagicType.FIRE && event.getSpell() != null && !event.getSpell().equals(mInfo.mLinkedSpell)) {
 			mMobsDamaged.add(event.getDamaged());
 
 			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
@@ -76,7 +76,7 @@ public class ElementalSpiritFire extends Ability {
 							farthestDistance = Math.sqrt(farthestDistance);
 							List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, farthestDistance + 1);
 							Vector dir = farthestMob.getLocation().subtract(loc).toVector().normalize();
-							BoundingBox fireSpirit = BoundingBox.of(mPlayer.getEyeLocation(), ES_FIRE_WIDTH, ES_FIRE_WIDTH, ES_FIRE_WIDTH);
+							BoundingBox fireSpirit = BoundingBox.of(mPlayer.getEyeLocation(), ES_FIRE_SIZE, ES_FIRE_SIZE, ES_FIRE_SIZE);
 
 							mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
 
@@ -86,7 +86,7 @@ public class ElementalSpiritFire extends Ability {
 									LivingEntity mob = iter.next();
 									if (mob.getBoundingBox().overlaps(fireSpirit)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell);
+										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
 										iter.remove();
 									}
 								}
@@ -134,9 +134,10 @@ public class ElementalSpiritFire extends Ability {
 						mWorld.spawnParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0.01);
 					}
 
-					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null ||
-						!mPlayer.isOnline() || mPlayer == null || mPlayer.isDead() ||
-						mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)) {
+					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritFire.class) == null
+					    || !mPlayer.isOnline()
+					    || mPlayer.isDead()
+					    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_FIRE)) {
 						this.cancel();
 						mParticleGenerator = null;
 					}

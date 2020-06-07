@@ -29,8 +29,8 @@ public class NightmarishAlchemy extends Ability {
 
 	public NightmarishAlchemy(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Nightmarish Alchemy");
-		mInfo.linkedSpell = Spells.NIGHTMARISH_ALCHEMY;
-		mInfo.scoreboardId = "Nightmarish";
+		mInfo.mLinkedSpell = Spells.NIGHTMARISH_ALCHEMY;
+		mInfo.mScoreboardId = "Nightmarish";
 		mInfo.mShorthandName = "Nm";
 		mInfo.mDescriptions.add("Your Alchemist Potions deal +2 damage. Non-boss enemies hit have a 10% chance to attack other enemies for 4s.");
 		mInfo.mDescriptions.add("Your Alchemist Potions deal +4 damage instead and the chance of confusing enemies is increased to 20%.");
@@ -57,7 +57,7 @@ public class NightmarishAlchemy extends Ability {
 	}
 
 	public boolean apply(LivingEntity mob, int size, boolean guaranteedApplicationApplied) {
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 		if (mob instanceof Mob) {
 			if (FastUtils.RANDOM.nextDouble() < mConfusionChance || !guaranteedApplicationApplied && size >= 1 / mConfusionChance) {
 				EntityUtils.applyConfusion(mPlugin, NIGHTMARISH_ALCHEMY_CONFUSION_DURATION, mob);

@@ -7,6 +7,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -52,14 +53,14 @@ public class Bodyguard extends Ability {
 
 	public Bodyguard(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Bodyguard");
-		mInfo.scoreboardId = "Bodyguard";
+		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
 		mInfo.mDescriptions.add("Passively gain 5% damage resistance. Left-click twice without hitting a mob while looking directly at another player without hitting any mobs makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Passively gain 10% damage resistance. Both you and the other player gain +4 armor and Absorption 2 for 8s instead. Additionally affected mobs are stunned for 3s.");
-		mInfo.linkedSpell = Spells.BODYGUARD;
-		mInfo.cooldown = BODYGUARD_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.BODYGUARD;
+		mInfo.mCooldown = BODYGUARD_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mDamageResistance = getAbilityScore() == 1 ? BODYGUARD_1_DAMAGE_RESISTANCE : BODYGUARD_2_DAMAGE_RESISTANCE;
 		mArmor = getAbilityScore() == 1 ? BODYGUARD_1_ARMOR : BODYGUARD_2_ARMOR;
 		mAbsorptionAmplifier = getAbilityScore() == 1 ? BODYGUARD_1_ABSORPTION_AMPLIFIER : BODYGUARD_2_ABSORPTION_AMPLIFIER;
@@ -67,7 +68,7 @@ public class Bodyguard extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
 				|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
@@ -154,13 +155,16 @@ public class Bodyguard extends Ability {
 					mPlugin.mPotionManager.addPotion(player, PotionID.ABILITY_OTHER,
 							new PotionEffect(PotionEffectType.ABSORPTION, BODYGUARD_BUFF_DURATION, mAbsorptionAmplifier, false, true));
 
-					player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + mArmor);
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(player.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - mArmor);
-						}
-					}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
+					AttributeInstance armor = player.getAttribute(Attribute.GENERIC_ARMOR);
+					if (armor != null) {
+						armor.setBaseValue(armor.getBaseValue() + mArmor);
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								armor.setBaseValue(armor.getBaseValue() - mArmor);
+							}
+						}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
+					}
 				}
 			}
 		}
@@ -178,14 +182,16 @@ public class Bodyguard extends Ability {
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.ABSORPTION, BODYGUARD_BUFF_DURATION, mAbsorptionAmplifier, false, true));
 
-		mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() + mArmor);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mPlayer.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(mPlayer.getAttribute(Attribute.GENERIC_ARMOR).getBaseValue() - mArmor);
-			}
-		}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
-
+		AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
+		if (armor != null) {
+			armor.setBaseValue(armor.getBaseValue() + mArmor);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					armor.setBaseValue(armor.getBaseValue() - mArmor);
+				}
+			}.runTaskLater(mPlugin, BODYGUARD_BUFF_DURATION);
+		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), BODYGUARD_RADIUS)) {
 			MovementUtils.knockAway(mPlayer, mob, 0.45f);
 			if (getAbilityScore() > 1) {

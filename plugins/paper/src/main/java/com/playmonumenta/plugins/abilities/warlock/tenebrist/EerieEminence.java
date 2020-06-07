@@ -55,11 +55,11 @@ public class EerieEminence extends Ability {
 
 	private final double mRadius;
 
-	private List<DebuffElement> debuffs = new ArrayList<DebuffElement>();
+	private final List<DebuffElement> mDebuffs = new ArrayList<>();
 
 	public EerieEminence(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Eerie Eminence");
-		mInfo.scoreboardId = "EerieEminence";
+		mInfo.mScoreboardId = "EerieEminence";
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("You gain an AoE debuff aura around you that applies a level 1 debuff for every of the following four skills that you used in the last 10s. Grasping Claws > Slowness. Consuming Flames > Set mobs on Fire. Fractal Enervation > Mining Fatigue. Withering Gaze > Wither. The AoE affects all enemies in a 6 block radius.");
 		mInfo.mDescriptions.add("The range is increased to 8. In addition it provides the opposite effect to players in range. Slowness > Speed. Set Fire > Extinguish Fire. Mining Fatigue > Haste. Wither > Regeneration.");
@@ -69,13 +69,13 @@ public class EerieEminence extends Ability {
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		if (event.getAbility() == Spells.GRASPING_CLAWS) {
-			debuffs.add(new DebuffElement(PotionEffectType.SLOW, PotionEffectType.SPEED, EERIE_EFFECT_TIMER));
+			mDebuffs.add(new DebuffElement(PotionEffectType.SLOW, PotionEffectType.SPEED, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.CONSUMING_FLAMES) {
-			debuffs.add(new DebuffElement(null, null, EERIE_EFFECT_TIMER));
+			mDebuffs.add(new DebuffElement(null, null, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.FRACTAL_ENERVATION) {
-			debuffs.add(new DebuffElement(PotionEffectType.SLOW_DIGGING, PotionEffectType.FAST_DIGGING, EERIE_EFFECT_TIMER));
+			mDebuffs.add(new DebuffElement(PotionEffectType.SLOW_DIGGING, PotionEffectType.FAST_DIGGING, EERIE_EFFECT_TIMER));
 		} else if (event.getAbility() == Spells.WITHERING_GAZE) {
-			debuffs.add(new DebuffElement(PotionEffectType.WITHER, PotionEffectType.REGENERATION, EERIE_EFFECT_TIMER));
+			mDebuffs.add(new DebuffElement(PotionEffectType.WITHER, PotionEffectType.REGENERATION, EERIE_EFFECT_TIMER));
 		}
 
 		return true;
@@ -84,7 +84,7 @@ public class EerieEminence extends Ability {
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (fourHertz) {
-			Iterator<DebuffElement> iter = debuffs.iterator();
+			Iterator<DebuffElement> iter = mDebuffs.iterator();
 			while (iter.hasNext()) {
 				DebuffElement entry = iter.next();
 

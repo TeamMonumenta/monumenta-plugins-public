@@ -12,6 +12,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,12 +40,12 @@ public class FinishingBlow extends Ability {
 		}
 	}
 
-	private Map<UUID, Counter> mMarkedMobs = new HashMap<UUID, Counter>();
-	private int mDamageBonus;
+	private final Map<UUID, Counter> mMarkedMobs = new HashMap<>();
+	private final int mDamageBonus;
 
 	public FinishingBlow(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Finishing Blow");
-		mInfo.scoreboardId = "FinishingBlow";
+		mInfo.mScoreboardId = "FinishingBlow";
 		mInfo.mDescriptions.add("Enemies hit by your fully-charged arrows are marked for 5 seconds. Striking a marked enemy with a melee attack detonates the mark to deal them 3 bonus damage, doubled against enemies below 50% health.");
 		mInfo.mDescriptions.add("Base damage increased to 6.");
 		mDamageBonus = getAbilityScore() == 1 ? FINISHING_BLOW_1_DAMAGE : FINISHING_BLOW_2_DAMAGE;
@@ -71,7 +72,7 @@ public class FinishingBlow extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (arrow.isCritical() && damagee instanceof LivingEntity) {
+		if (arrow.isCritical() && damagee != null) {
 			mMarkedMobs.put(damagee.getUniqueId(), new Counter(damagee));
 		}
 		return true;
@@ -92,7 +93,8 @@ public class FinishingBlow extends Ability {
 			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 20, 0.25, 0.5, 0.25, 0.1);
 			mWorld.spawnParticle(Particle.BLOCK_CRACK, loc, 20, 0.25, 0.5, 0.25, 0.4, Bukkit.createBlockData("redstone_wire[power=8]"));
 
-			if (mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() <= FINISHING_BLOW_THRESHOLD) {
+			AttributeInstance maxHealth = mob.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null && mob.getHealth() / maxHealth.getValue() <= FINISHING_BLOW_THRESHOLD) {
 				mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.8f, 1.75f);
 				mWorld.spawnParticle(Particle.CRIT, loc, 15, 0.25, 0.5, 0.25, 0.4);
 				mWorld.spawnParticle(Particle.REDSTONE, loc, 25, 0.35, 0.5, 0.35, 1.2, FINISHING_BLOW_COLOR);

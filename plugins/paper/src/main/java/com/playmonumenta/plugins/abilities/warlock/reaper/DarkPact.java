@@ -29,29 +29,29 @@ public class DarkPact extends Ability {
 	private BukkitRunnable mPactTimer;
 	private float mSaturation = 0;
 	private double mHealth = 0;
-	private boolean active = false;
+	private boolean mActive = false;
 	private int mLeftClicks = 0;
 
 	public DarkPact(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Dark Pact");
-		mInfo.scoreboardId = "DarkPact";
+		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
 		mInfo.mDescriptions.add("Left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage instead of healing. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
 		mInfo.mDescriptions.add("You deal 80% more melee damage instead. Scythe attacks also cleave for 50% of the damage dealt in a 1.5 block radius from the mob hit.");
-		mInfo.cooldown = DARK_PACT_COOLDOWN;
-		mInfo.linkedSpell = Spells.DARK_PACT;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = DARK_PACT_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.DARK_PACT;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 
 		/*
 		 * NOTE! Because this skill has two events it needs to bypass the automatic cooldown check
 		 * and manage cooldown itself
 		 */
-		mInfo.ignoreCooldown = true;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
 			return;
 		}
 
@@ -70,7 +70,7 @@ public class DarkPact extends Ability {
 		}
 		mLeftClicks = 0;
 
-		active = true;
+		mActive = true;
 		mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 50, 0.2, 0.1, 0.2, 1);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.25f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.5f);
@@ -85,10 +85,10 @@ public class DarkPact extends Ability {
 		}
 
 		mPactTimer = new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 			@Override
 			public void run() {
-				t++;
+				mT++;
 				mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 1, 0.25, 0.35, 0.25, 0);
 
 				// Prevent player from losing saturation to healing during Dark Pact
@@ -102,9 +102,9 @@ public class DarkPact extends Ability {
 				} else {
 					mHealth = mPlayer.getHealth();
 				}
-				if (t >= DARK_PACT_DURATION || mPlayer.isDead()) {
+				if (mT >= DARK_PACT_DURATION || mPlayer.isDead()) {
 					this.cancel();
-					active = false;
+					mActive = false;
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 0.75f);
 					mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 35, 0.25, 0.35, 0.25, 1);
 				}
@@ -117,7 +117,7 @@ public class DarkPact extends Ability {
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		// Melee attacks with scythes only
-		if (active && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mActive && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int level = getAbilityScore();
 			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 
@@ -133,7 +133,7 @@ public class DarkPact extends Ability {
 					if (mob != event.getEntity() && dir.dot(toMobVector) > 0.6) {
 						// This won't proc Perspicacity unless we rework how that enchantment works
 						// This is because it doesn't call the CustomDamageEvent
-						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false, mInfo.mLinkedSpell);
 					}
 				}
 			}
@@ -142,7 +142,7 @@ public class DarkPact extends Ability {
 	}
 
 	public boolean isActive() {
-		return active;
+		return mActive;
 	}
 
 }

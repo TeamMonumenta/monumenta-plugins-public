@@ -40,12 +40,12 @@ public class PrismaticShield extends Ability {
 
 	public PrismaticShield(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Prismatic Shield");
-		mInfo.linkedSpell = Spells.PRISMATIC_SHIELD;
-		mInfo.scoreboardId = "Prismatic";
+		mInfo.mLinkedSpell = Spells.PRISMATIC_SHIELD;
+		mInfo.mScoreboardId = "Prismatic";
 		mInfo.mShorthandName = "PS";
 		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back and take 3 damage. Cooldown: 90s.");
 		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks now take 6 damage. Cooldown: 70s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
+		mInfo.mCooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
 		mAmplifier = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_AMPLIFIER : PRISMATIC_SHIELD_2_AMPLIFIER;
 		mDuration = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
 		mDamage = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
@@ -101,7 +101,7 @@ public class PrismaticShield extends Ability {
 
 		// Conditions match - prismatic shield
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 			MovementUtils.knockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
 		}
 

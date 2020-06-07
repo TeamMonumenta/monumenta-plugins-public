@@ -27,7 +27,7 @@ public class GruesomeAlchemy extends Ability {
 
 	public GruesomeAlchemy(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Gruesome Alchemy");
-		mInfo.scoreboardId = "GruesomeAlchemy";
+		mInfo.mScoreboardId = "GruesomeAlchemy";
 		mInfo.mShorthandName = "GA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions give Slowness I and Wither I for 8 seconds.");
 		mInfo.mDescriptions.add("Your Alchemist's Potions now give Slowness II and Wither II.");

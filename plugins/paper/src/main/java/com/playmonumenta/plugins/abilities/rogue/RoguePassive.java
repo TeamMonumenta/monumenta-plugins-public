@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.rogue;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +35,7 @@ public class RoguePassive extends Ability {
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			if (InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) {
 				//  This test if the damagee is an instance of a Elite.
-				if (damagee instanceof LivingEntity) {
+				if (damagee != null) {
 					if (EntityUtils.isElite(damagee)) {
 						event.setDamage(event.getDamage() * PASSIVE_DAMAGE_ELITE_MODIFIER);
 					} else if (EntityUtils.isBoss(damagee)) {

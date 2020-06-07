@@ -38,7 +38,7 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 	}
 
 	private static Map<PotionEffectType, Integer> getOppositeEffects(LivingEntity e) {
-		Map<PotionEffectType, Integer> effects = new HashMap<PotionEffectType, Integer>();
+		Map<PotionEffectType, Integer> effects = new HashMap<>();
 		for (PotionEffect effect : e.getActivePotionEffects()) {
 			PotionEffectType type = effect.getType();
 			if (PotionUtils.hasNegativeEffects(type)) {

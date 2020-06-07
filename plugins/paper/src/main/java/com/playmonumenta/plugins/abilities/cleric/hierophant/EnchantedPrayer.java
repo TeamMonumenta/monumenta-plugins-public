@@ -41,13 +41,13 @@ public class EnchantedPrayer extends Ability {
 
 	public EnchantedPrayer(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Enchanted Prayer");
-		mInfo.scoreboardId = "EPrayer";
+		mInfo.mScoreboardId = "EPrayer";
 		mInfo.mShorthandName = "EP";
 		mInfo.mDescriptions.add("Right-clicking in the air while shifted enchants the weapons of all players in a 15 block radius with holy magic. Their next melee attack deals an additional 7 damage in a 3-block radius while healing the player for 2 hp. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage is increased to 12. Healing is increased to 4 hp.");
-		mInfo.linkedSpell = Spells.ENCHANTED_PRAYER;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.cooldown = ENCHANTED_PRAYER_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.ENCHANTED_PRAYER;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = ENCHANTED_PRAYER_COOLDOWN;
 	}
 
 	public static final String ENCHANTED_PRAYER_METAKEY = "EnchantedPrayerMetakey";
@@ -57,23 +57,23 @@ public class EnchantedPrayer extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
 		new BukkitRunnable() {
-			double rotation = 0;
-			Location loc = mPlayer.getLocation();
-			double radius = 0;
+			double mRotation = 0;
+			final Location mLoc = mPlayer.getLocation();
+			double mRadius = 0;
 
 			@Override
 			public void run() {
 
-				radius += 0.25;
+				mRadius += 0.25;
 				for (int i = 0; i < 36; i += 1) {
-					rotation += 10;
-					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
-					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.15, 0.15, 0.15, 0);
-					loc.subtract(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
+					mRotation += 10;
+					double radian1 = Math.toRadians(mRotation);
+					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
+					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
 
 				}
-				if (radius >= 5) {
+				if (mRadius >= 5) {
 					this.cancel();
 				}
 
@@ -86,10 +86,10 @@ public class EnchantedPrayer extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01);
 			p.setMetadata(ENCHANTED_PRAYER_METAKEY, new FixedMetadataValue(mPlugin, enchantedPrayer));
 			new BukkitRunnable() {
-				int t = 0;
+				int mT = 0;
 				@Override
 				public void run() {
-					t++;
+					mT++;
 					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
 					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
@@ -98,7 +98,7 @@ public class EnchantedPrayer extends Ability {
 						this.cancel();
 					}
 
-					if (t >= ENCHANTED_PRAYER_COOLDOWN || p == null || p.isDead() || !p.isOnline()) {
+					if (mT >= ENCHANTED_PRAYER_COOLDOWN || p.isDead() || !p.isOnline()) {
 						this.cancel();
 						p.removeMetadata(ENCHANTED_PRAYER_METAKEY, mPlugin);
 					}

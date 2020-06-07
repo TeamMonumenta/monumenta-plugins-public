@@ -23,7 +23,7 @@ public class DivineJustice extends Ability {
 
 	public DivineJustice(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Divine Justice");
-		mInfo.scoreboardId = "DivineJustice";
+		mInfo.mScoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
 		mInfo.mDescriptions.add("Your critical strikes deal 5 additional damage to undead enemies. When you critically strike an undead enemy, you heal yourself for 0.5 hearts.");
 		mInfo.mDescriptions.add("In addition, when you kill an undead enemy with a critical strike, you heal yourself for 1.5 hearts.");

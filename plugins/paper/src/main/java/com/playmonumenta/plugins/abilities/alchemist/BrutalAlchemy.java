@@ -29,8 +29,8 @@ public class BrutalAlchemy extends Ability {
 
 	public BrutalAlchemy(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Brutal Alchemy");
-		mInfo.linkedSpell = Spells.BRUTAL_ALCHEMY;
-		mInfo.scoreboardId = "BrutalAlchemy";
+		mInfo.mLinkedSpell = Spells.BRUTAL_ALCHEMY;
+		mInfo.mScoreboardId = "BrutalAlchemy";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("Your Alchemist's Potions deal 1 damage and 15% Vulnerability for 8 seconds.");
 		mInfo.mDescriptions.add("Your Alchemist's Potions now deal 2 damage and 25% Vulnerability.");
@@ -54,7 +54,7 @@ public class BrutalAlchemy extends Ability {
 
 	public void apply(LivingEntity mob) {
 		PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, BRUTAL_ALCHEMY_DURATION, mVulnerabilityAmplifier, false, true));
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 	}
 
 }

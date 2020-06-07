@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -42,13 +41,13 @@ public class EnfeeblingElixir extends Ability {
 
 	public EnfeeblingElixir(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Enfeebling Elixir");
-		mInfo.linkedSpell = Spells.ENFEEBLING_ELIXIR;
-		mInfo.scoreboardId = "EnfeeblingElixir";
+		mInfo.mLinkedSpell = Spells.ENFEEBLING_ELIXIR;
+		mInfo.mScoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 5s. You gain Jump Boost II and Speed 1 for 5s. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The knockback increases by 50% and Weakness I and Speed I are both increased to II. Cooldown: 10s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? ENFEEBLING_1_COOLDOWN : ENFEEBLING_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? ENFEEBLING_1_COOLDOWN : ENFEEBLING_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mWeaknessAmp = getAbilityScore() == 1 ? ENFEEBLING_1_WEAKNESS_AMP : ENFEEBLING_2_WEAKNESS_AMP;
 		mSpeedAmp = getAbilityScore() == 1 ? ENFEEBLING_1_SPEED_AMP : ENFEEBLING_2_SPEED_AMP;
 		mKnockbackSpeed = getAbilityScore() == 1 ? ENFEEBLING_1_KNOCKBACK_SPEED : ENFEEBLING_2_KNOCKBACK_SPEED;

@@ -43,13 +43,13 @@ public class ChoirBells extends Ability {
 
 	public ChoirBells(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Choir Bells");
-		mInfo.linkedSpell = Spells.CHOIR_BELLS;
-		mInfo.scoreboardId = "ChoirBells";
+		mInfo.mLinkedSpell = Spells.CHOIR_BELLS;
+		mInfo.mScoreboardId = "ChoirBells";
 		mInfo.mShorthandName = "CB";
 		mInfo.mDescriptions.add("Left-clicking while shifted while airborne causes the Cleric to become the target of any undead within a ten-block-long cone in front of them. Affected Undead gain Slowness 2 for 20s. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Affected Undead also gain 30% Vulnerability for 20s. Cooldown is reduced to 20s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? CHOIR_BELLS_1_COOLDOWN : CHOIR_BELLS_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? CHOIR_BELLS_1_COOLDOWN : CHOIR_BELLS_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override

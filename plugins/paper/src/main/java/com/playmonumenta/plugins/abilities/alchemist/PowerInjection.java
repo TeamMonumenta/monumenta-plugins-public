@@ -39,13 +39,13 @@ public class PowerInjection extends Ability {
 
 	public PowerInjection(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Power Injection");
-		mInfo.linkedSpell = Spells.POWER_INJECTION;
-		mInfo.scoreboardId = "PowerInjection";
+		mInfo.mLinkedSpell = Spells.POWER_INJECTION;
+		mInfo.mScoreboardId = "PowerInjection";
 		mInfo.mShorthandName = "PI";
 		mInfo.mDescriptions.add("Left-clicking, while looking at another player within 16 blocks, while holding an Alchemist Potion gives you Speed I and +2 melee damage for 15 seconds. If you were looking at another player, also give that player the effects. Cooldown 30s");
 		mInfo.mDescriptions.add("Give +5 melee damage instead.");
-		mInfo.cooldown = POWER_INJECTION_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = POWER_INJECTION_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? POWER_INJECTION_1_DAMAGE : POWER_INJECTION_2_DAMAGE;
 	}
 
@@ -106,7 +106,7 @@ public class PowerInjection extends Ability {
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		if (InventoryUtils.testForItemWithName(inMainHand, "Alchemist's Potion")) {
 			LivingEntity targetEntity = EntityUtils.getEntityAtCursor(mPlayer, POWER_INJECTION_RANGE, true, true, true);
-			if (targetEntity != null && targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) {
+			if (targetEntity instanceof Player && ((Player) targetEntity).getGameMode() != GameMode.SPECTATOR) {
 				mTargetPlayer = (Player) targetEntity;
 			}
 

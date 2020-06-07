@@ -36,14 +36,14 @@ public class ManaLance extends Ability {
 
 	public ManaLance(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Mana Lance");
-		mInfo.linkedSpell = Spells.MANA_LANCE;
-		mInfo.scoreboardId = "ManaLance";
+		mInfo.mLinkedSpell = Spells.MANA_LANCE;
+		mInfo.mScoreboardId = "ManaLance";
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 8 damage to enemies in the path of the beam. This beam will not go through solid blocks. 5 second cooldown.");
 		mInfo.mDescriptions.add("The beam instead deals 10 damage with a 3 second cooldown.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore() == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
 					iter.remove();
 					mobs.remove(mob);

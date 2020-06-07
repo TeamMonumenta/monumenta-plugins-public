@@ -29,8 +29,8 @@ public class ElementalArrows extends Ability {
 
 	public ElementalArrows(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Elemental Arrows");
-		mInfo.linkedSpell = Spells.ELEMENTAL_ARROWS;
-		mInfo.scoreboardId = "Elemental";
+		mInfo.mLinkedSpell = Spells.ELEMENTAL_ARROWS;
+		mInfo.mScoreboardId = "Elemental";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Your arrows are set on fire. If you are shooting an arrow while sneaking, it turns into an ice arrow instead, afflicting the target with 6 seconds of Slowness II. Fire and Ice arrows deal 1 extra damage. Ice arrows deal 8 extra damage to Blazes. Fire arrows deal 8 extra damage to strays. This skill can not apply Spellshock.");
 		mInfo.mDescriptions.add("Your fire arrows also set nearby enemies within a radius of 3 blocks on fire when they hit a target. Your ice arrows also slow nearby enemies within a radius of 3 blocks when they hit a target. Both area of effect effects do 3 damage to all targets affected.");
@@ -43,7 +43,7 @@ public class ElementalArrows extends Ability {
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell, false, true);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, false, true);
 					mob.setFireTicks(ELEMENTAL_ARROWS_DURATION);
 				}
 			}
@@ -51,12 +51,12 @@ public class ElementalArrows extends Ability {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
 
-			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell, false, true);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell, false, true);
 			EntityUtils.applyFire(mPlugin, ELEMENTAL_ARROWS_DURATION, damagee, mPlayer);
 		} else if (arrow.hasMetadata("ElementalArrowsIceArrow")) {
 			if (elementalArrows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ELEMENTAL_ARROWS_RADIUS, damagee)) {
-					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 				}
 			}
@@ -64,7 +64,7 @@ public class ElementalArrows extends Ability {
 				damage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 			}
 
-			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
+			EntityUtils.damageEntity(mPlugin, damagee, damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
 			PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.SLOW, ELEMENTAL_ARROWS_DURATION, 1));
 		}
 

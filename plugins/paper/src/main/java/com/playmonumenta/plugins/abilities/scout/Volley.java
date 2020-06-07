@@ -32,25 +32,25 @@ public class Volley extends Ability {
 
 	public Volley(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Volley");
-		mInfo.linkedSpell = Spells.VOLLEY;
-		mInfo.scoreboardId = "Volley";
+		mInfo.mLinkedSpell = Spells.VOLLEY;
+		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
 		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15 s). Only one arrow is consumed, and each arrow deals 50% bonus damage.");
 		mInfo.mDescriptions.add("Increases the number of Arrows to 10 and enhances the bonus damage to 100%.");
-		mInfo.cooldown = VOLLEY_COOLDOWN;
+		mInfo.mCooldown = VOLLEY_COOLDOWN;
 
 		/*
 		 * NOTE! Because Volley has two events - the actual shot event won't trigger by default
 		 * when volley is on cooldown. Therefor it needs to bypass the automatic cooldown check
 		 * and manage cooldown itself
 		 */
-		mInfo.ignoreCooldown = true;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public boolean playerShotArrowEvent(Arrow arrow) {
 		if (!mPlayer.isSneaking()
-		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
 			return true;
 		}
@@ -81,38 +81,38 @@ public class Volley extends Ability {
 
 				projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, numArrows, 1.75, 5, Arrow.class);
 
-				for (Projectile proj : projectiles) {
-					Arrow projArrow = (Arrow)proj;
+				for (Projectile projectile : projectiles) {
+					Arrow volleyArrow = (Arrow)projectile;
 
-					proj.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
+					projectile.setMetadata("Volley", new FixedMetadataValue(mPlugin, 0));
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
 					if (tArrowData != null) {
-						(projArrow).setBasePotionData(tArrowData);
+						(volleyArrow).setBasePotionData(tArrowData);
 					}
 
-					projArrow.setCritical(arrow.isCritical());
-					projArrow.setFireTicks(arrow.getFireTicks());
-					projArrow.setKnockbackStrength(arrow.getKnockbackStrength());
-					projArrow.setDamage(arrow.getDamage());
+					volleyArrow.setCritical(arrow.isCritical());
+					volleyArrow.setFireTicks(arrow.getFireTicks());
+					volleyArrow.setKnockbackStrength(arrow.getKnockbackStrength());
+					volleyArrow.setDamage(arrow.getDamage());
 					if (arrow.hasMetadata("ArrowQuickdraw")) {
 						// Manually register these tags because volley doesn't for some reason
-						projArrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
-						if (AbilityUtils.getArrowBaseDamage(projArrow) == 0) {
-							AbilityUtils.setArrowBaseDamage(mPlugin, projArrow, AbilityUtils.getArrowBaseDamage(arrow));
+						volleyArrow.setMetadata("ArrowQuickdraw", new FixedMetadataValue(mPlugin, null));
+						if (AbilityUtils.getArrowBaseDamage(volleyArrow) == 0) {
+							AbilityUtils.setArrowBaseDamage(mPlugin, volleyArrow, AbilityUtils.getArrowBaseDamage(arrow));
 						}
 					}
 					double multiplier = getAbilityScore() == 1 ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
-					AbilityUtils.multiplyArrowFinalDamageMultiplier(mPlugin, projArrow, multiplier);
+					AbilityUtils.multiplyArrowFinalDamageMultiplier(mPlugin, volleyArrow, multiplier);
 					// Manually register these tags because volley doesn't for some reason
-					if (AbilityUtils.getArrowBonusDamage(projArrow) == 0) {
-						AbilityUtils.addArrowBonusDamage(mPlugin, projArrow, AbilityUtils.getArrowBonusDamage(arrow));
+					if (AbilityUtils.getArrowBonusDamage(volleyArrow) == 0) {
+						AbilityUtils.addArrowBonusDamage(mPlugin, volleyArrow, AbilityUtils.getArrowBonusDamage(arrow));
 					}
 
-					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
+					mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SMOKE_NORMAL);
 
 					//Fire: How stupid of me. I completely forgot we can call Bukkit Events on our OWN
-					ProjectileLaunchEvent event = new ProjectileLaunchEvent(projArrow);
+					ProjectileLaunchEvent event = new ProjectileLaunchEvent(volleyArrow);
 					Bukkit.getPluginManager().callEvent(event);
 				}
 

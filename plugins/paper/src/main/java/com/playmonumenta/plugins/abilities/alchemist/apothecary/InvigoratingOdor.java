@@ -33,12 +33,12 @@ public class InvigoratingOdor extends Ability {
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.5f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
-	private int mDamage;
+	private final int mDamage;
 
 	public InvigoratingOdor(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Invigorating Odor");
-		mInfo.linkedSpell = Spells.INVIGORATING_ODOR;
-		mInfo.scoreboardId = "InvigoratingOdor";
+		mInfo.mLinkedSpell = Spells.INVIGORATING_ODOR;
+		mInfo.mScoreboardId = "InvigoratingOdor";
 		mInfo.mShorthandName = "IO";
 		mInfo.mDescriptions.add("Alchemist Potions deal +1 damage and leave an aura for 3 seconds where they hit. The aura provides Speed I and Haste I to players for 10 seconds. The 50% chance for a potion on ally kills is increased to 75%.");
 		mInfo.mDescriptions.add("Alchemist Potions deal +2 damage and Resistance I is added to the aura. The chance for a potion on ally kills is increased to 100%.");
@@ -63,7 +63,7 @@ public class InvigoratingOdor extends Ability {
 	}
 
 	public void apply(LivingEntity le) {
-		EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
+		EntityUtils.damageEntity(mPlugin, le, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 	}
 
 	public void createAura(Location loc, double radius) {

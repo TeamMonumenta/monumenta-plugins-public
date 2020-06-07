@@ -30,7 +30,7 @@ public class SagesInsight extends Ability {
 
 	public SagesInsight(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Sage's Insight");
-		mInfo.scoreboardId = "SagesInsight";
+		mInfo.mScoreboardId = "SagesInsight";
 		mInfo.mShorthandName = "SI";
 		mInfo.mDescriptions.add("Whenever the user casts a spell the cooldowns of other equipped spells are reduced by 5%, capped at 0.5 seconds.");
 		mInfo.mDescriptions.add("Cooldown reduction upon casting a spell is increased to 10%, and the cap is increased to 1 second.");
@@ -50,10 +50,11 @@ public class SagesInsight extends Ability {
 			AbilityManager.getManager().getPlayerAbility(mPlayer, FlashSword.class)
 		};
 
-		for (int i = 0; i < abilities.length; i++) {
-			if (abilities[i] != null) {
-				mPlugin.mTimers.updateCooldown(mPlayer, abilities[i].getInfo().linkedSpell,
-						(int)(Math.min(mCooldownReductionCap, abilities[i].getInfo().cooldown * mCooldownReductionPercent)));
+		for (Ability ability : abilities) {
+			if (ability != null) {
+				mPlugin.mTimers.updateCooldown(mPlayer, ability.getInfo().mLinkedSpell,
+				                               (int) (Math.min(mCooldownReductionCap,
+				                                      ability.getInfo().mCooldown * mCooldownReductionPercent)));
 			}
 		}
 

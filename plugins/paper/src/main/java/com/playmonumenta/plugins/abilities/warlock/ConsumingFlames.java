@@ -32,13 +32,13 @@ public class ConsumingFlames extends Ability {
 
 	public ConsumingFlames(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Consuming Flames");
-		mInfo.scoreboardId = "ConsumingFlames";
+		mInfo.mScoreboardId = "ConsumingFlames";
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. (Cooldown: 10s)");
 		mInfo.mDescriptions.add("The damage is increased to 8, and also afflict mobs with Weakness I.");
-		mInfo.linkedSpell = Spells.CONSUMING_FLAMES;
-		mInfo.cooldown = CONSUMING_FLAMES_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mLinkedSpell = Spells.CONSUMING_FLAMES;
+		mInfo.mCooldown = CONSUMING_FLAMES_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? CONSUMING_FLAMES_1_DAMAGE : CONSUMING_FLAMES_2_DAMAGE;
 	}
 
@@ -47,20 +47,20 @@ public class ConsumingFlames extends Ability {
 		Location loc = mPlayer.getLocation();
 
 		new BukkitRunnable() {
-			double r = 0;
-			Location loc = mPlayer.getLocation();
+			double mRadius = 0;
+			final Location mLoc = mPlayer.getLocation();
 			@Override
 			public void run() {
-				r += 1.25;
+				mRadius += 1.25;
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
-					loc.add(Math.cos(radian1) * r, 0.15, Math.sin(radian1) * r);
-					mWorld.spawnParticle(Particle.FLAME, loc, 2, 0, 0, 0, 0.125);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 3, 0, 0, 0, 0.15);
-					loc.subtract(Math.cos(radian1) * r, 0.15, Math.sin(radian1) * r);
+					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mWorld.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 3, 0, 0, 0, 0.15);
+					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
 				}
 
-				if (r >= CONSUMING_FLAMES_RADIUS + 1) {
+				if (mRadius >= CONSUMING_FLAMES_RADIUS + 1) {
 					this.cancel();
 				}
 			}
@@ -72,7 +72,7 @@ public class ConsumingFlames extends Ability {
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CONSUMING_FLAMES_RADIUS, mPlayer)) {
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {

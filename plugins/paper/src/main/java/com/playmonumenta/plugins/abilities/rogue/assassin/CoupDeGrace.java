@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -35,7 +36,7 @@ public class CoupDeGrace extends Ability {
 
 	public CoupDeGrace(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Coup de Grace");
-		mInfo.scoreboardId = "CoupDeGrace";
+		mInfo.mScoreboardId = "CoupDeGrace";
 		mInfo.mShorthandName = "CdG";
 		mInfo.mDescriptions.add("If you melee attack a normal enemy and they get under 10% health they die instantly. The threshold for elites is 20% health");
 		mInfo.mDescriptions.add("The health threshold is increased to 15% for normal enemies and 30% for elites.");
@@ -47,14 +48,17 @@ public class CoupDeGrace extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
 			LivingEntity le = (LivingEntity) event.getEntity();
-			double maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-			if (EntityUtils.isElite(le)) {
-				if (le.getHealth() - (event.getFinalDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealth * mEliteThreshold) {
-					execute(event);
-				}
-			} else if (!EntityUtils.isBoss(le)) {
-				if (le.getHealth() - (event.getFinalDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealth * mNormalThreshold) {
-					execute(event);
+			AttributeInstance maxHealth = le.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null) {
+				double maxHealthValue = maxHealth.getValue();
+				if (EntityUtils.isElite(le)) {
+					if (le.getHealth() - (event.getFinalDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealthValue * mEliteThreshold) {
+						execute(event);
+					}
+				} else if (!EntityUtils.isBoss(le)) {
+					if (le.getHealth() - (event.getFinalDamage() * EntityUtils.vulnerabilityMult(le)) < maxHealthValue * mNormalThreshold) {
+						execute(event);
+					}
 				}
 			}
 		}

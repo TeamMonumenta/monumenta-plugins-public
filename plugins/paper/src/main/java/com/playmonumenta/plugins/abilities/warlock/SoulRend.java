@@ -30,12 +30,12 @@ public class SoulRend extends Ability {
 
 	public SoulRend(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Soul Rend");
-		mInfo.scoreboardId = "SoulRend";
+		mInfo.mScoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
 		mInfo.mDescriptions.add("Getting a critical hit with a scythe heals you for 2 hp + 20% of the damage dealt. (Cooldown: 6s)");
 		mInfo.mDescriptions.add("The healing increases to 4 hp + 20% of the damage dealt and nearby allies are healed as well.");
-		mInfo.linkedSpell = Spells.SOUL_REND;
-		mInfo.cooldown = getAbilityScore() == 1 ? SOUL_REND_1_COOLDOWN : SOUL_REND_2_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.SOUL_REND;
+		mInfo.mCooldown = getAbilityScore() == 1 ? SOUL_REND_1_COOLDOWN : SOUL_REND_2_COOLDOWN;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class SoulRend extends Ability {
 				if (dp != null && dp.isActive()) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), SOUL_REND_RADIUS)) {
 						world.spawnParticle(Particle.DAMAGE_INDICATOR, mob.getLocation().add(0, 1, 0), 12, 0.5, 0.5, 0.5, 0.0);
-						EntityUtils.damageEntity(mPlugin, mob, heal, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, heal, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					}
 				} else {
 					if (soulRend > 1) {

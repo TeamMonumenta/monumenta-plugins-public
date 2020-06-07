@@ -32,14 +32,14 @@ public class DefensiveLine extends Ability {
 
 	public DefensiveLine(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Defensive Line");
-		mInfo.linkedSpell = Spells.DEFENSIVE_LINE;
-		mInfo.scoreboardId = "DefensiveLine";
+		mInfo.mLinkedSpell = Spells.DEFENSIVE_LINE;
+		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
 		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain Resistance II for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 50 seconds.");
 		mInfo.mDescriptions.add("The cooldown is decreased to 30 seconds. In addition mobs that are knocked back are given 10 seconds of Weakness 1.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore() == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -61,21 +61,21 @@ public class DefensiveLine extends Ability {
 						Location loc = target.getLocation();
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25);
 						new BukkitRunnable() {
-							double r = 1.25;
-							double y = 0.15;
+							final double mRadius = 1.25;
+							double mY = 0.15;
 							@Override
 							public void run() {
 								Location loc = target.getLocation();
-								y += 0.2;
+								mY += 0.2;
 								for (double j = 0; j < 360; j += 18) {
 									double radian1 = Math.toRadians(j);
-									loc.add(Math.cos(radian1) * r, y, Math.sin(radian1) * r);
+									loc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 									mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
 									mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
-									loc.subtract(Math.cos(radian1) * r, y, Math.sin(radian1) * r);
+									loc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
 								}
 
-								if (y >= 1.8) {
+								if (mY >= 1.8) {
 									this.cancel();
 								}
 							}
@@ -103,9 +103,10 @@ public class DefensiveLine extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && ((mHand != null && mHand.getType() == Material.SHIELD && oHand.getType() != Material.BOW)
-		    || (oHand != null && oHand.getType() == Material.SHIELD && mHand.getType() != Material.BOW));
+		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		return mPlayer.isSneaking()
+		       && ((mainHand.getType() == Material.SHIELD && offHand.getType() != Material.BOW)
+		           || (offHand.getType() == Material.SHIELD && mainHand.getType() != Material.BOW));
 	}
 }

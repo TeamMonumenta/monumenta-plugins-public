@@ -57,38 +57,36 @@ public class Dreadful extends StatMultiplier {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (event.getEntity() instanceof LivingEntity) {
-			LivingEntity mob = event.getEntity();
+		LivingEntity mob = event.getEntity();
 
-			if (!mob.getScoreboardTags().contains(DREADFUL_DREADNAUGHT_TAG)
-					&& !mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG)
-					&& !mob.getScoreboardTags().contains(DREADFUL_DREADLING_TAG)) {
-				if (EntityUtils.isElite(mob)) {
-					mEliteSpawnCounter += (4 + FastUtils.RANDOM.nextInt(3));
+		if (!mob.getScoreboardTags().contains(DREADFUL_DREADNAUGHT_TAG)
+				&& !mob.getScoreboardTags().contains(Spectral.SPECTRAL_SPECTRE_TAG)
+				&& !mob.getScoreboardTags().contains(DREADFUL_DREADLING_TAG)) {
+			if (EntityUtils.isElite(mob)) {
+				mEliteSpawnCounter += (4 + FastUtils.RANDOM.nextInt(3));
 
-					if (mEliteSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
-						mEliteSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
-						Location loc = mob.getLocation();
-						String command = DREADFUL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mDreadfulSummonCommandData;
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+				if (mEliteSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
+					mEliteSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
+					Location loc = mob.getLocation();
+					String command = DREADFUL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mDreadfulSummonCommandData;
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
-						loc.add(0, 1, 0);
-						mWorld.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
-					}
-				} else {
-					mSpawnCounter += (2 + FastUtils.RANDOM.nextInt(2));
+					loc.add(0, 1, 0);
+					mWorld.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.1);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
+				}
+			} else {
+				mSpawnCounter += (2 + FastUtils.RANDOM.nextInt(2));
 
-					if (mSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
-						mSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
-						Location loc = mob.getLocation();
-						String command = Spectral.SPECTRAL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mSpectralSummonCommandData;
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+				if (mSpawnCounter >= DREADFUL_SPAWN_COUNTER_SPAWN) {
+					mSpawnCounter -= DREADFUL_SPAWN_COUNTER_SPAWN;
+					Location loc = mob.getLocation();
+					String command = Spectral.SPECTRAL_SUMMON_COMMAND + loc.getX() + " " + loc.getY() + " " + loc.getZ() + mSpectralSummonCommandData;
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
 
-						loc.add(0, 1, 0);
-						mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
-					}
+					loc.add(0, 1, 0);
+					mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.5);
+					mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0.5, 1, 0.5, 0);
 				}
 			}
 		}

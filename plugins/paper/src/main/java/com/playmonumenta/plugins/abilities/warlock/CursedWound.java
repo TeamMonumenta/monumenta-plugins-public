@@ -28,15 +28,15 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_1_DAMAGE = 1;
 	private static final int CURSED_WOUND_2_DAMAGE = 2;
 
-	private final int damageBonus;
+	private final int mDamageBonus;
 
 	public CursedWound(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Cursed Wound");
-		mInfo.scoreboardId = "CursedWound";
+		mInfo.mScoreboardId = "CursedWound";
 		mInfo.mShorthandName = "CW";
 		mInfo.mDescriptions.add("Hitting an enemy with a scythe gives 6s of Wither II. In addition, scythe attacks deal +1 damage.");
 		mInfo.mDescriptions.add("If you critically hit with a scythe, enemies within 3 blocks of the target also take 6s of Wither II. Additionally, your scythe attacks deal +2 damage.");
-		damageBonus = getAbilityScore() == 1 ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
+		mDamageBonus = getAbilityScore() == 1 ? CURSED_WOUND_1_DAMAGE : CURSED_WOUND_2_DAMAGE;
 
 	}
 
@@ -51,7 +51,7 @@ public class CursedWound extends Ability {
 				mWorld.spawnParticle(Particle.SPELL_MOB, damagee.getLocation().add(0, damagee.getHeight() / 2, 0), 6,
 				                     (damagee.getWidth() / 2) + 0.1, damagee.getHeight() / 3, (damagee.getWidth() / 2) + 0.1, 0);
 				PotionUtils.applyPotion(mPlayer, damagee, new PotionEffect(PotionEffectType.WITHER, CURSED_WOUND_DURATION, CURSED_WOUND_EFFECT_LEVEL, false, true));
-				event.setDamage(event.getDamage() + damageBonus);
+				event.setDamage(event.getDamage() + mDamageBonus);
 				CustomDamageEvent customDamageEvent = new CustomDamageEvent(mPlayer, damagee, 0, null);
 				Bukkit.getPluginManager().callEvent(customDamageEvent);
 			}

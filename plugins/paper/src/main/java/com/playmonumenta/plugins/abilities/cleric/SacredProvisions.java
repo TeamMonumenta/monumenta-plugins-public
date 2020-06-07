@@ -10,7 +10,7 @@ public class SacredProvisions extends Ability {
 
 	public SacredProvisions(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Sacred Provisions");
-		mInfo.scoreboardId = "SacredProvisions";
+		mInfo.mScoreboardId = "SacredProvisions";
 		mInfo.mShorthandName = "SP";
 		mInfo.mDescriptions.add("Players within 30 blocks of a cleric have a 20% chance to not consume food, potions, arrows, or durability when the respective item is used. Does not stack with multiple clerics.");
 		mInfo.mDescriptions.add("The chance is increased to 40%.");

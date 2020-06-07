@@ -32,8 +32,8 @@ public class SplitArrow extends Ability {
 
 	public SplitArrow(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Split Arrow");
-		mInfo.linkedSpell = Spells.SPLIT_ARROW;
-		mInfo.scoreboardId = "SplitArrow";
+		mInfo.mLinkedSpell = Spells.SPLIT_ARROW;
+		mInfo.mScoreboardId = "SplitArrow";
 		mInfo.mShorthandName = "SA";
 		mInfo.mDescriptions.add("When you hit an enemy with an arrow, the next nearest enemy within 5 blocks takes 6 damage. Any effects the arrows might have are also applied.");
 		mInfo.mDescriptions.add("Damage to the second target is increased to 10.");
@@ -72,7 +72,7 @@ public class SplitArrow extends Ability {
 				mWorld.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
 				mWorld.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
 				mWorld.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
-				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, nearestMob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 				MovementUtils.knockAway(damagee, nearestMob, 0.125f, 0.35f);
 
 				if (arrow.getFireTicks() > 0) {

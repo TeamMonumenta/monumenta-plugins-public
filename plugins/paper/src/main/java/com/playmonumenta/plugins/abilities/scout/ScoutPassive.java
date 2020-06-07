@@ -17,7 +17,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class ScoutPassive extends Ability {
 
-	private static float PASSIVE_ARROW_SAVE = 0.20f;
+	private static final float PASSIVE_ARROW_SAVE = 0.20f;
 
 	public ScoutPassive(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, null);

@@ -34,8 +34,8 @@ public class DeathsTouch extends Ability {
 	private static final int DEATHS_TOUCH_2_COOLDOWN = 15 * 20;
 	private static final int DEATHS_TOUCH_1_BUFF_DURATION = 15 * 20;
 	private static final int DEATHS_TOUCH_2_BUFF_DURATION = 20 * 20;
-	private static final int DEATHS_TOUCH_1_AMPLIFER_CAP = 0;
-	private static final int DEATHS_TOUCH_2_AMPLIFER_CAP = 1;
+	private static final int DEATHS_TOUCH_1_AMPLIFIER_CAP = 0;
+	private static final int DEATHS_TOUCH_2_AMPLIFIER_CAP = 1;
 	private static final int DEATHS_TOUCH_RANGE = 20;
 
 	private final int mBuffDuration;
@@ -43,20 +43,20 @@ public class DeathsTouch extends Ability {
 
 	// Although we now track the mob buffs on kill with metadata,
 	// We still need this variable to easily apply particle effects
-	private LivingEntity target = null;
+	private LivingEntity mTarget = null;
 	private int mRightClicks = 0;
 
 	public DeathsTouch(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Death's Touch");
-		mInfo.linkedSpell = Spells.DEATHS_TOUCH;
-		mInfo.scoreboardId = "DeathsTouch";
+		mInfo.mLinkedSpell = Spells.DEATHS_TOUCH;
+		mInfo.mScoreboardId = "DeathsTouch";
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Double right-clicking marks the enemy you are looking at as the reaper's next victim. If you do not correctly aim at a mob this skill goes on cooldown for 5s and it does nothing. If you or another player kills that enemy, the player that killed it is granted 15s of level 1 buffs contrary to the debuffs affecting it. Weakness > Strength. Slowness > Speed. Fire > Fire Resistance. Wither/Poison > Regeneration. Mining Fatigue > Haste. Blindness > Night Vision. Cooldown: 25s.");
 		mInfo.mDescriptions.add("The killing player gets buffs for 20 seconds instead, and the level of the buff is preserved, up to level 2. Cooldown: 15s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mBuffDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_BUFF_DURATION : DEATHS_TOUCH_2_BUFF_DURATION;
-		mAmplifierCap = getAbilityScore() == 1 ? DEATHS_TOUCH_1_AMPLIFER_CAP : DEATHS_TOUCH_2_AMPLIFER_CAP;
+		mAmplifierCap = getAbilityScore() == 1 ? DEATHS_TOUCH_1_AMPLIFIER_CAP : DEATHS_TOUCH_2_AMPLIFIER_CAP;
 	}
 
 	@Override
@@ -96,30 +96,30 @@ public class DeathsTouch extends Ability {
 			mWorld.spawnParticle(Particle.SPELL_MOB, bloc, 5, 0.15, 0.15, 0.15, 0);
 			for (LivingEntity mob : mobsInRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
-					target = mob;
+					mTarget = mob;
 					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
 					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
 					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.5f, 1f);
 
 					new BukkitRunnable() {
-						int runnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
-						double width = mob.getWidth() / 2;
-						int t = 0;
+						final int mRunnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
+						final double mWidth = mob.getWidth() / 2;
+						int mT = 0;
 
 						@Override
 						public void run() {
-							t++;
-							if (target != null) {
-								mPlayer.spawnParticle(Particle.SPELL_MOB, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
-								mPlayer.spawnParticle(Particle.SPELL_WITCH, target.getLocation().add(0, mob.getHeight() / 2, 0), 1, width, width, width, 0);
+							mT++;
+							if (mTarget != null) {
+								mPlayer.spawnParticle(Particle.SPELL_MOB, mTarget.getLocation().add(0, mob.getHeight() / 2, 0), 1, mWidth, mWidth, mWidth, 0);
+								mPlayer.spawnParticle(Particle.SPELL_WITCH, mTarget.getLocation().add(0, mob.getHeight() / 2, 0), 1, mWidth, mWidth, mWidth, 0);
 							}
-							if (t >= runnableDuration || (target != null && (target.isDead() || !target.isValid()))) {
+							if (mT >= mRunnableDuration || (mTarget != null && (mTarget.isDead() || !mTarget.isValid()))) {
 								this.cancel();
-								if (target != null) {
-									target.removeMetadata(DEATHS_TOUCH_BUFF_DURATION, mPlugin);
-									target.removeMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, mPlugin);
+								if (mTarget != null) {
+									mTarget.removeMetadata(DEATHS_TOUCH_BUFF_DURATION, mPlugin);
+									mTarget.removeMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, mPlugin);
 								}
-								target = null;
+								mTarget = null;
 							}
 						}
 
@@ -130,10 +130,10 @@ public class DeathsTouch extends Ability {
 				}
 			}
 		}
-		if (mInfo.linkedSpell != null) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 20 * 5);
-				PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.linkedSpell);
+		if (mInfo.mLinkedSpell != null) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 20 * 5);
+				PlayerUtils.callAbilityCastEvent(mPlayer, mInfo.mLinkedSpell);
 			}
 		}
 	}

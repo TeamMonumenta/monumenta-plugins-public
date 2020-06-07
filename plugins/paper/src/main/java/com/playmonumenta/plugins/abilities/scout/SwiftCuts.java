@@ -49,13 +49,13 @@ public class SwiftCuts extends Ability {
 	private static final int SWIFT_CUTS_1_DAMAGE = 3;
 	private static final int SWIFT_CUTS_2_DAMAGE = 5;
 
-	private Map<UUID, Counter> mMarkedMobs = new HashMap<UUID, Counter>();
-	private int mVulnerabilityAmplifier;
-	private int mDamageBonus;
+	private final Map<UUID, Counter> mMarkedMobs = new HashMap<>();
+	private final int mVulnerabilityAmplifier;
+	private final int mDamageBonus;
 
 	public SwiftCuts(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Swift Cuts");
-		mInfo.scoreboardId = "SwiftCuts";
+		mInfo.mScoreboardId = "SwiftCuts";
 		mInfo.mShorthandName = "SC";
 		mInfo.mDescriptions.add("On a melee hit you mark your target. When that target is hit again the mark is removed, they take 3 extra damage, and they get 10% Vulnerability for 2 seconds. You can not remark a target within 3 seconds of it having your mark removed.");
 		mInfo.mDescriptions.add("Effects increased to 5 damage and 20% Vulnerability.");

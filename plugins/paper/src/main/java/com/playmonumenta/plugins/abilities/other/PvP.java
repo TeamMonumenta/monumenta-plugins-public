@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,10 @@ public class PvP extends Ability {
 		super(plugin, world, player, null);
 
 		if (player != null) {
-			player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
+			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null) {
+				maxHealth.setBaseValue(40);
+			}
 		}
 	}
 
@@ -38,8 +42,13 @@ public class PvP extends Ability {
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = mPlayer;
 		if (player.getKiller() != null) {
-			event.setReviveHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-			Bukkit.broadcastMessage(event.getDeathMessage());
+			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+			if (maxHealth != null) {
+				event.setReviveHealth(maxHealth.getValue());
+			}
+			if (event.getDeathMessage() != null) {
+				Bukkit.broadcastMessage(event.getDeathMessage());
+			}
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
 			player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);

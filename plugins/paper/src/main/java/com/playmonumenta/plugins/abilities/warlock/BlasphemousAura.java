@@ -31,11 +31,11 @@ public class BlasphemousAura extends Ability {
 	private static final double BLASPHEMY_ARMOR_INCREMENT = 1;
 	private static final double BLASPHEMY_TOUGHNESS_INCREMENT = 0.5;
 
-	private int oldBonus = 0;
+	private int mOldBonus = 0;
 
 	public BlasphemousAura(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Blasphemous Aura");
-		mInfo.scoreboardId = "BlasphemousAura";
+		mInfo.mScoreboardId = "BlasphemousAura";
 		mInfo.mShorthandName = "BA";
 		mInfo.mDescriptions.add("When you hit an enemy with a skill other than Blasphemous Aura they gain 15% vulnerability for 5 seconds.");
 		mInfo.mDescriptions.add("The warlock gains +1 armor and +.5 armor toughness for every ability they have on cooldown lasting until skills come off cooldown.");
@@ -69,18 +69,22 @@ public class BlasphemousAura extends Ability {
 			if (gc != null && gc.onCooldown()) {
 				bonus++;
 			}
-			for (int i = 0; i < abilities.length; i++) {
-				if (abilities[i] != null && abilities[i].isOnCooldown()) {
+			for (Ability ability : abilities) {
+				if (ability != null && ability.isOnCooldown()) {
 					bonus++;
 				}
 			}
 
 			AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-			armor.setBaseValue(armor.getBaseValue() + (bonus - oldBonus) * BLASPHEMY_ARMOR_INCREMENT);
 			AttributeInstance toughness = mPlayer.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-			toughness.setBaseValue(toughness.getBaseValue() + (bonus - oldBonus) * BLASPHEMY_TOUGHNESS_INCREMENT);
+			if (armor != null) {
+				armor.setBaseValue(armor.getBaseValue() + (bonus - mOldBonus) * BLASPHEMY_ARMOR_INCREMENT);
+			}
+			if (toughness != null) {
+				toughness.setBaseValue(toughness.getBaseValue() + (bonus - mOldBonus) * BLASPHEMY_TOUGHNESS_INCREMENT);
+			}
 
-			oldBonus = bonus;
+			mOldBonus = bonus;
 		}
 	}
 }

@@ -67,14 +67,14 @@ public class MeteorSlam extends Ability {
 		super(plugin, world, player, "Meteor Slam");
 		mPlugin = plugin;
 
-		mInfo.linkedSpell = Spells.METEOR_SLAM;
-		mInfo.scoreboardId = "MeteorSlam";
+		mInfo.mLinkedSpell = Spells.METEOR_SLAM;
+		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 3 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 7s.");
 		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 5 seconds.");
-		mInfo.cooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
-		mInfo.ignoreCooldown = true;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 
 		mRunnable = new BukkitRunnable() {
 			@Override
@@ -178,7 +178,7 @@ public class MeteorSlam extends Ability {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
 			if (mob != damagee) {
-				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 			}
 		}
 
@@ -191,9 +191,9 @@ public class MeteorSlam extends Ability {
 
 	public double getSlamDamage() {
 		int meteorSlam = getAbilityScore();
-		double dmgMultLow = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_LOW : METEOR_SLAM_2_DAMAGE_LOW;
-		double dmgMultHigh = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_HIGH : METEOR_SLAM_2_DAMAGE_HIGH;
-		return Math.min(8, mFallDistance) * dmgMultLow + Math.max(0, (mFallDistance - 8)) * dmgMultHigh;
+		double dmgMultiplierLow = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_LOW : METEOR_SLAM_2_DAMAGE_LOW;
+		double dmgMultiplierHigh = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_HIGH : METEOR_SLAM_2_DAMAGE_HIGH;
+		return Math.min(8, mFallDistance) * dmgMultiplierLow + Math.max(0, (mFallDistance - 8)) * dmgMultiplierHigh;
 	}
 
 	@Override

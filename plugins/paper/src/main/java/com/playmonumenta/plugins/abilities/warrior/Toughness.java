@@ -17,7 +17,7 @@ public class Toughness extends Ability {
 
 	public Toughness(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Toughness");
-		mInfo.scoreboardId = "Toughness";
+		mInfo.mScoreboardId = "Toughness";
 		mInfo.mShorthandName = "Tgh";
 		mInfo.mDescriptions.add("You gain +4 max health (2 hearts).");
 		mInfo.mDescriptions.add("You gain +8 max health (4 hearts).");
@@ -25,9 +25,11 @@ public class Toughness extends Ability {
 			removeModifier(player);
 			double healthBoost = getAbilityScore() == 1 ? TOUGHNESS_1_HEALTH_BOOST : TOUGHNESS_2_HEALTH_BOOST;
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-			AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoost,
-					AttributeModifier.Operation.ADD_NUMBER);
-			maxHealth.addModifier(mod);
+			if (maxHealth != null) {
+				AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoost,
+						AttributeModifier.Operation.ADD_NUMBER);
+				maxHealth.addModifier(mod);
+			}
 		}
 	}
 

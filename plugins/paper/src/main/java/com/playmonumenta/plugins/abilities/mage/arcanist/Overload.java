@@ -26,11 +26,11 @@ public class Overload extends Ability {
 	private static final int OVERLOAD_1_DAMAGE = 1;
 	private static final int OVERLOAD_2_DAMAGE = 2;
 
-	private int mDamage;
+	private final int mDamage;
 
 	public Overload(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Overload");
-		mInfo.scoreboardId = "Overload";
+		mInfo.mScoreboardId = "Overload";
 		mInfo.mShorthandName = "Ov";
 		mInfo.mDescriptions.add("Spells other than Spellshock and Channeling deal an additional 1 damage for each spell on cooldown.");
 		mInfo.mDescriptions.add("The damage per spell on cooldown is increased to 2.");

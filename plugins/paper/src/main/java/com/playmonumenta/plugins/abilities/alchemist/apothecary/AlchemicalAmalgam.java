@@ -43,18 +43,18 @@ public class AlchemicalAmalgam extends Ability {
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 
-	private int mDamage;
-	private int mShield;
+	private final int mDamage;
+	private final int mShield;
 
 	public AlchemicalAmalgam(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Alchemical Amalgam");
-		mInfo.scoreboardId = "Alchemical";
+		mInfo.mScoreboardId = "Alchemical";
 		mInfo.mShorthandName = "AAm";
 		mInfo.mDescriptions.add("Shift left click with a Bow to shoot a mixture that deals 8 damage to every enemy touched and adds 2 absorption health to players (including yourself), lasting 30 seconds, maximum 12. After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 30 seconds.");
 		mInfo.mDescriptions.add("Absorption health added is increased to 3 and damage is increased to 16.");
-		mInfo.cooldown = 20 * 30;
-		mInfo.linkedSpell = Spells.ALCHEMICAL_AMALGAM;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = 20 * 30;
+		mInfo.mLinkedSpell = Spells.ALCHEMICAL_AMALGAM;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? AMALGAM_1_DAMAGE : AMALGAM_2_DAMAGE;
 		mShield = getAbilityScore() == 1 ? AMALGAM_1_SHIELD : AMALGAM_2_SHIELD;
 	}
@@ -71,8 +71,8 @@ public class AlchemicalAmalgam extends Ability {
 		putOnCooldown();
 
 		new BukkitRunnable() {
-			Location mLoc = mPlayer.getEyeLocation();
-			BoundingBox mBox = BoundingBox.of(mLoc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
+			final Location mLoc = mPlayer.getEyeLocation();
+			final BoundingBox mBox = BoundingBox.of(mLoc, AMALGAM_RADIUS, AMALGAM_RADIUS, AMALGAM_RADIUS);
 			Vector mIncrement = mLoc.getDirection().multiply(AMALGAM_MOVE_SPEED);
 
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
@@ -91,7 +91,7 @@ public class AlchemicalAmalgam extends Ability {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox.overlaps(mob.getBoundingBox())) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 						mobIter.remove();
 					}
 				}

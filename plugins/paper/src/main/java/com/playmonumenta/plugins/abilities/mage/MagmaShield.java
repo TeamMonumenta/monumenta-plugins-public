@@ -35,13 +35,13 @@ public class MagmaShield extends Ability {
 
 	public MagmaShield(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Magma Shield");
-		mInfo.linkedSpell = Spells.MAGMA_SHIELD;
-		mInfo.scoreboardId = "Magma";
+		mInfo.mLinkedSpell = Spells.MAGMA_SHIELD;
+		mInfo.mScoreboardId = "Magma";
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add("When you block while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 7 damage and setting them on fire. You must hold a wand to trigger this effect. (Cooldown: 12 s)");
 		mInfo.mDescriptions.add("The damage is increased to 14.");
-		mInfo.cooldown = MAGMA_SHIELD_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = MAGMA_SHIELD_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
 	}
 
@@ -54,34 +54,34 @@ public class MagmaShield extends Ability {
 				float kb = (mob instanceof Player) ? 0.3f : MAGMA_SHIELD_KNOCKBACK_SPEED;
 				MovementUtils.knockAway(mPlayer, mob, kb);
 				EntityUtils.applyFire(mPlugin, MAGMA_SHIELD_FIRE_DURATION, mob, mPlayer);
-				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
 			}
 		}
 
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 15, 0.05, 0.05, 0.05, 0.1);
 		new BukkitRunnable() {
-			Location loc = mPlayer.getLocation();
-			double radius = 0;
+			final Location mLoc = mPlayer.getLocation();
+			double mRadius = 0;
 
 			@Override
 			public void run() {
-				if (radius == 0) {
-					loc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
+				if (mRadius == 0) {
+					mLoc.setDirection(mPlayer.getLocation().getDirection().setY(0).normalize());
 				}
 				Vector vec;
-				radius += 1.25;
+				mRadius += 1.25;
 				for (double degree = 30; degree <= 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
-					vec = new Vector(Math.cos(radian1) * radius, 0.125, Math.sin(radian1) * radius);
-					vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());
-					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+					vec = new Vector(Math.cos(radian1) * mRadius, 0.125, Math.sin(radian1) * mRadius);
+					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch());
+					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-					Location l = loc.clone().add(0, 0.1, 0).add(vec);
+					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
 					mWorld.spawnParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
 				}
 
-				if (radius >= MAGMA_SHIELD_RADIUS + 1) {
+				if (mRadius >= MAGMA_SHIELD_RADIUS + 1) {
 					this.cancel();
 				}
 			}

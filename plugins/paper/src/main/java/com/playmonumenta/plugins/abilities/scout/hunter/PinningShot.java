@@ -29,7 +29,7 @@ public class PinningShot extends Ability {
 
 	public PinningShot(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Pinning Shot");
-		mInfo.scoreboardId = "PinningShot";
+		mInfo.mScoreboardId = "PinningShot";
 		mInfo.mShorthandName = "PSh";
 		mInfo.mDescriptions.add("When you shoot a non-boss enemy with a bow you automatically inflict Slowness 7 for 5s. Shooting a pinned enemy removes the slowness. This can only affect each enemy once.");
 		mInfo.mDescriptions.add("Slowness 7 is applied for 10s instead. In addition shooting a pinned enemy increases arrow damage by 50%.");

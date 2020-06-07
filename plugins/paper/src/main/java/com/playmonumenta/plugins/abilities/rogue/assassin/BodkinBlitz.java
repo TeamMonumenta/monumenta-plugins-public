@@ -47,14 +47,14 @@ public class BodkinBlitz extends Ability {
 
 	public BodkinBlitz(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Bodkin Blitz");
-		mInfo.linkedSpell = Spells.BODKIN_BLITZ;
-		mInfo.scoreboardId = "BodkinBlitz";
+		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
+		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
 		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Bodkin Blitz utilises a charge system. Gain a charge once every 16 seconds.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks. Cooldown per charge reduced to 12 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you.");
-		mInfo.cooldown = 0;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mCooldown = 0;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mCharges = BODKINBLITZ_MAX_CHARGES;
 		mChargeCooldown = 0;
 	}
@@ -78,10 +78,10 @@ public class BodkinBlitz extends Ability {
 
 		new BukkitRunnable() {
 			Location mTpLoc = mPlayer.getLocation();
-			Vector mShiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
-			BoundingBox mPlayerBox = mPlayer.getBoundingBox();
+			final Vector mShiftVec = mPlayer.getLocation().getDirection().normalize().multiply(0.1);
+			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			int mTick = 0;
-			int mStep = getAbilityScore() == 1 ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
+			final int mStep = getAbilityScore() == 1 ? BODKINBLITZ_1_STEP : BODKINBLITZ_2_STEP;
 
 			@Override
 			public void run() {

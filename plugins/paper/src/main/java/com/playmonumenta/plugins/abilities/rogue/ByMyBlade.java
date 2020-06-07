@@ -30,17 +30,17 @@ public class ByMyBlade extends Ability {
 	private static final int BY_MY_BLADE_2_DAMAGE = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 
-	private int mHasteAmplifier;
-	private int mDamageBonus;
+	private final int mHasteAmplifier;
+	private final int mDamageBonus;
 
 	public ByMyBlade(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "By My Blade");
-		mInfo.linkedSpell = Spells.BY_MY_BLADE;
-		mInfo.scoreboardId = "ByMyBlade";
+		mInfo.mLinkedSpell = Spells.BY_MY_BLADE;
+		mInfo.mScoreboardId = "ByMyBlade";
 		mInfo.mShorthandName = "BmB";
 		mInfo.mDescriptions.add("While holding two swords, your next critical strike grants Haste II for 4 seconds and deals 12 additional damage. (Cooldown 10s)");
 		mInfo.mDescriptions.add("This buff is increased to Haste IV and critical strikes deal 24 additional damage instead.");
-		mInfo.cooldown = BY_MY_BLADE_COOLDOWN;
+		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
 		mHasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
@@ -54,12 +54,10 @@ public class ByMyBlade extends Ability {
 
 			int extraDamage = mDamageBonus;
 			// Since RoguePassive uses a Custom Damage Event, I'll just put the modifier here
-			if (damagee instanceof LivingEntity) {
-				if (EntityUtils.isElite(damagee)) {
-					extraDamage *= RoguePassive.PASSIVE_DAMAGE_ELITE_MODIFIER;
-				} else if (EntityUtils.isBoss(damagee)) {
-					extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
-				}
+			if (EntityUtils.isElite(damagee)) {
+				extraDamage *= RoguePassive.PASSIVE_DAMAGE_ELITE_MODIFIER;
+			} else if (EntityUtils.isBoss(damagee)) {
+				extraDamage *= RoguePassive.PASSIVE_DAMAGE_BOSS_MODIFIER;
 			}
 
 			event.setDamage(event.getDamage() + extraDamage);

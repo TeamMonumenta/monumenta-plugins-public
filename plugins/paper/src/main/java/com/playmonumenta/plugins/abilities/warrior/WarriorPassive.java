@@ -24,7 +24,9 @@ public class WarriorPassive extends Ability {
 
 	@Override
 	public void setupClassPotionEffects() {
-		AttributeInstance att = mPlayer.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-		att.setBaseValue(att.getBaseValue() + PASSIVE_KNOCKBACK_RESISTANCE);
+		AttributeInstance knockbackResistance = mPlayer.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		if (knockbackResistance != null) {
+			knockbackResistance.setBaseValue(knockbackResistance.getBaseValue() + PASSIVE_KNOCKBACK_RESISTANCE);
+		}
 	}
 }

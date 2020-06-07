@@ -32,16 +32,16 @@ public class Exorcism  extends Ability {
 
 	public Exorcism(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Exorcism");
-		mInfo.linkedSpell = Spells.EXORCISM;
-		mInfo.scoreboardId = "Exorcism";
+		mInfo.mLinkedSpell = Spells.EXORCISM;
+		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
 		mInfo.mDescriptions.add("Right clicking while looking down without shifting removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. (Cooldown: 25s)");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? EXORCISM_1_COOLDOWN : EXORCISM_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
-	private List<PotionEffect> debuffs = new ArrayList<PotionEffect>();
+	private final List<PotionEffect> mDebuffs = new ArrayList<>();
 
 	@Override
 	public void cast(Action action) {
@@ -53,19 +53,18 @@ public class Exorcism  extends Ability {
 		boolean onFire = false;
 		for (PotionEffect effect : mPlayer.getActivePotionEffects()) {
 			if (PotionUtils.hasNegativeEffects(effect.getType())) {
-				// createEffect() multiplies the given duration, so it needs to be divided by the same factor, effect.getType().getDurationModifier().
-				debuffs.add(effect.getType().createEffect((int) (EXORCISM_DURATION / effect.getType().getDurationModifier()), effect.getAmplifier()));
+				mDebuffs.add(effect.getType().createEffect(EXORCISM_DURATION, effect.getAmplifier()));
 			} else if (getAbilityScore() > 1) {
 				if (effect.getType().equals(PotionEffectType.SPEED)) {
-					debuffs.add(new PotionEffect(PotionEffectType.SLOW, EXORCISM_DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
-					debuffs.add(new PotionEffect(PotionEffectType.WEAKNESS, EXORCISM_DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.WEAKNESS, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.REGENERATION)) {
-					debuffs.add(new PotionEffect(PotionEffectType.WITHER, EXORCISM_DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.WITHER, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.FAST_DIGGING)) {
-					debuffs.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, EXORCISM_DURATION, effect.getAmplifier()));
+					mDebuffs.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, EXORCISM_DURATION, effect.getAmplifier()));
 				} else if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
-					debuffs.add(new PotionEffect(PotionEffectType.UNLUCK, EXORCISM_DURATION, (effect.getAmplifier()*2) + 1));
+					mDebuffs.add(new PotionEffect(PotionEffectType.UNLUCK, EXORCISM_DURATION, (effect.getAmplifier()*2) + 1));
 				} else if (effect.getType().equals(PotionEffectType.FIRE_RESISTANCE)) {
 					onFire = true;
 				}
@@ -78,7 +77,7 @@ public class Exorcism  extends Ability {
 		}
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), EXORCISM_RANGE)) {
-			for (PotionEffect debuff : debuffs) {
+			for (PotionEffect debuff : mDebuffs) {
 				PotionUtils.applyPotion(mPlayer, mob, debuff);
 			}
 			if (onFire) {
@@ -88,17 +87,19 @@ public class Exorcism  extends Ability {
 		}
 
 		// a cool particle effect on the player would be nice too
-		debuffs.clear();
+		mDebuffs.clear();
 
 	}
 
 	@Override
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		return mPlayer.getLocation().getPitch() > EXORCISM_ANGLE && !mPlayer.isSneaking() &&
-				InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) &&
-				(offHand == null || offHand.getType() != Material.BOW) &&
-				(!mPlayer.getActivePotionEffects().isEmpty() || (mPlayer.getFireTicks() > 1));
+		return !mPlayer.isSneaking()
+		       && mPlayer.getLocation().getPitch() > EXORCISM_ANGLE
+		       && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())
+		       && offHand.getType() != Material.BOW
+		       && (!mPlayer.getActivePotionEffects().isEmpty()
+		           || (mPlayer.getFireTicks() > 1));
 	}
 
 }

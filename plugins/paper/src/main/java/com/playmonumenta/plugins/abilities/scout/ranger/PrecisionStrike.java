@@ -31,7 +31,7 @@ public class PrecisionStrike extends Ability {
 	private static final int PRECISION_STRIKE_1_DAMAGE = 8;
 	private static final int PRECISION_STRIKE_2_DAMAGE = 16;
 	private static final double PRECISION_STRIKE_STUN_RADIUS = 3;
-	private static final int PRECISION_STRIKE_STUN_DURATION = 1 * 20;
+	private static final int PRECISION_STRIKE_STUN_DURATION = 20;
 	private static final int PRECISION_STRIKE_VULNERABILITY_DURATION = 3 * 20;
 	private static final int PRECISION_STRIKE_1_VULNERABILITY_LEVEL = 3;
 	private static final int PRECISION_STRIKE_2_VULNERABILITY_LEVEL = 5;
@@ -41,13 +41,13 @@ public class PrecisionStrike extends Ability {
 
 	public PrecisionStrike(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Precision Strike");
-		mInfo.linkedSpell = Spells.PRECISION_STRIKE;
-		mInfo.scoreboardId = "PrecisionStrike";
+		mInfo.mLinkedSpell = Spells.PRECISION_STRIKE;
+		mInfo.mScoreboardId = "PrecisionStrike";
 		mInfo.mShorthandName = "PSt";
 		mInfo.mDescriptions.add("Sprint right-clicking while not holding a bow, food, trident, potion, or block executes a fast dash that launches the user a short distance. The user stops at the first enemy hit dealing 6 damage and applying 20% Vulnerability for 3 seconds. The hit enemy is also stunned for 1 second. If the ground is hit before an enemy nothing happens. Cooldown: 6s.");
 		mInfo.mDescriptions.add("Damage is increased to 10. Vulnerability is increased to 30%. All mobs in a 3 block radius from the enemy you hit are stunned for 1 second.");
-		mInfo.cooldown = PRECISION_STRIKE_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = PRECISION_STRIKE_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class PrecisionStrike extends Ability {
 				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), PRECISION_STRIKE_ACTIVATION_RADIUS)) {
 					if (!le.isDead()) {
-						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer, null, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, le, damage, mPlayer, null, true, mInfo.mLinkedSpell);
 						mHitMob = le;
 						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.UNLUCK, PRECISION_STRIKE_VULNERABILITY_DURATION, level, false, true));
 						if (!EntityUtils.isElite(le) && !EntityUtils.isBoss(le)) {

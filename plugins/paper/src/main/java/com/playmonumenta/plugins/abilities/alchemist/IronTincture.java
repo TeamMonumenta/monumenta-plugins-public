@@ -33,28 +33,23 @@ public class IronTincture extends Ability {
 
 	public IronTincture(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Iron Tincture");
-		mInfo.linkedSpell = Spells.IRON_TINCTURE;
-		mInfo.scoreboardId = "IronTincture";
+		mInfo.mLinkedSpell = Spells.IRON_TINCTURE;
+		mInfo.mScoreboardId = "IronTincture";
 		mInfo.mShorthandName = "IT";
 		mInfo.mDescriptions.add("Crouch and right-click to throw a tincture. If you walk over the tincture, gain 8 absorption health for 50 seconds, up to 8 absorption health. If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. Cooldown: 50 seconds.");
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
-		mInfo.cooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mAbsorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
 	}
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSneaking()) {
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (mainHand == null ||
-			    (!InventoryUtils.isBowItem(mainHand)
-			     && mainHand.getType() != Material.SPLASH_POTION
-			     && mainHand.getType() != Material.LINGERING_POTION)) {
-				return true;
-			}
-		}
-		return false;
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		return mPlayer.isSneaking()
+		       && !InventoryUtils.isBowItem(mainHand)
+		       && mainHand.getType() != Material.SPLASH_POTION
+		       && mainHand.getType() != Material.LINGERING_POTION;
 	}
 
 	@Override
@@ -97,7 +92,7 @@ public class IronTincture extends Ability {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+					mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 					putOnCooldown();
 
 					this.cancel();
@@ -105,12 +100,12 @@ public class IronTincture extends Ability {
 				}
 
 				mTinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || tincture == null || !tincture.isValid() || tincture.isDead()) {
+				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
 					tincture.remove();
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell, 0);
+					mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell, 0);
 				}
 			}
 
@@ -125,7 +120,7 @@ public class IronTincture extends Ability {
 		new BukkitRunnable() {
 			double mRotation = 0;
 			double mY = 0.15;
-			double mRadius = 1.15;
+			final double mRadius = 1.15;
 			@Override
 			public void run() {
 				Location loc = player.getLocation();

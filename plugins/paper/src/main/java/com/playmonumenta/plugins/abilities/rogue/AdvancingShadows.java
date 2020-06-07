@@ -42,10 +42,10 @@ public class AdvancingShadows extends Ability {
 
 	public AdvancingShadows(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Advancing Shadows");
-		mInfo.linkedSpell = Spells.ADVANCING_SHADOWS;
-		mInfo.scoreboardId = "AdvancingShadows";
-		mInfo.cooldown = ADVANCING_SHADOWS_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mLinkedSpell = Spells.ADVANCING_SHADOWS;
+		mInfo.mScoreboardId = "AdvancingShadows";
+		mInfo.mCooldown = ADVANCING_SHADOWS_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mDescriptions.add("While holding two swords, right click to teleport to the target hostile enemy within 10 blocks and gain Strength II for 5 seconds. (Cooldown 20s)");
 		mInfo.mDescriptions.add("Teleport range is increased to 15 blocks and all hostile non-target mobs within 4 blocks are knocked away from the target.");
 	}

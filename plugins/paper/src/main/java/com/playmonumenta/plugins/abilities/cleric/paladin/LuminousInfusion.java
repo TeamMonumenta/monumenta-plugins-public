@@ -48,24 +48,24 @@ public class LuminousInfusion extends Ability {
 
 	public LuminousInfusion(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Luminous Infusion");
-		mInfo.linkedSpell = Spells.LUMINOUS_INFUSION;
-		mInfo.scoreboardId = "LuminousInfusion";
+		mInfo.mLinkedSpell = Spells.LUMINOUS_INFUSION;
+		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
 		mInfo.mDescriptions.add("Sneak and right-click while looking at the ground to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage (Cooldown: 15 seconds).");
 		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal +5 damage.");
-		mInfo.cooldown = LUMINOUS_INFUSION_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mCooldown = LUMINOUS_INFUSION_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			return;
 		}
 
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		if (inMainHand == null || !mPlayer.isSneaking() || InventoryUtils.isBowItem(inMainHand)
+		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+		if (!mPlayer.isSneaking() || InventoryUtils.isBowItem(mainHand)
 		    || mPlayer.getLocation().getPitch() < 50) {
 			return;
 		}
@@ -143,9 +143,9 @@ public class LuminousInfusion extends Ability {
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
 			mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
 			if (EntityUtils.isUndead(e)) {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 			} else {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 			}
 			MovementUtils.knockAway(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
 		}

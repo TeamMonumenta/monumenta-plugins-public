@@ -34,77 +34,25 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class ShieldBash extends Ability {
 
-	private static final int SHIELD_BASH_1_STUN = 20 * 1;
+	private static final int SHIELD_BASH_1_STUN = 20;
 	private static final int SHIELD_BASH_2_STUN = 20 * 2;
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 5;
 	private static final int SHIELD_BASH_RANGE = 4;
 
-	public static class PlayerWithShieldBash {
-		public Player mPlayer;
-		private boolean mIsShielding = false;
-		private boolean mWasShielding = false;
-
-		public PlayerWithShieldBash(Player player) {
-			mPlayer = player;
-		}
-
-		public void updateStatus() {
-			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			mWasShielding = mIsShielding;
-			// Check for no bows because drawing them counts as raising your hand
-			mIsShielding = (mPlayer.isBlocking() || mPlayer.isHandRaised())
-			               && (offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD)
-			               && (offHand.getType() != Material.BOW || mainHand.getType() != Material.BOW);
-		}
-
-		public boolean startedShielding() {
-			return mIsShielding && !mWasShielding;
-		}
-
-		public boolean stoppedShielding() {
-			return !mIsShielding && mWasShielding;
-		}
-	}
-
 	private static BukkitRunnable mShieldTracker;
-	private static Map<UUID, PlayerWithShieldBash> mPlayersWithShieldBash = new HashMap<UUID, PlayerWithShieldBash>();
 
-	private int mStunDuration;
+	private final int mStunDuration;
 
 	public ShieldBash(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Shield Bash");
-		mInfo.linkedSpell = Spells.SHIELD_BASH;
-		mInfo.scoreboardId = "ShieldBash";
+		mInfo.mLinkedSpell = Spells.SHIELD_BASH;
+		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
 		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to stun them for 1 second (Cooldown: 5 seconds).");
 		mInfo.mDescriptions.add("Stun duration is increased to 2 seconds.");
-		mInfo.cooldown = SHIELD_BASH_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mStunDuration = getAbilityScore() == 1 ? SHIELD_BASH_1_STUN : SHIELD_BASH_2_STUN;
-		if (player != null) {
-			mPlayersWithShieldBash.put(player.getUniqueId(), new PlayerWithShieldBash(player));
-		}
-
-		if (mShieldTracker == null || mShieldTracker.isCancelled()) {
-			mShieldTracker = new BukkitRunnable() {
-				@Override
-				public void run() {
-					Iterator<Map.Entry<UUID, PlayerWithShieldBash>> iter = mPlayersWithShieldBash.entrySet().iterator();
-
-					while (iter.hasNext()) {
-						PlayerWithShieldBash p = iter.next().getValue();
-
-						p.updateStatus();
-
-						if (AbilityManager.getManager().getPlayerAbility(p.mPlayer, ShieldBash.class) == null) {
-							iter.remove();
-						}
-					}
-				}
-			};
-			mShieldTracker.runTaskTimer(plugin, 0, 1);
-		}
 	}
 
 	@Override
@@ -148,10 +96,5 @@ public class ShieldBash extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD;
-	}
-
-	@Override
-	public void invalidate() {
-		mPlayersWithShieldBash.remove(mPlayer.getUniqueId());
 	}
 }

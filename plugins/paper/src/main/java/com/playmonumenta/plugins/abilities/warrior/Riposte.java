@@ -33,12 +33,12 @@ public class Riposte extends Ability {
 
 	public Riposte(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Riposte");
-		mInfo.linkedSpell = Spells.RIPOSTE;
-		mInfo.scoreboardId = "Obliteration";
+		mInfo.mLinkedSpell = Spells.RIPOSTE;
+		mInfo.mScoreboardId = "Obliteration";
 		mInfo.mShorthandName = "Rip";
 		mInfo.mDescriptions.add("While wielding a sword or axe, you block a melee attack that would have hit you. (Cooldown: 10 s).");
 		mInfo.mDescriptions.add("If you block an attack with Riposte's effect while holding a sword, gain 5s of Strength II. If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 4s.");
-		mInfo.cooldown = RIPOSTE_COOLDOWN;
+		mInfo.mCooldown = RIPOSTE_COOLDOWN;
 	}
 
 	@Override

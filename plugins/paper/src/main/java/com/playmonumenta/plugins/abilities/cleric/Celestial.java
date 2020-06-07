@@ -7,6 +7,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -33,13 +34,13 @@ public class Celestial extends Ability {
 
 	public Celestial(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Celestial Blessing");
-		mInfo.linkedSpell = Spells.CELESTIAL_BLESSING;
-		mInfo.scoreboardId = "Celestial";
+		mInfo.mLinkedSpell = Spells.CELESTIAL_BLESSING;
+		mInfo.mScoreboardId = "Celestial";
 		mInfo.mShorthandName = "CB";
 		mInfo.mDescriptions.add("When you strike while sneaking (regardless of whether you hit anything), while on the ground, you and all other players in a 12 block radius gain +20% attack damage and +20% speed for 10 s. (Cooldown: 40 s)");
 		mInfo.mDescriptions.add("Increases the buff to +35% attack damage for 12 s.");
-		mInfo.cooldown = CELESTIAL_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK_AIR;
+		mInfo.mCooldown = CELESTIAL_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK_AIR;
 	}
 
 	@Override
@@ -63,7 +64,10 @@ public class Celestial extends Ability {
 				p.setMetadata(CELESTIAL_MULTIPLE_TAGNAME, new FixedMetadataValue(mPlugin, 0));
 			} else if (!p.hasMetadata(CELESTIAL_1_TAGNAME) && !p.hasMetadata(CELESTIAL_2_TAGNAME)) {
 				p.setMetadata(tagName, new FixedMetadataValue(mPlugin, 0));
-				p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
+				AttributeInstance speed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+				if (speed != null) {
+					speed.setBaseValue(speed.getBaseValue() + 0.02);
+				}
 				Location loc = p.getLocation();
 				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.1);
 				world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 25, 0.5, 0.5, 0.5, 0);
@@ -76,10 +80,10 @@ public class Celestial extends Ability {
 
 
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 			@Override
 			public void run() {
-				t += 2;
+				mT += 2;
 				for (Player p : affectedPlayers) {
 					Location loc = p.getLocation();
 					world.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 1, 0.25, 0.25, 0.25, 0.1);
@@ -87,13 +91,16 @@ public class Celestial extends Ability {
 					world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.1);
 				}
 
-				if (t >= duration) {
+				if (mT >= duration) {
 					for (Player p : affectedPlayers) {
 						if (p.hasMetadata(CELESTIAL_MULTIPLE_TAGNAME)) {
 							p.removeMetadata(CELESTIAL_MULTIPLE_TAGNAME, mPlugin);
 						} else {
 							p.removeMetadata(tagName, mPlugin);
-							p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() - 0.02);
+							AttributeInstance speed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+							if (speed != null) {
+								speed.setBaseValue(speed.getBaseValue() - 0.02);
+							}
 						}
 						Location loc = p.getLocation();
 						world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.65f);

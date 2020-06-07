@@ -32,13 +32,13 @@ public class CleansingRain extends Ability {
 
 	public CleansingRain(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Cleansing Rain");
-		mInfo.linkedSpell = Spells.CLEANSING;
-		mInfo.scoreboardId = "Cleansing";
+		mInfo.mLinkedSpell = Spells.CLEANSING;
+		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
 		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
 		mInfo.mDescriptions.add("Additionally grants Resistance I (Cooldown: 30 seconds).");
-		mInfo.cooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -81,9 +81,10 @@ public class CleansingRain extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE &&
-		       (mainHand == null || mainHand.getType() != Material.BOW) &&
-		       (offHand == null || offHand.getType() != Material.BOW);
+		return mPlayer.isSneaking()
+		       && mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE
+		       && mainHand.getType() != Material.BOW
+		       && offHand.getType() != Material.BOW;
 	}
 
 }

@@ -65,8 +65,8 @@ public class ScorchedEarth extends Ability {
 	 * different players, etc. which is why we need a global tracker
 	 * to resolve these issues.
 	 */
-	private static Map<Location, Map.Entry<Player, Integer>> mZoneCenters = new HashMap<Location, Map.Entry<Player, Integer>>();
-	private static Map<LivingEntity, Double> mMobHealths = new HashMap<LivingEntity, Double>();
+	private static final Map<Location, Map.Entry<Player, Integer>> mZoneCenters = new HashMap<>();
+	private static Map<LivingEntity, Double> mMobHealths = new HashMap<>();
 	private static BukkitRunnable mMobHealthsTracker;
 
 	private final int mCooldown;
@@ -77,13 +77,13 @@ public class ScorchedEarth extends Ability {
 
 	public ScorchedEarth(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Scorched Earth");
-		mInfo.linkedSpell = Spells.SCORCHED_EARTH;
-		mInfo.scoreboardId = "ScorchedEarth";
+		mInfo.mLinkedSpell = Spells.SCORCHED_EARTH;
+		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
 		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are afflicted with Weakness I and are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
-		mInfo.cooldown = 0;		// Manage cooldowns manually due to multiple charges
-		mInfo.ignoreCooldown = true;
+		mInfo.mCooldown = 0;		// Manage cooldowns manually due to multiple charges
+		mInfo.mIgnoreCooldown = true;
 		mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;
 		mTimeToNextCharge = mCooldown;
@@ -125,8 +125,8 @@ public class ScorchedEarth extends Ability {
 					}
 
 					// Get the new mob healths and record which ones need to be damaged (health decreased)
-					Map<LivingEntity, Double> newMobHealths = new HashMap<LivingEntity, Double>();
-					Map<LivingEntity, Player> mobsToBeDamaged = new HashMap<LivingEntity, Player>();
+					Map<LivingEntity, Double> newMobHealths = new HashMap<>();
+					Map<LivingEntity, Player> mobsToBeDamaged = new HashMap<>();
 					for (Location loc : mZoneCenters.keySet()) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, SCORCHED_EARTH_RADIUS)) {
 							Double oldHealth = mMobHealths.get(mob);
@@ -151,7 +151,7 @@ public class ScorchedEarth extends Ability {
 						mWorld.spawnParticle(Particle.LAVA, mob.getLocation().clone().add(0, 1, 0), 3, 0.25, 0.5, 0.25, 0);
 						mob.setNoDamageTicks(0);
 						Vector velocity = mob.getVelocity();
-						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, SCORCHED_EARTH_BONUS_DAMAGE, entry.getValue(), MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 						mob.setVelocity(velocity);
 						newMobHealths.put(mob, mob.getHealth());
 					}
@@ -205,7 +205,7 @@ public class ScorchedEarth extends Ability {
 			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
 			mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
 
-			mZoneCenters.put(loc, new AbstractMap.SimpleEntry<Player, Integer>(mPlayer, SCORCHED_EARTH_DURATION));
+			mZoneCenters.put(loc, new AbstractMap.SimpleEntry<>(mPlayer, SCORCHED_EARTH_DURATION));
 		}
 
 		return true;

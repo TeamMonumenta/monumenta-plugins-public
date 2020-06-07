@@ -41,16 +41,16 @@ public class FractalEnervation extends Ability {
 
 	public FractalEnervation(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Fractal Enervation");
-		mInfo.scoreboardId = "Fractal";
+		mInfo.mScoreboardId = "Fractal";
 		mInfo.mShorthandName = "FE";
 		mInfo.mDescriptions.add("Right-clicking while not looking down and not shifting fires a dark magic beam that travels up to 9 blocks. The first enemy hit is afflicted with Mining Fatigue for 12s and takes 1 damage. In addition, all debuffs on the enemy increase by 1 effect level, and have their durations increased to 6 seconds if below 6 seconds. The beam then instantly spreads to all enemies in a 3 block radius, applying the same effects. It will continue spreading until it doesn't find any new targets. Cooldown: 12s.");
 		mInfo.mDescriptions.add("The spread radius is increased to 4 blocks. Additionally, Amplifying Hex's extra level cap is increased from 2 to 4 on affected enemies. Cooldown: 10s.");
-		mInfo.linkedSpell = Spells.FRACTAL_ENERVATION;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.cooldown = getAbilityScore() == 1 ? FRACTAL_1_COOLDOWN : FRACTAL_2_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.FRACTAL_ENERVATION;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? FRACTAL_1_COOLDOWN : FRACTAL_2_COOLDOWN;
 	}
 
-	private List<LivingEntity> hit = new ArrayList<LivingEntity>();
+	private final List<LivingEntity> mHit = new ArrayList<>();
 
 	@Override
 	public void cast(Action action) {
@@ -58,8 +58,8 @@ public class FractalEnervation extends Ability {
 		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 0.7, 0.7, 0.7);
 		Vector dir = mPlayer.getEyeLocation().getDirection();
 		List<LivingEntity> mobsInInitialRange = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), FRACTAL_INITIAL_RANGE, mPlayer);
-		List<LivingEntity> justHit = new ArrayList<LivingEntity>();
-		List<LivingEntity> justHitReplacement = new ArrayList<LivingEntity>();
+		List<LivingEntity> justHit = new ArrayList<>();
+		List<LivingEntity> justHitReplacement = new ArrayList<>();
 		int chainRange = getAbilityScore() == 1 ? FRACTAL_1_CHAIN_RANGE : FRACTAL_2_CHAIN_RANGE;
 		boolean cancel = false;
 		for (int i = 0; i < FRACTAL_INITIAL_RANGE; i++) {
@@ -75,14 +75,14 @@ public class FractalEnervation extends Ability {
 			for (LivingEntity mob : mobsInInitialRange) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					cancel = true;
-					hit.add(mob);
+					mHit.add(mob);
 					justHit.add(mob);
 					// Do 10 chain hit iterations, no risk of infinite loop
 					for (int j = 0; j < 10; j++) {
 						for (LivingEntity justHitMob : justHit) {
 							for (LivingEntity chainMob : EntityUtils.getNearbyMobs(justHitMob.getLocation(), chainRange)) {
-								if (!hit.contains(chainMob) && justHitMob.getLocation().distance(chainMob.getLocation()) < chainRange) {
-									hit.add(chainMob);
+								if (!mHit.contains(chainMob) && justHitMob.getLocation().distance(chainMob.getLocation()) < chainRange) {
+									mHit.add(chainMob);
 									justHitReplacement.add(chainMob);
 								}
 							}
@@ -106,21 +106,23 @@ public class FractalEnervation extends Ability {
 		}
 
 		// Apply everything in one go
-		for (LivingEntity mob : hit) {
-			for (PotionEffectType types : PotionUtils.getNegativeEffects(mob)) {
-				PotionEffect effect = mob.getPotionEffect(types);
-				mob.removePotionEffect(types);
-				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-				mob.addPotionEffect(new PotionEffect(types, Math.max(FRACTAL_REFRESH_DURATION, effect.getDuration()), effect.getAmplifier() + 1));
+		for (LivingEntity mob : mHit) {
+			for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mob)) {
+				PotionEffect effect = mob.getPotionEffect(effectType);
+				if (effect != null) {
+					mob.removePotionEffect(effectType);
+					// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
+					mob.addPotionEffect(new PotionEffect(effectType, Math.max(FRACTAL_REFRESH_DURATION, effect.getDuration()), effect.getAmplifier() + 1));
+				}
 			}
 			mob.setMetadata(FRACTAL_CAP_REMOVED_METAKEY, new FixedMetadataValue(mPlugin, null));
 			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_DIGGING, FRACTAL_FATIGUE_DURATION, 0));
-			EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.linkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, FRACTAL_DAMAGE, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 			mWorld.spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
 			mWorld.spawnParticle(Particle.SPELL_MOB, mob.getLocation(), 10, 0.25, 0.45, 0.25, 0);
 		}
 
-		hit.clear();
+		mHit.clear();
 		putOnCooldown();
 	}
 

@@ -30,7 +30,7 @@ public class Sharpshooter extends Ability {
 
 	public Sharpshooter(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Sharpshooter");
-		mInfo.scoreboardId = "Sharpshooter";
+		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
 		mInfo.mDescriptions.add("Each successful charged arrow hit increases your arrow damage by +1, up to a max of +5. This damage scales depending on the charge level of your bow. Every 4 seconds a stack expires, and hitting an enemy with a charged arrow restarts that timer. Volley can only give one stack.");
 		mInfo.mDescriptions.add("Each hit increases damage by +2 up to +8.");

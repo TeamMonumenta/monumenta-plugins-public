@@ -26,23 +26,23 @@ public class AbilityInfo {
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	public String mShorthandName;
 	// List of descriptions to aid ability selection
-	public List<String> mDescriptions = new ArrayList<String>();
+	public List<String> mDescriptions = new ArrayList<>();
 
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
-	public String scoreboardId = null;
+	public String mScoreboardId = null;
 
-	public Spells linkedSpell = null;
-	public AbilityTrigger trigger = null;
+	public Spells mLinkedSpell = null;
+	public AbilityTrigger mTrigger = null;
 
 	//This is in ticks
-	public int cooldown = 0;
+	public int mCooldown = 0;
 
 	/*
 	 * If this is set to true, methods of the class will be called even when the skill
 	 * is still on cooldown. This is needed for some skills that have multiple possible
 	 * triggers or need to catch events after the skill has been put on cooldown
 	 */
-	public boolean ignoreCooldown = false;
+	public boolean mIgnoreCooldown = false;
 
 	/*
 	 * If this is set to true, the LivingEntityDamagedByPlayerEvent will be allowed
@@ -58,7 +58,7 @@ public class AbilityInfo {
 		}
 
 		String skillHeader;
-		skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + Integer.toString(skillLevel) + "] : ";
+		skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
 
 		return new ComponentBuilder(skillHeader).color(ChatColor.GREEN).bold(true)
 		           .append(strDescription).color(ChatColor.GREEN).bold(false);
@@ -86,12 +86,12 @@ public class AbilityInfo {
 			if (mShorthandName == null) {
 				return null;
 			}
-			hoverableString = mShorthandName + Integer.toString(skillLevel);
+			hoverableString = mShorthandName + skillLevel;
 		} else {
 			if (mDisplayName == null) {
 				return null;
 			}
-			hoverableString = mDisplayName.toUpperCase() + " Level " + Integer.toString(skillLevel);
+			hoverableString = mDisplayName.toUpperCase() + " Level " + skillLevel;
 		}
 		ComponentBuilder componentBuilder = new ComponentBuilder(hoverableString).color(ChatColor.YELLOW);
 
@@ -110,11 +110,11 @@ public class AbilityInfo {
 
 	public JsonObject getAsJsonObject(boolean fullDetails) {
 		JsonObject info = new JsonObject();
-		if (scoreboardId != null) {
-			info.addProperty("scoreboardId", scoreboardId);
+		if (mScoreboardId != null) {
+			info.addProperty("scoreboardId", mScoreboardId);
 		}
-		if (linkedSpell != null) {
-			info.addProperty("name", linkedSpell.getName());
+		if (mLinkedSpell != null) {
+			info.addProperty("name", mLinkedSpell.getName());
 		}
 		if (fullDetails) {
 			if (mDisplayName != null) {
@@ -131,10 +131,10 @@ public class AbilityInfo {
 				info.add("descriptions", descriptions);
 			}
 		}
-		if (trigger != null) {
-			info.addProperty("trigger", trigger.toString());
+		if (mTrigger != null) {
+			info.addProperty("trigger", mTrigger.toString());
 		}
-		info.addProperty("cooldown", cooldown);
+		info.addProperty("cooldown", mCooldown);
 
 		return info;
 	}

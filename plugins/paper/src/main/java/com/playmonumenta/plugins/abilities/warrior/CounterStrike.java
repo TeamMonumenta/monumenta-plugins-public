@@ -38,13 +38,13 @@ public class CounterStrike extends Ability {
 
 	public CounterStrike(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Counter Strike");
-		mInfo.scoreboardId = "CounterStrike";
+		mInfo.mScoreboardId = "CounterStrike";
 		mInfo.mShorthandName = "CS";
 		mInfo.mDescriptions.add("Hitting a mob within 2s of successfully blocking an attack with either a shield or with Riposte deals 6 damage in an AoE cone 7 blocks in front of you. Cooldown: 8s. In addition, when you are hit you have a 15% chance to deal 6 damage to all enemies in a 5 block radius when you are hit by a melee attack (Even if you block).");
 		mInfo.mDescriptions.add("Damage is increased to 12. The passive part of the skill's damage is increased to 12.");
-		mInfo.linkedSpell = Spells.COUNTER_STRIKE;
-		mInfo.cooldown = COUNTER_STRIKE_COOLDOWN;
-		mInfo.ignoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.COUNTER_STRIKE;
+		mInfo.mCooldown = COUNTER_STRIKE_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class CounterStrike extends Ability {
 				double csDamage = counterStrike == 1 ? COUNTER_STRIKE_1_DAMAGE : COUNTER_STRIKE_2_DAMAGE;
 
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), COUNTER_STRIKE_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */, true, mInfo.linkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, csDamage, mPlayer, MagicType.SHADOWS /* Find a better type */, true, mInfo.mLinkedSpell);
 				}
 			}
 
@@ -87,12 +87,12 @@ public class CounterStrike extends Ability {
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 25, 0, 0, 0, 0.15);
 			new BukkitRunnable() {
-				double d = 30;
+				double mD = 30;
 				@Override
 				public void run() {
 					Vector vec;
 					for (double r = 1; r < 5; r += 0.5) {
-						for (double degree = d; degree <= d + 60; degree += 8) {
+						for (double degree = mD; degree <= mD + 60; degree += 8) {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(Math.cos(radian1) * r, 0.75, Math.sin(radian1) * r);
 							vec = VectorUtils.rotateZAxis(vec, 20);
@@ -104,8 +104,8 @@ public class CounterStrike extends Ability {
 							mWorld.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
 						}
 					}
-					d += 60;
-					if (d >= 150) {
+					mD += 60;
+					if (mD >= 150) {
 						this.cancel();
 					}
 				}
@@ -123,7 +123,7 @@ public class CounterStrike extends Ability {
 				if (mob != damagee) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 					if (playerDir.dot(toMobVector) > COUNTER_STRIKE_DOT_ANGLE) {
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 					}
 				}
 			}

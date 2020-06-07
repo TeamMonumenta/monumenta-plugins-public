@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class PatreonGreen extends Ability {
-	private boolean mNoSelfParticles = false;
+	private final boolean mNoSelfParticles;
 
 	public PatreonGreen(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, null);

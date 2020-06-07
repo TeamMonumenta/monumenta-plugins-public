@@ -37,13 +37,13 @@ public class Starfall extends Ability {
 
 	public Starfall(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Starfall");
-		mInfo.linkedSpell = Spells.STARFALL;
-		mInfo.scoreboardId = "Starfall";
+		mInfo.mLinkedSpell = Spells.STARFALL;
+		mInfo.mScoreboardId = "Starfall";
 		mInfo.mShorthandName = "SF";
 		mInfo.mDescriptions.add("Right click while looking up to prime the next right click within 10s to summon a meteor where the player is looking (up to 25 blocks). It deals 20 damage in a 5 block radius and sets enemies on fire for 3 seconds. This spell can trigger SpellShock and will not trigger Mana Lance. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Damage is increased to 36.");
-		mInfo.cooldown = STARFALL_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = STARFALL_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? STARFALL_1_DAMAGE : STARFALL_2_DAMAGE;
 	}
 
@@ -116,9 +116,9 @@ public class Starfall extends Ability {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
 								if (e instanceof Player) {
-									EntityUtils.damageEntity(mPlugin, e, mDamage * 0.75, player, MagicType.FIRE, true, mInfo.linkedSpell);
+									EntityUtils.damageEntity(mPlugin, e, mDamage * 0.75, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
 								} else {
-									EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.linkedSpell);
+									EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
 								}
 								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e, mPlayer);
 

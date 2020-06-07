@@ -47,14 +47,13 @@ public class DeadlyRonde extends Ability {
 
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
-	boolean cancelled = false;
-	BukkitRunnable activeRunnable = null;
-	int rondeStacks = 0;
+	BukkitRunnable mActiveRunnable = null;
+	int mRondeStacks = 0;
 
 	public DeadlyRonde(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Deadly Ronde");
-		mInfo.linkedSpell = Spells.RONDE;
-		mInfo.scoreboardId = "DeadlyRonde";
+		mInfo.mLinkedSpell = Spells.RONDE;
+		mInfo.mScoreboardId = "DeadlyRonde";
 		mInfo.mShorthandName = "DR";
 		mInfo.mDescriptions.add("After casting a skill, gain a stack of Deadly Ronde for 5 seconds, stacking up to 2 times. While Deadly Ronde is active, you gain Speed I, and your next melee attack consumes a stack to fire a flurry of blades, that fire in a cone with a radius of 4 blocks and deal 5 damage to all enemies they hit.");
 		mInfo.mDescriptions.add("Damage increased to 8, and you can now store up to 3 charges.");
@@ -63,8 +62,8 @@ public class DeadlyRonde extends Ability {
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		/* Re-up the duration every time an ability is cast */
-		if (activeRunnable != null) {
-			activeRunnable.cancel();
+		if (mActiveRunnable != null) {
+			mActiveRunnable.cancel();
 		} else {
 			new BukkitRunnable() {
 
@@ -72,38 +71,38 @@ public class DeadlyRonde extends Ability {
 				public void run() {
 					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR);
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, 5, 0));
-					if (activeRunnable == null) {
+					if (mActiveRunnable == null) {
 						this.cancel();
 					}
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
-		activeRunnable = new BukkitRunnable() {
+		mActiveRunnable = new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				activeRunnable = null;
-				rondeStacks = 0;
+				mActiveRunnable = null;
+				mRondeStacks = 0;
 			}
 
 		};
-		activeRunnable.runTaskLater(mPlugin, 20 * 5);
+		mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
 
 		int maxStacks = getAbilityScore() == 1 ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS;
-		if (rondeStacks < maxStacks) {
+		if (mRondeStacks < maxStacks) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_OUT, 1, 1f);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, 0.7f, 1.5f);
 		}
 
-		rondeStacks = Math.min(rondeStacks + 1, maxStacks);
-		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + rondeStacks);
+		mRondeStacks = Math.min(mRondeStacks + 1, maxStacks);
+		MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
 
 		return true;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (activeRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
+		if (mActiveRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInMainHand();
@@ -115,7 +114,7 @@ public class DeadlyRonde extends Ability {
 					if (playerDirVector.dot(toMobVector) > RONDE_DOT_COSINE) {
 						int damage = getAbilityScore() == 1 ? RONDE_1_DAMAGE : RONDE_2_DAMAGE;
 						mob.setNoDamageTicks(0);
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						MovementUtils.knockAway(mPlayer, mob, RONDE_KNOCKBACK_SPEED);
 					}
 				}
@@ -133,22 +132,22 @@ public class DeadlyRonde extends Ability {
 			mWorld.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.75f);
 			mWorld.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
 
-			activeRunnable.cancel();
-			activeRunnable = null;
+			mActiveRunnable.cancel();
+			mActiveRunnable = null;
 
-			rondeStacks--;
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + rondeStacks);
-			if (rondeStacks > 0) {
-				activeRunnable = new BukkitRunnable() {
+			mRondeStacks--;
+			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+			if (mRondeStacks > 0) {
+				mActiveRunnable = new BukkitRunnable() {
 
 					@Override
 					public void run() {
-						activeRunnable = null;
-						rondeStacks = 0;
+						mActiveRunnable = null;
+						mRondeStacks = 0;
 					}
 
 				};
-				activeRunnable.runTaskLater(mPlugin, 20 * 5);
+				mActiveRunnable.runTaskLater(mPlugin, 20 * 5);
 			}
 		}
 		return true;

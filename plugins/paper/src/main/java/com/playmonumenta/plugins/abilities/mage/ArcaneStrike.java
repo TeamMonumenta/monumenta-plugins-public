@@ -41,12 +41,12 @@ public class ArcaneStrike extends Ability {
 
 	public ArcaneStrike(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Arcane Strike");
-		mInfo.linkedSpell = Spells.ARCANE_STRIKE;
-		mInfo.scoreboardId = "ArcaneStrike";
+		mInfo.mLinkedSpell = Spells.ARCANE_STRIKE;
+		mInfo.mScoreboardId = "ArcaneStrike";
 		mInfo.mShorthandName = "AS";
 		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 5 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
 		mInfo.mDescriptions.add("The damage is increased to 8. Mobs that are on fire or slowed take 4 additional damage.");
-		mInfo.cooldown = ARCANE_STRIKE_COOLDOWN;
+		mInfo.mCooldown = ARCANE_STRIKE_COOLDOWN;
 		mDamageBonus = getAbilityScore() == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
 		mDamageBonusAffected = getAbilityScore() == 1 ? ARCANE_STRIKE_1_BONUS_DAMAGE : ARCANE_STRIKE_2_BONUS_DAMAGE;
 	}
@@ -68,7 +68,7 @@ public class ArcaneStrike extends Ability {
 				}
 
 				Vector velocity = mob.getVelocity();
-				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell, true, false);
+				EntityUtils.damageEntity(mPlugin, mob, dmg, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, false);
 				mob.setVelocity(velocity);
 			}
 
@@ -82,11 +82,11 @@ public class ArcaneStrike extends Ability {
 			mWorld.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
 			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			new BukkitRunnable() {
-				double d = 30;
+				double mD = 30;
 				@Override
 				public void run() {
 					Vector vec;
-					for (double degree = d; degree < d + 30; degree += 8) {
+					for (double degree = mD; degree < mD + 30; degree += 8) {
 						double radian1 = Math.toRadians(degree);
 						double cos = Math.cos(radian1);
 						double sin = Math.sin(radian1);
@@ -100,8 +100,8 @@ public class ArcaneStrike extends Ability {
 							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, ARCANE_STRIKE_COLOR_2);
 						}
 					}
-					d += 30;
-					if (d >= 150) {
+					mD += 30;
+					if (mD >= 150) {
 						this.cancel();
 					}
 				}
@@ -116,9 +116,6 @@ public class ArcaneStrike extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (InventoryUtils.isWandItem(mainHand)) {
-			return true;
-		}
-		return false;
+		return InventoryUtils.isWandItem(mainHand);
 	}
 }

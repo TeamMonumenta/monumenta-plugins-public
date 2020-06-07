@@ -27,14 +27,14 @@ public class EvasionEnchant extends Ability {
 	private static final int THRESHOLD_INTERVAL = 5;
 	private static final double DAMAGE_REDUCTION_INTERVAL = 0.2;
 	// Threshold -> Damage Reduction pairs
-	private static final Map<Integer, Double> EVASION_DAMAGE_REDUCTION = new LinkedHashMap<Integer, Double>();
+	private static final Map<Integer, Double> EVASION_DAMAGE_REDUCTION = new LinkedHashMap<>();
 
 	static {
 		// Reverse order checking evasion thresholds
 		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL * 4, DAMAGE_REDUCTION_INTERVAL * 4);
 		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL * 3, DAMAGE_REDUCTION_INTERVAL * 3);
 		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL * 2, DAMAGE_REDUCTION_INTERVAL * 2);
-		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL * 1, DAMAGE_REDUCTION_INTERVAL * 1);
+		EVASION_DAMAGE_REDUCTION.put(THRESHOLD_INTERVAL,     DAMAGE_REDUCTION_INTERVAL * 1);
 	}
 
 	public int mCounter = 0;

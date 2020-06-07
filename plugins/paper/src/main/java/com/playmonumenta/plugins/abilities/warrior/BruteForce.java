@@ -23,22 +23,22 @@ public class BruteForce extends Ability {
 	private static final double BRUTE_FORCE_2_DAMAGE = 5;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 
-	private final double damageBonus;
+	private final double mDamageBonus;
 
 	public BruteForce(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Brute Force");
-		mInfo.linkedSpell = Spells.BRUTE_FORCE;
-		mInfo.scoreboardId = "BruteForce";
+		mInfo.mLinkedSpell = Spells.BRUTE_FORCE;
+		mInfo.mScoreboardId = "BruteForce";
 		mInfo.mShorthandName = "BF";
 		mInfo.mDescriptions.add("When you critically strike, you deal 2 damage to all enemies near your target and knock them back.");
 		mInfo.mDescriptions.add("The damage is increased to 5.");
-		damageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
+		mDamageBonus = getAbilityScore() == 1 ? BRUTE_FORCE_1_DAMAGE : BRUTE_FORCE_2_DAMAGE;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (PlayerUtils.isCritical(mPlayer) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			event.setDamage(event.getDamage() + damageBonus);
+			event.setDamage(event.getDamage() + mDamageBonus);
 
 			Location loc = event.getEntity().getLocation().add(0, 0.75, 0);
 			mWorld.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 1);
@@ -46,7 +46,7 @@ public class BruteForce extends Ability {
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, BRUTE_FORCE_RADIUS, mPlayer)) {
 				if (mob != event.getEntity()) {
-					EntityUtils.damageEntity(mPlugin, mob, damageBonus, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, mDamageBonus, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 				}
 				if (!EntityUtils.isBoss(mob)) {
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, BRUTE_FORCE_KNOCKBACK_SPEED, BRUTE_FORCE_KNOCKBACK_SPEED / 2);

@@ -58,14 +58,14 @@ public class Spellshock extends Ability {
 	private static final int SPELL_SHOCK_2_DAMAGE = 5;
 	private static final Particle.DustOptions SPELL_SHOCK_COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
 
-	private static Map<UUID, SpellShockedMob> mSpellShockedMobs = new HashMap<UUID, SpellShockedMob>();
-	private static Set<LivingEntity> mPendingStaticMobs = new HashSet<LivingEntity>();
+	private static final Map<UUID, SpellShockedMob> mSpellShockedMobs = new HashMap<>();
+	private static final Set<LivingEntity> mPendingStaticMobs = new HashSet<>();
 	private static BukkitRunnable mRunnable = null;
 
 	public Spellshock(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Spellshock");
-		mInfo.linkedSpell = Spells.SPELLSHOCK;
-		mInfo.scoreboardId = "SpellShock";
+		mInfo.mLinkedSpell = Spells.SPELLSHOCK;
+		mInfo.mScoreboardId = "SpellShock";
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
 		mInfo.mDescriptions.add("Damage is increased to 5. Additionally, gain Speed 1 for 6 seconds whenever a spellshock is triggered.");
@@ -78,10 +78,10 @@ public class Spellshock extends Ability {
 				@Override
 				public void run() {
 					// Do at most 10 loops to get all the mobs caught in the spellshock chain
-					Map<LivingEntity, Player> pendingDamageMobs = new HashMap<LivingEntity, Player>();
+					Map<LivingEntity, Player> pendingDamageMobs = new HashMap<>();
 					boolean continueLooping;
 					for (int i = 0; i < 10; i++) {
-						Set<UUID> triggeredMobs = new HashSet<UUID>();
+						Set<UUID> triggeredMobs = new HashSet<>();
 						continueLooping = false;
 						for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
 							SpellShockedMob e = entry.getValue();
@@ -124,7 +124,7 @@ public class Spellshock extends Ability {
 						Vector velocity = damagee.getVelocity();
 						// This won't proc Perspicacity unless we rework how that enchantment works
 						// This is because it doesn't call the CustomDamageEvent
-						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
+						EntityUtils.damageEntity(plugin, damagee, damage, damager, MagicType.ARCANE, false /* do not register CustomDamageEvent */, mInfo.mLinkedSpell);
 						damagee.setVelocity(velocity);
 					}
 
@@ -141,7 +141,7 @@ public class Spellshock extends Ability {
 
 					// Particles and time tracking on static duration, at the end so that a mob with static that gets
 					// killed by a spell gets its static triggered first
-					Set<UUID> expiredMobs = new HashSet<UUID>();
+					Set<UUID> expiredMobs = new HashSet<>();
 					for (Map.Entry<UUID, SpellShockedMob> entry : mSpellShockedMobs.entrySet()) {
 						SpellShockedMob e = entry.getValue();
 						Location loc = e.mMob.getLocation();
@@ -168,7 +168,7 @@ public class Spellshock extends Ability {
 			SpellShockedMob e = mSpellShockedMobs.get(mob.getUniqueId());
 			e.mTriggeredBy = mPlayer;
 			e.mTriggered = true;
-		} else if (event.appliesSpellshock() && !mPendingStaticMobs.contains(mob)) {
+		} else if (event.appliesSpellshock()) {
 			mPendingStaticMobs.add(mob);
 		}
 	}

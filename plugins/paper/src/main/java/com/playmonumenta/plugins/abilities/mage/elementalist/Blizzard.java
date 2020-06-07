@@ -39,16 +39,16 @@ public class Blizzard extends Ability {
 
 	public Blizzard(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Blizzard");
-		mInfo.scoreboardId = "Blizzard";
+		mInfo.mScoreboardId = "Blizzard";
 		mInfo.mShorthandName = "Bl";
 		mInfo.mDescriptions.add("Shift Right Clicking while looking up creates an aura of ice and snow in a radius of 6 blocks that lasts 10 seconds and stays centered on the user. Mobs that enter the aura get Slowness 1. After three seconds in the aura they get Slowness 2. After six seconds in the aura enemies are given Slowness 4 (bosses remain at Slowness 2). Enemies take 2 damage a second while in the aura. Entities that are on fire within the aura are extinguished. This spell can trigger Spellshock but cannot apply it. Cooldown: 30s (starting after cast).");
 		mInfo.mDescriptions.add("The radius is increased to 8 blocks. Mobs take 3 damage a second. Cooldown is reduced to 25s.");
-		mInfo.linkedSpell = Spells.BLIZZARD;
-		mInfo.cooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mLinkedSpell = Spells.BLIZZARD;
+		mInfo.mCooldown = getAbilityScore() == 1 ? 20 * BLIZZARD_1_COOLDOWN : 20 * BLIZZARD_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
-	private Map<UUID, Integer> affected = new HashMap<UUID, Integer>();
+	private final Map<UUID, Integer> mAffected = new HashMap<>();
 	private boolean mActive = false;
 
 	@Override
@@ -65,37 +65,37 @@ public class Blizzard extends Ability {
 		double damage = getAbilityScore() == 1 ? BLIZZARD_1_DAMAGE : BLIZZARD_2_DAMAGE;
 		double radius = getAbilityScore() == 1 ? BLIZZARD_1_RADIUS : BLIZZARD_2_RADIUS;
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation();
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius, mPlayer);
-				t++;
-				if (t % 10 == 0) {
+				mT++;
+				if (mT % 10 == 0) {
 					for (Player p : PlayerUtils.playersInRange(loc, radius)) {
 						p.setFireTicks(-10);
 					}
 					for (LivingEntity mob : mobs) {
-						if (!affected.containsKey(mob.getUniqueId())) {
+						if (!mAffected.containsKey(mob.getUniqueId())) {
 							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 0, false, true));
-							affected.put(mob.getUniqueId(), 1);
+							mAffected.put(mob.getUniqueId(), 1);
 						} else {
-							int duration = affected.get(mob.getUniqueId());
+							int duration = mAffected.get(mob.getUniqueId());
 							if (duration >= 12) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 							} else if (duration >= 6) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1, false, true));
 							}
-							affected.put(mob.getUniqueId(), duration + 1);
+							mAffected.put(mob.getUniqueId(), duration + 1);
 						}
 					}
 				}
 
-				if (t % 20 == 0) {
+				if (mT % 20 == 0) {
 					for (LivingEntity mob : mobs) {
 						Vector v = mob.getVelocity();
-						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell, false, true);
+						EntityUtils.damageEntity(mPlugin, mob, (float) damage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell, false, true);
 						mob.setVelocity(v);
 					}
 				}
@@ -103,9 +103,9 @@ public class Blizzard extends Ability {
 				mWorld.spawnParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1);
 				mWorld.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
 				mWorld.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
-				if (t >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mT >= 20 * 10 || mPlayer.isDead() || !mPlayer.isValid()) {
 					this.cancel();
-					affected.clear();
+					mAffected.clear();
 					mActive = false;
 				}
 			}

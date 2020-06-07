@@ -25,7 +25,7 @@ public class Skirmisher extends Ability {
 
 	public Skirmisher(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Skirmisher");
-		mInfo.scoreboardId = "Skirmisher";
+		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
 		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");
 		mInfo.mDescriptions.add("Deal an additional 5 melee damage instead.");

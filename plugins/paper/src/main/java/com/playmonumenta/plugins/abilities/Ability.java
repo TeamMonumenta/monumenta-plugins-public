@@ -52,7 +52,7 @@ public abstract class Ability {
 	}
 
 	public String getScoreboard() {
-		return mInfo.scoreboardId;
+		return mInfo.mScoreboardId;
 	}
 
 	/**
@@ -74,7 +74,6 @@ public abstract class Ability {
 
 	/**
 	 * A custom check if additional checks are needed. For example, if you need to check if a player is looking up or down.
-	 * @param player
 	 * @return true or false
 	 */
 	public boolean runCheck() {
@@ -83,26 +82,25 @@ public abstract class Ability {
 
 	public boolean isOnCooldown() {
 		AbilityInfo info = getInfo();
-		if (info.linkedSpell != null && !info.ignoreCooldown) {
-			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell);
+		if (info.mLinkedSpell != null && !info.mIgnoreCooldown) {
+			return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell);
 		}
 		return false;
 	}
 
 	public void putOnCooldown() {
 		AbilityInfo info = getInfo();
-		if (info.linkedSpell != null) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.linkedSpell)) {
-				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.linkedSpell, info.cooldown);
-				PlayerUtils.callAbilityCastEvent(mPlayer, info.linkedSpell);
+		if (info.mLinkedSpell != null) {
+			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), info.mLinkedSpell)) {
+				mPlugin.mTimers.addCooldown(mPlayer.getUniqueId(), info.mLinkedSpell, info.mCooldown);
+				PlayerUtils.callAbilityCastEvent(mPlayer, info.mLinkedSpell);
 			}
 		}
 	}
 
 	/**
 	 * A combination of both runCheck and isOnCooldown.
-	 * @param player
-	 * @return
+	 * @return true or false
 	 */
 	public final boolean canCast() {
 		return runCheck() && !isOnCooldown();
@@ -266,10 +264,7 @@ public abstract class Ability {
 	 * For different conditions, an ability must override this method
 	 */
 	public boolean canUse(Player player) {
-		if (mInfo.scoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.scoreboardId) > 0) {
-			return true;
-		}
-		return false;
+		return mInfo.mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mInfo.mScoreboardId) > 0;
 	}
 
 	/*
@@ -277,9 +272,9 @@ public abstract class Ability {
 	 */
 	public int getAbilityScore() {
 		AbilityInfo info = getInfo();
-		if (mPlayer != null && info.scoreboardId != null) {
+		if (mPlayer != null && info.mScoreboardId != null) {
 			if (mScore == null) {
-				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.scoreboardId);
+				mScore = ScoreboardUtils.getScoreboardValue(mPlayer, info.mScoreboardId);
 			}
 			return mScore;
 		}

@@ -33,18 +33,18 @@ public class FrostNova extends Ability {
 	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
 	private static final int FROST_NOVA_DURATION = 4 * 20;
 
-	private int mDamage;
-	private int mSlownessAmplifier;
+	private final int mDamage;
+	private final int mSlownessAmplifier;
 
 	public FrostNova(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Frost Nova");
-		mInfo.linkedSpell = Spells.FROST_NOVA;
-		mInfo.scoreboardId = "FrostNova";
+		mInfo.mLinkedSpell = Spells.FROST_NOVA;
+		mInfo.mScoreboardId = "FrostNova";
 		mInfo.mShorthandName = "FN";
 		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 8 seconds of Slowness 2. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
 		mInfo.mDescriptions.add("Increases the damage to 8 and Slowness 4. Bosses and Elites are hit with 8 seconds of Slowness 2 and 8 damage instead.");
-		mInfo.cooldown = FROST_NOVA_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = FROST_NOVA_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
 		mSlownessAmplifier = getAbilityScore() == 1 ? FROST_NOVA_1_AMPLIFIER : FROST_NOVA_2_AMPLIFIER;
 	}
@@ -53,7 +53,7 @@ public class FrostNova extends Ability {
 	public void cast(Action action) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
 			Vector velocity = mob.getVelocity();
-			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
+			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
 			mob.setVelocity(velocity);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier - 1, true, false));
@@ -74,20 +74,20 @@ public class FrostNova extends Ability {
 		}
 
 		new BukkitRunnable() {
-			double radius = 0;
-			Location loc = mPlayer.getLocation();
+			double mRadius = 0;
+			final Location mLoc = mPlayer.getLocation();
 			@Override
 			public void run() {
-				radius += 1.25;
+				mRadius += 1.25;
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
-					loc.add(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
-					mWorld.spawnParticle(Particle.CLOUD, loc, 1, 0, 0, 0, 0.1);
-					mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 8, 0, 0, 0, 0.65);
-					loc.subtract(Math.cos(radian1) * radius, 0.15, Math.sin(radian1) * radius);
+					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mWorld.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
+					mWorld.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
+					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
 				}
 
-				if (radius >= FROST_NOVA_RADIUS + 1) {
+				if (mRadius >= FROST_NOVA_RADIUS + 1) {
 					this.cancel();
 				}
 			}

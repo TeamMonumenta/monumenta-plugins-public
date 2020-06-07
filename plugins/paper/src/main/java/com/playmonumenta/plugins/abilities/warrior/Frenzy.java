@@ -20,7 +20,7 @@ public class Frenzy extends Ability {
 
 	public Frenzy(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Frenzy");
-		mInfo.scoreboardId = "Frenzy";
+		mInfo.mScoreboardId = "Frenzy";
 		mInfo.mShorthandName = "Fnz";
 		mInfo.mDescriptions.add("You gain 5 seconds of Haste III after killing a mob. You lose this buff when you hold a pickaxe.");
 		mInfo.mDescriptions.add("The buff is improved to 5 seconds of Haste IV and Speed I. You only lose the Haste buff when holding a pickaxe.");

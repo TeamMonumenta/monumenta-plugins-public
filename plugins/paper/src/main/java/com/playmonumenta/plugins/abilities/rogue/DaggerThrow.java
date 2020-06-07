@@ -39,18 +39,18 @@ public class DaggerThrow extends Ability {
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
-	private int mDamage;
-	private int mVulnAmplifier;
+	private final int mDamage;
+	private final int mVulnAmplifier;
 
 	public DaggerThrow(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Dagger Throw");
-		mInfo.linkedSpell = Spells.DAGGER_THROW;
-		mInfo.scoreboardId = "DaggerThrow";
+		mInfo.mLinkedSpell = Spells.DAGGER_THROW;
+		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while holding two swords throws out three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown 15s");
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
-		mInfo.cooldown = DAGGER_THROW_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 		mVulnAmplifier = getAbilityScore() == 1 ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 	}
@@ -88,7 +88,7 @@ public class DaggerThrow extends Ability {
 						mWorld.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1);
 						mWorld.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
 
-						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, DAGGER_THROW_DURATION, mVulnAmplifier, true, false));
 						break;
 					} else if (bLoc.getBlock().getType().isSolid()) {

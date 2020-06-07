@@ -51,14 +51,14 @@ public class Challenge extends Ability {
 
 	public Challenge(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Challenge");
-		mInfo.scoreboardId = "Challenge";
+		mInfo.mScoreboardId = "Challenge";
 		mInfo.mShorthandName = "Ch";
 		mInfo.mDescriptions.add("Left-clicking while shifted makes all enemies within 12 blocks target you. You gain Absorption 1 and 0.5 armor per affected mob (max: 4) for 10s. If no mobs changed targets, gain 10% extra melee damage. Cooldown: 20s.");
 		mInfo.mDescriptions.add("You gain Absorption II and 1 armor per mob instead to a max of 8. The conditional damage bonus is increased to 20%.");
-		mInfo.cooldown = CHALLENGE_COOLDOWN;
-		mInfo.ignoreCooldown = true;
-		mInfo.linkedSpell = Spells.CHALLENGE;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = CHALLENGE_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.CHALLENGE;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mSoloDamageBonus = getAbilityScore() == 1 ? CHALLENGE_1_SOLO_DAMAGE_BONUS : CHALLENGE_2_SOLO_DAMAGE_BONUS;
 		mArmorMax = getAbilityScore() == 1 ? CHALLENGE_1_ARMOR_MAX : CHALLENGE_2_ARMOR_MAX;
 		mArmorIncrease = getAbilityScore() == 1 ? CHALLENGE_1_ARMOR : CHALLENGE_2_ARMOR;
@@ -67,40 +67,43 @@ public class Challenge extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell) || !mPlayer.isSneaking()) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell) || !mPlayer.isSneaking()) {
 			return;
 		}
 
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
-		int increase = Math.min(mArmorMax, mobs.size() * mArmorIncrease);
+		List<LivingEntity> livingEntities = EntityUtils.getNearbyMobs(mPlayer.getLocation(), CHALLENGE_RANGE, mPlayer);
+		int increase = Math.min(mArmorMax, livingEntities.size() * mArmorIncrease);
 		AttributeInstance armor = mPlayer.getAttribute(Attribute.GENERIC_ARMOR);
-		armor.setBaseValue(armor.getBaseValue() + increase);
+		if (armor != null) {
+			armor.setBaseValue(armor.getBaseValue() + increase);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mDamageBonusActive = false;
-				armor.setBaseValue(armor.getBaseValue() - increase);
-			}
-		}.runTaskLater(mPlugin, CHALLENGE_DURATION);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mDamageBonusActive = false;
+					armor.setBaseValue(armor.getBaseValue() - increase);
+				}
+			}.runTaskLater(mPlugin, CHALLENGE_DURATION);
+		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 				new PotionEffect(PotionEffectType.ABSORPTION, CHALLENGE_DURATION, mAbsorptionAmplifier, false, true));
 
 		boolean challenged = false;
 
-		for (LivingEntity mob : mobs) {
-			if (mob instanceof Mob) {
-				if (((Mob) mob).getTarget() != null && !((Mob) mob).getTarget().equals(mPlayer)) {
+		for (LivingEntity livingEntity : livingEntities) {
+			if (livingEntity instanceof Mob) {
+				Mob mob = (Mob) livingEntity;
+				if (mob.getTarget() != null && !mob.getTarget().equals(mPlayer)) {
 					challenged = true;
 				}
 
-				((Mob) mob).setTarget(mPlayer);
-			} else if (mob instanceof Player && AbilityManager.getManager().isPvPEnabled((Player)mob)) {
-				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation(), mob.getLocation());
-				Location loc = mob.getLocation();
+				mob.setTarget(mPlayer);
+			} else if (livingEntity instanceof Player && AbilityManager.getManager().isPvPEnabled((Player)livingEntity)) {
+				Vector dir = LocationUtils.getDirectionTo(mPlayer.getLocation(), livingEntity.getLocation());
+				Location loc = livingEntity.getLocation();
 				loc.setDirection(dir);
-				mob.teleport(loc);
+				livingEntity.teleport(loc);
 			}
 		}
 

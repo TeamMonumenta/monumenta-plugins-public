@@ -33,12 +33,12 @@ public class HallowedBeam extends Ability {
 
 	public HallowedBeam(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Hallowed Beam");
-		mInfo.scoreboardId = "HallowedBeam";
+		mInfo.mScoreboardId = "HallowedBeam";
 		mInfo.mShorthandName = "HB";
 		mInfo.mDescriptions.add("Firing a fully-drawn bow while shifted, while pointing directly at a non-boss undead, will instantly deal 42 damage to the undead instead of consuming an arrow. Cooldown: 20s.");
 		mInfo.mDescriptions.add("The targeted undead explodes dealing 22 damage to undead within a 5 block radius. All affected enemies gain slowness 4 for 3s.");
-		mInfo.linkedSpell = Spells.HALLOWED_BEAM;
-		mInfo.cooldown = 20 * 20;
+		mInfo.mLinkedSpell = Spells.HALLOWED_BEAM;
+		mInfo.mCooldown = 20 * 20;
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class HallowedBeam extends Ability {
 						break;
 					}
 				}
-				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, e, HALLOWED_DAMAGE_DIRECT, player, MagicType.HOLY, true, mInfo.mLinkedSpell);
 				Location eLoc = e.getLocation().add(0, e.getHeight() / 2, 0);
 				mWorld.spawnParticle(Particle.SPIT, eLoc, 40, 0, 0, 0, 0.25f);
 				mWorld.spawnParticle(Particle.FIREWORKS_SPARK, eLoc, 75, 0, 0, 0, 0.3f);
@@ -72,7 +72,7 @@ public class HallowedBeam extends Ability {
 					mWorld.spawnParticle(Particle.VILLAGER_HAPPY, e.getLocation(), 150, 2.55, 0.15f, 2.5, 1);
 					for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, 5)) {
 						if (EntityUtils.isUndead(le)) {
-							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY, true, mInfo.linkedSpell);
+							EntityUtils.damageEntity(mPlugin, le, HALLOWED_DAMAGE_EXPLOSION, player, MagicType.HOLY, true, mInfo.mLinkedSpell);
 						}
 						PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 5, 3, false, true));
 					}

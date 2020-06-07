@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.cleric;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -20,7 +21,7 @@ public class Rejuvenation extends Ability {
 
 	public Rejuvenation(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Rejuvenation");
-		mInfo.scoreboardId = "Rejuvenation";
+		mInfo.mScoreboardId = "Rejuvenation";
 		mInfo.mShorthandName = "Rjv";
 		mInfo.mDescriptions.add("You regenerate 5% of your max health every 3 seconds.");
 		mInfo.mDescriptions.add("All other players in a 12 block radius also regenerate 5% of their max health every 3 seconds.");
@@ -45,7 +46,12 @@ public class Rejuvenation extends Ability {
 							//  If this is us or we're allowing anyone to get it.
 							if (p == mPlayer || rejuvenation > 1) {
 								double oldHealth = p.getHealth();
-								PlayerUtils.healPlayer(p, p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.05);
+								double healAmount = 1;
+								AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+								if (maxHealth != null) {
+									healAmount = maxHealth.getValue() * 0.05;
+								}
+								PlayerUtils.healPlayer(p, healAmount);
 								if (p.getHealth() > oldHealth) {
 									mWorld.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 								}

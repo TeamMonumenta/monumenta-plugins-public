@@ -27,7 +27,7 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_RANGE = 5;
 	private static final int VICIOUS_COMBOS_EFFECT_DURATION = 15 * 20;
 	private static final int VICIOUS_COMBOS_EFFECT_LEVEL = 0;
-	private static final int VICIOUS_COMBOS_COOL_1 = 1 * 20;
+	private static final int VICIOUS_COMBOS_COOL_1 = 20;
 	private static final int VICIOUS_COMBOS_COOL_2 = 2 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;
 	private static final int VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 3;
@@ -35,7 +35,7 @@ public class ViciousCombos extends Ability {
 
 	public ViciousCombos(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Vicious Combos");
-		mInfo.scoreboardId = "ViciousCombos";
+		mInfo.mScoreboardId = "ViciousCombos";
 		mInfo.mShorthandName = "VC";
 		mInfo.mDescriptions.add("Passively, killing an enemy refreshes the cooldown of your abilities by 1 second. Killing an Elite enemy instead resets the cooldown of your abilities.");
 		mInfo.mDescriptions.add("Killing an enemy now refreshes your ability cooldowns by 2 seconds. Killing an Elite enemy inflicts nearby enemies within 5 blocks with Weakness I and 15% Vulnerability for 5 seconds.");
@@ -44,7 +44,10 @@ public class ViciousCombos extends Ability {
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		EntityDamageEvent e = event.getEntity().getLastDamageCause();
-		if (e.getCause() == DamageCause.ENTITY_ATTACK || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK || e.getCause() == DamageCause.CUSTOM) {
+		if (e != null
+		    && (e.getCause() == DamageCause.ENTITY_ATTACK
+			    || e.getCause() == DamageCause.ENTITY_SWEEP_ATTACK
+			    || e.getCause() == DamageCause.CUSTOM)) {
 			LivingEntity killedEntity = event.getEntity();
 			int viciousCombos = getAbilityScore();
 

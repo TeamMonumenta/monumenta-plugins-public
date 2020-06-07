@@ -29,10 +29,10 @@ public class ElementalSpiritIce extends Ability {
 	private static final int ES_ICE_2_DAMAGE = 7;
 	private static final int ES_ICE_RADIUS = 3;
 	private static final int ES_ICE_PULSES = 3;
-	private static final int ES_ICE_PULSE_INTERVAL = 20 * 1;
+	private static final int ES_ICE_PULSE_INTERVAL = 20;
 
 	private final int mDamage;
-	private final Set<LivingEntity> mMobsDamaged = new HashSet<LivingEntity>();
+	private final Set<LivingEntity> mMobsDamaged = new HashSet<>();
 	private BukkitRunnable mMobsDamagedParser;
 	private BukkitRunnable mParticleGenerator;
 
@@ -40,15 +40,15 @@ public class ElementalSpiritIce extends Ability {
 		/* NOTE: Display name is null so this variant will be ignored by the tesseract.
 		 * This variant also does not have a description */
 		super(plugin, world, player, null);
-		mInfo.scoreboardId = "ElementalSpirit";
-		mInfo.linkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
-		mInfo.cooldown = ES_ICE_COOLDOWN;
+		mInfo.mScoreboardId = "ElementalSpirit";
+		mInfo.mLinkedSpell = Spells.ELEMENTAL_SPIRIT_ICE;
+		mInfo.mCooldown = ES_ICE_COOLDOWN;
 		mDamage = getAbilityScore() == 1 ? ES_ICE_1_DAMAGE : ES_ICE_2_DAMAGE;
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
-		if (event.getMagicType() == MagicType.ICE && event.getSpell() != null && !event.getSpell().equals(mInfo.linkedSpell)) {
+		if (event.getMagicType() == MagicType.ICE && event.getSpell() != null && !event.getSpell().equals(mInfo.mLinkedSpell)) {
 			mMobsDamaged.add(event.getDamaged());
 
 			// We make 1 runnable that processes everything 1 tick later, so all the mob information is in.
@@ -73,7 +73,7 @@ public class ElementalSpiritIce extends Ability {
 							Location loc = closestMob.getLocation();
 
 							new BukkitRunnable() {
-								Location mLoc = loc.add(0, 1, 0);
+								final Location mLoc = loc.add(0, 1, 0);
 								int mPulses = 0;
 
 								@Override
@@ -84,7 +84,7 @@ public class ElementalSpiritIce extends Ability {
 									mWorld.playSound(mLoc, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
 									for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, ES_ICE_RADIUS)) {
 										mob.setNoDamageTicks(0);
-										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.linkedSpell);
+										EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
 										mob.setVelocity(new Vector(0, 0, 0));
 									}
 
@@ -133,9 +133,10 @@ public class ElementalSpiritIce extends Ability {
 						mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0, 0, 0, 0);
 					}
 
-					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritIce.class) == null ||
-						!mPlayer.isOnline() || mPlayer == null || mPlayer.isDead() ||
-						mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_ICE)) {
+					if (AbilityManager.getManager().getPlayerAbility(mPlayer, ElementalSpiritIce.class) == null
+					    || !mPlayer.isOnline()
+					    || mPlayer.isDead()
+					    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.ELEMENTAL_SPIRIT_ICE)) {
 						this.cancel();
 					}
 

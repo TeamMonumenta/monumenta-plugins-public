@@ -42,26 +42,26 @@ public class WitheringGaze extends Ability {
 
 	public WitheringGaze(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Withering Gaze");
-		mInfo.scoreboardId = "WitheringGaze";
+		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
 		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30 seconds.");
 		mInfo.mDescriptions.add("Stun lasts for 4 seconds and Wither lasts for 8 seconds. Cooldown: 20 seconds.");
-		mInfo.linkedSpell = Spells.WITHERING_GAZE;
-		mInfo.cooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mLinkedSpell = Spells.WITHERING_GAZE;
+		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
 	public void cast(Action action) {
 		Player player = mPlayer;
-		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by halfslabs
+		Location loc = player.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
 		Vector direction = loc.getDirection().setY(0).normalize();
 		int duration = getAbilityScore() == 1 ? 20 * WITHERING_GAZE_1_DURATION : 20 * WITHERING_GAZE_2_DURATION;
 		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
 		player.getLocation().getWorld().playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
 		new BukkitRunnable() {
 			double mT = 0;
-			double mDamagerange = 1.15;
+			double mDamageRange = 1.15;
 			double mR = 1;
 			@Override
 			public void run() {
@@ -81,7 +81,7 @@ public class WitheringGaze extends Ability {
 				}
 				mR += 0.55;
 
-				for (Entity e : player.getNearbyEntities(mDamagerange, mDamagerange * 2, mDamagerange)) {
+				for (Entity e : player.getNearbyEntities(mDamageRange, mDamageRange * 2, mDamageRange)) {
 					if (EntityUtils.isHostileMob(e)) {
 						Vector eVec = e.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
 						if (direction.dot(eVec) > 0.4) {
@@ -98,7 +98,7 @@ public class WitheringGaze extends Ability {
 					}
 				}
 
-				mDamagerange += 1;
+				mDamageRange += 1;
 				loc.add(direction.clone().multiply(0.75));
 				if (loc.getBlock().getType().isSolid()) {
 					this.cancel();

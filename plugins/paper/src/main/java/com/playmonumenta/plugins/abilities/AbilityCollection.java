@@ -8,7 +8,7 @@ import java.util.Map;
 import com.google.gson.JsonObject;
 
 public class AbilityCollection {
-	private Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<Class<? extends Ability>, Ability>();
+	private final Map<Class<? extends Ability>, Ability> mAbilities = new LinkedHashMap<>();
 
 	public AbilityCollection(List<Ability> abilities) {
 		for (Ability ability : abilities) {

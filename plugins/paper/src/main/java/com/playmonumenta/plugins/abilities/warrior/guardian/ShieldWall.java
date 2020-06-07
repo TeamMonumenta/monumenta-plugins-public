@@ -53,13 +53,13 @@ public class ShieldWall extends Ability {
 
 	public ShieldWall(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Shield Wall");
-		mInfo.scoreboardId = "ShieldWall";
+		mInfo.mScoreboardId = "ShieldWall";
 		mInfo.mShorthandName = "SW";
 		mInfo.mDescriptions.add("Blocking and then blocking again within .25s creates a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 6 damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.");
 		mInfo.mDescriptions.add("The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown is reduced to 20s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
-		mInfo.linkedSpell = Spells.SHIELD_WALL;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? SHIELD_WALL_1_COOLDOWN : SHIELD_WALL_2_COOLDOWN;
+		mInfo.mLinkedSpell = Spells.SHIELD_WALL;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	private int mRightClicks = 0;
@@ -94,43 +94,43 @@ public class ShieldWall extends Ability {
 
 		if (mRightClicks >= 2) {
 			int time = getAbilityScore() == 1 ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION;
-			boolean knockback = getAbilityScore() == 1 ? false : true;
+			boolean knockback = getAbilityScore() != 1;
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1.5f);
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.8f);
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f);
 			putOnCooldown();
 			new BukkitRunnable() {
-				int t = 0;
-				Location loc = mPlayer.getLocation();
-				List<BoundingBox> boxes = new ArrayList<BoundingBox>();
-				List<LivingEntity> mobsAlreadyHit = new ArrayList<LivingEntity>();
-				List<LivingEntity> mobsHitThisTick = new ArrayList<LivingEntity>();
-				boolean hitboxes = false;
+				int mT = 0;
+				final Location mLoc = mPlayer.getLocation();
+				final List<BoundingBox> mBoxes = new ArrayList<>();
+				List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
+				final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
+				boolean mHitboxes = false;
 
 				@Override
 				public void run() {
-					t++;
+					mT++;
 					Vector vec;
 					for (int y = 0; y < 5; y++) {
 						for (double degree = 0; degree < 180; degree += 10) {
 							double radian1 = Math.toRadians(degree);
 							vec = new Vector(Math.cos(radian1) * 4, y, Math.sin(radian1) * 4);
 							vec = VectorUtils.rotateXAxis(vec, 0);
-							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-							Location l = loc.clone().add(vec);
-							if (t % 4 == 0) {
+							Location l = mLoc.clone().add(vec);
+							if (mT % 4 == 0) {
 								mWorld.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
 							}
-							if (!hitboxes) {
-								boxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
+							if (!mHitboxes) {
+								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
 								                         l.clone().add(0.6, 5, 0.6)));
 							}
 						}
-						hitboxes = true;
+						mHitboxes = true;
 					}
 
-					for (BoundingBox box : boxes) {
+					for (BoundingBox box : mBoxes) {
 						for (Entity e : mWorld.getNearbyEntities(box)) {
 							Location eLoc = e.getLocation();
 							if (e instanceof Projectile) {
@@ -146,14 +146,14 @@ public class ShieldWall extends Ability {
 							} else if (EntityUtils.isHostileMob(e)) {
 								LivingEntity le = (LivingEntity) e;
 								// Stores mobs hit this tick
-								mobsHitThisTick.add(le);
+								mMobsHitThisTick.add(le);
 								// This list does not update to the mobs hit this tick until after everything runs
-								if (!mobsAlreadyHit.contains(le)) {
-									mobsAlreadyHit.add(le);
+								if (!mMobsAlreadyHit.contains(le)) {
+									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
-									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.linkedSpell);
+									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 									if (knockback) {
-										MovementUtils.knockAway(loc, le, 0.3f);
+										MovementUtils.knockAway(mLoc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
 									} else {
@@ -183,17 +183,17 @@ public class ShieldWall extends Ability {
 					 * tick, meaning it is no longer in the shield wall hitbox
 					 * and is thus eligible for another hit.
 					 */
-					List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<LivingEntity>();
-					for (LivingEntity mob : mobsAlreadyHit) {
-						if (mobsHitThisTick.contains(mob)) {
+					List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
+					for (LivingEntity mob : mMobsAlreadyHit) {
+						if (mMobsHitThisTick.contains(mob)) {
 							mobsAlreadyHitAdjusted.add(mob);
 						}
 					}
-					mobsAlreadyHit = mobsAlreadyHitAdjusted;
-					mobsHitThisTick.clear();
-					if (t >= time) {
+					mMobsAlreadyHit = mobsAlreadyHitAdjusted;
+					mMobsHitThisTick.clear();
+					if (mT >= time) {
 						this.cancel();
-						boxes.clear();
+						mBoxes.clear();
 					}
 				}
 

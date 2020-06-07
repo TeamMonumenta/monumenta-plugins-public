@@ -42,10 +42,10 @@ public class Rampage extends Ability {
 
 	public Rampage(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Rampage");
-		mInfo.linkedSpell = Spells.RAMPAGE;
-		mInfo.cooldown = 0;
-		mInfo.scoreboardId = "Rampage";
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mLinkedSpell = Spells.RAMPAGE;
+		mInfo.mCooldown = 0;
+		mInfo.mScoreboardId = "Rampage";
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
 		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 0.5% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/4 stacks consumed.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
@@ -65,7 +65,7 @@ public class Rampage extends Ability {
 
 		if (mStacks >= 10 && loc.getPitch() > 70) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RAMPAGE_RADIUS)) {
-				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+				EntityUtils.damageEntity(mPlugin, mob, mStacks, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 				mWorld.spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1);
 			}
 

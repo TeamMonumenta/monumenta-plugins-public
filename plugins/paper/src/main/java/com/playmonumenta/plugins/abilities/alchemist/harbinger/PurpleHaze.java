@@ -69,8 +69,8 @@ public class PurpleHaze extends Ability {
 	private static final int PURPLE_HAZE_RADIUS = 5;
 	private static final int PURPLE_HAZE_RANGE = 32;
 
-	private static Map<UUID, HazedMob> mHazedMobs = new HashMap<UUID, HazedMob>();
-	private static Map<UUID, HazedMob> newHazedMobs = new HashMap<UUID, HazedMob>();
+	private static final Map<UUID, HazedMob> mHazedMobs = new HashMap<>();
+	private static final Map<UUID, HazedMob> newHazedMobs = new HashMap<>();
 
 	private static BukkitRunnable mRunnable = null;
 
@@ -80,13 +80,13 @@ public class PurpleHaze extends Ability {
 
 	public PurpleHaze(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Purple Haze");
-		mInfo.linkedSpell = Spells.PURPLE_HAZE;
-		mInfo.scoreboardId = "PurpleHaze";
+		mInfo.mLinkedSpell = Spells.PURPLE_HAZE;
+		mInfo.mScoreboardId = "PurpleHaze";
 		mInfo.mShorthandName = "PH";
 		mInfo.mDescriptions.add("Left-clicking while shifted with a bow while looking at a mob within 32 blocks deals 3 damage per second and gives Slowness III for 8 seconds to that mob. If the target dies, the user gains an additional Alchemist's Potion and the effects transfer to up to 2 mob up to 5 blocks from the target that died. The maximum number of times effects can spread is a chain 2 mobs deep. Cooldown: 35s.");
 		mInfo.mDescriptions.add("Damage and Slowness duration increases to 10 seconds. Cooldown reduced to 20 seconds.");
-		mInfo.cooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = getAbilityScore() == 1 ? PURPLE_HAZE_1_COOLDOWN : PURPLE_HAZE_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? PURPLE_HAZE_1_DURATION : PURPLE_HAZE_2_DURATION;
 
 		/*
@@ -110,7 +110,7 @@ public class PurpleHaze extends Ability {
 							Vector v = damagee.getVelocity();
 							// This won't proc Perspicacity unless we rework how that enchantment works
 							// This is because it doesn't call the CustomDamageEvent
-							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.linkedSpell);
+							EntityUtils.damageEntity(plugin, damagee, PURPLE_HAZE_DAMAGE, e.mTriggeredBy, MagicType.ALCHEMY, false /* do not register CustomDamageEvent */, mInfo.mLinkedSpell);
 							damagee.setVelocity(v);
 							damagee.setNoDamageTicks(ticks);
 							PotionUtils.applyPotion(e.mTriggeredBy, damagee, new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));

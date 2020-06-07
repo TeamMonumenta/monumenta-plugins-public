@@ -47,14 +47,14 @@ public class WindWalk extends Ability {
 
 	public WindWalk(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Wind Walk");
-		mInfo.linkedSpell = Spells.WIND_WALK;
-		mInfo.scoreboardId = "WindWalk";
+		mInfo.mLinkedSpell = Spells.WIND_WALK;
+		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
 		mInfo.mDescriptions.add("Left-click twice without hitting a mob while sprinting to dash in the target direction, stunning and levitating enemies for 2 seconds. Elites are not levitated. Cooldown: 25 seconds. Charges: 2.");
 		mInfo.mDescriptions.add("Now afflicts 30% Vulnerability; enemies are stunned and levitated for 4 seconds.");
-		mInfo.cooldown = WIND_WALK_COOLDOWN;
-		mInfo.ignoreCooldown = true;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mCooldown = WIND_WALK_COOLDOWN;
+		mInfo.mIgnoreCooldown = true;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? WIND_WALK_1_DURATION : WIND_WALK_2_DURATION;
 	}
 
@@ -92,7 +92,7 @@ public class WindWalk extends Ability {
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 		new BukkitRunnable() {
-			List<LivingEntity> mMobsAlreadyHit = new ArrayList<LivingEntity>();
+			final List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 			@Override
 			public void run() {
 				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
@@ -130,24 +130,24 @@ public class WindWalk extends Ability {
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		// If the skill is somehow on cooldown when charges are full, take it off cooldown
 		if (mCharges == WIND_WALK_MAX_CHARGES
-				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
-			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 		}
 
 		// Increment charges if last check was on cooldown, and now is off cooldown.
 		if (mCharges < WIND_WALK_MAX_CHARGES && mWasOnCooldown
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			mCharges++;
 			MessagingUtils.sendActionBarMessage(mPlayer, "Wind Walk Charges: " + mCharges);
 		}
 
 		// Put on cooldown if charges can still be gained
 		if (mCharges < WIND_WALK_MAX_CHARGES
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			putOnCooldown();
 		}
 
-		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 	}
 
 }

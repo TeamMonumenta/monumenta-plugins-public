@@ -54,15 +54,15 @@ public class Dodging extends Ability {
 
 	public Dodging(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Dodging");
-		mInfo.linkedSpell = Spells.DODGING;
-		mInfo.scoreboardId = "Dodging";
+		mInfo.mLinkedSpell = Spells.DODGING;
+		mInfo.mScoreboardId = "Dodging";
 		mInfo.mShorthandName = "Dg";
 		mInfo.mDescriptions.add("Blocks an arrow or blaze fireball that would have hit you. Cooldown: 12 s.");
 		mInfo.mDescriptions.add("The cooldown is reduced to 10 s. When this ability is triggered, you gain 15 s of Speed I.");
 		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.cooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		mInfo.mCooldown = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
 		// NOTE: This skill will get events even when it is on cooldown!
-		mInfo.ignoreCooldown = true;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -89,10 +89,7 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		if (!dodge()) {
-			return true;
-		}
-		return false;
+		return !dodge();
 	}
 
 
@@ -121,10 +118,7 @@ public class Dodging extends Ability {
 		if (!(event.getEntity().getShooter() instanceof LivingEntity) || event.getEntity().getShooter() instanceof Player) {
 			return true;
 		}
-		if (!dodge()) {
-			return true;
-		}
-		return false;
+		return !dodge();
 	}
 
 	private boolean dodge() {
@@ -137,7 +131,7 @@ public class Dodging extends Ability {
 		 * Must check with cooldown timers directly because isAbilityOnCooldown always returns
 		 * false (because ignoreCooldown is true)
 		 */
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/*
 			 * This ability is actually on cooldown (and was not triggered this tick)
 			 * Don't process dodging

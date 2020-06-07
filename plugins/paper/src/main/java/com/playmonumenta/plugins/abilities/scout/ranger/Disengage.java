@@ -46,14 +46,14 @@ public class Disengage extends Ability {
 
 	public Disengage(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Disengage");
-		mInfo.linkedSpell = Spells.DISENGAGE;
-		mInfo.scoreboardId = "Disengage";
+		mInfo.mLinkedSpell = Spells.DISENGAGE;
+		mInfo.mScoreboardId = "Disengage";
 		mInfo.mShorthandName = "Dis";
 		mInfo.mDescriptions.add("Right-clicking while shifted while not holding a bow, food, trident, potion, compass, or block causes you to leap backwards 6 blocks. Enemies within melee range of your previous position take 12 damage. If you land after being propelled by this skill's effect fall damage is calculated as if you fell for half as many blocks as you actually fell for. This cannot be used in towns. Cooldown: 12s.");
 		mInfo.mDescriptions.add("Non-elite/boss enemies in melee range when you activate this skill are stunned for 4 seconds. Cooldown: 10s.");
-		mInfo.cooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mCooldown = getAbilityScore() == 1 ? DISENGAGE_1_COOLDOWN : DISENGAGE_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class Disengage extends Ability {
 			return mPlayer.isSneaking() && !InventoryUtils.isBowItem(inMainHand) && !InventoryUtils.isBowItem(inOffHand) &&
 			       !InventoryUtils.isPotionItem(inMainHand) && !inMainHand.getType().isBlock() && !inMainHand.getType().isEdible()
 			       && inMainHand.getType() != Material.TRIDENT && inMainHand.getType() != Material.COMPASS
-			       && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell);
+			       && !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 		}
 		return false;
 	}
@@ -84,7 +84,7 @@ public class Disengage extends Ability {
 				EntityUtils.applyStun(mPlugin, DISENGAGE_STUN_DURATION, le);
 			}
 
-			EntityUtils.damageEntity(mPlugin, le, DISENGAGE_DAMAGE, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+			EntityUtils.damageEntity(mPlugin, le, DISENGAGE_DAMAGE, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 		}
 
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);

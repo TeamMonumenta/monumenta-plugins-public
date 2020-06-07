@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -178,11 +179,11 @@ public class AbilityManager {
 
 	private static AbilityManager mManager = null;
 
-	private Plugin mPlugin;
-	private World mWorld;
-	private List<Ability> mReferenceAbilities;
-	private List<Ability> mDisabledAbilities;
-	private Map<UUID, AbilityCollection> mAbilities = new HashMap<UUID, AbilityCollection>();
+	private final Plugin mPlugin;
+	private final World mWorld;
+	private final List<Ability> mReferenceAbilities;
+	private final List<Ability> mDisabledAbilities;
+	private final Map<UUID, AbilityCollection> mAbilities = new HashMap<>();
 
 	//Public manager methods
 	//---------------------------------------------------------------------------------------------------------------
@@ -192,8 +193,8 @@ public class AbilityManager {
 		mWorld = world;
 		mManager = this;
 
-		mReferenceAbilities = new ArrayList<Ability>();
-		mDisabledAbilities = new ArrayList<Ability>();
+		mReferenceAbilities = new ArrayList<>();
+		mDisabledAbilities = new ArrayList<>();
 		// Damage multiplying skills must come before damage bonus skills
 
 		List<Ability> specAbilitiesPriority = Arrays.asList(
@@ -225,7 +226,7 @@ public class AbilityManager {
 		                               new PatreonPurple(mPlugin, mWorld, null),
 		                               new PatreonRed(mPlugin, mWorld, null),
 
-		                               /********** MAGE **********/
+		                               //********** MAGE **********//
 		                               new ArcaneStrike(mPlugin, mWorld, null),
 		                               new Channeling(mPlugin, mWorld, null),
 		                               new ElementalArrows(mPlugin, mWorld, null),
@@ -235,7 +236,7 @@ public class AbilityManager {
 		                               new ManaLance(mPlugin, mWorld, null),
 		                               new Spellshock(mPlugin, mWorld, null),
 
-		                               /********** ROGUE **********/
+		                               //********** ROGUE **********//
 		                               new AdvancingShadows(mPlugin, mWorld, null),
 		                               new ByMyBlade(mPlugin, mWorld, null),
 		                               new DaggerThrow(mPlugin, mWorld, null),
@@ -245,7 +246,7 @@ public class AbilityManager {
 		                               new ViciousCombos(mPlugin, mWorld, null),
 		                               new Skirmisher(mPlugin, mWorld, null),
 
-		                               /********** SCOUT **********/
+		                               //********** SCOUT **********//
 		                               new Agility(mPlugin, mWorld, null),
 		                               new BowMastery(mPlugin, mWorld, null),
 		                               new Volley(mPlugin, mWorld, null),
@@ -256,7 +257,7 @@ public class AbilityManager {
 		                               new Sharpshooter(mPlugin, mWorld, null),
 		                               new FinishingBlow(mPlugin, mWorld, null),
 
-		                               /********** WARRIOR **********/
+		                               //********** WARRIOR **********//
 		                               new BruteForce(mPlugin, mWorld, null),
 		                               new CounterStrike(mPlugin, mWorld, null),
 		                               new DefensiveLine(mPlugin, mWorld, null),
@@ -267,7 +268,7 @@ public class AbilityManager {
 		                               new WarriorPassive(mPlugin, mWorld, null),
 		                               new WeaponryMastery(mPlugin, mWorld, null),
 
-		                               /********** CLERIC **********/
+		                               //********** CLERIC **********//
 		                               new Celestial(mPlugin, mWorld, null),
 		                               new CleansingRain(mPlugin, mWorld, null),
 		                               new HandOfLight(mPlugin, mWorld, null),
@@ -278,7 +279,7 @@ public class AbilityManager {
 		                               new Sanctified(mPlugin, mWorld, null),
 		                               new SacredProvisions(mPlugin, mWorld, null),
 
-		                               /********** WARLOCK **********/
+		                               //********** WARLOCK **********//
 		                               new AmplifyingHex(mPlugin, mWorld, null),
 		                               new BlasphemousAura(mPlugin, mWorld, null),
 		                               new ConsumingFlames(mPlugin, mWorld, null),
@@ -289,7 +290,7 @@ public class AbilityManager {
 		                               new SoulRend(mPlugin, mWorld, null),
 		                               new Exorcism(mPlugin, mWorld, null),
 
-		                               /********** ALCHEMIST **********/
+		                               //********** ALCHEMIST **********//
 		                               new AlchemicalArtillery(mPlugin, mWorld, null),
 		                               new BasiliskPoison(mPlugin, mWorld, null),
 		                               new UnstableArrows(mPlugin, mWorld, null),
@@ -303,7 +304,7 @@ public class AbilityManager {
 		                           ));
 
 		List<Ability> specAbilities = Arrays.asList(
-                /********** MAGE **********/
+                //********** MAGE **********//
                 // ELEMENTALIST
 				   // Starfall up above
                 new ElementalSpiritFire(mPlugin, mWorld, null),
@@ -315,7 +316,7 @@ public class AbilityManager {
                 new Overload(mPlugin, mWorld, null),
                 new SagesInsight(mPlugin, mWorld, null),
 
-                /********** ROGUE **********/
+                //********** ROGUE **********//
                 // SWORDSAGE
                 new WindWalk(mPlugin, mWorld, null),
                 new BladeDance(mPlugin, mWorld, null),
@@ -326,7 +327,7 @@ public class AbilityManager {
                 new CloakAndDagger(mPlugin, mWorld, null),
                 new CoupDeGrace(mPlugin, mWorld, null),
 
-                /********** SCOUT **********/
+                //********** SCOUT **********//
                 // RANGER
                 new Quickdraw(mPlugin, mWorld, null),
                 new Disengage(mPlugin, mWorld, null),
@@ -337,7 +338,7 @@ public class AbilityManager {
                 new PinningShot(mPlugin, mWorld, null),
                 new SplitArrow(mPlugin, mWorld, null),
 
-                /********** WARRIOR **********/
+                //********** WARRIOR **********//
                 // BERSERKER
                 new MeteorSlam(mPlugin, mWorld, null),
                 new Rampage(mPlugin, mWorld, null),
@@ -347,7 +348,7 @@ public class AbilityManager {
                 new Challenge(mPlugin, mWorld, null),
                 new Bodyguard(mPlugin, mWorld, null),
 
-                /********** CLERIC **********/
+                //********** CLERIC **********//
                 // PALADIN
                 new HolyJavelin(mPlugin, mWorld, null),
                 new ChoirBells(mPlugin, mWorld, null),
@@ -358,7 +359,7 @@ public class AbilityManager {
                 new HallowedBeam(mPlugin, mWorld, null),
                 new ThuribleProcession(mPlugin, mWorld, null),
 
-                /********** WARLOCK **********/
+                //********** WARLOCK **********//
                 // REAPER
                 new DeathsTouch(mPlugin, mWorld, null),
                 new HungeringVortex(mPlugin, mWorld, null),
@@ -369,7 +370,7 @@ public class AbilityManager {
                 new FractalEnervation(mPlugin, mWorld, null),
                 new WitheringGaze(mPlugin, mWorld, null),
 
-                /********** ALCHEMIST **********/
+                //********** ALCHEMIST **********//
                 // HARBINGER
                 new ScorchedEarth(mPlugin, mWorld, null),
                 new NightmarishAlchemy(mPlugin, mWorld, null),
@@ -392,7 +393,7 @@ public class AbilityManager {
 		mReferenceAbilities.addAll(Arrays.asList(
 									   new EvasionEnchant(mPlugin, mWorld, null),
 
-		                               /********** DELVES **********/
+		                               //********** DELVES **********//
 		                               // CURSED
 		                               new Ruthless(mPlugin, mWorld, null),
 		                               new Unyielding(mPlugin, mWorld, null),
@@ -413,23 +414,44 @@ public class AbilityManager {
 		return mManager;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void updatePlayerAbilities(Player player) {
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
+		AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		AttributeInstance armor = player.getAttribute(Attribute.GENERIC_ARMOR);
+		AttributeInstance toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
+		AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+		AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+		AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+
 		// Reset passive buffs to player base attributes
-		player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0);
-		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
-		if (player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() != 0.1
-		    && !player.getGameMode().equals(GameMode.CREATIVE) && !player.getGameMode().equals(GameMode.SPECTATOR)) {
-			player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+		if (knockbackResistance != null) {
+			knockbackResistance.setBaseValue(0);
 		}
-		player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(0);
-		player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(0);
-		player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1);
-		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
-		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+		if (armor != null) {
+			armor.setBaseValue(0);
+		}
+		if (toughness != null) {
+			toughness.setBaseValue(0);
+		}
+		if (attackDamage != null) {
+			attackDamage.setBaseValue(1);
+		}
+		if (attackSpeed != null) {
+			attackSpeed.setBaseValue(4.0);
+		}
+		if (maxHealth != null) {
+			maxHealth.setBaseValue(20);
+		}
+		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
+		if (movementSpeed != null
+			&& movementSpeed.getValue() != 0.1
+			&& !player.getGameMode().equals(GameMode.CREATIVE)
+			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			movementSpeed.setBaseValue(0.1);
+		}
 		Toughness.removeModifier(player);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
@@ -443,7 +465,7 @@ public class AbilityManager {
 			}
 		}
 
-		List<Ability> abilities = new ArrayList<Ability>();
+		List<Ability> abilities = new ArrayList<>();
 
 		if (player.getScoreboardTags().contains("disable_class") || player.getGameMode().equals(GameMode.SPECTATOR)) {
 			/* This player's abilities are disabled - give them an empty set and stop here */
@@ -524,7 +546,7 @@ public class AbilityManager {
 				// Do not allow any skills with no cooldown to apply damage more than once
 				// Always allow sweep attacks to go through for things like Deadly Ronde
 				if (event.getCause() != DamageCause.ENTITY_SWEEP_ATTACK && !abil.getInfo().mIgnoreTriggerCap
-				    && (abil.getInfo().cooldown == 0 || abil.getInfo().ignoreCooldown)
+				    && (abil.getInfo().mCooldown == 0 || abil.getInfo().mIgnoreCooldown)
 				    && !MetadataUtils.checkOnceThisTick(mPlugin, player, i + "LivingEntityDamagedByPlayerEventTickTriggered")) {
 					return true;
 				}
@@ -643,7 +665,7 @@ public class AbilityManager {
 	}
 
 	public void playerExtendedSneakEvent(Player player) {
-		conditionalCast(player, (ability) -> ability.playerExtendedSneakEvent());
+		conditionalCast(player, Ability::playerExtendedSneakEvent);
 	}
 
 	public void playerHitByProjectileEvent(Player player, ProjectileHitEvent event) {
@@ -687,33 +709,33 @@ public class AbilityManager {
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
 		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
 			AbilityInfo info = abil.getInfo();
-			if (info.trigger != null) {
-				if (info.trigger == AbilityTrigger.LEFT_CLICK) {
+			if (info.mTrigger != null) {
+				if (info.mTrigger == AbilityTrigger.LEFT_CLICK) {
 					if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
 							abil.cast(action);
 						}
 					}
-				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK) {
+				} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK) {
 					if (action == Action.RIGHT_CLICK_AIR
 					    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
 							abil.cast(action);
 						}
 					}
-				} else if (info.trigger == AbilityTrigger.LEFT_CLICK_AIR) {
+				} else if (info.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
 					if (action == Action.LEFT_CLICK_AIR) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
 							abil.cast(action);
 						}
 					}
-				} else if (info.trigger == AbilityTrigger.RIGHT_CLICK_AIR) {
+				} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
 					if (action == Action.RIGHT_CLICK_AIR) {
 						if (abil.runCheck() && !abil.isOnCooldown()) {
 							abil.cast(action);
 						}
 					}
-				} else if (info.trigger == AbilityTrigger.ALL) {
+				} else if (info.mTrigger == AbilityTrigger.ALL) {
 					abil.cast(action);
 				}
 			}
@@ -746,8 +768,8 @@ public class AbilityManager {
 			}
 		}
 		// Reset Skill and SkillSpec
-		Integer skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel");
-		Integer spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec");
+		int skill = ScoreboardUtils.getScoreboardValue(player, "TotalLevel");
+		int spec = ScoreboardUtils.getScoreboardValue(player, "TotalSpec");
 		ScoreboardUtils.setScoreboardValue(player, "Skill", skill);
 		ScoreboardUtils.setScoreboardValue(player, "SkillSpec", spec);
 

@@ -34,20 +34,20 @@ public class BladeDance extends Ability {
 
 	public BladeDance(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Blade Dance");
-		mInfo.scoreboardId = "BladeDance";
+		mInfo.mScoreboardId = "BladeDance";
 		mInfo.mShorthandName = "BD";
 		mInfo.mDescriptions.add("When holding two swords, right-click while looking down to enter a defensive stance, parrying all attacks and becoming invulnerable for 0.75 seconds. Afterwards, unleash a powerful attack that deals 12 damage to and afflicts Weakness III to all enemies in a 4 block radius for 5 seconds. Cooldown: 20 seconds.");
 		mInfo.mDescriptions.add("The area attack now deals 18 damage and afflicts Weakness IV.");
-		mInfo.linkedSpell = Spells.BLADE_DANCE;
-		mInfo.cooldown = 20 * 15;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mLinkedSpell = Spells.BLADE_DANCE;
+		mInfo.mCooldown = 20 * 15;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 
 		/*
 		 * NOTE! Because BladeDance has two events (cast and damage), we need both
 		 * events to trigger even when it is on cooldown. Therefor it needs to bypass
 		 * the automatic cooldown check and manage cooldown itself
 		 */
-		mInfo.ignoreCooldown = true;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class BladeDance extends Ability {
 
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), DANCE_RADIUS)) {
 						mob.setNoDamageTicks(0);
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED);
 
 						int amplifier = getAbilityScore() == 1 ? 2 : 3;

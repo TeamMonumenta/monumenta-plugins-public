@@ -22,17 +22,11 @@ import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxExceptio
  */
 public class DeCluckifyHeldItem extends GenericCommand {
 	public static void register() {
-		registerPlayerCommand("decluckifyhelditem", "monumenta.command.decluckifyhelditem",
-		                      (sender, player) -> {
-		                          run(sender, player);
-		                      });
+		registerPlayerCommand("decluckifyhelditem", "monumenta.command.decluckifyhelditem", DeCluckifyHeldItem::run);
 	}
 
 	private static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
-		ItemStack item = player.getEquipment().getItemInMainHand();
-		if (item == null) {
-			CommandAPI.fail("Player must have a Clucking item in their main hand!");
-		}
+		ItemStack item = player.getInventory().getItemInMainHand();
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
@@ -60,7 +54,7 @@ public class DeCluckifyHeldItem extends GenericCommand {
 			meta.setLore(newLore);
 			item.setItemMeta(meta);
 
-			sender.sendMessage("Succesfully removed Clucking from the player's held item");
+			sender.sendMessage("Successfully removed Clucking from the player's held item");
 		}
 	}
 }

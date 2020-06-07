@@ -50,14 +50,14 @@ public class EnchantedShot extends Ability {
 
 	public EnchantedShot(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Enchanted Arrow");
-		mInfo.scoreboardId = "EnchantedArrow";
+		mInfo.mScoreboardId = "EnchantedArrow";
 		mInfo.mShorthandName = "EA";
 		mInfo.mDescriptions.add("Left-clicking with a bow, while not shifted, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Every enemy hit takes 40 damage instead. Cooldown is reduced to 20 seconds.");
-		mInfo.linkedSpell = Spells.ENCHANTED_ARROW;
-		mInfo.cooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.LEFT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.ENCHANTED_ARROW;
+		mInfo.mCooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class EnchantedShot extends Ability {
 						mWorld.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15);
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15);
 						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.1, 0.2, 0.1, 0.1);
-						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.linkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
 					}

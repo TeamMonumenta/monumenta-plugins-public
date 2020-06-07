@@ -52,14 +52,14 @@ public class HungeringVortex extends Ability {
 
 	public HungeringVortex(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Hungering Vortex");
-		mInfo.scoreboardId = "HungeringVortex";
+		mInfo.mScoreboardId = "HungeringVortex";
 		mInfo.mShorthandName = "HV";
 		mInfo.mDescriptions.add("Right-clicking while shifted while looking down pulls all mobs in a 8 block radius towards you, afflicting them with Slowness I for 8s. This draws the aggro of all mobs pulled and increases your melee damage by 1 for every affected enemy up to a maximum of 6 bonus damage for 8s. In addition, you gain Absorption I for 8 seconds on activation. This skill only goes on cooldown if at least one mob is affected. Cooldown: 18s.");
 		mInfo.mDescriptions.add("Slowness is increased to II, Absorption is increased to II, and melee damage increased by 2 for each affected enemy, up to a maximum of 12.");
-		mInfo.linkedSpell = Spells.HUNGERING_VORTEX;
-		mInfo.cooldown = HUNGERING_VORTEX_COOLDOWN;
-		mInfo.trigger = AbilityTrigger.RIGHT_CLICK;
-		mInfo.ignoreCooldown = true;
+		mInfo.mLinkedSpell = Spells.HUNGERING_VORTEX;
+		mInfo.mCooldown = HUNGERING_VORTEX_COOLDOWN;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mIgnoreCooldown = true;
 		mSlownessAmplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_SLOWNESS_AMPLIFIER : HUNGERING_VORTEX_2_SLOWNESS_AMPLIFIER;
 		mAbsorptionAmplifier = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_ABSORPTION_AMPLIFIER : HUNGERING_VORTEX_2_ABSORPTION_AMPLIFIER;
 		mExtraDamage = getAbilityScore() == 1 ? HUNGERING_VORTEX_1_EXTRA_DAMAGE : HUNGERING_VORTEX_2_EXTRA_DAMAGE;
@@ -76,7 +76,7 @@ public class HungeringVortex extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.linkedSpell)
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
 				|| !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
 			return;
 		}
@@ -92,7 +92,7 @@ public class HungeringVortex extends Ability {
 		}
 
 		// Cancel ability particles and cooldown if nothing is targeted
-		if (mobs == null || mobs.size() == 0) {
+		if (mobs.size() == 0) {
 			return;
 		}
 
@@ -103,10 +103,10 @@ public class HungeringVortex extends Ability {
 
 		// Gradual pull on mobs
 		new BukkitRunnable() {
-			int t = 0;
+			int mT = 0;
 			@Override
 			public void run() {
-				t += 2;
+				mT += 2;
 				for (LivingEntity mob : mobs) {
 					// Release suction on hit mobs for half a second
 					if (mob.getNoDamageTicks() > mob.getMaximumNoDamageTicks() - 10) {
@@ -117,7 +117,7 @@ public class HungeringVortex extends Ability {
 						}
 					}
 				}
-				if (t > HUNGERING_VORTEX_DURATION) {
+				if (mT > HUNGERING_VORTEX_DURATION) {
 					this.cancel();
 				}
 			}
@@ -125,23 +125,23 @@ public class HungeringVortex extends Ability {
 
 		// Creates a fast-spiraling helix.
 		new BukkitRunnable() {
-			Location loc = mPlayer.getLocation();
-			double rotation = 0;
-			double radius = HUNGERING_VORTEX_RADIUS;
+			final Location mLoc = mPlayer.getLocation();
+			double mRotation = 0;
+			double mRadius = HUNGERING_VORTEX_RADIUS;
 
 			@Override
 			public void run() {
 				for (int j = 0; j < 5; j++) {
 					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(rotation + (72 * i));
-						loc.add(Math.cos(radian1) * radius, 0.5, Math.sin(radian1) * radius);
-						mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.1, 0.1, 0.1, 0);
-						mPlayer.getWorld().spawnParticle(Particle.PORTAL, loc, 5, 0.1, 0.1, 0.1, 0);
-						loc.subtract(Math.cos(radian1) * radius, 0.5, Math.sin(radian1) * radius);
+						double radian1 = Math.toRadians(mRotation + (72 * i));
+						mLoc.add(Math.cos(radian1) * mRadius, 0.5, Math.sin(radian1) * mRadius);
+						mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
+						mPlayer.getWorld().spawnParticle(Particle.PORTAL, mLoc, 5, 0.1, 0.1, 0.1, 0);
+						mLoc.subtract(Math.cos(radian1) * mRadius, 0.5, Math.sin(radian1) * mRadius);
 					}
-					rotation += 8;
-					radius -= 0.25;
-					if (radius <= 0) {
+					mRotation += 8;
+					mRadius -= 0.25;
+					if (mRadius <= 0) {
 						this.cancel();
 						return;
 					}
@@ -167,8 +167,9 @@ public class HungeringVortex extends Ability {
 	public boolean runCheck() {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		return (mainHand == null || mainHand.getType() != Material.BOW) &&
-		       (offHand == null || offHand.getType() != Material.BOW) && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		return mainHand.getType() != Material.BOW
+		       && offHand.getType() != Material.BOW
+		       && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 
 	}
 

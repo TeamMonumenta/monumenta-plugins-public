@@ -46,7 +46,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
 	public AlchemistPotions(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, null);
-		mInfo.linkedSpell = Spells.ALCHEMIST_POTION;
+		mInfo.mLinkedSpell = Spells.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
 	}
 
@@ -87,7 +87,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 			setDamage();
 		}
 
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.linkedSpell);
+		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 	}
 
 	@Override
@@ -136,15 +136,15 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 		specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
 		specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
 
-		for (int i = 0; i < classAbilities.length; i++) {
-			if (classAbilities[i] != null) {
-				mDamage += DAMAGE_PER_SKILL_POINT * classAbilities[i].getAbilityScore();
+		for (Ability classAbility : classAbilities) {
+			if (classAbility != null) {
+				mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
 			}
 		}
 
-		for (int i = 0; i < specializationAbilities.length; i++) {
-			if (specializationAbilities[i] != null) {
-				mDamage += DAMAGE_PER_SPEC_POINT * specializationAbilities[i].getAbilityScore();
+		for (Ability specializationAbility : specializationAbilities) {
+			if (specializationAbility != null) {
+				mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
 			}
 		}
 	}
