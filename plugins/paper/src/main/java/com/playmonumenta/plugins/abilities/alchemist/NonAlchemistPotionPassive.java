@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -43,7 +43,7 @@ public class NonAlchemistPotionPassive extends Ability implements KillTriggeredA
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		mTracker.updateDamageDealtToBosses(event);
 		return true;
 	}

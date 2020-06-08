@@ -10,8 +10,6 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -79,9 +77,19 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
+import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
+import com.playmonumenta.plugins.abilities.delves.cursed.Mystic;
+import com.playmonumenta.plugins.abilities.delves.cursed.Ruthless;
+import com.playmonumenta.plugins.abilities.delves.cursed.Spectral;
+import com.playmonumenta.plugins.abilities.delves.cursed.Unyielding;
+import com.playmonumenta.plugins.abilities.delves.twisted.Arcanic;
+import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
+import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
+import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
 import com.playmonumenta.plugins.enchantments.AttributeRangedDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
@@ -359,46 +367,13 @@ public class EntityListener implements Listener {
 					// Set the projectiledamage from attributes
 					AttributeRangedDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
 
-					//If normal arrow is the projectile
-					if (proj instanceof Arrow) {
-						Arrow arrow = (Arrow)proj;
-						// If arrow is not a throwing knife or a trident
-						if (!ThrowingKnife.isThrowingKnife(arrow) && arrow.getType() != EntityType.TRIDENT) {
+					// Call events if not a throwing knife
+					if (!(proj instanceof Arrow && ThrowingKnife.isThrowingKnife((Arrow) proj))) {
+						mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
 
-							mPlugin.mTrackingManager.mPlayers.onDamage(mPlugin, player, (LivingEntity) damagee, event);
-							if (!mAbilities.livingEntityShotByPlayerEvent(player, arrow, (LivingEntity) damagee, event)) {
-								damager.remove();
-								event.setCancelled(true);
-							}
-
-							/*
-							 * This handles bow damage for abilities
-							 * Damage scaling abilities are applied to base arrow damage only (Volley, Pinning Shot)
-							 * Flat damage bonus abilities and enchantments are applied at the end (Bow Mastery, Sharpshooter)
-							 */
-
-							if (damagee instanceof LivingEntity) {
-								LivingEntity mob = (LivingEntity) damagee;
-
-								if (arrow.hasMetadata("ArrowQuickdraw")) {
-									event.setDamage(AbilityUtils.getArrowBaseDamage(arrow));
-								}
-
-								double bonusDamage = AbilityUtils.getArrowVelocityDamageMultiplier(arrow) * AbilityUtils.getArrowBonusDamage(arrow);
-								double multiplier = AbilityUtils.getArrowFinalDamageMultiplier(arrow);
-								if (mob.hasMetadata("PinningShotEnemyHasBeenPinned")
-									&& mob.getMetadata("PinningShotEnemyHasBeenPinned").get(0).asInt() != player.getTicksLived()
-									&& mob.hasMetadata("PinningShotEnemyIsPinned")) {
-									multiplier *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
-									mob.removeMetadata("PinningShotEnemyIsPinned", mPlugin);
-									mWorld.playSound(mob.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
-									mWorld.spawnParticle(Particle.FIREWORKS_SPARK, arrow.getLocation(), 20, 0, 0, 0, 0.2);
-									mWorld.spawnParticle(Particle.SNOWBALL, arrow.getLocation(), 30, 0, 0, 0, 0.25);
-									mob.removePotionEffect(PotionEffectType.SLOW);
-								}
-
-								event.setDamage(event.getDamage() * multiplier + bonusDamage);
-							}
+						if (!mAbilities.livingEntityShotByPlayerEvent(player, proj, (LivingEntity) damagee, event)) {
+							damager.remove();
+							event.setCancelled(true);
 						}
 					}
 				}
@@ -573,11 +548,45 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	private static final List<Class<? extends Ability>> STAT_MULTIPLIER_ABILITIES = new ArrayList<Class<? extends Ability>>();
+
+	static {
+		STAT_MULTIPLIER_ABILITIES.add(Ruthless.class);
+		STAT_MULTIPLIER_ABILITIES.add(Unyielding.class);
+		STAT_MULTIPLIER_ABILITIES.add(Mystic.class);
+		STAT_MULTIPLIER_ABILITIES.add(Spectral.class);
+		STAT_MULTIPLIER_ABILITIES.add(Merciless.class);
+		STAT_MULTIPLIER_ABILITIES.add(Relentless.class);
+		STAT_MULTIPLIER_ABILITIES.add(Arcanic.class);
+		STAT_MULTIPLIER_ABILITIES.add(Dreadful.class);
+	}
+
 	// Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
+
+		// Handle stat multipliers; only for delves
+		if (entity instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) entity;
+
+			// 128 is the mob auto-despawn range, so probably no spawners with a larger range, and dungeon cubes are at least this far apart
+			List<Player> players = PlayerUtils.playersInRange(mob.getLocation(), 128, true);
+
+			// We only need to check one player, since all players within range should have the same modifiers (and modifiers are only applied once)
+			if (players.size() > 0) {
+				Player player = players.get(0);
+
+				for (int i = 0; i < STAT_MULTIPLIER_ABILITIES.size(); i++) {
+					StatMultiplier sm = (StatMultiplier) AbilityManager.getManager().getPlayerAbility(player, STAT_MULTIPLIER_ABILITIES.get(i));
+					if (sm != null) {
+						sm.applyOnSpawnModifiers(mob);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	// Player shoots an arrow.
@@ -647,9 +656,6 @@ public class EntityListener implements Listener {
 				}
 
 				MetadataUtils.checkOnceThisTick(mPlugin, player, Constants.PLAYER_BOW_SHOT_METAKEY);
-
-				// Stores velocity for ability damage calculations
-				AbilityUtils.setArrowVelocityDamageMultiplier(mPlugin, arrow);
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
 				ThrownPotion potion = (ThrownPotion)proj;
 				if (potion.getItem() != null) {

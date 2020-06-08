@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.itemindex;
 
-import com.playmonumenta.plugins.enchantments.AttributeArrowSpeed;
+import java.util.ArrayList;
+
+import com.playmonumenta.plugins.enchantments.AttributeProjectileSpeed;
 import com.playmonumenta.plugins.enchantments.AttributeRangedDamage;
 import com.playmonumenta.plugins.enchantments.AttributeThrowRate;
-import com.playmonumenta.plugins.enchantments.BaseEnchantment;
-
-import java.util.ArrayList;
+import com.playmonumenta.plugins.enchantments.BaseAttribute;
 
 public enum Attribute {
 
@@ -14,7 +14,7 @@ public enum Attribute {
 	ATTACK_DAMAGE(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE, " Attack Damage"),
 	ATTACK_SPEED(org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED,  " Attack Speed"),
 	RANGED_DAMAGE(new AttributeRangedDamage()),
-	ARROW_SPEED(new AttributeArrowSpeed()),
+	PROJECTILE_SPEED(new AttributeProjectileSpeed()),
 	THROW_RATE(new AttributeThrowRate()),
 
 	//bukkit attributes
@@ -33,7 +33,7 @@ public enum Attribute {
 	;
 
 	private org.bukkit.attribute.Attribute mBukkitAttribute;
-	BaseEnchantment mCustomAttributeClass;
+	BaseAttribute mCustomAttributeClass;
 	String mReadableStringFormat;
 
 	Attribute(org.bukkit.attribute.Attribute bukkitAttribute, String s) {
@@ -42,7 +42,7 @@ public enum Attribute {
 		this.mReadableStringFormat = s;
 	}
 
-	Attribute(BaseEnchantment customAttribute) {
+	Attribute(BaseAttribute customAttribute) {
 		this.mBukkitAttribute = null;
 		this.mCustomAttributeClass = customAttribute;
 		this.mReadableStringFormat = customAttribute.getProperty();

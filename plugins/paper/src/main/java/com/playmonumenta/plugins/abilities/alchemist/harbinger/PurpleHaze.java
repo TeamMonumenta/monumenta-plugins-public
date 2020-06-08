@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -31,6 +30,7 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
@@ -194,7 +194,7 @@ public class PurpleHaze extends Ability {
 	public boolean runCheck() {
 		if (mPlayer.isSneaking()) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-			if (mainHand.getType() == Material.BOW) {
+			if (InventoryUtils.isBowItem(mainHand)) {
 
 				// Basically makes sure if the target is in LoS and if there is a path.
 				Location eyeLoc = mPlayer.getEyeLocation();

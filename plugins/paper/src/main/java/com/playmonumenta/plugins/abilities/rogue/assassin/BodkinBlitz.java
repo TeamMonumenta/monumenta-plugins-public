@@ -31,32 +31,37 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class BodkinBlitz extends Ability {
 
-	private static final int BODKINBLITZ_1_COOLDOWN = 16 * 20;
-	private static final int BODKINBLITZ_2_COOLDOWN = 12 * 20;
+	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
+	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 18;
 	private static final int BODKINBLITZ_2_BONUS_DMG = 20;
+	private static final int BODKINBLITZ_1_STEALTH_DURATION = 20;
+	private static final int BODKINBLITZ_2_STEALTH_DURATION = 30;
 	private static final int BODKINBLITZ_1_STEP = 25;
 	private static final int BODKINBLITZ_2_STEP = 35;
 	private static final int BODKINBLITZ_MAX_CHARGES = 2;
 
-	private BukkitRunnable mCDRunnable = null;
+	private final int mStealthDuration;
+
 	private BukkitRunnable mRunnable = null;
-	private int mTicks = 0;
 	private boolean mTeleporting = false;
+	private int mTicks;
+	private boolean mWasOnCooldown = false;
 	private int mCharges;
-	private int mChargeCooldown;
 
 	public BodkinBlitz(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Bodkin Blitz");
 		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Bodkin Blitz utilises a charge system. Gain a charge once every 16 seconds.");
-		mInfo.mDescriptions.add("Range increased to 14 blocks. Cooldown per charge reduced to 12 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you.");
-		mInfo.mCooldown = 0;
+		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Cooldown: 20 seconds. Charges: 2.");
+		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds, and Cooldown reduced to 18 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you.");
+		mInfo.mCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+
+		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
+
 		mCharges = BODKINBLITZ_MAX_CHARGES;
-		mChargeCooldown = 0;
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class BodkinBlitz extends Ability {
 			return;
 		}
 
-		consumeCharge();
+		mCharges--;
 		mTeleporting = true;
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
@@ -154,7 +159,7 @@ public class BodkinBlitz extends Ability {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 							new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
 
-					AbilityUtils.applyStealth(mPlugin, mPlayer, 20);
+					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 
 					mTicks = 100;
 					if (mRunnable == null || mRunnable.isCancelled()) {
@@ -199,11 +204,6 @@ public class BodkinBlitz extends Ability {
 	}
 
 	@Override
-	public boolean runCheck() {
-		return true;
-	}
-
-	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (mRunnable != null && event.getCause() == DamageCause.ENTITY_ATTACK) {
 			mTicks = 0;
@@ -226,44 +226,28 @@ public class BodkinBlitz extends Ability {
 		return true;
 	}
 
-	private void consumeCharge() {
-		if (mChargeCooldown <= 0) {
-			mChargeCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
+	@Override
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+		// If the skill is somehow on cooldown when charges are full, take it off cooldown
+		if (mCharges == BODKINBLITZ_MAX_CHARGES
+				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 		}
-		mCharges--;
 
-		if (mCDRunnable == null || mCDRunnable.isCancelled()) {
-			mCDRunnable = new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (mChargeCooldown <= 0) {
-						if (mCharges < BODKINBLITZ_MAX_CHARGES) {
-							// If charge count isn't maxed, add one.
-							mCharges++;
-							MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
-							if (mCharges < BODKINBLITZ_MAX_CHARGES) {
-								// If it still isn't, put it back on cooldown.
-								mChargeCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
-							} else {
-								this.cancel();
-								mCDRunnable = null;
-							}
-						}
-					} else {
-						mChargeCooldown -= 1;
-					}
-				}
-			};
-			mCDRunnable.runTaskTimer(mPlugin, 0, 1);
+		// Increment charges if last check was on cooldown, and now is off cooldown.
+		if (mCharges < BODKINBLITZ_MAX_CHARGES && mWasOnCooldown
+				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			mCharges++;
+			MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
 		}
+
+		// Put on cooldown if charges can still be gained
+		if (mCharges < BODKINBLITZ_MAX_CHARGES
+				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			putOnCooldown();
+		}
+
+		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 	}
 
-	public void lowerCooldown(int reduction) {
-		mChargeCooldown -= reduction;
-	}
-
-	public void fullReset() {
-		mCharges = 2;
-		mChargeCooldown = 0;
-	}
 }

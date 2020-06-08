@@ -4,14 +4,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 
 /*
  * Sharpshooter: Each successful, fully charged arrow hit increases your arrow
@@ -23,75 +22,63 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 
 public class Sharpshooter extends Ability {
 	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 4;
-	private static final int SHARPSHOOTER_1_MAX_BONUS = 5;
-	private static final int SHARPSHOOTER_2_MAX_BONUS = 8;
-	private static final int SHARPSHOOTER_1_INCREMENT = 1;
-	private static final int SHARPSHOOTER_2_INCREMENT = 2;
+	private static final int SHARPSHOOTER_MAX_STACKS = 10;
+	private static final double SHARPSHOOTER_1_INCREMENT = 0.03;
+	private static final double SHARPSHOOTER_2_INCREMENT = 0.05;
+
+	private final double mDamageBonusPerStack;
 
 	public Sharpshooter(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Sharpshooter");
 		mInfo.mScoreboardId = "Sharpshooter";
 		mInfo.mShorthandName = "Ss";
-		mInfo.mDescriptions.add("Each successful charged arrow hit increases your arrow damage by +1, up to a max of +5. This damage scales depending on the charge level of your bow. Every 4 seconds a stack expires, and hitting an enemy with a charged arrow restarts that timer. Volley can only give one stack.");
-		mInfo.mDescriptions.add("Each hit increases damage by +2 up to +8.");
+		mInfo.mDescriptions.add("Each enemy hit with a critical arrow gives you a stack of Sharpshooter, up to 10. Stacks decay after 4 seconds of not gaining a stack. Each stack makes your arrows deal 3% more damage.");
+		mInfo.mDescriptions.add("Damage per stack increased to 5%.");
+		mInfo.mIgnoreTriggerCap = true;
+
+		mDamageBonusPerStack = getAbilityScore() == 1 ? SHARPSHOOTER_1_INCREMENT : SHARPSHOOTER_2_INCREMENT;
 	}
 
-	private int mSharpshot = 0;
-	private int mTicks = 0;
-	private boolean mCanVolley = true;
+	private int mStacks = 0;
+	private int mTicksToStackDecay = 0;
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "SharpshooterBonusDamageRegistrationTick")) {
-			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, mSharpshot);
-		}
-		return true;
-	}
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (proj instanceof Arrow) {
+			Arrow arrow = (Arrow) proj;
 
-	@Override
-	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		// Only increment sharpshot if the arrow is critical. Sharpshot can be triggered once per volley
-		if (arrow.isCritical() && (!arrow.hasMetadata("Volley") || mCanVolley)) {
-			mTicks = 0;
-			mCanVolley = false;
+			// Critical arrow and mob is actually going to take damage
+			if (arrow.isCritical() && (damagee.getNoDamageTicks() <= 10 || damagee.getLastDamage() < event.getDamage())) {
+				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
 
-			if (mSharpshot <= 0) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mTicks++;
-						if (mTicks % 10 == 0) {
-							mCanVolley = true; // Reset volley proc every half second
-						}
-
-						if (mTicks >= SHARPSHOOTER_DECAY_TIMER) {
-							mTicks = 0;
-							mSharpshot--;
-							MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + mSharpshot);
-						}
-
-						if (mSharpshot <= 0) {
-							this.cancel();
-						}
-					}
-
-				}.runTaskTimer(mPlugin, 0, 1);
+				if (mStacks < SHARPSHOOTER_MAX_STACKS) {
+					mStacks++;
+					MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+				}
 			}
 
-			int max = getAbilityScore() == 1 ? SHARPSHOOTER_1_MAX_BONUS : SHARPSHOOTER_2_MAX_BONUS;
-			int increment = getAbilityScore() == 1 ? SHARPSHOOTER_1_INCREMENT : SHARPSHOOTER_2_INCREMENT;
-			mSharpshot += increment;
-			if (mSharpshot > max) {
-				mSharpshot = max;
-			}
-			MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter bonus: " + mSharpshot);
+			event.setDamage(event.getDamage() * (1 + mStacks * mDamageBonusPerStack));
 		}
 
 		return true;
 	}
 
-	public int getSharpshot() {
-		return mSharpshot;
+	@Override
+	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mStacks > 0) {
+			mTicksToStackDecay -= 5;
+
+			if (mTicksToStackDecay <= 0) {
+				mTicksToStackDecay = SHARPSHOOTER_DECAY_TIMER;
+				mStacks--;
+				MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Sharpshooter Stacks: " + mStacks);
+			}
+		}
+	}
+
+	public static double getDamageMultiplier(Player player) {
+		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
+		return ss == null ? 1 : (1 + ss.mStacks * ss.mDamageBonusPerStack);
 	}
 
 }

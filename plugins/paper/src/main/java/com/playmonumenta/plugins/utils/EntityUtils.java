@@ -62,12 +62,11 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class EntityUtils {
 
 	private static final EnumSet<DamageCause> PHYSICAL_DAMAGE = EnumSet.of(
-			DamageCause.BLOCK_EXPLOSION,
+			DamageCause.CUSTOM,
 			DamageCause.ENTITY_ATTACK,
 			DamageCause.ENTITY_EXPLOSION,
 			DamageCause.ENTITY_SWEEP_ATTACK,
@@ -141,12 +140,7 @@ public class EntityUtils {
 						mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 10);
 
 						if (mob instanceof Mob) {
-							Location mobLoc = mob.getLocation();
-							List<Player> nearbyPlayers = PlayerUtils.playersInRange(mobLoc, 8);
-							if (nearbyPlayers.size() > 0) {
-								nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(mobLoc) <= e2.getLocation().distance(mobLoc) ? 1 : -1);
-								((Mob) mob).setTarget(nearbyPlayers.get(0));
-							}
+							((Mob) mob).setTarget(getNearestPlayer(mob.getLocation(), mob.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue()));
 						}
 
 						coolingIter.remove();
@@ -180,12 +174,7 @@ public class EntityUtils {
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
 
 					if (mob.getTarget() == null) {
-						List<LivingEntity> nearbyMobs = getNearbyMobs(mob.getLocation(), 8, mob);
-						if (nearbyMobs.size() > 0) {
-							Location mobLoc = mob.getLocation();
-							nearbyMobs.sort((e1, e2) -> e1.getLocation().distance(mobLoc) <= e2.getLocation().distance(mobLoc) ? 1 : -1);
-							mob.setTarget(nearbyMobs.get(0));
-						}
+						mob.setTarget(getNearestMob(mob.getLocation(), 8));
 					}
 
 					if (confused.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
@@ -476,6 +465,33 @@ public class EntityUtils {
 		return getNearbyMobs(loc, radius, radius, radius, types);
 	}
 
+	public static LivingEntity getNearestMob(Location loc, double radius, LivingEntity getter) {
+		return getNearestMob(loc, getNearbyMobs(loc, radius, getter));
+	}
+
+	public static LivingEntity getNearestMob(Location loc, double radius) {
+		return getNearestMob(loc, getNearbyMobs(loc, radius));
+	}
+
+	public static LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
+		if (nearbyMobs.size() == 0) {
+			return null;
+		}
+
+		nearbyMobs.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
+		return nearbyMobs.get(0);
+	}
+
+	public static LivingEntity getNearestPlayer(Location loc, double radius) {
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius);
+		if (nearbyPlayers.size() == 0) {
+			return null;
+		}
+
+		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
+		return nearbyPlayers.get(0);
+	}
+
 	public static Entity getEntity(World world, UUID entityUUID) {
 		List<Entity> entities = world.getEntities();
 		for (Entity entity : entities) {
@@ -513,14 +529,22 @@ public class EntityUtils {
 			if (armorContents[i] != null) {
 				if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
 					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				}
 
-					if (cause == DamageCause.PROJECTILE) {
+				if (cause == DamageCause.PROJECTILE) {
+					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_PROJECTILE)) {
 						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE) * 2;
-					} else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
+					}
+				} else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
+					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)) {
 						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS) * 2;
-					} else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR || cause == DamageCause.LAVA) {
+					}
+				} else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR || cause == DamageCause.LAVA) {
+					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_FIRE)) {
 						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FIRE) * 2;
-					} else if (cause == DamageCause.FALL) {
+					}
+				} else if (cause == DamageCause.FALL) {
+					if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_FALL)) {
 						protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_FALL) * 3;
 					}
 				}
@@ -532,31 +556,6 @@ public class EntityUtils {
 
 		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
 	}
-
-	// Same thing as above, for boss ability damage, which is always physical.
-	public static double getRealFinalDamage(BossAbilityDamageEvent event) {
-		Player player = event.getDamaged();
-		double damage = event.getDamage();
-		double armor = player.getAttribute(Attribute.GENERIC_ARMOR).getValue();
-		double toughness = player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
-
-		int protection = 0;
-		ItemStack[] armorContents = player.getInventory().getArmorContents();
-
-		for (int i = 0; i < armorContents.length; i++) {
-			if (armorContents[i] != null) {
-				if (armorContents[i].containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)) {
-					protection += armorContents[i].getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
-				}
-			}
-		}
-
-		int resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) == null
-				? 0 : (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1);
-
-		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
-	}
-
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
 		damageEntity(plugin, target, damage, damager, null);
@@ -844,9 +843,9 @@ public class EntityUtils {
 			return event.getDamage() * multiplier;
 		}
 
-		LivingEntity mob = (LivingEntity) event.getEntity();
+		LivingEntity le = (LivingEntity) event.getEntity();
 
-		return getDamageApproximation(mob.getAttribute(Attribute.GENERIC_ARMOR).getValue(), mob.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier);
+		return getDamageApproximation(le.getAttribute(Attribute.GENERIC_ARMOR).getValue(), le.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue(), event.getDamage(), multiplier);
 	}
 
 	// getFinalDamage() does not work for dummy event calls, and this is fewer calculations than getRealFinalDamage()

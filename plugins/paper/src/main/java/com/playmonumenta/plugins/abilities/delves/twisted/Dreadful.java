@@ -45,7 +45,7 @@ public class Dreadful extends StatMultiplier {
 	public Dreadful(Plugin plugin, World world, Player player) {
 		super(plugin, world, player,
 				ChatColor.GRAY + "The air reeks of death, heralding a " + ChatColor.DARK_RED + ChatColor.BOLD + "DREADFUL" + ChatColor.GRAY + " fate for the fallen.",
-				1, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, DREADFUL_DAMAGE_TAKEN_MULTIPLIER);
+				DREADFUL_DAMAGE_TAKEN_MULTIPLIER, DREADFUL_DAMAGE_TAKEN_MULTIPLIER, 1);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? Spectral.SPECTRAL_2_SUMMON_COMMAND_DATA : Spectral.SPECTRAL_1_SUMMON_COMMAND_DATA;
 		mDreadfulSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? DREADFUL_2_SUMMON_COMMAND_DATA : DREADFUL_1_SUMMON_COMMAND_DATA;
 	}

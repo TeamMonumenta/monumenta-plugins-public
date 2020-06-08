@@ -21,13 +21,13 @@ public class Skirmisher extends Ability {
 	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
 	private static final int SKIRMISHER_1_DAMAGE = 3;
 	private static final int SKIRMISHER_2_DAMAGE = 5;
-	private static final int SKIRMISHER_ISOLATION_RADIUS = 4;
+	private static final double SKIRMISHER_ISOLATION_RADIUS = 2.5;
 
 	public Skirmisher(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 4 blocks.");
+		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 2.5 blocks.");
 		mInfo.mDescriptions.add("Deal an additional 5 melee damage instead.");
 	}
 

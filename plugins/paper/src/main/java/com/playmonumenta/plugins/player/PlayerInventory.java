@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.BaseAttribute;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
@@ -182,6 +183,14 @@ public class PlayerInventory {
 
 			property.onEquipmentUpdate(plugin, player);
 		}
+
+		// Attributes
+		// Since they're parsed more efficiently than enchants (and this is temporary anyways), not worried about maximizing efficiency of every case
+		if (event instanceof PlayerItemHeldEvent || event instanceof PlayerDropItemEvent) {
+			plugin.mAttributeManager.updateAttributeTrie(plugin, player, true);
+		} else {
+			plugin.mAttributeManager.updateAttributeTrie(plugin, player, false);
+		}
 	}
 
 	public void onKill(Plugin plugin, Player player, Entity target, EntityDeathEvent event) {
@@ -226,6 +235,10 @@ public class PlayerInventory {
 			Integer level = iter.getValue();
 
 			property.onLaunchProjectile(plugin, player, level, proj, event);
+		}
+
+		for (BaseAttribute attribute : plugin.mAttributeManager.mAttributes) {
+			attribute.onLaunchProjectile(plugin, player, plugin.mAttributeManager.mAttributeTrie.get(attribute.getProperty(), player), proj, event);
 		}
 	}
 

@@ -81,15 +81,17 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable) {
-		List<Player> out = new ArrayList<Player>();
+		List<Player> players = new ArrayList<Player>();
 
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-			if (player.getLocation().distance(loc) < range && player.getGameMode() != GameMode.SPECTATOR
-			    && player.getHealth() > 0 && !AbilityUtils.isStealthed(player)) {
-				out.add(player);
+			if (player.getLocation().distance(loc) < range && player.getGameMode() != GameMode.SPECTATOR && player.getHealth() > 0) {
+				if (includeNonTargetable || !AbilityUtils.isStealthed(player)) {
+					players.add(player);
+				}
 			}
 		}
-		return out;
+
+		return players;
 	}
 
 	public static void healPlayer(Player player, double healAmount) {

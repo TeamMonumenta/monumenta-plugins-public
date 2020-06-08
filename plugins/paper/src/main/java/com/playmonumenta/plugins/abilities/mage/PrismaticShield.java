@@ -66,6 +66,16 @@ public class PrismaticShield extends Ability {
 		return true;
 	}
 
+	@Override
+	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+		if (event.isCancelled()) {
+			return true;
+		}
+
+		execute(event);
+		return true;
+	}
+
 	/*
 	 * Works against all types of damage
 	 */
@@ -83,7 +93,7 @@ public class PrismaticShield extends Ability {
 	private void execute(EntityDamageEvent event) {
 		// Calculate whether this effect should not be run based on player health.
 		// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
-		double healthRemaining = mPlayer.getHealth() - EntityUtils.getRealFinalDamage(event);
+		double healthRemaining = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
 
 		// Health is less than 0 but does not penetrate the absorption shield
 		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAmplifier + 1);

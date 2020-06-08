@@ -63,11 +63,6 @@ public class ViciousCombos extends Ability {
 
 					if (EntityUtils.isElite(killedEntity)) {
 						mPlugin.mTimers.removeAllCooldowns(mPlayer.getUniqueId());
-
-						if (blitz != null) {
-							blitz.fullReset();
-						}
-
 						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "All your cooldowns have been reset");
 						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SPEED, VICIOUS_COMBOS_EFFECT_DURATION, VICIOUS_COMBOS_EFFECT_LEVEL, true, true, true));
 
@@ -88,10 +83,6 @@ public class ViciousCombos extends Ability {
 						int timeReduction = (viciousCombos == 1) ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2;
 						if (killedEntity instanceof Player) {
 							timeReduction *= 2;
-						}
-
-						if (blitz != null) {
-							blitz.lowerCooldown(timeReduction);
 						}
 
 						mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);

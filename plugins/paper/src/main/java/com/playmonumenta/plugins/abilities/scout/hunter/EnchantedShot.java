@@ -20,7 +20,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.scout.BowMastery;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
@@ -46,6 +45,8 @@ public class EnchantedShot extends Ability {
 	private static final Particle.DustOptions ENCHANTED_ARROW_COLOR = new Particle.DustOptions(Color.fromRGB(225, 255, 219), 2.0f);
 	private static final Particle.DustOptions ENCHANTED_ARROW_FRINGE_COLOR = new Particle.DustOptions(Color.fromRGB(168, 255, 252), 2.0f);
 
+	private final int mDamage;
+
 	private boolean mActive = false;
 
 	public EnchantedShot(Plugin plugin, World world, Player player) {
@@ -58,6 +59,8 @@ public class EnchantedShot extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
+
+		mDamage = getAbilityScore() == 1 ? ENCHANTED_1_DAMAGE : ENCHANTED_2_DAMAGE;
 	}
 
 	@Override
@@ -91,7 +94,6 @@ public class EnchantedShot extends Ability {
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);
 			mActive = false;
 			BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1.5, 1.5, 1.5);
-			double damage = getAbilityScore() == 1 ? ENCHANTED_1_DAMAGE : ENCHANTED_2_DAMAGE;
 
 			Player player = mPlayer;
 			Location loc = player.getEyeLocation();
@@ -105,14 +107,8 @@ public class EnchantedShot extends Ability {
 			mWorld.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(dir), 10, 0.2, 0.2, 0.2, 0.15);
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30, mPlayer);
-			BowMastery bm = AbilityManager.getManager().getPlayerAbility(mPlayer, BowMastery.class);
-			if (bm != null) {
-				damage += bm.getBonusDamage();
-			}
-			Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(mPlayer, Sharpshooter.class);
-			if (ss != null) {
-				damage += ss.getSharpshot();
-			}
+
+			double damage = mDamage * BowMastery.getDamageMultiplier(mPlayer) * Sharpshooter.getDamageMultiplier(mPlayer);
 
 			Location pLoc = mPlayer.getEyeLocation();
 			pLoc.setPitch(pLoc.getPitch() + 90);
@@ -135,12 +131,6 @@ public class EnchantedShot extends Ability {
 				while (iterator.hasNext()) {
 					LivingEntity mob = iterator.next();
 					if (mob.getBoundingBox().overlaps(box)) {
-						if (mob instanceof Player) {
-							damage *= 0.75;
-						}
-						if (mob.hasMetadata("PinningShotEnemyIsPinned")) {
-							damage *= mob.getMetadata("PinningShotEnemyIsPinned").get(0).asDouble();
-						}
 						mWorld.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation().add(0, 1, 0), 15, 0.1, 0.2, 0.1, 0.15);
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, mob.getLocation().add(0, 1, 0), 20, 0.1, 0.2, 0.1, 0.15);
 						mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mob.getLocation().add(0, 1, 0), 10, 0.1, 0.2, 0.1, 0.1);

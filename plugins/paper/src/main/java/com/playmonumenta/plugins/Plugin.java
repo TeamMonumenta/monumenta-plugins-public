@@ -49,6 +49,7 @@ import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.cooking.CookingCommand;
 import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
 import com.playmonumenta.plugins.cooking.CookingTableListeners;
+import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -91,6 +92,7 @@ public class Plugin extends JavaPlugin {
 	int mPeriodicTimer = -1;
 
 	public EnchantmentManager mEnchantmentManager;
+	public AttributeManager mAttributeManager;
 	public JunkItemListener mJunkItemsListener;
 	private HttpManager mHttpManager = null;
 	public TrackingManager mTrackingManager;
@@ -164,6 +166,8 @@ public class Plugin extends JavaPlugin {
 
 		mEnchantmentManager = new EnchantmentManager(this);
 		mEnchantmentManager.load(ServerProperties.getForbiddenItemLore());
+
+		mAttributeManager = new AttributeManager();
 
 		mJunkItemsListener = new JunkItemListener();
 

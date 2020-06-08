@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -38,7 +39,7 @@ public class InventoryUtils {
 	private static int BOOTS_SLOT = 36;
 
 	public static void scheduleDelayedEquipmentCheck(final Plugin plugin, final Player player, final Event event) {
-		player.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				final ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -47,7 +48,7 @@ public class InventoryUtils {
 				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
 				plugin.mTrackingManager.mPlayers.updateEquipmentProperties(player, event);
 			}
-		}, 0);
+		}.runTaskLater(plugin, 0);
 	}
 
 	public static boolean testForItemWithLore(final ItemStack item, final String loreText) {
@@ -269,7 +270,7 @@ public class InventoryUtils {
 	public static boolean isBowItem(final ItemStack item) {
 		if (item != null) {
 			final Material mat = item.getType();
-			return mat == Material.BOW;
+			return mat == Material.BOW || mat == Material.CROSSBOW;
 		}
 
 		return false;

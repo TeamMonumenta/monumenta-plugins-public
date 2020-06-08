@@ -6,6 +6,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -37,7 +38,12 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (!(proj instanceof Arrow)) {
+			return true;
+		}
+		Arrow arrow = (Arrow) proj;
+
 		int elementalArrows = getAbilityScore();
 		int damage = elementalArrows == 1 ? ELEMENTAL_ARROWS_1_DAMAGE : ELEMENTAL_ARROWS_2_DAMAGE;
 		if (arrow.hasMetadata("ElementalArrowsFireArrow")) {

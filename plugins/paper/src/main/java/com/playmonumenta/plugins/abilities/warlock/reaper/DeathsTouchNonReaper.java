@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
@@ -61,7 +61,7 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
 		mTracker.updateDamageDealtToBosses(event);
 		return true;
 	}
@@ -78,7 +78,12 @@ public class DeathsTouchNonReaper extends Ability implements KillTriggeredAbilit
 			int duration = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_BUFF_DURATION).get(0).asInt();
 			int amplifierCap = mob.getMetadata(DeathsTouch.DEATHS_TOUCH_AMPLIFIER_CAP).get(0).asInt();
 			for (Map.Entry<PotionEffectType, Integer> effect : effects.entrySet()) {
-				mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, Math.min(amplifierCap, effect.getValue()), true, true));
+				if (effect.getKey() == PotionEffectType.DAMAGE_RESISTANCE) {
+					// Only do Resistance I regardless of Vulnerability level
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, 0, true, true));
+				} else {
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_OTHER, new PotionEffect(effect.getKey(), duration, Math.min(amplifierCap, effect.getValue()), true, true));
+				}
 			}
 		}
 	}

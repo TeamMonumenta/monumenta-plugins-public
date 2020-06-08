@@ -29,7 +29,7 @@ public class Rampage extends Ability {
 	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 25;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
-	private static final double RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO = 1.0 / 2;
+	private static final double RAMPAGE_DAMAGE_RESISTANCE_STACK_RATIO = 1.0;
 	private static final double RAMPAGE_HEAL_STACK_RATIO = 1.0 / 4;
 	private static final double RAMPAGE_RADIUS = 4;
 
@@ -47,7 +47,7 @@ public class Rampage extends Ability {
 		mInfo.mScoreboardId = "Rampage";
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mShorthandName = "Rmp";
-		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 0.5% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/4 stacks consumed.");
+		mInfo.mDescriptions.add("Gain a stack of rage for each 40 melee damage dealt. Stacks decay by 1 every 5 seconds of not dealing melee damage and cap at 15. Passively gain 1% damage resistance for each stack. When at 10 or more stacks, right click while looking down to consume all stacks and damage mobs in a 4 block radius by stacks consumed and heal self by 1/4 stacks consumed.");
 		mInfo.mDescriptions.add("Gain a stack of rage for each 25 melee damage dealt, with stacks capping at 20.");
 		mDamagePerStack = getAbilityScore() == 1 ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK;
 		mStackLimit = getAbilityScore() == 1 ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT;

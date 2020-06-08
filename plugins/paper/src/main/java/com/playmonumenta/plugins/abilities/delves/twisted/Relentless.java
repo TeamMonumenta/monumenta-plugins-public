@@ -15,14 +15,14 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 public class Relentless extends StatMultiplier {
 
 	private static final int RELENTLESS_CHALLENGE_SCORE = 22;
-	private static final double RELENTLESS_DAMAGE_DEALT_MULTIPLIER = 0.5;
+	private static final double RELENTLESS_MOB_HEALTH_MULTIPLIER = 2;
 	private static final double RELENTLESS_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double RELENTLESS_SPEED_MULTIPLIER = 1.5;
 
 	public Relentless(Plugin plugin, World world, Player player) {
 		super(plugin, world, player,
 				ChatColor.GRAY + "Footsteps hound you, " + ChatColor.DARK_RED + ChatColor.BOLD + "RELENTLESS" + ChatColor.GRAY + " in their deadly pursuit.",
-				RELENTLESS_DAMAGE_DEALT_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_SPEED_MULTIPLIER);
+				RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_DAMAGE_TAKEN_MULTIPLIER, RELENTLESS_MOB_HEALTH_MULTIPLIER, RELENTLESS_SPEED_MULTIPLIER);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.playmonumenta.plugins.itemindex.Attribute;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -26,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import com.playmonumenta.plugins.itemindex.Attribute;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
@@ -256,8 +256,8 @@ public class ItemUtils {
 		Attribute.ATTACK_DAMAGE,
 		Attribute.RANGED_DAMAGE,
 		Attribute.ATTACK_SPEED,
-		Attribute.THROW_RATE,
-		Attribute.ARROW_SPEED
+		Attribute.PROJECTILE_SPEED,
+		Attribute.THROW_RATE
 	);
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
@@ -278,7 +278,7 @@ public class ItemUtils {
 			}
 			switch (attribute) {
 				case ATTACK_DAMAGE:
-				case ARROW_SPEED:
+				case PROJECTILE_SPEED:
 					amount += 1;
 					break;
 				case ATTACK_SPEED:

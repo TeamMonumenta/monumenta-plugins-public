@@ -16,6 +16,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -71,8 +72,8 @@ public class FinishingBlow extends Ability {
 	}
 
 	@Override
-	public boolean livingEntityShotByPlayerEvent(Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (arrow.isCritical() && damagee != null) {
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (proj instanceof Arrow && ((Arrow) proj).isCritical()) {
 			mMarkedMobs.put(damagee.getUniqueId(), new Counter(damagee));
 		}
 		return true;

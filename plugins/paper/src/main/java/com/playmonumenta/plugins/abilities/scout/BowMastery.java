@@ -3,38 +3,47 @@ package com.playmonumenta.plugins.abilities.scout;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class BowMastery extends Ability {
 
-	private static final int BOW_MASTER_1_DAMAGE = 3;
-	private static final int BOW_MASTER_2_DAMAGE = 6;
+	private static final double BOW_MASTERY_1_DAMAGE_MULTIPLIER = 1.15;
+	private static final double BOW_MASTERY_2_DAMAGE_MULTIPLIER = 1.3;
 
+	private final double mDamageMultiplier;
 	public BowMastery(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Bow Mastery");
 		mInfo.mScoreboardId = "BowMastery";
 		mInfo.mShorthandName = "BM";
-		mInfo.mDescriptions.add("Your arrows deal up to 3 extra damage scaling with the charge level of your bow.");
-		mInfo.mDescriptions.add("The extra damage is increased to up to 6.");
+		mInfo.mDescriptions.add("Your arrows deal 15% more damage.");
+		mInfo.mDescriptions.add("Your arrows deal 30% more damage.");
+		mInfo.mIgnoreTriggerCap = true;
+
+		mDamageMultiplier = getAbilityScore() == 1 ? BOW_MASTERY_1_DAMAGE_MULTIPLIER : BOW_MASTERY_2_DAMAGE_MULTIPLIER;
 	}
 
 	@Override
 	public boolean playerShotArrowEvent(Arrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
-		double bonusDamage = getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "BowMasteryBonusDamageRegistrationTick")) {
-			AbilityUtils.addArrowBonusDamage(mPlugin, arrow, bonusDamage);
-		}
 		return true;
 	}
 
-	public int getBonusDamage() {
-		return getAbilityScore() == 1 ? BOW_MASTER_1_DAMAGE : BOW_MASTER_2_DAMAGE;
+	@Override
+	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
+		event.setDamage(event.getDamage() * mDamageMultiplier);
+		return true;
+	}
+
+	public static double getDamageMultiplier(Player player) {
+		BowMastery bm = AbilityManager.getManager().getPlayerAbility(player, BowMastery.class);
+		return bm == null ? 1 : bm.mDamageMultiplier;
 	}
 
 }

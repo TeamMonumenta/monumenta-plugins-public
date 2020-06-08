@@ -16,6 +16,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -101,6 +102,7 @@ import com.playmonumenta.plugins.abilities.other.PatreonPurple;
 import com.playmonumenta.plugins.abilities.other.PatreonRed;
 import com.playmonumenta.plugins.abilities.other.PatreonWhite;
 import com.playmonumenta.plugins.abilities.other.PvP;
+import com.playmonumenta.plugins.abilities.other.SecondWindEnchant;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -193,13 +195,14 @@ public class AbilityManager {
 		mWorld = world;
 		mManager = this;
 
-		mReferenceAbilities = new ArrayList<>();
-		mDisabledAbilities = new ArrayList<>();
-		// Damage multiplying skills must come before damage bonus skills
+		mReferenceAbilities = new ArrayList<Ability>();
+		mDisabledAbilities = new ArrayList<Ability>();
 
 		List<Ability> specAbilitiesPriority = Arrays.asList(
+				                           // Damage multiplying skills must come before damage bonus skills
 			                               new GrowingRage(mPlugin, mWorld, null),
 			                               new DarkPact(mPlugin, mWorld, null),
+
 			                               // Starfall needs to come before Mana Lance
 			                               new Starfall(mPlugin, mWorld, null)
 			                           );
@@ -329,9 +332,9 @@ public class AbilityManager {
 
                 //********** SCOUT **********//
                 // RANGER
-                new Quickdraw(mPlugin, mWorld, null),
                 new Disengage(mPlugin, mWorld, null),
                 new PrecisionStrike(mPlugin, mWorld, null),
+                new Quickdraw(mPlugin, mWorld, null),
 
                 // HUNTER
                 new EnchantedShot(mPlugin, mWorld, null),
@@ -404,6 +407,8 @@ public class AbilityManager {
 		                               new Relentless(mPlugin, mWorld, null),
 		                               new Arcanic(mPlugin, mWorld, null),
 		                               new Dreadful(mPlugin, mWorld, null),
+
+		                               new SecondWindEnchant(mPlugin, mWorld, null),
 
 									   new PrismaticShield(mPlugin, mWorld, null),
 		                               new EscapeDeath(mPlugin, mWorld, null)
@@ -606,8 +611,8 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.playerCombustByEntityEvent(event));
 	}
 
-	public boolean livingEntityShotByPlayerEvent(Player player, Arrow arrow, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		return conditionalCastCancellable(player, (ability) -> ability.livingEntityShotByPlayerEvent(arrow, damagee, event));
+	public boolean livingEntityShotByPlayerEvent(Player player, Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		return conditionalCastCancellable(player, (ability) -> ability.livingEntityShotByPlayerEvent(proj, damagee, event));
 	}
 
 	public boolean playerShotArrowEvent(Player player, Arrow arrow) {

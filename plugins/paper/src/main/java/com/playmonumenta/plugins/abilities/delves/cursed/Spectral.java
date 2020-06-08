@@ -39,7 +39,7 @@ public class Spectral extends StatMultiplier {
 	public Spectral(Plugin plugin, World world, Player player) {
 		super(plugin, world, player,
 				ChatColor.GRAY + "The air reeks of death, heralding a " + ChatColor.RED + ChatColor.BOLD + "SPECTRAL" + ChatColor.GRAY + " fate for the fallen.",
-				1, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER);
+				SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, SPECTRAL_DAMAGE_TAKEN_MULTIPLIER, 1);
 		mSpectralSummonCommandData = ServerProperties.getClassSpecializationsEnabled() ? SPECTRAL_2_SUMMON_COMMAND_DATA : SPECTRAL_1_SUMMON_COMMAND_DATA;
 	}
 
