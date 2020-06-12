@@ -19,16 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
-import com.playmonumenta.plugins.enchantments.evasions.Evasion;
-import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
-import com.playmonumenta.plugins.enchantments.evasions.SecondWind;
-import com.playmonumenta.plugins.enchantments.infusions.Acumen;
-import com.playmonumenta.plugins.enchantments.infusions.Focus;
-import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
-import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
-import com.playmonumenta.plugins.enchantments.infusions.Vigor;
-import com.playmonumenta.plugins.enchantments.infusions.Vitality;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class EnchantmentManager implements Listener {

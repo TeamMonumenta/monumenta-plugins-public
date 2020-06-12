@@ -148,7 +148,7 @@ public class AttributeManager {
 	public List<BaseAttribute> mAttributes = new ArrayList<BaseAttribute>();
 
 	public AttributeManager() {
-		mAttributes.add(new AttributeRangedDamage());
+		mAttributes.add(new AttributeProjectileDamage());
 		mAttributes.add(new AttributeProjectileSpeed());
 		mAttributes.add(new AttributeThrowRate());
 

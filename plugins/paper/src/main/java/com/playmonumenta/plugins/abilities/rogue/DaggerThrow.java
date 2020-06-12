@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -47,10 +49,10 @@ public class DaggerThrow extends Ability {
 		mInfo.mLinkedSpell = Spells.DAGGER_THROW;
 		mInfo.mScoreboardId = "DaggerThrow";
 		mInfo.mShorthandName = "DT";
-		mInfo.mDescriptions.add("Sneaking and right-clicking while holding two swords throws out three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown 15s");
+		mInfo.mDescriptions.add("Sneak left click while holding two swords to throw three daggers which deal 6 damage and gives each target 20% Vulnerability for 10 seconds. Cooldown 15s");
 		mInfo.mDescriptions.add("The damage is increased to 12 and the Vulnerability increased to 40%.");
 		mInfo.mCooldown = DAGGER_THROW_COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamage = getAbilityScore() == 1 ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE;
 		mVulnAmplifier = getAbilityScore() == 1 ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN;
 	}
@@ -111,6 +113,15 @@ public class DaggerThrow extends Ability {
 			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);
 		}
 		return false;
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
+		if (event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
+			cast(Action.LEFT_CLICK_AIR);
+		}
+
+		return true;
 	}
 
 }

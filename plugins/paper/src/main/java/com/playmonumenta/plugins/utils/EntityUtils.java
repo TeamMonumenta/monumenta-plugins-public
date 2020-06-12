@@ -78,6 +78,7 @@ public class EntityUtils {
 			DamageCause.PROJECTILE,
 			DamageCause.THORNS
 	);
+
 	private static final EnumSet<EntityType> UNDEAD_MOBS = EnumSet.of(
 			EntityType.ZOMBIE,
 			EntityType.ZOMBIE_VILLAGER,
@@ -93,13 +94,54 @@ public class EntityUtils {
 		    EntityType.DROWNED
 	);
 
+	private static final EnumSet<EntityType> ARTHROPOD_MOBS = EnumSet.of(
+			EntityType.SPIDER,
+			EntityType.CAVE_SPIDER,
+			EntityType.SILVERFISH,
+			EntityType.ENDERMITE,
+			EntityType.BEE
+	);
+
+	private static final EnumSet<EntityType> AQUATIC_MOBS = EnumSet.of(
+			EntityType.DOLPHIN,
+			EntityType.GUARDIAN,
+			EntityType.ELDER_GUARDIAN,
+			EntityType.SQUID,
+			EntityType.TURTLE,
+			EntityType.COD,
+			EntityType.SALMON,
+			EntityType.TROPICAL_FISH,
+			EntityType.PUFFERFISH
+	);
+
 	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
 			EntityType.CREEPER,
 			EntityType.BLAZE,
+			EntityType.GHAST,
 			EntityType.ENDERMAN,
-			EntityType.ENDERMITE,
+			EntityType.ENDER_DRAGON,
 			EntityType.WOLF,
-			EntityType.OCELOT
+			EntityType.OCELOT,
+			EntityType.RAVAGER,
+			EntityType.SLIME,
+			EntityType.MAGMA_CUBE,
+			EntityType.SHULKER,
+			EntityType.POLAR_BEAR,
+			EntityType.BAT,
+			EntityType.CAT,
+			EntityType.CHICKEN,
+			EntityType.COW,
+			EntityType.DONKEY,
+			EntityType.FOX,
+			EntityType.HORSE,
+			EntityType.LLAMA,
+			EntityType.MULE,
+			EntityType.MUSHROOM_COW,
+			EntityType.PANDA,
+			EntityType.PARROT,
+			EntityType.PIG,
+			EntityType.RABBIT,
+			EntityType.SHEEP
 	);
 
 	private static final EnumSet<EntityType> HUMANOID_MOBS = EnumSet.of(
@@ -108,7 +150,10 @@ public class EntityUtils {
 			EntityType.EVOKER,
 			EntityType.VEX,
 			EntityType.WITCH,
-			EntityType.IRON_GOLEM
+			EntityType.IRON_GOLEM,
+			EntityType.GIANT,
+			EntityType.PILLAGER,
+			EntityType.SNOWMAN
 	);
 
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<LivingEntity, Integer>();
@@ -188,8 +233,19 @@ public class EntityUtils {
 		mobsTracker.runTaskTimer(plugin, 0, 1);
 	}
 
+	// Affected by Smite
 	public static boolean isUndead(LivingEntity mob) {
 		return UNDEAD_MOBS.contains(mob.getType());
+	}
+
+	// Affected by Bane of Arthropods
+	public static boolean isArthropod(LivingEntity mob) {
+		return ARTHROPOD_MOBS.contains(mob.getType());
+	}
+
+	// Affected by Impaling
+	public static boolean isAquatic(LivingEntity mob) {
+		return AQUATIC_MOBS.contains(mob.getType());
 	}
 
 	// Affected by Slayer
@@ -586,8 +642,7 @@ public class EntityUtils {
 				target.setNoDamageTicks(0);
 			}
 
-			// We want Precision Strike to trigger Swift Cuts
-			if (spell == Spells.PRECISION_STRIKE || !(damager instanceof Player)) {
+			if (!(damager instanceof Player)) {
 				// Applies DamageCause.ENTITY_ATTACK
 				target.damage(damage, damager);
 			} else if (damager instanceof Player) {

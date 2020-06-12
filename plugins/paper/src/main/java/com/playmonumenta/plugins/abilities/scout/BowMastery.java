@@ -14,16 +14,16 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 
 public class BowMastery extends Ability {
 
-	private static final double BOW_MASTERY_1_DAMAGE_MULTIPLIER = 1.15;
-	private static final double BOW_MASTERY_2_DAMAGE_MULTIPLIER = 1.3;
+	private static final double BOW_MASTERY_1_DAMAGE_MULTIPLIER = 1.2;
+	private static final double BOW_MASTERY_2_DAMAGE_MULTIPLIER = 1.35;
 
 	private final double mDamageMultiplier;
 	public BowMastery(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Bow Mastery");
 		mInfo.mScoreboardId = "BowMastery";
 		mInfo.mShorthandName = "BM";
-		mInfo.mDescriptions.add("Your arrows deal 15% more damage.");
-		mInfo.mDescriptions.add("Your arrows deal 30% more damage.");
+		mInfo.mDescriptions.add("Your arrows deal 20% more damage.");
+		mInfo.mDescriptions.add("Your arrows deal 35% more damage.");
 		mInfo.mIgnoreTriggerCap = true;
 
 		mDamageMultiplier = getAbilityScore() == 1 ? BOW_MASTERY_1_DAMAGE_MULTIPLIER : BOW_MASTERY_2_DAMAGE_MULTIPLIER;

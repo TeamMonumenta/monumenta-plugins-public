@@ -101,6 +101,15 @@ public class ChestUtils {
 		yellowTwistedLootTableMappings.put("r1/dungeons/5/ender-1", "r1/dungeons/delves/yellow/twisted_ender");
 		yellowTwistedLootTableMappings.put("r1/dungeons/5/overgrown-man-2", "r1/dungeons/delves/yellow/twisted_final");
 
+		Map<String, String> willowsCursedLootTableMappings = new HashMap<String, String>();
+		Map<String, String> willowsTwistedLootTableMappings = new HashMap<String, String>();
+		willowsCursedLootTableMappings.put("r1/dungeons/bonus/level_4_chest", "r1/dungeons/delves/willows/cursed_chest");
+		willowsCursedLootTableMappings.put("r1/dungeons/bonus/level_5_chest", "r1/dungeons/delves/willows/cursed_chest");
+		willowsCursedLootTableMappings.put("r1/dungeons/bonus/final_chest", "r1/dungeons/delves/willows/cursed_final");
+		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/level_4_chest", "r1/dungeons/delves/willows/twisted_chest");
+		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/level_5_chest", "r1/dungeons/delves/willows/twisted_chest");
+		willowsTwistedLootTableMappings.put("r1/dungeons/bonus/final_chest", "r1/dungeons/delves/willows/twisted_final");
+
 		Map<String, String> limeCursedLootTableMappings = new HashMap<String, String>();
 		Map<String, String> limeTwistedLootTableMappings = new HashMap<String, String>();
 		limeCursedLootTableMappings.put("r2/dungeons/lime/swamplevel_2_chest", "r2/dungeons/delves/lime/cursed_swamp");
@@ -210,6 +219,7 @@ public class ChestUtils {
 		DELVES_LOOT_TABLE_MAPPINGS.put("magenta", new DelvesLootTableMappings("Delve3Challenge", Arrays.asList(magentaCursedLootTableMappings, magentaTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("lightblue", new DelvesLootTableMappings("Delve4Challenge", Arrays.asList(lightblueCursedLootTableMappings, lightblueTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("yellow", new DelvesLootTableMappings("Delve5Challenge", Arrays.asList(yellowCursedLootTableMappings, yellowTwistedLootTableMappings)));
+		DELVES_LOOT_TABLE_MAPPINGS.put("willows", new DelvesLootTableMappings("DelveWChallenge", Arrays.asList(willowsCursedLootTableMappings, willowsTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("lime", new DelvesLootTableMappings("Delve6Challenge", Arrays.asList(limeCursedLootTableMappings, limeTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("pink", new DelvesLootTableMappings("Delve7Challenge", Arrays.asList(pinkCursedLootTableMappings, pinkTwistedLootTableMappings)));
 		DELVES_LOOT_TABLE_MAPPINGS.put("gray", new DelvesLootTableMappings("Delve8Challenge", Arrays.asList(grayCursedLootTableMappings, grayTwistedLootTableMappings)));

@@ -62,8 +62,8 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {
-						loc.getWorld().playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 2f, 0.5f);
-						loc.getWorld().spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
+						world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1f, 0.5f);
+						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);
 						}

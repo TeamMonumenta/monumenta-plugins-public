@@ -90,12 +90,11 @@ import com.playmonumenta.plugins.abilities.delves.twisted.Arcanic;
 import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
 import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
 import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
-import com.playmonumenta.plugins.enchantments.AttributeRangedDamage;
+import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
 import com.playmonumenta.plugins.enchantments.HexEater;
 import com.playmonumenta.plugins.enchantments.IceAspect;
-import com.playmonumenta.plugins.enchantments.Impact;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Slayer;
@@ -341,9 +340,10 @@ public class EntityListener implements Listener {
 				}
 			}
 		} else if (damager instanceof Projectile) {
-			Projectile proj = (Projectile)damager;
+			Projectile proj = (Projectile) damager;
+
 			if (proj.getShooter() instanceof Player) {
-				Player player = (Player)proj.getShooter();
+				Player player = (Player) proj.getShooter();
 
 				// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
 				if (player.getGameMode() == GameMode.ADVENTURE
@@ -364,8 +364,32 @@ public class EntityListener implements Listener {
 						return;
 					}
 
-					// Set the projectiledamage from attributes
-					AttributeRangedDamage.onShootAttack(mPlugin, (Projectile) damager, (LivingEntity) damagee, event);
+					LivingEntity le = (LivingEntity) damagee;
+
+					AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event);
+
+					Sniper.onShootAttack(mPlugin, proj, le, event);
+					PointBlank.onShootAttack(mPlugin, proj, le, event);
+					Frost.onShootAttack(mPlugin, proj, le, event);
+					Inferno.onShootAttack(mPlugin, proj, le, event);
+					Focus.onShootAttack(mPlugin, proj, le, event);
+
+					if (damager instanceof Trident) {
+						IceAspect.onShootAttack(mPlugin, proj, le, event);
+						Thunder.onShootAttack(mPlugin, proj, le, event);
+						HexEater.onShootAttack(mPlugin, proj, le, event);
+						Slayer.onShootAttack(mPlugin, proj, le, event);
+						Duelist.onShootAttack(mPlugin, proj, le, event);
+						Focus.onShootAttack(mPlugin, proj, le, event);
+
+						/*
+						 * The trident damage from Smite, Bane, Impaling seems to be properly applied, even
+						 * though AttributeProjectileDamage.onShootAttack(mPlugin, proj, le, event); does
+						 * direct damage setting, so that's convenient
+						 *
+						 * Sharpness bonus damage seems to not be registered, so no need to compensate there
+						 */
+					}
 
 					// Call events if not a throwing knife
 					if (!(proj instanceof Arrow && ThrowingKnife.isThrowingKnife((Arrow) proj))) {
@@ -377,26 +401,7 @@ public class EntityListener implements Listener {
 						}
 					}
 				}
-
 			}
-		}
-
-		if (damager instanceof Projectile && damagee instanceof LivingEntity) {
-			Sniper.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			PointBlank.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Frost.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Inferno.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Focus.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-		}
-
-		if (damager instanceof Trident && damagee instanceof LivingEntity) {
-			Impact.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			IceAspect.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Thunder.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			HexEater.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Slayer.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Duelist.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
-			Focus.onShootAttack(mPlugin, (Projectile)damager, (LivingEntity)damagee, event);
 		}
 
 		if (damagee instanceof LivingEntity) {
@@ -622,8 +627,8 @@ public class EntityListener implements Listener {
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
 					//Set Ranged Damage attribute
-					if (origBall.hasMetadata(AttributeRangedDamage.DAMAGE_METAKEY)) {
-						newBall.setMetadata(AttributeRangedDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origBall.getMetadata(AttributeRangedDamage.DAMAGE_METAKEY).get(0).asDouble()));
+					if (origBall.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
+						newBall.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origBall.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
 					}
 					event.setCancelled(true);
 					return;
@@ -643,8 +648,8 @@ public class EntityListener implements Listener {
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
 					//Set Ranged Damage attribute
-					if (origPearl.hasMetadata(AttributeRangedDamage.DAMAGE_METAKEY)) {
-						newPearl.setMetadata(AttributeRangedDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origPearl.getMetadata(AttributeRangedDamage.DAMAGE_METAKEY).get(0).asDouble()));
+					if (origPearl.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
+						newPearl.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origPearl.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
 					}
 					event.setCancelled(true);
 					return;

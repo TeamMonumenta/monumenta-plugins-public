@@ -62,8 +62,8 @@ public class MagicArrowBoss extends BossAbilityGroup {
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {
-						loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
-						loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
+						world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
+						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);
 						}

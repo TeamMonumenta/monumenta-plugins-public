@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.itemindex;
 
 import java.util.ArrayList;
 
+import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileSpeed;
-import com.playmonumenta.plugins.enchantments.AttributeRangedDamage;
 import com.playmonumenta.plugins.enchantments.AttributeThrowRate;
 import com.playmonumenta.plugins.enchantments.BaseAttribute;
 
@@ -13,7 +13,7 @@ public enum Attribute {
 	//so... main stats first
 	ATTACK_DAMAGE(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE, " Attack Damage"),
 	ATTACK_SPEED(org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED,  " Attack Speed"),
-	RANGED_DAMAGE(new AttributeRangedDamage()),
+	RANGED_DAMAGE(new AttributeProjectileDamage()),
 	PROJECTILE_SPEED(new AttributeProjectileSpeed()),
 	THROW_RATE(new AttributeThrowRate()),
 

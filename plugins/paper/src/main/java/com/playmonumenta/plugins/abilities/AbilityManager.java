@@ -130,9 +130,9 @@ import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.hunter.EnchantedShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
-import com.playmonumenta.plugins.abilities.scout.ranger.Disengage;
-import com.playmonumenta.plugins.abilities.scout.ranger.PrecisionStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.Reflexes;
+import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.BlasphemousAura;
 import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames;
@@ -332,8 +332,8 @@ public class AbilityManager {
 
                 //********** SCOUT **********//
                 // RANGER
-                new Disengage(mPlugin, mWorld, null),
-                new PrecisionStrike(mPlugin, mWorld, null),
+                new TacticalManeuver(mPlugin, mWorld, null),
+                new Reflexes(mPlugin, mWorld, null),
                 new Quickdraw(mPlugin, mWorld, null),
 
                 // HUNTER
@@ -458,6 +458,7 @@ public class AbilityManager {
 			movementSpeed.setBaseValue(0.1);
 		}
 		Toughness.removeModifier(player);
+		Swiftness.removeModifier(player);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
 		// The absorption tracker may lose track of the player when doing things like shard transfers, so reset absorption

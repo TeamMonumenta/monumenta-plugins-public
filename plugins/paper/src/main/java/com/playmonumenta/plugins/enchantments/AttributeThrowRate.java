@@ -28,7 +28,7 @@ public class AttributeThrowRate implements BaseAttribute {
 			ItemStack item = NmsUtils.getTridentItem(trident);
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
-			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0) {
+			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {
 				//Make trident unpickupable, set cooldown, damage trident based on Unbreaking enchant
 				player.setCooldown(item.getType(), (int)(20 / value));
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);

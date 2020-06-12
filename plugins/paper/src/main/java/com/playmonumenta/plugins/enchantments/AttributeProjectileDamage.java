@@ -10,9 +10,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
 
-public class AttributeRangedDamage implements BaseAttribute {
-	private static final String PROPERTY_NAME = "Ranged Damage";
-	public static final String DAMAGE_METAKEY = "AttributeRangedDamageMetakey";
+public class AttributeProjectileDamage implements BaseAttribute {
+	private static final String PROPERTY_NAME = "Projectile Damage";
+	public static final String DAMAGE_METAKEY = "AttributeProjectileDamageMetakey";
 	// Bow velocity comes out at around 2.95 to 3.05
 	private static final double ARROW_VELOCITY_SCALE = 3;
 
@@ -35,7 +35,7 @@ public class AttributeRangedDamage implements BaseAttribute {
 			// Only scale damage if not fully charged arrow and if it is an arrow being launched
 			if (proj instanceof Arrow && !((Arrow) proj).isCritical()) {
 				// Arrow speed will be different if arrow speed attribute is active, so scale properly
-				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeProjectileSpeed.getArrowSpeedModifier(proj));
+				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeProjectileSpeed.getProjectileSpeedModifier(proj));
 			}
 
 			//Regardless of projectile type, set damage here

@@ -1,5 +1,9 @@
 package com.playmonumenta.plugins.enchantments;
 
+import javax.annotation.Nullable;
+
+import org.bukkit.ChatColor;
+
 import com.playmonumenta.plugins.enchantments.evasions.AbilityEvasion;
 import com.playmonumenta.plugins.enchantments.evasions.Evasion;
 import com.playmonumenta.plugins.enchantments.evasions.MeleeEvasion;
@@ -10,9 +14,6 @@ import com.playmonumenta.plugins.enchantments.infusions.Perspicacity;
 import com.playmonumenta.plugins.enchantments.infusions.Tenacity;
 import com.playmonumenta.plugins.enchantments.infusions.Vigor;
 import com.playmonumenta.plugins.enchantments.infusions.Vitality;
-import org.bukkit.ChatColor;
-
-import javax.annotation.Nullable;
 
 public enum Enchantment {
 	// armor upgrades : they should not be present in the item index, thus, unused here
@@ -73,6 +74,7 @@ public enum Enchantment {
 	THORNS(ChatColor.GRAY + "Thorns", org.bukkit.enchantments.Enchantment.THORNS),
 	ADRENALINE(new Adrenaline()),
 	SAPPER(new Sapper()),
+	RECOIL(new Recoil()),
 
 	// armor protections
 	PROTECTION(ChatColor.GRAY + "Protection", org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL),

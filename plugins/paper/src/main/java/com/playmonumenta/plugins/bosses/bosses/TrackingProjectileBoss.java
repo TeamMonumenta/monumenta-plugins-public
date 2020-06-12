@@ -62,8 +62,8 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {
-						loc.getWorld().playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
-						loc.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25);
+						world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
+						world.spawnParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);
 						}

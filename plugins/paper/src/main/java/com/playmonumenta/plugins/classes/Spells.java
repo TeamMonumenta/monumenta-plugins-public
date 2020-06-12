@@ -73,8 +73,8 @@ public enum Spells {
 
 	//--Ranger
 	QUICKDRAW("Quickdraw"),
-	DISENGAGE("Disengage"),
-	PRECISION_STRIKE("Precision Strike"),
+	TACTICAL_MANEUVER("Tactical Maneuver"),
+	REFLEXES("Reflexes"),
 
 	//Warlock
 

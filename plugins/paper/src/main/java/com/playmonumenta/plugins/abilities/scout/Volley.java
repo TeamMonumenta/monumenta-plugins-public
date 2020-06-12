@@ -116,7 +116,7 @@ public class Volley extends Ability {
 				event.setDamage(event.getDamage() * mDamageMultiplier);
 			} else {
 				// Only let one Volley arrow hit a given mob
-				event.setDamage(0);
+				return false;
 			}
 		}
 

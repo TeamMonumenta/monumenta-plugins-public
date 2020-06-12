@@ -53,10 +53,10 @@ public class BodkinBlitz extends Ability {
 		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
-		mInfo.mDescriptions.add("Left-click while sneaking and holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Cooldown: 20 seconds. Charges: 2.");
+		mInfo.mDescriptions.add("Sneak right click while holding two swords to teleport 10 blocks forwards. Gain 1 second of Stealth upon teleporting. This ability cannot be used in safe zones. Cooldown: 20 seconds. Charges: 2.");
 		mInfo.mDescriptions.add("Range increased to 14 blocks, Stealth increased to 1.5 seconds, and Cooldown reduced to 18 seconds. Upon teleporting, your next melee attack deals 20 bonus damage if your target is not focused on you.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? BODKINBLITZ_1_COOLDOWN : BODKINBLITZ_2_COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 
 		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;

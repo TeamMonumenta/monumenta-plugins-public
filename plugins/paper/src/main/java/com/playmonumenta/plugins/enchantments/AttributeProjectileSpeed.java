@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.enchantments;
 
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -20,13 +19,13 @@ public class AttributeProjectileSpeed implements BaseAttribute {
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
 		// If level is 0, that means we have no modifiers
-		if (value != 0 && proj instanceof Arrow) {
+		if (value != 0) {
 			proj.setMetadata(SPEED_METAKEY, new FixedMetadataValue(plugin, value));
 			proj.setVelocity(proj.getVelocity().multiply(value));
 		}
 	}
 
-	public static double getArrowSpeedModifier(Projectile proj) {
+	public static double getProjectileSpeedModifier(Projectile proj) {
 		if (proj.hasMetadata(SPEED_METAKEY)) {
 			return proj.getMetadata(AttributeProjectileSpeed.SPEED_METAKEY).get(0).asDouble();
 		}

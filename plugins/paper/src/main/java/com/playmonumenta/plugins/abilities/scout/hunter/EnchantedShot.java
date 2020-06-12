@@ -28,14 +28,6 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
-/*
- * Enchanted Arrow: Left click while not sneaking will prime an enchanted arrow.
- * If a critical arrow is fired within 5 seconds, the ability goes on cooldown and
- * the arrow will instantaneously travel in a straight line for 30
- * blocks until hitting a block, piercing through all targets,
- * dealing 25 / 40 damage. (Cooldown: 25 / 20 s)
- */
-
 public class EnchantedShot extends Ability {
 
 	private static final int ENCHANTED_1_DAMAGE = 25;
@@ -53,8 +45,8 @@ public class EnchantedShot extends Ability {
 		super(plugin, world, player, "Enchanted Arrow");
 		mInfo.mScoreboardId = "EnchantedArrow";
 		mInfo.mShorthandName = "EA";
-		mInfo.mDescriptions.add("Left-clicking with a bow, while not shifted, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage. Cooldown: 25s.");
-		mInfo.mDescriptions.add("Every enemy hit takes 40 damage instead. Cooldown is reduced to 20 seconds.");
+		mInfo.mDescriptions.add("Left-clicking with a bow, while not shifted, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage, affected by Bow Mastery and Sharpshooter. Hit targets contribute to Sharpshooter stacks. Cooldown: 05s.");
+		mInfo.mDescriptions.add("Every enemy hit takes 40 damage instead. Cooldown is reduced to 16 seconds.");
 		mInfo.mLinkedSpell = Spells.ENCHANTED_ARROW;
 		mInfo.mCooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
@@ -109,6 +101,7 @@ public class EnchantedShot extends Ability {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getEyeLocation(), 30, mPlayer);
 
 			double damage = mDamage * BowMastery.getDamageMultiplier(mPlayer) * Sharpshooter.getDamageMultiplier(mPlayer);
+			int hits = 0;
 
 			Location pLoc = mPlayer.getEyeLocation();
 			pLoc.setPitch(pLoc.getPitch() + 90);
@@ -137,6 +130,7 @@ public class EnchantedShot extends Ability {
 						EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 						/* Prevent mob from being hit twice in one shot */
 						iterator.remove();
+						hits++;
 					}
 				}
 				if (bLoc.getBlock().getType().isSolid()) {
@@ -150,6 +144,7 @@ public class EnchantedShot extends Ability {
 				pVec.rotateAroundAxis(dir, Math.PI / 6);
 			}
 
+			Sharpshooter.addStacks(mPlugin, mPlayer, hits);
 			putOnCooldown();
 			return false;
 		}
