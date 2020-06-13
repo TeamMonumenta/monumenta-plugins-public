@@ -232,6 +232,12 @@ public class Boss {
 		}
 	}
 
+	public void nearbyEntityDeath(EntityDeathEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.nearbyEntityDeath(event);
+		}
+	}
+
 	public Entity getLastHitBy() {
 		return mLastHitBy;
 	}

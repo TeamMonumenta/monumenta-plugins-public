@@ -275,6 +275,11 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
+	 * Called when nearby enemy dies within 12 blocks
+	 */
+	public void nearbyEntityDeath(EntityDeathEvent event) {}
+
+	/*
 	 * Called when the mob is unloading and we need to save its metadata
 	 *
 	 * Needed whenever the boss needs more parameters to instantiate than just
