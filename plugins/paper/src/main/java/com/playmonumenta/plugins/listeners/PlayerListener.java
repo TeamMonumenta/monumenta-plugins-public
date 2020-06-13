@@ -91,8 +91,6 @@ import org.bukkit.util.Vector;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.cooking.CookingItemObject;
-import com.playmonumenta.plugins.cooking.CookingUtils;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
@@ -613,6 +611,7 @@ public class PlayerListener implements Listener {
 			 * Items dropped are invulnerable for a short while to prevent double-creepering
 			 */
 			event.setKeepInventory(true);
+			event.getDrops().clear();
 			event.setKeepLevel(false);
 
 			List<Item> droppedItems = new ArrayList<Item>();
@@ -767,12 +766,13 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		AbilityManager.getManager().playerItemConsumeEvent(player, event);
 
+		//MUST FIX: MAKES INFINITY CONSUMABLES WITH LORE NOT WORK WHEN ENABLED
 		// cooking
-		String json = CookingUtils.extractItemDataFromFirstLoreLine(event.getItem());
-		CookingItemObject item = CookingUtils.cookingItemObjectFromJson(json);
-		if (item != null) {
-			item.consumeItem(player);
-		}
+//		String json = CookingUtils.extractItemDataFromFirstLoreLine(event.getItem());
+//		CookingItemObject item = CookingUtils.cookingItemObjectFromJson(json);
+//		if (item != null) {
+//			item.consumeItem(player);
+//		}
 
 		/* Don't let players consume shattered items */
 		if (ItemUtils.isItemShattered(event.getItem())) {
