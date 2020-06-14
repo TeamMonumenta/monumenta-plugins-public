@@ -6,6 +6,6 @@ public class FastUtils {
 	public static final XoRoShiRo128PlusRandom RANDOM = new XoRoShiRo128PlusRandom();
 
 	public static final double randomDoubleInRange(double min, double max) {
-		return (RANDOM.nextDouble() * (max - min)) - min;
+		return (RANDOM.nextDouble() * (max - min)) + min;
 	}
 }
