@@ -23,7 +23,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 
 	private static final boolean SINGLE_TARGET = false;
 	private static final boolean LAUNCH_TRACKING = false;
-	private static final int COOLDOWN = 20 * 8;
+	private static final int COOLDOWN = 20 * 12;
 	private static final int DELAY = 20 * 1;
 	private static final double SPEED = 0.4;
 	private static final double TURN_RADIUS = Math.PI / 30;
