@@ -94,7 +94,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.integrations.JeffChestSortIntegration;
+import com.playmonumenta.plugins.integrations.ChestSortIntegration;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -410,38 +410,35 @@ public class PlayerListener implements Listener {
 		if (event.getWhoClicked() instanceof Player) {
 			Player player = (Player) event.getWhoClicked();
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
-			if (JeffChestSortIntegration.isPresent()) {
+			if (ChestSortIntegration.isPresent()) {
 				Inventory inventory = event.getClickedInventory();
 				if (inventory == null) {
 					return;
-				} else if (inventory instanceof PlayerInventory) {
-					// Don't sort player inventories until support is added
-					// to prevent sorting hotbar / armor slots
-				} else {
-					if (event.getClick() != null
-					    && event.getClick().equals(ClickType.RIGHT)
-					    && inventory.getItem(event.getSlot()) == null
-					    && event.getAction().equals(InventoryAction.NOTHING)) {
+				}
 
-						// Player right clicked an empty space and nothing happened
-						// Check if the last thing the player did was also the same thing.
-						// If so, sort the chest
-						if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
-							JeffChestSortIntegration.sortInventory(inventory);
-							player.updateInventory();
-							player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+				if (event.getClick() != null
+					&& event.getClick().equals(ClickType.RIGHT)
+					&& inventory.getItem(event.getSlot()) == null
+					&& event.getAction().equals(InventoryAction.NOTHING)) {
 
-							// Just in case we sorted an item on top of where the player was clicking
-							event.setCancelled(true);
-						} else {
-							// Mark the player as having right clicked an empty slot
-							player.setMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, new FixedMetadataValue(mPlugin, 1));
-						}
+					// Player right clicked an empty space and nothing happened
+					// Check if the last thing the player did was also the same thing.
+					// If so, sort the chest
+					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+						ChestSortIntegration.sortInventory(inventory);
+						player.updateInventory();
+						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
+
+						// Just in case we sorted an item on top of where the player was clicking
+						event.setCancelled(true);
 					} else {
-						// Player did something else with this inventory - clear the right click metadata if present
-						if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
-							player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
-						}
+						// Mark the player as having right clicked an empty slot
+						player.setMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, new FixedMetadataValue(mPlugin, 1));
+					}
+				} else {
+					// Player did something else with this inventory - clear the right click metadata if present
+					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
+						player.removeMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY, mPlugin);
 					}
 				}
 			}

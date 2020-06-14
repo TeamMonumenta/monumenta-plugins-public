@@ -2,18 +2,20 @@ package com.playmonumenta.plugins.integrations;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-import de.jeffclan.JeffChestSort.JeffChestSortPlugin;
+import de.jeff_media.ChestSort.ChestSortAPI;
+import de.jeff_media.ChestSort.ChestSortPlugin;
 
-public class JeffChestSortIntegration {
+public class ChestSortIntegration {
 	private static boolean checkedForPlugin = false;
-	private static JeffChestSortPlugin chestSortPlugin = null;
+	private static ChestSortAPI chestSortAPI = null;
 
 	private static void checkForPlugin() {
 		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("ChestSort");
-		if (plugin instanceof JeffChestSortPlugin) {
-			chestSortPlugin = (JeffChestSortPlugin)plugin;
+		if (plugin instanceof ChestSortPlugin) {
+			chestSortAPI = ((ChestSortPlugin)plugin).getAPI();
 		}
 		checkedForPlugin = true;
 	}
@@ -23,12 +25,16 @@ public class JeffChestSortIntegration {
 			checkForPlugin();
 		}
 
-		return chestSortPlugin != null;
+		return chestSortAPI != null;
 	}
 
 	public static void sortInventory(Inventory inventory) {
 		if (isPresent()) {
-			chestSortPlugin.sortInventory(inventory);
+			if (inventory instanceof PlayerInventory) {
+				chestSortAPI.sortInventory(inventory, 9, 35);
+			} else {
+				chestSortAPI.sortInventory(inventory);
+			}
 		}
 	}
 }
