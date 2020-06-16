@@ -17,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -204,7 +205,7 @@ public class AbilityUtils {
 		return false;
 	}
 
-	public static void refundArrow(Player player, Arrow arrow) {
+	public static void refundArrow(Player player, AbstractArrow arrow) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		//Only refund arrow once

@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -30,7 +30,7 @@ public class BowMastery extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.CLOUD);
 		return true;
 	}

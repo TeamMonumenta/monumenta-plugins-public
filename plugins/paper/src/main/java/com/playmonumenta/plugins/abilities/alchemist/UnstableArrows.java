@@ -4,9 +4,13 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -31,7 +35,7 @@ public class UnstableArrows extends Ability {
 	private static final int UNSTABLE_ARROWS_2_DAMAGE = 24;
 	private static final int UNSTABLE_ARROWS_RADIUS = 4;
 
-	private Arrow mUnstableArrow = null;
+	private AbstractArrow mUnstableArrow = null;
 
 	public UnstableArrows(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Unstable Arrows");
@@ -48,70 +52,75 @@ public class UnstableArrows extends Ability {
 	}
 
 	@Override
-	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (mUnstableArrow != null && arrow == mUnstableArrow) {
-			arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-			putOnCooldown();
-			mUnstableArrow = null;
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
+			AbstractArrow arrow = (AbstractArrow) proj;
+			if (mUnstableArrow != null && arrow == mUnstableArrow) {
+				arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
+				putOnCooldown();
+				mUnstableArrow = null;
 
-			Location loc = arrow.getLocation();
-
-			// Run cleansing rain here until it finishes
-			new BukkitRunnable() {
-				int mTicks = 0;
-				@Override
-				public void run() {
-					mWorld.spawnParticle(Particle.FLAME, loc, 3, 0.3, 0.3, 0.3, 0.05);
-					mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.075);
-					mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
-					                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
-					if (mTicks % 18 == 0) {
-						mWorld.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
-						mWorld.spawnParticle(Particle.LAVA, loc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
-					}
-					if (mTicks >= UNSTABLE_ARROWS_DURATION) {
-						arrow.remove();
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
-
-						mWorld.spawnParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2);
-						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35);
-						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35);
-						BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
-
-						int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
-
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
-							EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
-							MovementUtils.knockAwayRealistic(loc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
-							if (bp != null) {
-								bp.apply(mob);
-							}
+				Entity entity = event.getHitEntity();
+				// 1 tick delay so that we get the location of the arrow after it lands
+				// For some reason, this doesn't work when you shoot an arrow with more than 2 Projectile Speed; increasing the
+				// delay does nothing, and even weirder, the same exact code seems to work for AlchemicalArtillery but not this.
+				new BukkitRunnable() {
+					Location mLoc = entity == null ? proj.getLocation() : entity.getLocation();
+					int mTicks = 0;
+					@Override
+					public void run() {
+						mWorld.spawnParticle(Particle.FLAME, mLoc, 3, 0.3, 0.3, 0.3, 0.05);
+						mWorld.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 7, 0.5, 0.5, 0.5, 0.075);
+						mWorld.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 0.3f,
+						                 ((UNSTABLE_ARROWS_DURATION / 3.0f) + mTicks) / (1.5f * UNSTABLE_ARROWS_DURATION));
+						if (mTicks % 18 == 0) {
+							mWorld.playSound(mLoc, Sound.BLOCK_LAVA_EXTINGUISH, 1.6f, 1f + mTicks / 36f);
+							mWorld.spawnParticle(Particle.LAVA, mLoc, 80, UNSTABLE_ARROWS_RADIUS, 0, UNSTABLE_ARROWS_RADIUS, 0);
 						}
+						if (mTicks >= UNSTABLE_ARROWS_DURATION) {
+							arrow.remove();
+							mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 0f);
+							mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.25f);
 
-						// Custom knockback function because this is unreliable as is with weird arrow location calculations
-						if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
-							&& mPlayer.getLocation().distance(loc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
-							if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-								Vector dir = mPlayer.getLocation().subtract(loc.toVector()).toVector();
-								dir.setY(dir.getY() / 1.5).normalize().multiply(2);
-								dir.setY(dir.getY() + 0.5);
-								mPlayer.setVelocity(dir);
+							mWorld.spawnParticle(Particle.FLAME, mLoc, 115, 0.02, 0.02, 0.02, 0.2);
+							mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
+							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 40, 0.02, 0.02, 0.02, 0.35);
+							BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+
+							int baseDamage = (getAbilityScore() == 1) ? UNSTABLE_ARROWS_1_DAMAGE : UNSTABLE_ARROWS_2_DAMAGE;
+
+							for (LivingEntity mob : EntityUtils.getNearbyMobs(mLoc, UNSTABLE_ARROWS_RADIUS, mPlayer)) {
+								EntityUtils.damageEntity(mPlugin, mob, baseDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
+								MovementUtils.knockAwayRealistic(mLoc, mob, UNSTABLE_ARROWS_KNOCKBACK_SPEED, 0.5f);
+								if (bp != null) {
+									bp.apply(mob);
+								}
 							}
-						} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001
-							&& mPlayer.getLocation().distance(loc) < UNSTABLE_ARROWS_RADIUS) {
-							MovementUtils.knockAwayRealistic(loc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED * 4, 6);
+
+							// Custom knockback function because this is unreliable as is with weird arrow location calculations
+							if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 1
+								&& mPlayer.getLocation().distance(mLoc) < UNSTABLE_ARROWS_RADIUS / 2.0) {
+								if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+									Vector dir = mPlayer.getLocation().subtract(mLoc.toVector()).toVector();
+									dir.setY(dir.getY() / 1.5).normalize().multiply(2);
+									dir.setY(dir.getY() + 0.5);
+									mPlayer.setVelocity(dir);
+								}
+							} else if (ScoreboardUtils.getScoreboardValue(mPlayer, "RocketJumper") == 9001
+								&& mPlayer.getLocation().distance(mLoc) < UNSTABLE_ARROWS_RADIUS) {
+								MovementUtils.knockAwayRealistic(mLoc, mPlayer, UNSTABLE_ARROWS_KNOCKBACK_SPEED * 4, 6);
+							}
+							this.cancel();
 						}
-						this.cancel();
+						mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
 					}
-					mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
-				}
-			}.runTaskTimer(mPlugin, 0, UNSTABLE_ARROWS_PARTICLE_PERIOD);
+				}.runTaskTimer(mPlugin, 1, UNSTABLE_ARROWS_PARTICLE_PERIOD);
+			}
 		}
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		// Can't use runCheck for this because player doesn't need to be sneaking when arrow lands
 		if (mPlayer.isSneaking()) {
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5.0f, 0.25f);

@@ -17,8 +17,8 @@ public class Arcanic extends StatMultiplier {
 
 	private static final int ARCANIC_CHALLENGE_SCORE = 23;
 	private static final double ARCANIC_MOB_HEALTH_MULTIPLIER = 2;
-	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1.5;
-	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 3;
+	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1.25;
+	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2.5;
 	private static final double ARCANIC_ABILITY_CHANCE = 1;
 
 	private static final String[] ARCANIC_ABILITY_POOL = {
@@ -26,11 +26,12 @@ public class Arcanic extends StatMultiplier {
 		"boss_bombtossnoblockbreak",
 		"boss_seekingprojectile",
 		"boss_trackingprojectile",
-		"boss_earthshake",
 		"boss_tpbehindtargeted",
 		"boss_pulselaser",
 		"boss_flamelaser",
 		"boss_chargerstrong",
+		"boss_chargerstrong",
+		"boss_magicarrow",
 		"boss_magicarrow"
 	};
 

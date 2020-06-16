@@ -9,7 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -80,7 +80,7 @@ public class EnchantedShot extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mActive && arrow.isCritical()) {
 			arrow.remove();
 			mPlugin.mProjectileEffectTimers.removeEntity(arrow);

@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -42,7 +42,7 @@ public class HallowedBeam extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		Player player = mPlayer;
 		LivingEntity e = EntityUtils.getCrosshairTarget(player, 30, false, true, true, false);
 		if (e != null && EntityUtils.isUndead(e)) {

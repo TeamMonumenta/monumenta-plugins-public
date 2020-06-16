@@ -25,6 +25,8 @@ public class Mystic extends StatMultiplier {
 			"boss_pulselaser",
 			"boss_flamelaser",
 			"boss_chargerstrong",
+			"boss_chargerstrong",
+			"boss_magicarrow",
 			"boss_magicarrow"
 	};
 

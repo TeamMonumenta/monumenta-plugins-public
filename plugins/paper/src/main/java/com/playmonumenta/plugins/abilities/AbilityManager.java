@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -616,7 +616,7 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.livingEntityShotByPlayerEvent(proj, damagee, event));
 	}
 
-	public boolean playerShotArrowEvent(Player player, Arrow arrow) {
+	public boolean playerShotArrowEvent(Player player, AbstractArrow arrow) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerShotArrowEvent(arrow));
 	}
 
@@ -662,8 +662,8 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.playerItemHeldEvent(mainHand, offHand));
 	}
 
-	public void projectileHitEvent(Player player, ProjectileHitEvent event, Arrow arrow) {
-		conditionalCast(player, (ability) -> ability.projectileHitEvent(event, arrow));
+	public void projectileHitEvent(Player player, ProjectileHitEvent event, Projectile proj) {
+		conditionalCast(player, (ability) -> ability.projectileHitEvent(event, proj));
 	}
 
 	public void bossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {

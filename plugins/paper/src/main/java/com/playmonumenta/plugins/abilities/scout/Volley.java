@@ -7,10 +7,13 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -52,7 +55,7 @@ public class Volley extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (!mPlayer.isSneaking()
 		    || mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
 			/* This ability is actually on cooldown - event proceeds as normal */
@@ -69,20 +72,31 @@ public class Volley extends Ability {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				List<Projectile> projectiles;
+
 				// Store PotionData from the original arrow only if it is weakness or slowness
 				PotionData tArrowData = null;
-				if (arrow.hasCustomEffects()) {
-					tArrowData = arrow.getBasePotionData();
-					if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
-						// This arrow isn't weakness or slowness - don't store the potion data
-						tArrowData = null;
+
+				if (arrow instanceof Arrow) {
+					Arrow regularArrow = (Arrow) arrow;
+					if (regularArrow.hasCustomEffects()) {
+						tArrowData = regularArrow.getBasePotionData();
+						if (tArrowData.getType() != PotionType.SLOWNESS && tArrowData.getType() != PotionType.WEAKNESS) {
+							// This arrow isn't weakness or slowness - don't store the potion data
+							tArrowData = null;
+						}
 					}
+
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, mArrowCount, 1.75, 5, Arrow.class);
+				} else {
+					projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, mArrowCount, 1.75, 5, SpectralArrow.class);
 				}
 
-				List<Projectile> projectiles = EntityUtils.spawnArrowVolley(mPlugin, mPlayer, mArrowCount, 1.75, 5, Arrow.class);
+
 
 				for (Projectile proj : projectiles) {
-					Arrow projArrow = (Arrow) proj;
+					AbstractArrow projArrow = (AbstractArrow) proj;
+					projArrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
 					projArrow.setMetadata(VOLLEY_METAKEY, new FixedMetadataValue(mPlugin, null));
 					projArrow.setCritical(arrow.isCritical());
@@ -90,7 +104,7 @@ public class Volley extends Ability {
 
 					// If the base arrow's potion data is still stored, apply it to the new arrows
 					if (tArrowData != null) {
-						projArrow.setBasePotionData(tArrowData);
+						((Arrow) projArrow).setBasePotionData(tArrowData);
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(projArrow, Particle.SMOKE_NORMAL);

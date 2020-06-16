@@ -46,9 +46,9 @@ public class AvengerBoss extends BossAbilityGroup implements Listener {
 				//Raise the mobs attack damage
 				mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getBaseValue() * 1.1);
 
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5f, 0.8f);
-				mBoss.getWorld().spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
-				mBoss.getWorld().spawnParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 25, 1.5, 1.5, 1.5);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.1f, 0.8f);
+				mBoss.getWorld().spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 20, 0.25, 0.45, 0.25, 1);
+				mBoss.getWorld().spawnParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 20, 1.5, 1.5, 1.5);
 			}
 		}
 	}

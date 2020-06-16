@@ -223,7 +223,31 @@ public class SpellBaseSeekingProjectile extends Spell {
 					}
 				}
 
+
 				Vector shift = mDirection.clone().multiply(mSpeed);
+
+				Block block = mLocation.getBlock();
+				if (mCollidesWithBlocks) {
+					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
+						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)));
+						this.cancel();
+						if (!mLingers) {
+							mActiveRunnables.remove(this);
+						}
+						return;
+					}
+				} else {
+					if (mHitbox.overlaps(block.getBoundingBox())) {
+						if (block.isLiquid()) {
+							shift.multiply(0.5);
+						} else {
+							// If going through blocks, increase the effects
+							mProjectileAesthetic.run(mWorld, mLocation);
+							shift.multiply(0.125);
+						}
+					}
+				}
+
 				mLocation.add(shift);
 				mHitbox.shift(shift);
 				mProjectileAesthetic.run(mWorld, mLocation);
@@ -232,18 +256,6 @@ public class SpellBaseSeekingProjectile extends Spell {
 				for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2)) {
 					if (mHitbox.overlaps(player.getBoundingBox())) {
 						mHitAction.run(mWorld, player, mLocation);
-						this.cancel();
-						if (!mLingers) {
-							mActiveRunnables.remove(this);
-						}
-						return;
-					}
-				}
-
-				if (mCollidesWithBlocks) {
-					Block block = mLocation.getBlock();
-					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
-						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)));
 						this.cancel();
 						if (!mLingers) {
 							mActiveRunnables.remove(this);

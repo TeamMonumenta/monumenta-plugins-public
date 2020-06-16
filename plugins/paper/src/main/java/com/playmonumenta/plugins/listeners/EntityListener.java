@@ -655,7 +655,7 @@ public class EntityListener implements Listener {
 					return;
 				}
 			} else if (event.getEntityType() == EntityType.ARROW || event.getEntityType() == EntityType.SPECTRAL_ARROW) {
-				Arrow arrow = (Arrow)proj;
+				AbstractArrow arrow = (AbstractArrow) proj;
 				if (!mAbilities.playerShotArrowEvent(player, arrow)) {
 					event.setCancelled(true);
 				}
@@ -890,14 +890,17 @@ public class EntityListener implements Listener {
 	//  An Arrow hit something.
 	@EventHandler(priority = EventPriority.HIGH)
 	public void projectileHitEvent(ProjectileHitEvent event) {
-		EntityType type = event.getEntityType();
-
 		Entity entity = event.getHitEntity();
+		Projectile proj = event.getEntity();
+		ProjectileSource source = proj.getShooter();
+
 		if (entity != null && entity instanceof Player) {
-			Player player = (Player)entity;
+			Player player = (Player) entity;
 			mAbilities.playerHitByProjectileEvent(player, event);
-			if (type == EntityType.ARROW) {
-				Arrow arrow = (Arrow)event.getEntity();
+
+			// Tipped Arrow shenanigans
+			if (proj instanceof Arrow) {
+				Arrow arrow = (Arrow) proj;
 
 				if (player.isBlocking()) {
 					Vector to = player.getLocation().toVector();
@@ -931,24 +934,14 @@ public class EntityListener implements Listener {
 			}
 		}
 
-		if (type == EntityType.ARROW || type == EntityType.SPECTRAL_ARROW) {
-			Arrow arrow = (Arrow)event.getEntity();
-			ProjectileSource source = arrow.getShooter();
-			if (source instanceof Player) {
-				Player player = (Player)source;
-				mAbilities.projectileHitEvent(player, event, arrow);
-			}
+		if (source instanceof Player) {
+			mAbilities.projectileHitEvent((Player) source, event, proj);
 		}
 
-		mPlugin.mProjectileEffectTimers.removeEntity(event.getEntity());
+		mPlugin.mProjectileEffectTimers.removeEntity(proj);
 
-		if ((type == EntityType.SNOWBALL)
-		    && (event.getHitEntity() instanceof LivingEntity)
-		    && (!(event.getHitEntity() instanceof Player))
-		    && (!event.getHitEntity().isInvulnerable())) {
-
-			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 300, 0, false);
-			((LivingEntity)event.getHitEntity()).addPotionEffect(effect);
+		if (proj instanceof Snowball && entity instanceof LivingEntity && !(entity instanceof Player) && !entity.isInvulnerable() && source instanceof Player) {
+			PotionUtils.applyPotion((Player) source, (LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, 300, 0, false));
 		}
 	}
 

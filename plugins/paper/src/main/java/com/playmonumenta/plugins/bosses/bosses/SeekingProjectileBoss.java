@@ -28,7 +28,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 	private static final double SPEED = 0.4;
 	private static final double TURN_RADIUS = Math.PI / 30;
 	private static final int LIFETIME_TICKS = 20 * 8;
-	private static final double HITBOX_LENGTH = 0.75;
+	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 20;
@@ -48,21 +48,22 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 					// Initiate Aesthetic
 					(World world, Location loc) -> {
 						PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 0.5f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
 					},
 					// Launch Aesthetic
 					(World world, Location loc) -> {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1f);
+						world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
 					},
 					// Projectile Aesthetic
 					(World world, Location loc) -> {
 						world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0);
+						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.1f, 0.2f);
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {
-						world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 						world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
 						if (player != null) {
 							BossUtils.bossDamage(boss, player, DAMAGE);

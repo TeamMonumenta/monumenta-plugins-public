@@ -115,7 +115,7 @@ public class SpellBombToss extends Spell {
 				TNTPrimed mTnt = tnt;
 				@Override
 				public void run() {
-					mBoss.getLocation().getWorld().createExplosion(mBoss, mTnt.getLocation(), mYield, mSetFire, mBreakBlocks);
+					mBoss.getLocation().getWorld().createExplosion(mTnt.getLocation(), mYield, mSetFire, mBreakBlocks, mBoss);
 				}
 			};
 			explosion.runTaskLater(mPlugin, mFuse);

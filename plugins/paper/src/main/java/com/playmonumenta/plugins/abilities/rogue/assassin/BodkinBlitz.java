@@ -66,10 +66,19 @@ public class BodkinBlitz extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		if (mCharges <= 0 || mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return;
+		}
+
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		if (mCharges <= 0 || mTeleporting || !mPlayer.isSneaking() || !(InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand)) ||
-				ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if (!InventoryUtils.isSwordItem(mainHand) || !InventoryUtils.isSwordItem(offHand)) {
+			return;
+		}
+
+		Location loc = mPlayer.getLocation();
+		// Smokescreen trigger conflict
+		if (loc.getPitch() > 50) {
 			return;
 		}
 
@@ -78,8 +87,8 @@ public class BodkinBlitz extends Ability {
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
 
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
 
 		new BukkitRunnable() {
 			Location mTpLoc = mPlayer.getLocation();

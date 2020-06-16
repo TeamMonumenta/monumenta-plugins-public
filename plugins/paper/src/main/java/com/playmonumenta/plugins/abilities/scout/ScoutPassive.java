@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.abilities.scout;
 
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
@@ -29,7 +29,7 @@ public class ScoutPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
 			AbilityUtils.refundArrow(mPlayer, arrow);

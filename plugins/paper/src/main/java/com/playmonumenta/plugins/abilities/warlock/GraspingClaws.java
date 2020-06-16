@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -67,11 +68,11 @@ public class GraspingClaws extends Ability {
 	}
 
 	@Override
-	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (this.mArrow != null && this.mArrow == arrow) {
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (this.mArrow != null && this.mArrow == proj) {
 			this.mArrow = null;
-			Location loc = arrow.getLocation();
-			World world = arrow.getWorld();
+			Location loc = proj.getLocation();
+			World world = proj.getWorld();
 
 			world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1.25f, 1.25f);
 			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 1.25f, 1.45f);
@@ -81,13 +82,13 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125);
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(arrow.getLocation(), GRASPING_CLAWS_RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, GRASPING_CLAWS_RADIUS, mPlayer)) {
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-				MovementUtils.pullTowards(arrow, mob, GRASPING_CLAWS_SPEED);
+				MovementUtils.pullTowards(proj, mob, GRASPING_CLAWS_SPEED);
 				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, mAmplifier, false, true));
 			}
 
-			arrow.remove();
+			proj.remove();
 		}
 	}
 

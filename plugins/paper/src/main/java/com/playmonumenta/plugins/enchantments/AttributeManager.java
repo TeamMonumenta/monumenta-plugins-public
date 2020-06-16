@@ -210,16 +210,31 @@ public class AttributeManager {
 							loreSegments[0] = loreSegments[0].substring(0, loreSegments[0].length() - 1);
 						}
 
-						try {
-							// Given all the pre-processing and check of array length, this should be a parsable double, but use a try-catch block just in case
+						boolean foundDecimal = false;
+						int j;
+						for (j = 0; j < loreSegments[0].length(); j++) {
+							char c = loreSegments[0].charAt(j);
+							if (!Character.isDigit(c)) {
+								if (c == '.') {
+									if (foundDecimal) {
+										break;
+									} else {
+										foundDecimal = true;
+									}
+								} else {
+									break;
+								}
+							}
+						}
+
+						// Reached the end of iteration means parsable
+						if (j == loreSegments[0].length()) {
 							double value = Double.parseDouble(loreSegments[0]);
 							if (isMultiplier) {
 								value /= 100;
 							}
 
 							plugin.mAttributeManager.mAttributeTrie.add(loreSegments[1], player, value, isMultiplier, i == 1);
-						} catch (NumberFormatException e) {
-							e.printStackTrace();
 						}
 					}
 				}

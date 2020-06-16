@@ -6,9 +6,13 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -76,57 +80,70 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	@Override
-	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
-		if (arrow.hasMetadata(ALCHEMICAL_ARTILLERY_METAKEY)) {
-			// Must remove metadata or the arrow could bounce and go boom x2
-			arrow.removeMetadata(ALCHEMICAL_ARTILLERY_METAKEY, mPlugin);
-			Location loc = arrow.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
-			mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.08 * mRadius);
-			mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
-			mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
+		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
+			AbstractArrow arrow = (AbstractArrow) proj;
 
-			AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
-			BrutalAlchemy ba = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-			GruesomeAlchemy ga = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
-			NightmarishAlchemy na = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
-			InvigoratingOdor io = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-			BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+			if (arrow.hasMetadata(ALCHEMICAL_ARTILLERY_METAKEY)) {
+				// Must remove metadata or the arrow could bounce and go boom x2
+				arrow.removeMetadata(ALCHEMICAL_ARTILLERY_METAKEY, mPlugin);
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
-			int size = mobs.size();
-			boolean guaranteedApplicationApplied = false;
+				Entity entity = event.getHitEntity();
+				// Delayed run to get real location of arrow
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						Location loc = entity == null ? arrow.getLocation() : entity.getLocation();
 
-			for (LivingEntity mob : mobs) {
-				// Brutal must go first to apply the Vulnerability
-				if (ba != null) {
-					ba.apply(mob);
-				}
-				if (ga != null) {
-					ga.apply(mob);
-				}
-				if (ap != null) {
-					ap.apply(mob);
-				}
-				if (na != null) {
-					guaranteedApplicationApplied = na.apply(mob, size, guaranteedApplicationApplied);
-				}
-				if (io != null) {
-					io.apply(mob);
-				}
-				if (bp != null) {
-					bp.apply(mob);
-				}
-			}
-			if (io != null) {
-				io.createAura(loc, mRadius);
+						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
+						mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);
+						mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 5 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.08 * mRadius);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
+						mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 1);
+
+						AlchemistPotions ap = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemistPotions.class);
+						BrutalAlchemy ba = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
+						GruesomeAlchemy ga = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
+						NightmarishAlchemy na = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
+						InvigoratingOdor io = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
+						BasiliskPoison bp = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+
+						List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
+						int size = mobs.size();
+						boolean guaranteedApplicationApplied = false;
+
+						for (LivingEntity mob : mobs) {
+							// Brutal must go first to apply the Vulnerability
+							if (ba != null) {
+								ba.apply(mob);
+							}
+							if (ga != null) {
+								ga.apply(mob);
+							}
+							if (ap != null) {
+								ap.apply(mob);
+							}
+							if (na != null) {
+								guaranteedApplicationApplied = na.apply(mob, size, guaranteedApplicationApplied);
+							}
+							if (io != null) {
+								io.apply(mob);
+							}
+							if (bp != null) {
+								bp.apply(mob);
+							}
+						}
+						if (io != null) {
+							io.createAura(loc, mRadius);
+						}
+					}
+				}.runTaskLater(mPlugin, 1);
 			}
 		}
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mActive) {
 			if (AbilityUtils.removeAlchemistPotions(mPlayer, mCost)) {
 				mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.FIREWORKS_SPARK);

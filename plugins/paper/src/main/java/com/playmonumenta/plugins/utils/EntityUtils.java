@@ -18,8 +18,8 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -409,7 +409,7 @@ public class EntityUtils {
 		return null;
 	}
 
-	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends Arrow> arrowClass) {
+	public static Projectile spawnArrow(Plugin plugin, Player player, Vector rotation, Vector offset, Vector speed, Class<? extends AbstractArrow> arrowClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);
 		loc.setPitch(loc.getPitch() + (float)rotation.getX());
@@ -417,7 +417,7 @@ public class EntityUtils {
 		Vector vel = new Vector(loc.getDirection().getX() * speed.getX(), loc.getDirection().getY() * speed.getY(), loc.getDirection().getZ() * speed.getZ());
 
 		World world = player.getWorld();
-		Arrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, arrowClass);
+		AbstractArrow arrow = world.spawnArrow(loc, vel, 0.6f, 12.0f, arrowClass);
 
 		arrow.setShooter(player);
 		arrow.setVelocity(vel);
@@ -425,7 +425,7 @@ public class EntityUtils {
 		return arrow;
 	}
 
-	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends Arrow> arrowClass) {
+	public static List<Projectile> spawnArrowVolley(Plugin plugin, Player player, int numProjectiles, double speedModifier, double spacing, Class<? extends AbstractArrow> arrowClass) {
 		List<Projectile> projectiles = new ArrayList<Projectile>();
 
 		Vector speed = new Vector(1.75 * speedModifier, 2 * speedModifier, 1.75 * speedModifier);

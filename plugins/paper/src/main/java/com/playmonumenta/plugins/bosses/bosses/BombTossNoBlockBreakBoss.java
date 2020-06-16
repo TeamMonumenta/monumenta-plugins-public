@@ -17,7 +17,7 @@ public class BombTossNoBlockBreakBoss extends BossAbilityGroup {
 	LivingEntity mBoss;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BombTossBoss(plugin, boss);
+		return new BombTossNoBlockBreakBoss(plugin, boss);
 	}
 
 	public BombTossNoBlockBreakBoss(Plugin plugin, LivingEntity boss) {

@@ -2,10 +2,12 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -30,7 +32,7 @@ public class BasiliskPoison extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
-		if (proj instanceof Arrow) {
+		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
 			apply(damagee);
 			mWorld.spawnParticle(Particle.TOTEM, damagee.getLocation().add(0, 1.6, 0), 12, 0.4, 0.4, 0.4, 0.1);
 		}
@@ -47,7 +49,7 @@ public class BasiliskPoison extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.TOTEM);
 		return true;
 	}

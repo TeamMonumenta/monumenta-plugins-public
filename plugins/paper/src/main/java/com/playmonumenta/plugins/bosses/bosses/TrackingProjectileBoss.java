@@ -25,10 +25,10 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 	private static final boolean LAUNCH_TRACKING = true;
 	private static final int COOLDOWN = 20 * 16;
 	private static final int DELAY = 20 * 1;
-	private static final double SPEED = 0.2;
+	private static final double SPEED = 0.15;
 	private static final double TURN_RADIUS = Math.PI;
 	private static final int LIFETIME_TICKS = 20 * 16;
-	private static final double HITBOX_LENGTH = 1;
+	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 24;
@@ -59,6 +59,7 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 					(World world, Location loc) -> {
 						world.spawnParticle(Particle.SPELL_WITCH, loc, 6, 0, 0, 0, 0.3);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.4, 0.4, 0.4, 0);
+						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 0.1f, 0.5f);
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.mage;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.LivingEntity;
@@ -78,7 +79,7 @@ public class ElementalArrows extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (mPlayer.isSneaking()) {
 			arrow.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
 			arrow.setFireTicks(0);

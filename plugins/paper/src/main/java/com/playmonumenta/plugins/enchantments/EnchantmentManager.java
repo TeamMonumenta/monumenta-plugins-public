@@ -59,7 +59,8 @@ public class EnchantmentManager implements Listener {
 
 		// in order to add a new enchant to the manager, add it as an enum value in the Enchantment enum
 		for (Enchantment e : Enchantment.values()) {
-			if (e.isCustomEnchant()) {
+			// Don't double count regen; this is a crappy fix but the manager will be phased out soon anyways, so meh
+			if (e.isCustomEnchant() && e != Enchantment.MAINHAND_REGENERATION) {
 				init.add(e.getEnchantClass());
 			}
 		}

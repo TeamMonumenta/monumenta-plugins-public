@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -67,7 +67,7 @@ public class NonClericProvisionsPassive extends Ability {
 	}
 
 	@Override
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		if (testRandomChance()) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}

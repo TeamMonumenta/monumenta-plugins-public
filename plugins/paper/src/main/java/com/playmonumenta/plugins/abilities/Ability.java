@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities;
 import java.util.Collection;
 
 import org.bukkit.World;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -146,7 +146,7 @@ public abstract class Ability {
 		return true;
 	}
 
-	public boolean playerShotArrowEvent(Arrow arrow) {
+	public boolean playerShotArrowEvent(AbstractArrow arrow) {
 		return true;
 	}
 
@@ -181,7 +181,7 @@ public abstract class Ability {
 		return 0;
 	}
 
-	public void projectileHitEvent(ProjectileHitEvent event, Arrow arrow) {
+	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 
 	}
 
