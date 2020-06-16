@@ -42,8 +42,6 @@ import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
-import com.playmonumenta.plugins.commands.SpringCleanItems;
-import com.playmonumenta.plugins.commands.SpringScores;
 import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.cooking.CookingCommand;
 import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
@@ -74,7 +72,6 @@ import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.network.SocketManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.redis.RedisManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
@@ -104,8 +101,6 @@ public class Plugin extends JavaPlugin {
 	public ItemManager mItemManager;
 	public IndexInventoryManager mIndexInventoryManager;
 
-	private RedisManager mRedis;
-
 	public SocketManager mSocketManager;
 
 	public ItemOverrides mItemOverrides;
@@ -131,8 +126,6 @@ public class Plugin extends JavaPlugin {
 		FestiveHeldItem.register();
 		GildifyHeldItem.register();
 		InfuseHeldItem.register();
-		SpringCleanItems.register();
-		SpringScores.register();
 		ClaimRaffle.register(this);
 		DeCluckifyHeldItem.register();
 		CalculateReforge.register();
@@ -182,14 +175,6 @@ public class Plugin extends JavaPlugin {
 		PluginManager manager = getServer().getPluginManager();
 
 		mHttpManager.start();
-
-		try {
-			mRedis = new RedisManager(getLogger());
-		} catch (Exception ex) {
-			/* TODO: This is probably a fatal exception! */
-			getLogger().severe("Failed to instantiate redis manager: " + ex.getMessage());
-			ex.printStackTrace();
-		}
 
 		try {
 			mSocketManager = new SocketManager(this);
@@ -330,7 +315,6 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon disabling the plugin.
 	@Override
 	public void onDisable() {
-		mRedis.closePool();
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
 
