@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.commands.BossFight;
-import com.playmonumenta.plugins.commands.Bot;
 import com.playmonumenta.plugins.commands.BroadcastCommand;
 import com.playmonumenta.plugins.commands.CalculateReforge;
 import com.playmonumenta.plugins.commands.ClaimRaffle;
@@ -171,7 +170,6 @@ public class Plugin extends JavaPlugin {
 
 		mJunkItemsListener = new JunkItemListener();
 
-		Bot.register(this);
 		if (ServerProperties.getBroadcastCommandEnabled()) {
 			BroadcastCommand.register(this);
 		}
