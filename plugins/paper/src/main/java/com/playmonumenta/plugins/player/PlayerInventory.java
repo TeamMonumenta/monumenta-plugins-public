@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class PlayerInventory {
@@ -56,7 +57,7 @@ public class PlayerInventory {
 	private boolean mNeedsUpdate = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
-		updateEquipmentProperties(plugin, player, null);
+		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, null);
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
