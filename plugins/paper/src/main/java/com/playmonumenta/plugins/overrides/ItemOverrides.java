@@ -182,6 +182,7 @@ public class ItemOverrides {
 		mItems.put(Material.TNT_MINECART, minecartOverride);
 
 		mItems.put(Material.CONDUIT, new ConduitOverride());
+		mItems.put(Material.GRINDSTONE, new GrindstoneOverride());
 		mItems.put(Material.FILLED_MAP, new MapOverride());
 		mItems.put(Material.PUMPKIN_PIE, new PumpkinPieOverride());
 
