@@ -141,7 +141,9 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
+		ChestUtils.chestScalingLuck(plugin, player, block);
 		check_nerf_chest(block, player);
+		ChestUtils.replaceWithDelveLootTable(player, block);
 
 		return true;
 	}
@@ -165,8 +167,16 @@ public class ChestOverride extends BaseOverride {
 			}
 		}
 
-		for (Player player : PlayerUtils.playersInRange(block.getLocation(), 30)) {
+		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30);
+
+		for (Player player : players) {
 			check_nerf_chest(block, player);
+		}
+
+		//Runs replacement with closest player
+		if (players.size() > 0 && players.get(0) != null) {
+			ChestUtils.chestScalingLuck(plugin, players.get(0), block);
+			ChestUtils.replaceWithDelveLootTable(players.get(0), block);
 		}
 
 		return true;

@@ -181,6 +181,7 @@ public class ItemOverrides {
 		mItems.put(Material.HOPPER_MINECART, minecartOverride);
 		mItems.put(Material.TNT_MINECART, minecartOverride);
 
+		mItems.put(Material.COMPOSTER, new ComposterOverride());
 		mItems.put(Material.CONDUIT, new ConduitOverride());
 		mItems.put(Material.GRINDSTONE, new GrindstoneOverride());
 		mItems.put(Material.FILLED_MAP, new MapOverride());
@@ -211,6 +212,21 @@ public class ItemOverrides {
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
+
+		BaseOverride signOverride = new SignOverride();
+		mItems.put(Material.ACACIA_SIGN, signOverride);
+		mItems.put(Material.ACACIA_WALL_SIGN, signOverride);
+		mItems.put(Material.BIRCH_SIGN, signOverride);
+		mItems.put(Material.BIRCH_WALL_SIGN, signOverride);
+		mItems.put(Material.DARK_OAK_SIGN, signOverride);
+		mItems.put(Material.DARK_OAK_WALL_SIGN, signOverride);
+		mItems.put(Material.JUNGLE_SIGN, signOverride);
+		mItems.put(Material.JUNGLE_WALL_SIGN, signOverride);
+		mItems.put(Material.OAK_SIGN, signOverride);
+		mItems.put(Material.OAK_WALL_SIGN, signOverride);
+		mItems.put(Material.SPRUCE_SIGN, signOverride);
+		mItems.put(Material.SPRUCE_WALL_SIGN, signOverride);
+
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);

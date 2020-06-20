@@ -118,6 +118,8 @@ public class ItemUtils {
 		Material.ACACIA_FENCE_GATE,
 		Material.ACACIA_TRAPDOOR,
 		Material.ANVIL,
+		Material.CHIPPED_ANVIL,
+		Material.DAMAGED_ANVIL,
 		Material.BEACON,
 		Material.BIRCH_BUTTON,
 		Material.BIRCH_DOOR,
@@ -220,7 +222,18 @@ public class ItemUtils {
 		Material.WHITE_BED,
 		Material.WHITE_SHULKER_BOX,
 		Material.YELLOW_BED,
-		Material.YELLOW_SHULKER_BOX
+		Material.YELLOW_SHULKER_BOX,
+		Material.LOOM,
+		Material.BARREL,
+		Material.SMOKER,
+		Material.BLAST_FURNACE,
+		Material.CARTOGRAPHY_TABLE,
+		Material.FLETCHING_TABLE,
+		Material.GRINDSTONE,
+		Material.SMITHING_TABLE,
+		Material.STONECUTTER,
+		Material.BELL,
+		Material.COMPOSTER
 	);
 
 	public static final Set<Material> shulkerBoxes = EnumSet.of(
@@ -259,6 +272,26 @@ public class ItemUtils {
 		Attribute.PROJECTILE_SPEED,
 		Attribute.THROW_RATE
 	);
+
+	public static final Set<Material> dyes = EnumSet.of(
+		Material.RED_DYE,
+		Material.GREEN_DYE,
+		Material.PURPLE_DYE,
+		Material.CYAN_DYE,
+		Material.LIGHT_GRAY_DYE,
+		Material.GRAY_DYE,
+		Material.PINK_DYE,
+		Material.LIME_DYE,
+		Material.YELLOW_DYE,
+		Material.BLUE_DYE,
+		Material.LIGHT_BLUE_DYE,
+		Material.MAGENTA_DYE,
+		Material.ORANGE_DYE,
+		Material.BROWN_DYE,
+		Material.BLACK_DYE,
+		Material.WHITE_DYE
+	);
+
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
 		ChatColor color = ChatColor.BLUE;
@@ -731,6 +764,11 @@ public class ItemUtils {
 	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from
 	public static boolean isRanged(Material mat) {
 		return ranged.contains(mat);
+	}
+
+	//Returns true if the item material is a dye
+	public static boolean isDye(Material mat) {
+		return dyes.contains(mat);
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
