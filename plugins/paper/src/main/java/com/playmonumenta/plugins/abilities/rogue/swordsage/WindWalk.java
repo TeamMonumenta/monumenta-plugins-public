@@ -1,8 +1,9 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -16,17 +17,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
-public class WindWalk extends Ability {
+public class WindWalk extends MultipleChargeAbility {
 
 	private static final int WIND_WALK_COOLDOWN = 20 * 25;
 	private static final int WIND_WALK_MAX_CHARGES = 2;
@@ -42,11 +42,9 @@ public class WindWalk extends Ability {
 	private final int mDuration;
 
 	private int mLeftClicks = 0;
-	private int mCharges = 2;
-	private boolean mWasOnCooldown = false;
 
 	public WindWalk(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Wind Walk");
+		super(plugin, world, player, "Wind Walk", WIND_WALK_MAX_CHARGES, WIND_WALK_MAX_CHARGES);
 		mInfo.mLinkedSpell = Spells.WIND_WALK;
 		mInfo.mScoreboardId = "WindWalk";
 		mInfo.mShorthandName = "WW";
@@ -60,10 +58,14 @@ public class WindWalk extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mCharges == 0 || !mPlayer.isSprinting() || mPlayer.getLocation().getPitch() > 50
+		if (!mPlayer.isSprinting() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
 				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
-				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())
-				|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
+			return;
+		}
+
+		Location loc = mPlayer.getLocation();
+		if (loc.getPitch() > 50) {
 			return;
 		}
 
@@ -81,73 +83,67 @@ public class WindWalk extends Ability {
 			return;
 		}
 		mLeftClicks = 0;
-		mCharges--;
-		MessagingUtils.sendActionBarMessage(mPlayer, "Wind Walk Charges: " + mCharges);
 
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
-		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1f);
-		mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 90, 0.25, 0.45, 0.25, 0.1);
-		mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.45, 0.25, 0.15);
-		Vector direction = mPlayer.getLocation().getDirection();
+		if (!consumeCharge()) {
+			return;
+		}
+
+		mPlayer.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1.75f);
+		mPlayer.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1f);
+		mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1);
+		mWorld.spawnParticle(Particle.CLOUD, loc, 20, 0.25, 0.45, 0.25, 0.15);
+		Vector direction = loc.getDirection();
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
+
 		new BukkitRunnable() {
-			final List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
+			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
 			@Override
 			public void run() {
+				if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline()) {
+					this.cancel();
+					return;
+				}
+
+				Material block = mPlayer.getLocation().getBlock().getType();
+				if (block == Material.WATER || block == Material.LAVA || block == Material.LADDER) {
+					this.cancel();
+					return;
+				}
+
 				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation().add(mPlayer.getVelocity().normalize()), WIND_WALK_RADIUS)) {
-					if (!mMobsAlreadyHit.contains(mob)) {
+
+				Iterator<LivingEntity> iter = mMobsNotHit.iterator();
+				while (iter.hasNext()) {
+					LivingEntity mob = iter.next();
+
+					if (mob.getLocation().distance(mPlayer.getLocation()) < WIND_WALK_RADIUS) {
 						if (!EntityUtils.isBoss(mob)) {
+							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
 							mWorld.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 1.25f);
+
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
-						}
-						if (EntityUtils.isElite(mob)) {
-							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
-							mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
-							mWorld.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 0.75f);
-						} else if (!EntityUtils.isBoss(mob)) {
-							mWorld.spawnParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0);
-							mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
-							mob.setVelocity(mob.getVelocity().setY(0.5));
-							PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, mDuration, 0, true, false));
 							if (getAbilityScore() > 1) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.UNLUCK, mDuration + WIND_WALK_VULNERABILITY_DURATION_INCREASE, WIND_WALK_VULNERABILITY_AMPLIFIER, true, false));
 							}
+
+							if (EntityUtils.isElite(mob)) {
+								mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
+								mWorld.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 0.75f);
+							} else {
+								mWorld.spawnParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1);
+
+								mob.setVelocity(mob.getVelocity().setY(0.5));
+								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, mDuration, 0, true, false));
+							}
 						}
-						mMobsAlreadyHit.add(mob);
+
+						iter.remove();
 					}
-				}
-				if (mPlayer.isOnGround() || mPlayer.getLocation().getBlock().getType() == Material.WATER || mPlayer.getLocation().getBlock().getType() == Material.LAVA) {
-					this.cancel();
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
-	}
-
-	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		// If the skill is somehow on cooldown when charges are full, take it off cooldown
-		if (mCharges == WIND_WALK_MAX_CHARGES
-				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
-		}
-
-		// Increment charges if last check was on cooldown, and now is off cooldown.
-		if (mCharges < WIND_WALK_MAX_CHARGES && mWasOnCooldown
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mCharges++;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Wind Walk Charges: " + mCharges);
-		}
-
-		// Put on cooldown if charges can still be gained
-		if (mCharges < WIND_WALK_MAX_CHARGES
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			putOnCooldown();
-		}
-
-		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 	}
 
 }

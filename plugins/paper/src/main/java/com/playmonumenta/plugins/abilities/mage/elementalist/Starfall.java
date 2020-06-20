@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class Starfall extends Ability {
 	private static final int STARFALL_PRIMED_TICKS = 20 * 10;
@@ -29,6 +30,7 @@ public class Starfall extends Ability {
 	private static final int STARFALL_2_DAMAGE = 36;
 	private static final int STARFALL_FIRE_DURATION = 20 * 3;
 	private static final double STARFALL_RADIUS = 5;
+	private static final float STARFALL_KNOCKAWAY_SPEED = 0.7f;
 
 	private final int mDamage;
 
@@ -115,16 +117,9 @@ public class Starfall extends Ability {
 							this.cancel();
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, STARFALL_RADIUS, mPlayer)) {
-								if (e instanceof Player) {
-									EntityUtils.damageEntity(mPlugin, e, mDamage * 0.75, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
-								} else {
-									EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
-								}
+								EntityUtils.damageEntity(mPlugin, e, mDamage, player, MagicType.FIRE, true, mInfo.mLinkedSpell);
 								EntityUtils.applyFire(mPlugin, STARFALL_FIRE_DURATION, e, mPlayer);
-
-								Vector v = e.getLocation().toVector().subtract(loc.toVector()).normalize();
-								v.add(new Vector(0, 0.2, 0));
-								e.setVelocity(v);
+								MovementUtils.knockAway(loc, e, STARFALL_KNOCKAWAY_SPEED);
 							}
 							break;
 						}

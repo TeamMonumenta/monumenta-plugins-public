@@ -11,7 +11,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -45,11 +44,11 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 		super(plugin, world, player, "Cloak and Dagger");
 		mInfo.mScoreboardId = "CloakAndDagger";
 		mInfo.mShorthandName = "CnD";
-		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you shift right click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
+		mInfo.mDescriptions.add("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you five stacks. Stacks are capped at 8. When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain X seconds of Stealth and (1.5)(X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least 5 stacks to activate this.");
 		mInfo.mDescriptions.add("Cloak stacks are now capped at 12 and bonus damage is increased to (2.5)(X) where X is the number of stacks you have upon activating this skill.");
 		mInfo.mLinkedSpell = Spells.CLOAK_AND_DAGGER;
 		mInfo.mCooldown = 0;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamageMultiplier = getAbilityScore() == 1 ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER;
 		mMaxStacks = getAbilityScore() == 1 ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS;
 		mTracker = new KillTriggeredAbilityTracker(this);
@@ -57,7 +56,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 
 	@Override
 	public void cast(Action action) {
-		if (!AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS && mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50) {
+		if (!AbilityUtils.isStealthed(mPlayer) && mCloak >= CLOAK_MIN_STACKS
+				&& mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
+				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
+				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
@@ -69,15 +71,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 	}
 
 	@Override
-	public boolean runCheck() {
-		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack oHand = mPlayer.getInventory().getItemInOffHand();
-		return InventoryUtils.isSwordItem(mHand) && InventoryUtils.isSwordItem(oHand);
-	}
-
-	@Override
 	public boolean onStealthAttack(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && mActive
+				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
+				&& InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false);
 			event.setDamage(event.getDamage() + mCloakOnActivation * mDamageMultiplier);
 
@@ -90,6 +87,11 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility {
 			mActive = false;
 		}
 
+		return true;
+	}
+
+	@Override
+	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		mTracker.updateDamageDealtToBosses(event);
 		return true;
 	}

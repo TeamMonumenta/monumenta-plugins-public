@@ -12,8 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -21,9 +21,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
-public class TacticalManeuver extends Ability {
+public class TacticalManeuver extends MultipleChargeAbility {
 
 	private static final int TACTICAL_MANEUVER_1_MAX_CHARGES = 2;
 	private static final int TACTICAL_MANEUVER_2_MAX_CHARGES = 3;
@@ -35,14 +34,10 @@ public class TacticalManeuver extends Ability {
 	private static final int TACTICAL_LEAP_DAMAGE = 8;
 	private static final float TACTICAL_LEAP_KNOCKBACK_SPEED = 0.5f;
 
-	private final int mMaxCharges;
-
 	private int mLastCastTicks = 0;
-	private int mCharges;
-	private boolean mWasOnCooldown = false;
 
 	public TacticalManeuver(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Tactical Maneuver");
+		super(plugin, world, player, "Tactical Maneuver", TACTICAL_MANEUVER_1_MAX_CHARGES, TACTICAL_MANEUVER_2_MAX_CHARGES);
 		mInfo.mLinkedSpell = Spells.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
@@ -51,14 +46,11 @@ public class TacticalManeuver extends Ability {
 		mInfo.mCooldown = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_COOLDOWN : TACTICAL_MANEUVER_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;
-
-		mMaxCharges = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES;
-		mCharges = mMaxCharges;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mCharges == 0 || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if (!mPlayer.isSprinting() && !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return;
 		}
 
@@ -73,84 +65,67 @@ public class TacticalManeuver extends Ability {
 
 		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right clicking, but not the
 		// case for stuff like Bodkin Blitz. This check also fixes that bug.
-		if (ticks - mLastCastTicks > 10 && (mPlayer.isSprinting() || mPlayer.isSneaking())) {
-			mCharges--;
-			mLastCastTicks = ticks;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Tactical Maneuver Charges: " + mCharges);
+		if (ticks - mLastCastTicks <= 10 || !consumeCharge()) {
+			return;
+		}
 
-			if (mPlayer.isSprinting()) {
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-				mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
-				Vector dir = mPlayer.getLocation().getDirection();
-				mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
+		mLastCastTicks = ticks;
 
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (mPlayer.isOnGround() || mPlayer.getLocation().getBlock().getType() == Material.WATER
-						    || mPlayer.getLocation().getBlock().getType() == Material.LAVA || mPlayer.isDead() || !mPlayer.isOnline()) {
-							this.cancel();
-							return;
-						}
+		if (mPlayer.isSprinting()) {
+			mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 1.7f);
+			Vector dir = mPlayer.getLocation().getDirection();
+			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
-						mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline()) {
+						this.cancel();
+						return;
+					}
 
-						for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), 2, mPlayer)) {
-							if (!le.isDead()) {
-								EntityUtils.damageEntity(mPlugin, le, TACTICAL_DASH_DAMAGE, mPlayer, null, true, mInfo.mLinkedSpell);
-								for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), TACTICAL_MANEUVER_RADIUS)) {
-									EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
-								}
+					Material block = mPlayer.getLocation().getBlock().getType();
+					if (block == Material.WATER || block == Material.LAVA || block == Material.LADDER) {
+						this.cancel();
+						return;
+					}
 
-								mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
-								mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
-								mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1);
 
-								this.cancel();
-								break;
+					for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation().clone().add(mPlayer.getVelocity().normalize()), 2, mPlayer)) {
+						if (!le.isDead()) {
+							EntityUtils.damageEntity(mPlugin, le, TACTICAL_DASH_DAMAGE, mPlayer, null, true, mInfo.mLinkedSpell);
+							for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), TACTICAL_MANEUVER_RADIUS)) {
+								EntityUtils.applyStun(mPlugin, TACTICAL_DASH_STUN_DURATION, e);
 							}
+
+							mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2);
+							mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125);
+							mWorld.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 2.0f, 0.5f);
+
+							this.cancel();
+							break;
 						}
 					}
-				}.runTaskTimer(mPlugin, 5, 1);
-			} else {
-				for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TACTICAL_MANEUVER_RADIUS, mPlayer)) {
-					EntityUtils.damageEntity(mPlugin, le, TACTICAL_LEAP_DAMAGE, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
-					MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 				}
-
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
-				mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
-				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
-				mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(-1.65).setY(0.65));
+			}.runTaskTimer(mPlugin, 5, 1);
+			// Needs the 5 tick delay since being close to the ground will cancel the runnable
+		} else {
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), TACTICAL_MANEUVER_RADIUS, mPlayer)) {
+				EntityUtils.damageEntity(mPlugin, le, TACTICAL_LEAP_DAMAGE, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
+				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
+
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1.2f);
+			mWorld.spawnParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f);
+			mWorld.spawnParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f);
+			mPlayer.setVelocity(mPlayer.getLocation().getDirection().setY(0).normalize().multiply(-1.65).setY(0.65));
 		}
 	}
 
-	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		// If the skill is somehow on cooldown when charges are full, take it off cooldown
-		if (mCharges == mMaxCharges
-				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
-		}
-
-		// Increment charges if last check was on cooldown, and now is off cooldown.
-		if (mCharges < mMaxCharges && mWasOnCooldown
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mCharges++;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Tactical Maneuver Charges: " + mCharges);
-		}
-
-		// Put on cooldown if charges can still be gained
-		if (mCharges < mMaxCharges
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			putOnCooldown();
-		}
-
-		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
-	}
 }

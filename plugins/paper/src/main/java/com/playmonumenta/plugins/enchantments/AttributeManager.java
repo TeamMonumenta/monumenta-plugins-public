@@ -203,7 +203,7 @@ public class AttributeManager {
 					}
 					String[] loreSegments = loreEntryStripped.split(" ", 2);
 
-					if (loreSegments.length == 2) {
+					if (loreSegments.length == 2 && loreSegments[0].length() > 0) {
 						boolean isMultiplier = false;
 						if (loreSegments[0].endsWith("%")) {
 							isMultiplier = true;
@@ -214,8 +214,8 @@ public class AttributeManager {
 						int j;
 						for (j = 0; j < loreSegments[0].length(); j++) {
 							char c = loreSegments[0].charAt(j);
-							if (!Character.isDigit(c)) {
-								if (c == '.') {
+							if (!Character.isDigit(c) || (j == 0 && (c == '+' || c == '-'))) {
+								if (c == '.' && loreSegments[0].length() >= 2) {
 									if (foundDecimal) {
 										break;
 									} else {
@@ -227,14 +227,18 @@ public class AttributeManager {
 							}
 						}
 
-						// Reached the end of iteration means parsable
+						// Reached the end of iteration means very-likely to be parsable
 						if (j == loreSegments[0].length()) {
-							double value = Double.parseDouble(loreSegments[0]);
-							if (isMultiplier) {
-								value /= 100;
-							}
+							try {
+								double value = Double.parseDouble(loreSegments[0]);
+								if (isMultiplier) {
+									value /= 100;
+								}
 
-							plugin.mAttributeManager.mAttributeTrie.add(loreSegments[1], player, value, isMultiplier, i == 1);
+								plugin.mAttributeManager.mAttributeTrie.add(loreSegments[1], player, value, isMultiplier, i == 1);
+							} catch (NumberFormatException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}

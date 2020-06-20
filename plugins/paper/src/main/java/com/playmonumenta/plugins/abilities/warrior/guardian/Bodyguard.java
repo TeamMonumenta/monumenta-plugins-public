@@ -55,7 +55,7 @@ public class Bodyguard extends Ability {
 		super(plugin, world, player, "Bodyguard");
 		mInfo.mScoreboardId = "Bodyguard";
 		mInfo.mShorthandName = "Bg";
-		mInfo.mDescriptions.add("Passively gain 5% damage resistance. Left-click twice without hitting a mob while looking directly at another player without hitting any mobs makes you charge to them (max range: 25 blocks). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Passively gain 5% damage resistance. Left-click twice without hitting a mob while looking directly at another player without hitting any mobs makes you charge to them (max range: 25 blocks, cannot be used in safezones). You are immune to damage and knockback during the charge. Upon arriving you knockback all mobs within 4 blocks. Both you and the other player get +2 armor and Absorption 1 for 8s. Left-click twice while looking down to cast on yourself. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Passively gain 10% damage resistance. Both you and the other player gain +4 armor and Absorption 2 for 8s instead. Additionally affected mobs are stunned for 3s.");
 		mInfo.mLinkedSpell = Spells.BODYGUARD;
 		mInfo.mCooldown = BODYGUARD_COOLDOWN;

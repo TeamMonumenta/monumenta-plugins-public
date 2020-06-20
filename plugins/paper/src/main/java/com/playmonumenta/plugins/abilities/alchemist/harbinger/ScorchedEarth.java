@@ -22,22 +22,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
-/*
- * Shift-RClick with an Alchemist Potion to deploy a 5 block radius zone
- * that lasts 15 seconds where the potion lands. Mobs within this zone
- * take 3 extra damage whenever taking damage and are afflicted with
- * Weakness 1. Cooldown: 30 / 25 seconds, Charges: 1 / 2.
- */
-
-public class ScorchedEarth extends Ability {
+public class ScorchedEarth extends MultipleChargeAbility {
 
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
 
@@ -69,25 +61,15 @@ public class ScorchedEarth extends Ability {
 	private static Map<LivingEntity, Double> mMobHealths = new HashMap<>();
 	private static BukkitRunnable mMobHealthsTracker;
 
-	private final int mCooldown;
-	private final int mMaxCharges;
-
-	private int mTimeToNextCharge;
-	private int mCharges;
-
 	public ScorchedEarth(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Scorched Earth");
+		super(plugin, world, player, "Scorched Earth", SCORCHED_EARTH_1_CHARGES, SCORCHED_EARTH_2_CHARGES);
 		mInfo.mLinkedSpell = Spells.SCORCHED_EARTH;
 		mInfo.mScoreboardId = "ScorchedEarth";
 		mInfo.mShorthandName = "SE";
 		mInfo.mDescriptions.add("Shift right click with an Alchemist Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. Mobs in this zone are afflicted with Weakness I and are dealt 3 extra damage whenever taking damage. Cooldown: 30s.");
 		mInfo.mDescriptions.add("Cooldown reduced to 25s, and two charges of this ability can be stored at once.");
-		mInfo.mCooldown = 0;		// Manage cooldowns manually due to multiple charges
+		mInfo.mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
-		mCooldown = getAbilityScore() == 1 ? SCORCHED_EARTH_1_COOLDOWN : SCORCHED_EARTH_2_COOLDOWN;
-		mMaxCharges = getAbilityScore() == 1 ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES;
-		mTimeToNextCharge = mCooldown;
-		mCharges = mMaxCharges;
 
 		// Only one runnable ever exists for Scorched Earth - it is a global list, not tied to any individual players
 		if (mMobHealthsTracker == null) {
@@ -166,25 +148,11 @@ public class ScorchedEarth extends Ability {
 	}
 
 	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		if (oneSecond && mCharges < mMaxCharges) {
-			mTimeToNextCharge -= 20;
-
-			if (mTimeToNextCharge <= 0) {
-				mTimeToNextCharge = mCooldown;
-				mCharges++;
-				MessagingUtils.sendActionBarMessage(mPlayer, "Scorched Earth Charges: " + mCharges);
-			}
-		}
-	}
-
-	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mCharges > 0 && mPlayer.isSneaking()
-				&& InventoryUtils.testForItemWithName(mPlayer.getInventory().getItemInMainHand(), "Alchemist's Potion")) {
-			potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
-			mCharges--;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Scorched Earth Charges: " + mCharges);
+		if (mPlayer.isSneaking() && InventoryUtils.testForItemWithName(mPlayer.getInventory().getItemInMainHand(), "Alchemist's Potion")) {
+			if (consumeCharge()) {
+				potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
+			}
 		}
 
 		return true;
@@ -194,12 +162,11 @@ public class ScorchedEarth extends Ability {
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			Location loc = potion.getLocation();
-			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 100, 2.1, 0.5, 2.1, 0.1);
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 2.1, 0.5, 2.1, 0);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
-			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.5, 1, 0.4, 60);
-			mWorld.spawnParticle(Particle.FLAME, loc, 40, 2.1, 0.5, 2.1, 0.1);
-			mWorld.spawnParticle(Particle.LAVA, loc, 35, 1.5, 0.5, 1.5, 0);
+			mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1);
+			mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f));
+			mWorld.spawnParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1);
+			mWorld.spawnParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0);
 
 			mWorld.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
 			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);

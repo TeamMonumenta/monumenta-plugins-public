@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,17 +18,16 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
-public class BodkinBlitz extends Ability {
+public class BodkinBlitz extends MultipleChargeAbility {
 
 	private static final int BODKINBLITZ_1_COOLDOWN = 20 * 20;
 	private static final int BODKINBLITZ_2_COOLDOWN = 20 * 18;
@@ -45,11 +43,9 @@ public class BodkinBlitz extends Ability {
 	private BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
 	private int mTicks;
-	private boolean mWasOnCooldown = false;
-	private int mCharges;
 
 	public BodkinBlitz(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "Bodkin Blitz");
+		super(plugin, world, player, "Bodkin Blitz", BODKINBLITZ_MAX_CHARGES, BODKINBLITZ_MAX_CHARGES);
 		mInfo.mLinkedSpell = Spells.BODKIN_BLITZ;
 		mInfo.mScoreboardId = "BodkinBlitz";
 		mInfo.mShorthandName = "BB";
@@ -60,19 +56,13 @@ public class BodkinBlitz extends Ability {
 		mInfo.mIgnoreCooldown = true;
 
 		mStealthDuration = getAbilityScore() == 1 ? BODKINBLITZ_1_STEALTH_DURATION : BODKINBLITZ_2_STEALTH_DURATION;
-
-		mCharges = BODKINBLITZ_MAX_CHARGES;
 	}
 
 	@Override
 	public void cast(Action action) {
-		if (mCharges <= 0 || mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			return;
-		}
-
-		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
-		if (!InventoryUtils.isSwordItem(mainHand) || !InventoryUtils.isSwordItem(offHand)) {
+		if (mTeleporting || !mPlayer.isSneaking() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
+				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInMainHand())
+				|| !InventoryUtils.isSwordItem(mPlayer.getInventory().getItemInOffHand())) {
 			return;
 		}
 
@@ -82,10 +72,11 @@ public class BodkinBlitz extends Ability {
 			return;
 		}
 
-		mCharges--;
-		mTeleporting = true;
+		if (!consumeCharge()) {
+			return;
+		}
 
-		MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
+		mTeleporting = true;
 
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_BREATH, 1f, 2f);
 		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
@@ -233,30 +224,6 @@ public class BodkinBlitz extends Ability {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		// If the skill is somehow on cooldown when charges are full, take it off cooldown
-		if (mCharges == BODKINBLITZ_MAX_CHARGES
-				&& mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mPlugin.mTimers.removeCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
-		}
-
-		// Increment charges if last check was on cooldown, and now is off cooldown.
-		if (mCharges < BODKINBLITZ_MAX_CHARGES && mWasOnCooldown
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			mCharges++;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Bodkin Blitz Charges: " + mCharges);
-		}
-
-		// Put on cooldown if charges can still be gained
-		if (mCharges < BODKINBLITZ_MAX_CHARGES
-				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
-			putOnCooldown();
-		}
-
-		mWasOnCooldown = mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
 	}
 
 }

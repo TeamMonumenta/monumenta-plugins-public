@@ -45,7 +45,7 @@ public class EnchantedShot extends Ability {
 		super(plugin, world, player, "Enchanted Arrow");
 		mInfo.mScoreboardId = "EnchantedArrow";
 		mInfo.mShorthandName = "EA";
-		mInfo.mDescriptions.add("Left-clicking with a bow, while not shifted, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage, affected by Bow Mastery and Sharpshooter. Hit targets contribute to Sharpshooter stacks. Cooldown: 05s.");
+		mInfo.mDescriptions.add("Left-clicking with a bow while not sneaking, will prime an enchanted arrow that unprimes after 5 seconds. When you fire a critical arrow, it will instantaneously travel in a straight line for up to 30 blocks or until it hits a block. All targets hit take 25 damage, affected by Bow Mastery and Sharpshooter. Hit targets contribute to Sharpshooter stacks. Cooldown: 20 seconds.");
 		mInfo.mDescriptions.add("Every enemy hit takes 40 damage instead. Cooldown is reduced to 16 seconds.");
 		mInfo.mLinkedSpell = Spells.ENCHANTED_ARROW;
 		mInfo.mCooldown = getAbilityScore() == 1 ? ENCHANTED_1_COOLDOWN : ENCHANTED_2_COOLDOWN;

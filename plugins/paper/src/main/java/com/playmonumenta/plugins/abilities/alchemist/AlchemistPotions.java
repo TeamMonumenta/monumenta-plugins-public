@@ -1,7 +1,10 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -12,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -33,26 +37,72 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
- * This is a utility "ability" that makes it possible to give stacked potions in one place
+ * Handles giving potions on kills and the direct damage aspect
  */
 public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
+	private static final double EXTRA_POTION_CHANCE = 0.5;
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
 	private static final double DAMAGE_PER_SPEC_POINT = 1;
 
 	private final KillTriggeredAbilityTracker mTracker;
 
-	private double mDamage = -1;
+	private List<PotionAbility> mPotionAbilities = new ArrayList<PotionAbility>();
+	private double mDamage = 0;
 
 	public AlchemistPotions(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, null);
 		mInfo.mLinkedSpell = Spells.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
+
+		// Run this stuff a tick later so the AbilityManager has time to initialize everything
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Ability[] classAbilities = new Ability[8];
+				Ability[] specializationAbilities = new Ability[6];
+				classAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
+				classAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
+				classAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, IronTincture.class);
+				classAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+				classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
+				classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
+				classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
+				classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalArtillery.class);
+				specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
+				specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
+				specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
+				specializationAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, WardingRemedy.class);
+				specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
+				specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
+
+				for (Ability classAbility : classAbilities) {
+					if (classAbility != null) {
+						mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
+
+						if (classAbility instanceof PotionAbility) {
+							PotionAbility potionAbility = (PotionAbility) classAbility;
+							mPotionAbilities.add(potionAbility);
+							mDamage += potionAbility.getDamage();
+						}
+					}
+				}
+
+				for (Ability specializationAbility : specializationAbilities) {
+					if (specializationAbility != null) {
+						mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
+
+						if (specializationAbility instanceof PotionAbility) {
+							PotionAbility potionAbility = (PotionAbility) specializationAbility;
+							mPotionAbilities.add(potionAbility);
+							mDamage += potionAbility.getDamage();
+						}
+					}
+				}
+			}
+		}.runTaskLater(mPlugin, 1);
 	}
 
-	/*
-	 * Passive potion damage woo, potions for everyone
-	 */
 	@Override
 	public boolean canUse(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, "Class") == 5;
@@ -64,12 +114,15 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 			mPlugin.mProjectileEffectTimers.addEntity(potion, Particle.SPELL);
 			potion.setMetadata("AlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
+
 		return true;
 	}
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
 		if (potion.hasMetadata("AlchemistPotion")) {
+			createAura(potion.getLocation());
+
 			if (affectedEntities != null && !affectedEntities.isEmpty()) {
 				for (LivingEntity entity : affectedEntities) {
 					if (EntityUtils.isHostileMob(entity)) {
@@ -78,13 +131,26 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 				}
 			}
 		}
+
 		return true;
 	}
 
+	public void createAura(Location loc) {
+		for (PotionAbility potionAbility : mPotionAbilities) {
+			potionAbility.createAura(loc);
+		}
+	}
+
+	public void createAura(Location loc, double radius) {
+		for (PotionAbility potionAbility : mPotionAbilities) {
+			potionAbility.createAura(loc, radius);
+		}
+	}
+
 	public void apply(LivingEntity mob) {
-		// Initialize the damage once we're certain we can actually read the ability scores
-		if (mDamage == -1) {
-			setDamage();
+		// Apply effects first so stuff like Vulnerability properly stacks
+		for (PotionAbility potionAbility : mPotionAbilities) {
+			potionAbility.apply(mob);
 		}
 
 		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
@@ -109,43 +175,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		int newPot = 1;
-		if (FastUtils.RANDOM.nextDouble() < 0.50) {
-			newPot++;
-		}
-
-		AbilityUtils.addAlchemistPotions(mPlayer, newPot);
+		AbilityUtils.addAlchemistPotions(mPlayer, FastUtils.RANDOM.nextDouble() < EXTRA_POTION_CHANCE ? 2 : 1);
 	}
 
-	private void setDamage() {
-		mDamage = 0;
-		Ability[] classAbilities = new Ability[8];
-		Ability[] specializationAbilities = new Ability[6];
-		classAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
-		classAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-		classAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, IronTincture.class);
-		classAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
-		classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
-		classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
-		classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
-		classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalArtillery.class);
-		specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
-		specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
-		specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
-		specializationAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, WardingRemedy.class);
-		specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-		specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
-
-		for (Ability classAbility : classAbilities) {
-			if (classAbility != null) {
-				mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
-			}
-		}
-
-		for (Ability specializationAbility : specializationAbilities) {
-			if (specializationAbility != null) {
-				mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
-			}
-		}
-	}
 }

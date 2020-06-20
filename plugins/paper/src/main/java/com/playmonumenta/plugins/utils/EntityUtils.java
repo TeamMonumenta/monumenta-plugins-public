@@ -33,6 +33,7 @@ import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Shulker;
@@ -269,20 +270,21 @@ public class EntityUtils {
 	}
 
 	public static boolean isHostileMob(Entity entity) {
-		if ((entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear || entity instanceof Phantom || entity instanceof Shulker)
-		    && !entity.getScoreboardTags().contains("SkillImmune")) {
-			return true;
-		} else if (entity instanceof Wolf) {
-			return ((Wolf)entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
-		} else if (entity instanceof Rabbit) {
-			return ((Rabbit)entity).getRabbitType() == Type.THE_KILLER_BUNNY;
-		} else if (entity instanceof SkeletonHorse || entity instanceof ZombieHorse) {
-			return true;
-		} else if (entity instanceof Player) {
-			return AbilityManager.getManager().isPvPEnabled((Player)entity);
-		} else if (entity instanceof Mob) {
-			LivingEntity target = ((Mob)entity).getTarget();
-			return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer");
+		if (!entity.getScoreboardTags().contains("SkillImmune")) {
+			if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
+					|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+					|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse) {
+				return true;
+			} else if (entity instanceof Wolf) {
+				return ((Wolf) entity).isAngry() || entity.getScoreboardTags().contains("boss_targetplayer");
+			} else if (entity instanceof Rabbit) {
+				return ((Rabbit) entity).getRabbitType() == Type.THE_KILLER_BUNNY;
+			} else if (entity instanceof Player) {
+				return AbilityManager.getManager().isPvPEnabled((Player) entity);
+			} else if (entity instanceof Mob) {
+				LivingEntity target = ((Mob) entity).getTarget();
+				return (target != null && target instanceof Player) || entity.getScoreboardTags().contains("boss_targetplayer");
+			}
 		}
 
 		return false;
@@ -530,12 +532,18 @@ public class EntityUtils {
 	}
 
 	public static LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
-		if (nearbyMobs.size() == 0) {
-			return null;
+		LivingEntity nearest = null;
+		double nearestDistanceSquared = Double.POSITIVE_INFINITY;
+
+		for (LivingEntity mob : nearbyMobs) {
+			double distanceSquared = mob.getLocation().distanceSquared(loc);
+			if (distanceSquared < nearestDistanceSquared) {
+				nearest = mob;
+				nearestDistanceSquared = distanceSquared;
+			}
 		}
 
-		nearbyMobs.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
-		return nearbyMobs.get(0);
+		return nearest;
 	}
 
 	public static LivingEntity getNearestPlayer(Location loc, double radius) {

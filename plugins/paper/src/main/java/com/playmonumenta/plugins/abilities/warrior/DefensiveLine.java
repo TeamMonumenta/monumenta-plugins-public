@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,47 +55,71 @@ public class DefensiveLine extends Ability {
 					mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
 					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
-					for (Player target : PlayerUtils.playersInRange(mPlayer, DEFENSIVE_LINE_RADIUS, true)) {
+
+					List<Player> players = PlayerUtils.playersInRange(mPlayer, DEFENSIVE_LINE_RADIUS, true);
+
+					for (Player player : players) {
 						// Don't buff players that have their class disabled
-						if (target.getScoreboardTags().contains("disable_class")) {
+						if (player.getScoreboardTags().contains("disable_class")) {
 							continue;
 						}
 
-						Location loc = target.getLocation();
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25);
-						new BukkitRunnable() {
-							final double mRadius = 1.25;
-							double mY = 0.15;
-							@Override
-							public void run() {
-								Location loc = target.getLocation();
-								mY += 0.2;
-								for (double j = 0; j < 360; j += 18) {
-									double radian1 = Math.toRadians(j);
-									loc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
-									mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
-									mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
-									loc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
-								}
+						Location loc = player.getLocation().add(0, 1, 0);
+						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
 
-								if (mY >= 1.8) {
-									this.cancel();
-								}
-							}
-
-						}.runTaskTimer(mPlugin, 0, 1);
-
-						mPlugin.mPotionManager.addPotion(target, PotionID.APPLIED_POTION,
+						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
 						                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
 						                                                  DEFENSIVE_LINE_DURATION,
 						                                                  1, true, true));
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
-							MovementUtils.knockAway(target, mob, 0.25f);
+							MovementUtils.knockAway(player, mob, 0.25f);
 							if (getAbilityScore() > 1) {
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
 							}
 						}
 					}
+
+					new BukkitRunnable() {
+						final List<Player> mPlayers = players;
+						final double mRadius = 1.25;
+						double mY = 0.15;
+						@Override
+						public void run() {
+							mY += 0.2;
+
+							// Store calculations instead of doing them again for each player
+							double[] dx = new double[20];
+							double[] dz = new double[20];
+							for (int i = 0; i < 20; i++) {
+								double radians = Math.toRadians(i * 18);
+								dx[i] = Math.cos(radians) * mRadius;
+								dz[i] = Math.sin(radians) * mRadius;
+							}
+
+							Iterator<Player> iter = mPlayers.iterator();
+							while (iter.hasNext()) {
+								Player player = iter.next();
+
+								if (player.isDead() || !player.isOnline()) {
+									iter.remove();
+								} else {
+									Location loc = player.getLocation().add(0, mY, 0);
+
+									for (int i = 0; i < 20; i++) {
+										loc.add(dx[i], 0, dz[i]);
+										mWorld.spawnParticle(Particle.CRIT_MAGIC, loc, 3, 0.1, 0.1, 0.1, 0.125);
+										mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
+										loc.subtract(dx[i], 0, dz[i]);
+									}
+								}
+							}
+
+							if (mY >= 1.8) {
+								this.cancel();
+							}
+						}
+
+					}.runTaskTimer(mPlugin, 0, 1);
 
 					putOnCooldown();
 				}

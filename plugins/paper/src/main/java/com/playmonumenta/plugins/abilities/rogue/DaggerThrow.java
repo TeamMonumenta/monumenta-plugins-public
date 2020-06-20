@@ -107,7 +107,7 @@ public class DaggerThrow extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50 && mPlayer.getLocation().getPitch() < 50) {
+		if (mPlayer.isSneaking() && mPlayer.getLocation().getPitch() > -50) {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 			return InventoryUtils.isSwordItem(mainHand) && InventoryUtils.isSwordItem(offHand);

@@ -28,7 +28,6 @@ public class Riposte extends Ability {
 	private static final int RIPOSTE_SWORD_EFFECT_LEVEL = 1;
 	private static final int RIPOSTE_SWORD_DURATION = 5 * 20;
 	private static final int RIPOSTE_AXE_DURATION = 3 * 20;
-	private static final double RIPOSTE_MELEE_THRESHOLD = 2;
 	private static final float RIPOSTE_KNOCKBACK_SPEED = 0.15f;
 
 	public Riposte(Plugin plugin, World world, Player player) {
@@ -43,13 +42,9 @@ public class Riposte extends Ability {
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		if (EntityUtils.getRealFinalDamage(event) > 0) { //don't activate if the player wouldn't take damage
+		if (EntityUtils.getRealFinalDamage(event) > 0) {
 			LivingEntity damager = (LivingEntity) event.getDamager();
-			// First checks that the damage cause was either melee or custom (since entity.damage()
-			// counts as ENTITY_ATTACK), then eliminates 99% of ability attack cases by checking
-			// that the bounding box expanded by an arbitrary number intersects the player's location.
-			if (event.getCause() == DamageCause.ENTITY_ATTACK &&
-			    damager.getBoundingBox().expand(RIPOSTE_MELEE_THRESHOLD).contains(mPlayer.getLocation().toVector())) {
+			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 				ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 				MovementUtils.knockAway(mPlayer, damager, RIPOSTE_KNOCKBACK_SPEED);
 
