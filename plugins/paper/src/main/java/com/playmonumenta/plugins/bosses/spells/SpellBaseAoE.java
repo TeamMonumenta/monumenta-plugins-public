@@ -88,7 +88,7 @@ public class SpellBaseAoE extends Spell {
 	                    Sound chargeSound, ChargeAuraAction chargeAuraAction, ChargeCircleAction chargeCircleAction,
 	                    OutburstAction outburstAction, CircleOutburstAction circleOutburstAction, DealDamageAction dealDamageAction) {
 
-		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, chargeSound, 1.5f, 1, chargeAuraAction, chargeCircleAction, outburstAction,
+		this(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, chargeSound, 1f, 1, chargeAuraAction, chargeCircleAction, outburstAction,
 		     circleOutburstAction, dealDamageAction);
 	}
 
