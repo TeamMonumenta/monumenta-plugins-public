@@ -55,6 +55,11 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 		mInfo.mLinkedSpell = Spells.ALCHEMIST_POTION;
 		mTracker = new KillTriggeredAbilityTracker(this);
 
+		if (player == null) {
+			/* This is a reference ability, not one actually tied to a player */
+			return;
+		}
+
 		// Run this stuff a tick later so the AbilityManager has time to initialize everything
 		new BukkitRunnable() {
 			@Override
