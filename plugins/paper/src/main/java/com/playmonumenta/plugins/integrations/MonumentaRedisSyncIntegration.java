@@ -1,5 +1,5 @@
 
-package com.playmonumenta.plugins.listeners;
+package com.playmonumenta.plugins.integrations;
 
 import java.util.logging.Logger;
 
@@ -12,10 +12,10 @@ import org.bukkit.event.Listener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 
-public class ServerTransferListener implements Listener {
+public class MonumentaRedisSyncIntegration implements Listener {
 	private final Logger mLogger;
 
-	public ServerTransferListener(Logger logger) {
+	public MonumentaRedisSyncIntegration(Logger logger) {
 		mLogger = logger;
 	}
 

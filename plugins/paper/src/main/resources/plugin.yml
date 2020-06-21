@@ -2,8 +2,8 @@ name: Monumenta
 main: com.playmonumenta.plugins.Plugin
 version: 0.0.1
 api-version: 1.13
-depend: [CommandAPI,ScriptedQuests,MonumentaRedisSync,NBTAPI,ProtocolLib]
-softdepend: [PlaceholderAPI,ChestSort,LuckPerms,CoreProtect,NBTEditor]
+depend: [CommandAPI,ScriptedQuests,NBTAPI,ProtocolLib]
+softdepend: [MonumentaRedisSync,PlaceholderAPI,ChestSort,LuckPerms,CoreProtect,NBTEditor]
 commands:
   testnoscore:
     permission: monumenta.command.testnoscore

@@ -48,6 +48,7 @@ import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
 import com.playmonumenta.plugins.cooking.CookingTableListeners;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
@@ -60,7 +61,6 @@ import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.listeners.PortableEnderListener;
 import com.playmonumenta.plugins.listeners.PotionConsumeListener;
-import com.playmonumenta.plugins.listeners.ServerTransferListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
@@ -215,7 +215,6 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getAuditMessagesEnabled()) {
 			manager.registerEvents(new AuditListener(), this);
 		}
-		manager.registerEvents(new ServerTransferListener(this.getLogger()), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this, mWorld), this);
 		manager.registerEvents(new MobListener(this), this);
@@ -300,6 +299,11 @@ public class Plugin extends JavaPlugin {
 				mTicks = (mTicks + 1) % Constants.TICKS_PER_SECOND;
 			}
 		}, 0L, 1L);
+
+		// Hook into Monumenta Redis Sync for server transfers if available
+		if (Bukkit.getPluginManager().isPluginEnabled("MonumentaRedisSync")) {
+			manager.registerEvents(new MonumentaRedisSyncIntegration(this.getLogger()), this);
+		}
 
 		// Provide placeholder API replacements if it is present
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
