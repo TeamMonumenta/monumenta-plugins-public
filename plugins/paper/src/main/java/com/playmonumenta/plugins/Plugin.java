@@ -179,9 +179,12 @@ public class Plugin extends JavaPlugin {
 		try {
 			mSocketManager = new SocketManager(this);
 		} catch (Exception ex) {
-			/* TODO: This is probably a fatal exception! */
-			getLogger().severe("Failed to instantiate socket manager: " + ex.getMessage());
-			ex.printStackTrace();
+			getLogger().warning("Failed to instantiate socket manager: " + ex.getMessage());
+			if (ex instanceof java.net.UnknownHostException) {
+				getLogger().warning("This is expected if running a standalone server");
+			} else {
+				ex.printStackTrace();
+			}
 		}
 
 		mItemOverrides = new ItemOverrides();
@@ -324,7 +327,9 @@ public class Plugin extends JavaPlugin {
 
 		mTrackingManager.unloadTrackedEntities();
 		mHttpManager.stop();
-		mSocketManager.stop();
+		if (mSocketManager != null) {
+			mSocketManager.stop();
+		}
 		mBossManager.unloadAll(true);
 		MetadataUtils.removeAllMetadata(this);
 	}
