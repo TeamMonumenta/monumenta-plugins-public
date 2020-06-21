@@ -30,6 +30,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		));
 
 		super.constructBoss(plugin, identityTag, boss, activeSpells, null, detectionRange, null);
+		boss.setRemoveWhenFarAway(false);
 	}
 
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
