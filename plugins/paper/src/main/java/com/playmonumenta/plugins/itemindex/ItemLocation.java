@@ -43,7 +43,9 @@ public enum ItemLocation {
 	EVT_EASTER_2018(ChatColor.YELLOW + "Easter 2018"),
 	EVT_WINTER_2018(ChatColor.BLUE + "Winter 2018"),
 	EVT_HALLOWEEN_2019(ChatColor.DARK_GREEN + "Halloween 2019"),
-	EVT_WINTER_2019(ChatColor.BLUE + "Winter 2019");
+	EVT_WINTER_2019(ChatColor.BLUE + "Winter 2019"),
+	DEVELOPERS_PLAYGROUND(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Developers Playground"),
+	;
 
 	String mReadableString;
 

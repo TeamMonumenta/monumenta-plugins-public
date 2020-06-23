@@ -121,9 +121,15 @@ public class ItemManager {
 
 	@Nullable
 	public MonumentaItem getIndexMMItem(Material material, String name) {
-		return this.mItems.getOrDefault(material, new TreeMap<>()).getOrDefault(name, null);
+		if (material == null || this.mItems == null || this.mItems.size() == 0) {
+			return null;
+		}
+		Map<String, MonumentaItem> nameMap = this.mItems.getOrDefault(material, new TreeMap<>());
+		if (name == null || nameMap == null || nameMap.size() == 0) {
+			return null;
+		}
+		return nameMap.getOrDefault(name, null);
 	}
-
 
 	@Nullable
 	public MonumentaItem getMMItemWithEdits(ItemStack itemStack) {
@@ -132,12 +138,28 @@ public class ItemManager {
 		if (json != null) {
 			edits = new Gson().fromJson(json, MonumentaItem.class);
 		}
-		MonumentaItem item = new MonumentaItem();
-		MonumentaItem indexItem = getIndexMMItem(itemStack);
+		Material m = null;
+		String name = null;
+		if (edits != null) {
+			m = edits.getOldMaterial();
+			name = edits.getOldName();
+			if (name != null) {
+				name = ChatColor.stripColor(name.replace('&', '§'));
+			}
+		}
+		if (m == null) {
+			m = itemStack.getType();
+		}
+		if (name == null) {
+			name = ChatColor.stripColor(itemStack.getItemMeta().getDisplayName());
+		}
+		MonumentaItem indexItem = getIndexMMItem(m, name);
 		if (indexItem == null) {
 			indexItem = new MonumentaItem();
 			indexItem.setDefaultValues();
+			indexItem.setMaterial(m);
 		}
+		MonumentaItem item = new MonumentaItem();
 		item.setEdits(indexItem.clone());
 		item.mergeEdits();
 		item.setEdits(edits);
@@ -147,8 +169,10 @@ public class ItemManager {
 	public MonumentaItem[] getItemArray() {
 		ArrayList<MonumentaItem> out = new ArrayList<>();
 		for (Map.Entry<Material, Map<String, MonumentaItem>> entry : this.mItems.entrySet()) {
-			for (Map.Entry<String, MonumentaItem> entry2 : entry.getValue().entrySet()) {
-				out.add(entry2.getValue());
+			if (entry.getValue() != null) {
+				for (Map.Entry<String, MonumentaItem> entry2 : entry.getValue().entrySet()) {
+					out.add(entry2.getValue());
+				}
 			}
 		}
 		return out.toArray(new MonumentaItem[0]);

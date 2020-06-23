@@ -16,7 +16,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class GraveUtils {
 
-
 	// An item entity should be destroyed. Determine what to do with it before destroying it.
 	// If this method returns false, it means the item was not explicitly destroyed. It might still be destroyed by the code that called this method.
 	public static boolean destroyItemEntity(Item entity) {

@@ -300,9 +300,12 @@ public class ItemUtils {
 		if (amount <= 0) {
 			color = ChatColor.RED;
 			isPositive = "-";
+			amount *= -1;
 		}
 		if (operation == AttributeModifier.Operation.ADD_NUMBER) {
 			isPercent = "";
+		} else {
+			amount *= 100;
 		}
 		if (slot == com.playmonumenta.plugins.itemindex.EquipmentSlot.MAIN_HAND) {
 			if (mainStat.contains(attribute)) {

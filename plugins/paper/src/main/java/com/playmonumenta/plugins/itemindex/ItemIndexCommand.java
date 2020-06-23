@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import io.github.jorelali.commandapi.api.CommandAPI;
 import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
+import io.github.jorelali.commandapi.api.arguments.BooleanArgument;
 import io.github.jorelali.commandapi.api.arguments.DoubleArgument;
 import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
@@ -21,7 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
+import org.bukkit.inventory.meta.BannerMeta;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ public class ItemIndexCommand {
 		registerNew();
 		registerCommit();
 		registerRemove();
+		registerReload();
 		registerEdit();
 	}
 
@@ -113,8 +115,10 @@ public class ItemIndexCommand {
 								continue;
 							}
 							changes++;
-							MonumentaItem mMItem = new ItemStackParser(inputStack).parse();
-							inv.setItem(i, mMItem.toItemStack());
+							MonumentaItem item = new MonumentaItem();
+							item.setDefaultValues();
+							item.setEdits(new ItemStackParser(inputStack).parse());
+							inv.setItem(i, item.toItemStack());
 						}
 						p.sendMessage("parsed and edited " + changes + "items. make sure they are correct, then commit them");
 						return;
@@ -128,7 +132,7 @@ public class ItemIndexCommand {
 							if (item == null) {
 								continue;
 							}
-							item.mergeEdits();
+							item.preCalc();
 							Plugin.getInstance().mItemManager.addToManager(item);
 							changes++;
 						}
@@ -178,7 +182,7 @@ public class ItemIndexCommand {
 				if (item == null) {
 					return;
 				}
-				item.mergeEdits();
+				item.preCalc();
 				Plugin.getInstance().mItemManager.addToManager(item);
 				updateItemInHandNoTimestamps(item, p);
 				p.sendMessage("Index entry for " + item.getMaterial().toString().toLowerCase() + ":" + item.getNameColorless() +
@@ -215,7 +219,7 @@ public class ItemIndexCommand {
 				if (p == null) {
 					return;
 				}
-				MonumentaItem item = Plugin.getInstance().mItemManager.getIndexMMItem(p.getInventory().getItemInMainHand());
+				MonumentaItem item = Plugin.getInstance().mItemManager.getMMItemWithEdits(p.getInventory().getItemInMainHand());
 				if (item == null) {
 					p.sendMessage("no item has been found in the index that matches the current mainHand item");
 					return;
@@ -223,6 +227,24 @@ public class ItemIndexCommand {
 				Plugin.getInstance().mItemManager.remove(item);
 				p.sendMessage("item " + item.getMaterial().toString().toLowerCase() + ":" + item.getNameColorless() +
 					"has been successfully removed from index.");
+			}
+		);
+	}
+
+	private static void registerReload() {
+		//mi enableEdit
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("reload", new LiteralArgument("reload"));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				Plugin.getInstance().mItemManager = new ItemManager();
+				p.sendMessage("monumenta index reloaded ( " + Plugin.getInstance().mItemManager.getItemArray().length + "items )");
 			}
 		);
 	}
@@ -256,6 +278,14 @@ public class ItemIndexCommand {
 		registerEditColor();
 		registerEditAttribute();
 		registerEditArmorMaterial();
+		registerEditIsMagicWand();
+		registerEditUnbreakable();
+		registerEditDurability();
+		registerEditOnConsume();
+		registerEditBannerMeta();
+		registerEditCraftingMaterialKind();
+		registerEditBook();
+		registerEditQuestID();
 	}
 
 	private static void registerEditName() {
@@ -276,6 +306,7 @@ public class ItemIndexCommand {
 					return;
 				}
 				item.edit().setName("");
+				item.edit().setOldName(item.getNameRaw());
 				updateItemInHand(item, p);
 			}
 		);
@@ -293,6 +324,7 @@ public class ItemIndexCommand {
 					return;
 				}
 				item.edit().setName((String)args[0]);
+				item.edit().setOldName(item.getNameRaw());
 				updateItemInHand(item, p);
 			}
 		);
@@ -318,6 +350,7 @@ public class ItemIndexCommand {
 				}
 				Material mat = Material.valueOf(((String)args[0]).toUpperCase());
 				item.edit().setMaterial(mat);
+				item.edit().setOldMaterial(item.getMaterial());
 				updateItemInHand(item, p);
 			}
 		);
@@ -554,6 +587,276 @@ public class ItemIndexCommand {
 				}
 				ArmorMaterial mat = ArmorMaterial.valueOf(((String)args[0]).toUpperCase());
 				item.edit().setArmorMaterialOverride(mat);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditIsMagicWand() {
+		//mi edit isMagicWand <value>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("isMagicWand", new LiteralArgument("isMagicWand"));
+		arguments.put("value", new BooleanArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				item.edit().setIsMagicWand((Boolean)args[0]);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditUnbreakable() {
+		//mi edit unbreakable <value>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("unbreakable", new LiteralArgument("unbreakable"));
+		arguments.put("value", new BooleanArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				item.edit().setUnbreakable((Boolean)args[0]);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditDurability() {
+		//mi edit durability <value>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("durability", new LiteralArgument("durability"));
+		arguments.put("value", new IntegerArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				item.edit().setDurability((Integer)args[0]);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditOnConsume() {
+		//mi edit onConsume <effect> <potency> <duration>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("onConsume", new LiteralArgument("onConsume"));
+		arguments.put("effect", new DynamicSuggestedStringArgument(PassiveEffect::valuesAsStringArray));
+		arguments.put("potency", new IntegerArgument());
+		arguments.put("duration", new IntegerArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				PassiveEffect effect = PassiveEffect.valueOf(((String)args[0]).toUpperCase());
+				Integer potency = (Integer)args[1];
+				Integer duration = (Integer)args[2];
+				item.edit().setOnConsume(effect, potency, duration);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditBannerMeta() {
+		//mi edit applyBannerMeta
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("bannerMeta", new LiteralArgument("applyBannerMeta"));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				ItemStack offHandItem = p.getInventory().getItemInOffHand();
+				if (!(offHandItem.getItemMeta() instanceof BannerMeta)) {
+					p.sendMessage("To use that command, a banner item must be placed in your offhand");
+					return;
+				}
+				item.edit().setBanner(offHandItem);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditBook() {
+		// mi edit book applyPage <index>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("book", new LiteralArgument("book"));
+		arguments.put("action", new LiteralArgument("applyPage"));
+		arguments.put("index", new IntegerArgument(1));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				Integer index = (Integer)args[0] - 1;
+				ItemStack offHandItem = p.getInventory().getItemInOffHand();
+				MonumentaItem ohMMItem = Plugin.getInstance().mItemManager.getMMItemWithEdits(offHandItem);
+				if (ohMMItem == null) {
+					p.sendMessage("To use that command, you must have a MonumentaItem containing lore data in your offhand");
+					return;
+				}
+				ohMMItem.preCalc();
+				if (ohMMItem.getLore() == null || ohMMItem.getLore().size() == 0) {
+					p.sendMessage("To use that command, you must have a MonumentaItem containing lore data in your offhand");
+					return;
+				}
+				ArrayList<String> loreLines = new ArrayList<>();
+				for (int i = 0; i <= ohMMItem.getLore().lastKey(); i++) {
+					loreLines.add(ohMMItem.getLore().getOrDefault(i, ""));
+				}
+				item.edit().setBookPageContent(index, String.join("\n", loreLines.toArray(new String[0])));
+				updateItemInHand(item, p);
+			}
+		);
+		// mi edit book extractPage <index>
+		arguments.put("action", new LiteralArgument("extractPage"));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				Integer index = (Integer)args[0] - 1;
+				MonumentaItem out = new MonumentaItem();
+				out.setDefaultValues();
+				out.edit().setName(item.getName() + " - Page " + (index + 1));
+				String page = item.getBookPage(index - 1);
+				int i = 0;
+				if (page == null) {
+					page = "";
+				}
+				for (String s : page.split("\n")) {
+					out.edit().setLoreLine(i, s);
+					i++;
+				}
+				p.getInventory().setItemInOffHand(out.toItemStack());
+				updateItemInHand(item, p);
+			}
+		);
+		// mi edit book author <value>
+		arguments.put("action", new LiteralArgument("author"));
+		arguments.remove("index");
+		arguments.put("value", new GreedyStringArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				item.edit().setBookAuthor((String)args[0]);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditCraftingMaterialKind() {
+		//mi edit CraftingMaterialKind <value>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("craftingMaterialKind", new LiteralArgument("craftingMaterialKind"));
+		arguments.put("value", new DynamicSuggestedStringArgument(CraftingMaterialKind::valuesAsStringArray));
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				CraftingMaterialKind k = CraftingMaterialKind.valueOf(((String)args[0]).toUpperCase());
+				item.edit().setCraftingMaterialKind(k);
+				updateItemInHand(item, p);
+			}
+		);
+	}
+
+	private static void registerEditQuestID() {
+		//mi edit questID <value>
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("edit", new LiteralArgument("edit"));
+		arguments.put("QuestID", new LiteralArgument("QuestID"));
+		arguments.put("value", new StringArgument());
+		CommandAPI.getInstance().register("mi",
+			CommandPermission.fromString("monumenta.mi"),
+			arguments,
+			(sender, args) -> {
+				Player p = commandSecurities(sender);
+				if (p == null) {
+					return;
+				}
+				MonumentaItem item = itemSecurities(p);
+				if (item == null) {
+					return;
+				}
+				item.edit().setQuestID((String)args[0]);
 				updateItemInHand(item, p);
 			}
 		);

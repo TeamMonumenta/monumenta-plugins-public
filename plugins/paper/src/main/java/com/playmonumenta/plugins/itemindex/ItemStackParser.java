@@ -8,11 +8,19 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Banner;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ItemStackParser {
@@ -37,8 +45,98 @@ public class ItemStackParser {
 		this.parseEnchants();
 		this.parseLore();
 		this.parseLocation();
+		this.parseUnbreakable();
+		this.parseDurability();
+		this.parseOnConsume();
+		this.parseCraftingMaterial();
+		this.parseBannerPatterns();
+		this.parseBook();
+		this.parseQuestID();
 
 		return this.mMonumentaItem;
+	}
+
+	private void parseQuestID() {
+		List<String> loreLines = this.mItemStack.getItemMeta().getLore();
+		if (loreLines == null) {
+			return;
+		}
+		for (String s : loreLines) {
+			if (s.equals(ChatColor.LIGHT_PURPLE + "* Quest Item *")) {
+				this.mMonumentaItem.setQuestID("1");
+				for (String s2 : loreLines) {
+					if (s2.startsWith("#")) {
+						this.mMonumentaItem.setQuestID(s2.substring(1));
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	private void parseBook() {
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta instanceof BookMeta) {
+			BookMeta bMeta = (BookMeta)meta;
+			for (int i = 0; i < bMeta.getPageCount(); i++) {
+				this.mMonumentaItem.setBookPageContent(i, bMeta.getPage(i));
+			}
+			this.mMonumentaItem.setBookAuthor(bMeta.getAuthor());
+		}
+	}
+
+	private void parseBannerPatterns() {
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta instanceof BannerMeta) {
+			BannerMeta bMeta = (BannerMeta)meta;
+				this.mMonumentaItem.setBannerPatterns(bMeta.getPatterns());
+		} else if (this.mItemStack.getType() == Material.SHIELD) {
+			BlockStateMeta bsMeta = (BlockStateMeta)meta;
+			Banner banner = (Banner)bsMeta.getBlockState();
+			this.mMonumentaItem.setBannerBaseColor(banner.getBaseColor());
+			this.mMonumentaItem.setBannerPatterns(banner.getPatterns());
+		}
+	}
+
+	private void parseCraftingMaterial() {
+		List<String> loreLines = this.mItemStack.getItemMeta().getLore();
+		if (loreLines == null) {
+			return;
+		}
+		for (String s : loreLines) {
+			for (CraftingMaterialKind k : CraftingMaterialKind.values()) {
+				if (k != CraftingMaterialKind.NONE && k.getReadableString().equals(s)) {
+					this.mMonumentaItem.setCraftingMaterialKind(k);
+				}
+			}
+		}
+	}
+
+	private void parseOnConsume() {
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta instanceof PotionMeta) {
+			PotionMeta pMeta = (PotionMeta)meta;
+			for (PotionEffect effect : pMeta.getCustomEffects()) {
+				for (PassiveEffect p : PassiveEffect.values()) {
+					if (!p.isCustom() && p.getBukkitEffect() == effect.getType()) {
+						this.mMonumentaItem.setOnConsume(p, effect.getAmplifier(), effect.getDuration());
+					}
+				}
+			}
+		}
+	}
+
+	private void parseDurability() {
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		if (meta instanceof Damageable) {
+			Damageable dMeta = (Damageable)meta;
+			this.mMonumentaItem.setDurability(dMeta.getDamage());
+		}
+	}
+
+	private void parseUnbreakable() {
+		ItemMeta meta = this.mItemStack.getItemMeta();
+		this.mMonumentaItem.setUnbreakable(meta.isUnbreakable());
 	}
 
 	private void parseName() {
@@ -68,8 +166,12 @@ public class ItemStackParser {
 			return;
 		}
 		for (Map.Entry<Attribute, AttributeModifier> entry : attribs.entries()) {
-			this.mMonumentaItem.setAttribute(EquipmentSlot.valueOf(entry.getValue().getSlot().toString()),
-				com.playmonumenta.plugins.itemindex.Attribute.valueOf(entry.getKey().toString()),
+			String eSName = entry.getValue().getSlot().toString();
+			if (eSName.equals("HAND")) {
+				eSName = "MAIN_HAND";
+			}
+			this.mMonumentaItem.setAttribute(EquipmentSlot.valueOf(eSName),
+				com.playmonumenta.plugins.itemindex.Attribute.valueOf(entry.getKey().toString().replace("GENERIC_", "").replace("ARMOR_T", "T")),
 				entry.getValue().getOperation(), entry.getValue().getAmount());
 		}
 	}
@@ -113,6 +215,9 @@ public class ItemStackParser {
 			if (s.startsWith(ChatColor.DARK_GRAY + "")) {
 				for (Region r : Region.values()) {
 					if (r != Region.NONE && s.startsWith(r.getReadableString())) {
+						continue main;
+					} else if (s.startsWith(ChatColor.DARK_GRAY + "* Magic Wand *")) {
+						this.mMonumentaItem.setIsMagicWand(true);
 						continue main;
 					}
 				}

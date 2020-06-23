@@ -13,12 +13,21 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Banner;
+import org.bukkit.block.banner.Pattern;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
@@ -26,13 +35,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
 // describes a monumenta item
 public class MonumentaItem {
-	public MonumentaItem mEdits;
+	private MonumentaItem mEdits;
 	private String mName;
 	private Material mMaterial;
 	private Region mRegion;
@@ -46,22 +56,20 @@ public class MonumentaItem {
 	private TreeMap<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> mAttributeDataMap;
 	private ArmorMaterial mArmorMaterial;
 	private ArmorMaterial mArmorMaterialOverride;
+	private Boolean mIsMagicWand;
+	private Boolean mUnbreakable;
+	private Integer mBaseDurability;
+	private String mOldName;
+	private Material mOldMaterial;
+	private TreeMap<PassiveEffect, TreeMap<Integer, Integer>> mOnConsumeMap;
+	private ArrayList<Pattern> mBannerPatterns;
+	private DyeColor mBannerBaseColor;
+	private CraftingMaterialKind mCraftingMaterialKind;
+	private TreeMap<Integer, String> mBookTextContentMap;
+	private String mBookAuthor;
+	private String mQuestID;
 
 	public MonumentaItem() {
-		this.mEdits = null;
-		this.mName = null;
-		this.mMaterial = null;
-		this.mRegion = null;
-		this.mTier = null;
-		this.mLoc = null;
-		this.mLoreMap = null;
-		this.mEnchantMap = null;
-		this.mColor = null;
-		this.mLastEditedBy = null;
-		this.mLastEditedTimestamp = null;
-		this.mAttributeDataMap = null;
-		this.mArmorMaterial = null;
-		this.mArmorMaterialOverride = null;
 	}
 
 	public MonumentaItem clone() {
@@ -98,16 +106,45 @@ public class MonumentaItem {
 				}
 			}
 		}
+		out.mIsMagicWand = this.mIsMagicWand;
+		out.mUnbreakable = this.mUnbreakable;
+		out.mBaseDurability = this.mBaseDurability;
+		out.mOldName = this.mOldName;
+		out.mOldMaterial = this.mOldMaterial;
+		if (this.mOnConsumeMap != null) {
+			for (Map.Entry<PassiveEffect, TreeMap<Integer, Integer>> potionEntry : this.mOnConsumeMap.entrySet()) {
+				PassiveEffect effect = potionEntry.getKey();
+				for (Map.Entry<Integer, Integer> valueEntry : potionEntry.getValue().entrySet()) {
+					Integer potency = valueEntry.getKey();
+					Integer duration = valueEntry.getValue();
+					out.setOnConsume(effect, potency, duration);
+				}
+			}
+		}
+		out.mBannerBaseColor = this.mBannerBaseColor;
+		if (this.mBannerPatterns != null) {
+			out.mBannerPatterns = new ArrayList<>();
+			out.mBannerPatterns.addAll(this.mBannerPatterns);
+		}
+		out.mCraftingMaterialKind = this.mCraftingMaterialKind;
 		if (this.mEdits != null) {
 			out.mEdits = this.mEdits.clone();
 		}
+		if (this.mBookTextContentMap != null) {
+			out.mBookTextContentMap = new TreeMap<>();
+			for (Map.Entry<Integer, String> entry : this.mBookTextContentMap.entrySet()) {
+				out.mBookTextContentMap.put(entry.getKey(), entry.getValue());
+			}
+		}
+		out.mBookAuthor = this.mBookAuthor;
+		out.mQuestID = this.mQuestID;
 		return out;
 	}
 
 	public void mergeEdits() {
 		MonumentaItem e = this.mEdits;
 		if (e != null) {
-			e.preCalc();
+			e.mergeEdits();
 			if (e.mName != null) {
 				this.setName(e.getNameRaw());
 			}
@@ -138,7 +175,6 @@ public class MonumentaItem {
 			if (e.mColor != null) {
 				this.setColor(e.getColor());
 			}
-
 			if (e.mArmorMaterialOverride != null) {
 				this.setArmorMaterialOverride(e.getArmorMaterialOverride());
 			}
@@ -161,15 +197,53 @@ public class MonumentaItem {
 			if (e.mLastEditedTimestamp != null) {
 				this.mLastEditedTimestamp = e.getLastEditedTimestamp();
 			}
-			this.mEdits = null;
+			if (e.mIsMagicWand != null) {
+				this.mIsMagicWand = e.mIsMagicWand;
+			}
+			if (e.mUnbreakable != null) {
+				this.mUnbreakable = e.mUnbreakable;
+			}
+			if (e.mBaseDurability != null) {
+				this.mBaseDurability = e.mBaseDurability;
+			}
+			if (e.mOnConsumeMap != null) {
+				for (Map.Entry<PassiveEffect, TreeMap<Integer, Integer>> potionEntry : e.mOnConsumeMap.entrySet()) {
+					PassiveEffect effect = potionEntry.getKey();
+					for (Map.Entry<Integer, Integer> valueEntry : potionEntry.getValue().entrySet()) {
+						Integer potency = valueEntry.getKey();
+						Integer duration = valueEntry.getValue();
+						this.setOnConsume(effect, potency, duration);
+					}
+				}
+			}
+			if (e.mBannerBaseColor != null) {
+				this.mBannerBaseColor = e.mBannerBaseColor;
+			}
+			if (e.mBannerPatterns != null) {
+				this.mBannerPatterns = e.mBannerPatterns;
+			}
+			if (e.mCraftingMaterialKind != null) {
+				this.mCraftingMaterialKind = e.mCraftingMaterialKind;
+			}
+			if (e.mBookTextContentMap != null && e.mBookTextContentMap.size() > 0) {
+				if (this.mBookTextContentMap == null) {
+					this.mBookTextContentMap = new TreeMap<>();
+				}
+				for (int i = 0; i <= e.mBookTextContentMap.lastKey(); i++) {
+					if (e.mBookTextContentMap.get(i) != null) {
+						this.mBookTextContentMap.put(i, e.mBookTextContentMap.get(i));
+					}
+				}
+			}
+			if (e.mBookAuthor != null) {
+				this.mBookAuthor = e.mBookAuthor;
+			}
+			if (e.mQuestID != null) {
+				this.mQuestID = e.mQuestID;
+			}
+			this.mEdits = e.mEdits;
 		}
 	}
-
-	private void preCalc() {
-		// normal precalc
-		this.mergeEdits();
-	}
-
 
 	public ItemStack toItemStack() {
 		// init + material
@@ -183,8 +257,64 @@ public class MonumentaItem {
 		ItemMeta meta = out.getItemMeta();
 		ArrayList<String> loreLines = new ArrayList<>();
 
+		// banner patterns
+		if (this.mBannerPatterns != null && this.mBannerPatterns.size() > 0) {
+			if (meta instanceof BannerMeta) {
+				BannerMeta bMeta = (BannerMeta)meta;
+				for (Pattern p : this.mBannerPatterns) {
+					bMeta.addPattern(p);
+				}
+			} else if (this.getMaterial() == Material.SHIELD) {
+				BlockStateMeta bsMeta = (BlockStateMeta)meta;
+				Banner banner = (Banner)bsMeta.getBlockState();
+				banner.setBaseColor(this.mBannerBaseColor);
+				banner.setPatterns(this.mBannerPatterns);
+				banner.update();
+				bsMeta.setBlockState(banner);
+			}
+		}
+
 		// name
 		meta.setDisplayName(this.getName() + "§r");
+
+		// book things
+		if (meta instanceof BookMeta) {
+			BookMeta bMeta = (BookMeta)meta;
+			if (this.mBookTextContentMap != null && this.mBookTextContentMap.size() > 0) {
+				Integer last = this.mBookTextContentMap.lastKey();
+				for (int i = 0; i <= last; i++) {
+					String s = this.mBookTextContentMap.getOrDefault(i, " ");
+					bMeta.addPage(s.replace('&', '§'));
+				}
+			}
+			bMeta.setTitle("no u");
+			bMeta.setAuthor("System");
+			if (this.mBookAuthor != null) {
+				bMeta.setAuthor(this.mBookAuthor);
+				loreLines.add(ChatColor.GRAY + "by " + this.mBookAuthor);
+			}
+			loreLines.add(ChatColor.GRAY + "Original");
+		}
+
+		// on consume effects
+		if (this.mOnConsumeMap != null && meta instanceof PotionMeta) {
+			for (Map.Entry<PassiveEffect, TreeMap<Integer, Integer>> potionEntry : this.mOnConsumeMap.entrySet()) {
+				PassiveEffect effect = potionEntry.getKey();
+				for (Map.Entry<Integer, Integer> valueEntry : potionEntry.getValue().entrySet()) {
+					Integer potency = valueEntry.getKey();
+					Integer duration = valueEntry.getValue();
+					if (potency > 0 && duration != 0) {
+						if (!effect.isCustom()) {
+							PotionMeta pMeta = (PotionMeta)meta;
+							pMeta.addCustomEffect(new PotionEffect(effect.getBukkitEffect(), duration, potency - 1), false);
+						}
+						loreLines.add(String.format("%s%s%s%s", effect.isNegative() ^ duration < 0 ? ChatColor.RED : ChatColor.BLUE,
+							effect.getReadableStr(), potency > 1 ? " " + StringUtils.toRoman(potency) : "",
+							duration > 20 ? String.format(" (%s)", StringUtils.intToMinuteAndSeconds(duration / 20)) : ""));
+					}
+				}
+			}
+		}
 
 		// enchants
 		if (this.mEnchantMap != null) {
@@ -203,6 +333,16 @@ public class MonumentaItem {
 					}
 				}
 			}
+		}
+
+		// magic wand
+		if (this.mIsMagicWand != null && this.mIsMagicWand) {
+			loreLines.add(ChatColor.DARK_GRAY + "* Magic Wand *");
+		}
+
+		// crafting material
+		if (this.mCraftingMaterialKind != null && this.mCraftingMaterialKind != null) {
+			loreLines.add(this.mCraftingMaterialKind.getReadableString());
 		}
 
 		// armor material
@@ -250,6 +390,15 @@ public class MonumentaItem {
 			}
 		}
 
+		// questID
+
+		if (this.mQuestID != null) {
+			loreLines.add(ChatColor.LIGHT_PURPLE + "* Quest Item *");
+			if (!this.mQuestID.equals("1")) {
+				loreLines.add("#" + this.mQuestID);
+			}
+		}
+
 		// attributes
 		if (this.getAttributesMap() != null) {
 			for (Map.Entry<EquipmentSlot, TreeMap<Attribute, TreeMap<AttributeModifier.Operation, Double>>> entry1 : this.mAttributeDataMap.entrySet()) {
@@ -271,9 +420,22 @@ public class MonumentaItem {
 			}
 		}
 
+		// unbreakable
+		if (this.mUnbreakable != null) {
+			meta.setUnbreakable(this.mUnbreakable);
+		}
+
+		// durability
+		if (this.mBaseDurability != null) {
+			if (meta instanceof Damageable) {
+				((Damageable) meta).setDamage(this.mBaseDurability);
+			}
+		}
+
 		// finish
 		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		meta.setLore(loreLines);
 		out.setItemMeta(meta);
 		if (jsonToStore != null) {
@@ -283,12 +445,6 @@ public class MonumentaItem {
 			out = nbtOut.getItem();
 		}
 		return out.ensureServerConversions();
-	}
-
-	public String toLootTablePrettyJson() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(this.toLootTableJsonElement());
-		return json;
 	}
 
 	public String toColoredRawEditInfo() {
@@ -317,28 +473,72 @@ public class MonumentaItem {
 		ChatColor hidden = ChatColor.ITALIC;
 		//out.append(String.format("\n", ));
 		if (this.getNameRaw() != null) {
-			out.append(String.format("%sName:%s %s (%s%s)\n", editable, reset, this.getNameRaw(), this.getName(), reset));
+			out.append(String.format("%sName:%s %s (%s%s)\n",
+				editable,
+				reset,
+				this.getNameRaw(),
+				this.getName(),
+				reset));
 		}
 		if (this.getMaterial() != null) {
-			out.append(String.format("%sMaterial:%s %s (%s)\n", editable, reset, this.getMaterial(), this.getMaterial().getKey()));
+			out.append(String.format("%sMaterial:%s %s (%s)\n",
+				editable,
+				reset,
+				this.getMaterial(),
+				this.getMaterial().getKey()));
 		}
 		if (this.getRegion() != null) {
-			out.append(String.format("%s%sRegion:%s %s (%d : %s%s)\n", editable, this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "", reset, this.getRegion(), this.getRegion().getInt(), this.getRegion().getReadableString(), reset));
+			out.append(String.format("%s%sRegion:%s %s (%d : %s%s)\n",
+				editable,
+				this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "",
+				reset,
+				this.getRegion(),
+				this.getRegion().getInt(),
+				this.getRegion().getReadableString(),
+				reset));
 		}
 		if (this.getTier() != null) {
-			out.append(String.format("%s%sTier:%s %s (%s%s)\n", editable, this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "", reset, this.getTier(), this.getTier().getReadableString(), reset));
+			out.append(String.format("%s%sTier:%s %s (%s%s)\n",
+				editable,
+				this.getRegion() == Region.NONE || this.getTier() == ItemTier.NONE ? unused : "",
+				reset,
+				this.getTier(),
+				this.getTier().getReadableString(),
+				reset));
 		}
 		if (this.getLocation() != null) {
-			out.append(String.format("%s%sLocation:%s %s (%s%s)\n", editable, this.getLocation() == ItemLocation.NONE ? unused : "",reset, this.getLocation(), this.getLocation().getReadableString(), reset));
+			out.append(String.format("%s%sLocation:%s %s (%s%s)\n",
+				editable,
+				this.getLocation() == ItemLocation.NONE ? unused : "",
+				reset,
+				this.getLocation(),
+				this.getLocation().getReadableString(),
+				reset));
 		}
 		if (this.getLore() != null) {
-			out.append(String.format("%s%sLore:%s %s\n", editable, this.getLore().size() == 0 ? unused : "", reset, this.getLore().size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			out.append(String.format("%s%sLore:%s %s\n",
+				editable, this.getLore().size() == 0 ? unused : "",
+				reset, this.getLore().size() > 0 ? this.getLore().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
 		if (this.getEnchantMap() != null) {
-			out.append(String.format("%s%sEnchants:%s %s\n", editable, this.getEnchantMap().size() == 0 ? unused : "", reset, this.getEnchantMap().size() > 0 ? this.getEnchantMap().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+			out.append(String.format("%s%sEnchants:%s %s\n",
+				editable,
+				this.getEnchantMap().size() == 0 ? unused : "",
+				reset,
+				this.getEnchantMap().size() > 0 ? this.getEnchantMap().toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
 		}
 		if (this.getColor() != null) {
-			out.append(String.format("%s%sColor:%s R:%d G:%d B:%d -> %s\n", editable, this.isColorable() ? "" : unused, reset, this.getColor()[0], this.getColor()[1], this.getColor()[2], String.format("#%02X%02X%02X", this.getColor()[0], this.getColor()[1], this.getColor()[2])));
+			out.append(String.format("%s%sColor:%s R:%d G:%d B:%d -> %s\n",
+				editable,
+				this.isColorable() ? "" : unused,
+				reset,
+				this.getColor()[0],
+				this.getColor()[1],
+				this.getColor()[2],
+				String.format("#%02X%02X%02X",
+					this.getColor()[0],
+					this.getColor()[1],
+					this.getColor()[2])));
 		}
 		if (this.getAttributesMap() != null) {
 			out.append(String.format("%s%sAttributes:%s\n", editable, this.getAttributesMap().size() == 0 ? unused : "", reset));
@@ -355,16 +555,82 @@ public class MonumentaItem {
 			}
 		}
 		if (this.getLastEditor() != null) {
-			out.append(String.format("%s%sLastEditor:%s %s\n", readOnly, hidden, reset, this.getLastEditor()));
+			out.append(String.format("%s%sLastEditor:%s %s\n",
+				readOnly,
+				hidden,
+				reset,
+				this.getLastEditor()));
 		}
 		if (this.mLastEditedTimestamp != null) {
-			out.append(String.format("%s%sLastEditionTime:%s %s (%s)\n", readOnly, hidden, reset, this.getLastEditTimeAsString(), this.getTimeSinceLastEditAsString()));
+			out.append(String.format("%s%sLastEditionTime:%s %s (%s)\n",
+				readOnly,
+				hidden,
+				reset,
+				this.getLastEditTimeAsString(),
+				this.getTimeSinceLastEditAsString()));
 		}
 		if (this.getArmorMaterial() != null) {
-			out.append(String.format("%s%sArmorMaterial:%s %s (%s%s)\n", readOnly, this.getArmorMaterial() == ArmorMaterial.NONE || this.getArmorMaterialOverride() != null ? unused : "", reset, this.getArmorMaterial(), this.getArmorMaterial().getReadableString(), reset));
+			out.append(String.format("%s%sArmorMaterial:%s %s (%s%s)\n",
+				readOnly,
+				this.getArmorMaterial() == ArmorMaterial.NONE || this.getArmorMaterialOverride() != null ? unused : "",
+				reset,
+				this.getArmorMaterial(),
+				this.getArmorMaterial().getReadableString(),
+				reset));
 		}
 		if (this.getArmorMaterialOverride() != null) {
 			out.append(String.format("%sArmorMaterialOverride:%s %s (%s%s)\n", editable, reset, this.getArmorMaterialOverride(), this.getArmorMaterialOverride().getReadableString(), reset));
+		}
+		if (this.getIsMagicWand() != null) {
+			out.append(String.format("%sIsMagicWand:%s %s\n", editable, reset, this.isMagicWand()));
+		}
+		if (this.getUnbreakable() != null) {
+			out.append(String.format("%sUnbreakable:%s %s\n", editable, reset, this.getUnbreakable()));
+		}
+		if (this.getDurability() != null) {
+			out.append(String.format("%s%sDurability:%s %s\n", editable, this.getUnbreakable() != null && this.getUnbreakable() ? unused : "",  reset, this.getUnbreakable()));
+		}
+		if (this.getOldName() != null) {
+			out.append(String.format("%sOld Name:%s %s\n", readOnly, reset, this.getOldName()));
+		}
+		if (this.getOldMaterial() != null) {
+			out.append(String.format("%sOld Material:%s %s\n", readOnly, reset, this.getOldMaterial()));
+		}
+		if (this.mOnConsumeMap != null) {
+			out.append(String.format("%s%sOnConsume Effects:%s\n", editable, this.mOnConsumeMap.size() == 0 ? unused : "", reset));
+			for (Map.Entry<PassiveEffect, TreeMap<Integer, Integer>> potionEntry : this.mOnConsumeMap.entrySet()) {
+				PassiveEffect effect = potionEntry.getKey();
+				for (Map.Entry<Integer, Integer> valueEntry : potionEntry.getValue().entrySet()) {
+					Integer potency = valueEntry.getKey();
+					Integer duration = valueEntry.getValue();
+					out.append(String.format("%s   %s   %s\n", effect, potency, duration));
+				}
+			}
+		}
+		if (this.mBannerBaseColor != null) {
+			out.append(String.format("%s%sBanner Base Color:%s %s\n", editable, this.mMaterial == Material.SHIELD ? unused : "", reset, this.mBannerBaseColor));
+		}
+		if (this.mBannerPatterns != null) {
+			out.append(String.format("%s%sBanner Patterns:%s %s\n", editable, this.mMaterial == Material.SHIELD || (this.mMaterial != null && new ItemStack(this.mMaterial).getItemMeta() instanceof BannerMeta) ? unused : "", reset, this.mBannerPatterns.toString()));
+		}
+		if (this.mBookTextContentMap != null) {
+			out.append(String.format("%s%sBook Contents:%s %s\n",
+				editable, this.getMaterial() == Material.WRITABLE_BOOK || this.getMaterial() == Material.WRITTEN_BOOK ? "" : unused,
+				reset,
+				this.mBookTextContentMap.size() > 0 ? this.mBookTextContentMap.toString().replace(",", "\n              ").replace('{', '}').replace("}", "") : "None"));
+		}
+		if (this.mBookAuthor != null) {
+			out.append(String.format("%s%sBook Author:%s %s\n",
+				editable,
+				this.getMaterial() == Material.WRITABLE_BOOK || this.getMaterial() == Material.WRITTEN_BOOK ? "" : unused,
+				reset,
+				this.getBookAuthor()));
+		}
+		if (this.mQuestID != null) {
+			out.append(String.format("%sQuestID:%s %s\n",
+				editable,
+				reset,
+				this.mQuestID));
 		}
 		if (this.mEdits != null) {
 			out.append("Edits differing from ItemIndex instance:\n");
@@ -376,52 +642,7 @@ public class MonumentaItem {
 		return out.toString();
 	}
 
-	public void setDefaultValues() {
-		this.mName = "&7New Item";
-		this.mMaterial = Material.PAPER;
-		this.mRegion = Region.MONUMENTA;
-		this.mTier = ItemTier.DEV;
-		this.mLastEditedBy = "System";
-		this.mLastEditedTimestamp = LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
-	}
-
-	public JsonElement toLootTableJsonElement() {
-		ItemStack stack = this.toItemStack();
-		JsonObject function = new JsonObject();
-		function.addProperty("function", "set_nbt");
-		function.addProperty("tag", NBTUtils.getItemStackTag(stack).toString());
-		JsonArray functions = new JsonArray();
-		functions.add(function);
-		JsonObject entry = new JsonObject();
-		entry.addProperty("type", "item");
-		entry.addProperty("weight", 1);
-		entry.addProperty("name", stack.getType().getKey().toString());
-		entry.add("functions", functions);
-		JsonArray entries = new JsonArray();
-		entries.add(entry);
-		JsonObject pool = new JsonObject();
-		pool.addProperty("rolls", 1);
-		pool.add("entries", entries);
-		JsonArray pools = new JsonArray();
-		pools.add(pool);
-		JsonObject root = new JsonObject();
-		root.add("pools", pools);
-		root.add("monumentaItem", this.toJsonElement());
-		return root;
-	}
-
-	public JsonElement toJsonElement() {
-		return new Gson().toJsonTree(this);
-	}
-
-	public String toPrettyJson() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this);
-	}
-
-	public String toJson() {
-		return new Gson().toJson(this);
-	}
+	//getters
 
 	public MonumentaItem edit() {
 		if (this.mEdits == null) {
@@ -484,18 +705,20 @@ public class MonumentaItem {
 	}
 
 	public boolean isColorable() {
-		if (this.getMaterial() == null) {
-			return false;
+		boolean result = false;
+		if (this.getMaterial() != null) {
+			switch (this.getMaterial()) {
+				case LEATHER_BOOTS:
+				case LEATHER_LEGGINGS:
+				case LEATHER_CHESTPLATE:
+				case LEATHER_HELMET:
+					result = true;
+					break;
+				default:
+					break;
+			}
 		}
-		switch (this.getMaterial()) {
-			case LEATHER_BOOTS:
-			case LEATHER_LEGGINGS:
-			case LEATHER_CHESTPLATE:
-			case LEATHER_HELMET:
-				return true;
-			default:
-				return false;
-		}
+		return result;
 	}
 
 	@Nullable
@@ -561,6 +784,76 @@ public class MonumentaItem {
 	public ArmorMaterial getArmorMaterialOverride() {
 		return this.mArmorMaterialOverride;
 	}
+
+	@Nullable
+	public Boolean getIsMagicWand() {
+		return this.mIsMagicWand;
+	}
+
+	@Nullable
+	public Boolean isMagicWand() {
+		return mIsMagicWand;
+	}
+
+	@Nullable
+	public Boolean getUnbreakable() {
+		return this.mUnbreakable;
+	}
+
+	@Nullable
+	public Integer getDurability() {
+		return this.mBaseDurability;
+	}
+
+	@Nullable
+	public String getOldName() {
+		return this.mOldName;
+	}
+
+	@Nullable
+	public Material getOldMaterial() {
+		return this.mOldMaterial;
+	}
+
+	@Nullable
+	public TreeMap<PassiveEffect, TreeMap<Integer, Integer>> getOnConsumeMap() {
+		return this.mOnConsumeMap;
+	}
+
+	@Nullable
+	public ArrayList<Pattern> getBannerPatterns() {
+		return this.mBannerPatterns;
+	}
+
+	@Nullable
+	public CraftingMaterialKind getCraftingMaterialKind() {
+		return this.mCraftingMaterialKind;
+	}
+
+	@Nullable
+	public TreeMap<Integer, String> getBookTextContentMap() {
+		return this.mBookTextContentMap;
+	}
+
+	@Nullable
+	public String getBookPage(Integer i) {
+		String out = null;
+		if (this.mBookTextContentMap != null) {
+			out = this.mBookTextContentMap.get(i);
+		}
+		return out;
+	}
+
+	@Nullable
+	public String getBookAuthor() {
+		return mBookAuthor;
+	}
+
+	public String getQuestID() {
+		return this.mQuestID;
+	}
+
+	// setters
 
 	public void setEdits(MonumentaItem edits) {
 		this.mEdits = edits;
@@ -670,7 +963,177 @@ public class MonumentaItem {
 		this.mArmorMaterialOverride = armorMaterialOverride;
 	}
 
+	public void setIsMagicWand(Boolean isMagicWand) {
+		this.mIsMagicWand = isMagicWand;
+	}
+
+	public void setUnbreakable(Boolean unbreakable) {
+		this.mUnbreakable = unbreakable;
+	}
+
+	public void setDurability(Integer i) {
+		this.mBaseDurability = i;
+	}
+
+	public void setOldName(String oldName) {
+		this.mOldName = oldName;
+	}
+
+	public void setOldMaterial(Material oldMaterial) {
+		this.mOldMaterial = oldMaterial;
+	}
+
+	public void setOnConsume(PassiveEffect effect, Integer potency, Integer duration) {
+		if (this.mOnConsumeMap == null) {
+			this.mOnConsumeMap = new TreeMap<>();
+		}
+		TreeMap<Integer, Integer> valueMap = this.mOnConsumeMap.getOrDefault(effect, new TreeMap<>());
+		valueMap.put(potency, duration);
+		this.mOnConsumeMap.put(effect, valueMap);
+	}
+
+	public void setBannerPatterns(List<Pattern> patternList) {
+		ArrayList<Pattern> in = new ArrayList<>(patternList);
+		this.mBannerPatterns = in;
+	}
+
+	public void setBannerBaseColor(DyeColor bannerBaseColor) {
+		this.mBannerBaseColor = bannerBaseColor;
+	}
+
+	public void setBanner(ItemStack banner) {
+		if (banner.getItemMeta() instanceof BannerMeta) {
+			BannerMeta bMeta = (BannerMeta)banner.getItemMeta();
+			this.setBannerPatterns(bMeta.getPatterns());
+			DyeColor c = DyeColor.valueOf(banner.getType().toString().replace("_BANNER", ""));
+			this.setBannerBaseColor(c);
+		}
+	}
+
+	public void setCraftingMaterialKind(CraftingMaterialKind kind) {
+		this.mCraftingMaterialKind = kind;
+	}
+
+	public void setBookPageContent(int page, String content) {
+		if (this.mBookTextContentMap == null) {
+			this.mBookTextContentMap = new TreeMap<>();
+		}
+		this.mBookTextContentMap.put(page, content);
+	}
+
+	public void setBookAuthor(String mBookAuthor) {
+		this.mBookAuthor = mBookAuthor;
+	}
+
+	public void setQuestID(String mQuestID) {
+		this.mQuestID = mQuestID;
+	}
+
+	// utils
+
 	public static MonumentaItem fromItemStack(ItemStack itemStack) {
 		return Plugin.getInstance().mItemManager.getMMItemWithEdits(itemStack);
+	}
+
+	public JsonElement toLootTableJsonElement() {
+		ItemStack stack = this.toItemStack();
+		JsonObject function = new JsonObject();
+		function.addProperty("function", "set_nbt");
+		function.addProperty("tag", NBTUtils.getItemStackTag(stack).toString());
+		JsonArray functions = new JsonArray();
+		functions.add(function);
+		JsonObject entry = new JsonObject();
+		entry.addProperty("type", "item");
+		entry.addProperty("weight", 1);
+		entry.addProperty("name", stack.getType().getKey().toString());
+		entry.add("functions", functions);
+		JsonArray entries = new JsonArray();
+		entries.add(entry);
+		JsonObject pool = new JsonObject();
+		pool.addProperty("rolls", 1);
+		pool.add("entries", entries);
+		JsonArray pools = new JsonArray();
+		pools.add(pool);
+		JsonObject root = new JsonObject();
+		root.add("pools", pools);
+		root.add("monumentaItem", this.toJsonElement());
+		return root;
+	}
+
+	public JsonElement toJsonElement() {
+		return new Gson().toJsonTree(this);
+	}
+
+	public String toPrettyJson() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(this);
+	}
+
+	public String toJson() {
+		return new Gson().toJson(this);
+	}
+
+	public String toLootTablePrettyJson() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String json = gson.toJson(this.toLootTableJsonElement());
+		return json;
+	}
+
+	public void setDefaultValues() {
+		this.mName = "&7New Item";
+		this.mMaterial = Material.PAPER;
+		this.mRegion = Region.MONUMENTA;
+		this.mTier = ItemTier.DEV;
+	}
+
+	void preCalc() {
+		this.mergeEdits();
+
+		// remove useless values
+		// onConsume
+		if (this.mOnConsumeMap != null) {
+			TreeMap<PassiveEffect, TreeMap<Integer, Integer>> newMap = new TreeMap<>();
+			all : for (Map.Entry<PassiveEffect, TreeMap<Integer, Integer>> potionEntry : this.mOnConsumeMap.entrySet()) {
+				PassiveEffect effect = potionEntry.getKey();
+				TreeMap<Integer, Integer> newSubMap = new TreeMap<>();
+				for (Map.Entry<Integer, Integer> valueEntry : potionEntry.getValue().entrySet()) {
+					Integer potency = valueEntry.getKey();
+					if (potency == 0) {
+						continue all;
+					}
+					Integer duration = valueEntry.getValue();
+					if (duration != 0) {
+						newSubMap.put(potency, duration);
+					}
+				}
+				if (newSubMap.size() > 0) {
+					newMap.put(effect, newSubMap);
+				}
+			}
+			if (newMap.size() == 0) {
+				newMap = null;
+			}
+			this.mOnConsumeMap = newMap;
+		}
+		// QuestID
+		if (this.mQuestID != null && this.mQuestID.equals("0")) {
+			this.mQuestID = null;
+		}
+		// Lore
+		if (this.mLoreMap != null && this.mLoreMap.size() > 0) {
+			ArrayList<Integer> toRemove = new ArrayList<>();
+			for (Map.Entry<Integer, String> entry : this.mLoreMap.entrySet()) {
+				if (entry.getValue().equals(".")) {
+					toRemove.add(entry.getKey());
+				}
+			}
+			for (Integer i : toRemove) {
+				this.mLoreMap.remove(i);
+			}
+			if (this.mLoreMap.size() == 0) {
+				this.mLoreMap = null;
+			}
+		}
+
 	}
 }

@@ -84,7 +84,7 @@ public class IndexInventory {
 		if (this.mCurrentPage > (this.mItems.length - 1) / 45 + 1) {
 			this.mCurrentPage = 0;
 		} else if (this.mCurrentPage == -1) {
-			this.mCurrentPage = (this.mItems.length - 1) / 45 + 1;
+			this.mCurrentPage = (this.mItems.length - 1) / 45;
 		}
 		for (int i = 0; i < 45 && i + this.mCurrentPage * 45 < this.mItems.length; i++) {
 			MonumentaItem item = this.mItems[i + this.mCurrentPage * 45];
