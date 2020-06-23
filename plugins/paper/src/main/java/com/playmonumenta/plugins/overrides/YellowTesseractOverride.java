@@ -81,14 +81,13 @@ public class YellowTesseractOverride extends BaseOverride {
 			if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
 				storeSkills(player, item);
 			}
-
+		} else if (player.isSneaking()
+			    && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
+				//Reset Tesseract with shift + left click
+				resetTesseract(player, item);
 		} else if (InventoryUtils.isSoulboundToPlayer(item, player)) {
 			/* Active and soulbound to player */
-
-			if (player.isSneaking()
-			    && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
-				resetTesseract(player, item);
-			} else if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
+			if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
 				boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5);
 				int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown");
 				// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
