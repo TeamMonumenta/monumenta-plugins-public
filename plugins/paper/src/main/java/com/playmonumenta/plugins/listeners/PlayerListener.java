@@ -47,6 +47,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -419,9 +420,10 @@ public class PlayerListener implements Listener {
 				if (event.getClick() != null
 					&& event.getClick().equals(ClickType.RIGHT)
 					&& inventory.getItem(event.getSlot()) == null
-					&& event.getAction().equals(InventoryAction.NOTHING)) {
+					&& event.getAction().equals(InventoryAction.NOTHING)
+					&& event.getSlotType() != InventoryType.SlotType.CRAFTING) {
 
-					// Player right clicked an empty space and nothing happened
+					// Player right clicked an no-crafting empty space and nothing happened
 					// Check if the last thing the player did was also the same thing.
 					// If so, sort the chest
 					if (player.hasMetadata(Constants.PLAYER_CHEST_SORT_CLICK_COUNT_METAKEY)) {
