@@ -25,6 +25,8 @@ public class NoExperienceBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(EntityDeathEvent event) {
-		event.setDroppedExp(0);
+		if (event != null) {
+			event.setDroppedExp(0);
+		}
 	}
 }

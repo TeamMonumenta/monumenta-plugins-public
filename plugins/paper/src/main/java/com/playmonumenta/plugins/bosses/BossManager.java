@@ -30,6 +30,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
@@ -462,6 +463,22 @@ public class BossManager implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void entityExplodeEvent(EntityExplodeEvent event) {
+		if (!event.isCancelled()) {
+			Entity entity = event.getEntity();
+			if (!(entity instanceof LivingEntity)) {
+				return;
+			}
+
+			Boss boss = mBosses.get(entity.getUniqueId());
+			if (boss != null) {
+				boss.death(null);
+				boss.unload(false);
+			}
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();

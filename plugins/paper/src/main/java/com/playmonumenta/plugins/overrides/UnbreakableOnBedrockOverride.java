@@ -9,6 +9,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class UnbreakableOnBedrockOverride extends BaseOverride {
 	@Override
@@ -35,7 +37,7 @@ public class UnbreakableOnBedrockOverride extends BaseOverride {
 		if (blockUnder != null && (
 		        blockUnder.getType() == Material.BEDROCK ||
 		        blockUnder.getType() == Material.BARRIER
-		    )) {
+		    ) && !(ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.PLOTS_POSSIBLE))) {
 			return false;
 		}
 
