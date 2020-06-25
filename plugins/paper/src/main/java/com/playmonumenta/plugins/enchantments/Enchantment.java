@@ -75,6 +75,7 @@ public enum Enchantment {
 	ADRENALINE(new Adrenaline()),
 	SAPPER(new Sapper()),
 	RECOIL(new Recoil()),
+	ERUPTION(new Eruption()),
 
 	// armor protections
 	PROTECTION(ChatColor.GRAY + "Protection", org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL),

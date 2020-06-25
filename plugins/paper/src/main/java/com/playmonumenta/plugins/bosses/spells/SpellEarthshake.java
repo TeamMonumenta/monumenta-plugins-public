@@ -18,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -185,6 +186,11 @@ public class SpellEarthshake extends SpellBaseAoE {
 							p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
 							BossUtils.bossDamage(launcher, p, 35.0);
 						}
+					}
+					//Knock up other mobs because it's fun
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, radius * 2);
+					for (LivingEntity mob : mobs) {
+						mob.setVelocity(mob.getVelocity().add(new Vector(0.0, 2.0, 0.0)));
 					}
 				}
 
