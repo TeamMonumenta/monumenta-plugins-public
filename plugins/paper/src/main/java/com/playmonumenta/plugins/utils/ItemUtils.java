@@ -505,12 +505,10 @@ public class ItemUtils {
 
 	// Returns an ItemDeathResult reporting what should happen to an item when the player carrying it dies.
 	public static ItemDeathResult getItemDeathResult(ItemStack item) {
-		if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-			if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 1) {
-				return ItemDeathResult.SHATTER_NOW;
-			} else if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 2) {
-				return ItemDeathResult.DESTROY;
-			}
+		if (isItemCurseOfVanishingII(item)) {
+			return ItemDeathResult.DESTROY;
+		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+			return ItemDeathResult.SHATTER_NOW;
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:
@@ -687,6 +685,20 @@ public class ItemUtils {
 			if (lore != null) {
 				for (String loreEntry : lore) {
 					if (loreEntry.contains(ChatColor.DARK_RED + "" + ChatColor.BOLD + "* SHATTERED *")) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isItemCurseOfVanishingII(ItemStack item) {
+		if (item != null) {
+			List<String> lore = item.getLore();
+			if (lore != null) {
+				for (String loreEntry : lore) {
+					if (loreEntry.contains("Curse of Vanishing II")) {
 						return true;
 					}
 				}
