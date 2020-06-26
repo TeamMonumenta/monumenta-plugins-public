@@ -117,10 +117,13 @@ public class DelvesListener implements Listener {
 	 * Importing the event directly here will cause this entire class to fail to load.
 	 */
 	public static void onTransfer(Player player, String target) {
-		String message = DELVE_MESSAGES.get(ScoreboardUtils.getScoreboardValue(player, ScoreboardUtils.getDelveScoreboard(target)));
+		String scoreboard = ScoreboardUtils.getDelveScoreboard(target);
+		if (scoreboard != null) {
+			String message = DELVE_MESSAGES.get(ScoreboardUtils.getScoreboardValue(player, scoreboard));
 
-		if (message != null) {
-			MessagingUtils.sendRawMessage(player, message);
+			if (message != null) {
+				MessagingUtils.sendRawMessage(player, message);
+			}
 		}
 	}
 

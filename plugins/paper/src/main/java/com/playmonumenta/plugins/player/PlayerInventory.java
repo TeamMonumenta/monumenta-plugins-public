@@ -78,13 +78,12 @@ public class PlayerInventory {
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
 		//Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent) {
-			if (((InventoryClickEvent) event).getSlotType() == InventoryType.SlotType.CRAFTING) {
-				mNeedsUpdate = true;
-			}
-			if (((InventoryClickEvent) event).isShiftClick()) {
+			InventoryClickEvent invClickEvent = (InventoryClickEvent) event;
+			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING
+				|| invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
 				return;
-			} else if (((InventoryClickEvent) event).isRightClick() && ShulkerEquipmentListener.isEquipmentBox(((InventoryClickEvent) event).getCurrentItem()))  {
+			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem()))  {
 				for (int i = 0; i <= 8; i++) {
 					// Update hotbar
 					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
@@ -93,12 +92,12 @@ public class PlayerInventory {
 					// Update armor and offhand
 					plugin.mEnchantmentManager.updateItemProperties(i, mCurrentProperties, mInventoryProperties, player, plugin);
 				}
-			} else if (((InventoryClickEvent) event).getHotbarButton() != -1) {
+			} else if (invClickEvent.getHotbarButton() != -1) {
 				// Updates clicked slot and hotbar slot if numbers were used to swap
-				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
-				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getHotbarButton(), mCurrentProperties, mInventoryProperties, player, plugin);
+				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getHotbarButton(), mCurrentProperties, mInventoryProperties, player, plugin);
 			} else {
-				plugin.mEnchantmentManager.updateItemProperties(((InventoryClickEvent) event).getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
+				plugin.mEnchantmentManager.updateItemProperties(invClickEvent.getSlot(), mCurrentProperties, mInventoryProperties, player, plugin);
 			}
 		} else if (event instanceof InventoryDragEvent) {
 			for (int i : ((InventoryDragEvent) event).getInventorySlots()) {
