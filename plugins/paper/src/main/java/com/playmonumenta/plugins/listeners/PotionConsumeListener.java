@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -27,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.enchantments.InstantDrink;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -98,6 +100,7 @@ public class PotionConsumeListener implements Listener {
 				event.getClickedInventory().setItem(event.getSlot(), prevPotion);
 			} else {
 				item.subtract();
+				prevPotion.setAmount(1);
 				event.getClickedInventory().addItem(prevPotion);
 			}
 			mPotionsConsumed.put(player.getUniqueId(), null);
@@ -142,6 +145,17 @@ public class PotionConsumeListener implements Listener {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
 					if (mTicks >= DRINK_DURATION && !this.isCancelled()) {
 						PotionUtils.applyPotion(mPlugin, player, meta);
+						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
+						if (NonClericProvisionsPassive.testRandomChance(player) && mPotionsConsumed.get(player.getUniqueId()) != null) {
+							Inventory inv = event.getClickedInventory();
+							int slot = event.getSlot();
+							ItemStack potion = mPotionsConsumed.get(player.getUniqueId());
+							if (inv.getItem(slot).getType() == Material.AIR || inv.getItem(slot).getType() == Material.GLASS_BOTTLE) {
+								inv.setItem(slot, potion);
+							} else {
+								inv.addItem(potion);
+							}
+						}
 						this.cancel();
 					}
 					float pitch = ((float)FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
@@ -157,6 +171,7 @@ public class PotionConsumeListener implements Listener {
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 
 		//Do not reduce potions or place glass bottles if the potion is infinite
+		//Also take into account Sacred Provisions (cleric skill) whether to consume potion or not
 		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			item.setAmount(item.getAmount() - 1);
 			//If not instant drink, place an empty bottle in the inventory
@@ -213,6 +228,12 @@ public class PotionConsumeListener implements Listener {
 		potion.setItem(item);
 
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
+
+		//If Sacred Provisions check passes, do not consume
+		if (NonClericProvisionsPassive.testRandomChance(player)) {
+			event.setCancelled(true);
+			return;
+		}
 
 		//Remove item
 		item.setAmount(item.getAmount() - 1);

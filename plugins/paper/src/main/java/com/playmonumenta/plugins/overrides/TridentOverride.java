@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRiptideEvent;
@@ -14,7 +15,32 @@ public class TridentOverride extends BaseOverride {
 			return true;
 		}
 
-		if (event.getItem().getEnchantmentLevel(Enchantment.RIPTIDE) > 0 && !LocationUtils.isLocationInWater(player.getEyeLocation())) {
+		if (event.getItem().getEnchantmentLevel(Enchantment.RIPTIDE) > 0 && player.getWorld().hasStorm()) {
+			//Checks in a 3x3 around the player's eye location for water
+			Location eyeLoc = player.getEyeLocation();
+			int radius = 1;
+			for (double x = eyeLoc.getX() - radius; x <= eyeLoc.getX() + radius; x++) {
+				for (double y = eyeLoc.getY() - radius; y <= eyeLoc.getY() + radius; y++) {
+					for (double z = eyeLoc.getZ() - radius; z <= eyeLoc.getZ() + radius; z++) {
+						if (LocationUtils.isLocationInWater(new Location(player.getWorld(), x, y, z))) {
+							return true;
+						}
+					}
+				}
+			}
+
+			//Checks in a 3x3 around the player's location for water
+			Location loc = player.getLocation();
+			for (double x = loc.getX() - radius; x <= loc.getX() + radius; x++) {
+				for (double y = loc.getY() - radius; y <= loc.getY() + radius; y++) {
+					for (double z = loc.getZ() - radius; z <= loc.getZ() + radius; z++) {
+						if (LocationUtils.isLocationInWater(new Location(player.getWorld(), x, y, z))) {
+							return true;
+						}
+					}
+				}
+			}
+
 			return false;
 		}
 

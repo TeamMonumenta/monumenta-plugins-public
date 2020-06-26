@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -9,9 +10,11 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,6 +27,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.playmonumenta.plugins.Constants;
@@ -193,6 +198,16 @@ public class MobListener implements Listener {
 			//Do not run below if it is the death of a player
 			if (livingEntity instanceof Player) {
 				return;
+			}
+
+			//Give wither to vexes spawned from the evoker that died so they die over time
+			if (livingEntity instanceof Evoker) {
+				List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
+				for (LivingEntity vex : vexes) {
+					if (vex instanceof Vex && ((Vex) vex).getSummoner() != null && ((Vex)vex).getSummoner().equals(livingEntity)) {
+						vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 0));
+					}
+				}
 			}
 			//If the item has meta, run through the lore to check if it has quest item in the lore list
 			ListIterator<ItemStack> iter = event.getDrops().listIterator();

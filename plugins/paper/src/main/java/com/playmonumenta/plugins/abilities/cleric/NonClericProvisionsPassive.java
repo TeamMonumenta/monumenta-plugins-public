@@ -32,10 +32,10 @@ public class NonClericProvisionsPassive extends Ability {
 		return true;
 	}
 
-	private boolean testRandomChance() {
+	public static boolean testRandomChance(Player player) {
 		int level = 0;
-		for (Player player : PlayerUtils.playersInRange(mPlayer, PROVISIONS_RANGE, true)) {
-			Ability provisions = AbilityManager.getManager().getPlayerAbility(player, SacredProvisions.class);
+		for (Player p : PlayerUtils.playersInRange(player, PROVISIONS_RANGE, true)) {
+			Ability provisions = AbilityManager.getManager().getPlayerAbility(p, SacredProvisions.class);
 			if (provisions != null) {
 				int score = provisions.getAbilityScore();
 				if (score == 2) {
@@ -54,21 +54,21 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (testRandomChance()) {
+		if (testRandomChance(mPlayer)) {
 			event.setReplacement(event.getItem());
 		}
 	}
 
 	@Override
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
-		if (testRandomChance()) {
+		if (testRandomChance(mPlayer)) {
 			event.setDamage(0);
 		}
 	}
 
 	@Override
 	public boolean playerShotArrowEvent(AbstractArrow arrow) {
-		if (testRandomChance()) {
+		if (testRandomChance(mPlayer)) {
 			AbilityUtils.refundArrow(mPlayer, arrow);
 		}
 		return true;
@@ -76,7 +76,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (testRandomChance()) {
+		if (testRandomChance(mPlayer)) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}
 		return true;
@@ -84,7 +84,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public boolean playerThrewLingeringPotionEvent(ThrownPotion potion) {
-		if (testRandomChance()) {
+		if (testRandomChance(mPlayer)) {
 			AbilityUtils.refundPotion(mPlayer, potion);
 		}
 		return true;

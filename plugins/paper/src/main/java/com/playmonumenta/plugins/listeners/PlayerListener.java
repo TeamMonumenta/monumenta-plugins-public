@@ -848,6 +848,11 @@ public class PlayerListener implements Listener {
 
 			event.setDamage(damage);
 		}
+
+		//Tridents do not take damage in safezones
+		if (event.getItem().getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
+			event.setDamage(0);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
