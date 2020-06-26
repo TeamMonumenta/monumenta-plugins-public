@@ -3,10 +3,6 @@ package com.playmonumenta.plugins;
 import java.io.IOException;
 import java.util.UUID;
 
-import com.playmonumenta.plugins.itemindex.ItemIndexCommand;
-import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
-import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
-import com.playmonumenta.plugins.itemindex.ItemManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -52,8 +48,13 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
+import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
+import com.playmonumenta.plugins.itemindex.ItemIndexCommand;
+import com.playmonumenta.plugins.itemindex.ItemManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
+import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
 import com.playmonumenta.plugins.listeners.JunkItemListener;
@@ -194,7 +195,7 @@ public class Plugin extends JavaPlugin {
 		mCombatLoggingTimers = new CombatLoggingTimers();
 
 		mWorld = Bukkit.getWorlds().get(0);
-		mProjectileEffectTimers = new ProjectileEffectTimers(mWorld);
+		mProjectileEffectTimers = new ProjectileEffectTimers(this, mWorld);
 
 		mItemManager = new ItemManager();
 		mIndexInventoryManager = new IndexInventoryManager();
@@ -237,6 +238,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
+		manager.registerEvents(new DelvesListener(this, mWorld), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());

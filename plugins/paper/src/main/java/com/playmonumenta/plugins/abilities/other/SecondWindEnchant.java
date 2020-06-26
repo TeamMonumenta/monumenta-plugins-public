@@ -49,7 +49,9 @@ public class SecondWindEnchant extends Ability {
 
 			mWorld.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.5f);
 			mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 2f);
+			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.5f, 0.2f);
 			mWorld.spawnParticle(Particle.CLOUD, loc, 50, 0, 0, 0, 0.5);
+			mWorld.spawnParticle(Particle.TOTEM, loc, 50, 0, 0, 0, 0.5);
 
 			new BukkitRunnable() {
 				@Override

@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 
@@ -23,6 +24,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		Player player = event.getPlayer();
 		mLogger.info("PlayerTransferEvent: Player: " + player + "   Target: " + event.getTarget());
+		DelvesListener.onTransfer(player, event.getTarget());
 
 		int dropped = InventoryUtils.removeSpecialItems(player, false);
 		if (dropped == 1) {

@@ -10,6 +10,8 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
 public class Recoil implements BaseEnchantment {
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Recoil";
@@ -28,7 +30,7 @@ public class Recoil implements BaseEnchantment {
 	public void onLaunchProjectile(Plugin plugin, Player player, int level, Projectile proj, ProjectileLaunchEvent event) {
 		if (player.isSneaking()) {
 			player.setCooldown(player.getInventory().getItemInMainHand().getType(), (int)(20 * Math.sqrt(level)));
-		} else {
+		} else if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			Vector velocity = player.getLocation().getDirection().multiply(-0.5 * Math.sqrt(level));
 			player.setVelocity(velocity.setY(Math.max(0.1, velocity.getY())));
 		}

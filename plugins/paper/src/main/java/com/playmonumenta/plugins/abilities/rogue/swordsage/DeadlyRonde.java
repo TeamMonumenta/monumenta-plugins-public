@@ -144,6 +144,7 @@ public class DeadlyRonde extends Ability {
 					public void run() {
 						mActiveRunnable = null;
 						mRondeStacks = 0;
+						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
 					}
 
 				};

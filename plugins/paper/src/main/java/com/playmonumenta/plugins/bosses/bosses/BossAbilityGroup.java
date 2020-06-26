@@ -196,7 +196,7 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
-	 * Boss damaged another entity
+	 * Boss damaged another entity, includes projectiles
 	 */
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
 

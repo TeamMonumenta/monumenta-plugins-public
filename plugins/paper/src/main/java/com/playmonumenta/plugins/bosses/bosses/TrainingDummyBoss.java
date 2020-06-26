@@ -33,11 +33,19 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		boss.setRemoveWhenFarAway(false);
 	}
 
+	@Override
 	public void bossDamagedByEntity(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
+		double damage = event.getFinalDamage();
+
+		// Damage smaller than this is only meant to tag the mob as damaged by a player
+		if (damage < 0.01) {
+			return;
+		}
+
 		if (damager instanceof Player) {
 			Player player = (Player) damager;
-			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + event.getFinalDamage());
+			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damage);
 		}
 
 		if (damager instanceof Projectile) {
@@ -45,7 +53,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 			if (projectile.getShooter() instanceof Player) {
 				Player player = (Player) projectile.getShooter();
-				player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + event.getFinalDamage());
+				player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damage);
 			}
 		}
 	}

@@ -61,51 +61,53 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 		}
 
 		// Run this stuff a tick later so the AbilityManager has time to initialize everything
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Ability[] classAbilities = new Ability[8];
-				Ability[] specializationAbilities = new Ability[6];
-				classAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
-				classAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
-				classAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, IronTincture.class);
-				classAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
-				classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
-				classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
-				classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
-				classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalArtillery.class);
-				specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
-				specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
-				specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
-				specializationAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, WardingRemedy.class);
-				specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
-				specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
+		if (player != null) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					Ability[] classAbilities = new Ability[8];
+					Ability[] specializationAbilities = new Ability[6];
+					classAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, GruesomeAlchemy.class);
+					classAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, BrutalAlchemy.class);
+					classAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, IronTincture.class);
+					classAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, BasiliskPoison.class);
+					classAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, PowerInjection.class);
+					classAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, UnstableArrows.class);
+					classAbilities[6] = AbilityManager.getManager().getPlayerAbility(mPlayer, EnfeeblingElixir.class);
+					classAbilities[7] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalArtillery.class);
+					specializationAbilities[0] = AbilityManager.getManager().getPlayerAbility(mPlayer, PurpleHaze.class);
+					specializationAbilities[1] = AbilityManager.getManager().getPlayerAbility(mPlayer, NightmarishAlchemy.class);
+					specializationAbilities[2] = AbilityManager.getManager().getPlayerAbility(mPlayer, ScorchedEarth.class);
+					specializationAbilities[3] = AbilityManager.getManager().getPlayerAbility(mPlayer, WardingRemedy.class);
+					specializationAbilities[4] = AbilityManager.getManager().getPlayerAbility(mPlayer, InvigoratingOdor.class);
+					specializationAbilities[5] = AbilityManager.getManager().getPlayerAbility(mPlayer, AlchemicalAmalgam.class);
 
-				for (Ability classAbility : classAbilities) {
-					if (classAbility != null) {
-						mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
+					for (Ability classAbility : classAbilities) {
+						if (classAbility != null) {
+							mDamage += DAMAGE_PER_SKILL_POINT * classAbility.getAbilityScore();
 
-						if (classAbility instanceof PotionAbility) {
-							PotionAbility potionAbility = (PotionAbility) classAbility;
-							mPotionAbilities.add(potionAbility);
-							mDamage += potionAbility.getDamage();
+							if (classAbility instanceof PotionAbility) {
+								PotionAbility potionAbility = (PotionAbility) classAbility;
+								mPotionAbilities.add(potionAbility);
+								mDamage += potionAbility.getDamage();
+							}
+						}
+					}
+
+					for (Ability specializationAbility : specializationAbilities) {
+						if (specializationAbility != null) {
+							mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
+
+							if (specializationAbility instanceof PotionAbility) {
+								PotionAbility potionAbility = (PotionAbility) specializationAbility;
+								mPotionAbilities.add(potionAbility);
+								mDamage += potionAbility.getDamage();
+							}
 						}
 					}
 				}
-
-				for (Ability specializationAbility : specializationAbilities) {
-					if (specializationAbility != null) {
-						mDamage += DAMAGE_PER_SPEC_POINT * specializationAbility.getAbilityScore();
-
-						if (specializationAbility instanceof PotionAbility) {
-							PotionAbility potionAbility = (PotionAbility) specializationAbility;
-							mPotionAbilities.add(potionAbility);
-							mDamage += potionAbility.getDamage();
-						}
-					}
-				}
-			}
-		}.runTaskLater(mPlugin, 1);
+			}.runTaskLater(mPlugin, 1);
+		}
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.bosses.spells.SpellTargetVisiblePlayer;
+import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class PlayerTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_targetplayer";
@@ -54,8 +55,9 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	}
 
 	/* Only allow mobs with this ability to target players */
+	@Override
 	public void bossChangedTarget(EntityTargetEvent event) {
-		if (!(event.getTarget() instanceof Player)) {
+		if (!EntityUtils.isConfused(mBoss) && !(event.getTarget() instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}

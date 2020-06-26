@@ -22,7 +22,6 @@ public class InvigoratingOdor extends PotionAbility {
 	private static final int INVIGORATING_2_DAMAGE = 2;
 	private static final int INVIGORATING_DURATION = 20 * 10;
 	private static final int INVIGORATING_AURA_DURATION = 20 * 3;
-	private static final int INVIGORATING_RADIUS = 3;
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.5f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 

@@ -708,7 +708,7 @@ public class EntityUtils {
 		int iFrames = mob.getNoDamageTicks();
 		Vector velocity = mob.getVelocity();
 		mob.setNoDamageTicks(0);
-		EntityUtils.damageEntity(plugin, mob, 0.001, player, null, false, null, false, false);
+		EntityUtils.damageEntity(plugin, mob, 0.001, player, MagicType.FIRE, false, null, false, false);
 		mob.setNoDamageTicks(iFrames);
 		mob.setVelocity(velocity);
 	}

@@ -7,7 +7,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityTargetEvent;
 
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -54,10 +53,13 @@ public class SpellTargetVisiblePlayer extends Spell {
 		mCooldownRemaining -= PERIOD;
 		mTicksSinceLastSeen += PERIOD;
 
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isConfused(mBoss)) {
+			return;
+		}
+
 		// Forget about this target if they leave the game or switch to spectator or are invisible
 		if (mLastTarget != null) {
-			if (EntityUtils.isStunned(mBoss) || EntityUtils.isConfused(mBoss) || !mLastTarget.isOnline() ||
-					mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || AbilityUtils.isStealthed(mLastTarget)) {
+			if (!mLastTarget.isOnline() || mLastTarget.getGameMode().equals(GameMode.SPECTATOR) || AbilityUtils.isStealthed(mLastTarget)) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
 				mCooldownRemaining = 0;
@@ -81,8 +83,8 @@ public class SpellTargetVisiblePlayer extends Spell {
 				if (mLastTarget != null && mBoss.getTarget() != mLastTarget) {
 					mBoss.setTarget(mLastTarget);
 				}
-			} else if (!EntityUtils.isStunned(mBoss)) {
-				// Potentially find a new target if not stunned
+			} else {
+				// Potentially find a new target
 				Location bossLoc = mBoss.getEyeLocation();
 				List<Player> potentialTargets = PlayerUtils.playersInRange(bossLoc, mDetectionRange);
 				Collections.sort(potentialTargets, (a, b) -> Double.compare(a.getLocation().distance(bossLoc), b.getLocation().distance(bossLoc)));
@@ -104,13 +106,6 @@ public class SpellTargetVisiblePlayer extends Spell {
 					mCooldownRemaining = 0;
 				}
 			}
-		}
-	}
-
-	/* Only allow mobs with this ability to target players */
-	public void bossChangedTarget(EntityTargetEvent event) {
-		if (!(event.getTarget() instanceof Player)) {
-			event.setCancelled(true);
 		}
 	}
 

@@ -8,19 +8,30 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
 
 public class ProjectileEffectTimers {
+	private Plugin mPlugin;
 	private World mWorld;
 	private HashMap<Entity, Particle> mTrackingEntities;
 	private int mDeadTicks = 0;
 
-	public ProjectileEffectTimers(World world) {
+	public ProjectileEffectTimers(Plugin plugin, World world) {
+		mPlugin = plugin;
 		mWorld = world;
 		mTrackingEntities = new HashMap<Entity, Particle>();
 	}
 
 	public void addEntity(Entity entity, Particle particle) {
-		mTrackingEntities.put(entity, particle);
+		// 2 tick delay so particles don't get spammed in the player's face
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mTrackingEntities.put(entity, particle);
+			}
+		}.runTaskLater(mPlugin, 2);
 	}
 
 	public void removeEntity(Entity entity) {

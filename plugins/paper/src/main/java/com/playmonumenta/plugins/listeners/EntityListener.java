@@ -77,19 +77,9 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.cleric.Celestial;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.delves.StatMultiplier;
-import com.playmonumenta.plugins.abilities.delves.cursed.Mystic;
-import com.playmonumenta.plugins.abilities.delves.cursed.Ruthless;
-import com.playmonumenta.plugins.abilities.delves.cursed.Spectral;
-import com.playmonumenta.plugins.abilities.delves.cursed.Unyielding;
-import com.playmonumenta.plugins.abilities.delves.twisted.Arcanic;
-import com.playmonumenta.plugins.abilities.delves.twisted.Dreadful;
-import com.playmonumenta.plugins.abilities.delves.twisted.Merciless;
-import com.playmonumenta.plugins.abilities.delves.twisted.Relentless;
 import com.playmonumenta.plugins.enchantments.AttributeProjectileDamage;
 import com.playmonumenta.plugins.enchantments.Duelist;
 import com.playmonumenta.plugins.enchantments.Frost;
@@ -553,45 +543,11 @@ public class EntityListener implements Listener {
 		}
 	}
 
-	private static final List<Class<? extends Ability>> STAT_MULTIPLIER_ABILITIES = new ArrayList<Class<? extends Ability>>();
-
-	static {
-		STAT_MULTIPLIER_ABILITIES.add(Ruthless.class);
-		STAT_MULTIPLIER_ABILITIES.add(Unyielding.class);
-		STAT_MULTIPLIER_ABILITIES.add(Mystic.class);
-		STAT_MULTIPLIER_ABILITIES.add(Spectral.class);
-		STAT_MULTIPLIER_ABILITIES.add(Merciless.class);
-		STAT_MULTIPLIER_ABILITIES.add(Relentless.class);
-		STAT_MULTIPLIER_ABILITIES.add(Arcanic.class);
-		STAT_MULTIPLIER_ABILITIES.add(Dreadful.class);
-	}
-
 	// Entity Spawn Event.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.addEntity(entity);
-
-		// Handle stat multipliers; only for delves
-		if (entity instanceof LivingEntity) {
-			LivingEntity mob = (LivingEntity) entity;
-
-			// 128 is the mob auto-despawn range, so probably no spawners with a larger range, and dungeon cubes are at least this far apart
-			List<Player> players = PlayerUtils.playersInRange(mob.getLocation(), 128, true);
-
-			// We only need to check one player, since all players within range should have the same modifiers (and modifiers are only applied once)
-			if (players.size() > 0) {
-				Player player = players.get(0);
-
-				for (int i = 0; i < STAT_MULTIPLIER_ABILITIES.size(); i++) {
-					StatMultiplier sm = (StatMultiplier) AbilityManager.getManager().getPlayerAbility(player, STAT_MULTIPLIER_ABILITIES.get(i));
-					if (sm != null) {
-						sm.applyOnSpawnModifiers(mob);
-						break;
-					}
-				}
-			}
-		}
 	}
 
 	// Player shoots an arrow.

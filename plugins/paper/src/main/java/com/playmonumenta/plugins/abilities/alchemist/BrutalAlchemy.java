@@ -16,6 +16,7 @@ public class BrutalAlchemy extends PotionAbility {
 	private static final int BRUTAL_ALCHEMY_DURATION = 20 * 8;
 	private static final int BRUTAL_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 2;
 	private static final int BRUTAL_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 4;
+
 	private final int mVulnerabilityAmplifier;
 
 	public BrutalAlchemy(Plugin plugin, World world, Player player) {

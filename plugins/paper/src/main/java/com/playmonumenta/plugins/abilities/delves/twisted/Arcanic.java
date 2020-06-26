@@ -15,10 +15,12 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Arcanic extends StatMultiplier {
 
-	private static final int ARCANIC_CHALLENGE_SCORE = 23;
+	public static final String MESSAGE = ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.DARK_RED + ChatColor.BOLD + "ARCANIC" + ChatColor.GRAY + " powers channeled within.";
+	public static final int SCORE = 23;
+
 	private static final double ARCANIC_MOB_HEALTH_MULTIPLIER = 2;
-	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1.25;
-	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2.5;
+	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1;
+	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double ARCANIC_ABILITY_CHANCE = 1;
 
 	private static final String[] ARCANIC_ABILITY_POOL = {
@@ -37,14 +39,13 @@ public class Arcanic extends StatMultiplier {
 
 	public Arcanic(Plugin plugin, World world, Player player) {
 		super(plugin, world, player,
-				ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.DARK_RED + ChatColor.BOLD + "ARCANIC" + ChatColor.GRAY + " powers channeled within.",
 				1, ServerProperties.getClassSpecializationsEnabled() ? ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER : ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER,
 				ARCANIC_MOB_HEALTH_MULTIPLIER, ARCANIC_ABILITY_POOL, ARCANIC_ABILITY_CHANCE);
 	}
 
 	@Override
 	public boolean canUse(Player player) {
-		return ScoreboardUtils.isDelveChallengeActive(player, ARCANIC_CHALLENGE_SCORE);
+		return ScoreboardUtils.isDelveChallengeActive(player, SCORE);
 	}
 
 }

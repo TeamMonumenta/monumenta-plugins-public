@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,8 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -91,8 +94,11 @@ public class EerieEminence extends Ability {
 				// Consuming Flames case
 				if (entry.getDebuff() == null) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius)) {
-						if (mob.getFireTicks() <= 0) {
-							EntityUtils.applyFire(mPlugin, 100, mob, mPlayer);
+						// Check that the mob is not on fire, that the mob can be set on fire, and that the mob won't be extinguished
+						if (mob.getFireTicks() <= 0 && !Inferno.mobHasInferno(mPlugin, mob)
+								&& (!EntityUtils.isFireResistant(mob) || PlayerTracking.getInstance().getPlayerCustomEnchantLevel(mPlayer, Inferno.class) > 0)
+								&& mob.getLocation().getBlock().getType() != Material.WATER) {
+							EntityUtils.applyFire(mPlugin, 80, mob, mPlayer);
 						}
 					}
 

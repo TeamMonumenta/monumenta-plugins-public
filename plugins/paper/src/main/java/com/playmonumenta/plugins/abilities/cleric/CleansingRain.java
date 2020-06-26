@@ -35,7 +35,7 @@ public class CleansingRain extends Ability {
 		mInfo.mLinkedSpell = Spells.CLEANSING;
 		mInfo.mScoreboardId = "Cleansing";
 		mInfo.mShorthandName = "CR";
-		mInfo.mDescriptions.add("Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
+		mInfo.mDescriptions.add("Right click while sneaking and looking upwards and standing on the ground to summon a \"cleansing rain\" that follows you, removing negative effects from players within 4 blocks, including yourself, and lasts for 15 seconds. (Cooldown: 45 seconds)");
 		mInfo.mDescriptions.add("Additionally grants Resistance I (Cooldown: 30 seconds).");
 		mInfo.mCooldown = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -82,9 +82,10 @@ public class CleansingRain extends Ability {
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return mPlayer.isSneaking()
-		       && mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE
-		       && mainHand.getType() != Material.BOW
-		       && offHand.getType() != Material.BOW;
+				&& mPlayer.isOnGround()
+				&& mPlayer.getLocation().getPitch() < -CLEANSING_ANGLE
+				&& mainHand.getType() != Material.BOW
+				&& offHand.getType() != Material.BOW;
 	}
 
 }

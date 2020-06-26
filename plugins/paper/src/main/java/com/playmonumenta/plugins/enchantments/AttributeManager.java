@@ -214,7 +214,7 @@ public class AttributeManager {
 						int j;
 						for (j = 0; j < loreSegments[0].length(); j++) {
 							char c = loreSegments[0].charAt(j);
-							if (!Character.isDigit(c) || (j == 0 && (c == '+' || c == '-'))) {
+							if (!Character.isDigit(c) && !(j == 0 && (c == '+' || c == '-'))) {
 								if (c == '.' && loreSegments[0].length() >= 2) {
 									if (foundDecimal) {
 										break;

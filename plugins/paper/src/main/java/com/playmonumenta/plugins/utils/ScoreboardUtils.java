@@ -88,17 +88,20 @@ public class ScoreboardUtils {
 	}
 
 	public static boolean isDelveChallengeActive(Player player, int challengeScore) {
+		return isDelveChallengeActive(player, challengeScore, ServerProperties.getShardName());
+	}
+
+	public static boolean isDelveChallengeActive(Player player, int challengeScore, String shard) {
 		if (player == null) {
 			return false;
 		}
 
-		String scoreboard = DELVE_SHARD_SCOREBOARD_MAPPINGS.get(ServerProperties.getShardName());
+		String scoreboard = getDelveScoreboard(shard);
+		return scoreboard != null && (ScoreboardUtils.getScoreboardValue(player, scoreboard) == challengeScore);
+	}
 
-		if (scoreboard != null) {
-			return ScoreboardUtils.getScoreboardValue(player, scoreboard) == challengeScore;
-		}
-
-		return false;
+	public static String getDelveScoreboard(String shard) {
+		return DELVE_SHARD_SCOREBOARD_MAPPINGS.get(shard);
 	}
 
 }

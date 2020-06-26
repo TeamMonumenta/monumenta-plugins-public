@@ -80,6 +80,7 @@ public class AlchemicalAmalgam extends Ability {
 			List<Player> mPlayers = PlayerUtils.playersInRange(mPlayer, AMALGAM_MOVE_SPEED * AMALGAM_MAX_DURATION + 2, false);
 
 			int mTicks = 0;
+			int mReverseTick = 0;
 			double mDegree = 0;
 			boolean mReverse = false;
 
@@ -91,6 +92,15 @@ public class AlchemicalAmalgam extends Ability {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox.overlaps(mob.getBoundingBox())) {
+						/*
+						 * Based on the ticks since reverse and the mob's noDamageTicks (11 to 20
+						 * is iframes range), we can somewhat deduce if the noDamageTicks were
+						 * triggered by the forward Amalgam hit and reset if necessary.
+						 */
+						if (mReverse && mReverseTick - mTicks + 10 <= mob.getNoDamageTicks()) {
+							mob.setNoDamageTicks(0);
+						}
+
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 						mobIter.remove();
 					}
@@ -123,6 +133,7 @@ public class AlchemicalAmalgam extends Ability {
 					mMobs = EntityUtils.getNearbyMobs(mLoc, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, mPlayer);
 					mPlayers = PlayerUtils.playersInRange(mPlayer, (0.3 + AMALGAM_MOVE_SPEED) * AMALGAM_MAX_DURATION + 2, false);
 					mReverse = true;
+					mReverseTick = mTicks;
 				}
 
 				if (mReverse) {
