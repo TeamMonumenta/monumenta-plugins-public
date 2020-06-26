@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
@@ -465,12 +466,8 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		if (!event.isCancelled()) {
-			Entity entity = event.getEntity();
-			if (!(entity instanceof LivingEntity)) {
-				return;
-			}
-
+		Entity entity = event.getEntity();
+		if (!event.isCancelled() && entity != null && entity instanceof Creeper) {
 			Boss boss = mBosses.get(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
@@ -478,7 +475,7 @@ public class BossManager implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile proj = event.getEntity();
