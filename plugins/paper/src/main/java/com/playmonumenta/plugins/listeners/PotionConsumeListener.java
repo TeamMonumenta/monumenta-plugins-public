@@ -146,7 +146,11 @@ public class PotionConsumeListener implements Listener {
 					if (mTicks >= DRINK_DURATION && !this.isCancelled()) {
 						PotionUtils.applyPotion(mPlugin, player, meta);
 						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
-						if (NonClericProvisionsPassive.testRandomChance(player) && mPotionsConsumed.get(player.getUniqueId()) != null) {
+						//Do not run addition on infinity potions
+						if (mPotionsConsumed.get(player.getUniqueId()) != null &&
+							!mPotionsConsumed.get(player.getUniqueId()).containsEnchantment(Enchantment.ARROW_INFINITE) &&
+							NonClericProvisionsPassive.testRandomChance(player)) {
+
 							Inventory inv = event.getClickedInventory();
 							int slot = event.getSlot();
 							ItemStack potion = mPotionsConsumed.get(player.getUniqueId());
@@ -171,7 +175,6 @@ public class PotionConsumeListener implements Listener {
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 
 		//Do not reduce potions or place glass bottles if the potion is infinite
-		//Also take into account Sacred Provisions (cleric skill) whether to consume potion or not
 		if (!item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 			item.setAmount(item.getAmount() - 1);
 			//If not instant drink, place an empty bottle in the inventory
