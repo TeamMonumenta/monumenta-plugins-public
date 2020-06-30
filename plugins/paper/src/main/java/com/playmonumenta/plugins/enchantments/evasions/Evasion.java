@@ -7,17 +7,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Evasion implements BaseEnchantment {
 
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Evasion";
-	private static final int EVASION_CAP = 20;
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Evasion";
 
 	@Override
 	public String getProperty() {
@@ -31,18 +26,7 @@ public class Evasion implements BaseEnchantment {
 
 	@Override
 	public void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
-		EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
-		if (evasion != null && EntityUtils.getRealFinalDamage(event) > 0) {
-			evasion.mCounter += Math.min(EVASION_CAP, level);
-		}
-	}
-
-	@Override
-	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
-		EvasionEnchant evasion = AbilityManager.getManager().getPlayerAbility(player, EvasionEnchant.class);
-		if (evasion != null) {
-			evasion.mCounter += Math.min(EVASION_CAP, level);
-		}
+		EvasionInfo.addStacks(player, level);
 	}
 
 }

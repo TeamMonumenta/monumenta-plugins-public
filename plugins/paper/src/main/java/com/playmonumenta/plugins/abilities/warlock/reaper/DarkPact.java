@@ -10,7 +10,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -25,6 +24,9 @@ public class DarkPact extends Ability {
 	private static final int DARK_PACT_DURATION = 20 * 10;
 	private static final double DARK_PACT_1_DAMAGE_MULTIPLIER = 1 + 0.5;
 	private static final double DARK_PACT_2_DAMAGE_MULTIPLIER = 1 + 0.8;
+	private static final double DARK_PACT_2_RADIUS = 1.5;
+
+	private final double mDamageMultiplier;
 
 	private BukkitRunnable mPactTimer;
 	private float mSaturation = 0;
@@ -36,17 +38,14 @@ public class DarkPact extends Ability {
 		super(plugin, world, player, "Dark Pact");
 		mInfo.mScoreboardId = "DarkPact";
 		mInfo.mShorthandName = "DaP";
-		mInfo.mDescriptions.add("Left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage instead of healing. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
+		mInfo.mDescriptions.add("Left-clicking twice with a scythe without hitting a mob greatly amplifies the user's power for 10s. During this time the user cannot heal. Melee attacks deal 50% more damage. Soul Rend deals Area of Effect damage (same radius and amount) instead of healing. Blasphemous Aura treats this skill as if it is always on cooldown. Cooldown: 10s.");
 		mInfo.mDescriptions.add("You deal 80% more melee damage instead. Scythe attacks also cleave for 50% of the damage dealt in a 1.5 block radius from the mob hit.");
 		mInfo.mCooldown = DARK_PACT_COOLDOWN;
 		mInfo.mLinkedSpell = Spells.DARK_PACT;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-
-		/*
-		 * NOTE! Because this skill has two events it needs to bypass the automatic cooldown check
-		 * and manage cooldown itself
-		 */
 		mInfo.mIgnoreCooldown = true;
+
+		mDamageMultiplier = getAbilityScore() == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
 	}
 
 	@Override
@@ -118,23 +117,14 @@ public class DarkPact extends Ability {
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		// Melee attacks with scythes only
 		if (mActive && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand()) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			int level = getAbilityScore();
-			double percent = level == 1 ? DARK_PACT_1_DAMAGE_MULTIPLIER : DARK_PACT_2_DAMAGE_MULTIPLIER;
+			event.setDamage(event.getDamage() * mDamageMultiplier);
 
-			event.setDamage(event.getDamage() * percent);
-			if (level > 1 && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())) {
-				Location loc = mPlayer.getLocation().add(0, 1.35, 0);
-				Vector dir = loc.getDirection();
-				loc.add(dir);
+			if (getAbilityScore() > 1) {
+				Location loc = event.getEntity().getLocation().add(0, 1, 0);
 				mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0);
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0.4f);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 1.5)) {
-					Vector toMobVector = mob.getLocation().toVector().subtract(loc.toVector()).normalize();
-					if (mob != event.getEntity() && dir.dot(toMobVector) > 0.6) {
-						// This won't proc Perspicacity unless we rework how that enchantment works
-						// This is because it doesn't call the CustomDamageEvent
-						EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false, mInfo.mLinkedSpell);
-					}
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, DARK_PACT_2_RADIUS)) {
+					EntityUtils.damageEntity(mPlugin, mob, event.getDamage() / 2, mPlayer, null, false, mInfo.mLinkedSpell);
 				}
 			}
 		}

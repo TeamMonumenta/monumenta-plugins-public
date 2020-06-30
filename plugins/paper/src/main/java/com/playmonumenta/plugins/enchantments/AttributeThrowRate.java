@@ -1,12 +1,16 @@
 package com.playmonumenta.plugins.enchantments;
 
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -24,7 +28,7 @@ public class AttributeThrowRate implements BaseAttribute {
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
 		if (proj instanceof Trident) {
-			Trident trident = (Trident)proj;
+			Trident trident = (Trident) proj;
 			ItemStack item = NmsUtils.getTridentItem(trident);
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
@@ -41,6 +45,19 @@ public class AttributeThrowRate implements BaseAttribute {
 					ItemUtils.damageItemWithUnbreaking(item, 1, false);
 					player.getInventory().setItemInOffHand(item);
 				}
+			}
+		} else if (proj instanceof Snowball) {
+			if (value > 0) {
+				Snowball snowball = (Snowball) player.getWorld().spawnEntity(proj.getLocation(), EntityType.SNOWBALL);
+				snowball.setShooter(player);
+				snowball.setVelocity(proj.getVelocity());
+				// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
+				if (proj.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
+					snowball.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(plugin, proj.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
+				}
+
+				player.setCooldown(Material.SNOWBALL, (int)(20 / value));
+				event.setCancelled(true);
 			}
 		}
 	}

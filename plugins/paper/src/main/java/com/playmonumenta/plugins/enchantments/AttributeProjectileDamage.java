@@ -9,6 +9,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class AttributeProjectileDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Projectile Damage";
@@ -23,8 +24,13 @@ public class AttributeProjectileDamage implements BaseAttribute {
 
 	@Override
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
-		// Don't heal mobs
-		if (value > 0) {
+		/*
+		 * Don't heal mobs and don't apply if there's a shootable item in the offhand; this is because you can use mainhand
+		 * items for the attribute damage (like a Ghastcaller's with no arrows) and an offhand projectile (like infinite
+		 * snowball) to get lots of damage. Since we have no shootables with offhand stats, just ignore the attribute calculation
+		 * if the player shoots something and has a shootable in the offhand.
+		 */
+		if (value > 0 && !ItemUtils.isShootableItem(player.getInventory().getItemInOffHand().getType())) {
 			proj.setMetadata(DAMAGE_METAKEY, new FixedMetadataValue(plugin, value));
 		}
 	}

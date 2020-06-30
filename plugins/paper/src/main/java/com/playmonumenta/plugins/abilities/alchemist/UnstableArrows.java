@@ -6,7 +6,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -60,12 +59,8 @@ public class UnstableArrows extends Ability {
 				putOnCooldown();
 				mUnstableArrow = null;
 
-				Entity entity = event.getHitEntity();
-				// 1 tick delay so that we get the location of the arrow after it lands
-				// For some reason, this doesn't work when you shoot an arrow with more than 2 Projectile Speed; increasing the
-				// delay does nothing, and even weirder, the same exact code seems to work for AlchemicalArtillery but not this.
 				new BukkitRunnable() {
-					Location mLoc = entity == null ? proj.getLocation() : entity.getLocation();
+					Location mLoc = EntityUtils.getProjectileHitLocation(event);
 					int mTicks = 0;
 					@Override
 					public void run() {
@@ -114,7 +109,7 @@ public class UnstableArrows extends Ability {
 						}
 						mTicks += UNSTABLE_ARROWS_PARTICLE_PERIOD;
 					}
-				}.runTaskTimer(mPlugin, 1, UNSTABLE_ARROWS_PARTICLE_PERIOD);
+				}.runTaskTimer(mPlugin, 0, UNSTABLE_ARROWS_PARTICLE_PERIOD);
 			}
 		}
 	}

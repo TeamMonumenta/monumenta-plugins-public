@@ -35,7 +35,6 @@ import com.playmonumenta.plugins.player.PlayerInventory;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -182,6 +181,13 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
+	public void onFatalHurt(Plugin plugin, Player player, EntityDamageEvent event) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.onFatalHurt(plugin, player, event);
+		}
+	}
+
 	public void onEvade(Plugin plugin, Player player, EvasionEvent event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {
@@ -194,13 +200,6 @@ public class PlayerTracking implements EntityTracking {
 		if (manager != null) {
 
 			manager.onConsume(plugin, player, event);
-		}
-	}
-
-	public void onBossDamage(Plugin plugin, Player player, BossAbilityDamageEvent event) {
-		PlayerInventory manager = mPlayers.get(player);
-		if (manager != null) {
-			manager.onBossDamage(plugin, player, event);
 		}
 	}
 

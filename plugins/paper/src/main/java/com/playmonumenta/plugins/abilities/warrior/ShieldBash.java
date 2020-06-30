@@ -1,10 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,40 +15,29 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
-/*
- * Shield Bash: Right click while looking at a mob within 4 blocks
- * to stun it for 1 / 2 seconds (Cooldown: 5 seconds).
- * Move twice / thrice as fast while blocking.
- */
-
 public class ShieldBash extends Ability {
 
-	private static final int SHIELD_BASH_1_STUN = 20;
-	private static final int SHIELD_BASH_2_STUN = 20 * 2;
-	private static final int SHIELD_BASH_COOLDOWN = 20 * 5;
+	private static final int SHIELD_BASH_DAMAGE = 5;
+	private static final int SHIELD_BASH_STUN = 20 * 1;
+	private static final int SHIELD_BASH_COOLDOWN = 20 * 8;
+	private static final int SHIELD_BASH_2_RADIUS = 2;
 	private static final int SHIELD_BASH_RANGE = 4;
-
-	private static BukkitRunnable mShieldTracker;
-
-	private final int mStunDuration;
 
 	public ShieldBash(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Shield Bash");
 		mInfo.mLinkedSpell = Spells.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
-		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to stun them for 1 second (Cooldown: 5 seconds).");
-		mInfo.mDescriptions.add("Stun duration is increased to 2 seconds.");
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage and stun them for 1 second. Cooldown: 8 seconds.");
+		mInfo.mDescriptions.add("Additionally, deal 5 damage and stun for 1 second all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mStunDuration = getAbilityScore() == 1 ? SHIELD_BASH_1_STUN : SHIELD_BASH_2_STUN;
 	}
 
 	@Override
@@ -79,7 +64,17 @@ public class ShieldBash extends Ability {
 								mWorld.spawnParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0);
 								mWorld.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 								mWorld.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
-								EntityUtils.applyStun(mPlugin, mStunDuration, mob);
+
+								if (getAbilityScore() == 1) {
+									EntityUtils.damageEntity(mPlugin, mob, SHIELD_BASH_DAMAGE, mPlayer);
+									EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
+								} else {
+									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
+										EntityUtils.damageEntity(mPlugin, le, SHIELD_BASH_DAMAGE, mPlayer);
+										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
+									}
+								}
+
 								putOnCooldown();
 								break;
 							}

@@ -96,13 +96,11 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.abilities.other.CluckingPotions;
-import com.playmonumenta.plugins.abilities.other.EvasionEnchant;
 import com.playmonumenta.plugins.abilities.other.PatreonGreen;
 import com.playmonumenta.plugins.abilities.other.PatreonPurple;
 import com.playmonumenta.plugins.abilities.other.PatreonRed;
 import com.playmonumenta.plugins.abilities.other.PatreonWhite;
 import com.playmonumenta.plugins.abilities.other.PvP;
-import com.playmonumenta.plugins.abilities.other.SecondWindEnchant;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -171,12 +169,13 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class AbilityManager {
+
+	private static final String CLICK_TICK_METAKEY = "ClickedThisTickMetakey";
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 
 	private static AbilityManager mManager = null;
@@ -394,9 +393,7 @@ public class AbilityManager {
 
 		// These abilities should trigger after all event damage is calculated
 		mReferenceAbilities.addAll(Arrays.asList(
-									   new EvasionEnchant(mPlugin, mWorld, null),
-
-		                               //********** DELVES **********//
+									   //********** DELVES **********//
 		                               // CURSED
 		                               new Ruthless(mPlugin, mWorld, null),
 		                               new Unyielding(mPlugin, mWorld, null),
@@ -407,8 +404,6 @@ public class AbilityManager {
 		                               new Relentless(mPlugin, mWorld, null),
 		                               new Arcanic(mPlugin, mWorld, null),
 		                               new Dreadful(mPlugin, mWorld, null),
-
-		                               new SecondWindEnchant(mPlugin, mWorld, null),
 
 									   new PrismaticShield(mPlugin, mWorld, null),
 		                               new EscapeDeath(mPlugin, mWorld, null)
@@ -666,10 +661,6 @@ public class AbilityManager {
 		conditionalCast(player, (ability) -> ability.projectileHitEvent(event, proj));
 	}
 
-	public void bossAbilityDamageEvent(Player player, BossAbilityDamageEvent event) {
-		conditionalCast(player, (ability) -> ability.playerDamagedByBossEvent(event));
-	}
-
 	public void playerExtendedSneakEvent(Player player) {
 		conditionalCast(player, Ability::playerExtendedSneakEvent);
 	}
@@ -713,36 +704,39 @@ public class AbilityManager {
 	}
 
 	public void playerInteractEvent(Player player, Action action, ItemStack itemInHand, Material blockClicked) {
-		for (Ability abil : getPlayerAbilities(player).getAbilities()) {
-			AbilityInfo info = abil.getInfo();
-			if (info.mTrigger != null) {
-				if (info.mTrigger == AbilityTrigger.LEFT_CLICK) {
-					if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast(action);
+		// Right clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
+		if (MetadataUtils.checkOnceThisTick(mPlugin, player, CLICK_TICK_METAKEY)) {
+			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+				AbilityInfo info = abil.getInfo();
+				if (info.mTrigger != null) {
+					if (info.mTrigger == AbilityTrigger.LEFT_CLICK) {
+						if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+							if (abil.runCheck() && !abil.isOnCooldown()) {
+								abil.cast(action);
+							}
 						}
-					}
-				} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK) {
-					if (action == Action.RIGHT_CLICK_AIR
-					    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast(action);
+					} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK) {
+						if (action == Action.RIGHT_CLICK_AIR
+						    || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked))) {
+							if (abil.runCheck() && !abil.isOnCooldown()) {
+								abil.cast(action);
+							}
 						}
-					}
-				} else if (info.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
-					if (action == Action.LEFT_CLICK_AIR) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast(action);
+					} else if (info.mTrigger == AbilityTrigger.LEFT_CLICK_AIR) {
+						if (action == Action.LEFT_CLICK_AIR) {
+							if (abil.runCheck() && !abil.isOnCooldown()) {
+								abil.cast(action);
+							}
 						}
-					}
-				} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
-					if (action == Action.RIGHT_CLICK_AIR) {
-						if (abil.runCheck() && !abil.isOnCooldown()) {
-							abil.cast(action);
+					} else if (info.mTrigger == AbilityTrigger.RIGHT_CLICK_AIR) {
+						if (action == Action.RIGHT_CLICK_AIR) {
+							if (abil.runCheck() && !abil.isOnCooldown()) {
+								abil.cast(action);
+							}
 						}
+					} else if (info.mTrigger == AbilityTrigger.ALL) {
+						abil.cast(action);
 					}
-				} else if (info.mTrigger == AbilityTrigger.ALL) {
-					abil.cast(action);
 				}
 			}
 		}

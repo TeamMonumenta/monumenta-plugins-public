@@ -30,16 +30,6 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 
-/*
- * Meteor Slam: Hitting an enemy with an axe or sword while falling removes
- * fall damage and does +3/4 for every block fallen diminishing returns
- * also deals the extra damage to all mobs within 3/5 blocks.
- * Right clicking the air twice in quick succession
- * grants you 2s of Jump Boost 4/5. (The jump boost has cooldown 7/5s).
- * If you fall more than 3 blocks without hitting an enemy, you still deal
- * damage but also take full fall damage.
- */
-
 public class MeteorSlam extends Ability {
 	private static final double FALL_DISTANCE_THRESHOLD = 3;
 
@@ -55,8 +45,8 @@ public class MeteorSlam extends Ability {
 	private static final int METEOR_SLAM_1_EFFECT_LVL = 3;
 	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
 	private static final int METEOR_SLAM_DURATION = 2 * 20;
-	private static final int METEOR_SLAM_1_COOLDOWN = 7 * 20;
-	private static final int METEOR_SLAM_2_COOLDOWN = 5 * 20;
+	private static final int METEOR_SLAM_1_COOLDOWN = 8 * 20;
+	private static final int METEOR_SLAM_2_COOLDOWN = 6 * 20;
 
 	private double mFallDistance = 0;
 	private boolean mCanTrigger = false;
@@ -70,8 +60,8 @@ public class MeteorSlam extends Ability {
 		mInfo.mLinkedSpell = Spells.METEOR_SLAM;
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 3 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 7s.");
-		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 5 seconds.");
+		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 3 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 8s.");
+		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 6 seconds.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

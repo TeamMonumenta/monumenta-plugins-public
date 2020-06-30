@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -29,7 +30,10 @@ public class ProjectileEffectTimers {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				mTrackingEntities.put(entity, particle);
+				// Make sure the entity still exists and has not yet landed
+				if (entity.isValid() && !(entity instanceof AbstractArrow && ((AbstractArrow) entity).isInBlock())) {
+					mTrackingEntities.put(entity, particle);
+				}
 			}
 		}.runTaskLater(mPlugin, 2);
 	}

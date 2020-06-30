@@ -3,16 +3,16 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
@@ -20,13 +20,14 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class Adrenaline implements BaseEnchantment {
 
-	private static String ADRENALINE_METAKEY = "ActiveAdrenalineLevel";
-	private static String PROPERTY_NAME = ChatColor.GRAY + "Adrenaline";
+	private static final String PROPERTY_NAME = ChatColor.GRAY + "Adrenaline";
+	private static final String ADRENALINE_MODIFIER = "AdrenalineSpeedModifier";
 
 	private static final int DURATION = 20 * 3;
+	private static final double SPEED_PER_LEVEL = 0.1;
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	private Map<UUID, BukkitRunnable> mRunnables = new HashMap<UUID, BukkitRunnable>();
+	private static final Map<Player, BukkitRunnable> TIMERS = new HashMap<Player, BukkitRunnable>();
 
 	@Override
 	public String getProperty() {
@@ -38,51 +39,47 @@ public class Adrenaline implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR);
 	}
 
-	// Adds +0.1 movement speed per level for 60 ticks, currently walkspeed, movement speed increase broken
-	// 0.2 is default for walk speed
 	@Override
 	public void onAttack(Plugin plugin, Player player, int level, LivingEntity target, EntityDamageByEntityEvent event) {
+		player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
 
-		BukkitRunnable runnable = mRunnables.get(player.getUniqueId());
-		if (runnable != null && !runnable.isCancelled()) {
-			if (player.getMetadata(ADRENALINE_METAKEY).get(0).asInt() < level) {
-				removeEffects(plugin, player);
-				applyEffects(plugin, player, level);
-			}
-			runnable.cancel();
-		} else {
-			applyEffects(plugin, player, level);
+		removeEffects(player);
+		applyEffects(player, level);
+
+		BukkitRunnable timer = TIMERS.get(player);
+		if (timer != null && !timer.isCancelled()) {
+			timer.cancel();
 		}
 
-		player.getWorld().spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
-		runnable = new BukkitRunnable() {
+		timer = new BukkitRunnable() {
 			@Override
 			public void run() {
-				removeEffects(plugin, player);
+				removeEffects(player);
 				this.cancel();
 			}
 		};
-		runnable.runTaskLater(plugin, DURATION);
-		mRunnables.put(player.getUniqueId(), runnable);
+		timer.runTaskLater(plugin, DURATION);
+
+		TIMERS.put(player, timer);
 	}
 
-	@Override
-	public void onDeath(Plugin plugin, Player player, PlayerDeathEvent event, int level) {
-		mRunnables.get(player.getUniqueId()).cancel();
-	}
-
-	private void applyEffects(Plugin plugin, Player player, int level) {
-		if (player.hasMetadata(ADRENALINE_METAKEY)) {
-			plugin.getLogger().warning("Tried to apply Adrenaline to player '" + player.getName() + "' that already has it!");
-		} else {
-			player.setWalkSpeed(player.getWalkSpeed() + (level * 0.02f));
-			player.setMetadata(ADRENALINE_METAKEY, new FixedMetadataValue(plugin, level));
+	private static void applyEffects(Player player, int level) {
+		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		if (speed != null) {
+			speed.addModifier(new AttributeModifier(ADRENALINE_MODIFIER,
+					SPEED_PER_LEVEL * level, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 
-	private void removeEffects(Plugin plugin, Player player) {
-		player.setWalkSpeed(player.getWalkSpeed() - (player.getMetadata(ADRENALINE_METAKEY).get(0).asInt() * 0.02f));
-		player.removeMetadata(ADRENALINE_METAKEY, plugin);
+	private static void removeEffects(Player player) {
+		AttributeInstance speed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		if (speed != null) {
+			for (AttributeModifier modifier : speed.getModifiers()) {
+				if (modifier != null && modifier.getName().startsWith(ADRENALINE_MODIFIER)) {
+					speed.removeModifier(modifier);
+				}
+			}
+		}
 	}
 
 }

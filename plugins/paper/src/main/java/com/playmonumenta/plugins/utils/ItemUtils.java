@@ -292,6 +292,20 @@ public class ItemUtils {
 		Material.WHITE_DYE
 	);
 
+	public static final Set<Material> SHOOTABLES = EnumSet.of(
+		Material.BOW,
+		Material.CROSSBOW,
+		Material.TRIDENT,
+		Material.SNOWBALL,
+		Material.EGG,
+		Material.ENDER_PEARL,
+		Material.FIREWORK_ROCKET,
+		Material.FISHING_ROD,
+		Material.SPLASH_POTION,
+		Material.LINGERING_POTION,
+		Material.EXPERIENCE_BOTTLE
+	);
+
 
 	public static String buildAttributeLoreLine(com.playmonumenta.plugins.itemindex.EquipmentSlot slot, Attribute attribute, AttributeModifier.Operation operation, Double amount) {
 		ChatColor color = ChatColor.BLUE;
@@ -758,6 +772,10 @@ public class ItemUtils {
 	// Check if item is armor with the "* Shattered *" lore entry
 	public static boolean isArmorItemShattered(ItemStack item) {
 		return item != null && isArmorItem(item.getType()) && isItemShattered(item);
+	}
+
+	public static boolean isShootableItem(Material mat) {
+		return SHOOTABLES.contains(mat);
 	}
 
 	public static boolean isArmorItem(Material mat) {

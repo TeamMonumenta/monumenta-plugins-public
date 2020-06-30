@@ -26,8 +26,8 @@ public class Swiftness extends Ability {
 		super(plugin, world, player, "Swiftness");
 		mInfo.mScoreboardId = "Swiftness";
 		mInfo.mShorthandName = "Swf";
-		mInfo.mDescriptions.add("You gain +20% Speed while not inside a town.");
-		mInfo.mDescriptions.add("In addition, you gain Jump Boost III while you are not inside a town.");
+		mInfo.mDescriptions.add("Gain +20% Speed when you are not inside a town.");
+		mInfo.mDescriptions.add("In addition, gain Jump Boost III when you are not inside a town.");
 
 		addModifier(player);
 	}

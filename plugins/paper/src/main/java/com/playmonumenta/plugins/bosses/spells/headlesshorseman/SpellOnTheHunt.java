@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,13 +20,15 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 /*
  * On the Hunt - The Horseman begins marking the player that currently has aggro to be the target of
-his hunt (They are warned he is doing so). After 1.5s, For the next 5 seconds the horseman has his
-aggro permanently set to that enemy, gaining a burst of speed to run down his mark. If the player is
-dealt damage by The Horseman they are skewered through the chest, taking 28/42 damage and being given
-antiheal 5 for the next 7 seconds and wither 2 for 5 seconds. (Normal mode) In hard mode the speed is
-higher and the charge-up is reduced to 1 seconds.
+ * his hunt (They are warned he is doing so). After 1.5s, For the next 5 seconds the horseman has his
+ * aggro permanently set to that enemy, gaining a burst of speed to run down his mark. If the player is
+ * dealt damage by The Horseman they are skewered through the chest, taking 42 damage and being given
+ * antiheal 5 for the next 7 seconds and wither 2 for 5 seconds. (Normal mode) In hard mode the speed is
+ * higher and the charge-up is reduced to 1 seconds.
  */
 public class SpellOnTheHunt extends Spell {
+
+	private static final int DAMAGE = 42;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -119,22 +122,20 @@ public class SpellOnTheHunt extends Spell {
 
 	@Override
 	public void bossDamagedEntity(EntityDamageByEntityEvent event) {
-		if (mActive) {
+		if (mActive && event.getEntity() instanceof Player) {
 			mActive = false;
+			Player player = (Player) event.getEntity();
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.5f, 0.85f);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.85f);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_HURT, 1.5f, 0.65f);
-			world.spawnParticle(Particle.BLOCK_CRACK, event.getEntity().getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
+			Location loc = mBoss.getLocation();
 
-			if (event.getEntity() instanceof Player) {
-				Player player = (Player) event.getEntity();
+			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, 1.5f, 0.85f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.85f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT, 1.5f, 0.65f);
+			world.spawnParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
 
-				BossUtils.bossDamage(mBoss, player, 42, (bossEvent) -> {
-					if (!bossEvent.isPlayerBlocking()) {
-						MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
-					}
-				});
+			BossUtils.bossDamage(mBoss, player, DAMAGE);
+			if (BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
+				MovementUtils.knockAway(mBoss.getLocation(), player, .6f, .6f);
 			}
 		}
 	}

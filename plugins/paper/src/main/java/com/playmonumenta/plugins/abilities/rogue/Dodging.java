@@ -15,10 +15,8 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -85,7 +83,8 @@ public class Dodging extends Ability {
 	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
 		// See if we should dodge. If false, allow the event to proceed normally
 		Projectile proj = (Projectile) event.getDamager();
-		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) || EntityUtils.getRealFinalDamage(event) <= 0) {
+		if ((proj.getShooter() != null && proj.getShooter() instanceof Player) ||
+				mPlayer.isBlocking() || EntityUtils.getRealFinalDamage(event) <= 0) {
 			return true;
 		}
 
@@ -95,18 +94,18 @@ public class Dodging extends Ability {
 
 	@Override
 	public boolean playerHitByProjectileEvent(ProjectileHitEvent event) {
+		Projectile proj = event.getEntity();
 		// See if we should dodge. If false, allow the event to proceed normally
-		if ((event.getEntity().getShooter() instanceof Player) || mPlayer.isBlocking()) {
+		if ((proj.getShooter() instanceof Player) || mPlayer.isBlocking()) {
 			return true;
 		}
 		if (!dodge()) {
 			return true;
 		}
 
-		if (event.getEntity() instanceof Arrow && ((Arrow) event.getEntity()).hasCustomEffects()) {
-			Arrow arrow = (Arrow) event.getEntity();
-			PotionData data = new PotionData(PotionType.MUNDANE);
-			arrow.setBasePotionData(data);
+		if (proj instanceof Arrow) {
+			Arrow arrow = (Arrow) proj;
+			arrow.setBasePotionData(null);
 			arrow.clearCustomEffects();
 		}
 		return true;

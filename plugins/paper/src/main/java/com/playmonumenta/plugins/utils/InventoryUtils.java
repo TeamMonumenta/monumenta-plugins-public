@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,7 +27,6 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 
 public class InventoryUtils {
 	private static int OFFHAND_SLOT = 40;
@@ -167,94 +164,6 @@ public class InventoryUtils {
 				}
 			}
 		}
-	}
-
-	private static final Map<String, ItemSlot> LORE_SLOT_MAPPINGS = new HashMap<String, ItemSlot>();
-
-	static {
-		LORE_SLOT_MAPPINGS.put(ChatColor.GRAY + "When in main hand:", ItemSlot.MAINHAND);
-		LORE_SLOT_MAPPINGS.put(ChatColor.GRAY + "When in off hand:", ItemSlot.OFFHAND);
-		LORE_SLOT_MAPPINGS.put(ChatColor.GRAY + "When on ", ItemSlot.ARMOR);
-	}
-
-	public static int getCustomAttribute(final ItemStack item, final String nameText, final Player player, final ItemSlot slot) {
-		if (nameText == null || nameText.isEmpty()) {
-			return 0;
-		}
-
-		if (item != null) {
-			final ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				final List<String> lore = meta.getLore();
-				if (lore != null && !lore.isEmpty()) {
-					for (final Map.Entry<String, ItemSlot> loreSlotMapping : LORE_SLOT_MAPPINGS.entrySet()) {
-						// Find the lore slot entry corresponding to the slot the item occupies
-						if (slot == loreSlotMapping.getValue()) {
-							boolean foundAttributeSlot = false;
-							// We'll bit-shift these together later which is why we need to store the negatives as positives
-							int flatPositive = 0;
-							int flatNegative = 0;
-							int percentPositive = 0;
-							int percentNegative = 0;
-
-							for (final String loreEntry : lore) {
-								// If we find the proper lore, then we found the attributes for the slot
-								if (loreEntry.contains(loreSlotMapping.getKey())) {
-									foundAttributeSlot = true;
-								} else {
-									// Check that the lore isn't any other attribute slot marker
-									for (final String loreKey : LORE_SLOT_MAPPINGS.keySet()) {
-										if (loreEntry.contains(loreKey)) {
-											foundAttributeSlot = false;
-										}
-									}
-								}
-
-								if (foundAttributeSlot && loreEntry.contains(nameText)) {
-									// If calculating any attribute and player has mainhand and offhand of same item (i.e. trident or bow), then ignore the offhand bow stats
-									// Both attributes have to be the set damage modifier (i.e. not - or +)
-									// Also ignore offhand if the main hand and off hand item is ranged (i.e. it shoots projectiles)
-									if ((nameText.equals(" Ranged Damage") || nameText.equals(" Arrow Speed") || nameText.equals(" Throw Rate")) && slot == ItemSlot.OFFHAND
-										&& ItemUtils.isRanged(player.getInventory().getItemInMainHand().getType()) && ItemUtils.isRanged(item.getType())) {
-										return 0;
-									}
-
-									// ChatColor takes up 2 characters, so the third character (index = 2) should be one of the following characters
-									if (loreEntry.charAt(2) == ' ' || loreEntry.charAt(2) == '-' || loreEntry.charAt(2) == '+') {
-										// Get the number value of the attribute
-										if (loreEntry.indexOf('%') == -1) {
-											final int flat = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf(' ', 3)).trim());
-											if (flat < 0) {
-												flatNegative += Math.abs(flat);
-											} else {
-												flatPositive += flat;
-											}
-										} else {
-											final int percent = Integer.parseInt(loreEntry.substring(2, loreEntry.indexOf('%', 3)).trim());
-											if (percent < 0) {
-												percentNegative += Math.abs(percent);
-											} else {
-												percentPositive += percent;
-											}
-										}
-									}
-								}
-							}
-
-							// Making some room here... -255%, +1023%, -64, +256 should cover all of our item design needs
-							return (percentNegative << 24) | (percentPositive << 14) | (flatNegative << 8) | flatPositive;
-						}
-					}
-				}
-			}
-		}
-
-		return 0;
-	}
-
-	// Returns the attribute value stored in the "level" (due to bitshifts)
-	public static double getAttributeValue(final int level) {
-		return Math.max(0, ((level & 0xFF) - ((level >>> 8) & 0x3F)) * (1 + (((level >>> 14) & 0x3FF) - (level >>> 24)) / 100.0));
 	}
 
 	public static boolean isAxeItem(final ItemStack item) {

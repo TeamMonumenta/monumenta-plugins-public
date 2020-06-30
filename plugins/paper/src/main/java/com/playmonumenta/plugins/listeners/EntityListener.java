@@ -91,6 +91,7 @@ import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.enchantments.Thunder;
+import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
 import com.playmonumenta.plugins.enchantments.infusions.Focus;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -98,7 +99,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -217,6 +217,7 @@ public class EntityListener implements Listener {
 			Player player = (Player)damagee;
 
 			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
+			EvasionInfo.triggerEvasion(player, event);
 
 			if (damager instanceof LivingEntity) {
 				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
@@ -397,6 +398,11 @@ public class EntityListener implements Listener {
 		if (damagee instanceof LivingEntity) {
 			LivingEntity mob = (LivingEntity) damagee;
 			event.setDamage(event.getDamage() * EntityUtils.vulnerabilityMult(mob));
+
+			if (damagee instanceof Player) {
+				// Damage triggering logic in PlayerInventory.java
+				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, (Player) damagee, event);
+			}
 		}
 	}
 
@@ -428,6 +434,12 @@ public class EntityListener implements Listener {
 
 			if (!mAbilities.playerDamagedEvent(player, event)) {
 				event.setCancelled(true);
+			}
+
+			// If this is an EntityDamageByEntityEvent, we'll intercept it in that method, since it's important this triggers after all other damage modifiers run
+			if (!(event instanceof EntityDamageByEntityEvent)) {
+				// Damage triggering logic in PlayerInventory.java
+				mPlugin.mTrackingManager.mPlayers.onFatalHurt(mPlugin, player, event);
 			}
 
 			if (source.equals(DamageCause.SUFFOCATION) && player.getVehicle() != null) {
@@ -582,10 +594,11 @@ public class EntityListener implements Listener {
 					Snowball newBall = (Snowball)mWorld.spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
-					//Set Ranged Damage attribute
+					// Set projectile attributes; don't need to do speed attribute since that's only used to calculate non-critical arrow damage
 					if (origBall.hasMetadata(AttributeProjectileDamage.DAMAGE_METAKEY)) {
 						newBall.setMetadata(AttributeProjectileDamage.DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, origBall.getMetadata(AttributeProjectileDamage.DAMAGE_METAKEY).get(0).asDouble()));
 					}
+
 					event.setCancelled(true);
 					return;
 				}
@@ -982,15 +995,6 @@ public class EntityListener implements Listener {
 	public void entityDismountEvent(EntityDismountEvent event) {
 		if (event.getDismounted() instanceof ArmorStand) {
 			event.getDismounted().remove();
-		}
-	}
-
-	@EventHandler
-	public void bossAbilityDamageEvent(BossAbilityDamageEvent event) {
-		if (event.getDamaged() instanceof Player) {
-			Player player = event.getDamaged();
-			mPlugin.mTrackingManager.mPlayers.onBossDamage(mPlugin, player, event);
-			mAbilities.bossAbilityDamageEvent(player, event);
 		}
 	}
 

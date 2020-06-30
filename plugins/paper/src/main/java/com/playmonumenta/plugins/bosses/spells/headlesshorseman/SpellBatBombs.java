@@ -19,10 +19,12 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 /*
  * Bat Bomb - The Horseman summons 20* bats around himself to distract his enemies. After 3 seconds
-the bats explode dealing 18/25 damage to anyone with 4 blocks of them, killing the bat in the process.
+the bats explode dealing 32 damage to anyone with 4 blocks of them, killing the bat in the process.
 The bats have 20hp.
  */
 public class SpellBatBombs extends Spell {
+
+	private static final int DAMAGE = 32;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
@@ -69,11 +71,10 @@ public class SpellBatBombs extends Spell {
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5)) {
 									if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-										BossUtils.bossDamage(mHorseman.getEntity(), player, 32, loc, (event) -> {
-											if (!event.isPlayerBlocking()) {
-												MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
-											}
-										});
+										BossUtils.bossDamage(mHorseman.getEntity(), player, DAMAGE, loc);
+										if (!BossUtils.bossDamageBlocked(player, DAMAGE, loc)) {
+											MovementUtils.knockAway(loc, player, 0.2f, 0.4f);
+										}
 									}
 								}
 							}

@@ -33,9 +33,9 @@ public class Volley extends Ability {
 	private static final String VOLLEY_HIT_METAKEY = "VolleyMobHitTickMetakey";
 	private static final int VOLLEY_COOLDOWN = 15 * 20;
 	private static final int VOLLEY_1_ARROW_COUNT = 7;
-	private static final int VOLLEY_2_ARROW_COUNT = 10;
-	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.5;
-	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 2.0;
+	private static final int VOLLEY_2_ARROW_COUNT = 11;
+	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
+	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
 
 	private final double mDamageMultiplier;
 	private final int mArrowCount;
@@ -45,8 +45,8 @@ public class Volley extends Ability {
 		mInfo.mLinkedSpell = Spells.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
-		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15 s). Only one arrow is consumed, and each arrow deals 50% bonus damage.");
-		mInfo.mDescriptions.add("Increases the number of Arrows to 10 and enhances the bonus damage to 100%.");
+		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15 s). Only one arrow is consumed, and each arrow deals 30% bonus damage.");
+		mInfo.mDescriptions.add("Increases the number of Arrows to 11 and enhances the bonus damage to 50%.");
 		mInfo.mCooldown = VOLLEY_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
 

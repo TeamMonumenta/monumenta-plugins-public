@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public interface BaseEnchantment {
@@ -148,11 +147,14 @@ public interface BaseEnchantment {
 
 	}
 
-	default void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
+	default void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
 
 	}
 
-	default void onHurtByEntity(Plugin plugin, Player player, int level, EntityDamageByEntityEvent event) {
+	/*
+	 * Triggers on events that are going to kill the player
+	 */
+	default void onFatalHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 
 	}
 

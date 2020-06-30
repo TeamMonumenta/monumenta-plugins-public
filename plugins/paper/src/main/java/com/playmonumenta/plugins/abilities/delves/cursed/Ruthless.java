@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 public class Ruthless extends StatMultiplier {
 
-	public static final String MESSAGE = ChatColor.GRAY + "With each one fallen, another returns with " + ChatColor.RED + ChatColor.BOLD + "MERCILESS" + ChatColor.GRAY + " resolve.";
+	public static final String MESSAGE = ChatColor.GRAY + "With each one fallen, another returns with " + ChatColor.RED + ChatColor.BOLD + "RUTHLESS" + ChatColor.GRAY + " resolve.";
 	public static final int SCORE = 11;
 
 	private static final double MERCILESS_MOB_HEALTH_MULTIPLIER = 1.35;

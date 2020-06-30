@@ -4,14 +4,15 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 
 public abstract class PotionAbility extends Ability {
 
-	private final double mDamage;
-	private final double mRadius;
+	private double mDamage;
+	private double mRadius;
 
 	public PotionAbility(Plugin plugin, World world, Player player,
 			String displayName, double damage1, double damage2) {
@@ -21,8 +22,15 @@ public abstract class PotionAbility extends Ability {
 	public PotionAbility(Plugin plugin, World world, Player player,
 			String displayName, double damage1, double damage2, double radius) {
 		super(plugin, world, player, displayName);
-		mDamage = getAbilityScore() == 1 ? damage1 : damage2;
-		mRadius = radius;
+
+		// getAbilityScore() doesn't work until we set the mInfo.mScoreboard in the child class
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mDamage = getAbilityScore() == 1 ? damage1 : damage2;
+				mRadius = radius;
+			}
+		}.runTaskLater(mPlugin, 1);
 	}
 
 	public void apply(LivingEntity mob) {

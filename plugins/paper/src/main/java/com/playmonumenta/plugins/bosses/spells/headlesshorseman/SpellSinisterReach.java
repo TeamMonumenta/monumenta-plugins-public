@@ -163,11 +163,9 @@ public class SpellSinisterReach extends Spell {
 				if (mInc < 36 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
 					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
-					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), (event) -> {
-						if (!event.isPlayerBlocking()) {
-							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
-						}
-					}, true);
+					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true);
+					// Doesn't matter if the player is blocking, there are 18 hits and only one can be blocked
+					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
 				}
 				if (mInc >= 36) {
 					p.setNoDamageTicks(mNDT);

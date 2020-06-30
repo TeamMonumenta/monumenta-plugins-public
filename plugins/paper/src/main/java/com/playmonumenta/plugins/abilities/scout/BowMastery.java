@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.abilities.scout;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.playmonumenta.plugins.Plugin;
@@ -37,7 +39,10 @@ public class BowMastery extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity le, EntityDamageByEntityEvent event) {
-		event.setDamage(event.getDamage() * mDamageMultiplier);
+		if (proj instanceof Arrow || proj instanceof SpectralArrow) {
+			event.setDamage(event.getDamage() * mDamageMultiplier);
+		}
+
 		return true;
 	}
 

@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.player;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bukkit.GameMode;
@@ -36,8 +36,9 @@ import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class PlayerInventory {
 	/*
@@ -47,11 +48,13 @@ public class PlayerInventory {
 	 *
 	 * mInventoryProperties indexes 0-40 for inventory slots and custom enchants.
 	 * 0-8 = hotbar, 36-39 = armor, 40 = offhand
+	 *
+	 * Needs to be ordered so that trigger orders are correct
 	 */
 
-	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new HashMap<Integer, Map<BaseEnchantment, Integer>>();
-	private Map<BaseEnchantment, Integer> mCurrentProperties = new HashMap<BaseEnchantment, Integer>();
-	private Map<BaseEnchantment, Integer> mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+	private Map<Integer, Map<BaseEnchantment, Integer>> mInventoryProperties = new LinkedHashMap<Integer, Map<BaseEnchantment, Integer>>();
+	private Map<BaseEnchantment, Integer> mCurrentProperties = new LinkedHashMap<BaseEnchantment, Integer>();
+	private Map<BaseEnchantment, Integer> mPreviousProperties = new LinkedHashMap<BaseEnchantment, Integer>();
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
@@ -134,13 +137,13 @@ public class PlayerInventory {
 			}
 
 			// Swap current and previous lists
-			mPreviousProperties = new HashMap<BaseEnchantment, Integer>();
+			mPreviousProperties = new LinkedHashMap<BaseEnchantment, Integer>();
 			Map<BaseEnchantment, Integer> temp = mPreviousProperties;
 			mPreviousProperties = mCurrentProperties;
 			mCurrentProperties = temp;
 
 			for (int i = 0; i <= 40; i++) {
-				mInventoryProperties.put(i, new HashMap<BaseEnchantment, Integer>());
+				mInventoryProperties.put(i, new LinkedHashMap<BaseEnchantment, Integer>());
 			}
 
 			// Clear the current map and update it with current properties
@@ -287,22 +290,24 @@ public class PlayerInventory {
 		}
 	}
 
-	public void onBossDamage(Plugin plugin, Player player, BossAbilityDamageEvent event) {
-		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
-			BaseEnchantment property = iter.getKey();
-			Integer level = iter.getValue();
-
-			property.onBossDamage(plugin, player, level, event);
-		}
-	}
-
-
 	public void onHurtByEntity(Plugin plugin, Player player, EntityDamageByEntityEvent event) {
 		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
 			BaseEnchantment property = iter.getKey();
 			Integer level = iter.getValue();
 
 			property.onHurtByEntity(plugin, player, level, event);
+		}
+	}
+
+	public void onFatalHurt(Plugin plugin, Player player, EntityDamageEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			// It is necessary to check each time in case the previous call to onFatalHurt() made the damage not fatal
+			if (player.getHealth() + AbsorptionUtils.getAbsorption(player) - EntityUtils.getRealFinalDamage(event) <= 0) {
+				property.onFatalHurt(plugin, player, level, event);
+			}
 		}
 	}
 

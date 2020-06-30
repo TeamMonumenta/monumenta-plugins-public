@@ -27,7 +27,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
@@ -215,10 +214,6 @@ public abstract class Ability {
 	}
 
 	public void playerAnimationEvent(PlayerAnimationEvent event) {
-
-	}
-
-	public void playerDamagedByBossEvent(BossAbilityDamageEvent event) {
 
 	}
 

@@ -238,7 +238,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
-		manager.registerEvents(new DelvesListener(this, mWorld), this);
+		manager.registerEvents(new DelvesListener(), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());

@@ -48,12 +48,14 @@ import org.bukkit.entity.ZombieHorse;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
@@ -617,8 +619,10 @@ public class EntityUtils {
 
 		int resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) == null
 				? 0 : (player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() + 1);
+		int vulnerability = (player.getPotionEffect(PotionEffectType.UNLUCK) == null
+				? 0 : (player.getPotionEffect(PotionEffectType.UNLUCK).getAmplifier() + 1));
 
-		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5);
+		return calculateDamageAfterArmor(damage, armor, toughness) * (1 - Math.min(20.0, protection) / 25) * (1 - Math.min(5, resistance) / 5) * (1 + 0.05 * vulnerability);
 	}
 
 	public static void damageEntity(Plugin plugin, LivingEntity target, double damage, Entity damager) {
@@ -840,6 +844,33 @@ public class EntityUtils {
 
 		entities.sort((left, right) -> left.getLocation().distance(loc) >= right.getLocation().distance(loc) ? 1 : -1);
 		return entities.get(0);
+	}
+
+	/*
+	 * When we retrieve the location of the projectile, we get the location of the projectile the tick before
+	 * it hits; any location data retrieved from later ticks is unreliable. This relies on the fact that the
+	 * location on the tick before the actual hit is close to the location of the actual hit.
+	 */
+	public static Location getProjectileHitLocation(ProjectileHitEvent event) {
+		Projectile proj = event.getEntity();
+		World world = proj.getWorld();
+		BoundingBox hitbox = proj.getBoundingBox();
+		Vector increment = proj.getVelocity();
+		int increments = (int)(increment.length() * 15);
+		increment.normalize().multiply(0.1);
+
+		Block block = event.getHitBlock();
+		BoundingBox target = block != null ? block.getBoundingBox() : event.getHitEntity().getBoundingBox();
+
+		for (int i = 0; i < increments; i++) {
+			hitbox.shift(increment);
+			if (hitbox.overlaps(target)) {
+				return hitbox.getCenter().add(increment).toLocation(world);
+			}
+		}
+
+		// If our manual search didn't find the target, then just default to the buggy location value
+		return proj.getLocation();
 	}
 
 	private static final double MARGIN_OF_ERROR = 0.001;

@@ -40,6 +40,9 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
  *
  */
 public class SpellVolcanicDemise extends Spell {
+
+	private static final int DAMAGE = 42;
+
 	private LivingEntity mBoss;
 	private Plugin mPlugin;
 	private double mRange;
@@ -161,15 +164,13 @@ public class SpellVolcanicDemise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(death)) {
-							BossUtils.bossDamage(mBoss, player, 1000, mLoc, (event) -> {
-								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
-							});
+							BossUtils.bossDamage(mBoss, player, 1000, mLoc);
+							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 						} else if (pBox.overlaps(box)) {
-							BossUtils.bossDamage(mBoss, player, 42, mLoc, (event) -> {
-								if (!event.isPlayerBlocking()) {
-									MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
-								}
-							});
+							BossUtils.bossDamage(mBoss, player, DAMAGE, mLoc);
+							if (!BossUtils.bossDamageBlocked(player, DAMAGE, mLoc)) {
+								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
+							}
 						}
 					}
 					for (Block block : LocationUtils.getNearbyBlocks(mLoc.getBlock(), 4)) {

@@ -89,7 +89,7 @@ public class AlchemicalArtillery extends Ability {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						Location loc = arrow == null ? event.getEntity().getLocation() : arrow.getLocation();
+						Location loc = EntityUtils.getProjectileHitLocation(event);
 
 						mWorld.spawnParticle(Particle.SPELL_MOB, loc, 15 * (int) Math.pow(mRadius, 2), mRadius, 0.5, mRadius, 0);
 						mWorld.spawnParticle(Particle.FLAME, loc, 3 * (int) Math.pow(mRadius, 2), 0, 0, 0, 0.06 * mRadius);

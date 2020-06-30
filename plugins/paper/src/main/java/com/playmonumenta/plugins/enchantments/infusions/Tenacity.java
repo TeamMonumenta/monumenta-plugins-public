@@ -9,7 +9,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.utils.BossUtils.BossAbilityDamageEvent;
 
 public class Tenacity implements BaseEnchantment {
 
@@ -32,9 +31,4 @@ public class Tenacity implements BaseEnchantment {
 		event.setDamage(event.getDamage() * (1.0 - reductionPct));
 	}
 
-	@Override
-	public void onBossDamage(Plugin plugin, Player player, int level, BossAbilityDamageEvent event) {
-		double reductionPct = level * REDUCT_PCT_PER_LEVEL;
-		event.setDamage(event.getDamage() * (1.0 - reductionPct));
-	}
 }

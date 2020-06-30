@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -9,7 +10,7 @@ import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 
 public class MultipleChargeAbility extends Ability {
 
-	private final int mMaxCharges;
+	private int mMaxCharges;
 
 	private int mCharges;
 	private boolean mWasOnCooldown;
@@ -17,8 +18,15 @@ public class MultipleChargeAbility extends Ability {
 	public MultipleChargeAbility(Plugin plugin, World world, Player player,
 			String displayName, int maxCharges1, int maxCharges2) {
 		super(plugin, world, player, displayName);
-		mMaxCharges = getAbilityScore() == 1 ? maxCharges1 : maxCharges2;
-		mCharges = mMaxCharges;
+
+		// getAbilityScore() doesn't work until we set the mInfo.mScoreboard in the child class
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mMaxCharges = getAbilityScore() == 1 ? maxCharges1 : maxCharges2;
+				mCharges = mMaxCharges;
+			}
+		}.runTaskLater(mPlugin, 1);
 	}
 
 	// Call this when the ability is cast; returns whether a charge was consumed or not
