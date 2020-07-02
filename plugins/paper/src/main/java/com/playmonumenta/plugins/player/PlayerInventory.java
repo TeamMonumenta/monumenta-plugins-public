@@ -27,12 +27,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.BaseAttribute;
 import com.playmonumenta.plugins.enchantments.BaseEnchantment;
+import com.playmonumenta.plugins.enchantments.Enchantment;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.events.EvasionEvent;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
@@ -60,7 +62,7 @@ public class PlayerInventory {
 	private boolean mNeedsUpdate = false;
 
 	public PlayerInventory(Plugin plugin, Player player) {
-		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, null);
+		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, new PlayerJoinEvent(player, ""));	// Just a dummy event
 	}
 
 	public void tick(Plugin plugin, World world, Player player) {
@@ -79,7 +81,22 @@ public class PlayerInventory {
 	}
 
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
-		//Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
+		// If the player transferred shards (join event), clear all properties and re-apply the relevant ones
+		if (event instanceof PlayerJoinEvent) {
+			for (Enchantment e : Enchantment.values()) {
+				if (e.isCustomEnchant()) {
+					e.getEnchantClass().removeProperty(plugin, player);
+				}
+			}
+
+			for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+				BaseEnchantment property = iter.getKey();
+				Integer level = iter.getValue();
+				property.applyProperty(plugin, player, level);
+			}
+		}
+
+		// Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent) {
 			InventoryClickEvent invClickEvent = (InventoryClickEvent) event;
 			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING

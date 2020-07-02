@@ -87,8 +87,8 @@ public enum Enchantment {
 	MELEE_EVASION(new MeleeEvasion()),
 	ABILITY_EVASION(new AbilityEvasion()),
 	SECOND_WIND(new SecondWind()),
-	RESURRECTION(new Resurrection()),
 	VOID_TETHER(new VoidTether()),
+	RESURRECTION(new Resurrection()),
 
 	// visuals
 	CLUCKING(new Clucking()),

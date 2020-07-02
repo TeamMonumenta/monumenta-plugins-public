@@ -54,29 +54,25 @@ public class VoidTether implements BaseEnchantment {
 	}
 
 	@Override
-	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
+	public void onFatalHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
 		Location ploc = player.getLocation();
 
-		if (event.getFinalDamage() < player.getHealth()) {
-			/* Non-fatal damage */
-			return;
-		}
-
-		/* Check to make sure the player still has a non-shattered totem */
-		ItemStack totemItem = player.getInventory().getItemInMainHand();
-		if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(totemItem)) {
-			totemItem = player.getInventory().getItemInOffHand();
-			if (totemItem == null || !totemItem.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(totemItem)) {
-				/* Nope, no totem or it is shattered */
-				return;
+		/* Check to make sure the player still has a non-shattered totem or resurrection item */
+		if (plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Resurrection.class) == 0) {
+			ItemStack item = player.getInventory().getItemInMainHand();
+			if (item == null || !item.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(item)) {
+				item = player.getInventory().getItemInOffHand();
+				if (item == null || !item.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(item)) {
+					/* Nope, no totem or resurrection item or it is shattered */
+					return;
+				}
 			}
 		}
 
 		if (ploc.getY() > 0) {
-			plugin.getLogger().info("Player '" + player.getName() + "' was not in the void when taking fatal damage and carrying a void totem");
 			/* Player took fatal damage but is not in the void */
 
-			if (event.getFinalDamage() >= player.getHealth() && !player.isOnGround()) {
+			if (!player.isOnGround()) {
 				/* Player really is going to die and is not on the ground - put them on a block */
 				Location saveLoc = new Location(ploc.getWorld(), ploc.getBlockX(), Math.max(0, ploc.getBlockY() - 1), ploc.getBlockZ());
 				if (saveLoc.getBlock().isPassable()) {
@@ -92,8 +88,6 @@ public class VoidTether implements BaseEnchantment {
 			return;
 		}
 
-		plugin.getLogger().info("Player '" + player.getName() + "' was in the void when taking fatal damage and carrying a void totem");
-
 		/* In the void and taking near-fatal damage - activate! */
 		Location lastPlayerLoc = PLAYER_LOCS.get(player);
 		if (lastPlayerLoc == null || lastPlayerLoc.getY() < ploc.getY()) {
@@ -103,8 +97,6 @@ public class VoidTether implements BaseEnchantment {
 
 		/* Don't let the player die in this event */
 		event.setCancelled(true);
-
-		plugin.getLogger().info("Activating void tether for player '" + player.getName() + "'");
 
 		/* Teleport the player to the nearest location to where they crossed into the void and let above logic catch them */
 		player.setVelocity(new Vector(0, 0, 0));
