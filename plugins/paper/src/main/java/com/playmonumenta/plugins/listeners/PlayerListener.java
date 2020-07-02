@@ -679,6 +679,9 @@ public class PlayerListener implements Listener {
 					if (!(dLoc.getBlock().isLiquid() || dLoc.clone().subtract(0, 1, 0).getBlock().isLiquid())
 							&& dLoc.getY() > location.getY() + 2) {
 						droppedItem.teleport(location);
+					} else if (dLoc.getBlock().getType() == Material.LAVA) {
+						//Force hoped items upwards if they're in lava.
+						droppedItem.setVelocity(new Vector(0,0.4,0));
 					}
 				} else {
 					this.cancel();
