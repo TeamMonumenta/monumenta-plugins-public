@@ -99,7 +99,7 @@ public class DeathsTouch extends Ability {
 					mTarget = mob;
 					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
 					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
-					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.5f, 1f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.25f, 1f);
 
 					new BukkitRunnable() {
 						final int mRunnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;
