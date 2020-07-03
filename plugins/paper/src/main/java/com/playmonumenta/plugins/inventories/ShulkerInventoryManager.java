@@ -43,10 +43,10 @@ public class ShulkerInventoryManager {
 	 *
 	 * @param player The Player who is trying to open the Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
+	 * @param parentSlot The slot the Shulker Box is in.
 	 * @return True if the Shulker Box was successfully opened.
 	 */
-	public boolean openShulker(Player player, Inventory parentInventory, ItemStack shulkerItem) {
+	public boolean openShulker(Player player, Inventory parentInventory, int parentSlot) {
 		if (mRateLimited.contains(player.getUniqueId())) {
 			player.sendMessage(ERROR_SHULKER_RATE_LIMITED);
 			return false;
@@ -59,6 +59,7 @@ public class ShulkerInventoryManager {
 			}
 		}.runTaskLater(mPlugin, 10);
 
+		ItemStack shulkerItem = parentInventory.getItem(parentSlot);
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
 			// Get metadata from shulker box. If it doesn't have metadata, this will generate blank data.
 			BlockStateMeta shulkerMeta = (BlockStateMeta)shulkerItem.getItemMeta();
@@ -111,10 +112,14 @@ public class ShulkerInventoryManager {
 			shulkerBox.setLock("ShulkerShortcut:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
 			shulkerItem.setItemMeta(shulkerMeta);
-			ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, shulkerItem);
-			mInventories.put(player.getUniqueId(), shulkerInventory);
-			shulkerInventory.openShulker();
-			return true;
+			try {
+				ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, parentSlot);
+				mInventories.put(player.getUniqueId(), shulkerInventory);
+				shulkerInventory.openShulker();
+				return true;
+			} catch (Exception e) {
+				mPlugin.getLogger().warning("Failed to open shulker via shortcut: " + e.getMessage());
+			}
 		}
 		return false;
 	}
@@ -125,11 +130,11 @@ public class ShulkerInventoryManager {
 	 *
 	 * @param player Player who is depositing the item.
 	 * @param parentInventory The inventory the shulker is in.
-	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
+	 * @param parentSlot The slot the Shulker Box is in.
 	 * @param item The item(s) to be inserted in the form of an ItemStack.
 	 * @return The amount of items from the stack that were not able to fit in the Shulker Box.
 	 */
-	public int addItemToShulker(Player player, Inventory parentInventory, ItemStack shulkerItem, ItemStack item) {
+	public int addItemToShulker(Player player, Inventory parentInventory, int parentSlot, ItemStack item) {
 		if (mRateLimited.contains(player.getUniqueId())) {
 			return -5;
 		}
@@ -141,6 +146,7 @@ public class ShulkerInventoryManager {
 			}
 		}.runTaskLater(mPlugin, 10);
 
+		ItemStack shulkerItem = parentInventory.getItem(parentSlot);
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
 			// Get metadata from shulker box. If it doesn't have metadata, this will generate blank data.
 			BlockStateMeta shulkerMeta = (BlockStateMeta) shulkerItem.getItemMeta();
@@ -184,12 +190,16 @@ public class ShulkerInventoryManager {
 			shulkerBox.setLock("ShulkerDeposit:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
 			shulkerItem.setItemMeta(shulkerMeta);
-			ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, shulkerItem, 1);
-			mDepositInventories.put(player.getUniqueId(), shulkerInventory);
 			try {
-				return shulkerInventory.depositItem(item);
+				ShulkerInventory shulkerInventory = new ShulkerInventory(mPlugin, player, parentInventory, parentSlot, 1);
+				mDepositInventories.put(player.getUniqueId(), shulkerInventory);
+				try {
+					return shulkerInventory.depositItem(item);
+				} catch (Exception e) {
+					mPlugin.getLogger().warning("Shulker Deposit Limit Exceeded ... Somehow");
+				}
 			} catch (Exception e) {
-				mPlugin.getLogger().warning("Shulker Deposit Limit Exceeded ... Somehow");
+				mPlugin.getLogger().warning("Failed to open shulker via shortcut: " + e.getMessage());
 			}
 		}
 		return -3;
@@ -202,6 +212,7 @@ public class ShulkerInventoryManager {
 	 * @param player Player whose Shulker Box should be updated.
 	 * @return True if the player has a valid Shulker open.
 	 */
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean updateShulker(Player player) {
 		if (mInventories.containsKey(player.getUniqueId())) {
 			ShulkerInventory inv = mInventories.get(player.getUniqueId());
@@ -230,7 +241,21 @@ public class ShulkerInventoryManager {
 	 * @return True if the player had a valid open Shulker Box.
 	 */
 	public boolean closeShulker(Player player) {
-		return closeShulker(player.getUniqueId());
+		return closeShulker(player.getUniqueId(), false);
+	}
+
+	/**
+	 * Closes a Shulker Box opened via a player.
+	 * This does not force the player to close their inventory.
+	 *
+	 * @param player Player whose Shulker Box should be closed.
+	 * @param instant If the Shulker Box should be saved on the same tick. Only used if the parent inventory will not
+	 *                exist on the next tick. For example: When a player is logging out.
+	 * @return True if the player had a valid open Shulker Box.
+	 */
+	@SuppressWarnings("UnusedReturnValue")
+	public boolean closeShulker(Player player, boolean instant) {
+		return closeShulker(player.getUniqueId(), instant);
 	}
 
 	/**
@@ -240,10 +265,24 @@ public class ShulkerInventoryManager {
 	 * @param uuid UUID of the player whose Shulker Box should be closed.
 	 * @return True if the player had a valid open Shulker Box
 	 */
+	@SuppressWarnings("UnusedReturnValue")
 	private boolean closeShulker(UUID uuid) {
+		return closeShulker(uuid, false);
+	}
+
+	/**
+	 * Closes a Shulker Box opened via a player.
+	 * This does not force the player to close their inventory.
+	 *
+	 * @param uuid UUID of the player whose Shulker Box should be closed.
+	 * @param instant If the Shulker Box should be saved on the same tick. Only used if the parent inventory will not
+	 *                exist on the next tick. For example: When a player is logging out.
+	 * @return True if the player had a valid open Shulker Box
+	 */
+	private boolean closeShulker(UUID uuid, boolean instant) {
 		if (mInventories.containsKey(uuid)) {
 			ShulkerInventory inv = mInventories.remove(uuid);
-			return inv.closeShulker();
+			return inv.closeShulker(instant);
 		}
 		return false;
 	}
@@ -267,7 +306,7 @@ public class ShulkerInventoryManager {
 	private boolean closeDepositShulker(UUID uuid) {
 		if (mDepositInventories.containsKey(uuid)) {
 			ShulkerInventory inv = mDepositInventories.remove(uuid);
-			return inv.closeShulker();
+			return inv.closeShulker(false);
 		}
 		return false;
 	}

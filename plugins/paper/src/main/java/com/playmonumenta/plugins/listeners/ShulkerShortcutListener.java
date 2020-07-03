@@ -10,12 +10,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
@@ -56,6 +59,7 @@ public class ShulkerShortcutListener implements Listener {
 		InventoryAction action = event.getAction();
 		ItemStack itemHeld = event.getCursor();
 		ItemStack itemClicked = event.getCurrentItem();
+		int slotClicked = event.getSlot();
 		Inventory topInventory = event.getView().getTopInventory();
 		Inventory clickedInventory = event.getClickedInventory();
 		if (event.getWhoClicked() instanceof Player && clickedInventory != null) {
@@ -93,7 +97,7 @@ public class ShulkerShortcutListener implements Listener {
 							// Player right-clicked shulker while holding an item on their cursor.
 							event.setCancelled(true);
 							int starting = itemHeld.getAmount();
-							int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, itemClicked, itemHeld);
+							int remaining = mPlugin.mShulkerInventoryManager.addItemToShulker(player, clickedInventory, slotClicked, itemHeld);
 							switch (remaining) {
 								case -5:
 									// Rate limited
@@ -139,7 +143,7 @@ public class ShulkerShortcutListener implements Listener {
 							}
 						} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
 							// Player right-clicked shulker with an empty cursor.
-							if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, itemClicked)) {
+							if (mPlugin.mShulkerInventoryManager.openShulker(player, clickedInventory, slotClicked)) {
 								// Shulker was successfully opened
 								player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 							} else {
@@ -227,5 +231,20 @@ public class ShulkerShortcutListener implements Listener {
 			event.setCancelled(true);
 			event.setBuild(false);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerKickEvent(PlayerKickEvent event) {
+		mPlugin.mShulkerInventoryManager.closeShulker(event.getPlayer(), true);
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerDeathEvent(PlayerDeathEvent event) {
+		mPlugin.mShulkerInventoryManager.closeShulker(event.getEntity(), true);
 	}
 }

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.HumanEntity;
@@ -22,10 +23,12 @@ public class ShulkerInventory {
 	private final Plugin mPlugin;
 	private final Player mPlayer;
 	private final ItemStack mShulkerItem;
+	private final BlockStateMeta mShulkerMeta;
+	private final ShulkerBox mShulkerState;
 	private final Inventory mInventory;
 	private final Inventory mParentInventory;
+	private final int mParentSlot;
 	private final int mDepositLimit;
-	private final String mLock;
 	private int mDepositCount;
 
 	/**
@@ -34,11 +37,11 @@ public class ShulkerInventory {
 	 * @param plugin The Plugin to manage scheduling tasks.
 	 * @param player The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
-	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, int)
+	 * @param parentSlot The slot the Shulker Box is in.
+	 * @see #ShulkerInventory(Plugin, Player, Inventory, int, int)
 	 */
-	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, ItemStack shulkerItem) {
-		this(plugin, player, parentInventory, shulkerItem, 0);
+	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, int parentSlot) throws Exception {
+		this(plugin, player, parentInventory, parentSlot, 0);
 	}
 
 	/**
@@ -50,27 +53,30 @@ public class ShulkerInventory {
 	 * @param plugin The Plugin to manage scheduling tasks.
 	 * @param player The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param shulkerItem The Shulker Box in the form of an ItemStack.
+	 * @param parentSlot The slot the Shulker Box is in.
 	 * @param depositLimit The number of ItemStacks that will be deposited into this Shulker Box.
 	 *                     Attempting to deposit more than this number will throw an error.
 	 *                     The shulker will automatically be closed when this number of deposits is reached.
 	 *                     If 0, the shulker is not being used for deposit, but to be opened by a player.
 	 */
-	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, ItemStack shulkerItem, int depositLimit) {
+	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, int parentSlot, int depositLimit) throws Exception {
 		mPlugin = plugin;
 		mPlayer = player;
 		mParentInventory = parentInventory;
-		mShulkerItem = shulkerItem;
+		mParentSlot = parentSlot;
+		mShulkerItem = mParentInventory.getItem(mParentSlot);
+		if (mShulkerItem == null || !ItemUtils.isShulkerBox(mShulkerItem.getType())) {
+			throw new Exception("not a shulker box");
+		}
 		mDepositLimit = depositLimit;
-		mLock = (mDepositLimit > 0 ? "ShulkerDeposit:" : "ShulkerShortcut:") + mPlayer.getUniqueId();
-		BlockStateMeta shulkerMeta = (BlockStateMeta)mShulkerItem.getItemMeta();
-		ShulkerBox shulkerBox = (ShulkerBox)shulkerMeta.getBlockState();
-		if (shulkerBox.getCustomName() != null) {
-			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, shulkerBox.getCustomName());
+		mShulkerMeta = (BlockStateMeta) mShulkerItem.getItemMeta();
+		mShulkerState = (ShulkerBox) mShulkerMeta.getBlockState();
+		if (mShulkerState.getCustomName() != null) {
+			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerState.getCustomName());
 		} else {
 			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
 		}
-		mInventory.setContents(shulkerBox.getInventory().getContents());
+		mInventory.setContents(mShulkerState.getInventory().getContents());
 	}
 
 	/**
@@ -80,10 +86,10 @@ public class ShulkerInventory {
 	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
 	 *
 	 * @return True if the Shulker Box still exists in the parent inventory.
-	 * @see #updateShulker(boolean)
+	 * @see #updateShulker(boolean, boolean)
 	 */
 	boolean updateShulker() {
-		return updateShulker(false);
+		return updateShulker(false, false);
 	}
 
 	/**
@@ -93,31 +99,42 @@ public class ShulkerInventory {
 	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
 	 *
 	 * @param unlock True if the Shulker Box should be unlocked after this update.
+	 * @param instant True if the Shulker Box should be saved instantly. For
 	 * @return True if the Shulker Box still exists in the parent inventory.
 	 */
-	private boolean updateShulker(boolean unlock) {
-		for (ItemStack item : mParentInventory) {
-			if (item != null && ItemUtils.isShulkerBox(item.getType())) {
-				BlockStateMeta shulkerMeta = (BlockStateMeta) item.getItemMeta();
-				ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
-				if (shulkerBox.getLock().equals(mLock)) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (unlock) {
-								shulkerBox.setLock(null);
-							}
-							shulkerBox.getInventory().setContents(mInventory.getContents());
-							shulkerMeta.setBlockState(shulkerBox);
-							mShulkerItem.setItemMeta(shulkerMeta);
-							item.setItemMeta(shulkerMeta);
-						}
-					}.runTask(mPlugin);
-					return true;
-				}
+	private boolean updateShulker(boolean unlock, boolean instant) {
+		if (isShulkerValid()) {
+			if (instant) {
+				return updateShulkerInstant(unlock);
+			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						updateShulkerInstant(unlock);
+					}
+				}.runTask(mPlugin);
+				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean updateShulkerInstant(boolean unlock) {
+		if (isShulkerValid()) {
+			if (unlock) {
+				mShulkerState.setLock(null);
+			}
+			mShulkerState.getInventory().setContents(mInventory.getContents());
+			mShulkerMeta.setBlockState(mShulkerState);
+			mShulkerItem.setItemMeta(mShulkerMeta);
+			mParentInventory.setItem(mParentSlot, mShulkerItem);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isShulkerValid() {
+		return mShulkerItem.equals(mParentInventory.getItem(mParentSlot));
 	}
 
 	/**
@@ -127,11 +144,13 @@ public class ShulkerInventory {
 	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
 	 * This does not close the player's inventory automatically.
 	 *
+	 * @param instant If the Shulker Box should be saved on the same tick. Only used if the parent inventory will not
+	 *                exist on the next tick. For example: When a player is logging out.
 	 * @return True if the Shulker Box still exists in the parent inventory.
-	 * @see #updateShulker(boolean)
+	 * @see #updateShulker(boolean, boolean)
 	 */
-	boolean closeShulker() {
-		return updateShulker(true);
+	boolean closeShulker(boolean instant) {
+		return updateShulker(true, instant);
 	}
 
 	/**
@@ -157,7 +176,7 @@ public class ShulkerInventory {
 	 *
 	 * @param item The ItemStack to be deposited.
 	 * @return The amount of the original stack that could not be deposited.
-	 * @see #ShulkerInventory(Plugin, Player, Inventory, ItemStack, int)
+	 * @see #ShulkerInventory(Plugin, Player, Inventory, int, int)
 	 */
 	int depositItem(ItemStack item) throws Exception {
 		if (isDepositComplete()) {
@@ -165,7 +184,7 @@ public class ShulkerInventory {
 		}
 		mDepositCount++;
 		HashMap<Integer, ItemStack> remaining = mInventory.addItem(item);
-		updateShulker(isDepositComplete());
+		updateShulker(isDepositComplete(), false);
 		if (remaining.isEmpty()) {
 			return 0;
 		}
