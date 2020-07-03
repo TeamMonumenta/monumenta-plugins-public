@@ -42,22 +42,32 @@ public class SpellBlockBreak extends Spell {
 	@Override
 	public void run() {
 		Location loc = mLauncher.getLocation();
-
 		/* Get a list of all blocks that impede the boss's movement */
 		List<Block> badBlockList = new ArrayList<Block>();
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		for (int x = -1; x <= 1; x++) {
-			testloc.setX(loc.getX() + (double) x);
+			testloc.setX(loc.getX() + x);
 			for (int y = 1; y <= 3; y++) {
-				testloc.setY(loc.getY() + (double) y);
+				testloc.setY(loc.getY() + y);
 				for (int z = -1; z <= 1; z++) {
-					testloc.setZ(loc.getZ() + (double) z);
+					testloc.setZ(loc.getZ() + z);
 					Block block = testloc.getBlock();
 					Material material = block.getType();
-					if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
+
+					if (material.equals(Material.COBWEB)) {
+						/* Break cobwebs immediately, don't add them to the bad block list */
+						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), Arrays.asList(block), 0f);
+						Bukkit.getServer().getPluginManager().callEvent(event);
+						if (!event.isCancelled()) {
+							/* Only allow bosses to break blocks in areas where explosions are allowed */
+							testloc.getBlock().setType(Material.AIR);
+							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
+							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+						}
+					} else if ((!mIgnoredMats.contains(material)) && !mNoBreak.contains(material) &&
 						(material.isSolid() || material.equals(Material.COBWEB)) &&
 						(!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
-						badBlockList.add(testloc.getBlock());
+						badBlockList.add(block);
 					}
 				}
 			}

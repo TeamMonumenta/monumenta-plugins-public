@@ -268,6 +268,9 @@ public class SpellBaseCharge extends Spell {
 			@Override
 			public void run() {
 				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss)) {
+					if (mBoss != null) {
+						mBoss.setAI(true);
+					}
 					this.cancel();
 					return;
 				}

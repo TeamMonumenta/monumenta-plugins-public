@@ -189,6 +189,7 @@ public class SpellBaseLaser extends Spell {
 				}
 
 				if ((blocked && mStopWhenBlocked) || EntityUtils.isStunned(mBoss)) {
+					mBoss.setAI(true);
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;
