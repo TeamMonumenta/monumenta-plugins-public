@@ -102,6 +102,7 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GraveUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -547,6 +548,10 @@ public class EntityListener implements Listener {
 				offhand.getType() == Material.TOTEM_OF_UNDYING && ItemUtils.isItemShattered(offhand)) {
 				event.setCancelled(true);
 			}
+
+			//Updates custom enchants in inventory
+			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, (Player) entity, event);
+
 			new BukkitRunnable() {
 				@Override
 				public void run() {

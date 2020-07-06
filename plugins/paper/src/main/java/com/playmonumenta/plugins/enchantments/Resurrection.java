@@ -69,6 +69,8 @@ public class Resurrection implements BaseEnchantment {
 		} else {
 			inventory.setItemInMainHand(new ItemStack(Material.AIR));
 		}
+
+		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, null);
 	}
 
 }
