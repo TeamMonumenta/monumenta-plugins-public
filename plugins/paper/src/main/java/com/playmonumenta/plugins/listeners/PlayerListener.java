@@ -135,6 +135,9 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mTrackingManager.addEntity(player);
 		DailyReset.handle(mPlugin, player);
+		//This checks to make sure that when you login you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
+		Location loc = player.getLocation();
+		runTeleportRunnable(player, loc);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -898,8 +901,36 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+
+		Player player = event.getPlayer();
+		Location loc = event.getTo();
+
+		if (!cause.equals(TeleportCause.UNKNOWN) && !cause.equals(TeleportCause.ENDER_PEARL) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
+			runTeleportRunnable(player, loc);
+		}
 	}
 
+	public void runTeleportRunnable(Player player, Location loc) {
+		// Runnable to make sure that players don't get stuck in the floor too often. That if statement is a testament to never trying to edit how teleporting works, its so easy to break it
+		// Made it only work if you are stuck exactly 2 blocks into the ground or less to prevent exploits, if it ends up being a problem, adding one for 3 blocks shouldn't be too hard
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Block block = player.getLocation().getBlock();
+				Block blockEye = player.getEyeLocation().getBlock();
+				if ((!block.getType().equals(Material.AIR) || !blockEye.getType().equals(Material.AIR))) {
+					if (player.getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR) && player.getEyeLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR)) {
+						player.teleport(loc.add(0, 1, 0));
+					} else if (player.getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR) && player.getEyeLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR)) {
+						player.teleport(loc.add(0, 2, 0));
+					}
+					this.cancel();
+				} else if ((block.getType().equals(Material.AIR) || blockEye.getType().equals(Material.AIR)) || player.isOnline() || player.isDead() || !player.isValid()) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+	}
 	/** Implements bed teleporters.
 	 *
 	 * When a player sleeps in a bed, the 10 blocks under that bed are checked for
