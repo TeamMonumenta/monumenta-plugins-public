@@ -746,8 +746,8 @@ public class EntityListener implements Listener {
 		// Don't apply effects to dead entities
 		affectedEntities.removeIf(entity -> (entity.isDead() || entity.getHealth() <= 0));
 
-		//Don't apply slowness type lingering potions to players
-		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.SLOW) && entity instanceof Player));
+		//Don't apply slowness type lingering potions to players if a player dropped it
+		affectedEntities.removeIf(entity -> (cloud.hasCustomEffect(PotionEffectType.SLOW) && entity instanceof Player && cloud.getSource() instanceof Player));
 
 		PotionData data = cloud.getBasePotionData();
 		PotionInfo info = (data != null) ? PotionUtils.getPotionInfo(data, 4) : null;
