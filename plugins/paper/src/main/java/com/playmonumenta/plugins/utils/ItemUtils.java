@@ -613,6 +613,7 @@ public class ItemUtils {
 		case IRON_HELMET:
 		case GOLDEN_HELMET:
 		case DIAMOND_HELMET:
+		case TURTLE_HELMET:
 		case PUMPKIN:
 		case CREEPER_HEAD:
 		case SKELETON_SKULL:
