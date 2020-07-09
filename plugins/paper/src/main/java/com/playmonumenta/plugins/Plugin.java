@@ -47,6 +47,7 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
 import com.playmonumenta.plugins.itemindex.IndexInventoryManager;
@@ -239,6 +240,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(this), this);
+		manager.registerEvents(new PlayerInventoryView(), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());
