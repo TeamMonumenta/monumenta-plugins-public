@@ -234,43 +234,32 @@ public class ChestUtils {
 	private static final String DUNGEON_LOOT_TABLE_NAMESPACE = "epic";
 
 	private static final int CHEST_LUCK_RADIUS = 128;
+	private static final double[] BONUS_ITEMS = {
+			0,		// Dummy value, this is a player count indexed array
+			0.5,
+			1.7,
+			2.6,
+			3.3,
+			3.8,
+			4.2,
+			4.4,
+			4.5
+	};		
 
 	public static void chestScalingLuck(Plugin plugin, Player player, Block block) {
 		int chestLuck = ScoreboardUtils.getScoreboardValue(player, "ChestLuckToggle");
 		if (chestLuck > 0) {
 			int playerCount = PlayerUtils.playersInRange(player.getLocation(), CHEST_LUCK_RADIUS).size();
+			double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, playerCount)];
+			int luckLevel = (int) bonusItems;
 
-			int luckLevel;
-
-			double rand = FastUtils.RANDOM.nextDouble();
-
-			if (playerCount <= 1) {
-				if (rand < 0.5) {
-					luckLevel = -1;
-				} else {
-					luckLevel = 0;
-				}
-			} else if (playerCount == 2) {
-				if (rand < 0.6) {
-					luckLevel = 0;
-				} else {
-					luckLevel = 1;
-				}
-			} else if (playerCount == 3) {
-				if (rand < 0.7) {
-					luckLevel = 1;
-				} else {
-					luckLevel = 2;
-				}
-			} else {
-				luckLevel = 2;
+			if (FastUtils.RANDOM.nextDouble() < bonusItems - luckLevel) {
+				luckLevel++;
 			}
 
-			player.getPotionEffect(PotionEffectType.LUCK);
-
-			if (luckLevel >= 0) {
+			if (luckLevel > 0) {
 				plugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, new PotionEffect(PotionEffectType.LUCK,
-				                                3, luckLevel, true, false));
+				                                3, luckLevel - 1, true, false));
 			}
 
 			if (player.getEquipment() != null &&
