@@ -55,11 +55,28 @@ public class ReforgeInventory extends GenericCommand {
 			int cxpCost = reforgeCost.getOrDefault(ItemRegion.KINGS_VALLEY, 0);
 			int ccsCost = reforgeCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
 			int cmmCost = reforgeCost.getOrDefault(ItemRegion.MONUMENTA, 0);
+			int csbCost = reforgeCost.getOrDefault(ItemRegion.SHULKER_BOX, 0);
 			if (cmmCost != 0) {
 				// ItemRegion.MONUMENTA currently only exists to allow items from
 				// Celsian Isles to be used in King's Valley. So the cost to reforge is Celsian Isles currency
 				// We need to figure out a more permanent solution to this at some point.
 				ccsCost += cmmCost;
+			}
+			if (csbCost != 0) {
+				// ItemRegion.SHULKER_BOX currently only exists to allow shulker boxes to be
+				// reforged with either King's Valley or Celsian Isles currency.
+				// We need to figure out a more permanent solution to this at some point.
+				if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+					// King's Valley: Use XP
+					cxpCost += csbCost;
+				} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+					// Celsian Isles: Use CS
+					ccsCost += csbCost;
+				} else {
+					// This shouldn't happen, but if it does, default to XP
+					cxpCost += csbCost;
+				}
+
 			}
 			boolean paid = false;
 			ItemStack cxp = CalculateReforge.mCXP.clone();

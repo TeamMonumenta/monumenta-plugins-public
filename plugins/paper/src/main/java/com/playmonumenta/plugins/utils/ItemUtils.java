@@ -352,6 +352,7 @@ public class ItemUtils {
 		UNKNOWN("Unknown"),
 		KINGS_VALLEY("King's Valley"),
 		CELSIAN_ISLES("Celsian Isles"),
+		SHULKER_BOX("Shulker Box"),
 		MONUMENTA("Monumenta");
 
 		String mReadableString;
@@ -439,7 +440,7 @@ public class ItemUtils {
 			}
 			// Shulker Boxes without lore should be considered "King's Valley : Shulker Box" items so they can shatter
 			if (isShulkerBox(item.getType())) {
-				return ItemRegion.KINGS_VALLEY;
+				return ItemRegion.SHULKER_BOX;
 			}
 		}
 		return ItemRegion.UNKNOWN;
@@ -527,6 +528,7 @@ public class ItemUtils {
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:
 		case CELSIAN_ISLES:
+		case SHULKER_BOX:
 		case MONUMENTA:
 			switch (getItemTier(item)) {
 			case ONE:
@@ -568,6 +570,7 @@ public class ItemUtils {
 		Map<ItemRegion, Integer> costs = new HashMap<>();
 		costs.put(ItemRegion.KINGS_VALLEY, 0);
 		costs.put(ItemRegion.CELSIAN_ISLES, 0);
+		costs.put(ItemRegion.SHULKER_BOX, 0);
 		costs.put(ItemRegion.MONUMENTA, 0);
 		for (ItemStack item : items) {
 			ItemRegion type = getItemRegion(item);
@@ -586,21 +589,22 @@ public class ItemUtils {
 			return item.getAmount() * 4;
 		case MEME:
 		case UNCOMMON:
-			return item.getAmount() * 16;
 		case UNIQUE:
+			return item.getAmount() * 16;
 		case UNIQUE_EVENT:
 		case ENHANCED_UNCOMMON:
 			return item.getAmount() * 32;
 		case RARE:
 		case PATRON_MADE:
-			return item.getAmount() * 64 * 1;
+			return item.getAmount() * 48;
 		case RELIC:
 		case ARTIFACT:
-		case SHULKER_BOX:
 		case ENHANCED_RARE:
+			return item.getAmount() * 64;
+		case SHULKER_BOX:
 			return item.getAmount() * 64 * 2;
 		case EPIC:
-			return item.getAmount() * 64 * 8;
+			return item.getAmount() * 64 * 4;
 		default:
 			return 0;
 		}

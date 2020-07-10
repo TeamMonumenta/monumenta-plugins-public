@@ -129,6 +129,19 @@ public class CalculateReforge extends GenericCommand {
 					// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
 					// Since they are obtained in R2, they should always cost R2 currency to repair.
 					handCurrency = "CS";
+				} else if (handRegion == ItemRegion.SHULKER_BOX) {
+					// The "Shulker Box" tag does not exist. It is internally used to identify shulker boxes.
+					// Shulker boxes can be reforged with R1 or R2 currency, based on the region you are in.
+					if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+						// King's Valley: Use XP
+						handCurrency = "XP";
+					} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+						// Celsian Isles: Use CS
+						handCurrency = "CS";
+					} else {
+						// This shouldn't happen, but if it does, default to XP
+						handCurrency = "XP";
+					}
 				}
 				if (handCurrency != null) {
 					// If the player is holding a shattered item, let them know how much it costs to reforge
@@ -142,10 +155,26 @@ public class CalculateReforge extends GenericCommand {
 			int cxp = fullInventoryCost.getOrDefault(ItemRegion.KINGS_VALLEY, 0);
 			int ccs = fullInventoryCost.getOrDefault(ItemRegion.CELSIAN_ISLES, 0);
 			int cmm = fullInventoryCost.getOrDefault(ItemRegion.MONUMENTA, 0);
+			int csb = fullInventoryCost.getOrDefault(ItemRegion.SHULKER_BOX, 0);
 			if (cmm != 0) {
 				// The "Monumenta" tag exists to allow items obtained in R2 to be used in R1.
 				// Since they are obtained in R2, they should always cost R2 currency to repair.
 				ccs += cmm;
+			}
+			if (csb != 0) {
+				// The "Shulker Box" tag does not exist. It is internally used to identify shulker boxes.
+				// Shulker boxes can be reforged with R1 or R2 currency, based on the region you are in.
+				if (player.getWorld().getName().equals("Project_Epic-region_1")) {
+					// King's Valley: Use XP
+					cxp += csb;
+				} else if (player.getWorld().getName().equals("Project_Epic-region_2")) {
+					// Celsian Isles: Use CS
+					ccs += csb;
+				} else {
+					// This shouldn't happen, but if it does, default to XP
+					cxp += csb;
+				}
+
 			}
 
 			// Tell the player the cost to reforge all items in their inventory
