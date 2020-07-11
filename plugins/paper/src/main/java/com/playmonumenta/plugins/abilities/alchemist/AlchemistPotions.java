@@ -60,7 +60,12 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 			return;
 		}
 
-		// Run this stuff a tick later so the AbilityManager has time to initialize everything
+		/*
+		 * Run this stuff 5 ticks later. As of now, the AbilityManager takes a tick
+		 * to initialize everything, and the PotionAbility classes take a tick to
+		 * initialize their damage values, but just give a few extra ticks for slight
+		 * future-proofing.
+		 */
 		if (player != null) {
 			new BukkitRunnable() {
 				@Override
@@ -106,7 +111,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 						}
 					}
 				}
-			}.runTaskLater(mPlugin, 1);
+			}.runTaskLater(mPlugin, 5);
 		}
 	}
 
