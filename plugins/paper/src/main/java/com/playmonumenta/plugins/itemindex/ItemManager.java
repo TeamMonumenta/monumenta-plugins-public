@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemindex;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class ItemManager {
+	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+
 	private Map<Material, Map<String, MonumentaItem>> mItems;
 	private File mItemFolderFile;
 
@@ -73,9 +76,9 @@ public class ItemManager {
 			JsonObject root = new JsonParser().parse(json).getAsJsonObject();
 			JsonElement elem = root.get("monumentaItem");
 			if (elem == null) {
-				return new Gson().fromJson(json, MonumentaItem.class);
+				return GSON.fromJson(json, MonumentaItem.class);
 			}
-			return new Gson().fromJson(root.get("monumentaItem"), MonumentaItem.class);
+			return GSON.fromJson(root.get("monumentaItem"), MonumentaItem.class);
 		} catch (IllegalStateException e) {
 			return null;
 		} catch (NullPointerException e) {
@@ -136,7 +139,7 @@ public class ItemManager {
 		String json = new NBTItem(itemStack).getString("MonumentaItemEdits");
 		MonumentaItem edits = null;
 		if (json != null) {
-			edits = new Gson().fromJson(json, MonumentaItem.class);
+			edits = GSON.fromJson(json, MonumentaItem.class);
 		}
 		Material m = null;
 		String name = null;

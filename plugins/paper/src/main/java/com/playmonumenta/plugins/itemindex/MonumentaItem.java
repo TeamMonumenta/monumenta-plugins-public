@@ -42,6 +42,9 @@ import java.util.UUID;
 
 // describes a monumenta item
 public class MonumentaItem {
+	private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+	private static final Gson GSON_PRETTY = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+
 	private MonumentaItem mEdits;
 	private String mName;
 	private Material mMaterial;
@@ -250,7 +253,7 @@ public class MonumentaItem {
 		String jsonToStore = null;
 		if (this.mEdits != null) {
 			//differs from index entry. create a separate instance
-			jsonToStore = new Gson().toJson(this.mEdits);
+			jsonToStore = GSON.toJson(this.mEdits);
 		}
 		this.preCalc();
 		ItemStack out = new ItemStack(this.getMaterial());
@@ -1061,22 +1064,19 @@ public class MonumentaItem {
 	}
 
 	public JsonElement toJsonElement() {
-		return new Gson().toJsonTree(this);
+		return GSON.toJsonTree(this);
 	}
 
 	public String toPrettyJson() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this);
+		return GSON_PRETTY.toJson(this);
 	}
 
 	public String toJson() {
-		return new Gson().toJson(this);
+		return GSON.toJson(this);
 	}
 
 	public String toLootTablePrettyJson() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(this.toLootTableJsonElement());
-		return json;
+		return GSON_PRETTY.toJson(this.toLootTableJsonElement());
 	}
 
 	public void setDefaultValues() {
