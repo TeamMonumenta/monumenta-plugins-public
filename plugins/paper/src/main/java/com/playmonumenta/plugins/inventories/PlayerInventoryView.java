@@ -1,24 +1,33 @@
 package com.playmonumenta.plugins.inventories;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.scriptedquests.utils.InventoryUtils;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
+	private static List<Player> players = new ArrayList<>();
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerInteractEvent(PlayerInteractEvent event) {
@@ -33,10 +42,25 @@ public class PlayerInventoryView implements Listener {
 		    && InventoryUtils.testForItemWithLore(mainHand, "Skin :")
 			&& InventoryUtils.testForItemWithLore(mainHand, "Soulbound to")
 			&& player.hasPermission(PERMISSION)) {
-			Entity targetEnt = event.getPlayer().getTargetEntity(3);
-			if (targetEnt instanceof Player) {
-				Player clickedPlayer = (Player)targetEnt;
-				inventoryView(event.getPlayer(), clickedPlayer);
+
+			Location eyeLoc = player.getEyeLocation();
+			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), 3);
+			ray.mThroughBlocks = false;
+			ray.mTargetPlayers = true;
+			ray.mThroughNonOccluding = false;
+			ray.mTargetNonPlayers = false;
+
+			RaycastData data = ray.shootRaycast();
+			List<LivingEntity> entities = data.getEntities();
+			if (entities != null && !entities.isEmpty()) {
+				//Below if check is almost certainly not necessary, but always be careful
+				if (data.getEntities().get(0) instanceof Player) {
+					Player clickedPlayer = (Player)data.getEntities().get(0);
+					if (!(clickedPlayer).getUniqueId().equals(player.getUniqueId())) {
+						inventoryView(event.getPlayer(), clickedPlayer);
+					}
+				}
+
 			}
 		}
 	}
@@ -44,7 +68,7 @@ public class PlayerInventoryView implements Listener {
 	//This handles clicking, shift clicking, double clicking, etc.
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (event.getView().getTitle().endsWith("'s Inventory")) {
+		if (players.contains(event.getWhoClicked())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -53,9 +77,24 @@ public class PlayerInventoryView implements Listener {
 	//Just as a precaution
 	@EventHandler(priority = EventPriority.LOW)
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		if (event.getView().getTitle().endsWith("'s Inventory")) {
+		if (players.contains(event.getWhoClicked())) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	//Make sure they can eventually move stuff
+	@EventHandler(priority = EventPriority.LOW)
+	public void inventoryCloseEvent(InventoryCloseEvent event) {
+		if (players.contains(event.getPlayer())) {
+			players.remove(event.getPlayer());
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerLoginEvent(PlayerLoginEvent event) {
+		if (players.contains(event.getPlayer())) {
+			players.remove(event.getPlayer());
 		}
 	}
 
@@ -65,6 +104,8 @@ public class PlayerInventoryView implements Listener {
 			player.sendMessage(ChatColor.RED + "This player has opted out of inventory viewing.");
 			return;
 		}
+		//Added for tracking to prevent them from clicking on stuff
+		players.add(player);
 
 		PlayerInventory playInv = clickedPlayer.getInventory();
 		Inventory openInv = Bukkit.createInventory(null, 18, clickedPlayer.getDisplayName() + "'s Inventory");

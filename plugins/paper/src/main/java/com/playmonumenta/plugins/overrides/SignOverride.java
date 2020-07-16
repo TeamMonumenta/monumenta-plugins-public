@@ -25,7 +25,7 @@ public class SignOverride extends BaseOverride {
 			display += line + " ";
 		}
 
-		if (!display.toLowerCase().contains("click") && !display.toLowerCase().contains("leaderboard")) {
+		if (!display.toLowerCase().contains("click") && !display.toLowerCase().contains("leaderboard") && !display.isEmpty()) {
 			player.sendMessage(display);
 		}
 		return item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && ItemUtils.isDye(item.getType()));

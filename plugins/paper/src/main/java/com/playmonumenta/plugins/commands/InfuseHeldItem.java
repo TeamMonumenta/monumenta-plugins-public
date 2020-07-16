@@ -17,6 +17,7 @@ import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument;
 import io.github.jorelali.commandapi.api.arguments.EntitySelectorArgument.EntitySelector;
+import io.github.jorelali.commandapi.api.arguments.IntegerArgument;
 import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
 import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxException;
 
@@ -28,6 +29,8 @@ import io.github.jorelali.commandapi.api.exceptions.WrapperCommandSyntaxExceptio
  * If this does not happen, your changes will NOT persist across weekly updates!
  */
 public class InfuseHeldItem extends GenericCommand {
+	static final String COMMAND = "infusehelditem";
+	static final String PERMISSION = "monumenta.command.infusehelditem";
 
 	@SuppressWarnings("unchecked")
 	private static void registerType(InfusionSelection selection) {
@@ -35,11 +38,22 @@ public class InfuseHeldItem extends GenericCommand {
 		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
 		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
 		arguments.put("frames", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		CommandAPI.getInstance().register("infusehelditem", CommandPermission.fromString("monumenta.command.infusehelditem"), arguments,
+		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
 			(sender, args) -> {
 				run(sender, (Player)args[0], (List<Entity>)args[1], selection);
 			});
 
+		arguments.clear();
+		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
+		arguments.put("level", new IntegerArgument(1));
+		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
+			(sender, args) -> {
+				if (sender instanceof Player) {
+					InfusionUtils.freeInfusion(sender, (Player)sender, selection, (Integer)args[0]);
+				} else {
+					CommandAPI.fail("This command can only be run by players");
+				}
+			});
 	}
 
 	public static void register() {

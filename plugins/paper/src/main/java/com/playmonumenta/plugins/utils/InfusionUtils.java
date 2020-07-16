@@ -167,6 +167,57 @@ public class InfusionUtils {
 		}
 	}
 
+	public static void freeInfusion(CommandSender sender, Player player, InfusionSelection selection, int level) throws WrapperCommandSyntaxException {
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if (selection.equals(InfusionSelection.REFUND)) {
+			refundInfusion(item, player);
+			return;
+		} else if (selection.equals(InfusionSelection.SPEC_REFUND)) {
+			specialRefund(item, player);
+			return;
+		}
+
+		List<String> newLore = new ArrayList<>();
+		if (item.getLore() != null) {
+			for (String line : item.getLore()) {
+				if (!line.contains("PRE COST ADJUST")) {
+					newLore.add(line);
+				}
+			}
+			item.setLore(newLore);
+		}
+
+
+		if (calcInfuseCost(item) < 0) {
+			CommandAPI.fail("You must have a valid item to infuse in your main hand!");
+			return;
+		}
+
+		if (item.getAmount() > 1) {
+			CommandAPI.fail("Only one item can be infused at a time!");
+			return;
+		}
+
+		String numeral = "";
+		switch (level) {
+			case 1:
+				numeral = " I";
+				break;
+			case 2:
+				numeral = " II";
+				break;
+			case 3:
+				numeral = " III";
+				break;
+			case 4:
+				numeral = " IV";
+				break;
+
+			default:
+				CommandAPI.fail("Not a valid level!");
+		}
+		CommandUtils.enchantify(sender, player, ChatColor.stripColor(selection.getEnchantName()) + numeral);
+	}
 	/*
 	 * Special Refunds for items that were infused prior to 4/2/2020 cost changes
 	 * Items must be marked with 'PRE-UPDATE' lore text to be eligible.
