@@ -383,13 +383,11 @@ public class MonumentaItem {
 
 		// armor color
 		if (this.getColor() != null) {
-			System.out.println("colored");
 			if (meta instanceof LeatherArmorMeta) {
-				System.out.println("leatherArmorMeta");
 				((LeatherArmorMeta)meta).setColor(Color.fromRGB(this.getColor()[0], this.getColor()[1], this.getColor()[2]));
 			}
 			if (this.isColorable()) {
-				System.out.println("colorable");
+				// TODO
 			}
 		}
 

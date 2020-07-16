@@ -239,7 +239,7 @@ public class ItemIndexCommand {
 			CommandPermission.fromString("monumenta.mi"),
 			arguments,
 			(sender, args) -> {
-				Player p = commandSecurities(sender);
+				Player p = commandSecurities(sender, false);
 				if (p == null) {
 					return;
 				}
@@ -864,13 +864,18 @@ public class ItemIndexCommand {
 
 	@Nullable
 	private static Player commandSecurities(CommandSender sender) {
+		return commandSecurities(sender, true);
+	}
+
+	@Nullable
+	private static Player commandSecurities(CommandSender sender, boolean requiresItem) {
 		Player p = CommandUtils.getPlayerFromSender(sender);
 		if (p == null) {
 			sender.sendMessage("Command must be launched from a Player");
 			return null;
 		}
 		ItemStack item = p.getInventory().getItemInMainHand();
-		if (item.getType() == Material.AIR || item.getAmount() == 0) {
+		if (requiresItem && (item.getType() == Material.AIR || item.getAmount() == 0)) {
 			p.sendMessage("You must hold an item in hand to use /mi edit");
 			return null;
 		}

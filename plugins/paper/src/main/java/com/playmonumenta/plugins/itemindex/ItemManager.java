@@ -72,7 +72,6 @@ public class ItemManager {
 			return null;
 		}
 		try {
-			System.out.println(json);
 			JsonObject root = new JsonParser().parse(json).getAsJsonObject();
 			JsonElement elem = root.get("monumentaItem");
 			if (elem == null) {
