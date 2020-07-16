@@ -416,9 +416,7 @@ public class ItemUtils {
 				ItemMeta meta = item.getItemMeta();
 				if (meta.hasDisplayName()) {
 					String name = meta.getDisplayName();
-					if (name.contains("Quest Compass")) {
-						return ItemRegion.MONUMENTA;
-					} else if (name.contains("Experiencinator")) {
+					if (name.contains("Experiencinator")) {
 						return ItemRegion.KINGS_VALLEY;
 					} else if (name.contains("Crystallizer")) {
 						return ItemRegion.CELSIAN_ISLES;
@@ -455,9 +453,7 @@ public class ItemUtils {
 			ItemMeta meta = item.getItemMeta();
 			if (meta.hasDisplayName()) {
 				String itemName = meta.getDisplayName();
-				if (itemName.contains("Quest Compass")) {
-					return ItemTier.QUEST_COMPASS;
-				} else if (itemName.contains("Experiencinator (u)")) {
+				if (itemName.contains("Experiencinator (u)")) {
 					return ItemTier.ENHANCED_RARE;
 				} else if (itemName.contains("Experiencinator")) {
 					return ItemTier.RARE;
@@ -524,6 +520,8 @@ public class ItemUtils {
 			return ItemDeathResult.DESTROY;
 		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
+		} else if (item.getType() == Material.COMPASS) {
+			return ItemDeathResult.KEEP;
 		}
 		switch (getItemRegion(item)) {
 		case KINGS_VALLEY:
@@ -554,8 +552,6 @@ public class ItemUtils {
 			case UNIQUE_EVENT:
 			case SHULKER_BOX:
 				return ItemDeathResult.SHATTER;
-			case QUEST_COMPASS:
-				return ItemDeathResult.KEEP;
 			default:
 				return ItemDeathResult.LOSE;
 			}
