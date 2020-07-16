@@ -87,12 +87,14 @@ public enum Enchantment {
 	MELEE_EVASION(new MeleeEvasion()),
 	ABILITY_EVASION(new AbilityEvasion()),
 	SECOND_WIND(new SecondWind()),
-	VOID_TETHER(new VoidTether()),
 	RESURRECTION(new Resurrection()),
+	VOID_TETHER(new VoidTether()),
+	ASHES_OF_ETERNITY(new AshesOfEternity()),
 
 	// visuals
 	CLUCKING(new Clucking()),
 	OINKING(new Oinking()),
+	BAAING(new Baaing()),
 	ETHERAL(new Ethereal()),
 	STYLISH(new Stylish()),
 	COLORFUL(new Colorful()),
@@ -187,6 +189,7 @@ public enum Enchantment {
 		switch (this) {
 			case HOPE:
 			case GILLS:
+			case BAAING:
 			case GILDED:
 			case ETHERAL:
 			case FESTIVE:
