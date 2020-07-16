@@ -45,7 +45,7 @@ public class Volley extends Ability {
 		mInfo.mLinkedSpell = Spells.VOLLEY;
 		mInfo.mScoreboardId = "Volley";
 		mInfo.mShorthandName = "Vly";
-		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15 s). Only one arrow is consumed, and each arrow deals 30% bonus damage.");
+		mInfo.mDescriptions.add("When you shoot an arrow while sneaking, you shoot a volley consisting of 7 arrows instead (Cooldown: 15s). Only one arrow is consumed, and each arrow deals 30% bonus damage.");
 		mInfo.mDescriptions.add("Increases the number of Arrows to 11 and enhances the bonus damage to 50%.");
 		mInfo.mCooldown = VOLLEY_COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
