@@ -66,11 +66,12 @@ public class OldLabsBoss extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mBoss.setRemoveWhenFarAway(false);
+		mBoss.addScoreboardTag("Boss");
+
 		if (!newBoss) {
 			resumeBossFight(plugin, boss);
 		} else {
-			mBoss.setRemoveWhenFarAway(false);
-
 			mBoss.setGravity(false);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
