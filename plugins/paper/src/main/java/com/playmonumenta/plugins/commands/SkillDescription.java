@@ -15,7 +15,6 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.StringArgument;
 
 public class SkillDescription extends GenericCommand {
-	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		String command = "skilldescription";
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skilldescription");
