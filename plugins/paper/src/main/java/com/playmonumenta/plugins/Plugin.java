@@ -48,6 +48,8 @@ import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemindex.IndexInventoryListeners;
@@ -243,6 +245,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(this), this);
 		manager.registerEvents(new PlayerInventoryView(), this);
+		manager.registerEvents(new AnvilFixInInventory(this), this);
+		manager.registerEvents(new LootChestsInInventory(), this);
 
 		// The last remaining Spigot-style command...
 		this.getCommand("testNoScore").setExecutor(new TestNoScore());
