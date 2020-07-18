@@ -68,17 +68,32 @@ public class WorldListener implements Listener {
 
 	// Convenience list of offsets to get adjacent blocks
 	private static final List<Vector> ADJACENT_OFFSETS = Arrays.asList(
-	                                                         new Vector(1, 0, 0),
-	                                                         new Vector(-1, 0, 0),
-	                                                         new Vector(0, 1, 0),
 	                                                         new Vector(0, 0, 1),
 	                                                         new Vector(0, 0, -1),
-
-	                                                         // Acacia fix
-	                                                         new Vector(-1, 1, 0),
-	                                                         new Vector(1, 1, 0),
+	                                                         new Vector(0, 1, 0),
+	                                                         new Vector(0, 1, 1),
 	                                                         new Vector(0, 1, -1),
-	                                                         new Vector(0, 1, 1)
+	                                                         new Vector(0, -1, 0),
+	                                                         new Vector(0, -1, 1),
+	                                                         new Vector(0, -1, -1),
+	                                                         new Vector(1, 0, 0),
+	                                                         new Vector(1, 0, 1),
+	                                                         new Vector(1, 0, -1),
+	                                                         new Vector(1, 1, 0),
+	                                                         new Vector(1, 1, 1),
+	                                                         new Vector(1, 1, -1),
+	                                                         new Vector(1, -1, 0),
+	                                                         new Vector(1, -1, 1),
+	                                                         new Vector(1, -1, -1),
+	                                                         new Vector(-1, 0, 0),
+	                                                         new Vector(-1, 0, 1),
+	                                                         new Vector(-1, 0, -1),
+	                                                         new Vector(-1, 1, 0),
+	                                                         new Vector(-1, 1, 1),
+	                                                         new Vector(-1, 1, -1),
+	                                                         new Vector(-1, -1, 0),
+	                                                         new Vector(-1, -1, 1),
+	                                                         new Vector(-1, -1, -1)
 	                                                     );
 
 	@EventHandler(priority = EventPriority.LOWEST)
