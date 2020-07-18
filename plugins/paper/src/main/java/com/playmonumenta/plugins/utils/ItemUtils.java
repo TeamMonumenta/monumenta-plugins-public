@@ -94,21 +94,39 @@ public class ItemUtils {
 	);
 
 	// List of materials that trees can replace when they grow
-	public static final Set<Material> allowedTreeReplaceMaterials = EnumSet.of(
-		Material.AIR,
-		Material.OAK_LEAVES,
-		Material.SPRUCE_LEAVES,
-		Material.BIRCH_LEAVES,
-		Material.JUNGLE_LEAVES,
-		Material.ACACIA_LEAVES,
-		Material.DARK_OAK_LEAVES,
-		Material.OAK_SAPLING,
-		Material.ACACIA_SAPLING,
-		Material.BIRCH_SAPLING,
-		Material.DARK_OAK_SAPLING,
-		Material.JUNGLE_SAPLING,
-		Material.SPRUCE_SAPLING,
-		Material.VINE
+	public static final Set<Material> notAllowedTreeReplace = EnumSet.of(
+		// Basically #minecraft:wither_immune + chests, barrels, shulker boxes, spawners
+		Material.BARRIER,
+		Material.BEDROCK,
+		Material.END_PORTAL,
+		Material.END_PORTAL_FRAME,
+		Material.END_GATEWAY,
+		Material.COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.STRUCTURE_BLOCK,
+		Material.JIGSAW,
+		Material.MOVING_PISTON,
+		Material.CHEST,
+		Material.BARREL,
+		Material.SPAWNER,
+		Material.SHULKER_BOX,
+		Material.WHITE_SHULKER_BOX,
+		Material.ORANGE_SHULKER_BOX,
+		Material.MAGENTA_SHULKER_BOX,
+		Material.LIGHT_BLUE_SHULKER_BOX,
+		Material.YELLOW_SHULKER_BOX,
+		Material.LIME_SHULKER_BOX,
+		Material.PINK_SHULKER_BOX,
+		Material.GRAY_SHULKER_BOX,
+		Material.LIGHT_GRAY_SHULKER_BOX,
+		Material.CYAN_SHULKER_BOX,
+		Material.PURPLE_SHULKER_BOX,
+		Material.BLUE_SHULKER_BOX,
+		Material.BROWN_SHULKER_BOX,
+		Material.GREEN_SHULKER_BOX,
+		Material.RED_SHULKER_BOX,
+		Material.BLACK_SHULKER_BOX
 	);
 
 	// List of blocks that can be interacted with using right click and generally perform some functionality
@@ -788,7 +806,7 @@ public class ItemUtils {
 	}
 
 	public static boolean isAllowedTreeReplace(Material item) {
-		return allowedTreeReplaceMaterials.contains(item);
+		return !notAllowedTreeReplace.contains(item);
 	}
 
 	public static boolean isShulkerBox(Material mat) {
