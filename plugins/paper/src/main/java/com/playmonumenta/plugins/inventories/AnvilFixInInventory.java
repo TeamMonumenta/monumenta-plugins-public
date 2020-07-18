@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.inventories;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.InventoryUtils;
 
@@ -35,11 +35,18 @@ public class AnvilFixInInventory implements Listener {
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;
 		}
+
 		ItemStack anvil = event.getCursor();
-		if (!anvil.getType().equals(Material.ANVIL) || !InventoryUtils.testForItemWithName(anvil, "Repair Anvil") || anvil == null) {
+		if (anvil == null || !anvil.getType().equals(Material.ANVIL)) {
 			return;
 		}
+
 		ItemStack item = event.getCurrentItem();
+
+		if (item == null || item.getType().equals(Material.AIR) || ItemUtils.isShulkerBox(item.getType())) {
+			return;
+		}
+
 		Player player = (Player)event.getWhoClicked();
 		if ((item != null && item.getDurability() > 0 && !item.getType().isBlock()
 		    && (!item.hasItemMeta() || !item.getItemMeta().hasLore()
@@ -58,11 +65,8 @@ public class AnvilFixInInventory implements Listener {
 					mTicks++;
 					if (mTicks >= 3) {
 						this.cancel();
-						world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
 						world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 						world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					} else {
-						world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 					}
 				}
 
