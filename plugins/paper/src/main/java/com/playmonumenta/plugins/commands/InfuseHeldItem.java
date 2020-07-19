@@ -36,15 +36,6 @@ public class InfuseHeldItem extends GenericCommand {
 	private static void registerType(InfusionSelection selection) {
 		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
 		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
-		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
-		arguments.put("frames", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
-		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
-			(sender, args) -> {
-				run(sender, (Player)args[0], (List<Entity>)args[1], selection);
-			});
-
-		arguments.clear();
-		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
 		arguments.put("level", new IntegerArgument(1));
 		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
 			(sender, args) -> {
@@ -53,6 +44,15 @@ public class InfuseHeldItem extends GenericCommand {
 				} else {
 					CommandAPI.fail("This command can only be run by players");
 				}
+			});
+
+		arguments.clear();
+		arguments.put(selection.getLabel(), new LiteralArgument(selection.getLabel()));
+		arguments.put("player", new EntitySelectorArgument(EntitySelector.ONE_PLAYER));
+		arguments.put("frames", new EntitySelectorArgument(EntitySelector.MANY_ENTITIES));
+		CommandAPI.getInstance().register(COMMAND, CommandPermission.fromString(PERMISSION), arguments,
+			(sender, args) -> {
+				run(sender, (Player)args[0], (List<Entity>)args[1], selection);
 			});
 	}
 
