@@ -43,7 +43,7 @@ public class AnvilFixInInventory implements Listener {
 
 		ItemStack item = event.getCurrentItem();
 
-		if (item == null || item.getType().equals(Material.AIR) || ItemUtils.isShulkerBox(item.getType())) {
+		if (item == null || item.getType().equals(Material.AIR) || ItemUtils.isShulkerBox(item.getType()) || item.getType().equals(Material.ANVIL)) {
 			return;
 		}
 
