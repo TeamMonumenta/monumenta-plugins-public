@@ -21,7 +21,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_seekingprojectile";
 	public static final int detectionRange = 24;
 
-	private static final boolean SINGLE_TARGET = false;
+	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
 	private static final int COOLDOWN = 20 * 12;
 	private static final int DELAY = 20 * 1;
@@ -46,20 +46,22 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 					// Initiate Aesthetic
-					(World world, Location loc) -> {
+					(World world, Location loc, int ticks) -> {
 						PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1f, 0.5f);
 					},
 					// Launch Aesthetic
-					(World world, Location loc) -> {
+					(World world, Location loc, int ticks) -> {
 						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 						world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
 					},
 					// Projectile Aesthetic
-					(World world, Location loc) -> {
+					(World world, Location loc, int ticks) -> {
 						world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
 						world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0);
-						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.1f, 0.2f);
+						if (ticks % 40 == 0) {
+							world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f);
+						}
 					},
 					// Hit Action
 					(World world, Player player, Location loc) -> {

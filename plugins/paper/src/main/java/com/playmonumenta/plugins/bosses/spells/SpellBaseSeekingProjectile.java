@@ -23,9 +23,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	@FunctionalInterface
 	public interface AestheticAction {
 		/**
-		 * @param loc Location to do aesthetics
+		 * @param loc Location to do aesthetics, also provides a ticks ongoing parameter if operations should be performed less often
 		 */
-		void run(World world, Location loc);
+		void run(World world, Location loc, int ticks);
 	}
 
 	@FunctionalInterface
@@ -101,7 +101,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 	@Override
 	public void run() {
-		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
+		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange);
 
@@ -176,7 +176,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	private void launch(Player target, Location targetLoc) {
-		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation());
+		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			Location mLocation = mBoss.getEyeLocation();
@@ -242,7 +242,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 							shift.multiply(0.5);
 						} else {
 							// If going through blocks, increase the effects
-							mProjectileAesthetic.run(mWorld, mLocation);
+							mProjectileAesthetic.run(mWorld, mLocation, mTicks);
 							shift.multiply(0.125);
 						}
 					}
@@ -250,7 +250,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 				mLocation.add(shift);
 				mHitbox.shift(shift);
-				mProjectileAesthetic.run(mWorld, mLocation);
+				mProjectileAesthetic.run(mWorld, mLocation, mTicks);
 
 				// Grab all players that could have overlapping bounding boxes
 				for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2)) {

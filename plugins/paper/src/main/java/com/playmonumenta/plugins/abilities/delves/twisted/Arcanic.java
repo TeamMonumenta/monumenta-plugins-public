@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 
 /*
- * ARCANIC: You deal x2 less damage and mobs get a random STRONKER ability (and are blast resistant)
+ * ARCANIC: mobs have x1.6 health and get a random STRONKER ability (and are blast resistant)
  */
 
 public class Arcanic extends StatMultiplier {
@@ -18,7 +18,7 @@ public class Arcanic extends StatMultiplier {
 	public static final String MESSAGE = ChatColor.GRAY + "A strange feeling washes over you, whispering of " + ChatColor.DARK_RED + ChatColor.BOLD + "ARCANIC" + ChatColor.GRAY + " powers channeled within.";
 	public static final int SCORE = 23;
 
-	private static final double ARCANIC_MOB_HEALTH_MULTIPLIER = 2;
+	private static final double ARCANIC_MOB_HEALTH_MULTIPLIER = 1.6;
 	private static final double ARCANIC_1_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 1;
 	private static final double ARCANIC_2_ABILITY_DAMAGE_TAKEN_MULTIPLIER = 2;
 	private static final double ARCANIC_ABILITY_CHANCE = 1;
