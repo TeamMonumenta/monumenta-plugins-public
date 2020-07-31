@@ -53,10 +53,7 @@ public class VoidTether implements BaseEnchantment {
 		}
 	}
 
-	@Override
-	public void onFatalHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
-		Location ploc = player.getLocation();
-
+	protected boolean runCheck(Plugin plugin, Player player) {
 		/* Check to make sure the player still has a non-shattered totem or resurrection item */
 		if (plugin.mTrackingManager.mPlayers.getPlayerCustomEnchantLevel(player, Resurrection.class) == 0) {
 			ItemStack item = player.getInventory().getItemInMainHand();
@@ -64,11 +61,24 @@ public class VoidTether implements BaseEnchantment {
 				item = player.getInventory().getItemInOffHand();
 				if (item == null || !item.getType().equals(Material.TOTEM_OF_UNDYING) || ItemUtils.isItemShattered(item)) {
 					/* Nope, no totem or resurrection item or it is shattered */
-					return;
+					return false;
 				}
 			}
 		}
+		return true;
+	}
 
+	/* Note - if the player dies in the void, this function will run twice. The first time
+	 * it will prevent the damage and teleport the player, then kill them again so it runs again,
+	 * processing them up above the void
+	 */
+	@Override
+	public void onFatalHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
+		if (event.isCancelled() || !runCheck(plugin, player)) {
+			return;
+		}
+
+		Location ploc = player.getLocation();
 		if (ploc.getY() > 0) {
 			/* Player took fatal damage but is not in the void */
 

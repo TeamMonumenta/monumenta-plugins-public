@@ -215,6 +215,7 @@ public class ItemOverrides {
 		mItems.put(Material.SHEARS, new ShearsOverride());
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
+		mItems.put(Material.CROSSBOW, new CrossbowOverride());
 
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);
