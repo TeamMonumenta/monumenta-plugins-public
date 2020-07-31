@@ -33,22 +33,15 @@ public class CurseOfCorruption implements BaseEnchantment {
 		return EnumSet.of(ItemSlot.INVENTORY);
 	}
 
-	//Allows for multiple held curse of corruption items in plots.
-	@Override
-	public int getLevelFromItem(ItemStack item, Player player) {
-		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-			return 0;
-		}
-		return getLevelFromItem(item);
-	}
-
 	@Override
 	public void applyProperty(Plugin plugin, Player player, int level) {
 		if (level > 1) {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true, false));
+			if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+				if (player.getGameMode() != GameMode.CREATIVE) {
+					plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true, false));
+				}
+				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, level - 2, true, false));
 			}
-			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW, 1000000, level - 2, true, false));
 		}
 	}
 
