@@ -44,7 +44,7 @@ public class DeathItemListener implements Listener {
 	}
 
 	//Records player's items into a map that gives slot of a hashmap
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void recordPlayerDeathEvent(PlayerDeathEvent event) {
 		if (!event.isCancelled()
 				&& event.getEntity() != null
