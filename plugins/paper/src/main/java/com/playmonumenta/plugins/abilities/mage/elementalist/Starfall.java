@@ -13,6 +13,7 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
@@ -52,7 +53,9 @@ public class Starfall extends Ability {
 	@Override
 	public boolean runCheck() {
 		ItemStack mHand = mPlayer.getInventory().getItemInMainHand();
-		return InventoryUtils.isWandItem(mHand);
+		Blizzard blizzard = AbilityManager.getManager().getPlayerAbility(mPlayer, Blizzard.class);
+		// If Blizzard would cast successfully, don't cast this ability
+		return InventoryUtils.isWandItem(mHand) && (blizzard == null || blizzard.isOnCooldown() || !blizzard.runCheck());
 	}
 
 	public boolean shouldCancelManaLance() {
