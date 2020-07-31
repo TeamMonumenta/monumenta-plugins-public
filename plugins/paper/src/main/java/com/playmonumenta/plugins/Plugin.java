@@ -70,6 +70,7 @@ import com.playmonumenta.plugins.listeners.PotionConsumeListener;
 import com.playmonumenta.plugins.listeners.ShatteredEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
+import com.playmonumenta.plugins.listeners.SpawnerListener;
 import com.playmonumenta.plugins.listeners.TridentListener;
 import com.playmonumenta.plugins.listeners.VehicleListener;
 import com.playmonumenta.plugins.listeners.WorldListener;
@@ -246,6 +247,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(this), this);
+		manager.registerEvents(new SpawnerListener(this), this);
 		manager.registerEvents(new PlayerInventoryView(), this);
 		manager.registerEvents(new AnvilFixInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
