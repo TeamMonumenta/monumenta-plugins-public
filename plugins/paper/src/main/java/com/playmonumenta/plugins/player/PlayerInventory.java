@@ -80,6 +80,11 @@ public class PlayerInventory {
 		}
 	}
 
+	//Updates only for the slot given
+	public void updateItemSlotProperties(Plugin plugin, Player player, int slot) {
+		plugin.mEnchantmentManager.updateItemProperties(slot, mCurrentProperties, mInventoryProperties, player, plugin);
+	}
+
 	public void updateEquipmentProperties(Plugin plugin, Player player, Event event) {
 		// If the player transferred shards (join event), clear all properties and re-apply the relevant ones
 		if (event instanceof PlayerJoinEvent) {

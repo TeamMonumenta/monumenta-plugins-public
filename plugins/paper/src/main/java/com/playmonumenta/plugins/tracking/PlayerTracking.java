@@ -104,6 +104,13 @@ public class PlayerTracking implements EntityTracking {
 		}
 	}
 
+	public void updateItemSlotProperties(Player player, int slot) {
+		PlayerInventory manager = mPlayers.get(player);
+		if (manager != null) {
+			manager.updateItemSlotProperties(mPlugin, player, slot);
+		}
+	}
+
 	public void onKill(Plugin plugin, Player player, Entity target, EntityDeathEvent event) {
 		PlayerInventory manager = mPlayers.get(player);
 		if (manager != null) {

@@ -58,6 +58,7 @@ import com.playmonumenta.plugins.itemindex.ItemIndexCommand;
 import com.playmonumenta.plugins.itemindex.ItemManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.CrossbowListener;
+import com.playmonumenta.plugins.listeners.DeathItemListener;
 import com.playmonumenta.plugins.listeners.DelvesListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.listeners.ExceptionListener;
@@ -235,6 +236,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new ShatteredEquipmentListener(this), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
+		manager.registerEvents(new DeathItemListener(this), this);
 		manager.registerEvents(new ZonePropertyListener(), this);
 		manager.registerEvents(new TridentListener(), this);
 		manager.registerEvents(new CrossbowListener(this), this);

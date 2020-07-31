@@ -48,6 +48,20 @@ public class InventoryUtils {
 		}.runTaskLater(plugin, 0);
 	}
 
+	//Updates equipment enchants for one specific slot
+	public static void scheduleDelayedEquipmentSlotCheck(final Plugin plugin, final Player player, final int slot) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				final ItemStack mainHand = player.getInventory().getItemInMainHand();
+				final ItemStack offHand = player.getInventory().getItemInOffHand();
+
+				AbilityManager.getManager().playerItemHeldEvent(player, mainHand, offHand);
+				plugin.mTrackingManager.mPlayers.updateItemSlotProperties(player, slot);
+			}
+		}.runTaskLater(plugin, 0);
+	}
+
 	public static boolean testForItemWithLore(final ItemStack item, final String loreText) {
 		if (loreText == null || loreText.isEmpty()) {
 			return true;

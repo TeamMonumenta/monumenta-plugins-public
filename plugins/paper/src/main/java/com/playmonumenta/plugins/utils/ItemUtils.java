@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -661,6 +662,43 @@ public class ItemUtils {
 			return EquipmentSlot.OFF_HAND;
 		default:
 			return EquipmentSlot.HAND;
+		}
+	}
+
+	//Gets the armor equip sound based off of the armor type
+	public static Sound getArmorEquipSound(Material mat) {
+		switch (mat) {
+		case CHAINMAIL_HELMET:
+		case CHAINMAIL_CHESTPLATE:
+		case CHAINMAIL_LEGGINGS:
+		case CHAINMAIL_BOOTS:
+			return Sound.ITEM_ARMOR_EQUIP_CHAIN;
+		case DIAMOND_HELMET:
+		case DIAMOND_CHESTPLATE:
+		case DIAMOND_LEGGINGS:
+		case DIAMOND_BOOTS:
+			return Sound.ITEM_ARMOR_EQUIP_DIAMOND;
+		case ELYTRA:
+			return Sound.ITEM_ARMOR_EQUIP_ELYTRA;
+		default:
+			return Sound.ITEM_ARMOR_EQUIP_GENERIC;
+		case GOLDEN_HELMET:
+		case GOLDEN_CHESTPLATE:
+		case GOLDEN_LEGGINGS:
+		case GOLDEN_BOOTS:
+			return Sound.ITEM_ARMOR_EQUIP_GOLD;
+		case IRON_HELMET:
+		case IRON_CHESTPLATE:
+		case IRON_LEGGINGS:
+		case IRON_BOOTS:
+			return Sound.ITEM_ARMOR_EQUIP_IRON;
+		case LEATHER_HELMET:
+		case LEATHER_CHESTPLATE:
+		case LEATHER_LEGGINGS:
+		case LEATHER_BOOTS:
+			return Sound.ITEM_ARMOR_EQUIP_LEATHER;
+		case TURTLE_HELMET:
+			return Sound.ITEM_ARMOR_EQUIP_TURTLE;
 		}
 	}
 
