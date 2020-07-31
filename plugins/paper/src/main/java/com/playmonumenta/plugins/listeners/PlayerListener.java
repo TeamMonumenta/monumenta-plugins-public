@@ -38,6 +38,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.ClickType;
@@ -342,6 +343,14 @@ public class PlayerListener implements Listener {
 		    && ZoneUtils.inPlot(armorStand, ServerProperties.getIsTownWorld())) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void entityShootBowEvent(EntityShootBowEvent event) {
+		if (event.getEntity() instanceof Player && event.getArrowItem() != null && event.getArrowItem().hasItemMeta() && event.getArrowItem().getItemMeta().hasLore()) {
+			mPlugin.mAttributeManager.mAttributeTrie.resetArrow((Player) event.getEntity());
+			mPlugin.mAttributeManager.updateAttributeArrowTrie(mPlugin, (Player) event.getEntity(), event.getArrowItem());
 		}
 	}
 

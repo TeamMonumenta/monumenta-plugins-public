@@ -4,12 +4,16 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class AttributeProjectileDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Projectile Damage";
@@ -42,6 +46,22 @@ public class AttributeProjectileDamage implements BaseAttribute {
 			if (proj instanceof Arrow && !((Arrow) proj).isCritical()) {
 				// Arrow speed will be different if arrow speed attribute is active, so scale properly
 				damage *= Math.min(1, proj.getVelocity().length() / ARROW_VELOCITY_SCALE / AttributeProjectileSpeed.getProjectileSpeedModifier(proj));
+			}
+
+			//Trident can have mob specific enchantments (Impaling, Smite, Bane of Arthropods)
+			if (proj instanceof Trident) {
+				Trident trident = (Trident) proj;
+				ItemStack item = NmsUtils.getTridentItem(trident);
+
+				if (item.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) && EntityUtils.isUndead(target)) {
+					damage += item.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) * 2.5;
+				}
+				if (item.containsEnchantment(org.bukkit.enchantments.Enchantment.IMPALING) && EntityUtils.isAquatic(target)) {
+					damage += item.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.IMPALING) * 2.5;
+				}
+				if (item.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS) && EntityUtils.isArthropod(target)) {
+					damage += item.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS) * 2.5;
+				}
 			}
 
 			//Regardless of projectile type, set damage here

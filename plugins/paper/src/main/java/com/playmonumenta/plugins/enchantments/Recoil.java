@@ -23,7 +23,7 @@ public class Recoil implements BaseEnchantment {
 
 	@Override
 	public EnumSet<ItemSlot> validSlots() {
-		return EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND);
+		return EnumSet.of(ItemSlot.MAINHAND);
 	}
 
 	@Override

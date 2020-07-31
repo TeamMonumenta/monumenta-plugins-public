@@ -48,6 +48,7 @@ public enum Enchantment {
 	CHANNELING(ChatColor.GRAY + "Channeling", org.bukkit.enchantments.Enchantment.CHANNELING),
 	DECAY(new Decay()),
 	EXORCISM(ChatColor.GRAY + "Exorcism"),
+	SPARK(new Spark()),
 
 	// passives
 	PUNCH(ChatColor.GRAY + "Punch", org.bukkit.enchantments.Enchantment.ARROW_KNOCKBACK),

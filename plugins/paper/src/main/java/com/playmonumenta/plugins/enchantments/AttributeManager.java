@@ -23,9 +23,11 @@ public class AttributeManager {
 			public double mMainHandMultiplier = 0;
 			public double mOtherFlat = 0;
 			public double mOtherMultiplier = 0;
+			public double mArrowFlat = 0;
+			public double mArrowMultiplier = 0;
 
 			public double getValue() {
-				return (mMainHandFlat + mOtherFlat) * (1 + mMainHandMultiplier + mOtherMultiplier);
+				return (mMainHandFlat + mOtherFlat + mArrowFlat) * (1 + mMainHandMultiplier + mOtherMultiplier + mArrowMultiplier);
 			}
 		}
 
@@ -56,6 +58,7 @@ public class AttributeManager {
 		}
 
 		// Resets attributes for the specified player, should be called before adds
+		//If isMainHand, reset arrow attribute anyway, in case player changed to non-arrow projectile launcher
 		public void reset(Player player, boolean resetMainHandOnly) {
 			for (BaseAttribute attribute : mAttributes) {
 				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player);
@@ -65,11 +68,15 @@ public class AttributeManager {
 				} else if (resetMainHandOnly) {
 					attributeInfo.mMainHandFlat = 0;
 					attributeInfo.mMainHandMultiplier = 0;
+					attributeInfo.mArrowFlat = 0;
+					attributeInfo.mArrowMultiplier = 0;
 				} else {
 					attributeInfo.mMainHandFlat = 0;
 					attributeInfo.mMainHandMultiplier = 0;
 					attributeInfo.mOtherFlat = 0;
 					attributeInfo.mOtherMultiplier = 0;
+					attributeInfo.mArrowFlat = 0;
+					attributeInfo.mArrowMultiplier = 0;
 				}
 			}
 		}
@@ -101,13 +108,46 @@ public class AttributeManager {
 			}
 		}
 
+		public void addArrow(String key, Player player, double value, boolean isMultiplier) {
+			Node node = get(key);
+
+			if (node != null) {
+				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player);
+				if (attributeInfo == null) {
+					attributeInfo = new AttributeInfo();
+					node.mAttributeInfoMappings.put(player, attributeInfo);
+				}
+
+				if (isMultiplier) {
+					attributeInfo.mArrowMultiplier += value;
+				} else {
+					attributeInfo.mArrowFlat += value;
+				}
+			}
+		}
+
+		public void resetArrow(Player player) {
+			for (BaseAttribute attribute : mAttributes) {
+				AttributeInfo attributeInfo = get(attribute.getProperty()).mAttributeInfoMappings.get(player);
+
+				if (attributeInfo == null) {
+					attributeInfo = new AttributeInfo();
+				} else {
+					attributeInfo.mArrowFlat = 0;
+					attributeInfo.mArrowMultiplier = 0;
+				}
+			}
+		}
+
 		// Retrieves attribute value in the trie
+		//By default, does not include arrow attributes
 		public double get(String key, Player player) {
 			Node node = get(key);
 
 			if (node != null) {
 				AttributeInfo attributeInfo = node.mAttributeInfoMappings.get(player);
 				if (attributeInfo != null) {
+					//Include attributes of arrow when shot
 					return attributeInfo.getValue();
 				}
 			}
@@ -143,6 +183,8 @@ public class AttributeManager {
 			ChatColor.GRAY + "When on legs:",
 			ChatColor.GRAY + "When on feet:"
 	};
+
+	private static final String ATTRIBUTE_ARROW = ChatColor.GRAY + "When shot:";
 
 	public AttributeTrie mAttributeTrie = new AttributeTrie();
 	public List<BaseAttribute> mAttributes = new ArrayList<BaseAttribute>();
@@ -239,6 +281,69 @@ public class AttributeManager {
 							} catch (NumberFormatException e) {
 								e.printStackTrace();
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void updateAttributeArrowTrie(Plugin plugin, Player player, ItemStack item) {
+		boolean readAttributes = false;
+
+		for (String loreEntry : item.getLore()) {
+			if (!readAttributes) {
+				if (ATTRIBUTE_ARROW.equals(loreEntry)) {
+					readAttributes = true;
+				}
+			} else {
+				if (ATTRIBUTE_INDICATORS[0].equals(loreEntry)) {
+					break;
+				}
+
+				String loreEntryStripped = "";
+				if (loreEntry.startsWith(ChatColor.DARK_GREEN + " ")) {
+					loreEntryStripped = loreEntry.substring(3);
+				} else if (loreEntry.startsWith(ChatColor.BLUE.toString()) || loreEntry.startsWith(ChatColor.RED.toString())) {
+					loreEntryStripped = loreEntry.substring(2);
+				}
+				String[] loreSegments = loreEntryStripped.split(" ", 2);
+
+				if (loreSegments.length == 2 && loreSegments[0].length() > 0) {
+					boolean isMultiplier = false;
+					if (loreSegments[0].endsWith("%")) {
+						isMultiplier = true;
+						loreSegments[0] = loreSegments[0].substring(0, loreSegments[0].length() - 1);
+					}
+
+					boolean foundDecimal = false;
+					int j;
+					for (j = 0; j < loreSegments[0].length(); j++) {
+						char c = loreSegments[0].charAt(j);
+						if (!Character.isDigit(c) && !(j == 0 && (c == '+' || c == '-'))) {
+							if (c == '.' && loreSegments[0].length() >= 2) {
+								if (foundDecimal) {
+									break;
+								} else {
+									foundDecimal = true;
+								}
+							} else {
+								break;
+							}
+						}
+					}
+
+					// Reached the end of iteration means very-likely to be parsable
+					if (j == loreSegments[0].length()) {
+						try {
+							double value = Double.parseDouble(loreSegments[0]);
+							if (isMultiplier) {
+								value /= 100;
+							}
+
+							plugin.mAttributeManager.mAttributeTrie.addArrow(loreSegments[1], player, value, isMultiplier);
+						} catch (NumberFormatException e) {
+							e.printStackTrace();
 						}
 					}
 				}

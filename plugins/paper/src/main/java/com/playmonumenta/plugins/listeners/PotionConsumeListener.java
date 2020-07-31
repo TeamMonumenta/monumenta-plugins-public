@@ -229,6 +229,7 @@ public class PotionConsumeListener implements Listener {
 		//Create item as type splash or lingering and set entity item to the inv potion
 		ThrownPotion potion = (ThrownPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
 		potion.setItem(item);
+		potion.setShooter(player);
 
 		CoreProtectIntegration.logContainerTransaction(player, event.getClickedInventory().getLocation());
 

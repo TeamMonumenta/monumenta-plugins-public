@@ -90,6 +90,7 @@ import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.enchantments.PointBlank;
 import com.playmonumenta.plugins.enchantments.Slayer;
 import com.playmonumenta.plugins.enchantments.Sniper;
+import com.playmonumenta.plugins.enchantments.Spark;
 import com.playmonumenta.plugins.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.enchantments.Thunder;
 import com.playmonumenta.plugins.enchantments.evasions.EvasionInfo;
@@ -366,6 +367,7 @@ public class EntityListener implements Listener {
 					Frost.onShootAttack(mPlugin, proj, le, event);
 					Inferno.onShootAttack(mPlugin, proj, le, event);
 					Focus.onShootAttack(mPlugin, proj, le, event);
+					Spark.onShootAttack(mPlugin, proj, le, event);
 
 					if (damager instanceof Trident) {
 						IceAspect.onShootAttack(mPlugin, proj, le, event);
