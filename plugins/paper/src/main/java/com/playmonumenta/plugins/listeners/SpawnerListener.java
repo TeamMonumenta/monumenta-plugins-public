@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,7 +35,8 @@ public class SpawnerListener implements Listener {
 		}
 	}
 
-	private static final int INACTIVITY_TIMER = 20 * 30;
+	private static final int PLAYER_CHECK_RADIUS_SQUARED = 8 * 8;
+	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
 
 	private final Map<UUID, MobInfo> mMobInfos = new HashMap<UUID, MobInfo>();
@@ -87,6 +91,12 @@ public class SpawnerListener implements Listener {
 			mSpawnerInfos.put(spawnerLoc, spawnerInfo);
 		}
 
+		// Generate list of player locations a single time
+		List<Location> playerLocations = new ArrayList<Location>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			playerLocations.add(player.getLocation());
+		}
+
 		// Check the list of mobs from the spawner to see if any should be disposed of
 		Iterator<MobInfo> iter = spawnerInfo.iterator();
 		while (iter.hasNext()) {
@@ -100,8 +110,19 @@ public class SpawnerListener implements Listener {
 
 				// Get rid of the mob if it's been 30+ seconds since having a target
 				if (mobInfo.mLastTarget == null && mobInfo.mMob.getTicksLived() - mobInfo.mTickLastTargeted > INACTIVITY_TIMER) {
-					iter.remove();
-					mobInfo.mMob.remove();
+					Location mobLocation = mobInfo.mMob.getLocation();
+					boolean remove = true;
+					for (Location loc : playerLocations) {
+						if (mobLocation.distanceSquared(loc) < PLAYER_CHECK_RADIUS_SQUARED) {
+							remove = false;
+							break;
+						}
+					}
+
+					if (remove) {
+						iter.remove();
+						mobInfo.mMob.remove();
+					}
 				}
 			}
 		}
