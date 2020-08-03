@@ -35,7 +35,7 @@ public class SpawnerListener implements Listener {
 		}
 	}
 
-	private static final int PLAYER_CHECK_RADIUS_SQUARED = 8 * 8;
+	private static final int PLAYER_CHECK_RADIUS_SQUARED = 5 * 5;
 	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
 
