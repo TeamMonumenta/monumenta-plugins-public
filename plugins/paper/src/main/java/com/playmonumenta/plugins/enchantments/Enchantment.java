@@ -114,6 +114,7 @@ public enum Enchantment {
 	// durability
 	UNBREAKING(ChatColor.GRAY + "Unbreaking", org.bukkit.enchantments.Enchantment.DURABILITY),
 	MENDING(ChatColor.GRAY + "Mending", org.bukkit.enchantments.Enchantment.MENDING),
+	HOPELESS(new Hopeless()),
 	HOPE(new Hope()),
 
 	// curses

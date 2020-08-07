@@ -37,6 +37,7 @@ public class DeathItemListener implements Listener {
 
 	private final Map<UUID, Map<ItemStack, List<Integer>>> mInventories = new HashMap<>();
 	private final Map<UUID, List<ItemStack>> mItemSlots = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<>();
 	private Plugin mPlugin;
 
 	public DeathItemListener(Plugin plugin) {
@@ -85,8 +86,16 @@ public class DeathItemListener implements Listener {
 
 			//Do not put in the death map of a player with no items
 			if (items.size() > 0) {
-				mInventories.put(event.getEntity().getUniqueId(), items);
-				mItemSlots.put(event.getEntity().getUniqueId(), itemSlots);
+				//Extra check/loop through to make sure that air was not accidentally saved
+				for (Map.Entry<ItemStack, List<Integer>> e : items.entrySet()) {
+					//If an item was found in the map that was not air, update the player's death inventory
+					if (e.getKey().getType() != Material.AIR) {
+						mInventories.put(event.getEntity().getUniqueId(), items);
+						mItemSlots.put(event.getEntity().getUniqueId(), itemSlots);
+						break;
+					}
+				}
+
 			}
 		}
 	}
@@ -142,6 +151,8 @@ public class DeathItemListener implements Listener {
 								mItemSlots.remove(player.getUniqueId());
 							}
 
+							runClearMapDelay(player.getUniqueId());
+
 							return;
 						} else {
 							//Remove from Map if filled, remove List too
@@ -151,6 +162,9 @@ public class DeathItemListener implements Listener {
 							}
 						}
 					}
+
+					runClearMapDelay(player.getUniqueId());
+
 				}
 
 				//Place item in next open spot not filled from before death and current inventory
@@ -166,6 +180,23 @@ public class DeathItemListener implements Listener {
 				}
 
 			}
+		}
+	}
+
+	//Clears the saving of the players inventory after 30 seconds
+	private void runClearMapDelay(UUID id) {
+		if (!mRunnables.containsKey(id)) {
+			//Delete the HashMap after 30 seconds once the player successfully picks up one item from their death pile
+			BukkitRunnable runnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mInventories.remove(id);
+					mItemSlots.remove(id);
+					mRunnables.remove(id);
+				}
+			};
+			runnable.runTaskLater(mPlugin, 20 * 30);
+			mRunnables.put(id, runnable);
 		}
 	}
 
