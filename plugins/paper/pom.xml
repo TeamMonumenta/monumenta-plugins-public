@@ -53,6 +53,28 @@
             <id>jeff-media-repo</id>
             <url>https://repo.jeff-media.de/maven2</url>
         </repository>
+
+		<!-- Prevent these unimportant repos from slowing down the build -->
+		<repository>
+			<id>bstats-repo</id>
+			<url>http://repo.bstats.org/content/repositories/releases</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>codemc-nms-repo</id>
+			<url>https://repo.codemc.org/repository/nms</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
     </repositories>
 
     <dependencies>
