@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -332,6 +333,16 @@ public class PlayerInventory {
 			}
 		}
 	}
+
+	public void onRegain(Plugin plugin, Player player, EntityRegainHealthEvent event) {
+		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {
+			BaseEnchantment property = iter.getKey();
+			Integer level = iter.getValue();
+
+			property.onRegain(plugin, player, level, event);
+		}
+	}
+
 
 	public void onEvade(Plugin plugin, Player player, EvasionEvent event) {
 		for (Map.Entry<BaseEnchantment, Integer> iter : mCurrentProperties.entrySet()) {

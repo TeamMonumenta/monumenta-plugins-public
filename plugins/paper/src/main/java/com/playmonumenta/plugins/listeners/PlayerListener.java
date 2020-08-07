@@ -38,6 +38,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.BrewEvent;
@@ -1209,6 +1210,15 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
 			AbilityManager.getManager().playerAnimationEvent(player, event);
+		}
+	}
+
+	//Player is healed.
+	@EventHandler(priority = EventPriority.LOW)
+	public void onRegain(EntityRegainHealthEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			mPlugin.mTrackingManager.mPlayers.onRegain(mPlugin, player, event);
 		}
 	}
 }

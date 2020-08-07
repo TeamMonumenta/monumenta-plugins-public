@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -96,8 +97,12 @@ public class PlayerUtils {
 
 	public static void healPlayer(Player player, double healAmount) {
 		if (!player.isDead()) {
-			double newHealth = Math.min(player.getHealth() + healAmount, player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-			player.setHealth(newHealth);
+			EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+			Bukkit.getPluginManager().callEvent(event);
+			if (!event.isCancelled()) {
+				double newHealth = Math.min(player.getHealth() + event.getAmount(), player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+				player.setHealth(newHealth);
+			}
 		}
 	}
 

@@ -125,6 +125,7 @@ public enum Enchantment {
 	CURSE_SHRAPNEL(new CurseOfShrapnel()),
 	CURSE_BINDING(ChatColor.RED + "Curse of Binding", org.bukkit.enchantments.Enchantment.BINDING_CURSE),
 	CURSE_VANISHING(ChatColor.RED + "Curse of Vanishing", org.bukkit.enchantments.Enchantment.VANISHING_CURSE),
+	CURSE_ANEMIA(new CurseOfAnemia()),
 	TWO_HANDED(new TwoHanded()),
 	;
 
