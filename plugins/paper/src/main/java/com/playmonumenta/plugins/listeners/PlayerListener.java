@@ -180,7 +180,7 @@ public class PlayerListener implements Listener {
 				return;
 			}
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block)) {
+			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block, event)) {
 				event.setCancelled(true);
 				return;
 			}

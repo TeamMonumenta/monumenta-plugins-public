@@ -205,7 +205,7 @@ public class MobListener implements Listener {
 				List<LivingEntity> vexes = EntityUtils.getNearbyMobs(livingEntity.getLocation(), 30, EnumSet.of(EntityType.VEX));
 				for (LivingEntity vex : vexes) {
 					if (vex instanceof Vex && ((Vex) vex).getSummoner() != null && ((Vex)vex).getSummoner().equals(livingEntity)) {
-						vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 0));
+						vex.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 9999, 3));
 					}
 				}
 			}

@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.Plugin;
@@ -11,7 +12,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class SignOverride extends BaseOverride {
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
 		//Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
 		Sign sign = (Sign)block.getState();
 		String display = "";

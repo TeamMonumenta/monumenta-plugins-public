@@ -16,6 +16,7 @@ import org.bukkit.block.CommandBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
@@ -66,7 +67,7 @@ public class ChestOverride extends BaseOverride {
 	);
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
 		if (player != null && !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			// Iterate over adjacent blocks to trigger physics
 			for (Vector vec : ADJACENT_OFFSETS) {

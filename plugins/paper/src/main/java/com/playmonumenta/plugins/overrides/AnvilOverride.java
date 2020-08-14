@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,8 +25,7 @@ public class AnvilOverride extends BaseOverride {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
 
 	@Override
-	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-	                                          Block block) {
+	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		} else if (player.getGameMode() == GameMode.ADVENTURE

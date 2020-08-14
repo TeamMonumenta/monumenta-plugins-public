@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.Blaze;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,6 +75,10 @@ public class Frost implements BaseEnchantment {
 
 			PotionUtils.applyPotion(event.getDamager(), target, new PotionEffect(PotionEffectType.SLOW, FROST_DURATION, 1, true, true));
 			target.getWorld().spawnParticle(Particle.SNOWBALL, target.getLocation().add(0, 1.15, 0), 10, 0.2, 0.35, 0.2, 0.05);
+
+			if (target instanceof Blaze) {
+				event.setDamage(event.getDamage() + 1.0);
+			}
 		}
 	}
 }

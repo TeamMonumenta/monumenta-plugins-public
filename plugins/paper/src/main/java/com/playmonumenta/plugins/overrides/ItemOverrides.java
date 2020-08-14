@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
@@ -216,6 +217,7 @@ public class ItemOverrides {
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.CROSSBOW, new CrossbowOverride());
+		mItems.put(Material.BARRIER, new BarrierOverride());
 
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);
@@ -261,8 +263,7 @@ public class ItemOverrides {
 		mItems.put(Material.POTTED_CACTUS, flowerOverride);
 	}
 
-	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item,
-	                                     Block block) {
+	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, ItemStack item, Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -274,7 +275,7 @@ public class ItemOverrides {
 		}
 
 		if (notCancelled && blockOverride != null) {
-			notCancelled = blockOverride.rightClickBlockInteraction(plugin, player, action, item, block);
+			notCancelled = blockOverride.rightClickBlockInteraction(plugin, player, action, item, block, event);
 		}
 
 		return notCancelled;
