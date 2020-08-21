@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Celestial extends Ability {
@@ -40,7 +42,7 @@ public class Celestial extends Ability {
 		mInfo.mDescriptions.add("When you strike while sneaking (regardless of whether you hit anything), while on the ground, you and all other players in a 12 block radius gain +20% attack damage and +20% speed for 10 s. (Cooldown: 40 s)");
 		mInfo.mDescriptions.add("Increases the buff to +35% attack damage for 12 s.");
 		mInfo.mCooldown = CELESTIAL_COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK_AIR;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 	}
 
 	@Override
@@ -120,7 +122,8 @@ public class Celestial extends Ability {
 	@Override
 	public boolean runCheck() {
 		if (mPlayer.isOnGround()) {
-			return mPlayer.isSneaking();
+			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
+			return (mPlayer.isSneaking() && !InventoryUtils.isPickaxeItem(mainHand));
 		}
 		return false;
 	}
