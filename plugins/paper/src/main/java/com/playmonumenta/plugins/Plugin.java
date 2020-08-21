@@ -246,7 +246,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mBossManager, this);
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
-		manager.registerEvents(new DelvesListener(this), this);
+		manager.registerEvents(new DelvesListener(), this);
 		manager.registerEvents(new SpawnerListener(this), this);
 		manager.registerEvents(new PlayerInventoryView(), this);
 		manager.registerEvents(new AnvilFixInInventory(this), this);
