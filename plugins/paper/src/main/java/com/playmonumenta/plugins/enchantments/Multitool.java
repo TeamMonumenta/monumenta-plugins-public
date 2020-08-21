@@ -41,6 +41,10 @@ public class Multitool implements BaseEnchantment {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR
 				|| (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(event.getClickedBlock().getBlockData().getMaterial()))) {
 			ItemStack item = player.getInventory().getItemInMainHand();
+			//Does not swap when player is sneaking
+			if (player.isSneaking()) {
+				return;
+			}
 			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
 			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
 			level = this.getLevelFromItem(item);
