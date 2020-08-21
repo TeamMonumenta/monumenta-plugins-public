@@ -766,6 +766,9 @@ public class ItemUtils {
 
 	public static boolean isItemCurseOfVanishingII(ItemStack item) {
 		if (item != null) {
+			if (item.getEnchantmentLevel(Enchantment.VANISHING_CURSE) == 2) {
+				return true;
+			}
 			List<String> lore = item.getLore();
 			if (lore != null) {
 				for (String loreEntry : lore) {
