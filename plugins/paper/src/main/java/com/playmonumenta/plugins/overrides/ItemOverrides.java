@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -217,7 +218,6 @@ public class ItemOverrides {
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.CROSSBOW, new CrossbowOverride());
-		mItems.put(Material.BARRIER, new BarrierOverride());
 
 		BaseOverride signOverride = new SignOverride();
 		mItems.put(Material.ACACIA_SIGN, signOverride);
@@ -345,6 +345,23 @@ public class ItemOverrides {
 		         || (ALLOW_PRECISE_LORE_MATS.containsKey(item.getType())
 			         && InventoryUtils.testForItemWithLore(item, ALLOW_PRECISE_LORE_MATS.get(item.getType()))))) {
 			eventCancelled |= true;
+		}
+
+		// Don't allow placing blocks on top of barriers for plots
+		if (event.getBlockPlaced().getLocation().getBlockY() > 0 && !player.getGameMode().equals(GameMode.CREATIVE)) {
+			Material belowMat = event.getBlockPlaced().getRelative(BlockFace.DOWN).getType();
+			if (belowMat.equals(Material.BARRIER)) {
+				eventCancelled = true;
+			}
+
+			// Don't allow players to place rail on bedrock because of a dumb mojang bug
+			Material blockPlacedMat = event.getBlockPlaced().getType();
+			if (belowMat.equals(Material.BEDROCK) &&
+				(blockPlacedMat.equals(Material.RAIL) ||
+				 blockPlacedMat.equals(Material.POWERED_RAIL) ||
+				 blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
+				eventCancelled = true;
+			}
 		}
 
 		// NOTE: This is disabled because while functionally nicer, players don't like it
