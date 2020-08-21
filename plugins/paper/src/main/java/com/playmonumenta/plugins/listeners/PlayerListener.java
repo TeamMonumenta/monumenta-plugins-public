@@ -960,6 +960,13 @@ public class PlayerListener implements Listener {
 		Location loc = bed.getLocation();
 		World world = loc.getWorld();
 
+		//Records player's previous spawnpoint
+		Location tempSpawnLoc = world.getSpawnLocation(); //Default spawn is za warudo spawn
+		if (player.getBedSpawnLocation() != null && !(player.getBedSpawnLocation().equals(loc))) {
+			tempSpawnLoc = player.getBedSpawnLocation(); //If the player has another bed in the world, that's their spawn
+		}
+		Location playerSpawn = tempSpawnLoc; //Weird scope error workaround
+
 		/* Prevent entering beds designed to glitch through blocks */
 		Material aboveMat = loc.add(0, 1, 0).getBlock().getType();
 		if (aboveMat.equals(Material.BEDROCK) || aboveMat.equals(Material.BARRIER) || aboveMat.equals(Material.OBSIDIAN)) {
@@ -1033,6 +1040,12 @@ public class PlayerListener implements Listener {
 
 								// Set player's gamemode back to whatever it was
 								player.setGameMode(mode);
+
+								//Set player's spawnpoint back to whatever it was
+								//I couldn't find a Bukkit method to do so, ran the spawnpoint command instead from console
+								String cmd = String.format("spawnpoint %s %d %d %d", player.getName(), playerSpawn.getBlockX(), playerSpawn.getBlockY(), playerSpawn.getBlockZ());
+								Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+
 							} else if (mTicks >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc);
 
