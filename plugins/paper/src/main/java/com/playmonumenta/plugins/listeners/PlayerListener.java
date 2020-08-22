@@ -658,7 +658,17 @@ public class PlayerListener implements Listener {
 			if (droppedItems.size() > 0) {
 				player.sendMessage(ChatColor.RED + "Some of your items were dropped! See /deathhelp for info");
 			}
+		} else {
+			//Remove Curse of Vanishing 2 Items even if Keep Inventory is on
+			PlayerInventory inv = player.getInventory();
+			for (int slot = 0; slot <= 40; slot++) {
+				ItemStack item = inv.getItem(slot);
+				if (ItemUtils.isItemCurseOfVanishingII(item)) {
+					inv.setItem(slot, null);
+				}
+			}
 		}
+
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
