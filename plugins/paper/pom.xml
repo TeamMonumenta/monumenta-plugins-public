@@ -34,8 +34,8 @@
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>jorelali</id>
-            <url>https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/</url>
+            <id>commandapi</id>
+            <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
         </repository>
         <repository>
             <id>coreprotect</id>
@@ -54,27 +54,27 @@
             <url>https://repo.jeff-media.de/maven2</url>
         </repository>
 
-		<!-- Prevent these unimportant repos from slowing down the build -->
-		<repository>
-			<id>bstats-repo</id>
-			<url>http://repo.bstats.org/content/repositories/releases</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>codemc-nms-repo</id>
-			<url>https://repo.codemc.org/repository/nms</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
+        <!-- Prevent these unimportant repos from slowing down the build -->
+        <repository>
+            <id>bstats-repo</id>
+            <url>http://repo.bstats.org/content/repositories/releases</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>codemc-nms-repo</id>
+            <url>https://repo.codemc.org/repository/nms</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
