@@ -37,7 +37,8 @@ public class DeathItemListener implements Listener {
 
 	private final Map<UUID, Map<ItemStack, List<Integer>>> mInventories = new HashMap<>();
 	private final Map<UUID, List<ItemStack>> mItemSlots = new HashMap<>();
-	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mTimers30Sec = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mTimers15Min = new HashMap<>();
 	private Plugin mPlugin;
 
 	public DeathItemListener(Plugin plugin) {
@@ -89,9 +90,13 @@ public class DeathItemListener implements Listener {
 				//Extra check/loop through to make sure that air was not accidentally saved
 				for (Map.Entry<ItemStack, List<Integer>> e : items.entrySet()) {
 					//If an item was found in the map that was not air, update the player's death inventory
+					//Update inventory includes the 15 minute timer that starts to run on death (synced up to hoped items despawn timer)
+					//Otherwise do not save if it finds nothing but air
 					if (e.getKey().getType() != Material.AIR) {
 						mInventories.put(event.getEntity().getUniqueId(), items);
 						mItemSlots.put(event.getEntity().getUniqueId(), itemSlots);
+						cancelTimers(event.getEntity().getUniqueId());
+						run15MinClearMap(event.getEntity().getUniqueId());
 						break;
 					}
 				}
@@ -149,6 +154,9 @@ public class DeathItemListener implements Listener {
 							if (itemToSlots == null || itemToSlots.isEmpty()) {
 								mInventories.remove(player.getUniqueId());
 								mItemSlots.remove(player.getUniqueId());
+								cancelTimers(player.getUniqueId());
+								mTimers30Sec.remove(player.getUniqueId());
+								mTimers15Min.remove(player.getUniqueId());
 							}
 
 							runClearMapDelay(player.getUniqueId());
@@ -177,6 +185,9 @@ public class DeathItemListener implements Listener {
 				if (itemToSlots == null || itemToSlots.isEmpty()) {
 					mInventories.remove(player.getUniqueId());
 					mItemSlots.remove(player.getUniqueId());
+					cancelTimers(player.getUniqueId());
+					mTimers30Sec.remove(player.getUniqueId());
+					mTimers15Min.remove(player.getUniqueId());
 				}
 
 			}
@@ -184,19 +195,52 @@ public class DeathItemListener implements Listener {
 	}
 
 	//Clears the saving of the players inventory after 30 seconds
+	//30 SECOND VARIANT
 	private void runClearMapDelay(UUID id) {
-		if (!mRunnables.containsKey(id)) {
+		if (!mTimers30Sec.containsKey(id)) {
 			//Delete the HashMap after 30 seconds once the player successfully picks up one item from their death pile
 			BukkitRunnable runnable = new BukkitRunnable() {
 				@Override
 				public void run() {
 					mInventories.remove(id);
 					mItemSlots.remove(id);
-					mRunnables.remove(id);
+					cancelTimers(id);
+					mTimers30Sec.remove(id);
+					mTimers15Min.remove(id);
 				}
 			};
-			runnable.runTaskLater(mPlugin, 20 * 30);
-			mRunnables.put(id, runnable);
+			runnable.runTaskLater(mPlugin, 20 * 30); //(20 ticks to one second) * (30 seconds)
+			mTimers30Sec.put(id, runnable);
+		}
+	}
+
+	//Clears the saving of the players inventory after 15 minutes
+	//15 MINUTE VARIANT
+	private void run15MinClearMap(UUID id) {
+		if (!mTimers15Min.containsKey(id)) {
+			//Delete the HashMap after 30 seconds once the player successfully picks up one item from their death pile
+			BukkitRunnable runnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					mInventories.remove(id);
+					mItemSlots.remove(id);
+					cancelTimers(id);
+					mTimers30Sec.remove(id);
+					mTimers15Min.remove(id);
+				}
+			};
+			runnable.runTaskLater(mPlugin, 20 * 60 * 15); //(20 ticks to one second) * (60 seconds to a minute) * (15 minutes)
+			mTimers15Min.put(id, runnable);
+		}
+	}
+
+	//Cancels the map wipe timers
+	private void cancelTimers(UUID id) {
+		if (mTimers15Min.containsKey(id)) {
+			mTimers15Min.get(id).cancel();
+		}
+		if (mTimers30Sec.containsKey(id)) {
+			mTimers30Sec.get(id).cancel();
 		}
 	}
 
