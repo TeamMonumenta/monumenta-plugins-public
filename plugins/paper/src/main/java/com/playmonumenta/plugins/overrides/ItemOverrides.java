@@ -193,6 +193,11 @@ public class ItemOverrides {
 		mItems.put(Material.BUCKET, bucketOverride);
 		mItems.put(Material.WATER_BUCKET, bucketOverride);
 		mItems.put(Material.LAVA_BUCKET, bucketOverride);
+		mItems.put(Material.COD_BUCKET, bucketOverride);
+		mItems.put(Material.MILK_BUCKET, bucketOverride);
+		mItems.put(Material.PUFFERFISH_BUCKET, bucketOverride);
+		mItems.put(Material.SALMON_BUCKET, bucketOverride);
+		mItems.put(Material.TROPICAL_FISH_BUCKET, bucketOverride);
 
 		BaseOverride chestOverride = new ChestOverride();
 		mItems.put(Material.CHEST, chestOverride);
