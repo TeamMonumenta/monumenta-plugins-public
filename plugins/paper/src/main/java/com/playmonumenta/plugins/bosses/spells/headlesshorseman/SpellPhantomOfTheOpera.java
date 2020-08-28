@@ -36,7 +36,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 	private double mRange;
 	private int mTimer;
 	private Set<UUID> mSummoned = new HashSet<UUID>();
-	private static final String mPhantom = "{CustomName:\"\\\"Night Terror\\\"\",Health:45.0f,Size:6,Attributes:[{Base:45.0d,Name:\"generic.maxHealth\"},{Base:100.0d,Name:\"generic.followRange\"}],Tags:[\"boss_charger\"],HandItems:[{id:\"minecraft:arrow\",Count:1b,tag:{display:{Name:\"\\\"Phantom Fang\\\"\"},AttributeModifiers:[{UUIDMost:-6498451240576266699L,UUIDLeast:-6858106810304442920L,Amount:10.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]}},{}]}";
+	private static final String mPhantom = "{CustomName:\"\\\"Night Terror\\\"\",Health:50.0f,Size:6,Attributes:[{Base:50.0d,Name:\"generic.maxHealth\"},{Base:100.0d,Name:\"generic.followRange\"}],Tags:[\"boss_chargerstrong\",\"boss_targetplayer\"],HandItems:[{id:\"minecraft:arrow\",Count:1b,tag:{display:{Name:\"\\\"Phantom Fang\\\"\"},AttributeModifiers:[{UUIDMost:-6498451240576266699L,UUIDLeast:-6858106810304442920L,Amount:12.0d,Slot:\"mainhand\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"}]}},{}]}";
 
 	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, Location center, int range, int timer) {
 		mPlugin = plugin;
@@ -66,8 +66,8 @@ public class SpellPhantomOfTheOpera extends Spell {
 				num = (int)Math.ceil(players.size() / 3 + 1);
 			}
 
-			if (num >= 4) {
-				num = 4;
+			if (num >= 5) {
+				num = 5;
 			}
 			int amt = num;
 

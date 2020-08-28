@@ -24,7 +24,7 @@ The bats have 20hp.
  */
 public class SpellBatBombs extends Spell {
 
-	private static final int DAMAGE = 32;
+	private static final int DAMAGE = 40;
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;

@@ -109,7 +109,7 @@ public class SpellBurningVengence extends Spell {
 							world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125);
 							for (Player player : PlayerUtils.playersInRange(loc, 5)) {
 								if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
-									BossUtils.bossDamagePercent(mBoss, player, 0.8);
+									BossUtils.bossDamagePercent(mBoss, player, 1.0);
 									MovementUtils.knockAway(loc, player, 0.7f);
 								}
 							}

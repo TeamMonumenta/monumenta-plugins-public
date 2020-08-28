@@ -68,12 +68,18 @@ public class SpellGroundSurge extends Spell {
 						targets = 1;
 					} else if (players.size() == 2) {
 						targets = 2;
-					} else if (players.size() >= 3 && players.size() <= 6) {
+					} else if (players.size() == 3) {
 						targets = 3;
-					} else if (players.size() >= 7 && players.size() <= 15) {
+					} else if (players.size() >= 4 && players.size() <= 6) {
 						targets = 4;
-					} else {
+					} else if (players.size() >= 7 && players.size() <= 10) {
 						targets = 5;
+					} else if (players.size() >= 11 && players.size() <= 15) {
+						targets = 6;
+					} else if (players.size() >= 16 && players.size() <= 20) {
+						targets = 7;
+					} else {
+						targets = 8;
 					}
 
 					List<Player> toHit = new ArrayList<Player>();
@@ -172,7 +178,7 @@ public class SpellGroundSurge extends Spell {
 												}
 												innerBoxLoc.add(0, 1, 0);
 												world.playSound(innerBoxLoc, Sound.BLOCK_STONE_BREAK, 0f, 1);
-												//Have particles with collision show only for the player who's targetted.
+												//Have particles with collision show only for the player who's targeted.
 												//This is to prevent lag from the numerous other surges that have these same
 												//Particles
 												player.spawnParticle(Particle.BLOCK_DUST, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
@@ -185,7 +191,7 @@ public class SpellGroundSurge extends Spell {
 														mHit.add(surgePlayer.getUniqueId());
 														BossUtils.bossDamage(mBoss, surgePlayer, 18);
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
-														MovementUtils.knockAway(mBoss.getLocation(), surgePlayer, 0.175f, 0.85f);
+														MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);
 														world.spawnParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25);
 														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);

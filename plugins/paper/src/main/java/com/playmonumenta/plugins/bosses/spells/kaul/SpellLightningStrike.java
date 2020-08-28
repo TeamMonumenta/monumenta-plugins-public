@@ -11,6 +11,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -112,10 +114,7 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
-						int ndt = p.getNoDamageTicks();
-						p.setNoDamageTicks(0);
-						BossUtils.bossDamagePercent(mBoss, p, 0.4, loc);
-						p.setNoDamageTicks(ndt);
+						multiHit(player);
 					}
 				}
 			}
@@ -126,5 +125,28 @@ public class SpellLightningStrike extends Spell {
 	@Override
 	public int duration() {
 		return 0;
+	}
+
+	public void multiHit(Player p) {
+		new BukkitRunnable() {
+			int mNDT = p.getNoDamageTicks();
+			int mInc = 0;
+			@Override
+			public void run() {
+				World world = mBoss.getWorld();
+				mInc++;
+				if (mInc < 22 && mInc % 2 == 0) {
+					p.setNoDamageTicks(0);
+					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
+					BossUtils.bossDamagePercent(mBoss, p, 0.05, (Location)null);
+					// Doesn't matter if the player is blocking, there are 18 hits and only one can be blocked
+					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
+				}
+				if (mInc >= 20) {
+					p.setNoDamageTicks(mNDT);
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }

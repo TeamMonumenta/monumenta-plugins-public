@@ -80,18 +80,14 @@ public class SpellArachnopocolypse extends Spell {
 	}
 
 	public void riseSpider(Location loc) {
-		int num = FastUtils.RANDOM.nextInt(5);
+		int num = FastUtils.RANDOM.nextInt(3);//5
 		String summon = null;
 		if (num == 0) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Corrupted Spider\\\"}\",Health:20.0f,Attributes:[{Base:20,Name:\"generic.maxHealth\"},{Base:0.36d,Name:\"generic.movementSpeed\"},{Base:25,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:199980,Id:8,Amplifier:3}],HandItems:[{id:\"minecraft:wooden_sword\",tag:{Enchantments:[{lvl:2,id:\"minecraft:knockback\"}]},Count:1b},{}]}";
+			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Corrupted Spider\\\"}\",Health:23.0f,Attributes:[{Base:23,Name:\"generic.maxHealth\"},{Base:0.36d,Name:\"generic.movementSpeed\"},{Base:40,Name:\"generic.followRange\"}],Tags:[\"boss_force\"],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:199980,Id:8,Amplifier:3}],HandItems:[{id:\"minecraft:wooden_sword\",tag:{Enchantments:[{lvl:2,id:\"minecraft:knockback\"}]},Count:1b},{}]}";
 		} else if (num == 1) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Shieldcrusher Spider\\\"}\",Health:24.0f,Attributes:[{Base:24,Name:\"generic.maxHealth\"}],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:222220,Id:26,Amplifier:0}],HandItems:[{id:\"minecraft:wooden_axe\",tag:{AttributeModifiers:[{UUIDMost:339242,UUIDLeast:52922,Amount:2,AttributeName:\"generic.attackDamage\",Operation:0,Name:\"generic.attackDamage\"}]},Count:1b},{}]}";
+			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Shieldcrusher Spider\\\"}\",Health:27.0f,Attributes:[{Base:27,Name:\"generic.maxHealth\"}],{Base:40,Name:\"generic.followRange\"}],HandDropChances:[-327.67f,0.085f],ActiveEffects:[{Duration:222220,Id:26,Amplifier:0}],HandItems:[{id:\"minecraft:wooden_axe\",tag:{AttributeModifiers:[{UUIDMost:339242,UUIDLeast:52922,Amount:2,AttributeName:\"generic.attackDamage\",Operation:0,Name:\"generic.attackDamage\"}]},Count:1b},{}]}";
 		} else if (num == 2) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Monstrous Spider\\\"}\",Health:16.0f,Attributes:[{Base:16,Name:\"generic.maxHealth\"},{Base:0.24d,Name:\"generic.movementSpeed\"},{Base:10,Name:\"generic.attackDamage\"},{Base:1,Name:\"generic.knockbackResistance\"}],ActiveEffects:[{Duration:199980,Id:11,Amplifier:1}]}";
-		} else if (num == 3) {
-			summon = "summon minecraft:cave_spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ();
-		} else if (num == 4) {
-			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {Passengers:[{Passengers:[{Passengers:[{CustomName:\"{\\\"text\\\":\\\"Queen Spider\\\"}\",Health:14.0f,Attributes:[{Base:14,Name:\"generic.maxHealth\"}],id:\"minecraft:cave_spider\"}],Potion:{id:\"minecraft:splash_potion\",tag:{CustomPotionEffects:[{Duration:120,Id:19,Amplifier:2}],Potion:\"minecraft:strong_poison\"},Count:1},id:\"minecraft:potion\"}],Attributes:[{Base:4,Name:\"generic.attackDamage\"}],id:\"minecraft:spider\"}],Attributes:[{Base:0.2d,Name:\"generic.movementSpeed\"},{Base:4,Name:\"generic.attackDamage\"}]}";
+			summon = "summon minecraft:spider " + loc.getX() + " " + (loc.getY() + 1) + " " + loc.getZ() + " {CustomName:\"{\\\"text\\\":\\\"Monstrous Spider\\\"}\",Health:19.0f,Attributes:[{Base:19,Name:\"generic.maxHealth\"},{Base:0.24d,Name:\"generic.movementSpeed\"},{Base:40,Name:\"generic.followRange\"}],{Base:10,Name:\"generic.attackDamage\"},{Base:1,Name:\"generic.knockbackResistance\"}],ActiveEffects:[{Duration:199980,Id:11,Amplifier:1}]}";
 		}
 
 		String toSummon = summon;

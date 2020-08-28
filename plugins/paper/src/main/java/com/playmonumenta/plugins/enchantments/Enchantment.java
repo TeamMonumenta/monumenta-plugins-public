@@ -96,6 +96,7 @@ public enum Enchantment {
 	CLUCKING(new Clucking()),
 	OINKING(new Oinking()),
 	BAAING(new Baaing()),
+	BARKING(new Barking()),
 	ETHERAL(new Ethereal()),
 	STYLISH(new Stylish()),
 	COLORFUL(new Colorful()),

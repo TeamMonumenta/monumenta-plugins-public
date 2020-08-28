@@ -93,9 +93,6 @@ public class BossUtils {
 			return true;
 		}
 
-		// Resistance reduces percent HP damage
-		percentHealth *= (1 - 0.2*resistance);
-
 		double toTake = (target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * percentHealth);
 		if (raw) {
 			toTake = percentHealth;

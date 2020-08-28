@@ -115,10 +115,11 @@ The elemental will lose his “Raise Jungle” ability, but will still possess t
  * fire) to players who stand in it. The aura lasts 5 seconds.
  * (Aka Disco Inferno)
  */
+
 public class Kaul extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
-	private static final String primordial = "{CustomName:\"{\\\"text\\\":\\\"§6Primordial Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulprimoridal\"],Team:\"kaulele\"}";
+	private static final String primordial = "{CustomName:\"{\\\"text\\\":\\\"§6Primordial Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:4s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulprimoridal\",\"boss_punchresist\"],Team:\"kaulele\"}";
 	private static final String immortal = "{CustomName:\"{\\\"text\\\":\\\"§6Immortal Elemental\\\"}\",Health:120.0f,ArmorItems:[{id:\"minecraft:leather_boots\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Boots\\\"}\"},Damage:0}},{id:\"minecraft:leather_leggings\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Leggings\\\"}\"},Damage:0}},{id:\"minecraft:leather_chestplate\",Count:1b,tag:{display:{color:8608560,Name:\"{\\\"text\\\":\\\"§fHobnailed Vest\\\"}\"},Damage:0}},{id:\"minecraft:brown_terracotta\",Count:1b,tag:{Enchantments:[{lvl:8s,id:\"minecraft:projectile_protection\"}],AttributeModifiers:[{UUIDMost:-4385518367071189805L,UUIDLeast:-8720188027200143741L,Amount:16.0d,Slot:\"head\",AttributeName:\"generic.attackDamage\",Operation:0,Name:\"Modifier\"},{UUIDMost:2698543145384691203L,UUIDLeast:-5523831565464878560L,Amount:0.15d,Slot:\"head\",AttributeName:\"generic.movementSpeed\",Operation:1,Name:\"Modifier\"}]}}],Attributes:[{Base:768.0d,Name:\"generic.maxHealth\"}],Tags:[\"Boss\",\"boss_kaulimmortal\"],Team:\"kaulele\"}";
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -673,61 +674,28 @@ public class Kaul extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
 		});
 
+
+		// Phase 3.25
+		//Summons a Immortal Elemental at 30% HP
+		events.put(30, mBoss -> {
+			summonImmortal(plugin, world);
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
+		});
+
+
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
 		events.put(25,  mBoss -> {
 			forceCastSpell(SpellKaulsJudgement.class);
 		});
 
+
 		// Phase 3.5
+		//Summons another Immortal Elemental at 20% HP if players are more than 5.
 		events.put(20, mBoss -> {
-			new BukkitRunnable() {
-				Location loc = mSpawnLoc;
-				double mRotation = 0;
-				double mRadius = 5;
-
-				@Override
-				public void run() {
-					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(mRotation + (72 * i));
-						loc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
-						world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 4, 0.2, 0.2, 0.2, 0.25,
-						Material.COARSE_DIRT.createBlockData());
-						loc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
-					}
-					mRotation += 8;
-					mRadius -= 0.25;
-					if (mRadius <= 0) {
-						this.cancel();
-						world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
-						world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
-						world.spawnParticle(Particle.CRIT_MAGIC, loc, 150, 0.1, 0.1, 0.1, 1);
-						LivingEntity miniboss = spawnImmortal(loc);
-						miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.01);
-						miniboss.setInvulnerable(true);
-						miniboss.setCustomNameVisible(true);
-						new BukkitRunnable() {
-
-							@Override
-							public void run() {
-
-								if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
-									this.cancel();
-									if (!miniboss.isDead()) {
-										miniboss.setHealth(0);
-									}
-								}
-							}
-
-						}.runTaskTimer(mPlugin, 0, 20);
-					}
-					if (mBoss.isDead()) {
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(plugin, 0, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
+			List<Player> playersInRange = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
+			if (playersInRange.size() >= 5) {
+				summonImmortal(plugin, world);
+			}
 		});
 
 		events.put(10, mBoss -> {
@@ -746,6 +714,56 @@ public class Kaul extends BossAbilityGroup {
 			}
 
 		}.runTaskLater(mPlugin, (20 * 10) + 1);
+	}
+
+	private void summonImmortal(Plugin plugin, World world) {
+		new BukkitRunnable() {
+			Location mLoc = mSpawnLoc;
+			double mRotation = 0;
+			double mRadius = 5;
+
+			@Override
+			public void run() {
+				for (int i = 0; i < 5; i++) {
+					double radian1 = Math.toRadians(mRotation + (72 * i));
+					mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
+					world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
+					Material.COARSE_DIRT.createBlockData());
+					mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+				}
+				mRotation += 8;
+				mRadius -= 0.25;
+				if (mRadius <= 0) {
+					this.cancel();
+					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
+					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
+					LivingEntity miniboss = spawnImmortal(mLoc);
+					miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(miniboss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.01);
+					miniboss.setInvulnerable(true);
+					miniboss.setCustomNameVisible(true);
+					new BukkitRunnable() {
+
+						@Override
+						public void run() {
+
+							if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
+								this.cancel();
+								if (!miniboss.isDead()) {
+									miniboss.setHealth(0);
+								}
+							}
+						}
+
+					}.runTaskTimer(mPlugin, 0, 20);
+				}
+				if (mBoss.isDead()) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 1);
 	}
 
 	private void knockback(Plugin plugin, double r) {

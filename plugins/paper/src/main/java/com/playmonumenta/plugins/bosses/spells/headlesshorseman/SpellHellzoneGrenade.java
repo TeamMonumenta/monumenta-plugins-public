@@ -129,7 +129,7 @@ public class SpellHellzoneGrenade extends Spell {
 									for (Player player : PlayerUtils.playersInRange(fallingBlock.getLocation(), 4)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 											/* Fire aura can not be blocked */
-											BossUtils.bossDamagePercent(mBoss, player, 0.05, (Location)null);
+											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
 											player.setFireTicks(20 * 3);
 										}
 									}

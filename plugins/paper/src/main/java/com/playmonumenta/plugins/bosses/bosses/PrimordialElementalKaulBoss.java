@@ -191,7 +191,7 @@ public class PrimordialElementalKaulBoss extends BossAbilityGroup {
 					return;
 				}
 				if (!blocked) {
-					BossUtils.bossDamage(boss, player, 22);
+					BossUtils.bossDamage(boss, player, 30);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 				} else {

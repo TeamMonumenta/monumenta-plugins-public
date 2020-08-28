@@ -66,7 +66,7 @@ public class SpellEarthsWrath extends Spell {
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
 									if (player.getBoundingBox().overlaps(box)) {
-										BossUtils.bossDamage(mBoss, player, 24);
+										BossUtils.bossDamage(mBoss, player, 32);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));
@@ -77,12 +77,13 @@ public class SpellEarthsWrath extends Spell {
 								}
 							}
 
-						}.runTaskTimer(mPlugin, 0, 1);
+						}.runTaskTimer(mPlugin, 5, 1);
+
 					}
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 1, 1);
 	}
 
 

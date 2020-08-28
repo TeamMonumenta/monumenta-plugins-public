@@ -68,7 +68,7 @@ public class SpellPutridPlague extends Spell {
 			}
 		}.runTaskLater(mPlugin, mTime);
 
-		double damage = mPhase3 ? 20 : 14;
+		double damage = 30;
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10, 0f);
