@@ -131,9 +131,9 @@ public class SpellGroundSurge extends Spell {
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(box)) {
 										this.cancel();
-										BossUtils.bossDamage(mBoss, player, 20);
+										BossUtils.bossDamage(mBoss, player, 30);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
-										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1.25f);
+										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
 										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
 										world.spawnParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25);
 										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -189,9 +189,9 @@ public class SpellGroundSurge extends Spell {
 															&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
 															&& !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
-														BossUtils.bossDamage(mBoss, surgePlayer, 18);
+														BossUtils.bossDamage(mBoss, surgePlayer, 30);
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
-														MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
+														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);
 														world.spawnParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25);
 														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);

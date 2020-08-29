@@ -48,6 +48,10 @@ public class SpellLightningStrike extends Spell {
 		mTimer = timer;
 		mDivisor = divisor;
 		mLoc = loc;
+
+		if (mTimer == 20 * 18) {
+			mCooldown = mTimer / 5;
+		}
 	}
 
 	@Override
@@ -119,7 +123,7 @@ public class SpellLightningStrike extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 5, 1);
 	}
 
 	@Override

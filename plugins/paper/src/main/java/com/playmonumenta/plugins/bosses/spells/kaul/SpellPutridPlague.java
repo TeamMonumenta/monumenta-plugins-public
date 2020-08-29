@@ -66,7 +66,7 @@ public class SpellPutridPlague extends Spell {
 			public void run() {
 				mPlagueActive = false;
 			}
-		}.runTaskLater(mPlugin, mTime);
+		}.runTaskLater(mPlugin, mTime + (20 * 3));
 
 		double damage = 30;
 		World world = mBoss.getWorld();
