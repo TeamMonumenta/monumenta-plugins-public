@@ -690,10 +690,10 @@ public class Kaul extends BossAbilityGroup {
 
 
 		// Phase 3.5
-		//Summons another Immortal Elemental at 20% HP if players are more than 5.
+		//Summons another Immortal Elemental at 20% HP if players are more than 15.
 		events.put(20, mBoss -> {
 			List<Player> playersInRange = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange);
-			if (playersInRange.size() >= 10) {
+			if (playersInRange.size() >= 15) {
 				summonImmortal(plugin, world);
 			}
 		});

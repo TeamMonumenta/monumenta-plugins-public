@@ -11,8 +11,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -123,7 +121,7 @@ public class SpellLightningStrike extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 5, 1);
+		}.runTaskTimer(mPlugin, 10, 1);
 	}
 
 	@Override
@@ -144,7 +142,6 @@ public class SpellLightningStrike extends Spell {
 					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 30, 0.1, 0.1, 0.1, 0.75);
 					BossUtils.bossDamagePercent(mBoss, p, 0.05, (Location)null);
 					// Doesn't matter if the player is blocking, there are 18 hits and only one can be blocked
-					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));
 				}
 				if (mInc >= 20) {
 					p.setNoDamageTicks(mNDT);
