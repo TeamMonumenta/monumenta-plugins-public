@@ -116,7 +116,7 @@ public class SpellLightningStrike extends Spell {
 					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3)) {
-						multiHit(player);
+						multiHit(p);
 					}
 				}
 			}
