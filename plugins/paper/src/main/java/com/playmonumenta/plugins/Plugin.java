@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.cooking.CookingCommand;
 import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
 import com.playmonumenta.plugins.cooking.CookingTableListeners;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.enchantments.AttributeManager;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
@@ -109,6 +110,7 @@ public class Plugin extends JavaPlugin {
 	private BossManager mBossManager;
 	public ItemManager mItemManager;
 	public IndexInventoryManager mIndexInventoryManager;
+	public EffectManager mEffectManager;
 
 	public SocketManager mSocketManager;
 
@@ -217,6 +219,7 @@ public class Plugin extends JavaPlugin {
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mCookingTableInventoryManager = new CookingTableInventoryManager(this);
 		mBossManager = new BossManager(this);
+		mEffectManager = new EffectManager(this);
 
 		DailyReset.startTimer(this);
 
@@ -248,6 +251,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mEnchantmentManager, this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mBossManager, this);
+		manager.registerEvents(mEffectManager, this);
 		manager.registerEvents(new CookingTableListeners(this), this);
 		manager.registerEvents(new IndexInventoryListeners(), this);
 		manager.registerEvents(new DelvesListener(), this);

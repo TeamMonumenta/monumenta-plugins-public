@@ -22,17 +22,17 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class PrismaticShield extends Ability {
 
-	private static final float PRISMATIC_SHIELD_RADIUS = 4.0f;
-	private static final int PRISMATIC_SHIELD_TRIGGER_HEALTH = 6;
-	private static final int PRISMATIC_SHIELD_1_AMPLIFIER = 1;
-	private static final int PRISMATIC_SHIELD_2_AMPLIFIER = 2;
-	private static final int PRISMATIC_SHIELD_1_DURATION = 12 * 20;
-	private static final int PRISMATIC_SHIELD_2_DURATION = 12 * 20;
-	private static final int PRISMATIC_SHIELD_1_COOLDOWN = 90 * 20;
-	private static final int PRISMATIC_SHIELD_2_COOLDOWN = 70 * 20;
-	private static final float PRISMATIC_SHIELD_KNOCKBACK_SPEED = 0.7f;
-	private static final int PRISMATIC_SHIELD_1_DAMAGE = 3;
-	private static final int PRISMATIC_SHIELD_2_DAMAGE = 6;
+	private static final float RADIUS = 4.0f;
+	private static final int TRIGGER_HEALTH = 6;
+	private static final int AMPLIFIER_1 = 1;
+	private static final int AMPLIFIER_2 = 2;
+	private static final int DURATION_1 = 12 * 20;
+	private static final int DURATION_2 = 12 * 20;
+	private static final int COOLDOWN_1 = 90 * 20;
+	private static final int COOLDOWN_2 = 70 * 20;
+	private static final float KNOCKBACK_SPEED = 0.7f;
+	private static final int DAMAGE_1 = 3;
+	private static final int DAMAGE_2 = 6;
 
 	private final int mAmplifier;
 	private final int mDuration;
@@ -45,10 +45,10 @@ public class PrismaticShield extends Ability {
 		mInfo.mShorthandName = "PS";
 		mInfo.mDescriptions.add("When your health drops below 3 hearts (including if the attack would've killed you), you receive an Absorption II shield (4 hearts) which lasts up to 12 s. In addition enemies within four blocks are knocked back and take 3 damage. Cooldown: 90s.");
 		mInfo.mDescriptions.add("The shield is improved to Absorption III (6 hearts) for 12 s. Enemies within four blocks now take 6 damage. Cooldown: 70s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_COOLDOWN : PRISMATIC_SHIELD_2_COOLDOWN;
-		mAmplifier = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_AMPLIFIER : PRISMATIC_SHIELD_2_AMPLIFIER;
-		mDuration = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_DURATION : PRISMATIC_SHIELD_2_DURATION;
-		mDamage = getAbilityScore() == 1 ? PRISMATIC_SHIELD_1_DAMAGE : PRISMATIC_SHIELD_2_DAMAGE;
+		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
+		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	/*
@@ -99,7 +99,7 @@ public class PrismaticShield extends Ability {
 		boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAmplifier + 1);
 
 
-		if (healthRemaining > PRISMATIC_SHIELD_TRIGGER_HEALTH) {
+		if (healthRemaining > TRIGGER_HEALTH) {
 			return;
 		} else if (dealDamageLater) {
 			// The player has taken fatal damage BUT will be saved by the absorption, so set damage to 0 and compensate later
@@ -110,9 +110,9 @@ public class PrismaticShield extends Ability {
 		putOnCooldown();
 
 		// Conditions match - prismatic shield
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), PRISMATIC_SHIELD_RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
-			MovementUtils.knockAway(mPlayer, mob, PRISMATIC_SHIELD_KNOCKBACK_SPEED);
+			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 		}
 
 		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,

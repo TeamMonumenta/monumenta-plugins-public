@@ -22,11 +22,11 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ConsumingFlames extends Ability {
 
-	private static final int CONSUMING_FLAMES_RADIUS = 8;
-	private static final int CONSUMING_FLAMES_1_DAMAGE = 1;
-	private static final int CONSUMING_FLAMES_2_DAMAGE = 8;
-	private static final int CONSUMING_FLAMES_DURATION = 7 * 20;
-	private static final int CONSUMING_FLAMES_COOLDOWN = 10 * 20;
+	private static final int RADIUS = 8;
+	private static final int DAMAGE_1 = 1;
+	private static final int DAMAGE_2 = 4;
+	private static final int DURATION = 7 * 20;
+	private static final int COOLDOWN = 10 * 20;
 
 	private final int mDamage;
 
@@ -37,9 +37,9 @@ public class ConsumingFlames extends Ability {
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. (Cooldown: 10s)");
 		mInfo.mDescriptions.add("The damage is increased to 8, and also afflict mobs with Weakness I.");
 		mInfo.mLinkedSpell = Spells.CONSUMING_FLAMES;
-		mInfo.mCooldown = CONSUMING_FLAMES_COOLDOWN;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDamage = getAbilityScore() == 1 ? CONSUMING_FLAMES_1_DAMAGE : CONSUMING_FLAMES_2_DAMAGE;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class ConsumingFlames extends Ability {
 					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
 				}
 
-				if (mRadius >= CONSUMING_FLAMES_RADIUS + 1) {
+				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
 			}
@@ -71,12 +71,12 @@ public class ConsumingFlames extends Ability {
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1.0f, 0.35f);
 		mWorld.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.35f);
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), CONSUMING_FLAMES_RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-			EntityUtils.applyFire(mPlugin, CONSUMING_FLAMES_DURATION, mob, mPlayer);
+			EntityUtils.applyFire(mPlugin, DURATION, mob, mPlayer);
 
 			if (getAbilityScore() > 1) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, CONSUMING_FLAMES_DURATION, 0, false, true));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, DURATION, 0, false, true));
 			}
 		}
 

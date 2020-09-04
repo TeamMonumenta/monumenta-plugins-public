@@ -25,13 +25,13 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class FrostNova extends Ability {
 
-	private static final float FROST_NOVA_RADIUS = 6.0f;
-	private static final int FROST_NOVA_1_DAMAGE = 4;
-	private static final int FROST_NOVA_2_DAMAGE = 8;
-	private static final int FROST_NOVA_1_AMPLIFIER = 1;
-	private static final int FROST_NOVA_2_AMPLIFIER = 3;
-	private static final int FROST_NOVA_COOLDOWN = 18 * 20;
-	private static final int FROST_NOVA_DURATION = 4 * 20;
+	private static final float RADIUS = 6.0f;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 8;
+	private static final int AMPLIFIER_1 = 1;
+	private static final int AMPLIFIER_2 = 3;
+	private static final int COOLDOWN = 18 * 20;
+	private static final int DURATION = 4 * 20;
 
 	private final int mDamage;
 	private final int mSlownessAmplifier;
@@ -43,22 +43,24 @@ public class FrostNova extends Ability {
 		mInfo.mShorthandName = "FN";
 		mInfo.mDescriptions.add("When you strike with a wand while you are sneaking, you unleash a frost nova, dealing 4 damage to all enemies in a 6 block radius and afflicting them with 8 seconds of Slowness 2. Also extinguishes fire on nearby players and mobs. Cooldown 18s.");
 		mInfo.mDescriptions.add("Increases the damage to 8 and Slowness 4. Bosses and Elites are hit with 8 seconds of Slowness 2 and 8 damage instead.");
-		mInfo.mCooldown = FROST_NOVA_COOLDOWN;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDamage = getAbilityScore() == 1 ? FROST_NOVA_1_DAMAGE : FROST_NOVA_2_DAMAGE;
-		mSlownessAmplifier = getAbilityScore() == 1 ? FROST_NOVA_1_AMPLIFIER : FROST_NOVA_2_AMPLIFIER;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mSlownessAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
 	}
 
 	@Override
 	public void cast(Action action) {
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), FROST_NOVA_RADIUS, mPlayer)) {
+		putOnCooldown();
+
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector velocity = mob.getVelocity();
 			EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ICE, true, mInfo.mLinkedSpell);
 			mob.setVelocity(velocity);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier - 1, true, false));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mSlownessAmplifier - 1, true, false));
 			} else {
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, FROST_NOVA_DURATION, mSlownessAmplifier, true, false));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mSlownessAmplifier, true, false));
 			}
 
 			if (mob.getFireTicks() > 1) {
@@ -67,7 +69,7 @@ public class FrostNova extends Ability {
 		}
 
 		// Extinguish fire on all nearby players
-		for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), FROST_NOVA_RADIUS)) {
+		for (Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), RADIUS)) {
 			if (player.getFireTicks() > 1) {
 				player.setFireTicks(1);
 			}
@@ -87,7 +89,7 @@ public class FrostNova extends Ability {
 					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
 				}
 
-				if (mRadius >= FROST_NOVA_RADIUS + 1) {
+				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
 			}
@@ -100,7 +102,6 @@ public class FrostNova extends Ability {
 		mWorld.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
 		mWorld.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
 		mWorld.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.0f);
-		putOnCooldown();
 	}
 
 	@Override

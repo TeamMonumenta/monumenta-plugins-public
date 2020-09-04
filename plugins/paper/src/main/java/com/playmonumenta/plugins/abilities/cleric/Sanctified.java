@@ -6,10 +6,12 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -21,41 +23,60 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class Sanctified extends Ability {
 
-	private static final int SANCTIFIED_1_DAMAGE = 5;
-	private static final int SANCTIFIED_2_DAMAGE = 7;
-	private static final int SANCTIFIED_EFFECT_LEVEL = 0;
-	private static final int SANCTIFIED_EFFECT_DURATION = 10 * 20;
-	private static final float SANCTIFIED_KNOCKBACK_SPEED = 0.35f;
+	private static final int PERCENT_DAMAGE_RETURNED_1 = 2;
+	private static final int PERCENT_DAMAGE_RETURNED_2 = 3;
+	private static final int SLOWNESS_AMPLIFIER_2 = 1;
+	private static final int SLOWNESS_DURATION = 20 * 3;
+	private static final float KNOCKBACK_SPEED = 0.4f;
 
-	private final int mDamage;
+	private final int mPercentDamageReturned;
 
 	public Sanctified(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Sanctified Armor");
 		mInfo.mLinkedSpell = Spells.SANCTIFIED;
 		mInfo.mScoreboardId = "Sanctified";
 		mInfo.mShorthandName = "Sa";
-		mInfo.mDescriptions.add("Whenever an undead enemy hits you with a melee attack, it takes 5 damage and it is knocked away from you.");
-		mInfo.mDescriptions.add("Increases the damage to 7 and afflicts affected enemies with 10 s of Slowness I.");
-		mDamage = getAbilityScore() == 1 ? SANCTIFIED_1_DAMAGE : SANCTIFIED_2_DAMAGE;
+		mInfo.mDescriptions.add("Whenever a non-boss undead enemy hits you with a melee or projectile attack, it takes twice the final damage you took and is knocked away from you.");
+		mInfo.mDescriptions.add("Deal triple the final damage instead, and the undead enemy is also afflicted with Slowness II for 3 seconds (even if you are blocking).");
+		mPercentDamageReturned = getAbilityScore() == 1 ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 	}
 
 	@Override
 	public boolean playerDamagedByLivingEntityEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damager = (LivingEntity) event.getDamager();
-		if (EntityUtils.isUndead(damager) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-			EntityUtils.damageEntity(mPlugin, damager, mDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+		LivingEntity mob = (LivingEntity) event.getDamager();
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isUndead(mob) && !EntityUtils.isBoss(mob)) {
+			trigger(mob, event);
+		}
 
-			MovementUtils.knockAway(mPlayer, damager, SANCTIFIED_KNOCKBACK_SPEED);
+		return true;
+	}
 
-			Location loc = damager.getLocation();
-			mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, damager.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
-			mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
-
-			if (getAbilityScore() > 1) {
-				PotionUtils.applyPotion(mPlayer, damager, new PotionEffect(PotionEffectType.SLOW, SANCTIFIED_EFFECT_DURATION, SANCTIFIED_EFFECT_LEVEL, false, true));
+	@Override
+	public boolean playerDamagedByProjectileEvent(EntityDamageByEntityEvent event) {
+		ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
+		if (source instanceof LivingEntity) {
+			LivingEntity mob = (LivingEntity) source;
+			if (EntityUtils.isUndead(mob) && !EntityUtils.isBoss(mob)) {
+				trigger(mob, event);
 			}
 		}
+
 		return true;
+	}
+
+	private void trigger(LivingEntity mob, EntityDamageByEntityEvent event) {
+		Location loc = mob.getLocation();
+		mPlayer.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc.add(0, mob.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125);
+		mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 0.7f, 1.2f);
+
+		MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED);
+		if (!mPlayer.isBlocking() || event.getFinalDamage() > 0) {
+			EntityUtils.damageEntity(mPlugin, mob, mPercentDamageReturned * EntityUtils.getRealFinalDamage(event), mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+		}
+
+		if (getAbilityScore() > 1) {
+			PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, SLOWNESS_DURATION, SLOWNESS_AMPLIFIER_2, false, true));
+		}
 	}
 
 }

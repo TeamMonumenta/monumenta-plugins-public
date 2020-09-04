@@ -1,0 +1,321 @@
+package com.playmonumenta.plugins.effects;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
+
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import com.playmonumenta.plugins.Plugin;
+
+public class EffectManager implements Listener {
+
+	private static class Effects {
+
+		/*
+		 * The first map layer divides the effects into 3 buckets, which define a loose trigger order (i.e. everything
+		 * with EffectPriority.EARLY will trigger before everything from EffectPriority.NORMAL, but order within each
+		 * bucket is undefined).
+		 *
+		 * The second map layer uses String keys as "sources" of the effects, and ordered sets of effects as values.
+		 * Sources could be specific to an ability, like "PowerInjectionPercentSpeedEffect" (a speed buff given by the
+		 * Power Injection ability), or more generic, like "VulnerabilityEffect" (increased damage, given by a variety
+		 * of abilities).
+		 *
+		 * Importantly, only the Effect with the highest "magnitude" from any given source is applied. Thus, all
+		 * ability specific buffs will stack with each other, while generic Vulnerability will only have the strongest
+		 * application take effect. Effects from the same source should always be the same type, and only ever have
+		 * differing durations and magnitudes.
+		 *
+		 * The ordered sets themselves are sorted by magnitude. While only the top Effect is ever applied, all Effects
+		 * are tracked and ticked down by the over-arching runnable, meaning that after a stronger Effect wears off,
+		 * longer lasting weaker Effects are still active and will be applied.
+		 */
+		public final Map<EffectPriority, Map<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<EffectPriority, Map<String, NavigableSet<Effect>>>(EffectPriority.class);
+		public final Entity mEntity;
+
+		public Effects(Entity entity) {
+			mEntity = entity;
+			mPriorityMap.put(EffectPriority.EARLY, new HashMap<String, NavigableSet<Effect>>());
+			mPriorityMap.put(EffectPriority.NORMAL, new HashMap<String, NavigableSet<Effect>>());
+			mPriorityMap.put(EffectPriority.LATE, new HashMap<String, NavigableSet<Effect>>());
+		}
+
+		public void addEffect(String source, Effect effect) {
+			Map<String, NavigableSet<Effect>> priorityEffects = mPriorityMap.get(effect.getPriority());
+
+			NavigableSet<Effect> effectGroup = priorityEffects.get(source);
+			if (effectGroup == null) {
+				effectGroup = new TreeSet<Effect>();
+				priorityEffects.put(source, effectGroup);
+			}
+
+			if (!effectGroup.isEmpty()) {
+				Effect currentEffect = effectGroup.last();
+				effectGroup.add(effect);
+				if (effectGroup.last() == effect) {
+					currentEffect.entityLoseEffect(mEntity);
+					effect.entityGainEffect(mEntity);
+				}
+			} else {
+				effectGroup.add(effect);
+				effect.entityGainEffect(mEntity);
+			}
+		}
+
+		public NavigableSet<Effect> getEffects(String source) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				NavigableSet<Effect> effectGroup = priorityEffects.get(source);
+				if (effectGroup != null) {
+					return effectGroup;
+				}
+			}
+
+			return null;
+		}
+
+		public NavigableSet<Effect> clearEffects(String source) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				NavigableSet<Effect> removedEffectGroup = priorityEffects.remove(source);
+				if (removedEffectGroup != null) {
+					removedEffectGroup.last().entityLoseEffect(mEntity);
+					return removedEffectGroup;
+				}
+			}
+
+			return null;
+		}
+
+		public void clearEffects() {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
+				for (NavigableSet<Effect> removedEffect : priorityEffects.values()) {
+					removedEffect.last().entityLoseEffect(mEntity);
+				}
+
+				priorityEffects.clear();
+			}
+		}
+	}
+
+	private static final int PERIOD = 5;
+
+	private final Map<Entity, Effects> mEntities = new HashMap<Entity, Effects>();
+	private final BukkitRunnable mTimer;
+
+	public EffectManager(Plugin plugin) {
+		/*
+		 * This timer also ticks down for offline players. Keeping it like this for now since most custom effects we
+		 * want to apply are short (no more than 30 seconds, e.g. class abilities) and already function this way.
+		 */
+		mTimer = new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				mTicks += PERIOD;
+				boolean fourHertz = mTicks % 5 == 0;
+				boolean twoHertz = mTicks % 10 == 0;
+				boolean oneHertz = mTicks % 20 == 0;
+
+				// Periodic trigger for Effects in case they need stuff like particles
+				for (Map.Entry<Entity, Effects> entry : mEntities.entrySet()) {
+					for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
+						for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+							effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+						}
+					}
+				}
+
+				// Count down the durations of all Effects, and remove expired Effects and empty sets
+				Iterator<Effects> entityIter = mEntities.values().iterator();
+				while (entityIter.hasNext()) {
+					Effects effects = entityIter.next();
+					Entity entity = effects.mEntity;
+					if (entity.isDead() || !entity.isValid()) {
+						if (!(entity instanceof Player) || ((Player) entity).isOnline()) {
+							entityIter.remove();
+							continue;
+						}
+					}
+
+					Iterator<Map<String, NavigableSet<Effect>>> effectsIter = effects.mPriorityMap.values().iterator();
+					while (effectsIter.hasNext()) {
+						Iterator<NavigableSet<Effect>> priorityEffectsIter = effectsIter.next().values().iterator();
+						while (priorityEffectsIter.hasNext()) {
+							NavigableSet<Effect> effectGroup = priorityEffectsIter.next();
+							if (effectGroup.isEmpty()) {
+								priorityEffectsIter.remove();
+								continue;
+							}
+
+							boolean currentEffectRemoved = false;
+							Effect currentEffect = effectGroup.last();
+							Iterator<Effect> effectGroupIter = effectGroup.descendingIterator();
+							while (effectGroupIter.hasNext()) {
+								Effect effect = effectGroupIter.next();
+
+								if (currentEffectRemoved) {
+									effect.entityGainEffect(entity);
+									currentEffectRemoved = false;
+								}
+
+								if (effect.tick(PERIOD)) {
+									if (effect == currentEffect) {
+										effect.entityLoseEffect(entity);
+										currentEffectRemoved = true;
+									}
+
+									effectGroupIter.remove();
+
+									if (!effectGroup.isEmpty()) {
+										currentEffect = effectGroup.last();
+									} else {
+										priorityEffectsIter.remove();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		mTimer.runTaskTimer(plugin, 0, PERIOD);
+	}
+
+	/**
+	 * Applies an effect to an entity.
+	 * <p>
+	 * You MUST assign difference "sources" to different effect types. The source should only be used to track level and duration overrides of the same effect.
+	 * <p>
+	 * You MUST create a new Effect object for each effect applied, as durations are tracked by the Effect object.
+	 *
+	 * @param entity the entity to receive the effect
+	 * @param source the source of the effect (only the highest effect from a source applies)
+	 * @param effect the effect to be applied
+	 */
+	public void addEffect(Entity entity, String source, Effect effect) {
+		Effects effects = mEntities.get(entity);
+		if (effects == null) {
+			effects = new Effects(entity);
+			mEntities.put(entity, effects);
+		}
+
+		effects.addEffect(source, effect);
+	}
+
+	/**
+	 * Returns effects from a given source from an entity.
+	 *
+	 * @param  entity the entity being checked
+	 * @param  source the source of effects to be retrieved
+	 * @return the set of effects if they exist, null otherwise
+	 */
+	public NavigableSet<Effect> getEffects(Entity entity, String source) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.getEffects(source);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Clears and returns effects from a given source from an entity.
+	 *
+	 * @param  entity the entity to clear effects from
+	 * @param  source the source of effects to be cleared
+	 * @return the set of effects if effects were removed, null otherwise
+	 */
+	public NavigableSet<Effect> clearEffects(Entity entity, String source) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			return effects.clearEffects(source);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Clears effects from an entity.
+	 *
+	 * @param entity the entity to clear effects from
+	 */
+	public void clearEffects(Entity entity) {
+		Effects effects = mEntities.get(entity);
+		if (effects != null) {
+			effects.clearEffects();
+			mEntities.remove(entity);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
+		Effects effects = mEntities.get(event.getEntity());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (!effectGroup.last().entityRegainHealthEvent(event)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public boolean entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+		Entity damager = event.getDamager();
+		if (damager instanceof Projectile) {
+			ProjectileSource shooter = ((Projectile) damager).getShooter();
+			if (shooter instanceof Entity) {
+				damager = (Entity) shooter;
+			}
+		}
+
+		Effects effects = mEntities.get(damager);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (!effectGroup.last().entityDealDamageEvent(event)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public boolean entityDamageEvent(EntityDamageEvent event) {
+		Effects effects = mEntities.get(event.getEntity());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					if (!effectGroup.last().entityReceiveDamageEvent(event)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+}

@@ -28,11 +28,13 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class ManaLance extends Ability {
 
-	private static final int MANA_LANCE_1_DAMAGE = 8;
-	private static final int MANA_LANCE_2_DAMAGE = 10;
-	private static final int MANA_LANCE_1_COOLDOWN = 5 * 20;
-	private static final int MANA_LANCE_2_COOLDOWN = 3 * 20;
+	private static final int DAMAGE_1 = 8;
+	private static final int DAMAGE_2 = 10;
+	private static final int COOLDOWN_1 = 5 * 20;
+	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+
+	private final int mDamage;
 
 	public ManaLance(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Mana Lance");
@@ -41,14 +43,14 @@ public class ManaLance extends Ability {
 		mInfo.mShorthandName = "ML";
 		mInfo.mDescriptions.add("Right clicking with a wand fires forth a piercing beam of Mana going 8 blocks, dealing 8 damage to enemies in the path of the beam. This beam will not go through solid blocks. 5 second cooldown.");
 		mInfo.mDescriptions.add("The beam instead deals 10 damage with a 3 second cooldown.");
-		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.mCooldown = getAbilityScore() == 1 ? MANA_LANCE_1_COOLDOWN : MANA_LANCE_2_COOLDOWN;
+		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
 	public void cast(Action action) {
-		int extraDamage = getAbilityScore() == 1 ? MANA_LANCE_1_DAMAGE : MANA_LANCE_2_DAMAGE;
+		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
 		BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
@@ -74,7 +76,7 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, extraDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
 					iter.remove();
 					mobs.remove(mob);
@@ -82,7 +84,6 @@ public class ManaLance extends Ability {
 			}
 		}
 
-		putOnCooldown();
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
 	}
 

@@ -106,6 +106,7 @@ public enum Spells {
 
 	//--Berserker
 	METEOR_SLAM("Meteor Slam"),
+	RECKLESS_SWING("Reckless Swing"),
 	RAMPAGE("Rampage"),
 
 	//--Guardian

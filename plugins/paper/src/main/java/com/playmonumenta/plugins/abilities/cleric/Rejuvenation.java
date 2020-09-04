@@ -1,21 +1,28 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Rejuvenation extends Ability {
 
-	private static final int REJUVENATION_RADIUS = 12;
-	private static final String REJUVENATION_METADATA_KEY = "RejuvenationMetadataKey";
+	private static final int RADIUS = 12;
+	private static final int HEAL_INTERVAL_1 = 20 * 5;
+	private static final int HEAL_INTERVAL_2 = 20 * 3;
+	private static final double PERCENT_HEAL = 0.05;
+
+	private static final Map<Player, Integer> LAST_HEAL_TICK = new HashMap<Player, Integer>();
+
+	private final int mHealInterval;
 
 	private int mTimer = 0;
 
@@ -23,39 +30,30 @@ public class Rejuvenation extends Ability {
 		super(plugin, world, player, "Rejuvenation");
 		mInfo.mScoreboardId = "Rejuvenation";
 		mInfo.mShorthandName = "Rjv";
-		mInfo.mDescriptions.add("You regenerate 5% of your max health every 3 seconds.");
-		mInfo.mDescriptions.add("All other players in a 12 block radius also regenerate 5% of their max health every 3 seconds.");
+		mInfo.mDescriptions.add("You and all other players in a 12 block radius regenerate 5% of their max health every 5 seconds.");
+		mInfo.mDescriptions.add("You and all other players in a 12 block radius regenerate 5% of their max health every 3 seconds.");
+		mHealInterval = getAbilityScore() == 1 ? HEAL_INTERVAL_1 : HEAL_INTERVAL_2;
 	}
 
 	@Override
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
-		if (fourHertz) {
-			//  Don't trigger this if dead!
-			if (!mPlayer.isDead()) {
-				// 5 ticks because it triggers on four hertz.
-				mTimer += 5;
-				if (mTimer % 60 == 0) {
-					int rejuvenation = getAbilityScore();
-					for (Player p : PlayerUtils.playersInRange(mPlayer, REJUVENATION_RADIUS, true)) {
-						// Don't buff players that have their class disabled or who have PvP enabled
-						if (p.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(p)) {
-							continue;
-						}
+		if (oneSecond && !mPlayer.isDead()) {
+			mTimer += 20;
+			if (mTimer % mHealInterval == 0) {
+				for (Player player : PlayerUtils.playersInRange(mPlayer, RADIUS, true)) {
+					// Don't buff players that have their class disabled or who have PvP enabled
+					if (player.getScoreboardTags().contains("disable_class") || AbilityManager.getManager().isPvPEnabled(player)) {
+						continue;
+					}
 
-						if (MetadataUtils.checkOnceThisTick(mPlugin, p, REJUVENATION_METADATA_KEY)) {
-							//  If this is us or we're allowing anyone to get it.
-							if (p == mPlayer || rejuvenation > 1) {
-								double oldHealth = p.getHealth();
-								double healAmount = 1;
-								AttributeInstance maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-								if (maxHealth != null) {
-									healAmount = maxHealth.getValue() * 0.05;
-								}
-								PlayerUtils.healPlayer(p, healAmount);
-								if (p.getHealth() > oldHealth) {
-									mWorld.spawnParticle(Particle.HEART, (p.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
-								}
-							}
+					Integer lastHealTick = LAST_HEAL_TICK.get(player);
+					if (lastHealTick == null || player.getTicksLived() - LAST_HEAL_TICK.get(player) >= mHealInterval) {
+						LAST_HEAL_TICK.put(player, player.getTicksLived());
+
+						double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+						if (player.getHealth() != maxHealth) {
+							PlayerUtils.healPlayer(player, PERCENT_HEAL * maxHealth);
+							mWorld.spawnParticle(Particle.HEART, (player.getLocation()).add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
 						}
 					}
 				}

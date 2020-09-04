@@ -1,21 +1,27 @@
 package com.playmonumenta.plugins.enchantments;
 
+import java.util.Collection;
 import java.util.EnumSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class LifeDrain implements BaseEnchantment {
+
 	private static final String PROPERTY_NAME = ChatColor.GRAY + "Life Drain";
 	private static final double LIFE_DRAIN_CRIT_HEAL = 1;
-	private static final double LIFE_DRAIN_HEAL = 0.25;
+	private static final double LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER = 0.5;
 
 	@Override
 	public String getProperty() {
@@ -33,8 +39,24 @@ public class LifeDrain implements BaseEnchantment {
 			PlayerUtils.healPlayer(player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
 			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001);
 		} else {
-			PlayerUtils.healPlayer(player, LIFE_DRAIN_HEAL * Math.sqrt(level) * player.getCooledAttackStrength(0));
+			double attackSpeed = 4;
+			double multiplier = 1;
+			Collection<AttributeModifier> modifiers = player.getInventory().getItemInMainHand().getItemMeta().getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
+			if (modifiers != null) {
+				for (AttributeModifier modifier : modifiers) {
+					if (modifier.getSlot() == EquipmentSlot.HAND) {
+						if (modifier.getOperation() == Operation.ADD_NUMBER) {
+							attackSpeed += modifier.getAmount();
+						} else if (modifier.getOperation() == Operation.ADD_SCALAR) {
+							multiplier += modifier.getAmount();
+						}
+					}
+				}
+			}
+
+			PlayerUtils.healPlayer(player, LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER / Math.sqrt(attackSpeed * multiplier) * Math.sqrt(level) * player.getCooledAttackStrength(0));
 			player.getWorld().spawnParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001);
 		}
 	}
+
 }

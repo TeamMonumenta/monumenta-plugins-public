@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -17,45 +18,41 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 
 public class Skirmisher extends Ability {
 
-	private static final double PASSIVE_DAMAGE_ELITE_MODIFIER = 2.0;
-	private static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.25;
-	private static final int SKIRMISHER_1_DAMAGE = 3;
-	private static final int SKIRMISHER_2_DAMAGE = 5;
+	private static final double ISOLATED_PERCENT_DAMAGE_1 = 0.25;
+	private static final double ISOLATED_PERCENT_DAMAGE_2 = 0.4;
 	private static final double SKIRMISHER_ISOLATION_RADIUS = 2.5;
+
+	private final double mIsolatedPercentDamage;
 
 	public Skirmisher(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Skirmisher");
 		mInfo.mScoreboardId = "Skirmisher";
 		mInfo.mShorthandName = "Sk";
-		mInfo.mDescriptions.add("When holding two swords, deal an additional 3 melee damage to mobs with no other mobs within 2.5 blocks.");
-		mInfo.mDescriptions.add("Deal an additional 5 melee damage instead.");
+		mInfo.mDescriptions.add("When holding two swords, deal +25% melee damage to mobs with no other mobs within 2.5 blocks.");
+		mInfo.mDescriptions.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased +40%.");
+		mIsolatedPercentDamage = getAbilityScore() == 1 ? ISOLATED_PERCENT_DAMAGE_1 : ISOLATED_PERCENT_DAMAGE_2;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getEntity() instanceof LivingEntity) {
+		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			LivingEntity mob = (LivingEntity) event.getEntity();
 			Location loc = mob.getLocation();
 
-			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() == 0) {
+			if (EntityUtils.getNearbyMobs(loc, SKIRMISHER_ISOLATION_RADIUS, mob).size() == 0
+					|| getAbilityScore() > 1 && mob instanceof Mob && !mPlayer.equals(((Mob) mob).getTarget())) {
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
 				mWorld.playSound(loc, Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1, 0.5f);
 				mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.5f);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0.05);
-				mWorld.spawnParticle(Particle.SPELL_MOB, loc.clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0.00001);
-				mWorld.spawnParticle(Particle.CRIT, loc.clone().add(0, 1, 0), 10, 0.25, 0.5, 0.25, 0.55);
+				loc.add(0, 1, 0);
+				mWorld.spawnParticle(Particle.SMOKE_NORMAL, loc, 10, 0.35, 0.5, 0.35, 0.05);
+				mWorld.spawnParticle(Particle.SPELL_MOB, loc, 10, 0.35, 0.5, 0.35, 0.00001);
+				mWorld.spawnParticle(Particle.CRIT, loc, 10, 0.25, 0.5, 0.25, 0.55);
 
-				// Not a CustomDamageEvent (similar to By My Blade)
-				int damage = getAbilityScore() == 1 ? SKIRMISHER_1_DAMAGE : SKIRMISHER_2_DAMAGE;
-				if (EntityUtils.isElite(mob)) {
-					damage *= PASSIVE_DAMAGE_ELITE_MODIFIER;
-				} else if (EntityUtils.isBoss(mob)) {
-					damage *= PASSIVE_DAMAGE_BOSS_MODIFIER;
-				}
-				event.setDamage(event.getDamage() + damage);
+				event.setDamage(event.getDamage() * (1 + mIsolatedPercentDamage));
 			}
-
 		}
+
 		return true;
 	}
 

@@ -46,7 +46,6 @@ import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.NonAlchemistPotionPassive;
 import com.playmonumenta.plugins.abilities.alchemist.PowerInjection;
-import com.playmonumenta.plugins.abilities.alchemist.PowerInjectionNonAlchemist;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableArrows;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.AlchemicalAmalgam;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.InvigoratingOdor;
@@ -156,9 +155,9 @@ import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WarriorPassive;
 import com.playmonumenta.plugins.abilities.warrior.WeaponryMastery;
-import com.playmonumenta.plugins.abilities.warrior.berserker.GrowingRage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.berserker.RecklessSwing;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -199,7 +198,7 @@ public class AbilityManager {
 
 		List<Ability> specAbilitiesPriority = Arrays.asList(
 				                           // Damage multiplying skills must come before damage bonus skills
-			                               new GrowingRage(mPlugin, mWorld, null),
+			                               new RecklessSwing(mPlugin, mWorld, null),
 			                               new DarkPact(mPlugin, mWorld, null),
 
 			                               // Starfall needs to come before Mana Lance
@@ -297,7 +296,6 @@ public class AbilityManager {
 		                               new BasiliskPoison(mPlugin, mWorld, null),
 		                               new UnstableArrows(mPlugin, mWorld, null),
 		                               new PowerInjection(mPlugin, mWorld, null),
-		                               new PowerInjectionNonAlchemist(mPlugin, mWorld, null),
 		                               new IronTincture(mPlugin, mWorld, null),
 		                               new GruesomeAlchemy(mPlugin, mWorld, null),
 		                               new BrutalAlchemy(mPlugin, mWorld, null),

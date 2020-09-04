@@ -36,35 +36,41 @@ public class MeteorSlam extends Ability {
 	private static final String CHECK_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickRightClicked";
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 
-	private static final double METEOR_SLAM_1_DAMAGE_LOW = 3;
-	private static final double METEOR_SLAM_2_DAMAGE_LOW = 4;
-	private static final double METEOR_SLAM_1_DAMAGE_HIGH = 2;
-	private static final double METEOR_SLAM_2_DAMAGE_HIGH = 2.5;
-	private static final double METEOR_SLAM_1_RADIUS = 3.0;
-	private static final double METEOR_SLAM_2_RADIUS = 5.0;
-	private static final int METEOR_SLAM_1_EFFECT_LVL = 3;
-	private static final int METEOR_SLAM_2_EFFECT_LVL = 4;
-	private static final int METEOR_SLAM_DURATION = 2 * 20;
-	private static final int METEOR_SLAM_1_COOLDOWN = 8 * 20;
-	private static final int METEOR_SLAM_2_COOLDOWN = 6 * 20;
+	private static final double DAMAGE_LOW_1 = 3;
+	private static final double DAMAGE_LOW_2 = 4;
+	private static final double DAMAGE_HIGH_1 = 2;
+	private static final double DAMAGE_HIGH_2 = 2.5;
+	private static final double RADIUS_1 = 2.0;
+	private static final double RADIUS_2 = 2.5;
+	private static final int JUMP_BOOST_AMPLIFIER_1 = 3;
+	private static final int JUMP_BOOST_AMPLIFIER_2 = 4;
+	private static final int DURATION = 2 * 20;
+	private static final int COOLDOWN_1 = 8 * 20;
+	private static final int COOLDOWN_2 = 6 * 20;
+
+	private final double mDamageLow;
+	private final double mDamageHigh;
+	private final double mRadius;
+	private final int mJumpBoostAmplifier;
 
 	private double mFallDistance = 0;
 	private boolean mCanTrigger = false;
-	private final Plugin mPlugin;
 	private final BukkitRunnable mRunnable;
 
 	public MeteorSlam(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Meteor Slam");
-		mPlugin = plugin;
-
 		mInfo.mLinkedSpell = Spells.METEOR_SLAM;
 		mInfo.mScoreboardId = "MeteorSlam";
 		mInfo.mShorthandName = "MS";
-		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 3 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 8s.");
-		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 6 seconds.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? METEOR_SLAM_1_COOLDOWN : METEOR_SLAM_2_COOLDOWN;
+		mInfo.mDescriptions.add("Hitting an enemy with an axe or sword while falling removes fall damage and does 3 extra damage for each block fallen (up to eight blocks) and 2 extra damage for each block fallen after that to all mobs within 2 blocks. If you fall more than 3 blocks but do not hit a mob, this effect still activates, but you do not negate fall damage. In addition right-clicking twice quickly grants you 2s of Jump Boost 4. Jump Boost Cooldown: 8s.");
+		mInfo.mDescriptions.add("Damage increases to 4 per block for the first eight blocks and 2.5 for each block after that to all enemies within 2.5 blocks. Right-clicking twice quickly now gives 2s of Jump Boost 5. The cooldown of the Jump Boost application is reduced to 6 seconds.");
+		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mIgnoreCooldown = true;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mDamageLow = getAbilityScore() == 1 ? DAMAGE_LOW_1 : DAMAGE_LOW_2;
+		mDamageHigh = getAbilityScore() == 1 ? DAMAGE_HIGH_1 : DAMAGE_HIGH_2;
+		mRadius = getAbilityScore() == 1 ? RADIUS_1 : RADIUS_2;
+		mJumpBoostAmplifier = getAbilityScore() == 1 ? JUMP_BOOST_AMPLIFIER_1 : JUMP_BOOST_AMPLIFIER_2;
 
 		mRunnable = new BukkitRunnable() {
 			@Override
@@ -89,6 +95,7 @@ public class MeteorSlam extends Ability {
 				}
 			}
 		};
+
 		mRunnable.runTaskTimer(plugin, 0, 1);
 	}
 
@@ -120,6 +127,7 @@ public class MeteorSlam extends Ability {
 		    inMainHand.getType().isEdible()) {
 			return;
 		}
+
 		if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), Spells.METEOR_SLAM)) { //cooldown check because of the ignore cooldown flag
 			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, CHECK_ONCE_THIS_TICK_METAKEY)) {
 				mRightClicks++;
@@ -137,15 +145,13 @@ public class MeteorSlam extends Ability {
 				return;
 			}
 			mRightClicks = 0;
-			int meteorSlam = getAbilityScore();
-			int effectLevel = meteorSlam == 1 ? METEOR_SLAM_1_EFFECT_LVL : METEOR_SLAM_2_EFFECT_LVL;
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, METEOR_SLAM_DURATION, effectLevel, true, false));
+
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, mJumpBoostAmplifier, true, false));
 			putOnCooldown();
 			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
 			mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 1, 0f, 1, 0);
 
-			//Wanted to try something new: Particles that have no y velocity and only x and z.
-			//Flame
+			// Flame particles that have no y velocity and only x and z.
 			for (int i = 0; i < 60; i++) {
 				double x = FastUtils.randomDoubleInRange(-3, 3);
 				double z = FastUtils.randomDoubleInRange(-3, 3);
@@ -157,33 +163,28 @@ public class MeteorSlam extends Ability {
 	}
 
 	public void doSlamAttack(LivingEntity damagee, double damage) {
-		double radius = getAbilityScore() == 1 ? METEOR_SLAM_1_RADIUS : METEOR_SLAM_2_RADIUS;
 		Location loc;
 		if (damagee == null) {
 			loc = mPlayer.getLocation().add(0, 0.15, 0);
 		} else {
 			loc = damagee.getLocation().add(0, 0.15, 0);
 		}
-		World world = mPlayer.getWorld();
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
 			if (mob != damagee) {
 				EntityUtils.damageEntity(Plugin.getInstance(), mob, damage, mPlayer, MagicType.PHYSICAL, true, mInfo.mLinkedSpell);
 			}
 		}
 
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
-		world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-		world.spawnParticle(Particle.LAVA, loc, 3 * (int)(radius * radius), radius, 0.25f, radius, 0);
+		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
+		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
+		mWorld.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
+		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
+		mWorld.spawnParticle(Particle.LAVA, loc, 3 * (int)(mRadius * mRadius), mRadius, 0.25f, mRadius, 0);
 	}
 
 	public double getSlamDamage() {
-		int meteorSlam = getAbilityScore();
-		double dmgMultiplierLow = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_LOW : METEOR_SLAM_2_DAMAGE_LOW;
-		double dmgMultiplierHigh = meteorSlam == 1 ? METEOR_SLAM_1_DAMAGE_HIGH : METEOR_SLAM_2_DAMAGE_HIGH;
-		return Math.min(8, mFallDistance) * dmgMultiplierLow + Math.max(0, (mFallDistance - 8)) * dmgMultiplierHigh;
+		return Math.min(8, mFallDistance) * mDamageLow + Math.max(0, (mFallDistance - 8)) * mDamageHigh;
 	}
 
 	@Override

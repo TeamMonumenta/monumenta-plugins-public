@@ -2,14 +2,19 @@ package com.playmonumenta.plugins.abilities.warlock;
 
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Harvester extends Ability {
+
+	private static final int COOLDOWN_REDUCTION = 10;
+	private static final double PERCENT_HEAL = 0.05;
 
 	public Harvester(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Harvester of the Damned");
@@ -21,13 +26,19 @@ public class Harvester extends Ability {
 
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		int level = getAbilityScore();
-		World world = mPlayer.getWorld();
-		mPlugin.mTimers.updateCooldowns(mPlayer, 10);
-		if (level > 1) {
-			PlayerUtils.healPlayer(mPlayer, 1);
+		mWorld.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 9, 0.35, 0.45, 0.35, 0.001);
+
+		// We want this to run after any relevant abilities have gone on cooldown
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				mPlugin.mTimers.updateCooldowns(mPlayer, COOLDOWN_REDUCTION);
+			}
+		}.runTaskLater(mPlugin, 0);
+
+		if (getAbilityScore() > 1) {
+			PlayerUtils.healPlayer(mPlayer, PERCENT_HEAL * mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		}
-		world.spawnParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1, 0), 9, 0.35, 0.45, 0.35, 0.001);
 	}
 
 	@Override

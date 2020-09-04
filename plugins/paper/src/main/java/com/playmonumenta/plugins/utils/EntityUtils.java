@@ -15,7 +15,10 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
@@ -63,6 +66,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.enchantments.Inferno;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 
@@ -702,6 +707,22 @@ public class EntityUtils {
 		return target;
 	}
 
+	private static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
+
+	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
+	}
+
+	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
+	private static final EnumSet<DamageCause> WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES = EnumSet.of(
+			DamageCause.ENTITY_ATTACK,
+			DamageCause.PROJECTILE
+	);
+
+	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
+		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, WEAKEN_EFFECT_AFFECTED_DAMAGE_CAUSES));
+	}
+
 	public static void applyFire(Plugin plugin, int ticks, LivingEntity mob, Player player) {
 		mob.setMetadata(Inferno.SET_FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
 		mob.setMetadata(Inferno.FIRE_TICK_METAKEY, new FixedMetadataValue(plugin, mob.getTicksLived()));
@@ -947,6 +968,24 @@ public class EntityUtils {
 		armor = Math.min(30, armor);
 		toughness = Math.min(20, toughness);
 		return damage * (1 - Math.min(20, Math.max(armor / 5, armor - damage / (2 + toughness / 4))) / 25);
+	}
+
+	public static void addAttribute(Attributable attributable, Attribute attribute, AttributeModifier modifier) {
+		AttributeInstance instance = attributable.getAttribute(attribute);
+		if (instance != null) {
+			instance.addModifier(modifier);
+		}
+	}
+
+	public static void removeAttribute(Attributable attributable, Attribute attribute, String modifierName) {
+		AttributeInstance instance = attributable.getAttribute(attribute);
+		if (instance != null) {
+			for (AttributeModifier modifier : instance.getModifiers()) {
+				if (modifier != null && modifier.getName().equals(modifierName)) {
+					instance.removeModifier(modifier);
+				}
+			}
+		}
 	}
 
 }

@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -17,55 +17,45 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class DivineJustice extends Ability {
 
-	private static final int DIVINE_JUSTICE_CRIT_DAMAGE = 5;
-	private static final int DIVINE_JUSTICE_CRIT_HEAL = 1;
-	private static final int DIVINE_JUSTICE_KILL_HEAL = 3;
+	private static final int CRITICAL_UNDEAD_DAMAGE_1 = 5;
+	private static final int CRITICAL_UNDEAD_DAMAGE_2 = 8;
+	private static final int ON_UNDEAD_KILL_HEAL = 2;
+
+	private final int mCriticalUndeadDamage;
 
 	public DivineJustice(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Divine Justice");
 		mInfo.mScoreboardId = "DivineJustice";
 		mInfo.mShorthandName = "DJ";
-		mInfo.mDescriptions.add("Your critical strikes deal 5 additional damage to undead enemies and heal you for 1 health.");
-		mInfo.mDescriptions.add("In addition, when you kill an undead enemy with a critical strike, heal yourself for 3 health.");
+		mInfo.mDescriptions.add("Your critical strikes deal +5 damage to undead enemies.");
+		mInfo.mDescriptions.add("Your critical strikes deal +8 damage to undead enemies. Additionally, heal 2 health whenever you kill an undead enemy.");
+		mCriticalUndeadDamage = getAbilityScore() == 1 ? CRITICAL_UNDEAD_DAMAGE_1 : CRITICAL_UNDEAD_DAMAGE_2;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		LivingEntity damagee = (LivingEntity) event.getEntity();
-		if (event.getCause() == DamageCause.ENTITY_ATTACK && EntityUtils.isUndead(damagee)) {
-			event.setDamage(event.getDamage() + DIVINE_JUSTICE_CRIT_DAMAGE);
-			PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_CRIT_HEAL);
+		if (event.getCause() == DamageCause.ENTITY_ATTACK && PlayerUtils.isCritical(mPlayer)) {
+			LivingEntity damagee = (LivingEntity) event.getEntity();
+			if (EntityUtils.isUndead(damagee)) {
+				Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
+				double xz = damagee.getWidth() / 2 + 0.1;
+				double y = damagee.getHeight() / 3;
+				mWorld.spawnParticle(Particle.END_ROD, loc, 5, xz, y, xz, 0.065);
+				mWorld.spawnParticle(Particle.FLAME, loc, 6, xz, y, xz, 0.05);
+				mWorld.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
 
-			Location loc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
-			double xz = damagee.getWidth() / 2 + 0.1;
-			double y = damagee.getHeight() / 3;
-			mWorld.spawnParticle(Particle.END_ROD, loc, 5, xz, y, xz, 0.065);
-			mWorld.spawnParticle(Particle.FLAME, loc, 6, xz, y, xz, 0.05);
-			mWorld.playSound(loc, Sound.BLOCK_ANVIL_LAND, 0.15f, 1.5f);
-
-			/*
-			 * Check for entity death here since Player.isCritical() checks for player attack
-			 * meter being full, which is not the case when the death event triggers
-			 */
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (damagee.isDead() && mPlayer.equals(damagee.getKiller())) {
-						PlayerUtils.healPlayer(mPlayer, DIVINE_JUSTICE_KILL_HEAL);
-						mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), 16, 0.4, 0.4, 0.4, 1);
-						mWorld.spawnParticle(Particle.END_ROD, loc, 5, xz, y, xz, 0.125);
-						mWorld.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.65f, 1.5f);
-					}
-				}
-			}.runTaskLater(mPlugin, 0);
+				event.setDamage(event.getDamage() + mCriticalUndeadDamage);
+			}
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean runCheck() {
-		return PlayerUtils.isCritical(mPlayer);
+	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (EntityUtils.isUndead(event.getEntity())) {
+			PlayerUtils.healPlayer(mPlayer, ON_UNDEAD_KILL_HEAL);
+		}
 	}
 
 }

@@ -24,25 +24,29 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class DefensiveLine extends Ability {
 
-	private static final Integer DEFENSIVE_LINE_DURATION = 14 * 20;
-	private static final float DEFENSIVE_LINE_RADIUS = 8.0f;
-	private static final Integer DEFENSIVE_LINE_1_COOLDOWN = 50 * 20;
-	private static final Integer DEFENSIVE_LINE_2_COOLDOWN = 30 * 20;
+	private static final int COOLDOWN = 20 * 30;
+	private static final int DURATION = 20 * 14;
+	private static final int RESISTANCE_AMPLIFIER_1 = 0;
+	private static final int RESISTANCE_AMPLIFIER_2 = 1;
+	private static final int RADIUS = 8;
+	private static final int KNOCK_AWAY_RADIUS = 3;
+	private static final float KNOCK_AWAY_SPEED = 0.25f;
+
+	private final int mResistanceAmplifier;
 
 	public DefensiveLine(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Defensive Line");
 		mInfo.mLinkedSpell = Spells.DEFENSIVE_LINE;
 		mInfo.mScoreboardId = "DefensiveLine";
 		mInfo.mShorthandName = "DL";
-		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain Resistance II for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 50 seconds.");
-		mInfo.mDescriptions.add("The cooldown is decreased to 30 seconds. In addition mobs that are knocked back are given 10 seconds of Weakness 1.");
-		// NOTE: getAbilityScore() can only be used after the scoreboardId is set!
-		mInfo.mCooldown = getAbilityScore() == 1 ? DEFENSIVE_LINE_1_COOLDOWN : DEFENSIVE_LINE_2_COOLDOWN;
+		mInfo.mDescriptions.add("When you block while sneaking, you and your allies in an 8 block radius gain Resistance I for 14 seconds. Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30 seconds.");
+		mInfo.mDescriptions.add("The effect is increased to Resistance II.");
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mResistanceAmplifier = getAbilityScore() == 1 ? RESISTANCE_AMPLIFIER_1 : RESISTANCE_AMPLIFIER_2;
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class DefensiveLine extends Ability {
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
 					mWorld.spawnParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 35, 0.2, 0, 0.2, 0.25);
 
-					List<Player> players = PlayerUtils.playersInRange(mPlayer, DEFENSIVE_LINE_RADIUS, true);
+					List<Player> players = PlayerUtils.playersInRange(mPlayer, RADIUS, true);
 
 					for (Player player : players) {
 						// Don't buff players that have their class disabled
@@ -68,14 +72,10 @@ public class DefensiveLine extends Ability {
 						mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 35, 0.4, 0.4, 0.4, 0.25);
 
 						mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION,
-						                                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
-						                                                  DEFENSIVE_LINE_DURATION,
-						                                                  1, true, true));
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 3, mPlayer)) {
-							MovementUtils.knockAway(player, mob, 0.25f);
-							if (getAbilityScore() > 1) {
-								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0, false, true));
-							}
+								new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, DURATION, mResistanceAmplifier, true, true));
+
+						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, KNOCK_AWAY_RADIUS, mPlayer)) {
+							MovementUtils.knockAway(player, mob, KNOCK_AWAY_SPEED);
 						}
 					}
 
@@ -123,7 +123,6 @@ public class DefensiveLine extends Ability {
 
 					putOnCooldown();
 				}
-				this.cancel();
 			}
 		}.runTaskLater(mPlugin, 1);
 	}

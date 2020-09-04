@@ -26,23 +26,16 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
-/*
-* Level 1: Shift+RClick+LookDown to charge you weapon with light. Your next
-* attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion
-* with a 4 block radius, knocking enemies away. Undead take 20 damage
-* from the explosion and all other mobs take 10 (Cooldown: 15 seconds).
-* Level 2: Additionally, deal 5 extra damage with melee attacks on undead.
-*/
-
 public class LuminousInfusion extends Ability {
 
-	private static final String LUMINOUS_INFUSION_EXPIRATION_MESSAGE = "The light from your hands fades...";
-	private static final double LUMINOUS_INFUSION_RADIUS = 4;
-	private static final int LUMINOUS_INFUSION_NORMIE_DAMAGE = 10;
-	private static final int LUMINOUS_INFUSION_UNDEAD_DAMAGE = 20;
-	private static final int LUMINOUS_INFUSION_PASSIVE_DAMAGE = 5;
-	private static final int LUMINOUS_INFUSION_COOLDOWN = 20 * 15;
-	private static final float LUMINOUS_INFUSION_KNOCKBACK_SPEED = 0.7f;
+	private static final String EXPIRATION_MESSAGE = "The light from your hands fades...";
+	private static final double RADIUS = 4;
+	private static final int DAMAGE = 10;
+	private static final int UNDEAD_DAMAGE = 20;
+	private static final int PASSIVE_UNDEAD_DAMAGE_2 = 4;
+	private static final int FIRE_DURATION_2 = 20 * 3;
+	private static final int COOLDOWN = 20 * 14;
+	private static final float KNOCKBACK_SPEED = 0.7f;
 
 	private boolean mActive = false;
 
@@ -51,11 +44,12 @@ public class LuminousInfusion extends Ability {
 		mInfo.mLinkedSpell = Spells.LUMINOUS_INFUSION;
 		mInfo.mScoreboardId = "LuminousInfusion";
 		mInfo.mShorthandName = "LI";
-		mInfo.mDescriptions.add("Sneak and right-click while looking at the ground to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage (Cooldown: 15 seconds).");
-		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal +5 damage.");
-		mInfo.mCooldown = LUMINOUS_INFUSION_COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mDescriptions.add("Sneak and right-click while looking at the ground to charge your weapon with holy light. Your next attack (melee, ranged, magic, etc.) on an undead mob triggers an explosion with a 4 block radius, knocking enemies away. Undead take 20 damage and all other mobs take 10 damage (Cooldown: 14 seconds).");
+		mInfo.mDescriptions.add("Additionally, melee attacks against undead passively deal +4 damage, and any attack lights undead on fire for 3 seconds.");
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mIgnoreCooldown = true;
+		mInfo.mIgnoreTriggerCap = true;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	@Override
@@ -86,9 +80,9 @@ public class LuminousInfusion extends Ability {
 				Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0);
 				mWorld.spawnParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0);
-				if (mT >= LUMINOUS_INFUSION_COOLDOWN || !mActive) {
-					if (mT >= LUMINOUS_INFUSION_COOLDOWN) {
-						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, LUMINOUS_INFUSION_EXPIRATION_MESSAGE);
+				if (mT >= COOLDOWN || !mActive) {
+					if (mT >= COOLDOWN) {
+						MessagingUtils.sendActionBarMessage(mPlugin, mPlayer, EXPIRATION_MESSAGE);
 					}
 					mActive = false;
 					this.cancel();
@@ -101,18 +95,17 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
-		DamageCause cause = event.getCause();
-		if (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.CUSTOM) {
-			LivingEntity le = (LivingEntity) event.getEntity();
+		LivingEntity mob = (LivingEntity) event.getEntity();
 
-			// Passive damage to undead from every melee hit, regardless of active
-			if (cause == DamageCause.ENTITY_ATTACK && getAbilityScore() > 1 && EntityUtils.isUndead(le)) {
-				event.setDamage(event.getDamage() + LUMINOUS_INFUSION_PASSIVE_DAMAGE);
+		if (getAbilityScore() > 1 && EntityUtils.isUndead(mob)) {
+			EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, mob, mPlayer);
+			if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+				event.setDamage(event.getDamage() + PASSIVE_UNDEAD_DAMAGE_2);
 			}
+		}
 
-			if (mActive && EntityUtils.isUndead(le)) {
-				execute(le, event);
-			}
+		if (mActive && EntityUtils.isUndead(mob)) {
+			execute(mob, event);
 		}
 
 		return true;
@@ -120,6 +113,10 @@ public class LuminousInfusion extends Ability {
 
 	@Override
 	public boolean livingEntityShotByPlayerEvent(Projectile proj, LivingEntity damagee, EntityDamageByEntityEvent event) {
+		if (getAbilityScore() > 1 && EntityUtils.isUndead(damagee)) {
+			EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, damagee, mPlayer);
+		}
+
 		if (mActive && EntityUtils.isUndead(damagee)) {
 			execute(damagee, event);
 		}
@@ -129,25 +126,43 @@ public class LuminousInfusion extends Ability {
 
 	public void execute(LivingEntity damagee, EntityDamageByEntityEvent event) {
 		mActive = false;
+
 		Location loc = damagee.getLocation();
-		// Active damage to undead
-		event.setDamage(event.getDamage() + LUMINOUS_INFUSION_UNDEAD_DAMAGE);
 		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
 		mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
 		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
-		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, LUMINOUS_INFUSION_RADIUS, damagee);
+
+		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, RADIUS, damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
 			double volume = 0.6 / Math.sqrt(affected.size());
 			mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, (float) volume, 1.1f);
 			mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0.05f, 0.05f, 0.05f, 0.1);
 			mWorld.spawnParticle(Particle.FLAME, loc, 7, 0.05f, 0.05f, 0.05f, 0.1);
+
 			if (EntityUtils.isUndead(e)) {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+				EntityUtils.damageEntity(mPlugin, e, UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+
+				/*
+				 * Annoying thing to fix eventually: there's some stuff with how the AbilityManager
+				 * currently works (to infinite loop safe against certain abilities like Brute Force)
+				 * where only one damage event per tick is counted. This means that there's not really
+				 * a self-contained way for Luminous Infusion level 2 to make AoE abilities light all
+				 * enemies on fire (instead of just the first hit) without some restructuring, which
+				 * is planned (but I have no time to do that right now). Luckily, the only multi-hit
+				 * abilities Paladin has are Holy Javelin (already lights things on fire) and this,
+				 * and so the fire, though it should be generically applied to all abilities, is
+				 * hard coded for Luminous Infusion level 2 and has the same effect, so this workaround
+				 * will be in place until the AbilityManager gets restructured.
+				 */
+				if (getAbilityScore() > 1) {
+					EntityUtils.applyFire(mPlugin, FIRE_DURATION_2, e, mPlayer);
+				}
 			} else {
-				EntityUtils.damageEntity(mPlugin, e, LUMINOUS_INFUSION_NORMIE_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+				EntityUtils.damageEntity(mPlugin, e, DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 			}
-			MovementUtils.knockAway(loc, e, LUMINOUS_INFUSION_KNOCKBACK_SPEED, LUMINOUS_INFUSION_KNOCKBACK_SPEED / 2);
+
+			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2);
 		}
 	}
 

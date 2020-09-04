@@ -25,39 +25,32 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 
-/*
-* Attacking while sprinting throws a spear of light in a 12 block line, dealing
-* 10 / 20 damage to undead and 5 / 10 damage to all others, also lights all
-* targets on fire for 5s. (7s cooldown)
-*/
-
 public class HolyJavelin extends Ability {
 
-	private static final Particle.DustOptions HOLY_JAVELIN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
-	private static final double HOLY_JAVELIN_RADIUS = 0.75;
-	private static final int HOLY_JAVELIN_RANGE = 12;
-	private static final int HOLY_JAVELIN_1_UNDEAD_DAMAGE = 10;
-	private static final int HOLY_JAVELIN_2_UNDEAD_DAMAGE = 20;
-	private static final int HOLY_JAVELIN_1_DAMAGE = 5;
-	private static final int HOLY_JAVELIN_2_DAMAGE = 10;
-	private static final int HOLY_JAVELIN_FIRE_DURATION = 5 * 20;
-	private static final int HOLY_JAVELIN_1_COOLDOWN = 7 * 20;
-	private static final int HOLY_JAVELIN_2_COOLDOWN = 8 * 20;
+	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
+	private static final double HITBOX_LENGTH = 0.75;
+	private static final int RANGE = 12;
+	private static final int UNDEAD_DAMAGE_1 = 12;
+	private static final int UNDEAD_DAMAGE_2 = 24;
+	private static final int DAMAGE_1 = 5;
+	private static final int DAMAGE_2 = 10;
+	private static final int FIRE_DURATION = 5 * 20;
+	private static final int COOLDOWN = 7 * 20;
 
 	private final int mDamage;
-	private final int mDamageUndead;
+	private final int mUndeadDamage;
 
 	public HolyJavelin(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Holy Javelin");
 		mInfo.mLinkedSpell = Spells.HOLY_JAVELIN;
 		mInfo.mScoreboardId = "HolyJavelin";
 		mInfo.mShorthandName = "HJ";
-		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks dealing 10 damage to undead and 5 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 7s.");
-		mInfo.mDescriptions.add("Damage is increased to 20 to undead and 10 to all others.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? HOLY_JAVELIN_1_COOLDOWN : HOLY_JAVELIN_2_COOLDOWN;
+		mInfo.mDescriptions.add("Sprint left-clicking while not holding a pickaxe throws a piercing spear of light 12 blocks dealing 12 damage to undead and 5 damage to all others. All hit enemies are set on fire for 5s. Cooldown: 7s.");
+		mInfo.mDescriptions.add("Damage is increased to 24 to undead and 10 to all others.");
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mDamage = getAbilityScore() == 1 ? HOLY_JAVELIN_1_DAMAGE : HOLY_JAVELIN_2_DAMAGE;
-		mDamageUndead = getAbilityScore() == 1 ? HOLY_JAVELIN_1_UNDEAD_DAMAGE : HOLY_JAVELIN_2_UNDEAD_DAMAGE;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mUndeadDamage = getAbilityScore() == 1 ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2;
 	}
 
 	@Override
@@ -76,12 +69,12 @@ public class HolyJavelin extends Ability {
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f);
 
 		// Get a list of all the mobs this could possibly hit (that are within range of the player)
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, HOLY_JAVELIN_RANGE, mPlayer);
-		BoundingBox box = BoundingBox.of(playerLoc, HOLY_JAVELIN_RADIUS, HOLY_JAVELIN_RADIUS, HOLY_JAVELIN_RADIUS);
-		for (int i = 0; i < HOLY_JAVELIN_RANGE; i++) {
+		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(location, RANGE, mPlayer);
+		BoundingBox box = BoundingBox.of(playerLoc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
+		for (int i = 0; i < RANGE; i++) {
 			box.shift(increment);
 			Location loc = box.getCenter().toLocation(mWorld);
-			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, HOLY_JAVELIN_COLOR);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR);
 			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f);
 
 			Iterator<LivingEntity> iter = mobs.iterator();
@@ -89,11 +82,11 @@ public class HolyJavelin extends Ability {
 				LivingEntity mob = iter.next();
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isUndead(mob)) {
-						EntityUtils.damageEntity(mPlugin, mob, mDamageUndead, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+						EntityUtils.damageEntity(mPlugin, mob, mUndeadDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					} else {
 						EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
 					}
-					EntityUtils.applyFire(mPlugin, HOLY_JAVELIN_FIRE_DURATION, mob, mPlayer);
+					EntityUtils.applyFire(mPlugin, FIRE_DURATION, mob, mPlayer);
 					iter.remove();
 				}
 			}

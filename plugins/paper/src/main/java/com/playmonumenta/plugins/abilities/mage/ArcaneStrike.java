@@ -26,15 +26,15 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class ArcaneStrike extends Ability {
 
-	private static final Particle.DustOptions ARCANE_STRIKE_COLOR_1 = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
-	private static final Particle.DustOptions ARCANE_STRIKE_COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
+	private static final Particle.DustOptions COLOR_1 = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
+	private static final Particle.DustOptions COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
 
-	private static final float ARCANE_STRIKE_RADIUS = 4.0f;
-	private static final int ARCANE_STRIKE_1_DAMAGE = 5;
-	private static final int ARCANE_STRIKE_2_DAMAGE = 8;
-	private static final int ARCANE_STRIKE_1_BONUS_DAMAGE = 2;
-	private static final int ARCANE_STRIKE_2_BONUS_DAMAGE = 4;
-	private static final int ARCANE_STRIKE_COOLDOWN = 6 * 20;
+	private static final float RADIUS = 4.0f;
+	private static final int DAMAGE_1 = 5;
+	private static final int DAMAGE_2 = 8;
+	private static final int BONUS_DAMAGE_1 = 2;
+	private static final int BONUS_DAMAGE_2 = 4;
+	private static final int COOLDOWN = 6 * 20;
 
 	private final int mDamageBonus;
 	private final int mDamageBonusAffected;
@@ -46,17 +46,19 @@ public class ArcaneStrike extends Ability {
 		mInfo.mShorthandName = "AS";
 		mInfo.mDescriptions.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing 5 damage to all mobs in a 4 block radius around the target. Enemies that are on fire or slowed take 2 extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: 6s.");
 		mInfo.mDescriptions.add("The damage is increased to 8. Mobs that are on fire or slowed take 4 additional damage.");
-		mInfo.mCooldown = ARCANE_STRIKE_COOLDOWN;
-		mDamageBonus = getAbilityScore() == 1 ? ARCANE_STRIKE_1_DAMAGE : ARCANE_STRIKE_2_DAMAGE;
-		mDamageBonusAffected = getAbilityScore() == 1 ? ARCANE_STRIKE_1_BONUS_DAMAGE : ARCANE_STRIKE_2_BONUS_DAMAGE;
+		mInfo.mCooldown = COOLDOWN;
+		mDamageBonus = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mDamageBonusAffected = getAbilityScore() == 1 ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			putOnCooldown();
+
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), ARCANE_STRIKE_RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(damagee.getLocation(), RADIUS, mPlayer)) {
 				int dmg = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
@@ -96,8 +98,8 @@ public class ArcaneStrike extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, ARCANE_STRIKE_COLOR_1);
-							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, ARCANE_STRIKE_COLOR_2);
+							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1);
+							mWorld.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2);
 						}
 					}
 					mD += 30;
@@ -107,7 +109,6 @@ public class ArcaneStrike extends Ability {
 				}
 
 			}.runTaskTimer(mPlugin, 0, 1);
-			putOnCooldown();
 		}
 
 		return true;

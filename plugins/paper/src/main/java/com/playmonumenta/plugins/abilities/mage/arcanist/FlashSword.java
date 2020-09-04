@@ -24,42 +24,38 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 
-/*
- * Flash Sword: Sprint left clicking with a wand causes a wave
- * of Arcane blades to cut down all the foes in your path. Each
- * enemy within a 5 block cone takes 4 damage 3 times in rapid
- * succession, being knocked back with the last swipe. At level
- * 2 this abilities damage increases to 7 damage 3 times.
- * (CD: 12 / 10 seconds)
- */
 public class FlashSword extends Ability {
 
-	private static final int FSWORD_1_DAMAGE = 4;
-	private static final int FSWORD_2_DAMAGE = 7;
-	private static final int FSWORD_SWINGS = 3;
-	private static final int FSWORD_RADIUS = 5;
-	private static final int FSWORD_1_COOLDOWN = 20 * 12;
-	private static final int FSWORD_2_COOLDOWN = 20 * 10;
-	private static final float FSWORD_KNOCKBACK_SPEED = 0.3f;
-	private static final double FSWORD_DOT_ANGLE = 0.33;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 7;
+	private static final int SWINGS = 3;
+	private static final int RADIUS = 5;
+	private static final int COOLDOWN_1 = 20 * 12;
+	private static final int COOLDOWN_2 = 20 * 10;
+	private static final float KNOCKBACK_SPEED_1 = 0.2f;
+	private static final float KNOCKBACK_SPEED_2 = 0.4f;
+	private static final double DOT_ANGLE = 0.33;
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
+
+	private final int mDamage;
+	private final float mKnockbackSpeed;
 
 	public FlashSword(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Flash Sword");
 		mInfo.mScoreboardId = "FlashSword";
 		mInfo.mShorthandName = "FS";
 		mInfo.mDescriptions.add("Sprint left-clicking with a wand causes a wave of Arcane blades to hit every enemy within a 5 block cone 3 times (4 damage per hit) in rapid succession. The last hit causes knockback. Only the first hit can apply or trigger spellshock. Cooldown: 12s.");
-		mInfo.mDescriptions.add("You instead do 7 damage 3 times. Cooldown: 10s.");
+		mInfo.mDescriptions.add("You instead do 7 damage 3 times. Knockback on the last hit is increased. Cooldown: 10s.");
 		mInfo.mLinkedSpell = Spells.FSWORD;
-		mInfo.mCooldown = getAbilityScore() == 1 ? FSWORD_1_COOLDOWN : FSWORD_2_COOLDOWN;
+		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;
 	}
 
 	@Override
 	public void cast(Action action) {
-		int flashSword = getAbilityScore();
-		Player player = mPlayer;
 		putOnCooldown();
 		new BukkitRunnable() {
 			int mT = 0;
@@ -70,40 +66,39 @@ public class FlashSword extends Ability {
 			public void run() {
 				mT++;
 				mSw++;
-				Vector playerDir = player.getEyeLocation().getDirection().setY(0).normalize();
-				Location origin = player.getLocation();
-				if (player.getVelocity().length() > 0.1) {
+				Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
+				Location origin = mPlayer.getLocation();
+				if (mPlayer.getVelocity().length() > 0.1) {
 					// If the player is moving, shift the flash sword in the direction they are moving
-					origin.add(player.getVelocity().normalize().multiply(1.2));
+					origin.add(mPlayer.getVelocity().normalize().multiply(1.2));
 				}
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, FSWORD_RADIUS)) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(origin, RADIUS)) {
 					Vector toMobVector = mob.getLocation().toVector().subtract(origin.toVector()).setY(0)
 					                     .normalize();
-					if (playerDir.dot(toMobVector) > FSWORD_DOT_ANGLE) {
-						int damageMultiplier = (flashSword == 1) ? FSWORD_1_DAMAGE : FSWORD_2_DAMAGE;
+					if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 						Vector velocity = mob.getVelocity();
 						mob.setNoDamageTicks(0);
 
 						// Only interact with spellshock on the first swing
 						if (mT == 1) {
-							EntityUtils.damageEntity(mPlugin, mob, damageMultiplier, player, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true);
+							EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, true, true);
 						} else {
-							EntityUtils.damageEntity(mPlugin, mob, damageMultiplier, player, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
+							EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell, false, false);
 						}
 
-						if (mT >= FSWORD_SWINGS) {
-							MovementUtils.knockAway(player, mob, FSWORD_KNOCKBACK_SPEED);
+						if (mT >= SWINGS) {
+							MovementUtils.knockAway(mPlayer, mob, mKnockbackSpeed, mKnockbackSpeed);
 						} else {
 							mob.setVelocity(velocity);
 						}
 					}
 				}
 
-				if (mT >= FSWORD_SWINGS) {
+				if (mT >= SWINGS) {
 					mPitch = 1.45f;
 				}
-				player.getWorld().playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
-				player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
+				mWorld.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f);
+				mWorld.playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.75f, mPitch);
 				new BukkitRunnable() {
 					final int mI = mSw;
 					double mRoll;
@@ -163,7 +158,7 @@ public class FlashSword extends Ability {
 					}
 
 				}.runTaskTimer(mPlugin, 0, 1);
-				if (mT >= FSWORD_SWINGS) {
+				if (mT >= SWINGS) {
 					this.cancel();
 				}
 			}

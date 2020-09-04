@@ -23,13 +23,13 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class MagmaShield extends Ability {
 
-	private static final int MAGMA_SHIELD_COOLDOWN = 12 * 20;
-	private static final int MAGMA_SHIELD_RADIUS = 6;
-	private static final int MAGMA_SHIELD_FIRE_DURATION = 4 * 20;
-	private static final int MAGMA_SHIELD_1_DAMAGE = 7;
-	private static final int MAGMA_SHIELD_2_DAMAGE = 14;
-	private static final float MAGMA_SHIELD_KNOCKBACK_SPEED = 0.5f;
-	private static final double MAGMA_SHIELD_DOT_ANGLE = 0.33;
+	private static final int COOLDOWN = 12 * 20;
+	private static final int RADIUS = 6;
+	private static final int FIRE_DURATION = 4 * 20;
+	private static final int DAMAGE_1 = 7;
+	private static final int DAMAGE_2 = 14;
+	private static final float KNOCKBACK_SPEED = 0.5f;
+	private static final double DOT_ANGLE = 0.33;
 
 	private final int mDamage;
 
@@ -40,20 +40,22 @@ public class MagmaShield extends Ability {
 		mInfo.mShorthandName = "MS";
 		mInfo.mDescriptions.add("When you block while you are sneaking, you summon a torrent of flames, knocking all enemies within 6 blocks that are in front of you away, dealing 7 damage and setting them on fire. You must hold a wand to trigger this effect. (Cooldown: 12 s)");
 		mInfo.mDescriptions.add("The damage is increased to 14.");
-		mInfo.mCooldown = MAGMA_SHIELD_COOLDOWN;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDamage = getAbilityScore() == 1 ? MAGMA_SHIELD_1_DAMAGE : MAGMA_SHIELD_2_DAMAGE;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
 	public void cast(Action action) {
+		putOnCooldown();
+
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), MAGMA_SHIELD_RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > MAGMA_SHIELD_DOT_ANGLE) {
-				float kb = (mob instanceof Player) ? 0.3f : MAGMA_SHIELD_KNOCKBACK_SPEED;
+			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
+				float kb = (mob instanceof Player) ? 0.3f : KNOCKBACK_SPEED;
 				MovementUtils.knockAway(mPlayer, mob, kb);
-				EntityUtils.applyFire(mPlugin, MAGMA_SHIELD_FIRE_DURATION, mob, mPlayer);
+				EntityUtils.applyFire(mPlugin, FIRE_DURATION, mob, mPlayer);
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.FIRE, true, mInfo.mLinkedSpell);
 			}
 		}
@@ -81,16 +83,16 @@ public class MagmaShield extends Ability {
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1);
 				}
 
-				if (mRadius >= MAGMA_SHIELD_RADIUS + 1) {
+				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);
+
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.75f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1f, 1.25f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
-		putOnCooldown();
 	}
 
 	@Override
