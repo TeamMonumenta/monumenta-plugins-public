@@ -168,6 +168,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -450,6 +451,7 @@ public class AbilityManager {
 			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
 			movementSpeed.setBaseValue(0.1);
 		}
+		EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "ToughnessMod");
 		Toughness.removeModifier(player);
 		Swiftness.removeModifier(player);
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
