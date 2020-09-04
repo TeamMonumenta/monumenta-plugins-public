@@ -104,6 +104,7 @@ public enum Enchantment {
 	DIVINE_AURA(new DivineAura()),
 	GILDED(new Gilded()),
 	RADIANT(new Radiant()),
+	CLOAKING(new Cloaking()),
 
 	// active effects
 	THROWING_KNIFE(new ThrowingKnife()),
@@ -201,6 +202,7 @@ public enum Enchantment {
 			case OINKING:
 			case RADIANT:
 			case STYLISH:
+			case CLOAKING:
 			case CLUCKING:
 			case COLORFUL:
 			case INFINITY:

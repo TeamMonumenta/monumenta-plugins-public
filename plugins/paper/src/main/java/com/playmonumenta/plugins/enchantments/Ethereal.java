@@ -3,15 +3,15 @@ package com.playmonumenta.plugins.enchantments;
 import java.util.EnumSet;
 
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
-import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 
 import net.md_5.bungee.api.ChatColor;
 
+//Ethereal: Increases I-Frames of a player by 1 tick per level. Default I-Frames is 20.
 public class Ethereal implements BaseEnchantment {
 	private static String PROPERTY_NAME = ChatColor.GRAY + "Ethereal";
 
@@ -26,14 +26,20 @@ public class Ethereal implements BaseEnchantment {
 	}
 
 	@Override
-	public void applyProperty(Plugin plugin, Player player, int level) {
-		if (level > 3) {
-			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 0, true, false));
-		}
+	public void onHurt(Plugin plugin, Player player, int level, EntityDamageEvent event) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				//Invulnerability frames are weird. This line guarentees that I-frames only extend if the timer has reset.
+				if (player.getNoDamageTicks() == 19 || player.getNoDamageTicks() == 20) {
+					player.setNoDamageTicks(20 + level);
+				}
+			}
+		}.runTaskLater(plugin, 0);
 	}
 
 	@Override
 	public void removeProperty(Plugin plugin, Player player) {
-		plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.INVISIBILITY);
+		player.setNoDamageTicks(20);
 	}
 }
