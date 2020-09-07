@@ -28,7 +28,8 @@ public class Overload extends Ability {
 	private static final int DAMAGE_2 = 8;
 	private static final int STUN_DURATION = 20 * 1;
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
+	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
+	private static final Particle.DustOptions COLOR2 = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
 	private final int mDamage;
 
@@ -48,8 +49,8 @@ public class Overload extends Ability {
 	public void periodicTrigger(boolean fourHertz, boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mSpellsToOverload == 1) {
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.4, 0.4, 0.4, 1);
 			mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.4, 0.4, 0.4, COLOR);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.5, 0.5, 0.5, COLOR2);
 		}
 	}
 
@@ -66,8 +67,8 @@ public class Overload extends Ability {
 			mSpellsToOverload = SPELLS_PER_OVERLOAD;
 
 			Location loc = mPlayer.getLocation().add(0, 1, 0);
-			mWorld.spawnParticle(Particle.SPELL_WITCH, loc, 25, 0.4, 0.4, 0.4, 1);
 			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 0.4, 0.4, 0.4, COLOR);
+			mWorld.spawnParticle(Particle.REDSTONE, loc, 35, 0.5, 0.5, 0.5, COLOR2);
 
 			// This is necessary for skills triggering over periods of time, such as Flash Sword and the soon to exist Arcane Barrage
 			mAffectedSpell = event.getAbility();
@@ -81,13 +82,21 @@ public class Overload extends Ability {
 			}.runTaskLater(mPlugin, 40);
 		}
 
+		if (mSpellsToOverload == 1) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 2, 1.2f);
+		}
+
 		return true;
 	}
 
 	@Override
 	public void playerDealtCustomDamageEvent(CustomDamageEvent event) {
+		LivingEntity damagee = event.getDamaged();
+		Location locD = damagee.getLocation().add(0, 1, 0);
 		if (event.getSpell() == mAffectedSpell) {
 			event.setDamage(event.getDamage() + mDamage);
+			mWorld.spawnParticle(Particle.REDSTONE, locD, 35, 0.4, 0.4, 0.4, COLOR);
+			mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2, COLOR2);
 		}
 	}
 
