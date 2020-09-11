@@ -27,15 +27,15 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class GraspingClaws extends Ability {
 
-	private static final int GRASPING_CLAWS_RADIUS = 8;
-	private static final float GRASPING_CLAWS_SPEED = 0.175f;
-	private static final int GRASPING_CLAWS_1_AMPLIFIER = 1;
-	private static final int GRASPING_CLAWS_2_AMPLIFIER = 2;
-	private static final int GRASPING_CLAWS_1_DAMAGE = 3;
-	private static final int GRASPING_CLAWS_2_DAMAGE = 8;
-	private static final int GRASPING_CLAWS_DURATION = 8 * 20;
-	private static final int GRASPING_CLAWS_1_COOLDOWN = 16 * 20;
-	private static final int GRASPING_CLAWS_2_COOLDOWN = 12 * 20;
+	private static final int RADIUS = 8;
+	private static final float PULL_SPEED = 0.175f;
+	private static final int AMPLIFIER_1 = 1;
+	private static final int AMPLIFIER_2 = 2;
+	private static final int DAMAGE_1 = 3;
+	private static final int DAMAGE_2 = 8;
+	private static final int DURATION = 8 * 20;
+	private static final int COOLDOWN_1 = 16 * 20;
+	private static final int COOLDOWN_2 = 12 * 20;
 
 	private final int mAmplifier;
 	private final int mDamage;
@@ -48,11 +48,11 @@ public class GraspingClaws extends Ability {
 		mInfo.mDescriptions.add("Left-clicking while shifted while holding a bow fires an arrow that pulls nearby enemies towards your arrow once it makes contact with a mob or block. Mobs caught in the arrow's 8 block radius are given Slowness 2 for 8 seconds and take 3 damage. (Cooldown: 16s)");
 		mInfo.mDescriptions.add("The pulled enemies now take 8 damage, and Slowness is increased to 3.");
 		mInfo.mLinkedSpell = Spells.GRASPING_CLAWS;
-		mInfo.mCooldown = getAbilityScore() == 1 ? GRASPING_CLAWS_1_COOLDOWN : GRASPING_CLAWS_2_COOLDOWN;
+		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
-		mAmplifier = getAbilityScore() == 1 ? GRASPING_CLAWS_1_AMPLIFIER : GRASPING_CLAWS_2_AMPLIFIER;
-		mDamage = getAbilityScore() == 1 ? GRASPING_CLAWS_1_DAMAGE : GRASPING_CLAWS_2_DAMAGE;
+		mAmplifier = getAbilityScore() == 1 ? AMPLIFIER_1 : AMPLIFIER_2;
+		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -82,17 +82,14 @@ public class GraspingClaws extends Ability {
 			world.spawnParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125);
 			world.spawnParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, Material.ANVIL.createBlockData());
 
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, GRASPING_CLAWS_RADIUS, mPlayer)) {
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
 				EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-				MovementUtils.pullTowards(proj, mob, GRASPING_CLAWS_SPEED);
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, GRASPING_CLAWS_DURATION, mAmplifier, false, true));
+				MovementUtils.pullTowards(proj, mob, PULL_SPEED);
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW, DURATION, mAmplifier, false, true));
 			}
 
 			proj.remove();
 		}
 	}
 
-	public boolean onCooldown() {
-		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell);
-	}
 }

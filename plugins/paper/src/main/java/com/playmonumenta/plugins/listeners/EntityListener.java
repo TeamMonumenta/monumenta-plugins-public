@@ -217,45 +217,37 @@ public class EntityListener implements Listener {
 
 		//  If the entity getting hurt is the player.
 		if (damagee instanceof Player) {
-			Player player = (Player)damagee;
-
-			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
-			EvasionInfo.triggerEvasion(player, event);
-
-			if (damager instanceof LivingEntity) {
-				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
-					event.setCancelled(true);
-				}
-				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
-			} else if (damager instanceof Firework) {
-				//  If we're hit by a rocket, cancel the damage.
-				event.setCancelled(true);
-			} else if (damager instanceof Projectile) {
-				// Drowneds throwing tridents at players should deal the damage of the trident
-				if (damager instanceof Trident) {
-					ProjectileSource source = ((Projectile) damager).getShooter();
-					if (source instanceof Drowned) {
-						ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
-						if (meta != null && meta.hasAttributeModifiers()) {
-							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
-							if (modifiers != null) {
-								Iterator<AttributeModifier> iter = modifiers.iterator();
-								while (iter.hasNext()) {
-									AttributeModifier mod = iter.next();
-									if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
-										// Use the last flat damage modifier on the trident, ignore other modifiers
-										// +1 for base damage to be consistent with melee attack damage
-										event.setDamage(mod.getAmount() + 1);
-									}
+			/*
+			 * First set the damage of the event to proper damage if it's a trident or crossbow
+			 *
+			 * We need to make this not a hard-coded mess at some point
+			 */
+			if (damager instanceof Trident) {
+				ProjectileSource source = ((Projectile) damager).getShooter();
+				if (source instanceof Drowned) {
+					ItemMeta meta = ((Drowned)source).getEquipment().getItemInMainHand().getItemMeta();
+					if (meta != null && meta.hasAttributeModifiers()) {
+						Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
+						if (modifiers != null) {
+							Iterator<AttributeModifier> iter = modifiers.iterator();
+							while (iter.hasNext()) {
+								AttributeModifier mod = iter.next();
+								if (mod.getOperation().equals(AttributeModifier.Operation.ADD_NUMBER)) {
+									// Use the last flat damage modifier on the trident, ignore other modifiers
+									// +1 for base damage to be consistent with melee attack damage
+									event.setDamage(mod.getAmount() + 1);
 								}
 							}
 						}
 					}
-				} else if (damager instanceof AbstractArrow) {
-					// Illagers shooting crossbows (or any non player entity using a crossbow)
-					ProjectileSource source = ((Projectile) damager).getShooter();
-					if (!(source instanceof Player)) {
-						ItemMeta meta = ((LivingEntity)source).getEquipment().getItemInMainHand().getItemMeta();
+				}
+			} else if (damager instanceof AbstractArrow) {
+				// Illagers shooting crossbows (or any non player entity using a crossbow)
+				ProjectileSource source = ((Projectile) damager).getShooter();
+				if (!(source instanceof Player)) {
+					ItemStack item = ((LivingEntity)source).getEquipment().getItemInMainHand();
+					if (item.getType() == Material.CROSSBOW) {
+						ItemMeta meta = item.getItemMeta();
 						if (meta != null && meta.hasAttributeModifiers()) {
 							Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(Attribute.GENERIC_ATTACK_DAMAGE);
 							if (modifiers != null) {
@@ -271,7 +263,22 @@ public class EntityListener implements Listener {
 						}
 					}
 				}
+			}
 
+			Player player = (Player)damagee;
+
+			mPlugin.mTrackingManager.mPlayers.onHurtByEntity(mPlugin, player, event);
+			EvasionInfo.triggerEvasion(player, event);
+
+			if (damager instanceof LivingEntity) {
+				if (!mAbilities.playerDamagedByLivingEntityEvent(player, event)) {
+					event.setCancelled(true);
+				}
+				MetadataUtils.checkOnceThisTick(mPlugin, damagee, Constants.PLAYER_DAMAGE_NONCE_METAKEY);
+			} else if (damager instanceof Firework) {
+				//  If we're hit by a rocket, cancel the damage.
+				event.setCancelled(true);
+			} else if (damager instanceof Projectile) {
 				if (!mAbilities.playerDamagedByProjectileEvent(player, event)) {
 					damager.remove();
 					event.setCancelled(true);

@@ -19,7 +19,7 @@ public class PercentHeal extends Effect {
 	@Override
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		event.setAmount(event.getAmount() * (1 + mAmount));
-		return true;
+		return mAmount > -1;
 	}
 
 }

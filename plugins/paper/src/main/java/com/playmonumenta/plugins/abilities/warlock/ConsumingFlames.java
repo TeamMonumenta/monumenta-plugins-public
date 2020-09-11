@@ -35,7 +35,7 @@ public class ConsumingFlames extends Ability {
 		mInfo.mScoreboardId = "ConsumingFlames";
 		mInfo.mShorthandName = "CF";
 		mInfo.mDescriptions.add("Sneaking and right-clicking while not looking down while holding a scythe knocks back and ignites mobs within 8 blocks of you for 7s, additionally dealing 1 damage. Amplifying Hex now counts fire as a debuff, and levels of inferno as extra debuff levels. (Cooldown: 10s)");
-		mInfo.mDescriptions.add("The damage is increased to 8, and also afflict mobs with Weakness I.");
+		mInfo.mDescriptions.add("The damage is increased to 4, and also afflict mobs with Weakness I.");
 		mInfo.mLinkedSpell = Spells.CONSUMING_FLAMES;
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

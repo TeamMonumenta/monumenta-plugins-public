@@ -21,6 +21,7 @@ public enum Spells {
 	ELEMENTAL_SPIRIT_ICE("Elemental Spirit (Ice)"),
 
 	//--Arcanist Spec.
+	ARCANE_BARRAGE("Arcane Barrage"),
 	FSWORD("Flash Sword"),
 
 	//Rogue
@@ -87,7 +88,7 @@ public enum Spells {
 	EXORCISM("Exorcism"),
 
 	//--Reaper
-	HUNGERING_VORTEX("Hungering Vortex"),
+	GHOULISH_TAUNT("Ghoulish Taunt"),
 	DEATHS_TOUCH("Death's Touch"),
 	DARK_PACT("Dark Pact"),
 

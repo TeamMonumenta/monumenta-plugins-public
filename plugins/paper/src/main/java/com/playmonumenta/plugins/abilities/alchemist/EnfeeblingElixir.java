@@ -23,18 +23,19 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class EnfeeblingElixir extends Ability {
-	private static final int ENFEEBLING_1_COOLDOWN = 20 * 15;
-	private static final int ENFEEBLING_2_COOLDOWN = 20 * 10;
-	private static final int ENFEEBLING_DURATION = 5 * 20;
-	private static final float ENFEEBLING_1_KNOCKBACK_SPEED = 0.35f;
-	private static final float ENFEEBLING_2_KNOCKBACK_SPEED = 0.5f;
-	private static final int ENFEEBLING_1_WEAKNESS_AMP = 0;
-	private static final int ENFEEBLING_2_WEAKNESS_AMP = 1;
-	private static final int ENFEEBLING_1_SPEED_AMP = 0;
-	private static final int ENFEEBLING_2_SPEED_AMP = 1;
-	private static final int ENFEEBLING_JUMP_LEVEL = 1;
+	private static final int COOLDOWN = 20 * 20;
+	private static final int DURATION_1 = 7 * 20;
+	private static final int DURATION_2 = 10 * 20;
+	private static final float KNOCKBACK_SPEED_1 = 0.35f;
+	private static final float KNOCKBACK_SPEED_2 = 0.5f;
+	private static final int WEAKNESS_AMPLIFIER_1 = 0;
+	private static final int WEAKNESS_AMPLIFIER_2 = 1;
+	private static final int SPEED_AMPLIFIER_1 = 0;
+	private static final int SPEED_AMPLIFIER_2 = 1;
+	private static final int JUMP_LEVEL = 1;
 	private static final int ENFEEBLING_RADIUS = 3;
 
+	private final int mDuration;
 	private final int mWeaknessAmp;
 	private final int mSpeedAmp;
 	private final float mKnockbackSpeed;
@@ -46,11 +47,12 @@ public class EnfeeblingElixir extends Ability {
 		mInfo.mShorthandName = "EE";
 		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 5s. You gain Jump Boost II and Speed 1 for 5s. Cooldown: 15s.");
 		mInfo.mDescriptions.add("The knockback increases by 50% and Weakness I and Speed I are both increased to II. Cooldown: 10s.");
-		mInfo.mCooldown = getAbilityScore() == 1 ? ENFEEBLING_1_COOLDOWN : ENFEEBLING_2_COOLDOWN;
+		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mWeaknessAmp = getAbilityScore() == 1 ? ENFEEBLING_1_WEAKNESS_AMP : ENFEEBLING_2_WEAKNESS_AMP;
-		mSpeedAmp = getAbilityScore() == 1 ? ENFEEBLING_1_SPEED_AMP : ENFEEBLING_2_SPEED_AMP;
-		mKnockbackSpeed = getAbilityScore() == 1 ? ENFEEBLING_1_KNOCKBACK_SPEED : ENFEEBLING_2_KNOCKBACK_SPEED;
+		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
+		mWeaknessAmp = getAbilityScore() == 1 ? WEAKNESS_AMPLIFIER_1 : WEAKNESS_AMPLIFIER_2;
+		mSpeedAmp = getAbilityScore() == 1 ? SPEED_AMPLIFIER_1 : SPEED_AMPLIFIER_2;
+		mKnockbackSpeed = getAbilityScore() == 1 ? KNOCKBACK_SPEED_1 : KNOCKBACK_SPEED_2;
 	}
 
 	@Override
@@ -60,13 +62,13 @@ public class EnfeeblingElixir extends Ability {
 		if (mHand.getType() != Material.BOW && mHand.getType() != Material.SPLASH_POTION) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), ENFEEBLING_RADIUS, mPlayer)) {
 				MovementUtils.knockAway(mPlayer, mob, mKnockbackSpeed);
-				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, ENFEEBLING_DURATION, mWeaknessAmp, true, false));
+				PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.WEAKNESS, mDuration, mWeaknessAmp, true, false));
 			}
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.SPEED, ENFEEBLING_DURATION, mSpeedAmp));
+			                                 new PotionEffect(PotionEffectType.SPEED, mDuration, mSpeedAmp));
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.JUMP, ENFEEBLING_DURATION, ENFEEBLING_JUMP_LEVEL));
+			                                 new PotionEffect(PotionEffectType.JUMP, mDuration, JUMP_LEVEL));
 
 			mWorld.spawnParticle(Particle.SPELL_MOB, mPlayer.getLocation(), 100, 2, 1.5, 2, 0);
 			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);

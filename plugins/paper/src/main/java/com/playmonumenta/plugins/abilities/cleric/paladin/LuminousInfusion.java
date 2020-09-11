@@ -127,11 +127,14 @@ public class LuminousInfusion extends Ability {
 	public void execute(LivingEntity damagee, EntityDamageByEntityEvent event) {
 		mActive = false;
 
+		EntityUtils.damageEntity(mPlugin, damagee, UNDEAD_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
+
 		Location loc = damagee.getLocation();
 		mWorld.spawnParticle(Particle.FIREWORKS_SPARK, loc, 100, 0.05f, 0.05f, 0.05f, 0.3);
 		mWorld.spawnParticle(Particle.FLAME, loc, 75, 0.05f, 0.05f, 0.05f, 0.3);
 		mWorld.playSound(loc, Sound.ITEM_TOTEM_USE, 0.8f, 1.1f);
 
+		// Exclude the damagee so that the knockaway is valid
 		List<LivingEntity> affected = EntityUtils.getNearbyMobs(loc, RADIUS, damagee);
 		for (LivingEntity e : affected) {
 			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs

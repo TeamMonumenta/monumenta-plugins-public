@@ -36,7 +36,7 @@ public class RecklessSwing extends Ability {
 	private final int mDamage;
 
 	public RecklessSwing(Plugin plugin, World world, Player player) {
-		super(plugin, world, player, "RecklessSwing");
+		super(plugin, world, player, "Reckless Swing");
 		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";

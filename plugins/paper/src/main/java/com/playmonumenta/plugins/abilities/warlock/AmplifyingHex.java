@@ -30,16 +30,16 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class AmplifyingHex extends Ability {
 
-	private static final int AMPLIFYING_1_EFFECT_DAMAGE = 5;
-	private static final int AMPLIFYING_2_EFFECT_DAMAGE = 7;
-	private static final int AMPLIFYING_1_AMPLIFIER_DAMAGE = 1;
-	private static final int AMPLIFYING_2_AMPLIFIER_DAMAGE = 2;
-	private static final int AMPLIFYING_AMPLIFIER_CAP = 2;
-	private static final int AMPLIFYING_RADIUS = 8;
-	private static final double AMPLIFYING_DOT_ANGLE = 0.33;
-	private static final int AMPLIFYING_1_COOLDOWN = 12 * 20;
-	private static final int AMPLIFYING_2_COOLDOWN = 10 * 20;
-	private static final float AMPLIFYING_KNOCKBACK_SPEED = 0.12f;
+	private static final int EFFECT_DAMAGE_1 = 5;
+	private static final int EFFECT_DAMAGE_2 = 7;
+	private static final int AMPLIFIER_DAMAGE_1 = 1;
+	private static final int AMPLIFIER_DAMAGE_2 = 2;
+	private static final int AMPLIFIER_CAP = 2;
+	private static final int RADIUS = 8;
+	private static final double DOT_ANGLE = 0.33;
+	private static final int COOLDOWN_1 = 20 * 12;
+	private static final int COOLDOWN_2 = 20 * 10;
+	private static final float KNOCKBACK_SPEED = 0.12f;
 
 	private static final List<PotionEffectType> DEBUFFS = Arrays.asList(
 	                                                          PotionEffectType.WITHER,
@@ -60,13 +60,13 @@ public class AmplifyingHex extends Ability {
 		super(plugin, world, player, "Amplifying Hex");
 		mInfo.mScoreboardId = "AmplifyingHex";
 		mInfo.mShorthandName = "AH";
-		mInfo.mDescriptions.add("If you left-click with a scythe while sneaking, you fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. Extra levels of Vulnerability not counted). Cooldown: 12s.");
+		mInfo.mDescriptions.add("Sneak left click with a scythe without looking up or down to fire a magic cone up to 8 blocks in front of you, dealing 5 damage to each enemy per debuff (potion effects like slowness or wither, as well as stun) they have, and an extra +1 damage per extra level of debuff (capped at 2 extra levels. Extra levels of Vulnerability not counted). Cooldown: 12s.");
 		mInfo.mDescriptions.add("The damage is increased to 7 damage per debuff, and extra damage increased to +2 per extra level. Cooldown: 10 seconds.");
 		mInfo.mLinkedSpell = Spells.AMPLIFYING;
-		mInfo.mCooldown = (getAbilityScore() == 1) ? AMPLIFYING_1_COOLDOWN : AMPLIFYING_2_COOLDOWN;
+		mInfo.mCooldown = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mEffectDamage = getAbilityScore() == 1 ? AMPLIFYING_1_EFFECT_DAMAGE : AMPLIFYING_2_EFFECT_DAMAGE;
-		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFYING_1_AMPLIFIER_DAMAGE : AMPLIFYING_2_AMPLIFIER_DAMAGE;
+		mEffectDamage = getAbilityScore() == 1 ? EFFECT_DAMAGE_1 : EFFECT_DAMAGE_2;
+		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class AmplifyingHex extends Ability {
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1);
 				}
 
-				if (mRadius >= AMPLIFYING_RADIUS + 1) {
+				if (mRadius >= RADIUS + 1) {
 					this.cancel();
 				}
 			}
@@ -104,9 +104,9 @@ public class AmplifyingHex extends Ability {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), AMPLIFYING_RADIUS, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RADIUS, mPlayer)) {
 			Vector toMobVector = mob.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
-			if (playerDir.dot(toMobVector) > AMPLIFYING_DOT_ANGLE) {
+			if (playerDir.dot(toMobVector) > DOT_ANGLE) {
 				int debuffCount = 0;
 				int amplifierCount = 0;
 				for (PotionEffectType effectType: DEBUFFS) {
@@ -115,7 +115,7 @@ public class AmplifyingHex extends Ability {
 						debuffCount++;
 						amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY)
 						                           ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP
-						                           : AMPLIFYING_AMPLIFIER_CAP,
+						                           : AMPLIFIER_CAP,
 						                           effect.getAmplifier());
 					}
 				}
@@ -125,7 +125,7 @@ public class AmplifyingHex extends Ability {
 				if (cf != null)	{
 					if (cf.getAbilityScore() > 0 && mob.getFireTicks() > 0) {
 						debuffCount++;
-						amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY) ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP : AMPLIFYING_AMPLIFIER_CAP,
+						amplifierCount += Math.min(mob.hasMetadata(FractalEnervation.FRACTAL_CAP_REMOVED_METAKEY) ? FractalEnervation.FRACTAL_AMPLIFYING_HEX_CAP : AMPLIFIER_CAP,
 								Inferno.getMobInfernoLevel(mPlugin, mob));
 					}
 				}
@@ -136,7 +136,7 @@ public class AmplifyingHex extends Ability {
 					EntityUtils.damageEntity(mPlugin, mob,
 							debuffCount * mEffectDamage + amplifierCount * mAmplifierDamage,
 							mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
-					MovementUtils.knockAway(mPlayer, mob, AMPLIFYING_KNOCKBACK_SPEED);
+					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 				}
 			}
 		}
@@ -146,7 +146,9 @@ public class AmplifyingHex extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
+		double pitch = mPlayer.getLocation().getPitch();
+		return mPlayer.isSneaking() && pitch < 50 && pitch > -50
+				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand());
 	}
 
 }

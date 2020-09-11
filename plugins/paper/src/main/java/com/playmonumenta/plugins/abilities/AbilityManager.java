@@ -87,9 +87,9 @@ import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.abilities.mage.PrismaticShield;
 import com.playmonumenta.plugins.abilities.mage.Spellshock;
+import com.playmonumenta.plugins.abilities.mage.arcanist.ArcaneBarrage;
 import com.playmonumenta.plugins.abilities.mage.arcanist.FlashSword;
 import com.playmonumenta.plugins.abilities.mage.arcanist.Overload;
-import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -142,7 +142,7 @@ import com.playmonumenta.plugins.abilities.warlock.WarlockPassive;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouch;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DeathsTouchNonReaper;
-import com.playmonumenta.plugins.abilities.warlock.reaper.HungeringVortex;
+import com.playmonumenta.plugins.abilities.warlock.reaper.GhoulishTaunt;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.EerieEminence;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
@@ -202,8 +202,9 @@ public class AbilityManager {
 			                               new RecklessSwing(mPlugin, mWorld, null),
 			                               new DarkPact(mPlugin, mWorld, null),
 
-			                               // Starfall needs to come before Mana Lance
-			                               new Starfall(mPlugin, mWorld, null)
+			                               // Starfall and Arcane Barrage need to come before Mana Lance
+			                               new Starfall(mPlugin, mWorld, null),
+			                               new ArcaneBarrage(mPlugin, mWorld, null)
 			                           );
 
 		if (ServerProperties.getClassSpecializationsEnabled()) {
@@ -257,7 +258,6 @@ public class AbilityManager {
 		                               new ScoutPassive(mPlugin, mWorld, null),
 		                               new SwiftCuts(mPlugin, mWorld, null),
 		                               new Sharpshooter(mPlugin, mWorld, null),
-		                               new FinishingBlow(mPlugin, mWorld, null),
 
 		                               //********** WARRIOR **********//
 		                               new BruteForce(mPlugin, mWorld, null),
@@ -312,10 +312,9 @@ public class AbilityManager {
                 new ElementalSpiritIce(mPlugin, mWorld, null),
                 new Blizzard(mPlugin, mWorld, null),
 
-                // MAGE SWORDSMAN
+                // ARCANIST
                 new FlashSword(mPlugin, mWorld, null),
                 new Overload(mPlugin, mWorld, null),
-                new SagesInsight(mPlugin, mWorld, null),
 
                 //********** ROGUE **********//
                 // SWORDSAGE
@@ -363,7 +362,7 @@ public class AbilityManager {
                 //********** WARLOCK **********//
                 // REAPER
                 new DeathsTouch(mPlugin, mWorld, null),
-                new HungeringVortex(mPlugin, mWorld, null),
+                new GhoulishTaunt(mPlugin, mWorld, null),
                 new DeathsTouchNonReaper(mPlugin, mWorld, null),
 
                 // TENEBRIST
@@ -404,6 +403,7 @@ public class AbilityManager {
 		                               new Arcanic(mPlugin, mWorld, null),
 		                               new Dreadful(mPlugin, mWorld, null),
 
+		                               new FinishingBlow(mPlugin, mWorld, null),
 									   new PrismaticShield(mPlugin, mWorld, null),
 		                               new EscapeDeath(mPlugin, mWorld, null)
 		                           ));

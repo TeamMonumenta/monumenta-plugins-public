@@ -52,7 +52,8 @@ public class EscapeDeath extends Ability {
 	}
 
 	private void execute(EntityDamageByEntityEvent event) {
-		if (mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event) <= TRIGGER_THRESHOLD_HEALTH) {
+		double newHealth = mPlayer.getHealth() + AbsorptionUtils.getAbsorption(mPlayer) - EntityUtils.getRealFinalDamage(event);
+		if (newHealth <= TRIGGER_THRESHOLD_HEALTH && newHealth > 0) {
 			putOnCooldown();
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {

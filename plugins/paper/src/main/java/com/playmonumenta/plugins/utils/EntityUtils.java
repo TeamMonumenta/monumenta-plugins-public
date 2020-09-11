@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -528,6 +529,29 @@ public class EntityUtils {
 
 	public static List<LivingEntity> getNearbyMobs(Location loc, double radius, EnumSet<EntityType> types) {
 		return getNearbyMobs(loc, radius, radius, radius, types);
+	}
+
+	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {
+		Set<LivingEntity> nearbyMobs = new HashSet<LivingEntity>(getNearbyMobs(loc, range));
+		List<LivingEntity> mobsInLine = new ArrayList<LivingEntity>();
+
+		Vector shift = direction.normalize().multiply(halfHitboxLength);
+		BoundingBox hitbox = BoundingBox.of(loc, halfHitboxLength * 2, halfHitboxLength * 2, halfHitboxLength * 2);
+
+		for (double r = 0; r < range; r += halfHitboxLength) {
+			Iterator<LivingEntity> iter = nearbyMobs.iterator();
+			while (iter.hasNext()) {
+				LivingEntity mob = iter.next();
+				if (mob.getBoundingBox().overlaps(hitbox)) {
+					mobsInLine.add(mob);
+					iter.remove();
+				}
+			}
+
+			hitbox.shift(shift);
+		}
+
+		return mobsInLine;
 	}
 
 	public static LivingEntity getNearestMob(Location loc, double radius, LivingEntity getter) {

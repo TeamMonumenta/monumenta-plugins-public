@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
@@ -73,13 +74,17 @@ public class Overload extends Ability {
 			// This is necessary for skills triggering over periods of time, such as Flash Sword and the soon to exist Arcane Barrage
 			mAffectedSpell = event.getAbility();
 
-			// Lame workaround until we fully axe Sage's Insight and can fully predict cooldowns
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mAffectedSpell = null;
-				}
-			}.runTaskLater(mPlugin, 40);
+			if (mAffectedSpell == Spells.ARCANE_BARRAGE) {
+				mAffectedSpell = null;
+				AbilityManager.getManager().getPlayerAbility(mPlayer, ArcaneBarrage.class).activateOverload();
+			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						mAffectedSpell = null;
+					}
+				}.runTaskLater(mPlugin, 40);
+			}
 		}
 
 		if (mSpellsToOverload == 1) {
