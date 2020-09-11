@@ -29,7 +29,7 @@ public class RecklessSwing extends Ability {
 	private static final int SELF_DAMAGE = 4;
 	private static final int DAMAGE_1 = 12;
 	private static final int DAMAGE_2 = 24;
-	private static final int RADIUS = 3;
+	private static final double RADIUS = 3.5;
 
 	private final double mDamagePercentPer4Health;
 	private final double mMaxDamagePercent;
@@ -40,10 +40,10 @@ public class RecklessSwing extends Ability {
 		mInfo.mLinkedSpell = Spells.RECKLESS_SWING;
 		mInfo.mScoreboardId = "RecklessSwing";
 		mInfo.mShorthandName = "RS";
-		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword without hitting a mob to deal 12 damage in a 3 block radius, while also taking 4 health of damage (not reduced by any kind of damage resistance, bypasses absorption).");
+		mInfo.mDescriptions.add("Passively, every 4 health you fall below your maximum health, gain +5% damage (capped at +25%) on sword and axe hits. Sneak left click with an axe or a sword without hitting a mob to deal 12 damage in a 3.5 block radius, while also taking 4 health of damage (not reduced by any kind of damage resistance, bypasses absorption).");
 		mInfo.mDescriptions.add("Gain +10% damage (capped at +50%) instead. Damage from the active increased to 24.");
 		mInfo.mIgnoreCooldown = true;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK_AIR;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDamagePercentPer4Health = getAbilityScore() == 1 ? DAMAGE_PERCENT_PER_4_HEALTH_1 : DAMAGE_PERCENT_PER_4_HEALTH_2;
 		mMaxDamagePercent = getAbilityScore() == 1 ? MAX_DAMAGE_PERCENT_1 : MAX_DAMAGE_PERCENT_2;
 		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
@@ -54,6 +54,7 @@ public class RecklessSwing extends Ability {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
 			int missingHealthChunks = (int)((mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() - mPlayer.getHealth()) / DAMAGE_INCREMENT_THRESHOLD_HEALTH);
 			event.setDamage(event.getDamage() * (1 + Math.min(mMaxDamagePercent, mDamagePercentPer4Health * missingHealthChunks)));
+			cast(Action.LEFT_CLICK_AIR);
 		}
 
 		return true;
