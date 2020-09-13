@@ -45,8 +45,8 @@ public class EnfeeblingElixir extends Ability {
 		mInfo.mLinkedSpell = Spells.ENFEEBLING_ELIXIR;
 		mInfo.mScoreboardId = "EnfeeblingElixir";
 		mInfo.mShorthandName = "EE";
-		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 5s. You gain Jump Boost II and Speed 1 for 5s. Cooldown: 15s.");
-		mInfo.mDescriptions.add("The knockback increases by 50% and Weakness I and Speed I are both increased to II. Cooldown: 10s.");
+		mInfo.mDescriptions.add("When you crouch and attack a mob or left click, all mobs within 3 blocks are knocked back several blocks and gain Weakness I for 7s. You gain Jump Boost II and Speed 1 for 7s. Cooldown: 20s.");
+		mInfo.mDescriptions.add("The knockback increases by 50%, Weakness I and Speed I are both increased to II, and the duration of buffs and debuffs is increased to 10s.");
 		mInfo.mCooldown = COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
