@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -93,8 +94,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f));
 							mWorld.spawnParticle(Particle.REDSTONE, loc, 2, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f));
 
-							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin(timer.getValue() % 40 / 20.0 * Math.PI), 0, 5 * Math.cos(timer.getValue() % 40 / 20.0 * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
-							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * Math.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * Math.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
+							mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timer.getValue() % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timer.getValue() % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f));
 
 							if (timer.getValue() % 4 == 0) {
 								mWorld.spawnParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0);

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -66,16 +67,16 @@ public class SpellBurningVengence extends Spell {
 						Location loc = h.getLocation();
 						for (int i = 0; i < 3; i++) {
 							double radian1 = Math.toRadians(i * 120 + (t * 3));
-							loc.add(Math.cos(radian1) * 4, 0, Math.sin(radian1) * 4);
+							loc.add(FastUtils.cos(radian1) * 4, 0, FastUtils.sin(radian1) * 4);
 							world.spawnParticle(Particle.FLAME, loc, 2, 0.1, 0.1, 0.1, 0.065);
 							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.1, 0.1, 0.1, 0.065);
-							loc.subtract(Math.cos(radian1) * 4, 0, Math.sin(radian1) * 4);
+							loc.subtract(FastUtils.cos(radian1) * 4, 0, FastUtils.sin(radian1) * 4);
 						}
 
 						for (double i = 0; i < 360; i += 7.5) {
 							double radian1 = Math.toRadians(i);
 							boolean reduce = false;
-							loc.add(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+							loc.add(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
 							if (loc.getBlock().getType().isSolid()) {
 								loc.add(0, 1, 0);
 								reduce = true;
@@ -94,7 +95,7 @@ public class SpellBurningVengence extends Spell {
 							if (reduce) {
 								loc.subtract(0, 1, 0);
 							}
-							loc.subtract(Math.cos(radian1) * radius, 0, Math.sin(radian1) * radius);
+							loc.subtract(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
 						}
 
 						radius -= 0.25;

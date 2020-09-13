@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.SerializationUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,10 +36,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.bosses.spells.SpellDelayedAction;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 
 public class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
@@ -147,10 +149,10 @@ public class TCalin extends BossAbilityGroup {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
 						for (int i = 0; i < 5; i++) {
 							double radian1 = Math.toRadians(mRotation + (72 * i));
-							loc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+							loc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							world.spawnParticle(Particle.SPELL_WITCH, loc, 6, 0.25, 0.25, 0.25, 0);
 							world.spawnParticle(Particle.SPELL_MOB, loc, 4, 0.25, 0.25, 0.25, 0);
-							loc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+							loc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						}
 						mRotation += 10;
 						mRadius -= 0.1;
@@ -220,10 +222,10 @@ public class TCalin extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
 					for (int i = 0; i < 5; i++) {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
-						mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						world.spawnParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0);
 						world.spawnParticle(Particle.SPELL_MOB, mLoc, 4, 0.25, 0.25, 0.25, 0);
-						mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					}
 					mRotation += 10;
 					mRadius -= 0.25;
@@ -282,10 +284,10 @@ public class TCalin extends BossAbilityGroup {
 				for (int i = 0; i < 15; i += 1) {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 2, 0.25, 0.25, 0.25, 0);
 					world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 2, 0.1, 0.1, 0.1, 0.1);
-					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}
 				mY -= mY * mYminus;

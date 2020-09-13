@@ -359,11 +359,11 @@ public class Kaul extends BossAbilityGroup {
 							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 3, 0.5f + (mJ / 25));
 							for (int i = 0; i < 5; i++) {
 								double radian1 = Math.toRadians(mRotation + (72 * i));
-								mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+								mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 								world.spawnParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0);
 								world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
 								Material.COARSE_DIRT.createBlockData());
-								mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							}
 							world.spawnParticle(Particle.SPELL_WITCH, mCenter.getLocation().add(0, 3, 0), 20, 8, 5, 8,
 							                    0);
@@ -391,11 +391,11 @@ public class Kaul extends BossAbilityGroup {
 										world.spawnParticle(Particle.SMOKE_NORMAL, mCenter.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
 										for (int i = 0; i < 36; i++) {
 											double radian1 = Math.toRadians(mRotation + (10 * i));
-											loc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+											loc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 											world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0);
 											world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.4, 0.4, 0.25,
 											                    Material.COARSE_DIRT.createBlockData());
-											loc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+											loc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 										}
 										for (Block block : LocationUtils.getEdge(loc.clone().subtract(mT, 0, mT),
 										                                 loc.clone().add(mT, 0, mT))) {
@@ -467,11 +467,11 @@ public class Kaul extends BossAbilityGroup {
 				public void run() {
 					for (int i = 0; i < 5; i++) {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
-						mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 						world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
 						world.spawnParticle(Particle.BLOCK_DUST, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
 						Material.DIRT.createBlockData());
-						mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					}
 					mRotation += 8;
 					mRadius -= 0.15;
@@ -622,10 +622,10 @@ public class Kaul extends BossAbilityGroup {
 												mRadius = mT;
 												for (int i = 0; i < 36; i++) {
 													double radian1 = Math.toRadians(mRotation + (10 * i));
-													mLoc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+													mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 													world.spawnParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1);
 													world.spawnParticle(Particle.BLOCK_DUST, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
-													mLoc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+													mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 												}
 												for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
 													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
@@ -726,11 +726,11 @@ public class Kaul extends BossAbilityGroup {
 			public void run() {
 				for (int i = 0; i < 5; i++) {
 					double radian1 = Math.toRadians(mRotation + (72 * i));
-					mLoc.add(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
 					world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
 					Material.COARSE_DIRT.createBlockData());
-					mLoc.subtract(Math.cos(radian1) * mRadius, 0, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 				}
 				mRotation += 8;
 				mRadius -= 0.25;
@@ -789,11 +789,11 @@ public class Kaul extends BossAbilityGroup {
 				for (int i = 0; i < 15; i += 1) {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 					mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
 					                               Material.COARSE_DIRT.createBlockData());
 					world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
-					mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}
 				mY -= mY * mYminus;
@@ -962,10 +962,10 @@ public class Kaul extends BossAbilityGroup {
 				mRadius = mT;
 				for (int i = 0; i < 36; i++) {
 					double radian1 = Math.toRadians(mRotation + (10 * i));
-					mLoc.add(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 					world.spawnParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null, true);
 					world.spawnParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null, true);
-					mLoc.subtract(Math.cos(radian1) * mRadius, 1, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 				}
 				for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
 					if (block.getType() == Material.MAGMA_BLOCK) {

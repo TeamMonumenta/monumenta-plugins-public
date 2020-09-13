@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,10 +25,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class BladeDance extends Ability {
 
@@ -117,7 +119,7 @@ public class BladeDance extends Ability {
 
 						@Override
 						public void run() {
-							mVec = new Vector(Math.cos(mRadians) * DANCE_RADIUS / 1.5, 0, Math.sin(mRadians) * DANCE_RADIUS / 1.5);
+							mVec = new Vector(FastUtils.cos(mRadians) * DANCE_RADIUS / 1.5, 0, FastUtils.sin(mRadians) * DANCE_RADIUS / 1.5);
 
 							Location loc2 = mPlayer.getEyeLocation().add(mVec);
 							mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0);

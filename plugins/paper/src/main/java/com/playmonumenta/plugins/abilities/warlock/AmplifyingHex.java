@@ -3,6 +3,12 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.Arrays;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -23,10 +29,6 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.enchantments.Inferno;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class AmplifyingHex extends Ability {
 
@@ -84,7 +86,7 @@ public class AmplifyingHex extends Ability {
 				mRadius += 1.25;
 				for (double degree = 30; degree <= 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
-					vec = new Vector(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch());
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 

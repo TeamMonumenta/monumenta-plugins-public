@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -128,10 +129,10 @@ public class IronTincture extends Ability {
 				mY += 0.175;
 				for (int i = 0; i < 3; i++) {
 					double degree = Math.toRadians(mRotation + (i * 120));
-					loc.add(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
+					loc.add(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
 					mWorld.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
-					loc.subtract(Math.cos(degree) * mRadius, mY, Math.sin(degree) * mRadius);
+					loc.subtract(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
 				}
 
 				if (mY >= 1.8) {

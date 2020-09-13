@@ -3,6 +3,14 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import java.util.Iterator;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,12 +29,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class AlchemicalAmalgam extends Ability {
 
@@ -118,7 +120,7 @@ public class AlchemicalAmalgam extends Ability {
 				Vector vec;
 				for (int i = 0; i < 2; i++) {
 					double radian1 = Math.toRadians(mDegree + (i * 180));
-					vec = new Vector(Math.cos(radian1) * 0.325, 0, Math.sin(radian1) * 0.325);
+					vec = new Vector(FastUtils.cos(radian1) * 0.325, 0, FastUtils.sin(radian1) * 0.325);
 					vec = VectorUtils.rotateXAxis(vec, -mLoc.getPitch() + 90);
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 

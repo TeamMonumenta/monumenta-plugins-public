@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -22,8 +23,8 @@ public class SpellDreadnaughtParticle extends Spell {
 	public void run() {
 		Location loc = mBoss.getLocation().add(0, 1, 0);
 		double yaw = loc.getYaw();
-		mWorld.spawnParticle(Particle.FLAME, loc.clone().add(-0.2 * Math.cos(yaw), 0.8, -0.2 * Math.sin(yaw)), 1, 0, 0, 0, 0);
-		mWorld.spawnParticle(Particle.FLAME, loc.clone().add(0.2 * Math.cos(yaw), 0.8, 0.2 * Math.sin(yaw)), 1, 0, 0, 0, 0);
+		mWorld.spawnParticle(Particle.FLAME, loc.clone().add(-0.2 * FastUtils.cos(yaw), 0.8, -0.2 * FastUtils.sin(yaw)), 1, 0, 0, 0, 0);
+		mWorld.spawnParticle(Particle.FLAME, loc.clone().add(0.2 * FastUtils.cos(yaw), 0.8, 0.2 * FastUtils.sin(yaw)), 1, 0, 0, 0, 0);
 		mWorld.spawnParticle(Particle.REDSTONE, loc.clone().add(0, -0.5, 0), 30, 0.2, 0.5, 0.2, 0, DREADFUL_COLOR);
 		mWorld.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.4, 0.5, 0.4, 0);
 	}

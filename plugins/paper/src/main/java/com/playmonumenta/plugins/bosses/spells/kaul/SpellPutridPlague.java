@@ -148,9 +148,9 @@ public class SpellPutridPlague extends Spell {
 					Location cLoc = point.getLocation();
 					for (double rotation = 0; rotation < 360; rotation += 6) {
 						double radian = Math.toRadians(rotation);
-						cLoc.add(Math.cos(radian) * 7, 0, Math.sin(radian) * 7);
+						cLoc.add(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
 						world.spawnParticle(Particle.SPELL_INSTANT, cLoc, 1, 0, 0, 0, 0, null, true);
-						cLoc.subtract(Math.cos(radian) * 7, 0, Math.sin(radian) * 7);
+						cLoc.subtract(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
 					}
 
 					if (t >= mTime) {

@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
@@ -96,8 +97,8 @@ public class ArcaneBarrage extends Ability {
 					Location loc = mPlayer.getLocation().add(0, 2.5, 0);
 					for (int i = 0; i < mMissiles; i++) {
 						double rotation = i * mRotationSpacing + mRotationOffset;
-						double dx = mRadius * Math.cos(rotation);
-						double dz = mRadius * Math.sin(rotation);
+						double dx = mRadius * FastUtils.cos(rotation);
+						double dz = mRadius * FastUtils.sin(rotation);
 
 						loc.add(dx, 0, dz);
 						mWorld.spawnParticle(Particle.REDSTONE, loc, 15, 0.2, 0.2, 0.2, 0.1, COLOR);

@@ -74,7 +74,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
 						world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1f, 0.5f);
 						for (int i = 0; i < 360; i += 18) {
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(Math.cos(Math.toRadians(i)) * radius, 0.2, Math.sin(Math.toRadians(i)) * radius), 1, 0.1, 0.1, 0.1, 0);
+							world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(FastUtils.cos(Math.toRadians(i)) * radius, 0.2, FastUtils.sin(Math.toRadians(i)) * radius), 1, 0.1, 0.1, 0.1, 0);
 						}
 						world.spawnParticle(Particle.BLOCK_CRACK, loc, 80, radius / 2, 0.1, radius / 2, Bukkit.createBlockData(Material.DIRT));
 						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 8, radius / 2, 0.1, radius / 2, 0);

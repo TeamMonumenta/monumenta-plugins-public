@@ -29,9 +29,9 @@ public class ParticleUtils {
 				mCurrentRadius += radius / ticks;
 
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / (7 * radius)) {
-					double x = mCurrentRadius * Math.cos(theta);
+					double x = mCurrentRadius * FastUtils.cos(theta);
 					double y = (FastUtils.RANDOM.nextDouble() - 0.5) * height;
-					double z = mCurrentRadius * Math.sin(theta);
+					double z = mCurrentRadius * FastUtils.sin(theta);
 					loc.add(x, y, z);
 
 					for (Map.Entry<Double, SpawnParticleAction> particle : particles) {
@@ -60,9 +60,9 @@ public class ParticleUtils {
 			public void run() {
 				mCurrentRadius = mCurrentRadius + 0.25 * Math.PI;
 				for (double theta = 0; theta <= 2 * Math.PI; theta = theta + Math.PI / 64) {
-					double x = mCurrentRadius * Math.cos(theta);
-					double y = 2 * Math.exp(-0.1 * mCurrentRadius) * Math.sin(mCurrentRadius) + 0.5;
-					double z = mCurrentRadius * Math.sin(theta);
+					double x = mCurrentRadius * FastUtils.cos(theta);
+					double y = 2 * Math.exp(-0.1 * mCurrentRadius) * FastUtils.sin(mCurrentRadius) + 0.5;
+					double z = mCurrentRadius * FastUtils.sin(theta);
 					mLoc.add(x, y, z);
 
 					Vector toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
@@ -75,9 +75,9 @@ public class ParticleUtils {
 
 					theta = theta + Math.PI / 64;
 
-					x = mCurrentRadius * Math.cos(theta);
-					y = 2 * Math.exp(-0.1 * mCurrentRadius) * Math.sin(mCurrentRadius) + 1.5;
-					z = mCurrentRadius * Math.sin(theta);
+					x = mCurrentRadius * FastUtils.cos(theta);
+					y = 2 * Math.exp(-0.1 * mCurrentRadius) * FastUtils.sin(mCurrentRadius) + 1.5;
+					z = mCurrentRadius * FastUtils.sin(theta);
 					mLoc.add(x, y, z);
 
 					toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();

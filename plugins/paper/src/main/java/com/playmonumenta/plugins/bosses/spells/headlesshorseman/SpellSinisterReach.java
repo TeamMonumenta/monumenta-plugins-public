@@ -3,6 +3,12 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import java.util.Collections;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,10 +24,6 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Sinister Reach - The horseman pauses momentarily for 0.8 seconds, afterwards the swing forward
@@ -96,7 +98,7 @@ public class SpellSinisterReach extends Spell {
 							double radian1 = Math.toRadians(m);
 							float yaw = mTloc.getYaw();
 							float yaw1 = yaw + 90;
-							vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+							vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 							vec = VectorUtils.rotateYAxis(vec, yaw1);
 							vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
 
@@ -127,7 +129,7 @@ public class SpellSinisterReach extends Spell {
 								double radian1 = Math.toRadians(n);
 								float yaw = mTloc.getYaw();
 								float yaw2 = yaw + 90;
-								vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 								vec = VectorUtils.rotateXAxis(vec, -mTloc.getPitch());
 								vec = VectorUtils.rotateYAxis(vec, yaw2);
 								Location l = mTloc.clone().add(vec);

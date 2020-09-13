@@ -145,6 +145,16 @@
             <version>4.5.0</version>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+			<version>1.19</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>1.19</version>
+		</dependency>
 
         <!-- These need to be shaded in! -->
         <dependency>

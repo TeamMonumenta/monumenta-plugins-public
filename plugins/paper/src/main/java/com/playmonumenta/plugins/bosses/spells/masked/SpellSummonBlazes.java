@@ -68,8 +68,8 @@ public class SpellSummonBlazes extends Spell {
 				if (mCountdown <= 0) {
 					for (int j = 0; j < mCount; j++) {
 						Entity blaz = mLoc.getWorld().spawnEntity(mLoc, EntityType.BLAZE);
-						double x = 0.5f * Math.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
-						double z = 0.5f * Math.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double x = 0.5f * FastUtils.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * FastUtils.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
 						blaz.setVelocity(new Vector(x, 0.3, z));
 					}
 

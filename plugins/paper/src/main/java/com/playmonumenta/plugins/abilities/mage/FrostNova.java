@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,10 +24,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class FrostNova extends Ability {
 
@@ -83,10 +85,10 @@ public class FrostNova extends Ability {
 				mRadius += 1.25;
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
-					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					mWorld.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
 					mWorld.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
-					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
 				if (mRadius >= RADIUS + 1) {

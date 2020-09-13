@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -71,7 +72,7 @@ public class WardingRemedy extends Ability {
 					mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7f, 2f);
 
 					for (int i = 0; i < 50; i++) {
-						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(6 * Math.sin(i / 25.0 * Math.PI), 0.15, 6 * Math.cos(i / 25.0 * Math.PI)), 1, 0, 0, 0, APOTHECARY_DARK_COLOR);
+						mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(6 * FastUtils.sin(i / 25.0 * Math.PI), 0.15, 6 * FastUtils.cos(i / 25.0 * Math.PI)), 1, 0, 0, 0, APOTHECARY_DARK_COLOR);
 					}
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().clone().add(0, 0.15, 0), 15, 2.8, 0, 2.8, 0);
 					mWorld.spawnParticle(Particle.REDSTONE, mPlayer.getLocation(), 40, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.5f));

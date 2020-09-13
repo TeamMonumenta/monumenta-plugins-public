@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -54,10 +55,10 @@ public class ConsumingFlames extends Ability {
 				mRadius += 1.25;
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
-					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					mWorld.spawnParticle(Particle.FLAME, mLoc, 2, 0, 0, 0, 0.125);
 					mWorld.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 3, 0, 0, 0, 0.15);
-					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
 				if (mRadius >= RADIUS + 1) {

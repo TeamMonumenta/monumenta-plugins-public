@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -60,11 +61,11 @@ public class SpellOmegaLeap extends Spell {
 								Location loc = mBoss.getLocation();
 								rotation += 10;
 								double radian1 = Math.toRadians(rotation);
-								loc.add(Math.cos(radian1)*radius, 0.25, Math.sin(radian1)*radius);
+								loc.add(FastUtils.cos(radian1)*radius, 0.25, FastUtils.sin(radian1)*radius);
 								world.spawnParticle(Particle.FLAME, loc, 2, 0.2, 0.2, 0.2, 0.1, null, true);
 								world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.2, 0.2, 0.2, 0.65, null, true);
 
-								loc.subtract(Math.cos(radian1)*radius, 0.25, Math.sin(radian1)*radius);
+								loc.subtract(FastUtils.cos(radian1)*radius, 0.25, FastUtils.sin(radian1)*radius);
 							}
 							for (Player player : PlayerUtils.playersInRange(l, radius)) {
 								if (player.getLocation().toVector().isInSphere(l.toVector(), radius)) {

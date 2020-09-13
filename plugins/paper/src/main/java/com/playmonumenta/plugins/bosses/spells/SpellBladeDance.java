@@ -96,10 +96,10 @@ public class SpellBladeDance extends Spell {
 							for (int i = 0; i < 15; i += 1) {
 								mRotation += 24;
 								double radian1 = Math.toRadians(mRotation);
-								mLoc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+								mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 								world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
 								world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
-								mLoc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+								mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 							}
 							mY -= mY * mYminus;

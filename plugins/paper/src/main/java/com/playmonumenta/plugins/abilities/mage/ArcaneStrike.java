@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,10 +25,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class ArcaneStrike extends Ability {
 
@@ -90,8 +92,8 @@ public class ArcaneStrike extends Ability {
 					Vector vec;
 					for (double degree = mD; degree < mD + 30; degree += 8) {
 						double radian1 = Math.toRadians(degree);
-						double cos = Math.cos(radian1);
-						double sin = Math.sin(radian1);
+						double cos = FastUtils.cos(radian1);
+						double sin = FastUtils.sin(radian1);
 						for (double r = 1; r < 4; r += 0.5) {
 							vec = new Vector(cos * r, 1, sin * r);
 							vec = VectorUtils.rotateXAxis(vec, -loc.getPitch());

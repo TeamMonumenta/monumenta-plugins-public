@@ -108,7 +108,7 @@ public class PlayerUtils {
 
 	public static Location getRightSide(Location location, double distance) {
 		float angle = location.getYaw() / 60;
-		return location.clone().subtract(new Vector(Math.cos(angle), 0, Math.sin(angle)).normalize().multiply(distance));
+		return location.clone().subtract(new Vector(FastUtils.cos(angle), 0, FastUtils.sin(angle)).normalize().multiply(distance));
 	}
 
 	/* Command should use @s for targeting selector */

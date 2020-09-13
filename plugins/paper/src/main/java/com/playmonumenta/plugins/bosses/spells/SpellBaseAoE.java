@@ -158,9 +158,9 @@ public class SpellBaseAoE extends Spell {
 				}
 				for (double i = 0; i < 360; i += 30) {
 					double radian1 = Math.toRadians(i);
-					loc.add(Math.cos(radian1) * mCurrentRadius, 0, Math.sin(radian1) * mCurrentRadius);
+					loc.add(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
 					mChargeCircleAction.run(loc);
-					loc.subtract(Math.cos(radian1) * mCurrentRadius, 0, Math.sin(radian1) * mCurrentRadius);
+					loc.subtract(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
 				}
 				mCurrentRadius -= (mRadius / ((double) mDuration));
 				if (mCurrentRadius <= 0) {
@@ -177,9 +177,9 @@ public class SpellBaseAoE extends Spell {
 								mBurstRadius += 1.5;
 								for (double i = 0; i < 360; i += 15) {
 									double radian1 = Math.toRadians(i);
-									mLoc.add(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
+									mLoc.add(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
 									mCircleOutburstAction.run(mLoc);
-									mLoc.subtract(Math.cos(radian1) * mBurstRadius, 0, Math.sin(radian1) * mBurstRadius);
+									mLoc.subtract(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
 								}
 							}
 							if (mBurstRadius >= mRadius) {

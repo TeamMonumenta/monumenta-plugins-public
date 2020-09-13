@@ -138,10 +138,10 @@ public class CrownbearerBoss extends BossAbilityGroup {
 				for (int i = 0; i < 15; i += 1) {
 					rotation += 24;
 					double radian1 = Math.toRadians(rotation);
-					loc.add(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					loc.add(FastUtils.cos(radian1) * radius, y, FastUtils.sin(radian1) * radius);
 					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0);
 					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 3, 0.1, 0.1, 0.1, 0.1);
-					loc.subtract(Math.cos(radian1) * radius, y, Math.sin(radian1) * radius);
+					loc.subtract(FastUtils.cos(radian1) * radius, y, FastUtils.sin(radian1) * radius);
 
 				}
 				y -= y * yminus;

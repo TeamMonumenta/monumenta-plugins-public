@@ -1,5 +1,12 @@
 package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,11 +21,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class SpellBash extends Spell {
 
@@ -64,7 +66,7 @@ public class SpellBash extends Spell {
 							for (double r = 1; r < 5; r += 0.5) {
 								for (double degree = d; degree <= d + 60; degree += 8) {
 									double radian1 = Math.toRadians(degree);
-									vec = new Vector(Math.cos(radian1) * r, 0.75, Math.sin(radian1) * r);
+									vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, 20);
 									vec = VectorUtils.rotateXAxis(vec, -loc.getPitch() + 20);
 									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
@@ -105,13 +107,8 @@ public class SpellBash extends Spell {
 	public boolean canRun() {
 		Creature creature = (Creature) mBoss;
 		if (creature.getTarget() != null) {
-
-			if (creature.getTarget().getLocation().distance(mBoss.getLocation()) < 4) {
-				return true;
-			}
-
+			return creature.getTarget().getLocation().distance(mBoss.getLocation()) < 4;
 		}
-
 		return false;
 	}
 

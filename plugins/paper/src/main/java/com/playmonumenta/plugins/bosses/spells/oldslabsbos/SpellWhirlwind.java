@@ -53,10 +53,10 @@ public class SpellWhirlwind extends Spell {
 
 					for (int i = 0; i < 15; i += 1) {
 						double radian1 = Math.toRadians(24 * i);
-						loc.add(Math.cos(radian1) * mRadius, 0.1, Math.sin(radian1) * mRadius);
+						loc.add(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
 						mWorld.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.025);
 						mWorld.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0.25);
-						loc.subtract(Math.cos(radian1) * mRadius, 0.1, Math.sin(radian1) * mRadius);
+						loc.subtract(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
 
 					}
 				}
@@ -81,13 +81,13 @@ public class SpellWhirlwind extends Spell {
 							for (int i = 0; i < 2; i++) {
 								mRotation += 10;
 								mSin += 0.1;
-								mY = 1 + Math.sin(mSin);
+								mY = 1 + FastUtils.sin(mSin);
 								double radian1 = Math.toRadians(mRotation);
-								loc.add(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+								loc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025);
 								mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025);
 								mWorld.spawnParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2);
-								loc.subtract(Math.cos(radian1) * mRadius, mY, Math.sin(radian1) * mRadius);
+								loc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 								/*
 								 * Check if this hits a player

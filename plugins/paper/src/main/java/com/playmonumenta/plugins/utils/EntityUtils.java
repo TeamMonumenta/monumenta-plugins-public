@@ -208,7 +208,7 @@ public class EntityUtils {
 
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
-					l.add(Math.cos(angle) * 0.5, mob.getHeight(), Math.sin(angle) * 0.5);
+					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight(), FastUtils.sin(angle) * 0.5);
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR);
 
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
@@ -224,7 +224,7 @@ public class EntityUtils {
 
 					double angle = Math.toRadians(mRotation);
 					Location l = mob.getLocation();
-					l.add(Math.cos(angle) * 0.5, mob.getHeight() + 0.25, Math.sin(angle) * 0.5);
+					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight() + 0.25, FastUtils.sin(angle) * 0.5);
 					mob.getWorld().spawnParticle(Particle.REDSTONE, l, 2, 0, 0, 0, CONFUSION_COLOR);
 
 					if (mob.getTarget() == null) {

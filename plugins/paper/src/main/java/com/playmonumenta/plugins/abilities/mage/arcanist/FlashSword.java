@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.mage.arcanist;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,10 +25,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class FlashSword extends Ability {
 
@@ -122,7 +124,7 @@ public class FlashSword extends Ability {
 							for (double r = 1; r < 5; r += 0.5) {
 								for (double degree = mD; degree < mD + 30; degree += 5) {
 									double radian1 = Math.toRadians(degree);
-									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+									vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, mRoll);
 									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());
@@ -139,7 +141,7 @@ public class FlashSword extends Ability {
 							for (double r = 1; r < 5; r += 0.5) {
 								for (double degree = mD; degree > mD - 30; degree -= 5) {
 									double radian1 = Math.toRadians(degree);
-									vec = new Vector(Math.cos(radian1) * r, 0, Math.sin(radian1) * r);
+									vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, mRoll);
 									vec = VectorUtils.rotateXAxis(vec, -origin.getPitch());
 									vec = VectorUtils.rotateYAxis(vec, origin.getYaw());

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -122,7 +123,7 @@ public class ElementalSpiritIce extends Ability {
 					mVertAngle -= 0.1f;
 					mRotation += 10;
 					double radian1 = Math.toRadians(mRotation);
-					loc.add(Math.cos(radian1), Math.sin(mVertAngle) * 0.5, Math.sin(radian1));
+					loc.add(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
 
 					// Don't display particles to player if they're in their face
 					if (loc.clone().subtract(mPlayer.getLocation().add(0, 1, 0)).toVector().normalize().dot(mPlayer.getEyeLocation().getDirection()) > 0.25) {
@@ -140,7 +141,7 @@ public class ElementalSpiritIce extends Ability {
 						this.cancel();
 					}
 
-					loc.subtract(Math.cos(radian1), Math.sin(mVertAngle) * 0.5, Math.sin(radian1));
+					loc.subtract(FastUtils.cos(radian1), FastUtils.sin(mVertAngle) * 0.5, FastUtils.sin(radian1));
 				}
 
 			};

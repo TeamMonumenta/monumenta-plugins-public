@@ -143,7 +143,7 @@ public class SpellVolcanicDemise extends Spell {
 						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 30)) {
-							player.spawnParticle(Particle.FLAME, mLoc.clone().add(Math.cos(deg), 0, Math.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
+							player.spawnParticle(Particle.FLAME, mLoc.clone().add(FastUtils.cos(deg), 0, FastUtils.sin(deg)), 1, 0.15, 0.15, 0.15, 0);
 						}
 					}
 				}

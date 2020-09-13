@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,10 +27,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
@@ -70,7 +72,7 @@ public class WitheringGaze extends Ability {
 				Vector vec;
 				for (double degree = 0; degree < 150; degree += 10) {
 					double radian1 = Math.toRadians(degree);
-					vec = new Vector(Math.cos(radian1) * mR, 0, Math.sin(radian1) * mR);
+					vec = new Vector(FastUtils.cos(radian1) * mR, 0, FastUtils.sin(radian1) * mR);
 					vec = VectorUtils.rotateXAxis(vec, 0);
 					vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 

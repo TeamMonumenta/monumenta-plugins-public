@@ -64,8 +64,8 @@ public class SpellAxtalMeleeMinions extends Spell {
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (skelly.getType() == EntityType.SKELETON) {
-						double x = 0.5f * Math.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
-						double z = 0.5f * Math.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double x = 0.5f * FastUtils.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * FastUtils.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}

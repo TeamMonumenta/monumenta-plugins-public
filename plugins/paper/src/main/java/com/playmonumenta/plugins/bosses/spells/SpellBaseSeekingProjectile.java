@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -214,11 +215,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 				if (newAngle < mTurnRadius) {
 					mDirection = newDirection;
 				} else {
-					double halfEndpointDistance = Math.sin(newAngle / 2);
+					double halfEndpointDistance = FastUtils.sin(newAngle / 2);
 
 					// Only do calculations if there's actually a direction change
 					if (halfEndpointDistance != 0) {
-						double scalar = (halfEndpointDistance + Math.sin(mTurnRadius - newAngle / 2)) / (2 * halfEndpointDistance);
+						double scalar = (halfEndpointDistance + FastUtils.sin(mTurnRadius - newAngle / 2)) / (2 * halfEndpointDistance);
 						mDirection.add(newDirection.subtract(mDirection).multiply(scalar)).normalize();
 					}
 				}

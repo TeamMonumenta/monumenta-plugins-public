@@ -3,6 +3,11 @@ package com.playmonumenta.plugins.abilities.warrior;
 import java.util.Iterator;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,9 +26,11 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+
 
 public class DefensiveLine extends Ability {
 
@@ -92,8 +99,8 @@ public class DefensiveLine extends Ability {
 							double[] dz = new double[20];
 							for (int i = 0; i < 20; i++) {
 								double radians = Math.toRadians(i * 18);
-								dx[i] = Math.cos(radians) * mRadius;
-								dz[i] = Math.sin(radians) * mRadius;
+								dx[i] = FastUtils.cos(radians) * mRadius;
+								dz[i] = FastUtils.sin(radians) * mRadius;
 							}
 
 							Iterator<Player> iter = mPlayers.iterator();

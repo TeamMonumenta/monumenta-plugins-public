@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,7 +59,7 @@ public class SpellKaulBlockBreak extends Spell {
 			Vector vec;
 			float yaw = tloc.getYaw();
 			float yaw1 = yaw + 90;
-			vec = new Vector(Math.cos(0) * i, 0, Math.sin(0) * i);
+			vec = new Vector(FastUtils.cos(0) * i, 0, FastUtils.sin(0) * i);
 			vec = VectorUtils.rotateYAxis(vec, yaw1);
 			vec = VectorUtils.rotateXAxis(vec, -tloc.getPitch());
 

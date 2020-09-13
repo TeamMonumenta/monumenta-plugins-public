@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -68,9 +69,9 @@ public class EnchantedPrayer extends Ability {
 				for (int i = 0; i < 36; i += 1) {
 					mRotation += 10;
 					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 					mWorld.spawnParticle(Particle.SPELL_INSTANT, mLoc, 2, 0.15, 0.15, 0.15, 0);
-					mLoc.subtract(Math.cos(radian1) * mRadius, 0.15, Math.sin(radian1) * mRadius);
+					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 
 				}
 				if (mRadius >= 5) {

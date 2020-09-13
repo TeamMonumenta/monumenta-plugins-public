@@ -3,6 +3,13 @@ package com.playmonumenta.plugins.abilities.warrior.guardian;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,11 +33,6 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Shield Wall: Blocking and then blocking again within 0.25s
@@ -114,7 +116,7 @@ public class ShieldWall extends Ability {
 					for (int y = 0; y < 5; y++) {
 						for (double degree = 0; degree < 180; degree += 10) {
 							double radian1 = Math.toRadians(degree);
-							vec = new Vector(Math.cos(radian1) * 4, y, Math.sin(radian1) * 4);
+							vec = new Vector(FastUtils.cos(radian1) * 4, y, FastUtils.sin(radian1) * 4);
 							vec = VectorUtils.rotateXAxis(vec, 0);
 							vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 

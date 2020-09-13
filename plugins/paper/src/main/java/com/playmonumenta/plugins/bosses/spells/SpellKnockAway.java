@@ -89,8 +89,8 @@ public class SpellKnockAway extends Spell {
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
 					angle = j * increment;
-					particleLoc.setX(lloc.getX() + (rad * Math.cos(angle)));
-					particleLoc.setZ(lloc.getZ() + (rad * Math.sin(angle)));
+					particleLoc.setX(lloc.getX() + (rad * FastUtils.cos(angle)));
+					particleLoc.setZ(lloc.getZ() + (rad * FastUtils.sin(angle)));
 					particleLoc.setY(lloc.getY() + 1.5);
 					particleLoc.getWorld().spawnParticle(Particle.CRIT, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
 				}

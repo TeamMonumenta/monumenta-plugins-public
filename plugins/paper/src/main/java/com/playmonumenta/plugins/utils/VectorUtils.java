@@ -19,8 +19,8 @@ public class VectorUtils {
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = Math.cos(radians);
-		double sin = Math.sin(radians);
+		double cos = FastUtils.cos(radians);
+		double sin = FastUtils.sin(radians);
 		return (new Vector(x * cos - z * sin, y, z * cos + x * sin));
 	}
 
@@ -33,8 +33,8 @@ public class VectorUtils {
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = Math.cos(radians);
-		double sin = Math.sin(radians);
+		double cos = FastUtils.cos(radians);
+		double sin = FastUtils.sin(radians);
 		return (new Vector(x, y * cos + z * sin, z * cos - y * sin));
 	}
 
@@ -44,8 +44,8 @@ public class VectorUtils {
 		double x = position.getX();
 		double y = position.getY();
 		double z = position.getZ();
-		double cos = Math.cos(radians);
-		double sin = Math.sin(radians);
+		double cos = FastUtils.cos(radians);
+		double sin = FastUtils.sin(radians);
 		return (new Vector(x * cos + y * sin, y * cos - x * sin, z));
 	}
 

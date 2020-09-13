@@ -1,5 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,10 +20,6 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class SpellEarthsWrath extends Spell {
 	private Plugin mPlugin;
@@ -52,20 +54,20 @@ public class SpellEarthsWrath extends Spell {
 					for (int i = 0; i < 48; i++) {
 						int j = i;
 						new BukkitRunnable() {
-							BoundingBox box = BoundingBox.of(loc, 0.75, 0.4, 0.75);
-							double radian1 = Math.toRadians((7.5 * j));
-							Location point = loc.clone().add(Math.cos(radian1) * 0.5, 0, Math.sin(radian1) * 0.5);
-							Vector dir = LocationUtils.getDirectionTo(point, loc);
+							final BoundingBox mBox = BoundingBox.of(loc, 0.75, 0.4, 0.75);
+							final double mRadian1 = Math.toRadians((7.5 * j));
+							final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
+							final Vector mDir = LocationUtils.getDirectionTo(mPoint, loc);
 							int t = 0;
 							@Override
 							public void run() {
 								t++;
-								box.shift(dir.clone().multiply(0.45));
-								Location bLoc = box.getCenter().toLocation(world);
+								mBox.shift(mDir.clone().multiply(0.45));
+								Location bLoc = mBox.getCenter().toLocation(world);
 								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
 								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40)) {
-									if (player.getBoundingBox().overlaps(box)) {
+									if (player.getBoundingBox().overlaps(mBox)) {
 										BossUtils.bossDamage(mBoss, player, 28);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
