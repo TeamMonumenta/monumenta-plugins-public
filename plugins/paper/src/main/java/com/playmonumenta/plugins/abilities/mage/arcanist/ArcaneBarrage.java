@@ -6,6 +6,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,10 +17,12 @@ import org.bukkit.util.Vector;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.OverloadBarrage;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -27,10 +30,10 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class ArcaneBarrage extends Ability {
 
-	private static final String OVERLOAD_EFFECT_NAME = "OverloadPercentDamageReceivedEffect";
+	private static final String OVERLOAD_EFFECT_NAME = "OverloadFlatDamageDealtEffect";
 	private static final int OVERLOAD_DURATION = 20 * 4;
-	private static final double OVERLOAD_AMOUNT_1 = 0.1;
-	private static final double OVERLOAD_AMOUNT_2 = 0.2;
+	private static final double OVERLOAD_AMOUNT_1 = 1;
+	private static final double OVERLOAD_AMOUNT_2 = 2;
 	private static final EnumSet<DamageCause> OVERLOAD_DAMAGE_CAUSES = EnumSet.of(DamageCause.CUSTOM);
 
 	private static final double HALF_HITBOX_LENGTH = 0.275;
@@ -44,12 +47,12 @@ public class ArcaneBarrage extends Ability {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(16, 144, 192), 1.0f);
 
-	private final double mOverloadAmount;
 	private final int mDuration;
 	private final int mMissileCount;
 
 	private BukkitRunnable mParticleRunnable;
 
+	private double mOverloadAmount;
 	private int mMissiles = 0;
 	private int mSummonTick = 0;
 	private boolean mOverloadIsActive = false;
@@ -58,7 +61,7 @@ public class ArcaneBarrage extends Ability {
 		super(plugin, world, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
-		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. Left-clicking the air with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, mobs damaged by the spear take 10% (Overload level 1) or 20% (Overload level 2) more ability damage (from any player) for 4 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, mobs damaged by the spear take 1 (Overload level 1) or 2 (Overload level 2) more ability damage (from any player) for 4 seconds. Cooldown: 20 seconds.");
 		mInfo.mDescriptions.add("Missiles last for 20 seconds instead, and gain 5 missiles when casting.");
 		mInfo.mLinkedSpell = Spells.ARCANE_BARRAGE;
 		mInfo.mCooldown = COOLDOWN;
@@ -66,16 +69,17 @@ public class ArcaneBarrage extends Ability {
 		mInfo.mIgnoreCooldown = true;
 		mDuration = getAbilityScore() == 1 ? DURATION_1 : DURATION_2;
 		mMissileCount = getAbilityScore() == 1 ? MISSILE_COUNT_1 : MISSILE_COUNT_2;
-		mOverloadAmount = getAbilityScore() == 1 ? OVERLOAD_AMOUNT_1 : OVERLOAD_AMOUNT_2;
 	}
 
 	@Override
 	public void cast(Action action) {
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
 				&& !mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
-				&& !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50) {
+				&& !mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50 && mMissiles == 0) {
 			mMissiles = mMissileCount;
 			mSummonTick = mPlayer.getTicksLived();
+			mWorld.playSound(mPlayer.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 0.4f, 1.75f);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.5f);
 
 			mParticleRunnable = new BukkitRunnable() {
 				final int mRadius = getAbilityScore() == 1 ? 2 : 3;
@@ -110,7 +114,7 @@ public class ArcaneBarrage extends Ability {
 			mParticleRunnable.runTaskTimer(mPlugin, 0, 1);
 
 			putOnCooldown();
-		} else if (action == Action.LEFT_CLICK_AIR && mMissiles > 0) {
+		} else if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && mMissiles > 0) {
 			mMissiles--;
 			Location loc = mPlayer.getEyeLocation();
 			Vector shift = mPlayer.getLocation().getDirection();
@@ -128,7 +132,9 @@ public class ArcaneBarrage extends Ability {
 				EntityUtils.damageEntity(mPlugin, mob, DAMAGE, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 				MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.2f, 0.2f);
 				if (mOverloadIsActive) {
-					mPlugin.mEffectManager.addEffect(mob, OVERLOAD_EFFECT_NAME, new PercentDamageReceived(OVERLOAD_DURATION, mOverloadAmount, OVERLOAD_DAMAGE_CAUSES));
+					Overload overload = AbilityManager.getManager().getPlayerAbility(mPlayer, Overload.class);
+					mOverloadAmount = overload.getAbilityScore() == 1 ? OVERLOAD_AMOUNT_1 : OVERLOAD_AMOUNT_2;
+					mPlugin.mEffectManager.addEffect(mob, OVERLOAD_EFFECT_NAME, new OverloadBarrage(OVERLOAD_DURATION, mOverloadAmount, OVERLOAD_DAMAGE_CAUSES));
 				}
 			}
 		}
@@ -136,7 +142,12 @@ public class ArcaneBarrage extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand());
+		//Cancels if mana lance is able to be cast and missiles are up.
+		ManaLance manaLance = AbilityManager.getManager().getPlayerAbility(mPlayer, ManaLance.class);
+		if (manaLance != null && !manaLance.isOnCooldown() && mMissiles != 0) {
+			return false;
+		}
+        return (!mPlayer.isSneaking() && InventoryUtils.isWandItem(mPlayer.getInventory().getItemInMainHand()));
 	}
 
 	public void activateOverload() {

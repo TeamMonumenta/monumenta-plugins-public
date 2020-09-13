@@ -100,5 +100,4 @@ public class ManaLance extends Ability {
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 		return !mPlayer.isSneaking() && InventoryUtils.isWandItem(mainHand);
 	}
-
 }

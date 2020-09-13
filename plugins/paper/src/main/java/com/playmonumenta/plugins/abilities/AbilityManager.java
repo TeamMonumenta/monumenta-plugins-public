@@ -315,6 +315,7 @@ public class AbilityManager {
                 // ARCANIST
                 new FlashSword(mPlugin, mWorld, null),
                 new Overload(mPlugin, mWorld, null),
+                	//Arcane Barrage up above
 
                 //********** ROGUE **********//
                 // SWORDSAGE
@@ -735,7 +736,9 @@ public class AbilityManager {
 							}
 						}
 					} else if (info.mTrigger == AbilityTrigger.ALL) {
-						abil.cast(action);
+						if (abil.runCheck() && !abil.isOnCooldown()) {
+                            abil.cast(action);
+                       }
 					}
 				}
 			}
