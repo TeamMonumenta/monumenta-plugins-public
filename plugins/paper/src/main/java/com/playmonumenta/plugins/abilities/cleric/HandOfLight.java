@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
@@ -37,7 +38,7 @@ public class HandOfLight extends Ability {
 		mInfo.mLinkedSpell = Spells.HEALING;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("When you block while sneaking, you heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. Cooldown: 14 seconds.");
+		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Cooldown: 14 seconds.");
 		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health, and the cooldown is reduced to 10 seconds.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
@@ -45,6 +46,14 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		//Must be holding weapon or tool.
+		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		if (InventoryUtils.isBowItem(inMainHand) || InventoryUtils.isBowItem(inOffHand) || InventoryUtils.isPotionItem(inMainHand) || inMainHand.getType().isBlock()
+				|| inMainHand.getType().isEdible() || inMainHand.getType() == Material.TRIDENT || inMainHand.getType() == Material.COMPASS) {
+			return;
+		}
+
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
 		boolean healCaster = AbilityManager.getManager().isPvPEnabled(mPlayer);
@@ -85,11 +94,10 @@ public class HandOfLight extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		// Must be holding a shield
+		// If holding a shield, must be sneaking to activate
 		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
 		ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
-		if (offHand.getType() != Material.SHIELD
-		    && mainHand.getType() != Material.SHIELD) {
+		if ((offHand.getType() == Material.SHIELD || mainHand.getType() == Material.SHIELD) && mPlayer.isSneaking() == false) {
 			return false;
 		}
 
@@ -111,8 +119,9 @@ public class HandOfLight extends Ability {
 			return false;
 		}
 
-		// Must be sneaking
-		return mPlayer.isSneaking();
+		// Is holding a shield and sneaking or is not holding a shield and right clicks.
+		return true;
 	}
+
 
 }

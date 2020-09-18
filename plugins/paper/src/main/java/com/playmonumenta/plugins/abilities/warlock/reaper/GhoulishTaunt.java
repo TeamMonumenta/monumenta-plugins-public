@@ -6,6 +6,7 @@ import java.util.NavigableSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -47,6 +49,7 @@ public class GhoulishTaunt extends Ability {
 	private static final int WEAKNESS_RADIUS = 12;
 	private static final int COOLDOWN = 20 * 25;
 
+	private int mLeftClicks = 0;
 	private final double mPercent;
 	private final double mCleavePercentDamage;
 	private final int mWeaknessAmplifier;
@@ -55,11 +58,11 @@ public class GhoulishTaunt extends Ability {
 		super(plugin, world, player, "Ghoulish Taunt");
 		mInfo.mScoreboardId = "GhoulishTaunt";
 		mInfo.mShorthandName = "GT";
-		mInfo.mDescriptions.add("Right-clicking while sneaking and looking down unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 1.5 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 25 seconds.");
+		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 1.5 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 25 seconds.");
 		mInfo.mDescriptions.add("Apply Weakness II to mobs instead, and gain +20% speed and +20% attack speed and 50% cleaving damage instead.");
 		mInfo.mLinkedSpell = Spells.GHOULISH_TAUNT;
 		mInfo.mCooldown = COOLDOWN;
-		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;
 		mPercent = getAbilityScore() == 1 ? PERCENT_1 : PERCENT_2;
 		mCleavePercentDamage = getAbilityScore() == 1 ? CLEAVE_PERCENT_DAMAGE_1 : CLEAVE_PERCENT_DAMAGE_2;
@@ -106,16 +109,28 @@ public class GhoulishTaunt extends Ability {
 
 	@Override
 	public void cast(Action action) {
-		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)
-				|| !mPlayer.isSneaking() || mPlayer.getLocation().getPitch() < 50) {
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), mInfo.mLinkedSpell)) {
+			return;
+		}
+		mLeftClicks++;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (mLeftClicks > 0) {
+					mLeftClicks--;
+				}
+				this.cancel();
+			}
+		}.runTaskLater(mPlugin, 5);
+		if (mLeftClicks < 2) {
 			return;
 		}
 
 		Location loc = mPlayer.getEyeLocation();
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, 0.6f, 0.4f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, 0.6f, 0.6f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, 0.6f, 0.8f);
-		mWorld.playSound(loc, Sound.ENTITY_GHAST_HURT, 0.6f, 0.6f);
+		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
+		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
+		mWorld.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		mWorld.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.PLAYERS, 0.6f, 0.6f);
 		mWorld.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 400, 0, 0, 0, 4);
 
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, WEAKNESS_RADIUS);

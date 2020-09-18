@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.warrior.berserker;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -148,7 +149,7 @@ public class MeteorSlam extends Ability {
 
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, mJumpBoostAmplifier, true, false));
 			putOnCooldown();
-			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+			mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
 			mWorld.spawnParticle(Particle.LAVA, mPlayer.getLocation(), 15, 1, 0f, 1, 0);
 
 			// Flame particles that have no y velocity and only x and z.
@@ -176,8 +177,8 @@ public class MeteorSlam extends Ability {
 			}
 		}
 
-		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 0);
-		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1.25F);
+		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
+		mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
 		mWorld.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
 		mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
 		mWorld.spawnParticle(Particle.LAVA, loc, 3 * (int)(mRadius * mRadius), mRadius, 0.25f, mRadius, 0);

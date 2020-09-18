@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -85,7 +86,7 @@ public class DeathsTouch extends Ability {
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection();
-		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.5f, 0.25f);
+		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
 
 		// Get a list of mobs that can possibly be hit - so we don't have to ask the game for nearby mobs every time
 		List<LivingEntity> mobsInRange = EntityUtils.getNearbyMobs(loc, DEATHS_TOUCH_RANGE, mPlayer);
@@ -99,7 +100,7 @@ public class DeathsTouch extends Ability {
 					mTarget = mob;
 					mob.setMetadata(DEATHS_TOUCH_BUFF_DURATION, new FixedMetadataValue(mPlugin, mBuffDuration));
 					mob.setMetadata(DEATHS_TOUCH_AMPLIFIER_CAP, new FixedMetadataValue(mPlugin, mAmplifierCap));
-					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, 0.25f, 1f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.25f, 1f);
 
 					new BukkitRunnable() {
 						final int mRunnableDuration = getAbilityScore() == 1 ? DEATHS_TOUCH_1_COOLDOWN : DEATHS_TOUCH_2_COOLDOWN;

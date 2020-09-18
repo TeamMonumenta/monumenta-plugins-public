@@ -3,12 +3,14 @@ package com.playmonumenta.plugins.abilities.warlock;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -26,16 +28,17 @@ public class Exorcism  extends Ability {
 	private static final int DURATION = 20 * 15;
 	private static final int COOLDOWN_1 = 20 * 25;
 	private static final int COOLDOWN_2 = 20 * 15;
+	private static final double EXORCISM_ANGLE = 50.0;
 
 	public Exorcism(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Exorcism");
 		mInfo.mLinkedSpell = Spells.EXORCISM;
 		mInfo.mScoreboardId = "Exorcism";
 		mInfo.mShorthandName = "Ex";
-		mInfo.mDescriptions.add("Sneak left clicking while looking up removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. (Cooldown: 25s)");
+		mInfo.mDescriptions.add("Right click while looking down without sneaking removes all your debuffs and applies them to enemies within 12 blocks of you. Level of debuffs is preserved. (Cooldown: 25s)");
 		mInfo.mDescriptions.add("Also apply the corresponding debuff to enemies for every buff you have. Cooldown is reduced to 15s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
-		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
+		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}
 
 	private final List<PotionEffect> mDebuffs = new ArrayList<>();
@@ -90,9 +93,13 @@ public class Exorcism  extends Ability {
 
 	@Override
 	public boolean runCheck() {
-		return mPlayer.isSneaking() && mPlayer.getLocation().getPitch() < -50
-				&& InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())
-				&& (!mPlayer.getActivePotionEffects().isEmpty() || (mPlayer.getFireTicks() > 1));
+		ItemStack offHand = mPlayer.getInventory().getItemInOffHand();
+		return !mPlayer.isSneaking()
+		       && mPlayer.getLocation().getPitch() > EXORCISM_ANGLE
+		       && InventoryUtils.isScytheItem(mPlayer.getInventory().getItemInMainHand())
+		       && offHand.getType() != Material.BOW
+		       && (!mPlayer.getActivePotionEffects().isEmpty()
+		           || (mPlayer.getFireTicks() > 1));
 	}
 
 }
