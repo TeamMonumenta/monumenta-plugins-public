@@ -44,7 +44,7 @@ public class SpellEarthshake extends SpellBaseAoE {
 	private static int particleCounter2 = 0;
 
 	public SpellEarthshake(Plugin plugin, LivingEntity launcher, int radius, int time) {
-		super(plugin, launcher, radius * 2, time, 0, false, Sound.BLOCK_ENDER_CHEST_OPEN,
+		super(plugin, launcher, radius * 2, time, 0, true, Sound.BLOCK_ENDER_CHEST_OPEN,
 			(Location loc) -> {
 				List<Player> players = PlayerUtils.playersInRange(launcher.getLocation(), 12.0);
 				if (!players.isEmpty() && !targeted) {
