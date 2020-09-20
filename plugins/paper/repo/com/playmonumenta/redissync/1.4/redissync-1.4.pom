@@ -4,5 +4,5 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.playmonumenta</groupId>
   <artifactId>redissync</artifactId>
-  <version>0.3</version>
+  <version>1.4</version>
 </project>

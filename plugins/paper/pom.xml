@@ -123,7 +123,7 @@
         <dependency>
             <groupId>com.playmonumenta</groupId>
             <artifactId>redissync</artifactId>
-            <version>0.3</version>
+            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
 
