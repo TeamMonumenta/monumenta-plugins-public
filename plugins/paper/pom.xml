@@ -126,6 +126,12 @@
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.playmonumenta</groupId>
+            <artifactId>libraryofsouls</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.goncalomb.bukkit</groupId>
