@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.commands.ReforgeInventory;
 import com.playmonumenta.plugins.commands.RefreshClass;
 import com.playmonumenta.plugins.commands.RemoveTags;
 import com.playmonumenta.plugins.commands.RestartEmptyCommand;
+import com.playmonumenta.plugins.commands.ShatterHeldItem;
 import com.playmonumenta.plugins.commands.SkillDescription;
 import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
@@ -140,6 +141,7 @@ public class Plugin extends JavaPlugin {
 		ClaimRaffle.register(this);
 		BarkifyHeldItem.register();
 		DeCluckifyHeldItem.register();
+		ShatterHeldItem.register();
 		DeBarkifyHeldItem.register();
 		CalculateReforge.register();
 		ReforgeHeldItem.register();
