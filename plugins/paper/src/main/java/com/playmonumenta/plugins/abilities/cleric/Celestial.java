@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -19,10 +20,18 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class Celestial extends Ability {
+
+	public static class CelestialCooldownEnchantment extends BaseAbilityEnchantment {
+		public CelestialCooldownEnchantment() {
+			super("Celestial Blessing Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int CELESTIAL_COOLDOWN = 40 * 20;
 	private static final int CELESTIAL_1_DURATION = 10 * 20;
@@ -47,6 +56,7 @@ public class Celestial extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		mInfo.mCooldown = (int) CelestialCooldownEnchantment.getCooldown(mPlayer, CELESTIAL_COOLDOWN, CelestialCooldownEnchantment.class);
 		int celestial = getAbilityScore();
 
 		World world = mPlayer.getWorld();

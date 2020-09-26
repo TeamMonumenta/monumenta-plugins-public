@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import java.util.EnumSet;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,6 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -23,6 +27,30 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class ByMyBlade extends Ability {
 
+	public static class ByMyBladeHasteEnchantment extends BaseAbilityEnchantment {
+		public ByMyBladeHasteEnchantment() {
+			super("By My Blade Haste Level", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class ByMyBladeDamageEnchantment extends BaseAbilityEnchantment {
+		public ByMyBladeDamageEnchantment() {
+			super("By My Blade Damage", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class ByMyBladeCooldownEnchantment extends BaseAbilityEnchantment {
+		public ByMyBladeCooldownEnchantment() {
+			super("By My Blade Cooldown", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
+
+	public static class ByMyBladeDurationEnchantment extends BaseAbilityEnchantment {
+		public ByMyBladeDurationEnchantment() {
+			super("By My Blade Haste Duration", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
 	private static final int BY_MY_BLADE_1_HASTE_AMPLIFIER = 1;
 	private static final int BY_MY_BLADE_2_HASTE_AMPLIFIER = 3;
 	private static final int BY_MY_BLADE_HASTE_DURATION = 4 * 20;
@@ -30,7 +58,6 @@ public class ByMyBlade extends Ability {
 	private static final int BY_MY_BLADE_2_DAMAGE = 24;
 	private static final int BY_MY_BLADE_COOLDOWN = 10 * 20;
 
-	private final int mHasteAmplifier;
 	private final int mDamageBonus;
 
 	public ByMyBlade(Plugin plugin, World world, Player player) {
@@ -41,18 +68,23 @@ public class ByMyBlade extends Ability {
 		mInfo.mDescriptions.add("While holding two swords, your next critical strike grants Haste II for 4 seconds and deals 12 additional damage. (Cooldown 10s)");
 		mInfo.mDescriptions.add("This buff is increased to Haste IV and critical strikes deal 24 additional damage instead.");
 		mInfo.mCooldown = BY_MY_BLADE_COOLDOWN;
-		mHasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
 		mDamageBonus = getAbilityScore() == 1 ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE;
 	}
 
 	@Override
 	public boolean livingEntityDamagedByPlayerEvent(EntityDamageByEntityEvent event) {
 		if (event.getCause() == DamageCause.ENTITY_ATTACK) {
+			//Ability enchantments
+			mInfo.mCooldown = (int) ByMyBladeCooldownEnchantment.getCooldown(mPlayer, BY_MY_BLADE_COOLDOWN, ByMyBladeCooldownEnchantment.class);
+			int duration = BY_MY_BLADE_HASTE_DURATION + (int) ByMyBladeDurationEnchantment.getExtraDuration(mPlayer, ByMyBladeDurationEnchantment.class);
+			int hasteAmplifier = getAbilityScore() == 1 ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER;
+			hasteAmplifier += ByMyBladeHasteEnchantment.getLevel(mPlayer, ByMyBladeHasteEnchantment.class);
+			int extraDamage = mDamageBonus + (int) ByMyBladeDamageEnchantment.getExtraDamage(mPlayer, ByMyBladeDamageEnchantment.class);
+
 			LivingEntity damagee = (LivingEntity) event.getEntity();
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, BY_MY_BLADE_HASTE_DURATION, mHasteAmplifier, false, true));
+			                                 new PotionEffect(PotionEffectType.FAST_DIGGING, duration, hasteAmplifier, false, true));
 
-			int extraDamage = mDamageBonus;
 			// Since RoguePassive uses a Custom Damage Event, I'll just put the modifier here
 			if (EntityUtils.isElite(damagee)) {
 				extraDamage *= RoguePassive.PASSIVE_DAMAGE_ELITE_MODIFIER;

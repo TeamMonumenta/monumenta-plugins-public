@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import java.util.EnumSet;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,11 +17,25 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class CleansingRain extends Ability {
+
+	public static class CleansingRainCooldownEnchantment extends BaseAbilityEnchantment {
+		public CleansingRainCooldownEnchantment() {
+			super("Cleansing Rain Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
+	public static class CleansingRainRadiusEnchantment extends BaseAbilityEnchantment {
+		public CleansingRainRadiusEnchantment() {
+			super("Cleansing Rain Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int CLEANSING_DURATION = 15 * 20;
 	private static final int CLEANSING_RESIST_LEVEL = 0;
@@ -43,6 +59,8 @@ public class CleansingRain extends Ability {
 
 	@Override
 	public void cast(Action action) {
+		int cd = getAbilityScore() == 1 ? CLEANSING_1_COOLDOWN : CLEANSING_2_COOLDOWN;
+		mInfo.mCooldown = (int) CleansingRainCooldownEnchantment.getCooldown(mPlayer, cd, CleansingRainCooldownEnchantment.class);
 		mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.45f, 0.8f);
 		putOnCooldown();
 
@@ -57,7 +75,9 @@ public class CleansingRain extends Ability {
 				mPlayer.getWorld().spawnParticle(Particle.WATER_DROP, mPlayer.getLocation().add(0, 2, 0), 15, 2.5, 2, 2.5, 0.001);
 				mPlayer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, mPlayer.getLocation().add(0, 2, 0), 1, 2, 1.5, 2, 0.001);
 
-				for (Player player : PlayerUtils.playersInRange(mPlayer, CLEANSING_RADIUS, true)) {
+				float radius = CleansingRainRadiusEnchantment.getRadius(mPlayer, CLEANSING_RADIUS, CleansingRainRadiusEnchantment.class);
+
+				for (Player player : PlayerUtils.playersInRange(mPlayer, radius, true)) {
 					PotionUtils.clearNegatives(mPlugin, player);
 
 					if (player.getFireTicks() > 1) {

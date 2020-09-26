@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -20,15 +21,52 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class AdvancingShadows extends Ability {
+
+	public static class AdvancingShadowsRadiusEnchantment extends BaseAbilityEnchantment {
+		public AdvancingShadowsRadiusEnchantment() {
+			super("Advancing Shadows Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class AdvancingShadowsKnockbackRadiusEnchantment extends BaseAbilityEnchantment {
+		public AdvancingShadowsKnockbackRadiusEnchantment() {
+			super("Advancing Shadows Knockback Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+
+		private static float getKnockbackRadius(Player player, float base) {
+			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackRadiusEnchantment.class);
+			return base * (float) ((level / 100.0) + 1);
+		}
+	}
+
+	public static class AdvancingShadowsKnockbackSpeedEnchantment extends BaseAbilityEnchantment {
+		public AdvancingShadowsKnockbackSpeedEnchantment() {
+			super("Advancing Shadows Knockback Speed", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+
+		private static float getKnockbackSpeed(Player player, float base) {
+			int level = PlayerTracking.getInstance().getPlayerCustomEnchantLevel(player, AdvancingShadowsKnockbackSpeedEnchantment.class);
+			return base * (float) ((level / 100.0) + 1);
+		}
+	}
+
+	public static class AdvancingShadowsCooldownEnchantment extends BaseAbilityEnchantment {
+		public AdvancingShadowsCooldownEnchantment() {
+			super("Advancing Shadows Cooldown", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
@@ -53,6 +91,8 @@ public class AdvancingShadows extends Ability {
 
 	@Override
 	public void cast(Action action) {
+
+		mInfo.mCooldown = (int) AdvancingShadowsCooldownEnchantment.getCooldown(mPlayer, ADVANCING_SHADOWS_COOLDOWN, AdvancingShadowsCooldownEnchantment.class);
 
 		LivingEntity entity = mTarget;
 		if (entity != null) {
@@ -107,12 +147,13 @@ public class AdvancingShadows extends Ability {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 			                                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ADVANCING_SHADOWS_STRENGTH_DURATION,
 			                                                  ADVANCING_SHADOWS_STRENGTH_EFFECT_LEVEL, true, true, true));
-
+			float range = AdvancingShadowsKnockbackRadiusEnchantment.getKnockbackRadius(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE);
+			float speed = AdvancingShadowsKnockbackSpeedEnchantment.getKnockbackSpeed(mPlayer, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
 			if (advancingShadows > 1) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				                                                  ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+				                                                  range, mPlayer)) {
 					if (mob != entity) {
-						MovementUtils.knockAway(entity, mob, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+						MovementUtils.knockAway(entity, mob, speed);
 					}
 				}
 			}
@@ -133,6 +174,7 @@ public class AdvancingShadows extends Ability {
 			if (!mPlayer.isSneaking()) {
 				int advancingShadows = getAbilityScore();
 				int range = (advancingShadows == 1) ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2;
+				range = (int) AdvancingShadowsRadiusEnchantment.getRadius(mPlayer, range, AdvancingShadowsRadiusEnchantment.class);
 
 				// Basically makes sure if the target is in LoS and if there is
 				// a path.

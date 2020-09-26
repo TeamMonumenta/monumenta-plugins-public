@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.abilities.alchemist;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -30,6 +31,8 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.PurpleHaze;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -40,6 +43,12 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
  * Handles giving potions on kills and the direct damage aspect
  */
 public class AlchemistPotions extends Ability implements KillTriggeredAbility {
+
+	public static class AlchemistPotionsDamageEnchantment extends BaseAbilityEnchantment {
+		public AlchemistPotionsDamageEnchantment() {
+			super("Alchemist Potion Damage", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final double EXTRA_POTION_CHANCE = 0.5;
 	private static final double DAMAGE_PER_SKILL_POINT = 0.5;
@@ -110,6 +119,7 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 							}
 						}
 					}
+
 				}
 			}.runTaskLater(mPlugin, 5);
 		}
@@ -164,8 +174,8 @@ public class AlchemistPotions extends Ability implements KillTriggeredAbility {
 		for (PotionAbility potionAbility : mPotionAbilities) {
 			potionAbility.apply(mob);
 		}
-
-		EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
+		double damage = mDamage + AlchemistPotionsDamageEnchantment.getExtraDamage(mPlayer, AlchemistPotionsDamageEnchantment.class);
+		EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ALCHEMY, true, mInfo.mLinkedSpell);
 	}
 
 	@Override

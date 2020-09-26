@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warrior;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -17,11 +18,25 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class ShieldBash extends Ability {
+
+	public static class ShieldBashCooldownEnchantment extends BaseAbilityEnchantment {
+		public ShieldBashCooldownEnchantment() {
+			super("Shield Bash Cooldown", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
+
+	public static class ShieldBashDamageEnchantment extends BaseAbilityEnchantment {
+		public ShieldBashDamageEnchantment() {
+			super("Shield Bash Damage", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final int SHIELD_BASH_DAMAGE = 5;
 	private static final int SHIELD_BASH_STUN = 20 * 1;
@@ -47,6 +62,8 @@ public class ShieldBash extends Ability {
 			@Override
 			public void run() {
 				if (mPlayer.isHandRaised()) {
+					mInfo.mCooldown = (int) ShieldBashCooldownEnchantment.getCooldown(mPlayer, SHIELD_BASH_COOLDOWN, ShieldBashCooldownEnchantment.class);
+					int damage = (int) ShieldBashDamageEnchantment.getExtraDamage(mPlayer, ShieldBashDamageEnchantment.class) + SHIELD_BASH_DAMAGE;
 					Location eyeLoc = mPlayer.getEyeLocation();
 					Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), SHIELD_BASH_RANGE);
 					ray.mThroughBlocks = false;
@@ -66,11 +83,11 @@ public class ShieldBash extends Ability {
 								mWorld.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
 								if (getAbilityScore() == 1) {
-									EntityUtils.damageEntity(mPlugin, mob, SHIELD_BASH_DAMAGE, mPlayer);
+									EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer);
 									EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, mob);
 								} else {
 									for (LivingEntity le : EntityUtils.getNearbyMobs(mob.getLocation(), SHIELD_BASH_2_RADIUS)) {
-										EntityUtils.damageEntity(mPlugin, le, SHIELD_BASH_DAMAGE, mPlayer);
+										EntityUtils.damageEntity(mPlugin, le, damage, mPlayer);
 										EntityUtils.applyStun(mPlugin, SHIELD_BASH_STUN, le);
 									}
 								}

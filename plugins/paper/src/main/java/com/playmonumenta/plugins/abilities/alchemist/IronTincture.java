@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
-import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.EnumSet;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,11 +18,27 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 
 public class IronTincture extends Ability {
+
+	public static class IronTinctureAbsorptionEnchantment extends BaseAbilityEnchantment {
+		public IronTinctureAbsorptionEnchantment() {
+			super("Iron Tincture Absorption Level", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class IronTinctureCooldownEnchantment extends BaseAbilityEnchantment {
+		public IronTinctureCooldownEnchantment() {
+			super("Iron Tincture Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
+
 	private static final int IRON_TINCTURE_THROW_COOLDOWN = 10 * 20;
 	private static final int IRON_TINCTURE_USE_COOLDOWN = 50 * 20;
 	private static final int IRON_TINCTURE_1_ABSORPTION = 8;
@@ -29,8 +46,6 @@ public class IronTincture extends Ability {
 	private static final int IRON_TINCTURE_ABSORPTION_DURATION = 20 * 50;
 	private static final int IRON_TINCTURE_TICK_PERIOD = 2;
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
-
-	private final int mAbsorption;
 
 	public IronTincture(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Iron Tincture");
@@ -41,7 +56,6 @@ public class IronTincture extends Ability {
 		mInfo.mDescriptions.add("Effect and effect cap increased to 12 absorption health.");
 		mInfo.mCooldown = IRON_TINCTURE_USE_COOLDOWN; // Full duration cooldown
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mAbsorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
 	}
 
 	@Override
@@ -67,6 +81,7 @@ public class IronTincture extends Ability {
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
 
+		mInfo.mCooldown = (int) IronTinctureCooldownEnchantment.getCooldown(mPlayer, IRON_TINCTURE_USE_COOLDOWN, IronTinctureCooldownEnchantment.class);
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();
 
@@ -114,7 +129,10 @@ public class IronTincture extends Ability {
 	}
 
 	private void execute(Player player) {
-		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, IRON_TINCTURE_ABSORPTION_DURATION);
+		int absorption = getAbilityScore() == 1 ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION;
+		absorption += IronTinctureAbsorptionEnchantment.getLevel(mPlayer, IronTinctureAbsorptionEnchantment.class);
+
+		AbsorptionUtils.addAbsorption(player, absorption, absorption, IRON_TINCTURE_ABSORPTION_DURATION);
 
 		mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 		mWorld.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);

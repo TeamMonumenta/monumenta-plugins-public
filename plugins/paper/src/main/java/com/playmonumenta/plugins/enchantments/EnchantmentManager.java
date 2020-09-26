@@ -19,6 +19,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions.AlchemistPotionsDamageEnchantment;
+import com.playmonumenta.plugins.abilities.alchemist.IronTincture.IronTinctureCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.cleric.Celestial.CelestialCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.cleric.CleansingRain.CleansingRainCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.mage.ManaLance.ManaLanceCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.mage.Spellshock.SpellshockDamageEnchantment;
+import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows.AdvancingShadowsCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.rogue.ByMyBlade.ByMyBladeCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.rogue.Dodging.DodgingCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.scout.Volley.VolleyCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex.AmplifyingHexCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.warlock.ConsumingFlames.ConsumingFlamesCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.warrior.BruteForce.BruteForceDamageEnchantment;
+import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashCooldownEnchantment;
+import com.playmonumenta.plugins.abilities.warrior.ShieldBash.ShieldBashDamageEnchantment;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 public class EnchantmentManager implements Listener {
@@ -64,6 +79,53 @@ public class EnchantmentManager implements Listener {
 				init.add(e.getEnchantClass());
 			}
 		}
+
+		// Ability Enchantments
+		//Mage
+		//init.add(new ManaLanceDamageEnchantment());
+		init.add(new ManaLanceCooldownEnchantment());
+		init.add(new SpellshockDamageEnchantment());
+		//init.add(new SpellshockRadiusEnchantment());
+
+		//Rogue
+		//init.add(new AdvancingShadowsRadiusEnchantment());
+		//init.add(new AdvancingShadowsKnockbackRadiusEnchantment());
+		//init.add(new AdvancingShadowsKnockbackSpeedEnchantment());
+		init.add(new AdvancingShadowsCooldownEnchantment());
+		//init.add(new ByMyBladeDamageEnchantment());
+		init.add(new ByMyBladeCooldownEnchantment());
+		//init.add(new ByMyBladeHasteEnchantment());
+		//init.add(new ByMyBladeDurationEnchantment());
+		init.add(new DodgingCooldownEnchantment());
+
+		//Scout
+		//init.add(new VolleyDamageEnchantment());
+		//init.add(new VolleyArrowsEnchantment());
+		init.add(new VolleyCooldownEnchantment());
+		//init.add(new VolleyMultiplierEnchantment());
+
+		//Warrior
+		init.add(new BruteForceDamageEnchantment());
+		//init.add(new BruteForceRadiusEnchantment());
+		//init.add(new BruteForceKnockbackEnchantment());
+		init.add(new ShieldBashCooldownEnchantment());
+		init.add(new ShieldBashDamageEnchantment());
+
+		//Cleric
+		init.add(new CelestialCooldownEnchantment());
+		init.add(new CleansingRainCooldownEnchantment());
+		//init.add(new CleansingRainRadiusEnchantment());
+
+		//Alchemist
+		//init.add(new IronTinctureAbsorptionEnchantment());
+		init.add(new IronTinctureCooldownEnchantment());
+		init.add(new AlchemistPotionsDamageEnchantment());
+
+		//Warlock
+		//init.add(new AmplifyingHexDamageEnchantment());
+		init.add(new AmplifyingHexCooldownEnchantment());
+		init.add(new ConsumingFlamesCooldownEnchantment());
+
 
 		// Tesseracts (not actually items a player can get enchants from)
 		init.add(new PestilenceTesseract());

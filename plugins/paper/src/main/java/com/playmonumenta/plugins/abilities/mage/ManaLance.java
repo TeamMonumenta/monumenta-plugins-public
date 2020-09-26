@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,19 +24,30 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.ArcaneBarrage;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 
 public class ManaLance extends Ability {
+	public static class ManaLanceDamageEnchantment extends BaseAbilityEnchantment {
+		public ManaLanceDamageEnchantment() {
+			super("Mana Lance Damage", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class ManaLanceCooldownEnchantment extends BaseAbilityEnchantment {
+		public ManaLanceCooldownEnchantment() {
+			super("Mana Lance Cooldown", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final int DAMAGE_1 = 8;
 	private static final int DAMAGE_2 = 10;
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
-
-	private final int mDamage;
 
 	public ManaLance(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Mana Lance");
@@ -46,11 +58,16 @@ public class ManaLance extends Ability {
 		mInfo.mDescriptions.add("The beam instead deals 10 damage with a 3 second cooldown.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
 	public void cast(Action action) {
+		//Ability enchantments
+		int damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+		damage += ManaLanceDamageEnchantment.getExtraDamage(mPlayer, ManaLanceDamageEnchantment.class);
+		float cd = getAbilityScore() == 1 ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = (int) ManaLanceCooldownEnchantment.getCooldown(mPlayer, cd, ManaLanceCooldownEnchantment.class);
+
 		putOnCooldown();
 
 		Location loc = mPlayer.getEyeLocation();
@@ -77,7 +94,7 @@ public class ManaLance extends Ability {
 			while (iter.hasNext()) {
 				LivingEntity mob = iter.next();
 				if (box.overlaps(mob.getBoundingBox())) {
-					EntityUtils.damageEntity(mPlugin, mob, mDamage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
+					EntityUtils.damageEntity(mPlugin, mob, damage, mPlayer, MagicType.ARCANE, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f);
 					iter.remove();
 					mobs.remove(mob);

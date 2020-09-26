@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.mage;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,12 +25,25 @@ import com.playmonumenta.plugins.classes.magic.MagicType;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 
 public class Spellshock extends Ability {
+	public static class SpellshockRadiusEnchantment extends BaseAbilityEnchantment {
+		public SpellshockRadiusEnchantment() {
+			super("Spellshock Range", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class SpellshockDamageEnchantment extends BaseAbilityEnchantment {
+		public SpellshockDamageEnchantment() {
+			super("Spellshock Damage", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
 
 	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellShockDamagedThisTick";
 
@@ -40,9 +54,7 @@ public class Spellshock extends Ability {
 
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 5;
-	private static final int RADIUS_SQUARED = 9;	// Faster computations for a quadratic number of distance comparisons
-
-	private final int mDamage;
+	private static final int RADIUS = 3;
 
 	public Spellshock(Plugin plugin, World world, Player player) {
 		super(plugin, world, player, "Spellshock");
@@ -51,7 +63,6 @@ public class Spellshock extends Ability {
 		mInfo.mShorthandName = "SS";
 		mInfo.mDescriptions.add("Hitting an enemy with a wand or spell inflicts “static” for 6 seconds. If an enemy with static is hit by another spell, a spellshock centered on the enemy deals 3 damage to all mobs in a 3 block radius. Spellshock can cause a chain reaction on enemies with static. An enemy can only be hit by a spellshock once per tick.");
 		mInfo.mDescriptions.add("Damage is increased to 5. Additionally, gain +15% speed for 6 seconds whenever a spellshock is triggered.");
-		mDamage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
 	}
 
 	@Override
@@ -83,6 +94,10 @@ public class Spellshock extends Ability {
 				List<LivingEntity> triggeredMobs = new LinkedList<LivingEntity>();
 				triggeredMobs.add(mob);
 
+				int radius = (int) SpellshockRadiusEnchantment.getRadius(mPlayer, RADIUS, SpellshockRadiusEnchantment.class);
+				int damage = getAbilityScore() == 1 ? DAMAGE_1 : DAMAGE_2;
+				damage += SpellshockDamageEnchantment.getExtraDamage(mPlayer, SpellshockDamageEnchantment.class);
+
 				/*
 				 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
 				 * deal damage. If the mob can be triggered, trigger it, adding it before the iteration
@@ -101,7 +116,7 @@ public class Spellshock extends Ability {
 						Iterator<LivingEntity> nearbyMobsIter = nearbyMobs.iterator();
 						while (nearbyMobsIter.hasNext()) {
 							LivingEntity nearbyMob = nearbyMobsIter.next();
-							if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < RADIUS_SQUARED) {
+							if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < (radius * radius)) {
 								// Only damage a mob once per tick
 								if (MetadataUtils.checkOnceThisTick(mPlugin, nearbyMob, DAMAGED_THIS_TICK_METAKEY)) {
 									Vector velocity = nearbyMob.getVelocity();
@@ -113,7 +128,7 @@ public class Spellshock extends Ability {
 									 * probably be restructured and removed)), but I don't have the time currently to verify that
 									 * nothing explodes
 									 */
-									EntityUtils.damageEntity(mPlugin, nearbyMob, mDamage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell);
+									EntityUtils.damageEntity(mPlugin, nearbyMob, damage, mPlayer, MagicType.ARCANE, false, mInfo.mLinkedSpell);
 									nearbyMob.setVelocity(velocity);
 								}
 

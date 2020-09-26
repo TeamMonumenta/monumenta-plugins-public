@@ -1,13 +1,8 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
-
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -28,9 +23,27 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.FractalEnervation;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.enchantments.Inferno;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 public class AmplifyingHex extends Ability {
+	public static class AmplifyingHexDamageEnchantment extends BaseAbilityEnchantment {
+		public AmplifyingHexDamageEnchantment() {
+			super("Amplifying Hex Damage", EnumSet.of(ItemSlot.MAINHAND, ItemSlot.OFFHAND, ItemSlot.ARMOR));
+		}
+	}
+
+	public static class AmplifyingHexCooldownEnchantment extends BaseAbilityEnchantment {
+		public AmplifyingHexCooldownEnchantment() {
+			super("Amplifying Hex Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int EFFECT_DAMAGE_1 = 5;
 	private static final int EFFECT_DAMAGE_2 = 7;
@@ -55,7 +68,6 @@ public class AmplifyingHex extends Ability {
 	                                                          PotionEffectType.HUNGER
 	                                                      );
 
-	private final int mEffectDamage;
 	private final int mAmplifierDamage;
 
 	public AmplifyingHex(Plugin plugin, World world, Player player) {
@@ -67,12 +79,14 @@ public class AmplifyingHex extends Ability {
 		mInfo.mLinkedSpell = Spells.AMPLIFYING;
 		mInfo.mCooldown = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
-		mEffectDamage = getAbilityScore() == 1 ? EFFECT_DAMAGE_1 : EFFECT_DAMAGE_2;
 		mAmplifierDamage = getAbilityScore() == 1 ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2;
 	}
 
 	@Override
 	public void cast(Action action) {
+		int cd = (getAbilityScore() == 1) ? COOLDOWN_1 : COOLDOWN_2;
+		mInfo.mCooldown = (int) AmplifyingHexCooldownEnchantment.getCooldown(mPlayer, cd, AmplifyingHexCooldownEnchantment.class);
+
 		new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation();
 			double mRadius = 0.5;
@@ -102,6 +116,8 @@ public class AmplifyingHex extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 
+		float effectDamage = getAbilityScore() == 1 ? EFFECT_DAMAGE_1 : EFFECT_DAMAGE_2;
+		effectDamage += AmplifyingHexDamageEnchantment.getExtraDamage(mPlayer, AmplifyingHexDamageEnchantment.class);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f);
 
@@ -136,7 +152,7 @@ public class AmplifyingHex extends Ability {
 				}
 				if (debuffCount > 0) {
 					EntityUtils.damageEntity(mPlugin, mob,
-							debuffCount * mEffectDamage + amplifierCount * mAmplifierDamage,
+							debuffCount * effectDamage + amplifierCount * mAmplifierDamage,
 							mPlayer, MagicType.DARK_MAGIC, true, mInfo.mLinkedSpell);
 					MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED);
 				}

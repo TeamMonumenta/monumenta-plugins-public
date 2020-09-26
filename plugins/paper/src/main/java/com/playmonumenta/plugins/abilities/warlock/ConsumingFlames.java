@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.warlock;
 
-import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.EnumSet;
+
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,11 +18,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.classes.magic.MagicType;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 
 public class ConsumingFlames extends Ability {
+	public static class ConsumingFlamesCooldownEnchantment extends BaseAbilityEnchantment {
+		public ConsumingFlamesCooldownEnchantment() {
+			super("Consuming Flames Cooldown", EnumSet.of(ItemSlot.ARMOR));
+		}
+	}
 
 	private static final int RADIUS = 8;
 	private static final int DAMAGE_1 = 1;
@@ -81,6 +90,7 @@ public class ConsumingFlames extends Ability {
 			}
 		}
 
+		mInfo.mCooldown = (int) ConsumingFlamesCooldownEnchantment.getCooldown(mPlayer, COOLDOWN, ConsumingFlamesCooldownEnchantment.class);
 		putOnCooldown();
 	}
 

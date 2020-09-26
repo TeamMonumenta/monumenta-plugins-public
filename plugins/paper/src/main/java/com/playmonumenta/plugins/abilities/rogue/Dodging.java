@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.rogue;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,10 +22,19 @@ import org.bukkit.potion.PotionEffectType;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.Spells;
+import com.playmonumenta.plugins.enchantments.BaseAbilityEnchantment;
+import com.playmonumenta.plugins.enchantments.EnchantmentManager.ItemSlot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
 public class Dodging extends Ability {
+
+	public static class DodgingCooldownEnchantment extends BaseAbilityEnchantment {
+		public DodgingCooldownEnchantment() {
+			super("Dodging Cooldown", EnumSet.of(ItemSlot.OFFHAND));
+		}
+	}
+
 	/*
 	 * This skill is a freaking nightmare because it spans two different events.
 	 *
@@ -144,6 +154,8 @@ public class Dodging extends Ability {
 		 * tick will also be dodged
 		 */
 		mTriggerTick = mPlayer.getTicksLived();
+		int cd = getAbilityScore() == 1 ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2;
+		mInfo.mCooldown = (int) DodgingCooldownEnchantment.getCooldown(mPlayer, cd, DodgingCooldownEnchantment.class);
 		putOnCooldown();
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
