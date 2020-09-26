@@ -577,7 +577,7 @@ public class EntityUtils {
 		return nearest;
 	}
 
-	public static LivingEntity getNearestPlayer(Location loc, double radius) {
+	public static Player getNearestPlayer(Location loc, double radius) {
 		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius);
 		if (nearbyPlayers.size() == 0) {
 			return null;
@@ -585,6 +585,12 @@ public class EntityUtils {
 
 		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
 		return nearbyPlayers.get(0);
+	}
+
+	public static List<Player> getNearestPlayers(Location loc, double radius) {
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, radius);
+		nearbyPlayers.sort((e1, e2) -> e1.getLocation().distance(loc) <= e2.getLocation().distance(loc) ? 1 : -1);
+		return nearbyPlayers;
 	}
 
 	public static Entity getEntity(World world, UUID entityUUID) {

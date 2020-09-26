@@ -1,0 +1,201 @@
+package com.playmonumenta.plugins.bosses.spells;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+
+public class SpellBaseLeapAttack extends Spell {
+
+	@FunctionalInterface
+	public interface AestheticAction {
+		/**
+		 * @param loc Location to do aesthetics
+		 */
+		void run(World world, Location loc);
+	}
+
+	@FunctionalInterface
+	public interface HitAction {
+		/**
+		 * Called when the boss intersects a player or lands
+		 * @param player Player being targeted (null if landed)
+		 * @param loc    Location where the projectile hit (either at player or location landed)
+		 */
+		void run(World world, Player player, Location loc, Vector dir);
+	}
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final World mWorld;
+	private final int mRange;
+	private final int mMinRange;
+	private final int mRunDistance;
+	private final int mCooldown;
+	private final double mVelocityMultiplier;
+	private final AestheticAction mInitiateAesthetic;
+	private final AestheticAction mLeapAesthetic;
+	private final AestheticAction mLeapingAesthetic;
+	private final HitAction mHitAction;
+
+	/**
+	 * @param plugin              Plugin
+	 * @param boss                Boss
+	 * @param range               Range within which players may be targeted
+	 * @param minRange            Minimum range for the attack to initiate
+	 * @param runDistance         How far the mob runs before leaping
+	 * @param cooldown            How often this spell can be cast
+	 * @param velocityMultiplier  Adjusts distance of the leap (multiplier of 1 usually lands around the target at a distance of 8+ blocks away)
+	 * @param initiateAesthetic   Called when the attack initiates
+	 * @param leapAesthetic       Called when the boss leaps
+	 * @param leapingAesthetic    Called each tick at boss location during leap
+	 * @param hitAction           Called when the boss intersects a player or lands
+	 */
+	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown, double velocityMultiplier,
+			AestheticAction initiateAesthetic, AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mWorld = boss.getWorld();
+		mRange = range;
+		mMinRange = minRange;
+		mRunDistance = runDistance;
+		mCooldown = cooldown;
+		mVelocityMultiplier = velocityMultiplier;
+		mInitiateAesthetic = initiateAesthetic;
+		mLeapAesthetic = leapAesthetic;
+		mLeapingAesthetic = leapingAesthetic;
+		mHitAction = hitAction;
+	}
+
+	@Override
+	public void run() {
+		if (!(mBoss instanceof Mob)) {
+			return;
+		}
+
+		Location loc = mBoss.getLocation();
+		Location locTarget = null;
+		List<Player> players = PlayerUtils.playersInRange(loc, mRange);
+		if (!players.isEmpty()) {
+			Collections.shuffle(players);
+			for (Player player : players) {
+				Location locPlayer = player.getLocation();
+				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(locPlayer) > mMinRange) {
+					locTarget = locPlayer;
+					break;
+				}
+			}
+		}
+
+		if (locTarget == null) {
+			return;
+		}
+
+
+		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
+
+		Vector offset = locTarget.clone().subtract(loc).toVector().normalize().multiply(mRunDistance);
+		Location moveTo = loc.clone().add(offset);
+		int i;
+		for (i = 0; i < 3; i++) {
+			if (!moveTo.getBlock().isPassable()) {
+				moveTo.add(0, 1, 0);
+			} else {
+				break;
+			}
+		}
+
+		if (i == 3) {
+			// Failed to find a good path
+			return;
+		}
+
+		((Mob) mBoss).getPathfinder().moveTo(moveTo);
+
+
+		double distance = moveTo.distance(locTarget);
+		Vector velocity = locTarget.subtract(moveTo).toVector().multiply(0.19 * mVelocityMultiplier);
+		velocity.setY(velocity.getY() * 0.5 + distance * 0.08);
+
+		BukkitRunnable leap = new BukkitRunnable() {
+			Location mLeapLocation = moveTo;
+			Vector mVelocity = velocity.clone();
+			Vector mDirection = velocity.setY(0).normalize();
+			boolean mLeaping = false;
+			int mTime = 0;
+
+			@Override
+			public void run() {
+				if (!mLeaping) {
+					if (mBoss.getLocation().distance(mLeapLocation) < 1) {
+						mLeapAesthetic.run(mWorld, mBoss.getLocation());
+						((Mob) mBoss).getPathfinder().stopPathfinding();
+						mBoss.setVelocity(mVelocity);
+						mLeaping = true;
+					} else {
+						mTime++;
+
+						// Still hasn't reached the leap point after half the cooldown elapsed, so cancel leap
+						if (mTime > mCooldown / 2) {
+							this.cancel();
+							return;
+						}
+					}
+				} else {
+					mLeapingAesthetic.run(mWorld, mBoss.getLocation());
+
+					if (mBoss.isOnGround()) {
+						mHitAction.run(mWorld, null, mBoss.getLocation(), mDirection);
+						this.cancel();
+						return;
+					}
+
+					BoundingBox hitbox = mBoss.getBoundingBox();
+					for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+						if (player.getBoundingBox().overlaps(hitbox)) {
+							((Mob) mBoss).setTarget(player);
+							mHitAction.run(mWorld, player, player.getLocation(), mDirection);
+							this.cancel();
+							return;
+						}
+					}
+				}
+			}
+		};
+
+		leap.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(leap);
+	}
+
+	@Override
+	public boolean canRun() {
+		Location loc = mBoss.getLocation();
+		List<Player> players = PlayerUtils.playersInRange(loc, mRange);
+		if (!players.isEmpty()) {
+			for (Player player : players) {
+				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(player.getLocation()) > mMinRange) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int duration() {
+		return mCooldown;
+	}
+
+}
