@@ -70,6 +70,7 @@ public class MobListener implements Listener {
 		// It's easier to check the intentional ways than the natural ones.
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG &&
+		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER &&
 		    event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.DEFAULT &&
 		    EntityUtils.isHostileMob(entity)) {
 			if (ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_NATURAL_SPAWNS)) {
