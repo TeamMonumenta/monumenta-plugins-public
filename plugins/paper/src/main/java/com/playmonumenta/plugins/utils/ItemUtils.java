@@ -27,6 +27,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import com.playmonumenta.plugins.itemindex.Attribute;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 
@@ -539,7 +540,8 @@ public class ItemUtils {
 			return ItemDeathResult.DESTROY;
 		} else if (item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
 			return ItemDeathResult.SHATTER_NOW;
-		} else if (item.getType() == Material.COMPASS) {
+		} else if (item.getType().equals(Material.COMPASS) ||
+		           ShulkerShortcutListener.isEnderExpansion(item)) {
 			return ItemDeathResult.KEEP;
 		}
 		switch (getItemRegion(item)) {

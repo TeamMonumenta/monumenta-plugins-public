@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.utils.ItemUtils;
 
 import org.bukkit.Bukkit;
@@ -73,6 +74,8 @@ public class ShulkerInventory {
 		mShulkerState = (ShulkerBox) mShulkerMeta.getBlockState();
 		if (mShulkerState.getCustomName() != null) {
 			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerState.getCustomName());
+		} else if (ShulkerShortcutListener.isEnderExpansion(mShulkerItem)) {
+			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX, mShulkerItem.getItemMeta().getDisplayName());
 		} else {
 			mInventory = Bukkit.createInventory(mPlayer, InventoryType.SHULKER_BOX);
 		}

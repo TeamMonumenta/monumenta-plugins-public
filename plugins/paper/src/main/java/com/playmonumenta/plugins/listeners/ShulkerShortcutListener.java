@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -17,16 +22,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.utils.ItemUtils;
 
 /**
  * These listeners work together with ShulkerInventoryManager and ShulkerInventory to
@@ -77,6 +79,24 @@ public class ShulkerShortcutListener implements Listener {
 						player.closeInventory(InventoryCloseEvent.Reason.CANT_USE);
 					}
 				}.runTask(mPlugin);
+			} else if (itemClicked != null &&
+			           click == ClickType.RIGHT &&
+			           isEnderExpansion(itemClicked) &&
+					   !event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST)) {
+				// Right clicked an Ender Chest Expansion shulker outside an ender chest
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
+				event.setCancelled(true);
+			} else if (itemClicked != null &&
+			           click == ClickType.RIGHT &&
+			           isEnderExpansion(itemClicked) &&
+					   !InventoryUtils.isSoulboundToPlayer(itemClicked, player)) {
+				// Right clicked an Ender Chest Expansion shulker that doesn't belong to you
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "This item is not yours");
+				// TODO: Auto re-soulbound
+				player.sendMessage(ChatColor.RED + "If you changed your name, ask a moderator for help");
+				event.setCancelled(true);
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
 			           !PortableEnderListener.isPortableEnder(itemClicked) &&
@@ -208,7 +228,9 @@ public class ShulkerShortcutListener implements Listener {
 	public void blockDispenseEvent(BlockDispenseEvent event) {
 		if (!event.isCancelled() &&
 			ItemUtils.isShulkerBox(event.getItem().getType()) &&
-			mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem())) {
+			(mPlugin.mShulkerInventoryManager.isShulkerInUse(event.getItem()) ||
+			 isEnderExpansion(event.getItem()))) {
+			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}
 	}
@@ -246,5 +268,20 @@ public class ShulkerShortcutListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		mPlugin.mShulkerInventoryManager.closeShulker(event.getEntity(), true);
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void playerDropItemEvent(PlayerDropItemEvent event) {
+		if (isEnderExpansion(event.getItemDrop().getItemStack())) {
+			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			event.setCancelled(true);
+		}
+	}
+
+	public static boolean isEnderExpansion(ItemStack item) {
+		return item != null &&
+		       ItemUtils.isShulkerBox(item.getType()) &&
+			   item.hasItemMeta() &&
+			   item.getItemMeta().getDisplayName().contains("Ender Chest Expansion");
 	}
 }

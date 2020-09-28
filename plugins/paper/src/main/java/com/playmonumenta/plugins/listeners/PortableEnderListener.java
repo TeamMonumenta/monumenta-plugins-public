@@ -53,6 +53,7 @@ public class PortableEnderListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void blockDispenseEvent(BlockDispenseEvent event) {
 		if (!event.isCancelled() && isPortableEnder(event.getItem())) {
+			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}
 	}
