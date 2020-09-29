@@ -79,7 +79,6 @@ import com.playmonumenta.plugins.bosses.bosses.DebuffHitBoss;
 import com.playmonumenta.plugins.bosses.bosses.DreadlingBoss;
 import com.playmonumenta.plugins.bosses.bosses.DreadnaughtParticleBoss;
 import com.playmonumenta.plugins.bosses.bosses.EarthshakeBoss;
-import com.playmonumenta.plugins.bosses.bosses.EvokerNoVex;
 import com.playmonumenta.plugins.bosses.bosses.FireResistantBoss;
 import com.playmonumenta.plugins.bosses.bosses.FireballBoss;
 import com.playmonumenta.plugins.bosses.bosses.FlameLaserBoss;
@@ -248,7 +247,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> new GraySummoned(p, e));
 		mStatelessBosses.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
 		mStatelessBosses.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> new PunchResistBoss(p, e));
-		mStatelessBosses.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> new EvokerNoVex(p, e));
 		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> new HalloweenCreeperBoss(p, e));
 		mStatelessBosses.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> new NoExperienceBoss(p, e));
 		mStatelessBosses.put(FocusFireBoss.identityTag, (Plugin p, LivingEntity e) -> new FocusFireBoss(p, e));
@@ -361,7 +359,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> GraySummoned.deserialize(p, e));
 		mBossDeserializers.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
 		mBossDeserializers.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> PunchResistBoss.deserialize(p, e));
-		mBossDeserializers.put(EvokerNoVex.identityTag, (Plugin p, LivingEntity e) -> EvokerNoVex.deserialize(p, e));
 		mBossDeserializers.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e) -> OldLabsBoss.deserialize(p, e));
 		mBossDeserializers.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> HalloweenCreeperBoss.deserialize(p, e));
 		mBossDeserializers.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e) -> HeadlessHorsemanBoss.deserialize(p, e));

@@ -14,7 +14,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class AttributeThrowRate implements BaseAttribute {
 	//Trident attribute only
@@ -29,7 +28,7 @@ public class AttributeThrowRate implements BaseAttribute {
 	public void onLaunchProjectile(Plugin plugin, Player player, double value, Projectile proj, ProjectileLaunchEvent event) {
 		if (proj instanceof Trident) {
 			Trident trident = (Trident) proj;
-			ItemStack item = NmsUtils.getTridentItem(trident);
+			ItemStack item = trident.getItemStack();
 
 			// Only run Throw Rate if the Infinity enchantment is not on the trident
 			if (item.getEnchantmentLevel(Enchantment.ARROW_INFINITE) <= 0 && value > 0) {

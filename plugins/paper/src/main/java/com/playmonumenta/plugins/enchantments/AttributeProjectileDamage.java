@@ -13,7 +13,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class AttributeProjectileDamage implements BaseAttribute {
 	private static final String PROPERTY_NAME = "Projectile Damage";
@@ -51,7 +50,7 @@ public class AttributeProjectileDamage implements BaseAttribute {
 			//Trident can have mob specific enchantments (Impaling, Smite, Bane of Arthropods)
 			if (proj instanceof Trident) {
 				Trident trident = (Trident) proj;
-				ItemStack item = NmsUtils.getTridentItem(trident);
+				ItemStack item = trident.getItemStack();
 
 				if (item.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) && EntityUtils.isUndead(target)) {
 					damage += item.getEnchantmentLevel(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) * 2.5;

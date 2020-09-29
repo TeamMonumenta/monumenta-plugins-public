@@ -13,7 +13,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 
 public class TridentListener implements Listener {
 
@@ -31,8 +30,7 @@ public class TridentListener implements Listener {
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		ItemStack offhand = player.getInventory().getItemInOffHand();
 		Trident trident = (Trident)event.getEntity();
-
-		ItemStack item = NmsUtils.getTridentItem(trident);
+		ItemStack item = trident.getItemStack();
 
 		//If neither hand has the same trident as the projectile,
 		//or mainhand is changed to a trident while the offhand is being thrown (in case the mainhand has trident enchantments),
