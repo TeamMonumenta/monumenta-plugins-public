@@ -129,6 +129,7 @@ import com.playmonumenta.plugins.bosses.bosses.TrackingProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.bosses.bosses.TsunamiChargerBoss;
 import com.playmonumenta.plugins.bosses.bosses.UnstableBoss;
+import com.playmonumenta.plugins.bosses.bosses.Urik;
 import com.playmonumenta.plugins.bosses.bosses.Varcosa;
 import com.playmonumenta.plugins.bosses.bosses.Virius;
 import com.playmonumenta.plugins.bosses.bosses.VolatileBoss;
@@ -279,6 +280,7 @@ public class BossManager implements Listener {
 		mStatefulBosses.put(OldLabsBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new OldLabsBoss(p, e, s, l));
 		mStatefulBosses.put(HeadlessHorsemanBoss.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new HeadlessHorsemanBoss(p, e, s, l));
 		mStatefulBosses.put(Varcosa.identityTag, (Plugin p, LivingEntity e, Location s, Location l) -> new Varcosa(p, e, s, l));
+		mStatefulBosses.put(Urik.identityTag, ((Plugin p, LivingEntity e, Location s, Location l) -> new Urik(p, e, s, l)));
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
