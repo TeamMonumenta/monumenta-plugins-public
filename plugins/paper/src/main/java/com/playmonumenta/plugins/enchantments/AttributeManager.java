@@ -193,6 +193,7 @@ public class AttributeManager {
 		mAttributes.add(new AttributeProjectileDamage());
 		mAttributes.add(new AttributeProjectileSpeed());
 		mAttributes.add(new AttributeThrowRate());
+		mAttributes.add(new AttributeThornsDamage());
 
 		for (BaseAttribute attribute : mAttributes) {
 			mAttributeTrie.put(attribute.getProperty());

@@ -154,7 +154,8 @@ public class ShieldWall extends Ability {
 									mMobsAlreadyHit.add(le);
 									Vector v = le.getVelocity();
 									EntityUtils.damageEntity(mPlugin, le, SHIELD_WALL_DAMAGE, mPlayer, MagicType.HOLY, true, mInfo.mLinkedSpell);
-									if (knockback) {
+									//Bosses should not be affected by slowness or knockback.
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										MovementUtils.knockAway(mLoc, le, 0.3f);
 										mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f);
 										mWorld.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1f);
@@ -162,7 +163,7 @@ public class ShieldWall extends Ability {
 										le.setVelocity(v);
 									}
 								} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
-									if (knockback) {
+									if (knockback && !e.getScoreboardTags().contains("Boss")) {
 										/*
 										 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
 										 *
