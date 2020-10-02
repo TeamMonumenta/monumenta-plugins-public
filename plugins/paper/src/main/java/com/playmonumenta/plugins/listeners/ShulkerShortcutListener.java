@@ -87,16 +87,6 @@ public class ShulkerShortcutListener implements Listener {
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
 				event.setCancelled(true);
-			} else if (itemClicked != null &&
-			           click == ClickType.RIGHT &&
-			           isEnderExpansion(itemClicked) &&
-					   !InventoryUtils.isSoulboundToPlayer(itemClicked, player)) {
-				// Right clicked an Ender Chest Expansion shulker that doesn't belong to you
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "This item is not yours");
-				// TODO: Auto re-soulbound
-				player.sendMessage(ChatColor.RED + "If you changed your name, ask a moderator for help");
-				event.setCancelled(true);
 			} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType()) &&
 			           !ShulkerEquipmentListener.isEquipmentBox(itemClicked) &&
 			           !PortableEnderListener.isPortableEnder(itemClicked) &&
