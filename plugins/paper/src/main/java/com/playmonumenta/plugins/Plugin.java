@@ -42,7 +42,6 @@ import com.playmonumenta.plugins.commands.SkillSummary;
 import com.playmonumenta.plugins.commands.Spectate;
 import com.playmonumenta.plugins.commands.SpectateBot;
 import com.playmonumenta.plugins.commands.TeleportByScore;
-import com.playmonumenta.plugins.commands.TestNoScore;
 import com.playmonumenta.plugins.cooking.CookingCommand;
 import com.playmonumenta.plugins.cooking.CookingTableInventoryManager;
 import com.playmonumenta.plugins.cooking.CookingTableListeners;
@@ -261,9 +260,6 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PlayerInventoryView(), this);
 		manager.registerEvents(new AnvilFixInInventory(this), this);
 		manager.registerEvents(new LootChestsInInventory(), this);
-
-		// The last remaining Spigot-style command...
-		this.getCommand("testNoScore").setExecutor(new TestNoScore());
 
 		//  Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
