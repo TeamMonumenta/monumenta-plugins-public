@@ -119,7 +119,7 @@ public class WrathBoss extends BossAbilityGroup {
 								}
 							}
 						}.runTaskTimer(mPlugin, 0, 1);
-					}),
+					}, null, null),
 			new SpellDuelist(plugin, boss, COOLDOWN, DAMAGE)
 		));
 

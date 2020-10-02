@@ -22,7 +22,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		mBoss = boss;
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellEarthshake(plugin, mBoss, 2, 80)
+			new SpellEarthshake(plugin, mBoss, 2, 50)
 		));
 
 		super.constructBoss(plugin, identityTag, mBoss, activeSpells, null, detectionRange, null);
