@@ -58,7 +58,7 @@ public class GhoulishTaunt extends Ability {
 		super(plugin, world, player, "Ghoulish Taunt");
 		mInfo.mScoreboardId = "GhoulishTaunt";
 		mInfo.mShorthandName = "GT";
-		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 1.5 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 25 seconds.");
+		mInfo.mDescriptions.add("Left clicking twice with a scythe unleashes a devilish shriek, causing all mobs within a 12 block range to target you and afflicting them with Weakness I for 10 seconds. For the next 10 seconds, gain +10% speed and +10% attack speed, and your melee attacks cleave in a 1.5 block radius from the strike, dealing 30% of the damage from the original attack. Each kill during this time increases the duration of the buffs by 1 second. Cooldown: 25s.");
 		mInfo.mDescriptions.add("Apply Weakness II to mobs instead, and gain +20% speed and +20% attack speed and 50% cleaving damage instead.");
 		mInfo.mLinkedSpell = Spells.GHOULISH_TAUNT;
 		mInfo.mCooldown = COOLDOWN;

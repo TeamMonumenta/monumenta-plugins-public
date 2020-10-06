@@ -29,7 +29,7 @@ public class SoulRend extends Ability {
 		super(plugin, world, player, "Soul Rend");
 		mInfo.mScoreboardId = "SoulRend";
 		mInfo.mShorthandName = "SR";
-		mInfo.mDescriptions.add("Getting a critical hit with a scythe heals you for 2 hp + 20% of the damage dealt. Cooldown: 6 seconds.");
+		mInfo.mDescriptions.add("Getting a critical hit with a scythe heals you for 2 hp + 20% of the damage dealt. Cooldown: 6s.");
 		mInfo.mDescriptions.add("The healing increases to 4 hp + 20% of the damage dealt and nearby allies are healed as well.");
 		mInfo.mLinkedSpell = Spells.SOUL_REND;
 		mInfo.mCooldown = COOLDOWN;

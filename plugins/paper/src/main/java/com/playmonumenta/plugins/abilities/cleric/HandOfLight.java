@@ -38,8 +38,8 @@ public class HandOfLight extends Ability {
 		mInfo.mLinkedSpell = Spells.HEALING;
 		mInfo.mScoreboardId = "Healing";
 		mInfo.mShorthandName = "HoL";
-		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Cooldown: 14 seconds.");
-		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health, and the cooldown is reduced to 10 seconds.");
+		mInfo.mDescriptions.add("Right click while holding a weapon or tool to heal all OTHER players in a 12 block range in front of you or within 2 blocks of you for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. If holding a shield, the trigger is changed to crouch + right click. Cooldown: 14s.");
+		mInfo.mDescriptions.add("The healing is improved to 4 hearts + 20% of their max health. Cooldown: 10s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? HEALING_1_COOLDOWN : HEALING_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 	}

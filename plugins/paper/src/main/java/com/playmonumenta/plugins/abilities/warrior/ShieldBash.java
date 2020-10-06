@@ -49,7 +49,7 @@ public class ShieldBash extends Ability {
 		mInfo.mLinkedSpell = Spells.SHIELD_BASH;
 		mInfo.mScoreboardId = "ShieldBash";
 		mInfo.mShorthandName = "SB";
-		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage and stun them for 1 second. Cooldown: 8 seconds.");
+		mInfo.mDescriptions.add("Block while looking at an enemy within 4 blocks to deal 5 damage and stun them for 1 second. Cooldown: 8s.");
 		mInfo.mDescriptions.add("Additionally, deal 5 damage and stun for 1 second all enemies in a 2 block radius from the enemy you are looking at.");
 		mInfo.mCooldown = SHIELD_BASH_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;

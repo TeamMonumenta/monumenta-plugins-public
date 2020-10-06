@@ -34,7 +34,7 @@ public class EscapeDeath extends Ability {
 		mInfo.mLinkedSpell = Spells.ESCAPE_DEATH;
 		mInfo.mScoreboardId = "EscapeDeath";
 		mInfo.mShorthandName = "ED";
-		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90 seconds.");
+		mInfo.mDescriptions.add("When taking damage from a mob leaves you below 5 hearts, throw a paralyzing grenade that stuns all enemies within 5 blocks for 3 seconds. Cooldown: 90s.");
 		mInfo.mDescriptions.add("When this skill is triggered, also gain 8 seconds of Absorption II, Speed II, and Jump Boost III.");
 		mInfo.mCooldown = COOLDOWN;
 	}

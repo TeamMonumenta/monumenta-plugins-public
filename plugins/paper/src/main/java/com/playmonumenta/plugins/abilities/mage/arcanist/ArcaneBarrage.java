@@ -61,7 +61,7 @@ public class ArcaneBarrage extends Ability {
 		super(plugin, world, player, "Arcane Barrage");
 		mInfo.mScoreboardId = "ArcaneBarrage";
 		mInfo.mShorthandName = "AB";
-		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, mobs damaged by the spear take 1 (Overload level 1) or 2 (Overload level 2) more ability damage (from any player) for 4 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Right-click while not sneaking and looking up to summon 3 Arcane Missiles around you for up to 10 seconds. If missiles are active, right-clicking while not sneaking with a Wand fires a missile in the target direction, piercing through enemies within 12 blocks and dealing 7 damage. If cast with Overload, mobs damaged by the spear take 1 (Overload level 1) or 2 (Overload level 2) more ability damage (from any player) for 4 seconds. Cooldown: 20s.");
 		mInfo.mDescriptions.add("Missiles last for 20 seconds instead, and gain 5 missiles when casting.");
 		mInfo.mLinkedSpell = Spells.ARCANE_BARRAGE;
 		mInfo.mCooldown = COOLDOWN;

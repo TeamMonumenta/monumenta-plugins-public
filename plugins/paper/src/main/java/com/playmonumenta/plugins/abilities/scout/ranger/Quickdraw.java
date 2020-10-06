@@ -36,7 +36,7 @@ public class Quickdraw extends Ability {
 		mInfo.mScoreboardId = "Quickdraw";
 		mInfo.mShorthandName = "Qd";
 		mInfo.mDescriptions.add("Left-clicking with a bow instantly fires a fully charged arrow with +1 Piercing that afflicts Slowness 3 for 2 seconds. Cooldown: 15s.");
-		mInfo.mDescriptions.add("Cooldown is reduced to 7s.");
+		mInfo.mDescriptions.add("Cooldown: 7s.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? QUICKDRAW_1_COOLDOWN : QUICKDRAW_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
 		mInfo.mIgnoreCooldown = true;

@@ -41,8 +41,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mInfo.mLinkedSpell = Spells.TACTICAL_MANEUVER;
 		mInfo.mScoreboardId = "TacticalManeuver";
 		mInfo.mShorthandName = "TM";
-		mInfo.mDescriptions.add("Sprint right click to dash forward, dealing the first enemy hit 16 damage, and stunning it and all enemies in a 3 block radius for 1 second. Shift right click to leap backwards, dealing enemies in a 3 block radius 8 damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: 12 seconds. Charges: 2.");
-		mInfo.mDescriptions.add("Cooldown decreased to 10 seconds and Charges increased to 3.");
+		mInfo.mDescriptions.add("Sprint right click to dash forward, dealing the first enemy hit 16 damage, and stunning it and all enemies in a 3 block radius for 1 second. Shift right click to leap backwards, dealing enemies in a 3 block radius 8 damage and knocking them away. Only triggers with non-trident melee weapons. Cooldown: 12s. Charges: 2.");
+		mInfo.mDescriptions.add("Cooldown: 10s. Charges: 3.");
 		mInfo.mCooldown = getAbilityScore() == 1 ? TACTICAL_MANEUVER_1_COOLDOWN : TACTICAL_MANEUVER_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.RIGHT_CLICK;
 		mInfo.mIgnoreCooldown = true;

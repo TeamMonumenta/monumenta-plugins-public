@@ -1,11 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -27,6 +21,11 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.classes.Spells;
 import com.playmonumenta.plugins.events.CustomDamageEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 
 /*
  * Withering Gaze: Sprinting and left clicking unleashes a cone of
@@ -46,8 +45,8 @@ public class WitheringGaze extends Ability {
 		super(plugin, world, player, "Withering Gaze");
 		mInfo.mScoreboardId = "WitheringGaze";
 		mInfo.mShorthandName = "WG";
-		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30 seconds.");
-		mInfo.mDescriptions.add("Stun lasts for 4 seconds and Wither lasts for 8 seconds. Cooldown: 20 seconds.");
+		mInfo.mDescriptions.add("Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. Enemies in its path are stunned for 3 seconds (elites and bosses are given Slowness 3 instead) and given Wither 3 for 6 seconds. Cooldown: 30s.");
+		mInfo.mDescriptions.add("Stun lasts for 4 seconds and Wither lasts for 8 seconds. Cooldown: 20s.");
 		mInfo.mLinkedSpell = Spells.WITHERING_GAZE;
 		mInfo.mCooldown = getAbilityScore() == 1 ? WITHERING_GAZE_1_COOLDOWN : WITHERING_GAZE_2_COOLDOWN;
 		mInfo.mTrigger = AbilityTrigger.LEFT_CLICK;
